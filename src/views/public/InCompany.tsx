@@ -64,7 +64,9 @@ export function InCompanyPage() {
     phone: "",
     groupSize: "",
     modality: "",
-    objectiveThemeChallenges: ""
+    trainingObjective: "",
+    trainingTheme: "",
+    mainChallenges: ""
   });
 
   const update = (key: keyof typeof form, value: string) => {
@@ -102,8 +104,18 @@ export function InCompanyPage() {
       return;
     }
 
-    if (!form.objectiveThemeChallenges.trim()) {
-      toast.error("Preencha objetivo, tema e desafios principais.");
+    if (!form.trainingObjective.trim()) {
+      toast.error("Informe o objetivo do treinamento.");
+      return;
+    }
+
+    if (!form.trainingTheme.trim()) {
+      toast.error("Informe o tema a ser abordado.");
+      return;
+    }
+
+    if (!form.mainChallenges.trim()) {
+      toast.error("Informe os desafios principais.");
       return;
     }
 
@@ -113,7 +125,7 @@ export function InCompanyPage() {
       phone: form.phone,
       courseInterest: "Treinamento In-Company",
       origin: "Site",
-      message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo, tema e desafios: ${form.objectiveThemeChallenges}`
+      message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
     });
     toast.success("Proposta registrada para atendimento consultivo.");
   };
@@ -218,7 +230,9 @@ export function InCompanyPage() {
                 <SelectItem value="Híbrido">Híbrido</SelectItem>
               </SelectContent>
             </Select>
-            <Textarea className="md:col-span-2" placeholder="Objetivo, tema que será abordado e desafios principais" value={form.objectiveThemeChallenges} onChange={(event) => update("objectiveThemeChallenges", event.target.value)} />
+            <Textarea placeholder="Objetivo do treinamento" value={form.trainingObjective} onChange={(event) => update("trainingObjective", event.target.value)} />
+            <Textarea placeholder="Tema que será abordado" value={form.trainingTheme} onChange={(event) => update("trainingTheme", event.target.value)} />
+            <Textarea className="md:col-span-2" placeholder="Desafios principais" value={form.mainChallenges} onChange={(event) => update("mainChallenges", event.target.value)} />
             <Button className="md:col-span-2" size="lg" onClick={submit}>
               Enviar solicitação de proposta
             </Button>

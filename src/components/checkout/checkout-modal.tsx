@@ -9,6 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAppStore } from "@/lib/app-store";
 import type { Course } from "@/types";
 
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
+function formatCPF(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+}
+
 type CheckoutModalProps = {
   course: Course;
   open: boolean;
@@ -35,9 +51,23 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course.id), [classes, course.id]);
 
   const nextStep = () => {
-    if (step === 1 && (!form.studentName || !form.email || !form.phone || !form.cpf)) {
-      toast.error("Preencha os dados pessoais obrigatórios.");
-      return;
+    if (step === 1) {
+      if (!form.studentName.trim() || form.studentName.trim().length < 3) {
+        toast.error("Nome deve ter no mínimo 3 caracteres.");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        toast.error("E-mail inválido.");
+        return;
+      }
+      if (form.phone.replace(/\D/g, "").length < 10) {
+        toast.error("Telefone deve ter no mínimo 10 dígitos.");
+        return;
+      }
+      if (form.cpf.replace(/\D/g, "").length !== 11) {
+        toast.error("CPF deve ter 11 dígitos.");
+        return;
+      }
     }
 
     if (step === 2 && (!form.organization || !form.jobTitle)) {
@@ -50,12 +80,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
       return;
     }
 
-    if (step === 4 && !form.paymentMethod) {
-      toast.error("Escolha uma forma de pagamento.");
-      return;
-    }
-
-    setStep((current) => Math.min(5, current + 1));
+    setStep((current) => Math.min(4, current + 1));
   };
 
   const finish = () => {
@@ -89,8 +114,8 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
           <DialogTitle>Secure Enrollment</DialogTitle>
         </DialogHeader>
         <div className="grid gap-6">
-          <div className="grid gap-2 md:grid-cols-5">
-            {["Dados", "Profissional", "Turma", "Pagamento", "Confirmação"].map((label, index) => (
+          <div className="grid gap-2 md:grid-cols-4">
+            {["Dados", "Profissional", "Turma", "Pagamento"].map((label, index) => (
               <div
                 key={label}
                 className={`rounded-lg px-3 py-2 text-center text-sm font-semibold ${
@@ -105,9 +130,9 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
           {step === 1 ? (
             <div className="grid gap-4 md:grid-cols-2">
               <Input placeholder="Nome completo" value={form.studentName} onChange={(event) => setForm((current) => ({ ...current, studentName: event.target.value }))} />
-              <Input placeholder="E-mail" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
-              <Input placeholder="Telefone / WhatsApp" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} />
-              <Input placeholder="CPF" value={form.cpf} onChange={(event) => setForm((current) => ({ ...current, cpf: event.target.value }))} />
+              <Input type="email" placeholder="E-mail" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+              <Input type="tel" placeholder="Telefone / WhatsApp" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: formatPhone(event.target.value) }))} />
+              <Input placeholder="CPF" value={form.cpf} onChange={(event) => setForm((current) => ({ ...current, cpf: formatCPF(event.target.value) }))} />
             </div>
           ) : null}
 
@@ -149,7 +174,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
           ) : null}
 
           {step === 4 ? (
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4">
               <Select value={form.paymentMethod} onValueChange={(value) => setForm((current) => ({ ...current, paymentMethod: value as typeof form.paymentMethod }))}>
                 <SelectTrigger>
                   <SelectValue placeholder="Forma de pagamento" />
@@ -164,17 +189,14 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
               <div className="rounded-lg border border-outline-variant bg-surface-muted p-4 text-sm leading-6 text-text-muted">
                 Pagamento protegido com confirmação de inscrição e envio de próximos passos por e-mail.
               </div>
-            </div>
-          ) : null}
-
-          {step === 5 ? (
-            <div className="surface-card space-y-4 p-5">
-              <h4 className="text-lg font-semibold">Resumo da inscrição</h4>
-              <div className="grid gap-2 text-sm text-muted-foreground">
-                <div>Curso: {course.title}</div>
-                <div>Aluno: {form.studentName}</div>
-                <div>Forma de pagamento: {form.paymentMethod}</div>
-                <div>Tipo de inscrição: {form.enrollmentType}</div>
+              <div className="surface-card space-y-4 p-5">
+                <h4 className="text-lg font-semibold">Resumo da inscrição</h4>
+                <div className="grid gap-2 text-sm text-muted-foreground">
+                  <div>Curso: {course.title}</div>
+                  <div>Aluno: {form.studentName}</div>
+                  <div>Forma de pagamento: {form.paymentMethod}</div>
+                  <div>Tipo de inscrição: {form.enrollmentType}</div>
+                </div>
               </div>
             </div>
           ) : null}
@@ -183,7 +205,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
             <Button variant="outline" onClick={() => setStep((current) => Math.max(1, current - 1))}>
               Voltar
             </Button>
-            {step < 5 ? <Button onClick={nextStep}>Continuar</Button> : <Button onClick={finish}>Finalizar inscrição</Button>}
+            {step < 4 ? <Button onClick={nextStep}>Continuar</Button> : <Button onClick={finish}>Finalizar inscrição</Button>}
           </div>
         </div>
       </DialogContent>

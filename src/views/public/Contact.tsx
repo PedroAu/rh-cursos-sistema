@@ -41,8 +41,18 @@ export function ContactPage() {
   };
 
   const submit = () => {
-    if (!form.name || !form.email || !form.message) {
-      toast.error("Preencha nome, e-mail e mensagem para enviar.");
+    if (!form.name.trim() || form.name.trim().length < 3) {
+      toast.error("Nome deve ter no mínimo 3 caracteres.");
+      return;
+    }
+
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      toast.error("Informe um e-mail válido.");
+      return;
+    }
+
+    if (!form.message.trim() || form.message.trim().length < 10) {
+      toast.error("Mensagem deve ter no mínimo 10 caracteres.");
       return;
     }
 
@@ -121,11 +131,13 @@ export function ContactPage() {
                 onChange={(event) => update("name", event.target.value)}
               />
               <Input
+                type="email"
                 placeholder="E-mail"
                 value={form.email}
                 onChange={(event) => update("email", event.target.value)}
               />
               <Input
+                type="tel"
                 placeholder="Telefone"
                 value={form.phone}
                 onChange={(event) => update("phone", event.target.value)}
