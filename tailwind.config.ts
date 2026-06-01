@@ -1,0 +1,83 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  darkMode: ["class"],
+  content: ["./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  theme: {
+    container: {
+      center: true,
+      padding: {
+        DEFAULT: "1.5rem",
+        md: "2rem",
+        xl: "2.5rem"
+      },
+      screens: {
+        "2xl": "1280px"
+      }
+    },
+    extend: {
+      colors: {
+        background: "var(--ea-color-background)",
+        foreground: "var(--ea-color-on-surface)",
+        primary: {
+          DEFAULT: "var(--ea-color-primary)",
+          foreground: "var(--ea-color-on-primary)"
+        },
+        secondary: {
+          DEFAULT: "var(--ea-color-secondary-container)",
+          foreground: "var(--ea-color-on-secondary-container)"
+        },
+        accent: {
+          DEFAULT: "var(--ea-color-prestige-gold)",
+          foreground: "var(--ea-color-primary)"
+        },
+        muted: {
+          DEFAULT: "var(--ea-color-surface-container-low)",
+          foreground: "var(--ea-color-text-muted)"
+        },
+        card: {
+          DEFAULT: "var(--ea-color-surface-container-lowest)",
+          foreground: "var(--ea-color-on-surface)"
+        },
+        border: "var(--ea-color-outline-variant)",
+        input: "var(--ea-color-outline-variant)",
+        ring: "var(--ea-color-prestige-gold)",
+        warning: "var(--ea-color-secondary-fixed-dim)",
+        success: "var(--ea-color-success-green)",
+        danger: "var(--ea-color-error)",
+        "deep-navy": "var(--ea-color-deep-navy)",
+        "prestige-gold": "var(--ea-color-prestige-gold)",
+        surface: "var(--ea-color-surface)",
+        "surface-muted": "var(--ea-color-surface-muted)",
+        "surface-container": "var(--ea-color-surface-container)",
+        "text-main": "var(--ea-color-text-main)",
+        "text-muted": "var(--ea-color-text-muted)",
+        "outline-variant": "var(--ea-color-outline-variant)"
+      },
+      borderRadius: {
+        DEFAULT: "var(--ea-radius-default)",
+        lg: "var(--ea-radius-lg)",
+        xl: "var(--ea-radius-xl)",
+        "2xl": "var(--ea-radius-2xl)",
+        "3xl": "var(--ea-radius-2xl)"
+      },
+      boxShadow: {
+        soft: "var(--ea-shadow-soft)",
+        card: "var(--ea-shadow-card)"
+      },
+      fontFamily: {
+        sans: ["-apple-system", "BlinkMacSystemFont", "Inter", "system-ui", "sans-serif"],
+        display: ["-apple-system", "BlinkMacSystemFont", "Manrope", "Inter", "system-ui", "sans-serif"]
+      },
+      backgroundImage: {
+        "hero-radial":
+          "linear-gradient(90deg, rgba(0,23,54,0.96), rgba(0,23,54,0.86) 48%, rgba(0,23,54,0.24))",
+        "ocean-panel":
+          "linear-gradient(145deg, rgba(0,23,54,0.98), rgba(0,43,91,0.96) 58%, rgba(47,12,0,0.86) 100%)"
+      }
+    }
+  },
+  plugins: []
+};
+
+export default config;
