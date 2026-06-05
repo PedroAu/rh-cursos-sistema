@@ -95,64 +95,68 @@ export function CoursesPage() {
   const activePathName = trainingPaths.find((path) => path.id === filters.path)?.shortName;
 
   return (
-    <section className="bg-surface-muted">
-      <div className="border-b border-outline-variant bg-white/90 px-4 pb-8 pt-6 sm:px-6 sm:pb-10 sm:pt-8">
-        <div className="ea-container overflow-hidden rounded-xl bg-deep-navy px-6 py-12 text-white shadow-card sm:px-10 sm:py-14">
-          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-prestige-gold/45 bg-prestige-gold/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-secondary">
-              <span className="h-1.5 w-1.5 rounded-full bg-prestige-gold" />
-              Programas profissionais
-            </span>
-            <h1 className="mt-6 max-w-4xl font-display text-[40px] font-extrabold leading-[1.08] text-white sm:text-[56px]">
-              Encontre a formação certa para sua equipe evoluir com segurança.
-            </h1>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
-              Filtre cursos por trilha, modalidade, carga horária e nível. O catálogo reúne
-              capacitações práticas para rotinas públicas, gestão, tecnologia e comunicação.
-            </p>
-            <div className="mt-8">
-              <Button
-                type="button"
-                variant="secondary"
-                size="lg"
-                className="gap-2 px-8"
-                onClick={() => searchRef.current?.focus()}
-              >
-                <Search className="h-4 w-4" />
-                Explorar cursos
-              </Button>
-            </div>
-          </div>
-
-          <div className="mx-auto mt-12 grid w-full max-w-4xl gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3">
-            {[
-              { label: "Trilhas especializadas", value: trainingPaths.length, icon: Target },
-              { label: "Cursos no catálogo", value: courses.length, icon: BookOpenCheck },
-              { label: "Programas em destaque", value: featuredCoursesCount, icon: GraduationCap }
-            ].map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-center bg-white/[0.04] px-5 py-5"
-                >
-                  <div className="flex items-center gap-3 text-left">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-prestige-gold/15 text-prestige-gold">
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div>
-                      <strong className="block font-display text-3xl leading-none text-white">{item.value}</strong>
-                      <span className="mt-1 block text-sm font-medium text-white/68">{item.label}</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+    <>
+    <section className="bg-deep-navy px-4 py-12 text-white sm:px-6 sm:py-14">
+      <div className="ea-container overflow-hidden rounded-xl bg-deep-navy px-6 py-12 text-white shadow-card sm:px-10 sm:py-14">
+        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-prestige-gold/45 bg-prestige-gold/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-secondary">
+            <span className="h-1.5 w-1.5 rounded-full bg-prestige-gold" />
+            Programas profissionais
+          </span>
+          <h1 className="mt-6 max-w-4xl font-display text-[40px] font-extrabold leading-[1.08] text-white sm:text-[56px]">
+            Encontre a formação certa para sua equipe evoluir com segurança.
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
+            Filtre cursos por trilha, modalidade, carga horária e nível. O catálogo reúne
+            capacitações práticas para rotinas públicas, gestão, tecnologia e comunicação.
+          </p>
+          <div className="mt-8">
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="gap-2 px-8"
+              onClick={() => {
+                searchRef.current?.focus();
+                searchRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+              }}
+            >
+              <Search className="h-4 w-4" />
+              Explorar cursos
+            </Button>
           </div>
         </div>
-      </div>
 
+        <div className="mx-auto mt-12 grid w-full max-w-4xl gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3">
+          {[
+            { label: "Trilhas especializadas", value: trainingPaths.length, icon: Target },
+            { label: "Cursos no catálogo", value: courses.length, icon: BookOpenCheck },
+            { label: "Programas em destaque", value: featuredCoursesCount, icon: GraduationCap }
+          ].map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <div
+                key={item.label}
+                className="flex items-center justify-center bg-white/10 px-5 py-5"
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-prestige-gold/15 text-prestige-gold">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <strong className="block font-display text-3xl leading-none text-white">{item.value}</strong>
+                    <span className="mt-1 block text-sm font-medium text-white/85">{item.label}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <section className="bg-surface-muted">
       <div className="ea-container py-10">
         <div className="grid gap-8 lg:grid-cols-[340px_1fr] lg:items-start">
           <aside className="apple-surface p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
@@ -281,7 +285,7 @@ export function CoursesPage() {
             {loading ? (
               <LoadingBlocks count={6} />
             ) : filtered.length ? (
-              <div className="grid items-stretch gap-6 xl:grid-cols-2">
+              <div className="grid items-stretch gap-6 md:grid-cols-2">
                 {filtered.map((course) => (
                   <CourseCard key={course.id} course={course} nextClass={classes.find((item) => item.id === course.nextClassId)} compact />
                 ))}
@@ -298,5 +302,6 @@ export function CoursesPage() {
         </div>
       </div>
     </section>
+    </>
   );
 }

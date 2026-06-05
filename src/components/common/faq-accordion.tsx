@@ -9,7 +9,7 @@ const items = [
   {
     value: "item-2",
     question: "Recebo certificado?",
-    answer: "Sim. A plataforma simula emissão de certificado para validar a jornada e a experiência do aluno."
+    answer: "Sim. A equipe RH Cursos orienta a emissão e o envio de certificados conforme a turma contratada."
   },
   {
     value: "item-3",
@@ -25,16 +25,7 @@ const items = [
 
 export function FAQAccordion() {
   return (
-    <div className="space-y-6">
-      <div className="mx-auto max-w-3xl text-center">
-        <h2 className="font-display text-[36px] font-bold leading-[1.25] text-deep-navy">
-          Perguntas frequentes
-        </h2>
-        <p className="mt-3 text-base leading-7 text-text-muted">
-          Tire dúvidas antes de escolher sua próxima turma.
-        </p>
-      </div>
-      <Accordion type="single" collapsible className="mx-auto grid max-w-4xl gap-3">
+    <Accordion type="single" collapsible className="mx-auto grid max-w-4xl gap-3">
         {items.map((item) => (
           <AccordionItem
             key={item.value}
@@ -50,6 +41,5 @@ export function FAQAccordion() {
           </AccordionItem>
         ))}
       </Accordion>
-    </div>
   );
 }

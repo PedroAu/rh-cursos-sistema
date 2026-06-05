@@ -1,10 +1,11 @@
-import { Clock3, GraduationCap, Star, Users } from "lucide-react";
+import { Clock3, Star, Users } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "@/lib/router-compat";
 
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { currency } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
 
 type CourseCardProps = {
@@ -28,16 +29,11 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           </div>
         </div>
         <div className="border-b border-slate-100 bg-white p-6">
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-2">
-              <div className="inline-flex rounded bg-accent px-2 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
-                {course.level}
-              </div>
-              <StatusBadge status={course.status} />
+          <div className="space-y-2">
+            <div className="inline-flex rounded bg-accent px-2 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+              {course.level}
             </div>
-            <div className="rounded-lg bg-surface-muted p-3 text-primary" aria-hidden="true">
-              <GraduationCap className="h-4 w-4" />
-            </div>
+            <StatusBadge status={course.status} />
           </div>
         </div>
         <CardContent className="space-y-6 p-6">
@@ -60,6 +56,9 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               {course.studentsCount} alunos capacitados
+            </div>
+            <div className="font-bold text-accent">
+              {course.price ? `${currency(course.price)}` : "Sob consulta"}
             </div>
             {!compact && nextClass ? (
               <div className="rounded-lg bg-secondary/70 px-4 py-3 text-primary">

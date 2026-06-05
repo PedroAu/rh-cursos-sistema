@@ -58,7 +58,7 @@ export function CourseDetailPage() {
                   <Badge variant="muted">{course.modality}</Badge>
                   <Badge variant="success">{course.durationLabel}</Badge>
                 </div>
-                <h1 className="text-primary">{course.title}</h1>
+                <h1 className="font-display text-primary">{course.title}</h1>
                 <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{course.fullDescription}</p>
                 <div className="flex flex-wrap gap-5 text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
@@ -83,6 +83,10 @@ export function CourseDetailPage() {
               </div>
 
               <div className="flex flex-wrap gap-8 border-t border-outline-variant pt-6">
+                <div>
+                  <span className="ea-label text-text-muted">Investimento</span>
+                  <p className="mt-1 font-bold text-primary">{currency(course.price)}</p>
+                </div>
                 <div>
                   <span className="ea-label text-text-muted">Carga</span>
                   <p className="mt-1 font-bold text-primary">{course.durationLabel}</p>
@@ -112,24 +116,44 @@ export function CourseDetailPage() {
               </div>
           </div>
 
+          <section className="bg-surface-muted py-10">
+            <div className="ea-container">
+              <SectionTitle eyebrow="Objetivos centrais" title="O que voce vai desenvolver" align="center" />
+              <div className="mt-8 grid gap-6 md:grid-cols-3">
+                {[...course.objectives, ...course.benefits].slice(0, 4).map((objective, index) => (
+                  <Card key={objective} className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-deep-navy text-white" : ""}>
+                    <CardContent className="space-y-3 p-8">
+                      <ShieldCheck className={`h-8 w-8 ${index === 1 ? "text-prestige-gold" : "text-prestige-gold"}`} />
+                      <h3 className={index === 1 ? "text-white" : "text-primary"}>{objective}</h3>
+                      <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-text-muted"}>
+                        Aplicação prática com foco em decisão, rotina profissional e segurança na execução.
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="space-y-8">
-              <section className="bg-surface-muted py-10">
-                <SectionTitle eyebrow="Objetivos centrais" title="O que voce vai desenvolver" align="center" />
-                <div className="mt-8 grid gap-6 md:grid-cols-3">
-                  {[...course.objectives, ...course.benefits].slice(0, 4).map((objective, index) => (
-                    <Card key={objective} className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-deep-navy text-white" : ""}>
-                      <CardContent className="space-y-3 p-8">
-                        <ShieldCheck className={`h-8 w-8 ${index === 1 ? "text-prestige-gold" : "text-prestige-gold"}`} />
-                        <h3 className={index === 1 ? "text-white" : "text-primary"}>{objective}</h3>
-                        <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-text-muted"}>
-                          Aplicação prática com foco em decisão, rotina profissional e segurança na execução.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
+              <Card>
+                <CardContent className="space-y-6 p-6">
+                  <SectionTitle eyebrow="Público-alvo" title="Para quem é este curso" />
+                  {course.targetAudience && course.targetAudience.length > 0 ? (
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {course.targetAudience.map((audience) => (
+                        <div key={audience} className="flex items-center gap-3 rounded-lg border border-outline-variant bg-white/50 p-4">
+                          <ShieldCheck className="h-5 w-5 shrink-0 text-accent" />
+                          <span className="text-sm font-medium text-primary">{audience}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Público-alvo não especificado.</p>
+                  )}
+                </CardContent>
+              </Card>
 
               <Card>
                 <CardContent className="space-y-6 p-6">
@@ -159,9 +183,12 @@ export function CourseDetailPage() {
             <Card className="h-fit border-slate-200 bg-deep-navy text-white lg:sticky lg:top-24">
               <CardContent className="space-y-5 p-6">
                 <div className="space-y-1">
-                  <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-white">Secure Enrollment</div>
+                  <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
                   <div className="text-4xl font-extrabold text-prestige-gold">{currency(course.price)}</div>
                 </div>
+                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => setOpenCheckout(true)}>
+                  Inscrever-se agora
+                </Button>
                 <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm font-medium text-white">
                   Próxima turma disponível: {courseClasses[0] ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(courseClasses[0].startDate)) : "Em breve"}
                 </div>
@@ -173,9 +200,6 @@ export function CourseDetailPage() {
                     </li>
                   ))}
                 </ul>
-                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => setOpenCheckout(true)}>
-                  Inscrever-se agora
-                </Button>
                 <Button asChild className="w-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white" variant="outline" size="lg">
                   <a href="#atendimento">
                     <MessageCircle className="h-4 w-4" />
@@ -183,7 +207,7 @@ export function CourseDetailPage() {
                   </a>
                 </Button>
                 <div className="rounded-lg border border-dashed border-white/20 p-4 text-sm leading-6 text-white/70">
-                  Inclui material de apoio, confirmacao por e-mail e acesso ao painel do aluno.
+                  Inclui material de apoio, confirmacao por e-mail e atendimento da equipe RH Cursos.
                 </div>
               </CardContent>
             </Card>
@@ -207,7 +231,16 @@ export function CourseDetailPage() {
           <div className="space-y-6">
             <SectionTitle eyebrow="Instrutor" title={instructor?.name ?? "Instrutor"} description={instructor?.bio} />
             <Card>
-              <CardContent className="space-y-4 p-6">
+              <CardContent className="space-y-6 p-6">
+                {instructor?.avatar && (
+                  <div className="flex justify-center">
+                    <img
+                      src={instructor.avatar}
+                      alt={instructor.name}
+                      className="h-24 w-24 rounded-full object-cover border-2 border-outline-variant"
+                    />
+                  </div>
+                )}
                 <div className="text-sm text-muted-foreground">Especialidade: {instructor?.specialty}</div>
                 <div className="text-sm text-muted-foreground">Avaliação média: {instructor?.rating.toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">Cursos vinculados: {instructor?.courseIds.length ?? 0}</div>
