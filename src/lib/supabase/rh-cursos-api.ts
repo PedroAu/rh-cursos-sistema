@@ -60,6 +60,7 @@ export async function fetchLeadsFromSupabase() {
   return (result.data as LeadRow[]).map(mapLead);
 }
 
+
 export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt" | "status">) {
   if (!supabase) return null;
 

@@ -23,6 +23,7 @@ import {
   trainingPaths
 } from "@/data";
 import { slugify } from "@/lib/utils";
+import { company } from "@/lib/company";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import {
   fetchLeadsFromSupabase,
@@ -80,6 +81,11 @@ type AppStoreValue = AppState & {
 
 const STORAGE_KEY = "rhcursos-demo-store-v4";
 
+type AdminMutation =
+  | { resource: "courses" | "classes" | "students" | "instructors" | "blog"; action: "upsert"; payload: unknown }
+  | { resource: "courses" | "classes" | "instructors" | "blog"; action: "delete"; id: string }
+  | { resource: "leads" | "enrollments"; action: "update-status"; id: string; status: string };
+
 const initialState: AppState = {
   courses: mockCourses,
   classes: mockClasses,
@@ -109,6 +115,22 @@ function readInitialState() {
   } catch {
     return initialState;
   }
+}
+
+function persistAdminMutation(mutation: AdminMutation) {
+  if (!isSupabaseConfigured) return;
+
+  void fetch("/api/admin/resources", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(mutation)
+  }).then((response) => {
+    if (!response.ok) {
+      toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
+    }
+  }).catch(() => {
+    toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
+  });
 }
 
 export function AppStoreProvider({ children }: PropsWithChildren) {
@@ -170,10 +192,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
           return false;
         }
 
-        const student = state.students.find((item) => item.email === email);
-        const instructor = state.instructors.find((item) => item.email === email);
-        const fallbackName =
-          student?.name ?? instructor?.name ?? matchedAccess.name ?? name ?? email.split("@")[0];
+        const fallbackName = matchedAccess.name ?? name ?? email.split("@")[0];
 
         setState((current) => ({
           ...current,
@@ -286,6 +305,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Lead cadastrado.");
       },
       updateLeadStatus: (id, status) => {
+        persistAdminMutation({ resource: "leads", action: "update-status", id, status });
         setState((current) => ({
           ...current,
           leads: current.leads.map((lead) => (lead.id === id ? { ...lead, status } : lead))
@@ -293,39 +313,40 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Status do lead atualizado.");
       },
       upsertCourse: (course) => {
-        setState((current) => {
-          const exists = course.id && current.courses.some((item) => item.id === course.id);
-          const nextCourse: Course = exists
-            ? ({ ...current.courses.find((item) => item.id === course.id)!, ...course } as Course)
-            : ({
-                id: `course-${Date.now()}`,
-                slug: slugify(course.title ?? "novo-curso"),
-                title: course.title ?? "Novo curso",
-                pathId: course.pathId ?? trainingPaths[0].id,
-                pathName:
-                  trainingPaths.find((item) => item.id === (course.pathId ?? trainingPaths[0].id))?.name ??
-                  trainingPaths[0].name,
-                modality: course.modality ?? "Ao vivo online",
-                durationLabel: course.durationLabel ?? "8h",
-                durationHours: course.durationHours ?? 8,
-                level: course.level ?? "Básico",
-                publicType: course.publicType ?? "Profissionais",
-                price: course.price ?? 0,
-                shortDescription: course.shortDescription ?? "Descrição curta do curso.",
-                fullDescription: course.fullDescription ?? "Descrição completa do curso.",
-                targetAudience: course.targetAudience ?? ["Profissionais"],
-                objectives: course.objectives ?? ["Objetivo principal"],
-                benefits: course.benefits ?? ["Material de apoio"],
-                modules: course.modules ?? [],
-                instructorId: course.instructorId ?? current.instructors[0]?.id ?? "inst-1",
-                image: course.image ?? courseCoverByPath[course.pathId ?? trainingPaths[0].id] ?? defaultCourseCover,
-                rating: course.rating ?? 4.8,
-                studentsCount: course.studentsCount ?? 0,
-                status: course.status ?? "Ativo",
-                featured: course.featured ?? false,
-                nextClassId: course.nextClassId ?? current.classes[0]?.id ?? ""
-              } as Course);
+        const exists = course.id && state.courses.some((item) => item.id === course.id);
+        const nextCourse: Course = exists
+          ? ({ ...state.courses.find((item) => item.id === course.id)!, ...course } as Course)
+          : ({
+              id: `course-${Date.now()}`,
+              slug: slugify(course.title ?? "novo-curso"),
+              title: course.title ?? "Novo curso",
+              pathId: course.pathId ?? trainingPaths[0].id,
+              pathName:
+                trainingPaths.find((item) => item.id === (course.pathId ?? trainingPaths[0].id))?.name ??
+                trainingPaths[0].name,
+              modality: course.modality ?? "Ao vivo online",
+              durationLabel: course.durationLabel ?? "8h",
+              durationHours: course.durationHours ?? 8,
+              level: course.level ?? "Básico",
+              publicType: course.publicType ?? "Profissionais",
+              price: course.price ?? 0,
+              shortDescription: course.shortDescription ?? "Descrição curta do curso.",
+              fullDescription: course.fullDescription ?? "Descrição completa do curso.",
+              targetAudience: course.targetAudience ?? ["Profissionais"],
+              objectives: course.objectives ?? ["Objetivo principal"],
+              benefits: course.benefits ?? ["Material de apoio"],
+              modules: course.modules ?? [],
+              instructorId: course.instructorId ?? state.instructors[0]?.id ?? "inst-1",
+              image: course.image ?? courseCoverByPath[course.pathId ?? trainingPaths[0].id] ?? defaultCourseCover,
+              rating: course.rating ?? 4.8,
+              studentsCount: course.studentsCount ?? 0,
+              status: course.status ?? "Ativo",
+              featured: course.featured ?? false,
+              nextClassId: course.nextClassId ?? state.classes[0]?.id ?? ""
+            } as Course);
 
+        persistAdminMutation({ resource: "courses", action: "upsert", payload: nextCourse });
+        setState((current) => {
           return {
             ...current,
             courses: exists
@@ -336,6 +357,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success(course.id ? "Curso editado." : "Curso criado no admin.");
       },
       deleteCourse: (id) => {
+        persistAdminMutation({ resource: "courses", action: "delete", id });
         setState((current) => ({
           ...current,
           courses: current.courses.filter((item) => item.id !== id)
@@ -361,27 +383,28 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Curso duplicado.");
       },
       upsertClass: (trainingClass) => {
-        setState((current) => {
-          const exists = trainingClass.id && current.classes.some((item) => item.id === trainingClass.id);
-          const nextClass: TrainingClass = exists
-            ? ({ ...current.classes.find((item) => item.id === trainingClass.id)!, ...trainingClass } as TrainingClass)
-            : ({
-                id: `class-${Date.now()}`,
-                courseId: trainingClass.courseId ?? current.courses[0]?.id ?? "",
-                startDate: trainingClass.startDate ?? new Date().toISOString(),
-                endDate: trainingClass.endDate ?? new Date().toISOString(),
-                time: trainingClass.time ?? "09:00 às 17:00",
-                modality: trainingClass.modality ?? "Ao vivo online",
-                location: trainingClass.location ?? "Online",
-                instructorId: trainingClass.instructorId ?? current.instructors[0]?.id ?? "",
-                totalSeats: trainingClass.totalSeats ?? 30,
-                filledSeats: trainingClass.filledSeats ?? 0,
-                availableSeats: trainingClass.availableSeats ?? 30,
-                status: trainingClass.status ?? "Inscrições abertas",
-                price: trainingClass.price ?? 0,
-                notes: trainingClass.notes ?? "Turma criada no modo simulado."
-              } as TrainingClass);
+        const exists = trainingClass.id && state.classes.some((item) => item.id === trainingClass.id);
+        const nextClass: TrainingClass = exists
+          ? ({ ...state.classes.find((item) => item.id === trainingClass.id)!, ...trainingClass } as TrainingClass)
+          : ({
+              id: `class-${Date.now()}`,
+              courseId: trainingClass.courseId ?? state.courses[0]?.id ?? "",
+              startDate: trainingClass.startDate ?? new Date().toISOString(),
+              endDate: trainingClass.endDate ?? new Date().toISOString(),
+              time: trainingClass.time ?? "09:00 às 17:00",
+              modality: trainingClass.modality ?? "Ao vivo online",
+              location: trainingClass.location ?? "Online",
+              instructorId: trainingClass.instructorId ?? state.instructors[0]?.id ?? "",
+              totalSeats: trainingClass.totalSeats ?? 30,
+              filledSeats: trainingClass.filledSeats ?? 0,
+              availableSeats: trainingClass.availableSeats ?? 30,
+              status: trainingClass.status ?? "Inscrições abertas",
+              price: trainingClass.price ?? 0,
+              notes: trainingClass.notes ?? "Turma criada no modo simulado."
+            } as TrainingClass);
 
+        persistAdminMutation({ resource: "classes", action: "upsert", payload: nextClass });
+        setState((current) => {
           return {
             ...current,
             classes: exists
@@ -392,6 +415,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success(trainingClass.id ? "Turma editada." : "Turma criada.");
       },
       deleteClass: (id) => {
+        persistAdminMutation({ resource: "classes", action: "delete", id });
         setState((current) => ({
           ...current,
           classes: current.classes.filter((item) => item.id !== id)
@@ -399,23 +423,24 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Turma excluída.");
       },
       upsertInstructor: (instructor) => {
-        setState((current) => {
-          const exists = instructor.id && current.instructors.some((item) => item.id === instructor.id);
-          const nextInstructor: Instructor = exists
-            ? ({ ...current.instructors.find((item) => item.id === instructor.id)!, ...instructor } as Instructor)
-            : ({
-                id: `inst-${Date.now()}`,
-                name: instructor.name ?? "Novo instrutor",
-                email: instructor.email ?? "instrutor@mock.com",
-                phone: instructor.phone ?? "(61) 99999-0000",
-                specialty: instructor.specialty ?? "Especialidade",
-                bio: instructor.bio ?? "Mini bio do instrutor.",
-                courseIds: instructor.courseIds ?? [],
-                rating: instructor.rating ?? 4.8,
-                avatar: instructor.avatar ?? "NI",
-                status: instructor.status ?? "Ativo"
-              } as Instructor);
+        const exists = instructor.id && state.instructors.some((item) => item.id === instructor.id);
+        const nextInstructor: Instructor = exists
+          ? ({ ...state.instructors.find((item) => item.id === instructor.id)!, ...instructor } as Instructor)
+          : ({
+              id: `inst-${Date.now()}`,
+              name: instructor.name ?? "Novo instrutor",
+              email: instructor.email ?? "instrutor@mock.com",
+              phone: instructor.phone ?? company.phones.primary,
+              specialty: instructor.specialty ?? "Especialidade",
+              bio: instructor.bio ?? "Mini bio do instrutor.",
+              courseIds: instructor.courseIds ?? [],
+              rating: instructor.rating ?? 4.8,
+              avatar: instructor.avatar ?? "NI",
+              status: instructor.status ?? "Ativo"
+            } as Instructor);
 
+        persistAdminMutation({ resource: "instructors", action: "upsert", payload: nextInstructor });
+        setState((current) => {
           return {
             ...current,
             instructors: exists
@@ -426,6 +451,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success(instructor.id ? "Instrutor editado." : "Instrutor criado.");
       },
       deleteInstructor: (id) => {
+        persistAdminMutation({ resource: "instructors", action: "delete", id });
         setState((current) => ({
           ...current,
           instructors: current.instructors.filter((item) => item.id !== id)
@@ -433,6 +459,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Instrutor excluído.");
       },
       updateStudent: (student) => {
+        persistAdminMutation({ resource: "students", action: "upsert", payload: student });
         setState((current) => ({
           ...current,
           students: current.students.map((item) => (item.id === student.id ? { ...item, ...student } : item))
@@ -440,6 +467,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Aluno atualizado.");
       },
       updateEnrollmentStatus: (id, status) => {
+        persistAdminMutation({ resource: "enrollments", action: "update-status", id, status });
         setState((current) => ({
           ...current,
           enrollments: current.enrollments.map((item) => (item.id === id ? { ...item, status } : item))
@@ -447,26 +475,27 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Status da inscrição atualizado.");
       },
       upsertBlogPost: (post) => {
-        setState((current) => {
-          const exists = post.id && current.blogPosts.some((item) => item.id === post.id);
-          const nextPost: BlogPost = exists
-            ? ({ ...current.blogPosts.find((item) => item.id === post.id)!, ...post } as BlogPost)
-            : ({
-                id: `post-${Date.now()}`,
-                title: post.title ?? "Novo post",
-                slug: slugify(post.title ?? "novo-post"),
-                summary: post.summary ?? "Resumo do artigo.",
-                content: post.content ?? "Conteúdo do artigo.",
-                category: post.category ?? "Tecnologia",
-                tags: post.tags ?? ["novo"],
-                author: post.author ?? "Equipe RH Cursos",
-                date: new Date().toISOString(),
-                readingTime: post.readingTime ?? "5 min",
-                status: post.status ?? "Rascunho",
-                image: post.image ?? "https://images.unsplash.com/photo-1516321318423",
-                relatedCourseId: post.relatedCourseId ?? current.courses[0]?.id ?? ""
-              } as BlogPost);
+        const exists = post.id && state.blogPosts.some((item) => item.id === post.id);
+        const nextPost: BlogPost = exists
+          ? ({ ...state.blogPosts.find((item) => item.id === post.id)!, ...post } as BlogPost)
+          : ({
+              id: `post-${Date.now()}`,
+              title: post.title ?? "Novo post",
+              slug: slugify(post.title ?? "novo-post"),
+              summary: post.summary ?? "Resumo do artigo.",
+              content: post.content ?? "Conteúdo do artigo.",
+              category: post.category ?? "Tecnologia",
+              tags: post.tags ?? ["novo"],
+              author: post.author ?? "Equipe RH Cursos",
+              date: new Date().toISOString(),
+              readingTime: post.readingTime ?? "5 min",
+              status: post.status ?? "Rascunho",
+              image: post.image ?? "https://images.unsplash.com/photo-1516321318423",
+              relatedCourseId: post.relatedCourseId ?? state.courses[0]?.id ?? ""
+            } as BlogPost);
 
+        persistAdminMutation({ resource: "blog", action: "upsert", payload: nextPost });
+        setState((current) => {
           return {
             ...current,
             blogPosts: exists
@@ -477,6 +506,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success(post.id ? "Post atualizado." : "Post publicado.");
       },
       deleteBlogPost: (id) => {
+        persistAdminMutation({ resource: "blog", action: "delete", id });
         setState((current) => ({
           ...current,
           blogPosts: current.blogPosts.filter((item) => item.id !== id)
