@@ -1,4 +1,4 @@
-export type UserRole = "lead" | "student" | "instructor" | "admin";
+export type UserRole = "lead" | "admin";
 
 export type CourseStatus = "Ativo" | "Inativo" | "Destaque" | "Em breve";
 export type ClassStatus = "Inscrições abertas" | "Poucas vagas" | "Encerrada" | "Em breve";
@@ -108,6 +108,8 @@ export type Lead = {
   email: string;
   phone: string;
   courseInterest: string;
+  organization?: string;
+  teamSize?: number;
   origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn";
   status: LeadStatus;
   message: string;
@@ -164,7 +166,7 @@ export type Enrollment = {
 };
 
 export type CurrentSession = {
-  role: UserRole;
+  role: "admin";
   email: string;
   name: string;
 };

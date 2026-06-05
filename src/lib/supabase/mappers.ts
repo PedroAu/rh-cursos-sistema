@@ -128,13 +128,6 @@ function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_
   return "PF";
 }
 
-function toDbLeadType(value: Lead["origin"], message: string): LeadRow["tipo"] {
-  if (/in company|orçamento|orcamento|proposta/i.test([value, message].join(" "))) return "InCompany";
-  if (/newsletter/i.test(message)) return "Newsletter";
-  if (/contato|atendimento/i.test(message)) return "Contato";
-  return "Curso";
-}
-
 function fromDbLeadStatus(value: LeadRow["status_crm"]): Lead["status"] {
   const map: Record<LeadRow["status_crm"], Lead["status"]> = {
     Novo: "Novo",
@@ -265,7 +258,8 @@ export function leadToInsert(payload: Omit<Lead, "id" | "createdAt" | "status">)
     nome: payload.name,
     email: payload.email,
     telefone: payload.phone,
-    tipo: toDbLeadType(payload.origin, payload.message),
+    orgao: payload.organization,
+    num_participantes: payload.teamSize,
     tema_interesse: payload.courseInterest,
     origem: payload.origin,
     mensagem: payload.message,
