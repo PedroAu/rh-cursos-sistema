@@ -1,4 +1,5 @@
-import { LayoutDashboard, Menu, MessageCircle, PhoneCall, Search } from "lucide-react";
+import { LockKeyhole, Menu, MessageCircle, PhoneCall, Search } from "lucide-react";
+import Image from "next/image";
 import { useMemo, useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation } from "@/lib/router-compat";
 
@@ -9,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
+import { company } from "@/lib/company";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -60,15 +62,15 @@ function WhatsAppSupport() {
           <Textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
-            placeholder="Escreva sua mensagem para o atendimento simulado"
+            placeholder="Escreva sua mensagem para a equipe de atendimento"
           />
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
               onClick={() =>
                 createLead({
                   name: "Lead do atendimento",
-                  email: "atendimento@mockmail.com",
-                  phone: "(61) 99999-0000",
+                  email: company.email,
+                  phone: company.phones.whatsapp,
                   courseInterest: "Atendimento geral",
                   origin: "WhatsApp",
                   message: message || "Solicitação enviada pelo atendimento rápido"
@@ -76,10 +78,10 @@ function WhatsAppSupport() {
               }
             >
               <PhoneCall className="h-4 w-4" />
-              Registrar atendimento
+              Enviar solicitação
             </Button>
             <Button asChild variant="outline">
-              <a href="https://wa.me/5561999999999" target="_blank" rel="noreferrer">
+              <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
                 Ir para WhatsApp
               </a>
             </Button>
@@ -111,14 +113,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
       <header className={headerClasses}>
         <div className="ea-container flex min-h-[72px] items-center justify-between gap-8">
           <Link to="/" className="flex items-center gap-3">
-            <div>
-              <div className="font-display text-xl font-extrabold leading-none text-deep-navy">
-                RH Cursos Academy
-              </div>
-              <div className="mt-1 text-xs uppercase tracking-[0.05em] text-text-muted">
-                & Soluções
-              </div>
-            </div>
+            <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-12 w-auto" priority />
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
@@ -151,8 +146,8 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
             </div>
             <Button asChild variant="outline" size="sm">
               <Link to="/login">
-                <LayoutDashboard className="h-4 w-4" />
-                Portal do Aluno
+                <LockKeyhole className="h-4 w-4" />
+                Admin
               </Link>
             </Button>
           </div>
@@ -171,7 +166,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
               </SheetTrigger>
               <SheetContent className="space-y-6 border-primary/10 bg-background">
                 <div>
-                  <div className="font-display text-[28px] font-bold text-primary">RH Cursos Academy</div>
+                  <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-20 w-auto" />
                   <p className="mt-2 text-sm leading-7 text-muted-foreground">
                     Acesso rápido às principais áreas do site.
                   </p>
@@ -196,7 +191,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
                   </Button>
                   <Button asChild className="w-full">
                     <Link to="/login" onClick={() => setOpen(false)}>
-                      Portal do Aluno
+                      Admin
                     </Link>
                   </Button>
                   <Button asChild variant="ghost" className="w-full">
@@ -221,16 +216,16 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           <div className="grid gap-8 border-b border-white/10 pb-12 xl:grid-cols-[1.3fr_repeat(3,minmax(0,1fr))]">
             <div className="space-y-5">
               <div className="space-y-3">
-                <div className="font-display text-[32px] font-bold leading-none text-white">
-                  RH Cursos Academy
+                <div className="inline-flex rounded-lg bg-white p-3">
+                  <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-24 w-auto" />
                 </div>
                 <p className="max-w-md text-sm leading-7 text-white/70">
-                  Desde 2007, formando quem transforma.
+                  Desde {company.foundedYear}, cursos, consultoria e treinamento empresarial.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <a
-                  href="https://wa.me/5561999999999"
+                  href={company.links.whatsapp}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center rounded-lg border border-white/12 bg-white/10 px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/12"
@@ -238,7 +233,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
                   WhatsApp
                 </a>
                 <a
-                  href="mailto:atendimento@rhcursos.com.br"
+                  href={company.links.email}
                   className="inline-flex items-center rounded-lg border border-white/12 bg-white/10 px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/12"
                 >
                   E-mail
@@ -264,8 +259,9 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
                 Atendimento
               </div>
               <div className="grid gap-3 text-sm text-white/80">
-                <span>(61) 99999-9999</span>
-                <span>Brasília, DF</span>
+                <span>{company.phones.primary} / {company.phones.secondary}</span>
+                <span>{company.phones.whatsapp}</span>
+                <span>{company.address.district}, {company.address.cityState}</span>
                 <span>Turmas abertas e in company</span>
                 <span>Resposta em até 24h úteis</span>
               </div>
@@ -277,7 +273,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
               </div>
               <div className="grid gap-3 text-sm text-white/80">
                 <Link to="/login" className="transition hover:text-white">
-                  Portal do Aluno
+                  Administração
                 </Link>
                 <Link to="/cursos" className="transition hover:text-white">
                   Catálogo de cursos
@@ -293,7 +289,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-8 text-sm text-white/60 md:flex-row md:items-center md:justify-between">
-            <span>RH Cursos & Soluções • Brasília • 2007–2026</span>
+            <span>{company.legalName} • CNPJ {company.cnpj}</span>
             <span>Plataforma institucional para cursos, turmas e atendimento.</span>
           </div>
         </div>

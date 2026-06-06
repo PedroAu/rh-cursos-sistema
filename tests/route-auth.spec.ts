@@ -14,9 +14,7 @@ const publicPaths = [
 ];
 
 const protectedPaths = [
-  { path: "/admin", role: "admin", email: "admin@rhcursos.demo", password: "admin123" },
-  { path: "/aluno", role: "student", email: "ana.silva1@mockmail.com", password: "aluno123" },
-  { path: "/instrutor", role: "instructor", email: "mariana.teles@rhcursos.com", password: "instrutor123" }
+  { path: "/admin", role: "admin", email: "admin@rhcursos.demo", password: "admin123" }
 ];
 
 test.describe("rotas publicas", () => {
@@ -66,19 +64,20 @@ test.describe("autenticacao por papel", () => {
     });
   }
 
-  test("bloqueia papel incorreto", async ({ request }) => {
+  test("rejeita papeis fora do escopo de publicacao", async ({ request }) => {
     const login = await request.post("/api/auth/session", {
       data: {
-        role: "admin",
-        email: "admin@rhcursos.demo",
-        password: "admin123"
+        role: "student",
+        email: "ana.silva1@mockmail.com",
+        password: "aluno123"
       }
     });
 
-    expect(login.status()).toBe(200);
+    expect(login.status()).toBe(400);
+  });
 
-    const response = await request.get("/aluno", { maxRedirects: 0 });
-    expect(response.status()).toBe(307);
-    expect(response.headers().location).toContain("/login?status=required");
+  test("rotas de portal aluno e instrutor nao existem nesta publicacao", async ({ request }) => {
+    await expect.poll(async () => (await request.get("/aluno")).status()).toBe(404);
+    await expect.poll(async () => (await request.get("/instrutor")).status()).toBe(404);
   });
 });

@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDays, Home, LayoutDashboard, Search } from "lucide-react";
+import { BookOpen, CalendarDays, Home, LockKeyhole, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 
@@ -12,7 +12,7 @@ const baseRoutes = [
   { label: "Cursos", href: "/cursos", icon: BookOpen },
   { label: "Agenda", href: "/agenda", icon: CalendarDays },
   { label: "Blog", href: "/blog", icon: Search },
-  { label: "Área do aluno", href: "/login", icon: LayoutDashboard }
+  { label: "Admin", href: "/login", icon: LockKeyhole }
 ];
 
 export function CommandPalette() {

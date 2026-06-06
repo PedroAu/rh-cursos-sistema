@@ -10,7 +10,7 @@ import {
 import { supabaseServer } from "@/lib/supabase/server";
 
 function normalizeRole(value: unknown): DashboardRole | null {
-  return value === "student" || value === "admin" || value === "instructor" ? value : null;
+  return value === "admin" ? value : null;
 }
 
 async function authenticateWithSupabase(email: string, password: string, requestedRole: DashboardRole) {

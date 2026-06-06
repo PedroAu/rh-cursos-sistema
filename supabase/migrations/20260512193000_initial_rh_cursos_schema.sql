@@ -74,7 +74,7 @@ end;
 $$;
 
 create table if not exists public.aluno (
-  id uuid primary key default gen_random_uuid(),
+  id varchar(80) primary key default gen_random_uuid()::text,
   nome_completo varchar(180) not null,
   email varchar(180) not null,
   cpf varchar(20),
@@ -97,7 +97,7 @@ create unique index if not exists aluno_cpf_unique_idx
   where cpf is not null and deleted_at is null;
 
 create table if not exists public.instrutor (
-  id uuid primary key default gen_random_uuid(),
+  id varchar(80) primary key default gen_random_uuid()::text,
   nome varchar(180) not null,
   email varchar(180),
   telefone varchar(30),
@@ -115,7 +115,7 @@ create table if not exists public.instrutor (
 );
 
 create table if not exists public.curso (
-  id uuid primary key default gen_random_uuid(),
+  id varchar(80) primary key default gen_random_uuid()::text,
   titulo varchar(240) not null,
   slug varchar(260) not null,
   descricao_curta text,
@@ -150,9 +150,9 @@ create table if not exists public.curso (
 -- A course may have several instructors. This resolves the mismatch between
 -- the proposed 1:N text and the current site, which already stores courseIds.
 create table if not exists public.curso_instrutor (
-  id uuid primary key default gen_random_uuid(),
-  curso_id uuid not null references public.curso(id) on delete cascade,
-  instrutor_id uuid not null references public.instrutor(id) on delete restrict,
+  id varchar(80) primary key default gen_random_uuid()::text,
+  curso_id varchar(80) not null references public.curso(id) on delete cascade,
+  instrutor_id varchar(80) not null references public.instrutor(id) on delete restrict,
   principal boolean not null default false,
   created_at timestamptz not null default now(),
   unique (curso_id, instrutor_id)
@@ -163,9 +163,9 @@ create unique index if not exists curso_instrutor_um_principal_idx
   where principal;
 
 create table if not exists public.turma (
-  id uuid primary key default gen_random_uuid(),
-  curso_id uuid not null references public.curso(id) on delete restrict,
-  instrutor_id uuid references public.instrutor(id) on delete set null,
+  id varchar(80) primary key default gen_random_uuid()::text,
+  curso_id varchar(80) not null references public.curso(id) on delete restrict,
+  instrutor_id varchar(80) references public.instrutor(id) on delete set null,
   data_inicio date not null,
   data_fim date,
   horario varchar(80),
@@ -186,9 +186,9 @@ create table if not exists public.turma (
 );
 
 create table if not exists public.inscricao (
-  id uuid primary key default gen_random_uuid(),
-  aluno_id uuid not null references public.aluno(id) on delete restrict,
-  turma_id uuid not null references public.turma(id) on delete restrict,
+  id varchar(80) primary key default gen_random_uuid()::text,
+  aluno_id varchar(80) not null references public.aluno(id) on delete restrict,
+  turma_id varchar(80) not null references public.turma(id) on delete restrict,
   status_inscricao public.status_inscricao not null default 'Pendente',
   status_pagamento public.status_pagamento not null default 'Pendente',
   valor_pago numeric(10,2) not null default 0,
@@ -209,7 +209,7 @@ create unique index if not exists inscricao_aluno_turma_active_idx
   where status_inscricao not in ('Cancelada');
 
 create table if not exists public.lead (
-  id uuid primary key default gen_random_uuid(),
+  id varchar(80) primary key default gen_random_uuid()::text,
   nome varchar(180) not null,
   email varchar(180),
   telefone varchar(30),
@@ -217,7 +217,7 @@ create table if not exists public.lead (
   orgao varchar(180),
   num_participantes integer,
   tema_interesse varchar(240),
-  curso_id uuid references public.curso(id) on delete set null,
+  curso_id varchar(80) references public.curso(id) on delete set null,
   status_crm public.status_lead not null default 'Novo',
   mensagem text,
   utm_source varchar(120),
@@ -228,9 +228,9 @@ create table if not exists public.lead (
 );
 
 create table if not exists public.avaliacao (
-  id uuid primary key default gen_random_uuid(),
-  inscricao_id uuid not null references public.inscricao(id) on delete cascade,
-  turma_id uuid not null references public.turma(id) on delete restrict,
+  id varchar(80) primary key default gen_random_uuid()::text,
+  inscricao_id varchar(80) not null references public.inscricao(id) on delete cascade,
+  turma_id varchar(80) not null references public.turma(id) on delete restrict,
   nota integer not null,
   comentario text,
   publicar boolean not null default false,
@@ -352,19 +352,19 @@ create or replace function public.registrar_inscricao_publica(
   p_cargo varchar,
   p_orgao varchar,
   p_tipo_aluno public.tipo_aluno,
-  p_turma_id uuid,
+  p_turma_id varchar(80),
   p_tipo_inscricao varchar,
   p_forma_pagamento public.forma_pagamento,
   p_observacoes text default null
 )
-returns uuid
+returns varchar(80)
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_aluno_id uuid;
-  v_inscricao_id uuid;
+  v_aluno_id varchar(80);
+  v_inscricao_id varchar(80);
 begin
   select id
     into v_aluno_id
@@ -440,7 +440,7 @@ grant execute on function public.registrar_inscricao_publica(
   varchar,
   varchar,
   public.tipo_aluno,
-  uuid,
+  varchar,
   varchar,
   public.forma_pagamento,
   text

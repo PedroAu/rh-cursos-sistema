@@ -285,7 +285,7 @@ export function CoursesPage() {
             {loading ? (
               <LoadingBlocks count={6} />
             ) : filtered.length ? (
-              <div className="grid items-stretch gap-6 md:grid-cols-2">
+              <div className="grid items-stretch gap-6 lg:grid-cols-2">
                 {filtered.map((course) => (
                   <CourseCard key={course.id} course={course} nextClass={classes.find((item) => item.id === course.nextClassId)} compact />
                 ))}

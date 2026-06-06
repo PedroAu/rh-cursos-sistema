@@ -78,7 +78,7 @@ migrations ainda precisam ser executadas no SQL Editor ou pela CLI.
 | Dashboard aluno `/aluno` | inscricoes, turmas, certificado e pagamento; progresso, tempo de estudo, pontos, materiais e duvidas | `aluno`, `inscricao`, `turma`, `certificado`, `pagamento`; futuras entidades de progresso/material/atendimento | Basico coberto; progresso, materiais e duvidas sao somente demonstrativos |
 | Dashboard instrutor `/instrutor` | perfil, cursos, turmas, alunos e avaliacao; acao concluir aula | `instrutor`, `curso_instrutor`, `turma`, `inscricao`, `avaliacao` | Coberto; acao ainda altera apenas estado local e pode usar `turma.status = Realizada` |
 | Admin `/admin` | contagens, leads por status, inscricoes por trilha e turmas por modalidade | consultas agregadas sobre tabelas operacionais | Coberto quando os dados base forem persistidos; receita e conversao sao valores simulados |
-| Admin recursos | CRUD de cursos, turmas, alunos, leads, inscricoes, instrutores e blog | tabelas correspondentes e APIs administrativas | Todas exceto blog existem; os CRUDs ainda escrevem somente em `localStorage` |
+| Admin recursos | CRUD de cursos, turmas, alunos, leads, inscricoes, instrutores e blog | tabelas correspondentes e APIs administrativas | Persistencia server-side em `/api/admin/resources`, com fallback local quando Supabase nao esta configurado |
 | Sobre `/sobre` | texto institucional e numeros de marketing | nenhuma obrigatoria no escopo atual | Conteudo fixo em codigo |
 
 ## Lacunas confirmadas
@@ -111,9 +111,6 @@ migrations ainda precisam ser executadas no SQL Editor ou pela CLI.
 
 ### Ja cobertas no schema, mas ainda sem persistencia completa na aplicacao
 
-- CRUD administrativo de `curso`, `turma`, `aluno`, `lead`, `inscricao` e
-  `instrutor`: as tabelas existem, mas as acoes administrativas permanecem
-  em `localStorage`.
 - Depoimentos: podem ser derivados de `avaliacao` publicada, junto a
   `inscricao`, `aluno`, `turma` e `curso`; a tela ainda usa mocks.
 - Certificados e pagamentos: as tabelas foram adicionadas na Sprint 4; o
@@ -137,8 +134,8 @@ migrations ainda precisam ser executadas no SQL Editor ou pela CLI.
    inscricoes, leads, RLS, certificados e pagamentos.
 2. Validar por API que `curso`, `turma`, `instrutor`, `curso_instrutor`,
    `lead` e `registrar_inscricao_publica` existem.
-3. Criar uma nova migration, rastreada pela story, para `trilha`,
-   `post_blog`, campos estruturados de In Company e papeis de acesso.
+3. Aplicar a migration `20260604164120_content_access_alignment.sql`, que cria
+   `trilha`, `post_blog`, campos estruturados de In Company e papeis de acesso.
 4. Somente depois inserir dados reais do catalogo, posts e trilhas ou trocar
    os mocks por queries.
 
@@ -149,6 +146,7 @@ migrations ainda precisam ser executadas no SQL Editor ou pela CLI.
 - `supabase/migrations/20260513200000_sprint2_integrity.sql`
 - `supabase/migrations/20260513300000_sprint3_performance.sql`
 - `supabase/migrations/20260513400000_sprint4_evolution.sql`
+- `supabase/migrations/20260604164120_content_access_alignment.sql`
 - `src/lib/supabase/client.ts`
 - `src/lib/supabase/database.types.ts`
 - `src/lib/supabase/mappers.ts`

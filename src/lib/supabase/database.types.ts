@@ -3,6 +3,33 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   public: {
     Tables: {
+      trilha: {
+        Row: {
+          id: string;
+          codigo: string;
+          nome: string;
+          nome_curto: string;
+          slug: string;
+          descricao: string;
+          icone: string;
+          ordem: number;
+          ativa: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          codigo: string;
+          nome: string;
+          nome_curto: string;
+          slug: string;
+          descricao: string;
+          icone: string;
+          ordem?: number;
+          ativa?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["trilha"]["Insert"]>;
+      };
       aluno: {
         Row: {
           id: string;
@@ -221,6 +248,10 @@ export type Database = {
           utm_term: string | null;
           utm_content: string | null;
           origem: string | null;
+          modalidade_preferida: string | null;
+          objetivo_treinamento: string | null;
+          tema_treinamento: string | null;
+          desafios_principais: string | null;
           created_at: string;
           updated_at: string;
           deleted_at: string | null;
@@ -243,9 +274,50 @@ export type Database = {
           utm_term?: string | null;
           utm_content?: string | null;
           origem?: string | null;
+          modalidade_preferida?: string | null;
+          objetivo_treinamento?: string | null;
+          tema_treinamento?: string | null;
+          desafios_principais?: string | null;
           deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["lead"]["Insert"]>;
+      };
+      post_blog: {
+        Row: {
+          id: string;
+          titulo: string;
+          slug: string;
+          resumo: string;
+          conteudo: string;
+          categoria: string;
+          tags: Json;
+          autor: string;
+          publicado_em: string | null;
+          tempo_leitura: string | null;
+          status: "Rascunho" | "Publicado" | "Arquivado";
+          imagem_url: string | null;
+          curso_id: string | null;
+          created_at: string;
+          updated_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          titulo: string;
+          slug: string;
+          resumo: string;
+          conteudo: string;
+          categoria: string;
+          tags?: Json;
+          autor: string;
+          publicado_em?: string | null;
+          tempo_leitura?: string | null;
+          status?: "Rascunho" | "Publicado" | "Arquivado";
+          imagem_url?: string | null;
+          curso_id?: string | null;
+          deleted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["post_blog"]["Insert"]>;
       };
       avaliacao: {
         Row: {
@@ -273,13 +345,13 @@ export type Database = {
       profiles: {
         Row: {
           id: string;
-          role: "user" | "admin";
+          role: "student" | "instructor" | "admin";
           created_at: string;
           updated_at: string;
         };
         Insert: {
           id: string;
-          role?: "user" | "admin";
+          role?: "student" | "instructor" | "admin";
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };

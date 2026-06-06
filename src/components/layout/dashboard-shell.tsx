@@ -1,31 +1,26 @@
-import { BookOpen, GraduationCap, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { Link, NavLink, Outlet } from "@/lib/router-compat";
 
 import { Button } from "@/components/ui/button";
 import { AppToaster } from "@/components/ui/toaster";
 import { useAppStore } from "@/lib/app-store";
-import type { UserRole } from "@/types";
+import { company } from "@/lib/company";
 
-const linksByRole: Record<UserRole, Array<{ to: string; label: string }>> = {
-  lead: [],
-  student: [{ to: "/aluno", label: "Dashboard" }],
-  instructor: [{ to: "/instrutor", label: "Dashboard" }],
-  admin: [
-    { to: "/admin", label: "Visão geral" },
-    { to: "/admin/cursos", label: "Cursos" },
-    { to: "/admin/turmas", label: "Turmas" },
-    { to: "/admin/alunos", label: "Alunos" },
-    { to: "/admin/leads", label: "Leads" },
-    { to: "/admin/inscricoes", label: "Inscrições" },
-    { to: "/admin/instrutores", label: "Instrutores" },
-    { to: "/admin/blog", label: "Blog" }
-  ]
-};
+const adminLinks: Array<{ to: string; label: string }> = [
+  { to: "/admin", label: "Visão geral" },
+  { to: "/admin/cursos", label: "Cursos" },
+  { to: "/admin/turmas", label: "Turmas" },
+  { to: "/admin/alunos", label: "Alunos" },
+  { to: "/admin/leads", label: "Leads" },
+  { to: "/admin/inscricoes", label: "Inscrições" },
+  { to: "/admin/instrutores", label: "Instrutores" },
+  { to: "/admin/blog", label: "Blog" }
+];
 
-export function DashboardShell({ role, children }: { role: Exclude<UserRole, "lead">; children?: ReactNode }) {
+export function DashboardShell({ role, children }: { role: "admin"; children?: ReactNode }) {
   const { currentSession, logout } = useAppStore();
-  const links = linksByRole[role];
 
   return (
     <div className="min-h-screen bg-background">
@@ -33,11 +28,9 @@ export function DashboardShell({ role, children }: { role: Exclude<UserRole, "le
         <aside className="border-r border-slate-200 bg-surface-muted lg:w-72">
           <div className="border-b p-6">
             <Link to="/" className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary text-white">
-                <GraduationCap className="h-5 w-5" />
-              </div>
+              <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-14 w-auto" />
               <div>
-                <div className="font-semibold text-primary">RH Academy</div>
+                <div className="font-semibold text-primary">{company.brandName}</div>
                 <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{role}</div>
               </div>
             </Link>
@@ -56,11 +49,11 @@ export function DashboardShell({ role, children }: { role: Exclude<UserRole, "le
           </div>
 
           <nav className="grid gap-2 p-4">
-            {links.map((item) => (
+            {adminLinks.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
-                end={item.to === "/admin" || item.to === "/aluno" || item.to === "/instrutor"}
+                end={item.to === "/admin"}
                 className={({ isActive }) =>
                   `rounded-lg px-4 py-3 text-sm font-semibold transition ${
                     isActive ? "bg-primary text-white" : "text-muted-foreground hover:bg-secondary hover:text-primary"
@@ -96,8 +89,8 @@ export function DashboardShell({ role, children }: { role: Exclude<UserRole, "le
           <div className="border-b border-slate-200 bg-white px-6 py-4">
             <div className="container flex items-center justify-between gap-4">
               <div>
-                <div className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Portal executivo</div>
-                <div className="text-lg font-semibold text-primary">Painel {role}</div>
+                <div className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Administração</div>
+                <div className="text-lg font-semibold text-primary">Painel admin</div>
               </div>
               <Button asChild>
                 <Link to="/login">

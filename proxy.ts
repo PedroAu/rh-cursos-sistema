@@ -3,9 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { decodeSession, SESSION_COOKIE, type DashboardRole } from "@/lib/auth";
 
 const protectedRoutes: Array<{ prefix: string; role: DashboardRole }> = [
-  { prefix: "/admin", role: "admin" },
-  { prefix: "/aluno", role: "student" },
-  { prefix: "/instrutor", role: "instructor" }
+  { prefix: "/admin", role: "admin" }
 ];
 
 export async function proxy(request: NextRequest) {
@@ -29,5 +27,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/aluno/:path*", "/instrutor/:path*"]
+  matcher: ["/admin/:path*"]
 };

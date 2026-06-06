@@ -23,19 +23,19 @@ create or replace function public.registrar_inscricao_publica(
   p_cargo           varchar,
   p_orgao           varchar,
   p_tipo_aluno      public.tipo_aluno,
-  p_turma_id        uuid,
+  p_turma_id        varchar(80),
   p_tipo_inscricao  varchar,
   p_forma_pagamento public.forma_pagamento,
   p_observacoes     text default null
 )
-returns uuid
+returns varchar(80)
 language plpgsql
 security definer
 set search_path = public
 as $$
 declare
-  v_aluno_id     uuid;
-  v_inscricao_id uuid;
+  v_aluno_id varchar(80);
+  v_inscricao_id varchar(80);
   v_turma        record;
 begin
   -- Validar disponibilidade da turma
@@ -153,7 +153,7 @@ returns trigger
 language plpgsql
 as $$
 declare
-  v_turma_id uuid;
+  v_turma_id varchar(80);
 begin
   select turma_id into v_turma_id
     from public.inscricao
@@ -179,5 +179,5 @@ comment on function public.sync_turma_status()
   is 'Atualiza turma.status automaticamente ao alterar vagas_preenchidas.';
 comment on function public.validate_avaliacao_turma()
   is 'Garante que avaliacao.turma_id coincide com inscricao.turma_id.';
-comment on function public.registrar_inscricao_publica(varchar,varchar,varchar,varchar,varchar,varchar,public.tipo_aluno,uuid,varchar,public.forma_pagamento,text)
+comment on function public.registrar_inscricao_publica(varchar,varchar,varchar,varchar,varchar,varchar,public.tipo_aluno,varchar,varchar,public.forma_pagamento,text)
   is 'Inscreve aluno em turma validando disponibilidade. Callable por anon/authenticated via RPC.';

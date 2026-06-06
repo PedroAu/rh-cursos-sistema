@@ -24,7 +24,7 @@ returns trigger
 language plpgsql
 as $$
 declare
-  v_curso_id   uuid;
+  v_curso_id varchar(80);
   v_avg_rating numeric(3,2);
 begin
   select t.curso_id into v_curso_id
@@ -62,7 +62,7 @@ returns trigger
 language plpgsql
 as $$
 declare
-  v_curso_id uuid;
+  v_curso_id varchar(80);
   v_delta    integer := 0;
 begin
   if tg_op = 'INSERT' and new.status_inscricao = 'Confirmada' then

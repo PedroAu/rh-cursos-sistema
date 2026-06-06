@@ -15,7 +15,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Link } from "@/lib/router-compat";
 
 import { CTASection } from "@/components/common/cta-section";
@@ -101,12 +101,19 @@ const journeySteps = [
 
 export function HomePage() {
   const { trainingPaths, testimonials } = useAppStore();
+  const [testimonialPage, setTestimonialPage] = useState(0);
   const testimonialsTrackRef = useRef<HTMLDivElement>(null);
+
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(testimonials.length / itemsPerPage);
+  const visibleTestimonials = testimonials.slice(testimonialPage * itemsPerPage, (testimonialPage + 1) * itemsPerPage);
+
   const scrollTestimonials = (direction: "previous" | "next") => {
-    testimonialsTrackRef.current?.scrollBy({
-      left: direction === "next" ? 380 : -380,
-      behavior: "smooth"
-    });
+    if (direction === "next" && testimonialPage < totalPages - 1) {
+      setTestimonialPage(testimonialPage + 1);
+    } else if (direction === "previous" && testimonialPage > 0) {
+      setTestimonialPage(testimonialPage - 1);
+    }
   };
 
   return (
@@ -309,14 +316,28 @@ export function HomePage() {
             </div>
             <div
               ref={testimonialsTrackRef}
-              className="-mx-2 flex snap-x gap-5 overflow-x-auto px-2 pb-4"
+              className="grid gap-5 md:grid-cols-3"
             >
-              {testimonials.map((testimonial) => (
-                <div key={testimonial.id} className="min-w-[310px] max-w-[310px] snap-start md:min-w-[360px] md:max-w-[360px]">
+              {visibleTestimonials.map((testimonial) => (
+                <div key={testimonial.id}>
                   <TestimonialCard testimonial={testimonial} />
                 </div>
               ))}
             </div>
+            {totalPages > 1 && (
+              <div className="flex justify-center gap-2 pt-6">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setTestimonialPage(index)}
+                    className={`h-2 w-2 rounded-full transition-all ${
+                      index === testimonialPage ? "w-8 bg-primary" : "bg-outline-variant"
+                    }`}
+                    aria-label={`Ir para página ${index + 1} de depoimentos`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -3,6 +3,7 @@ import { Building2, ShieldCheck, Sparkles, Users } from "lucide-react";
 import { CTASection } from "@/components/common/cta-section";
 import { SectionTitle } from "@/components/common/section-title";
 import { Card, CardContent } from "@/components/ui/card";
+import { company } from "@/lib/company";
 
 export function AboutPage() {
   return (
@@ -12,15 +13,15 @@ export function AboutPage() {
           <div className="space-y-6">
             <SectionTitle
               eyebrow="Sobre nós"
-              title="Capacitação profissional construída com clareza, segurança e aplicação prática."
-              description="A empresa atua com cursos, treinamentos e capacitações para setor público e privado, com foco em atualização normativa, segurança técnica e desenvolvimento de competências."
+              title="Cursos, consultoria e treinamento empresarial desde 2007."
+              description={`${company.brandName} atua em Brasília - DF com capacitação profissional, consultoria e treinamentos para setor público e privado, com foco em aplicação prática e desenvolvimento de competências.`}
             />
             <div className="grid gap-4 md:grid-cols-2">
               {[
                 "Conteúdo técnico e aplicável",
                 "Atendimento consultivo",
                 "Cursos voltados a realidade de quem executa",
-                "Flexibilidade para turmas abertas e in company"
+                "Turmas abertas, in company, mentoria e plano de capacitação"
               ].map((item) => (
                 <Card key={item}>
                   <CardContent className="p-6 font-medium">{item}</CardContent>
@@ -35,7 +36,7 @@ export function AboutPage() {
                   { icon: Users, value: "1.500+", label: "Alunos capacitados" },
                   { icon: Building2, value: "120+", label: "Organizações atendidas" },
                   { icon: ShieldCheck, value: "4.8/5", label: "Avaliação média" },
-                  { icon: Sparkles, value: "25", label: "Programas no catalogo" }
+                  { icon: Sparkles, value: "2007", label: "Ano de fundação" }
                 ].map((item) => {
                   const Icon = item.icon;
                   return (

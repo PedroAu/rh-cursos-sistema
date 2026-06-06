@@ -14,6 +14,11 @@ exception
   when duplicate_object then null;
 end $$;
 
+drop policy if exists "catalogo_publico_instrutor_select" on public.instrutor;
+
+alter table public.instrutor
+  alter column status drop default;
+
 alter table public.instrutor
   alter column status type public.status_instrutor
   using case status::text
@@ -24,6 +29,11 @@ alter table public.instrutor
 
 alter table public.instrutor
   alter column status set default 'Ativo'::public.status_instrutor;
+
+create policy "catalogo_publico_instrutor_select"
+  on public.instrutor for select
+  to anon, authenticated
+  using (deleted_at is null and status = 'Ativo');
 
 -- ── S1.2  aluno.user_id ─────────────────────────────────────────────────────
 alter table public.aluno

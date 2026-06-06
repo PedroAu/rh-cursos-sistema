@@ -34,8 +34,8 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `src/lib/router-compat.tsx` preserva a API usada pelas telas aprovadas (`Link`, `NavLink`, `useNavigate`, `useParams`, `useSearchParams`) sobre `next/link` e `next/navigation`.
 - `src/components/next-page-shell.tsx` centraliza `AppStoreProvider`, layouts aprovados e `Suspense` exigido pelo Next 16 para query strings.
 - A pasta `src/pages` foi renomeada para `src/views` para o Next não tratá-la como Pages Router.
-- A árvore Next antiga foi movida para `legacy/next-scaffold/`.
-- A árvore Vite de configuração foi mantida em `legacy/vite/` apenas como referência.
+- A árvore Next antiga foi removida após a migração ser consolidada em `app/` e `src/`.
+- A árvore Vite de configuração foi removida após a migração ser consolidada no runtime Next.
 - `proxy.ts` protege rotas por papel: admin, student e instructor.
 - O login visual aprovado agora chama `/api/auth/session`, tenta Supabase Auth quando configurado e mantém fallback demo para desenvolvimento.
 - A sessão HTTP-only passou a ser assinada em `src/lib/auth.ts`; `proxy.ts` valida a assinatura antes de liberar dashboards.
@@ -118,6 +118,4 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `src/views/public/Login.tsx`
 - `src/views/public/Courses.tsx`
 - `tests/route-auth.spec.ts`
-- `legacy/next-scaffold/`
-- `legacy/vite/`
 - `docs/stories/2026-05-13-next-migration-hardening.md`

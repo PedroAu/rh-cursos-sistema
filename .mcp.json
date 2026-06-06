@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://hwpsrujkxjhmmwphqdlz.supabase.co"
+    },
     "nano-banana-pro": {
       "type": "stdio",
       "command": "npx",

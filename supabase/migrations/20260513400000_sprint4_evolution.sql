@@ -16,7 +16,7 @@ alter table public.lead
 -- ── E4.2  Tabela certificado ─────────────────────────────────────────────────
 create table if not exists public.certificado (
   id                 uuid primary key default gen_random_uuid(),
-  inscricao_id       uuid not null references public.inscricao(id) on delete restrict,
+  inscricao_id       varchar(80) not null references public.inscricao(id) on delete restrict,
   numero_certificado varchar(80) not null,
   data_emissao       date not null default current_date,
   pdf_url            varchar(500),
@@ -61,7 +61,7 @@ create policy "certificado_admin_update" on public.certificado for update
 -- ── E4.3  Tabela pagamento ───────────────────────────────────────────────────
 create table if not exists public.pagamento (
   id              uuid primary key default gen_random_uuid(),
-  inscricao_id    uuid not null references public.inscricao(id) on delete restrict,
+  inscricao_id       varchar(80) not null references public.inscricao(id) on delete restrict,
   valor           numeric(10,2) not null,
   forma_pagamento public.forma_pagamento not null,
   status          public.status_pagamento not null default 'Pendente',

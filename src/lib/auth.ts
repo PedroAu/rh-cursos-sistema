@@ -1,4 +1,4 @@
-export type DashboardRole = "student" | "admin" | "instructor";
+export type DashboardRole = "admin";
 
 export type DemoSession = {
   role: DashboardRole;
@@ -11,22 +11,10 @@ const SESSION_SECRET = process.env.AUTH_SESSION_SECRET ?? "rh-cursos-local-sessi
 
 export const demoUsers: Array<DemoSession & { password: string }> = [
   {
-    role: "student",
-    email: "ana.silva1@mockmail.com",
-    password: "aluno123",
-    name: "Ana Silva"
-  },
-  {
     role: "admin",
     email: "admin@rhcursos.demo",
     password: "admin123",
     name: "Admin RH Cursos"
-  },
-  {
-    role: "instructor",
-    email: "mariana.teles@rhcursos.com",
-    password: "instrutor123",
-    name: "Mariana Teles"
   }
 ];
 
@@ -58,7 +46,7 @@ async function signPayload(payload: string) {
 }
 
 function isDashboardRole(value: unknown): value is DashboardRole {
-  return value === "student" || value === "admin" || value === "instructor";
+  return value === "admin";
 }
 
 export async function encodeSession(session: DemoSession) {

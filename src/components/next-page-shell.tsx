@@ -5,7 +5,6 @@ import { Suspense, type ReactNode } from "react";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { AppStoreProvider } from "@/lib/app-store";
-import type { UserRole } from "@/types";
 
 export function PublicPageShell({ children }: { children: ReactNode }) {
   return (
@@ -21,7 +20,7 @@ export function DashboardPageShell({
   role,
   children
 }: {
-  role: Exclude<UserRole, "lead">;
+  role: "admin";
   children: ReactNode;
 }) {
   return (
