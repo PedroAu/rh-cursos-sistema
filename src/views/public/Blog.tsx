@@ -15,7 +15,7 @@ import { useHotkey } from "@/hooks/use-hotkey";
 const categories = ["Todos", "Departamento Pessoal", "eSocial", "Gestão Pública", "Liderança", "Tecnologia", "Assédio e Compliance"] as const;
 
 export function BlogPage() {
-  const { blogPosts } = useAppStore();
+  const { blogPosts, createLead } = useAppStore();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<(typeof categories)[number]>("Todos");
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -42,13 +42,30 @@ export function BlogPage() {
 
   const featuredPost = posts[0];
 
+  const submitNewsletter = () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
+      toast.error("Informe um e-mail válido para continuar.");
+      return;
+    }
+
+    createLead({
+      name: newsletterEmail.split("@")[0],
+      email: newsletterEmail,
+      phone: "",
+      courseInterest: "Newsletter",
+      origin: "Blog",
+      message: "Cadastro de newsletter pelo blog."
+    });
+    setNewsletterEmail("");
+  };
+
   return (
     <section className="page-section">
       <div className="container space-y-8">
         <SectionTitle
           eyebrow="Conteúdo e SEO"
-          title="Conteudo institucional para apoiar decisao e atualizacao profissional."
-          description="Artigos por categoria com temas de departamento pessoal, gestao publica, lideranca e compliance."
+          title="Conteúdo institucional para apoiar decisão e atualização profissional."
+          description="Artigos por categoria com temas de departamento pessoal, gestão pública, liderança e compliance."
         />
 
         <div className="surface-card grid gap-4 p-6 xl:grid-cols-[1.5fr_1fr]">
@@ -95,11 +112,7 @@ export function BlogPage() {
                 />
                 <Button
                   className="w-full"
-                  onClick={() =>
-                    newsletterEmail
-                      ? toast.success("Newsletter cadastrada.")
-                      : toast.error("Informe um e-mail para continuar.")
-                  }
+                  onClick={submitNewsletter}
                 >
                   Quero receber conteúdos
                 </Button>

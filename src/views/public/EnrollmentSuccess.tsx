@@ -24,7 +24,7 @@ export function EnrollmentSuccessPage() {
             <span className="eyebrow">Inscrição recebida com sucesso</span>
             <h1 className="text-4xl font-extrabold text-primary">Tudo pronto para a próxima etapa.</h1>
             <p className="text-base leading-7 text-muted-foreground">
-              Recebemos sua inscricao. Confira o resumo e acompanhe os proximos passos pelo portal do aluno.
+              Recebemos sua inscrição. Confira o resumo e acompanhe os próximos passos pelo seu e-mail.
             </p>
 
             <div className="grid gap-4 rounded-lg bg-secondary/60 p-6 text-left md:grid-cols-2">
@@ -47,11 +47,10 @@ export function EnrollmentSuccessPage() {
             </div>
 
             <div className="space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>Proximos passos: confirmacao da turma, acesso a area do aluno, materiais e certificados.</p>
+              <p>Próximos passos: confirmação da turma, envio de orientações, materiais e certificado pela equipe RH Cursos.</p>
             </div>
 
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
-              <Button asChild><Link to="/aluno">Acessar área do aluno</Link></Button>
               <Button asChild variant="outline"><Link to="/cursos">Ver outros cursos</Link></Button>
               <Button asChild variant="ghost"><a href="#atendimento">Falar com atendimento</a></Button>
             </div>

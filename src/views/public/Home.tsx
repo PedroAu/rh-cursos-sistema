@@ -145,7 +145,7 @@ export function HomePage() {
                 return (
                   <div
                     key={item.label}
-                    className="apple-material-dark flex min-h-[148px] flex-col justify-between rounded-lg border border-white/12 p-4 shadow-soft"
+                    className="apple-material-dark flex min-h-[148px] flex-col justify-between rounded-lg border border-white/20 bg-white/5 backdrop-blur p-4 shadow-soft"
                   >
                     {item.featured ? (
                       <div className="flex gap-1 text-prestige-gold">
@@ -163,7 +163,7 @@ export function HomePage() {
                     )}
                     <div>
                       <p className="text-xl font-bold text-white">{item.value}</p>
-                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.05em] text-white/60">{item.label}</p>
+                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.05em] text-white/70">{item.label}</p>
                     </div>
                   </div>
                 );
