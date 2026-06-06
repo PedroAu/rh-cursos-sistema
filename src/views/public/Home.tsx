@@ -195,7 +195,7 @@ export function HomePage() {
               return (
                 <Card key={item.title} className={`h-full border-l-4 ${item.accent} bg-white shadow-card`}>
                   <CardContent className="flex h-full flex-col gap-5 p-7">
-                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-lg ${item.iconClass}`}>
+                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${item.iconClass}`}>
                       <Icon className="h-8 w-8" />
                     </div>
                     <div className="space-y-3">
@@ -227,7 +227,7 @@ export function HomePage() {
               return (
                 <Card key={item.title} className={`h-full border-t-4 ${item.accent} bg-white shadow-card`}>
                   <CardContent className="flex h-full flex-col gap-6 p-7">
-                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-lg ${item.iconClass}`}>
+                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${item.iconClass}`}>
                       <Icon className="h-8 w-8" />
                     </div>
                     <div className="space-y-3">

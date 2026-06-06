@@ -8,24 +8,44 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
+import { company } from "@/lib/company";
 
 const contactItems = [
   {
     icon: MessageCircle,
     label: "WhatsApp",
-    value: "+55 (61) 99999-9999"
+    value: company.phones.whatsapp
+  },
+  {
+    icon: PhoneCall,
+    label: "Telefone",
+    value: `${company.phones.primary} / ${company.phones.secondary}`
   },
   {
     icon: Mail,
     label: "E-mail",
-    value: "atendimento@rhcursos.com.br"
+    value: company.email
   },
   {
     icon: MapPin,
     label: "Localização",
-    value: "Brasília, DF"
+    value: `${company.address.district}, ${company.address.cityState}`
   }
 ];
+
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 11);
+
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+}
+
+function getPhoneDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
 
 export function ContactPage() {
   const { createLead } = useAppStore();
@@ -37,7 +57,11 @@ export function ContactPage() {
   });
 
   const update = (key: keyof typeof form, value: string) => {
-    setForm((current) => ({ ...current, [key]: value }));
+    if (key === "phone") {
+      setForm((current) => ({ ...current, [key]: formatPhone(value) }));
+    } else {
+      setForm((current) => ({ ...current, [key]: value }));
+    }
   };
 
   const submit = () => {
@@ -48,6 +72,11 @@ export function ContactPage() {
 
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
       toast.error("Informe um e-mail válido.");
+      return;
+    }
+
+    if (form.phone && getPhoneDigits(form.phone).length < 10) {
+      toast.error("Informe um telefone válido (mínimo 10 dígitos).");
       return;
     }
 
@@ -78,6 +107,9 @@ export function ContactPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-[18px] leading-[1.6] text-white/78">
             Tire dúvidas sobre cursos, trilhas, agenda, propostas in company e atendimento para órgãos públicos.
+          </p>
+          <p className="mt-4 max-w-3xl text-sm leading-7 text-white/62">
+            {company.legalName} • CNPJ {company.cnpj} • {company.address.full}
           </p>
         </div>
       </section>
@@ -113,6 +145,20 @@ export function ContactPage() {
                 );
               })}
             </div>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild>
+                <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 w-4" />
+                  Chamar no WhatsApp
+                </a>
+              </Button>
+              <Button asChild variant="outline">
+                <a href={company.links.email}>
+                  <Mail className="h-4 w-4" />
+                  Enviar e-mail
+                </a>
+              </Button>
+            </div>
           </div>
 
           <Card className="border-outline-variant bg-white/95 shadow-card">
@@ -138,6 +184,7 @@ export function ContactPage() {
               />
               <Input
                 type="tel"
+                inputMode="tel"
                 placeholder="Telefone"
                 value={form.phone}
                 onChange={(event) => update("phone", event.target.value)}

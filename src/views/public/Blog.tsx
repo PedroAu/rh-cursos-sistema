@@ -1,6 +1,7 @@
 import { Mail } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useSearchParams } from "@/lib/router-compat";
 
 import { BlogCard } from "@/components/blog/blog-card";
 import { EmptyState } from "@/components/common/empty-state";
@@ -16,10 +17,21 @@ const categories = ["Todos", "Departamento Pessoal", "eSocial", "Gestão Públic
 
 export function BlogPage() {
   const { blogPosts, createLead } = useAppStore();
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<(typeof categories)[number]>("Todos");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [category, setCategory] = useState<(typeof categories)[number]>(
+    (searchParams.get("category") as (typeof categories)[number]) || "Todos"
+  );
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (category !== "Todos") params.set("category", category);
+    const paramString = params.toString();
+    setSearchParams(paramString ? `?${paramString}` : "");
+  }, [query, category, setSearchParams]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
