@@ -95,9 +95,10 @@ export function DataTable<T extends { id: string }>({
             {selectedIds.size} item{selectedIds.size !== 1 ? "ns" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}
           </span>
           <Button
-            variant="destructive"
+            variant="ghost"
             size="sm"
             onClick={() => setConfirmDeleteBulk(true)}
+            className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
           >
             <Trash2 className="h-4 w-4" />
             Deletar selecionados
@@ -174,7 +175,9 @@ export function DataTable<T extends { id: string }>({
           </AlertDialogHeader>
           <div className="flex justify-end gap-3">
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBulkDelete} className="bg-red-600 text-white hover:bg-red-700">
+            <AlertDialogAction
+              onClick={handleBulkDelete}
+            >
               Deletar
             </AlertDialogAction>
           </div>

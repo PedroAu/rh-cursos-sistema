@@ -26,11 +26,10 @@ export function BlogPage() {
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    if (category !== "Todos") params.set("category", category);
-    const paramString = params.toString();
-    setSearchParams(paramString ? `?${paramString}` : "");
+    const params: Record<string, string> = {};
+    if (query) params.q = query;
+    if (category !== "Todos") params.category = category;
+    setSearchParams(params);
   }, [query, category, setSearchParams]);
 
   useHotkey(
