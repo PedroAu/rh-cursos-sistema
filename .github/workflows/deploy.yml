@@ -87,11 +87,20 @@ jobs:
 
           cd $APP_DIR
 
+          # Initialize git repository if it doesn't exist
+          if [ ! -d ".git" ]; then
+            echo "🔧 Initializing git repository..."
+            git init
+            git remote add origin https://github.com/PedroAu/site-rh-cursos.git
+          fi
+
           # Backup current state
           echo "📦 Creating backup..."
           BACKUP_DIR="~/backups/backup-$(date +%Y%m%d-%H%M%S)"
           mkdir -p $BACKUP_DIR
-          cp -r . $BACKUP_DIR/ || true
+          if [ -f ".git" ] || [ -d ".git" ]; then
+            cp -r --exclude=.git . $BACKUP_DIR/ || true
+          fi
 
           # Pull latest code
           echo "📥 Pulling latest code..."
