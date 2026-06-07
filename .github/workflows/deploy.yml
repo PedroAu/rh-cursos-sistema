@@ -84,10 +84,23 @@ jobs:
             echo "🔍 Checking Node.js..."
             if ! command -v node &> /dev/null; then
               echo "📦 Installing Node.js 20..."
-              cd /tmp
-              curl -fsSL https://deb.nodesource.com/setup_20.x | bash - || true
-              apt-get update -qq
-              apt-get install -y nodejs
+
+              # Detect OS and install accordingly
+              if [ -f /etc/redhat-release ]; then
+                echo "CentOS/RedHat detected"
+                curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - || true
+                yum install -y nodejs || dnf install -y nodejs
+              elif [ -f /etc/debian_version ]; then
+                echo "Debian/Ubuntu detected"
+                curl -fsSL https://deb.nodesource.com/setup_20.x | bash - || true
+                apt-get update -qq && apt-get install -y nodejs
+              else
+                echo "Unknown OS, trying to install from source..."
+                cd /tmp && curl -O https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.xz
+                tar -xf node-v20.11.0-linux-x64.tar.xz
+                ln -sf /tmp/node-v20.11.0-linux-x64/bin/node /usr/local/bin/node
+                ln -sf /tmp/node-v20.11.0-linux-x64/bin/npm /usr/local/bin/npm
+              fi
               echo "✅ Node.js installed"
             else
               echo "✅ Node.js already installed: $(node --version)"
