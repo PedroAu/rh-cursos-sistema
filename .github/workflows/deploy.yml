@@ -84,17 +84,22 @@ jobs:
             echo "🔍 Checking Node.js..."
             if ! command -v node &> /dev/null; then
               echo "📦 Installing Node.js 24 from tarball..."
-              cd /tmp
-              curl -fsSL -O https://nodejs.org/dist/v24.0.0/node-v24.0.0-linux-x64.tar.xz
-              tar -xf node-v24.0.0-linux-x64.tar.xz
-              sudo mkdir -p /opt/node
-              sudo mv node-v24.0.0-linux-x64 /opt/node/
-              sudo ln -sf /opt/node/node-v24.0.0-linux-x64/bin/node /usr/local/bin/node
-              sudo ln -sf /opt/node/node-v24.0.0-linux-x64/bin/npm /usr/local/bin/npm
-              echo "✅ Node.js installed"
+              mkdir -p ~/opt/node
+              cd ~/opt/node
+              # Using a stable Node.js 24 release
+              NODE_VERSION="v24.9.0"
+              curl -fsSL https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz -o node.tar.xz
+              tar -xf node.tar.xz
+              rm node.tar.xz
+              mkdir -p ~/.local/bin
+              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/node ~/.local/bin/node
+              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/npm ~/.local/bin/npm
+              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/npx ~/.local/bin/npx
+              echo "✅ Node.js installed to ~/.local/bin"
             else
               echo "✅ Node.js already installed: $(node --version)"
             fi
+            export PATH=$HOME/.local/bin:$PATH
             node --version
             npm --version
 
@@ -105,6 +110,7 @@ jobs:
           username: ${{ secrets.SSH_USER }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
+            export PATH=$HOME/.local/bin:$PATH
             cd ~/app
             echo "📚 Installing dependencies..."
             npm ci --only=production
@@ -112,6 +118,7 @@ jobs:
             npm start > /tmp/app.log 2>&1 &
             sleep 2
             echo "✅ Application started"
+            ps aux | grep "npm start" | grep -v grep
 
       - name: Notify success
         if: success()
