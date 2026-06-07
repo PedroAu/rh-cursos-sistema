@@ -48,6 +48,8 @@ jobs:
             public/
             package.json
             package-lock.json
+            server.js
+            install-node.sh
           retention-days: 1
           if-no-files-found: error
 
