@@ -1,78 +1,16 @@
-name: Deploy to Locaweb
+ name: Deploy via ftp
+      on: push
+      jobs:
+        deploy:
+          name: Deploy
+          runs-on: ubuntu-latest
+          steps:
+          - uses: actions/checkout@v2
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run type check
-        run: npm run typecheck
-
-      - name: Run linting
-        run: npm run lint
-
-      - name: Build application
-        run: npm run build
-
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Deploy to Locaweb
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o HostKeyAlgorithms=ssh-rsa \
-            -o PubkeyAcceptedKeyTypes=ssh-rsa \
-            -o StrictHostKeyChecking=no \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-
-          set -e
-
-          # Navigate to app directory
-          cd ~/app
-
-          # Pull latest code
-          git pull origin main
-
-          # Install dependencies
-          npm ci
-
-          # Build application
-          npm run build
-
-          # Restart PM2 app
-          pm2 restart site-rh-cursos || pm2 start npm --name site-rh-cursos -- start
-
-          echo "✅ Deploy completed successfully"
-
-          EOF
-
-      - name: Notify deployment
-        if: success()
-        run: echo "🚀 Deployment to production completed"
-
-      - name: Notify failure
-        if: failure()
-        run: |
-          echo "❌ Deployment failed"
-          exit 1
+          - name: FTP Deploy Locaweb
+            uses: locaweb/ftp-deploy@1.0.0
+            with:
+              host: ${{ secrets.HOST }} 
+              user: ${{ secrets.USER }}
+              password: ${{ secrets.PASS }}
+              localDir: "dist"
