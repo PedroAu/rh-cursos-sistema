@@ -115,7 +115,7 @@ jobs:
             -o HostKeyAlgorithms=ssh-rsa \
             -o PubkeyAcceptedKeyTypes=ssh-rsa \
             -o StrictHostKeyChecking=no \
-            -r ./build-artifacts/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$HOME/app/
+            -r ./build-artifacts/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/app/
 
       - name: Install dependencies and restart
         run: |
