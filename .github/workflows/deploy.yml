@@ -1,16 +1,162 @@
- name: Deploy via ftp
-      on: push
-      jobs:
-        deploy:
-          name: Deploy
-          runs-on: ubuntu-latest
-          steps:
-          - uses: actions/checkout@v2
+ name: Deploy to Locaweb
 
-          - name: FTP Deploy Locaweb
-            uses: locaweb/ftp-deploy@1.0.0
-            with:
-              host: ${{ secrets.HOST }} 
-              user: ${{ secrets.USER }}
-              password: ${{ secrets.PASS }}
-              localDir: "dist"
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and Test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run typecheck
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: dist/
+          retention-days: 1
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    name: Deploy to Production
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Deploy to Locaweb
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o HostKeyAlgorithms=ssh-rsa \
+            -o PubkeyAcceptedKeyTypes=ssh-rsa \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+
+          set -e
+
+          echo "🚀 Starting deployment..."
+
+          # Navigate to app directory
+          APP_DIR="~/app"
+          cd $APP_DIR
+
+          # Backup current state
+          echo "📦 Creating backup..."
+          BACKUP_DIR="~/backups/backup-$(date +%Y%m%d-%H%M%S)"
+          mkdir -p $BACKUP_DIR
+          cp -r . $BACKUP_DIR/ || true
+
+          # Pull latest code
+          echo "📥 Pulling latest code..."
+          git fetch origin
+          git reset --hard origin/main
+
+          # Install dependencies
+          echo "📚 Installing dependencies..."
+          npm ci
+
+          # Build application
+          echo "🔨 Building application..."
+          npm run build
+
+          # Verify build artifacts
+          if [ ! -d "dist" ]; then
+            echo "❌ Build failed: dist directory not found"
+            exit 1
+          fi
+
+          # Stop PM2 gracefully
+          echo "🛑 Stopping application..."
+          pm2 stop site-rh-cursos || true
+
+          # Restart PM2 app
+          echo "▶️ Starting application..."
+          pm2 restart site-rh-cursos || pm2 start npm --name site-rh-cursos -- start
+          pm2 save
+
+          # Wait for app to start
+          sleep 5
+
+          # Health check
+          echo "🏥 Running health check..."
+          if curl -f http://localhost:3000 > /dev/null 2>&1; then
+            echo "✅ Application is responding correctly"
+          else
+            echo "⚠️ Health check warning: application may not be fully ready"
+          fi
+
+          # Cleanup old backups (keep last 10)
+          echo "🧹 Cleaning old backups..."
+          ls -t ~/backups | tail -n +11 | xargs -r rm -rf
+
+          echo "✅ Deployment completed successfully"
+          echo "📊 App status:"
+          pm2 list
+
+          EOF
+
+      - name: Verify deployment
+        run: |
+          echo "Checking deployment status..."
+          ssh -i ~/.ssh/deploy_key \
+            -o HostKeyAlgorithms=ssh-rsa \
+            -o PubkeyAcceptedKeyTypes=ssh-rsa \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+
+          pm2 list
+          echo "✅ Deployment verification complete"
+
+          EOF
+
+      - name: Notify success
+        if: success()
+        run: |
+          echo "🚀 Deployment to production completed successfully!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Branch: ${{ github.ref }}"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Please check the logs above for details"
+          exit 1
