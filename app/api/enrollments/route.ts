@@ -7,15 +7,21 @@ import { checkRateLimit, rateLimitConfigs } from "@/lib/rate-limiter";
 import { withCors, isOriginAllowed } from "@/lib/cors";
 import { getCsrfTokenFromRequest, validateCsrfToken } from "@/lib/csrf";
 import { getSessionSecret } from "@/lib/auth";
+import { handleApiError, RateLimitError, ForbiddenError, ValidationError } from "@/lib/error-handler";
+import { logEnrollmentEvent, logSecurityEvent } from "@/lib/audit-logger";
+import { applyApiSecurityHeaders } from "@/lib/security-headers";
 
 async function handlePost(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
+
   try {
     // Rate limiting check by IP
-    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
     const rateLimit = checkRateLimit(ip, rateLimitConfigs.enrollment);
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
+      logSecurityEvent("security.rate_limit_exceeded", ip);
+
+      const response = NextResponse.json(
         { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
         {
           status: 429,
@@ -25,44 +31,58 @@ async function handlePost(request: NextRequest) {
           },
         }
       );
+      return applyApiSecurityHeaders(response);
     }
 
     // CORS validation
     const origin = request.headers.get("origin");
     if (!isOriginAllowed(origin)) {
-      return NextResponse.json({ ok: false, error: "Origin not allowed" }, { status: 403 });
+      logSecurityEvent("security.suspicious_activity", ip, undefined, {
+        reason: "invalid_origin",
+        origin,
+      });
+
+      const response = NextResponse.json(
+        { ok: false, error: "Origin not allowed" },
+        { status: 403 }
+      );
+      return applyApiSecurityHeaders(response);
     }
 
     // CSRF token validation
     const csrfToken = getCsrfTokenFromRequest(request);
     if (!csrfToken || !validateCsrfToken(csrfToken, getSessionSecret())) {
-      return NextResponse.json(
-        { ok: false, error: "Invalid CSRF token" },
-        { status: 403 }
-      );
+      logSecurityEvent("security.csrf_failed", ip, undefined, {
+        hasCsrfToken: !!csrfToken,
+      });
+
+      throw new ForbiddenError("Invalid CSRF token");
     }
 
     // Parse and validate payload
     const payload = (await request.json().catch(() => null)) as unknown;
 
     if (!payload) {
-      return NextResponse.json(
-        { ok: false, error: "Invalid request body" },
-        { status: 400 }
-      );
+      throw new ValidationError("Invalid request body");
     }
 
     // Validate input using Zod schema
     const validation = validateInput(enrollmentSchema, payload);
 
     if (!validation.success) {
-      return NextResponse.json(
-        { ok: false, error: "Validation failed", errors: validation.errors },
-        { status: 400 }
-      );
+      throw new ValidationError("Validation failed", validation.errors);
     }
 
-    const enrollment = await createEnrollmentInSupabase(validation.data as Omit<Enrollment, "id" | "createdAt" | "status">);
+    // Create enrollment
+    const enrollment = await createEnrollmentInSupabase(
+      validation.data as Omit<Enrollment, "id" | "createdAt" | "status">
+    );
+
+    // Log successful enrollment
+    logEnrollmentEvent("create", enrollment.id, validation.data.email, ip, {
+      courseId: validation.data.courseId,
+      classId: validation.data.classId,
+    });
 
     const response = NextResponse.json(
       { ok: true, enrollment },
@@ -72,16 +92,13 @@ async function handlePost(request: NextRequest) {
     // Add rate limit info to headers
     response.headers.set("X-RateLimit-Remaining", rateLimit.remaining.toString());
 
-    return response;
+    // Apply API security headers
+    return applyApiSecurityHeaders(response);
   } catch (error) {
-    console.error("Error creating enrollment:", error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error: process.env.NODE_ENV === "development" ? (error instanceof Error ? error.message : "Unknown error") : "Internal server error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error, {
+      context: "enrollment.create",
+      ipAddress: ip,
+    });
   }
 }
 

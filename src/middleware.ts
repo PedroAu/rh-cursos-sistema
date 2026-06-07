@@ -1,24 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isOriginAllowed, setupCorsHeaders } from "@/lib/cors";
+import { applySecurityHeaders, applyApiSecurityHeaders } from "@/lib/security-headers";
 
 export function middleware(request: NextRequest) {
   const response = NextResponse.next();
 
-  // Add security headers
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
-  // HTTPS enforcement in production
-  if (process.env.NODE_ENV === "production") {
-    response.headers.set("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-  }
+  // Apply security headers globally
+  applySecurityHeaders(response);
 
   // Setup CORS headers for API routes
   if (request.nextUrl.pathname.startsWith("/api")) {
     const origin = request.headers.get("origin");
-    return setupCorsHeaders(response, origin);
+    setupCorsHeaders(response, origin);
+
+    // Additional security headers for API responses
+    applyApiSecurityHeaders(response);
   }
 
   return response;
@@ -26,7 +22,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // API routes
-    "/api/:path*",
+    // Protect all routes with security headers
+    "/:path*",
   ],
 };
