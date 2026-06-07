@@ -74,59 +74,20 @@ jobs:
             **/node_modules/**
             **/.env*
 
-      - name: Install Node.js on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            echo "🔍 Checking Node.js..."
-            if ! command -v node &> /dev/null; then
-              echo "📦 Installing Node.js 24 from tarball..."
-              mkdir -p ~/opt/node
-              cd ~/opt/node
-              # Using a stable Node.js 24 release
-              NODE_VERSION="v24.9.0"
-              curl -fsSL https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz -o node.tar.xz
-              tar -xf node.tar.xz
-              rm node.tar.xz
-              mkdir -p ~/.local/bin
-              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/node ~/.local/bin/node
-              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/npm ~/.local/bin/npm
-              ln -sf ~/opt/node/node-${NODE_VERSION}-linux-x64/bin/npx ~/.local/bin/npx
-              echo "✅ Node.js installed to ~/.local/bin"
-            else
-              echo "✅ Node.js already installed: $(node --version)"
-            fi
-            export PATH=$HOME/.local/bin:$PATH
-            node --version
-            npm --version
-
-      - name: Install dependencies on server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          script: |
-            export PATH=$HOME/.local/bin:$PATH
-            cd ~/app
-            echo "📚 Installing dependencies..."
-            npm ci --only=production
-            echo "▶️ Starting application..."
-            npm start > /tmp/app.log 2>&1 &
-            sleep 2
-            echo "✅ Application started"
-            ps aux | grep "npm start" | grep -v grep
-
       - name: Notify success
         if: success()
         run: |
-          echo "🚀 Deployment to production completed successfully!"
+          echo "🚀 Deployment to production completed via FTP!"
           echo "Commit: ${{ github.sha }}"
           echo "Author: ${{ github.actor }}"
           echo "Branch: ${{ github.ref }}"
+          echo ""
+          echo "📋 Next steps:"
+          echo "1. SSH into the server: ssh rhcursos2@ftp.rhcursos.com.br"
+          echo "2. Navigate to app: cd /app"
+          echo "3. Run install script: bash install-node.sh"
+          echo "4. Install dependencies: ./.node/bin/npm ci --only=production"
+          echo "5. Start application: ./.node/bin/npm start"
 
       - name: Notify failure
         if: failure()
