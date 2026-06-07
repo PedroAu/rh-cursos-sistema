@@ -63,12 +63,15 @@ export async function POST(request: NextRequest) {
   }
 
   const response = NextResponse.json({ ok: true, session });
+  const isProduction = process.env.NODE_ENV === "production";
+  const isSecure = request.nextUrl.protocol === "https:" || isProduction;
+
   response.cookies.set({
     name: SESSION_COOKIE,
     value: await encodeSession(session),
     httpOnly: true,
-    sameSite: "lax",
-    secure: request.nextUrl.protocol === "https:",
+    sameSite: "strict",
+    secure: isSecure,
     path: "/",
     maxAge: 60 * 60 * 8
   });

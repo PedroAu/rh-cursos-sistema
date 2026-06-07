@@ -7,16 +7,60 @@ export type DemoSession = {
 };
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
-const SESSION_SECRET = process.env.AUTH_SESSION_SECRET ?? "rh-cursos-local-session-secret";
 
-export const demoUsers: Array<DemoSession & { password: string }> = [
-  {
-    role: "admin",
-    email: "admin@rhcursos.demo",
-    password: "admin123",
-    name: "Admin RH Cursos"
+function getSessionSecret(): string {
+  const secret = process.env.AUTH_SESSION_SECRET;
+
+  if (!secret) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "AUTH_SESSION_SECRET environment variable is required in production"
+      );
+    }
+    console.warn(
+      "⚠️ AUTH_SESSION_SECRET not set. Using insecure fallback for development only."
+    );
+    return "dev-insecure-fallback-change-in-production";
   }
-];
+
+  if (secret.length < 32) {
+    throw new Error(
+      "AUTH_SESSION_SECRET must be at least 32 characters for security"
+    );
+  }
+
+  return secret;
+}
+
+export const SESSION_SECRET = getSessionSecret();
+
+function getDemoUsers(): Array<DemoSession & { password: string }> {
+  if (process.env.NODE_ENV === "production") {
+    return [];
+  }
+
+  const demoPassword = process.env.DEMO_ADMIN_PASSWORD;
+  if (!demoPassword) {
+    if (process.env.DEMO_AUTH_ENABLED !== "true") {
+      return [];
+    }
+    console.warn(
+      "⚠️ DEMO_ADMIN_PASSWORD not set. Demo authentication disabled."
+    );
+    return [];
+  }
+
+  return [
+    {
+      role: "admin",
+      email: "admin@rhcursos.demo",
+      password: demoPassword,
+      name: "Admin RH Cursos"
+    }
+  ];
+}
+
+export const demoUsers = getDemoUsers();
 
 function toBase64Url(value: ArrayBuffer | string) {
   const binary =

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
 import { company } from "@/lib/company";
+import "@/lib/env-validation";
 
 export const metadata: Metadata = {
   title: "RH Cursos & Soluções",
