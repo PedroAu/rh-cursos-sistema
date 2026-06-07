@@ -32,6 +32,12 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET || 'build-default-secret' }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co' }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'build-default-key' }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL || 'postgresql://user:pass@localhost/db' }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
