@@ -8,7 +8,7 @@ export type DemoSession = {
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
 
-function getSessionSecret(): string {
+export function getSessionSecret(): string {
   const secret = process.env.AUTH_SESSION_SECRET;
 
   if (!secret) {
