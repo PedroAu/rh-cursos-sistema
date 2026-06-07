@@ -74,6 +74,27 @@ jobs:
             **/node_modules/**
             **/.env*
 
+      - name: Install Node.js on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            echo "🔍 Checking Node.js..."
+            if ! command -v node &> /dev/null; then
+              echo "📦 Installing Node.js 20..."
+              cd /tmp
+              curl -fsSL https://deb.nodesource.com/setup_20.x | bash - || true
+              apt-get update -qq
+              apt-get install -y nodejs
+              echo "✅ Node.js installed"
+            else
+              echo "✅ Node.js already installed: $(node --version)"
+            fi
+            node --version
+            npm --version
+
       - name: Install dependencies on server
         uses: appleboy/ssh-action@master
         with:
@@ -82,20 +103,11 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ~/app
-            # Find npm location
-            NPM_PATH=$(find /home -name npm -type f 2>/dev/null | head -1)
-            if [ -z "$NPM_PATH" ]; then
-              NPM_PATH=$(find /usr -name npm -type f 2>/dev/null | head -1)
-            fi
-            echo "NPM found at: $NPM_PATH"
-
-            if [ -n "$NPM_PATH" ]; then
-              $NPM_PATH ci --only=production
-              node -e "require('child_process').spawn('node', ['node_modules/.bin/next', 'start'], {detached: true, stdio: 'ignore'})"
-            else
-              echo "❌ npm not found"
-              exit 1
-            fi
+            echo "📚 Installing dependencies..."
+            npm ci --only=production
+            echo "▶️ Starting application..."
+            npm start > /tmp/app.log 2>&1 &
+            sleep 2
             echo "✅ Application started"
 
       - name: Notify success
