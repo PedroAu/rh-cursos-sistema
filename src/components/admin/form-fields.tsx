@@ -133,6 +133,7 @@ export function ModulesBuilder({
     topics: string[];
     duration: string;
   }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (v: any[]) => void;
   error?: string;
 }) {
