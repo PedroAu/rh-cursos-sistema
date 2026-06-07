@@ -56,126 +56,25 @@ jobs:
     environment: production
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
           name: build
           path: ./build-artifacts
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
-
-      - name: Prepare remote directory
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o HostKeyAlgorithms=ssh-rsa \
-            -o PubkeyAcceptedKeyTypes=ssh-rsa \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=10 \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-
-          set -e
-          echo "🚀 Starting deployment..."
-          APP_DIR="$HOME/app"
-
-          # Create app directory if needed
-          if [ ! -d "$APP_DIR" ]; then
-            echo "📁 Creating app directory..."
-            mkdir -p $APP_DIR
-          fi
-
-          # Backup current state
-          echo "📦 Creating backup..."
-          BACKUP_DIR="$HOME/backups/backup-$(date +%Y%m%d-%H%M%S)"
-          mkdir -p $BACKUP_DIR
-          if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
-            cp -r $APP_DIR/* $BACKUP_DIR/ 2>/dev/null || true
-          fi
-
-          # Clean build artifacts only (keep node_modules)
-          echo "🧹 Cleaning previous build..."
-          cd $APP_DIR
-          rm -rf .next || true
-          rm -f package*.json || true
-
-          echo "✅ Directory ready for deployment"
-
-          EOF
-
-      - name: Copy build artifacts via SCP
-        run: |
-          scp -i ~/.ssh/deploy_key \
-            -o HostKeyAlgorithms=ssh-rsa \
-            -o PubkeyAcceptedKeyTypes=ssh-rsa \
-            -o StrictHostKeyChecking=no \
-            -r ./build-artifacts/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/app/
-
-      - name: Install dependencies and restart
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o HostKeyAlgorithms=ssh-rsa \
-            -o PubkeyAcceptedKeyTypes=ssh-rsa \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=10 \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-
-          set -e
-          cd $HOME/app
-
-          echo "📚 Installing dependencies..."
-          npm ci --only=production 2>/dev/null || npm install --production
-
-          # Stop PM2 gracefully
-          echo "🛑 Stopping application..."
-          pm2 stop site-rh-cursos || true
-
-          # Restart PM2 app
-          echo "▶️ Starting application..."
-          pm2 restart site-rh-cursos || pm2 start npm --name site-rh-cursos -- start
-          pm2 save
-
-          # Wait for app to start
-          sleep 5
-
-          # Health check
-          echo "🏥 Running health check..."
-          if curl -f http://localhost:3000 > /dev/null 2>&1; then
-            echo "✅ Application is responding correctly"
-          else
-            echo "⚠️ Health check warning: application may not be fully ready"
-          fi
-
-          # Cleanup old backups (keep last 10)
-          echo "🧹 Cleaning old backups..."
-          ls -t $HOME/backups 2>/dev/null | tail -n +11 | xargs -r rm -rf 2>/dev/null || true
-
-          echo "✅ Deployment completed successfully"
-          echo "📊 App status:"
-          pm2 list
-
-          EOF
-
-      - name: Verify deployment
-        if: success()
-        run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o HostKeyAlgorithms=ssh-rsa \
-            -o PubkeyAcceptedKeyTypes=ssh-rsa \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=10 \
-            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-
-          pm2 list
-          echo "✅ Deployment verification complete"
-
-          EOF
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./build-artifacts/
+          server-dir: /app/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/node_modules/**
+            **/.env*
 
       - name: Notify success
         if: success()
