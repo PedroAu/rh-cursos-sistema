@@ -43,7 +43,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: .
+          path: |
+            .next/
+            public/
+            package.json
+            package-lock.json
           retention-days: 1
           if-no-files-found: error
 
@@ -73,24 +77,37 @@ jobs:
             **/.git*
             **/node_modules/**
             **/.env*
+            **/test-results/**
+            **/.next/.cache/**
+            **/.next/cache/**
+
+      - name: Verify deployment
+        run: |
+          echo "✅ Build artifacts deployed to /app/"
+          echo ""
+          echo "📋 Deployment Summary:"
+          echo "  Commit: ${{ github.sha }}"
+          echo "  Author: ${{ github.actor }}"
+          echo "  Branch: ${{ github.ref }}"
+          echo "  Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
       - name: Notify success
         if: success()
         run: |
           echo "🚀 Deployment to production completed via FTP!"
-          echo "Commit: ${{ github.sha }}"
-          echo "Author: ${{ github.actor }}"
-          echo "Branch: ${{ github.ref }}"
           echo ""
           echo "📋 Next step - Complete setup via HTTP:"
-          echo "Visit: https://www.rhcursos.com.br/setup.php?token=setup-$(date +%Y-%m-%d)"
+          echo "Visit: https://www.rhcursos.com.br/setup.php"
           echo ""
           echo "This will:"
-          echo "  1. Install Node.js 24.9.0"
+          echo "  1. Install Node.js 24.9.0 (if not present)"
           echo "  2. Run npm ci --only=production"
-          echo "  3. Start the application"
+          echo "  3. Start the application with: npm start"
           echo ""
-          echo "⚠️  After setup, delete setup.php from the server for security"
+          echo "⚠️  IMPORTANT:"
+          echo "  - After setup completes, delete setup.php from the server"
+          echo "  - Monitor /tmp/app.log for application output"
+          echo "  - Check port assignment with your hosting provider"
 
       - name: Notify failure
         if: failure()
