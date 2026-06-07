@@ -43,7 +43,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: dist/
+          path: |
+            dist/
+            package.json
+            package-lock.json
           retention-days: 1
 
   deploy:
@@ -85,31 +88,26 @@ jobs:
             mkdir -p $APP_DIR
           fi
 
-          cd $APP_DIR
-
-          # Initialize git repository if it doesn't exist
-          if [ ! -d ".git" ]; then
-            echo "🔧 Initializing git repository..."
-            git init
-            git remote add origin git@github.com:PedroAu/site-rh-cursos.git
-          fi
-
-          # Configure git to use SSH for GitHub
-          mkdir -p ~/.ssh
-          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>/dev/null || true
-
           # Backup current state
           echo "📦 Creating backup..."
           BACKUP_DIR="~/backups/backup-$(date +%Y%m%d-%H%M%S)"
           mkdir -p $BACKUP_DIR
-          if [ -f ".git" ] || [ -d ".git" ]; then
-            cp -r --exclude=.git . $BACKUP_DIR/ || true
+          if [ "$(ls -A $APP_DIR)" ]; then
+            cp -r $APP_DIR/* $BACKUP_DIR/ 2>/dev/null || true
           fi
 
-          # Pull latest code
-          echo "📥 Pulling latest code..."
-          git fetch origin
-          git reset --hard origin/main
+          # Clone repository
+          echo "📥 Cloning latest code..."
+          cd /tmp
+          rm -rf site-rh-cursos-deploy
+          git clone https://github.com/PedroAu/site-rh-cursos.git site-rh-cursos-deploy 2>/dev/null || \
+          git clone --depth 1 https://github.com/PedroAu/site-rh-cursos.git site-rh-cursos-deploy || \
+          (wget -q -O - https://github.com/PedroAu/site-rh-cursos/archive/main.zip 2>/dev/null | unzip -q - && mv site-rh-cursos-main site-rh-cursos-deploy) || \
+          (curl -sL https://github.com/PedroAu/site-rh-cursos/archive/main.zip 2>/dev/null | unzip -q - && mv site-rh-cursos-main site-rh-cursos-deploy)
+
+          # Copy to app directory
+          cp -r /tmp/site-rh-cursos-deploy/* $APP_DIR/
+          cd $APP_DIR
 
           # Install dependencies
           echo "📚 Installing dependencies..."
