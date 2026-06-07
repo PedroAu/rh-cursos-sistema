@@ -91,8 +91,12 @@ jobs:
           if [ ! -d ".git" ]; then
             echo "🔧 Initializing git repository..."
             git init
-            git remote add origin https://github.com/PedroAu/site-rh-cursos.git
+            git remote add origin git@github.com:PedroAu/site-rh-cursos.git
           fi
+
+          # Configure git to use SSH for GitHub
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>/dev/null || true
 
           # Backup current state
           echo "📦 Creating backup..."
