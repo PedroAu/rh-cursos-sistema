@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // Email validation
-const emailSchema = z.string().email("Email inválido").toLowerCase().trim();
+const emailSchema = z.string().email("Email inválido").toLowerCase();
 
 // CPF validation (format: XXX.XXX.XXX-XX)
 const cpfSchema = z
@@ -113,7 +113,7 @@ export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { succe
   } catch (error) {
     if (error instanceof z.ZodError) {
       const errors: Record<string, string> = {};
-      error.errors.forEach((err: z.ZodIssue) => {
+      error.issues.forEach((err) => {
         const path = err.path.join(".");
         errors[path] = err.message;
       });

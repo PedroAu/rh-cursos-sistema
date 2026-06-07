@@ -110,6 +110,9 @@ export type Lead = {
   courseInterest: string;
   organization?: string;
   teamSize?: number;
+  preferredModality?: string;
+  trainingObjective?: string;
+  mainChallenges?: string;
   origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn";
   status: LeadStatus;
   message: string;

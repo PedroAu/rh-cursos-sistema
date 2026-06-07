@@ -128,9 +128,9 @@ export function InCompanyPage() {
       teamSize: Number(form.groupSize),
       preferredModality: form.modality,
       trainingObjective: form.trainingObjective,
-      trainingTheme: form.trainingTheme,
       mainChallenges: form.mainChallenges,
       origin: "Site",
+      status: "Novo",
       message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
     });
     toast.success("Proposta registrada para atendimento consultivo.");
