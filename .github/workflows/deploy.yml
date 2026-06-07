@@ -82,12 +82,15 @@ jobs:
           echo "Author: ${{ github.actor }}"
           echo "Branch: ${{ github.ref }}"
           echo ""
-          echo "📋 Next steps:"
-          echo "1. SSH into the server: ssh rhcursos2@ftp.rhcursos.com.br"
-          echo "2. Navigate to app: cd /app"
-          echo "3. Run install script: bash install-node.sh"
-          echo "4. Install dependencies: ./.node/bin/npm ci --only=production"
-          echo "5. Start application: ./.node/bin/npm start"
+          echo "📋 Next step - Complete setup via HTTP:"
+          echo "Visit: https://www.rhcursos.com.br/setup.php?token=setup-$(date +%Y-%m-%d)"
+          echo ""
+          echo "This will:"
+          echo "  1. Install Node.js 24.9.0"
+          echo "  2. Run npm ci --only=production"
+          echo "  3. Start the application"
+          echo ""
+          echo "⚠️  After setup, delete setup.php from the server for security"
 
       - name: Notify failure
         if: failure()
