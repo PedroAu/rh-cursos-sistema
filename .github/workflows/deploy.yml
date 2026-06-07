@@ -82,10 +82,20 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd ~/app
-            export PATH=/usr/local/bin:$PATH
-            which npm
-            npm ci --only=production
-            npm start &
+            # Find npm location
+            NPM_PATH=$(find /home -name npm -type f 2>/dev/null | head -1)
+            if [ -z "$NPM_PATH" ]; then
+              NPM_PATH=$(find /usr -name npm -type f 2>/dev/null | head -1)
+            fi
+            echo "NPM found at: $NPM_PATH"
+
+            if [ -n "$NPM_PATH" ]; then
+              $NPM_PATH ci --only=production
+              node -e "require('child_process').spawn('node', ['node_modules/.bin/next', 'start'], {detached: true, stdio: 'ignore'})"
+            else
+              echo "❌ npm not found"
+              exit 1
+            fi
             echo "✅ Application started"
 
       - name: Notify success
