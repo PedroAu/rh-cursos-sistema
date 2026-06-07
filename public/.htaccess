@@ -1,0 +1,15 @@
+# Redirect all requests to Next.js server
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Allow setup.php to be accessed directly
+  RewriteRule ^setup\.php$ - [L]
+
+  # Skip rewriting for actual files and directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Route all requests to index.html (Next.js will handle routing)
+  RewriteRule ^(.*)$ index.html [L]
+</IfModule>
