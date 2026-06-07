@@ -100,7 +100,8 @@ export const adminResourceSchema = z.object({
     .transform((val) => (val ? val.trim() : undefined)),
   type: z.enum(["document", "video", "link", "other"]),
   url: z.string().url("URL inválida").optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata: z.record(z.string(), z.any()).optional(),
 });
 
 export type AdminResource = z.infer<typeof adminResourceSchema>;

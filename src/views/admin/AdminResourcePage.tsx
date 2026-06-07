@@ -45,7 +45,8 @@ type FieldConfig = {
   required?: boolean;
 };
 
-function exportToCSV(data: Record<string, unknown>[], filename: string) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function exportToCSV(data: any[], filename: string) {
   if (data.length === 0) {
     return;
   }
@@ -80,7 +81,8 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Record<string, unknown>>({});
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [form, setForm] = useState<Record<string, any>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const errorsByField = useMemo(() => {
     const result: { [key: string]: string } = {};
