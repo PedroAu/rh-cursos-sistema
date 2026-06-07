@@ -388,13 +388,13 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               phone: row.phone || "",
               courseInterest: row.courseInterest,
               origin: row.origin,
-              status: row.status || "Novo",
+              status: row.status,
               organization: row.organization || "",
               teamSize: row.teamSize?.toString() || "",
               preferredModality: row.preferredModality || "",
               trainingObjective: row.trainingObjective || "",
               mainChallenges: row.mainChallenges || "",
-              message: ""
+              message: row.message || ""
             });
             setValidationErrors([]);
             setOpen(true);

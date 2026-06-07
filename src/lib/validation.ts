@@ -106,7 +106,7 @@ export const adminResourceSchema = z.object({
 export type AdminResource = z.infer<typeof adminResourceSchema>;
 
 // Validation helper function
-export function validateInput<T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: T } | { success: false; errors: Record<string, string> } {
+export function validateInput<T>(schema: z.ZodType<T>, data: unknown): { success: true; data: T } | { success: false; errors: Record<string, string> } {
   try {
     const validatedData = schema.parse(data);
     return { success: true, data: validatedData };
