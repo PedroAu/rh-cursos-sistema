@@ -78,6 +78,13 @@ jobs:
 
           # Navigate to app directory
           APP_DIR="~/app"
+
+          # Create app directory if it doesn't exist
+          if [ ! -d "$APP_DIR" ]; then
+            echo "📁 Creating app directory..."
+            mkdir -p $APP_DIR
+          fi
+
           cd $APP_DIR
 
           # Backup current state
