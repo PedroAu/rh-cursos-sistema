@@ -77,13 +77,14 @@ jobs:
       - name: Install dependencies on server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd /app
             npm ci --only=production
-            echo "✅ Dependencies installed"
+            npm start &
+            echo "✅ Application started"
 
       - name: Notify success
         if: success()
