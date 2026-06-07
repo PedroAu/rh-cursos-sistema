@@ -33,7 +33,7 @@ import {
   validateBlogPost,
   type ValidationError
 } from "@/lib/admin-form-validation";
-import type { BlogPost, Course, Enrollment, Instructor, Lead, Student, TrainingClass } from "@/types";
+import type { BlogPost, Course, Enrollment, Instructor, Lead, Student, TrainingClass, TrainingPath } from "@/types";
 
 type ResourceKey = "courses" | "classes" | "students" | "leads" | "enrollments" | "instructors" | "blog";
 
@@ -45,7 +45,7 @@ type FieldConfig = {
   required?: boolean;
 };
 
-function exportToCSV(data: any[], filename: string) {
+function exportToCSV(data: Record<string, unknown>[], filename: string) {
   if (data.length === 0) {
     return;
   }
@@ -80,7 +80,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<Record<string, unknown>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const errorsByField = useMemo(() => {
     const result: { [key: string]: string } = {};
@@ -106,7 +106,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     switch (resource) {
       case "courses": {
         const rows = store.courses.filter((item) => item.title.toLowerCase().includes(search.toLowerCase()));
-        const pathOptions = store.trainingPaths?.map((p: any) => ({ value: p.id, label: p.name })) || [];
+        const pathOptions = store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
         const modalityOptions = [
           { value: "Ao vivo online", label: "Ao vivo online" },
           { value: "Presencial", label: "Presencial" },

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { BlogPostClient } from "@/components/page-clients/blog-post-client";
 import { mockBlogPosts } from "@/data";
+import type { BlogPost } from "@/types";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -12,12 +13,12 @@ async function getBlogPosts() {
 }
 
 export async function generateStaticParams() {
-  return (await getBlogPosts()).map((post: any) => ({ slug: post.slug }));
+  return (await getBlogPosts()).map((post: BlogPost) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = (await getBlogPosts()).find((item: any) => item.slug === slug);
+  const post = (await getBlogPosts()).find((item: BlogPost) => item.slug === slug);
 
   if (!post) {
     return {
