@@ -8,10 +8,20 @@
 $allowed_token = 'setup-' . date('Y-m-d');
 $provided_token = $_GET['token'] ?? '';
 
+// Debug: Show current date and expected token
+$current_date = date('Y-m-d');
+$server_timezone = date_default_timezone_get();
+
 if ($provided_token !== $allowed_token) {
     http_response_code(403);
-    echo "❌ Access denied. Invalid or missing token.\n";
+    echo "❌ Access denied. Invalid or missing token.\n\n";
+    echo "Debug Info:\n";
+    echo "  Current Date: $current_date\n";
+    echo "  Server Timezone: $server_timezone\n";
+    echo "  Expected Token: $allowed_token\n";
+    echo "  Provided Token: " . ($provided_token ?: "(empty)") . "\n\n";
     echo "Expected token format: setup-YYYY-MM-DD\n";
+    echo "Example: setup-$current_date\n";
     die();
 }
 
