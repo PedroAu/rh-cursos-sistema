@@ -43,11 +43,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build
-          path: |
-            .next/
-            package.json
-            package-lock.json
+          path: .
           retention-days: 1
+          if-no-files-found: error
 
   deploy:
     needs: build-and-test
@@ -75,6 +73,17 @@ jobs:
             **/.git*
             **/node_modules/**
             **/.env*
+
+      - name: Install dependencies on server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          script: |
+            cd /app
+            npm ci --only=production
+            echo "✅ Dependencies installed"
 
       - name: Notify success
         if: success()
