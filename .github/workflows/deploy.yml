@@ -83,24 +83,14 @@ jobs:
           script: |
             echo "🔍 Checking Node.js..."
             if ! command -v node &> /dev/null; then
-              echo "📦 Installing Node.js 20..."
-
-              # Detect OS and install accordingly
-              if [ -f /etc/redhat-release ]; then
-                echo "CentOS/RedHat detected"
-                curl -fsSL https://rpm.nodesource.com/setup_24.x | bash - || true
-                yum install -y nodejs || dnf install -y nodejs
-              elif [ -f /etc/debian_version ]; then
-                echo "Debian/Ubuntu detected"
-                curl -fsSL https://deb.nodesource.com/setup_24.x | bash - || true
-                apt-get update -qq && apt-get install -y nodejs
-              else
-                echo "Unknown OS, trying to install from source..."
-                cd /tmp && curl -O https://nodejs.org/dist/v24.0.0/node-v24.0.0-linux-x64.tar.xz
-                tar -xf node-v24.0.0-linux-x64.tar.xz
-                ln -sf /tmp/node-v24.0.0-linux-x64/bin/node /usr/local/bin/node
-                ln -sf /tmp/node-v24.0.0-linux-x64/bin/npm /usr/local/bin/npm
-              fi
+              echo "📦 Installing Node.js 24 from tarball..."
+              cd /tmp
+              curl -fsSL -O https://nodejs.org/dist/v24.0.0/node-v24.0.0-linux-x64.tar.xz
+              tar -xf node-v24.0.0-linux-x64.tar.xz
+              sudo mkdir -p /opt/node
+              sudo mv node-v24.0.0-linux-x64 /opt/node/
+              sudo ln -sf /opt/node/node-v24.0.0-linux-x64/bin/node /usr/local/bin/node
+              sudo ln -sf /opt/node/node-v24.0.0-linux-x64/bin/npm /usr/local/bin/npm
               echo "✅ Node.js installed"
             else
               echo "✅ Node.js already installed: $(node --version)"
