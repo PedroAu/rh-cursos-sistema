@@ -44,7 +44,7 @@ jobs:
         with:
           name: build
           path: |
-            dist/
+            .next/
             package.json
             package-lock.json
           retention-days: 1
@@ -59,6 +59,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: ./build-artifacts
+
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -66,7 +72,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -t rsa -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
-      - name: Deploy to Locaweb
+      - name: Prepare remote directory
         run: |
           ssh -i ~/.ssh/deploy_key \
             -o HostKeyAlgorithms=ssh-rsa \
@@ -76,13 +82,10 @@ jobs:
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
 
           set -e
-
           echo "🚀 Starting deployment..."
+          APP_DIR="$HOME/app"
 
-          # Navigate to app directory
-          APP_DIR="~/app"
-
-          # Create app directory if it doesn't exist
+          # Create app directory if needed
           if [ ! -d "$APP_DIR" ]; then
             echo "📁 Creating app directory..."
             mkdir -p $APP_DIR
@@ -90,38 +93,44 @@ jobs:
 
           # Backup current state
           echo "📦 Creating backup..."
-          BACKUP_DIR="~/backups/backup-$(date +%Y%m%d-%H%M%S)"
+          BACKUP_DIR="$HOME/backups/backup-$(date +%Y%m%d-%H%M%S)"
           mkdir -p $BACKUP_DIR
-          if [ "$(ls -A $APP_DIR)" ]; then
+          if [ -d "$APP_DIR" ] && [ "$(ls -A $APP_DIR)" ]; then
             cp -r $APP_DIR/* $BACKUP_DIR/ 2>/dev/null || true
           fi
 
-          # Clone repository
-          echo "📥 Cloning latest code..."
-          cd /tmp
-          rm -rf site-rh-cursos-deploy
-          git clone https://github.com/PedroAu/site-rh-cursos.git site-rh-cursos-deploy 2>/dev/null || \
-          git clone --depth 1 https://github.com/PedroAu/site-rh-cursos.git site-rh-cursos-deploy || \
-          (wget -q -O - https://github.com/PedroAu/site-rh-cursos/archive/main.zip 2>/dev/null | unzip -q - && mv site-rh-cursos-main site-rh-cursos-deploy) || \
-          (curl -sL https://github.com/PedroAu/site-rh-cursos/archive/main.zip 2>/dev/null | unzip -q - && mv site-rh-cursos-main site-rh-cursos-deploy)
-
-          # Copy to app directory
-          cp -r /tmp/site-rh-cursos-deploy/* $APP_DIR/
+          # Clean build artifacts only (keep node_modules)
+          echo "🧹 Cleaning previous build..."
           cd $APP_DIR
+          rm -rf .next || true
+          rm -f package*.json || true
 
-          # Install dependencies
+          echo "✅ Directory ready for deployment"
+
+          EOF
+
+      - name: Copy build artifacts via SCP
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -o HostKeyAlgorithms=ssh-rsa \
+            -o PubkeyAcceptedKeyTypes=ssh-rsa \
+            -o StrictHostKeyChecking=no \
+            -r ./build-artifacts/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:$HOME/app/
+
+      - name: Install dependencies and restart
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o HostKeyAlgorithms=ssh-rsa \
+            -o PubkeyAcceptedKeyTypes=ssh-rsa \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+
+          set -e
+          cd $HOME/app
+
           echo "📚 Installing dependencies..."
-          npm ci
-
-          # Build application
-          echo "🔨 Building application..."
-          npm run build
-
-          # Verify build artifacts
-          if [ ! -d "dist" ]; then
-            echo "❌ Build failed: dist directory not found"
-            exit 1
-          fi
+          npm ci --only=production 2>/dev/null || npm install --production
 
           # Stop PM2 gracefully
           echo "🛑 Stopping application..."
@@ -145,7 +154,7 @@ jobs:
 
           # Cleanup old backups (keep last 10)
           echo "🧹 Cleaning old backups..."
-          ls -t ~/backups | tail -n +11 | xargs -r rm -rf
+          ls -t $HOME/backups 2>/dev/null | tail -n +11 | xargs -r rm -rf 2>/dev/null || true
 
           echo "✅ Deployment completed successfully"
           echo "📊 App status:"
@@ -154,8 +163,8 @@ jobs:
           EOF
 
       - name: Verify deployment
+        if: success()
         run: |
-          echo "Checking deployment status..."
           ssh -i ~/.ssh/deploy_key \
             -o HostKeyAlgorithms=ssh-rsa \
             -o PubkeyAcceptedKeyTypes=ssh-rsa \
