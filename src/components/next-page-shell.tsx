@@ -2,6 +2,7 @@
 
 import { Suspense, type ReactNode } from "react";
 
+import { AdminGuard } from "@/components/admin/admin-guard";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { AppStoreProvider } from "@/lib/app-store";
@@ -26,7 +27,9 @@ export function DashboardPageShell({
   return (
     <AppStoreProvider>
       <Suspense fallback={null}>
-        <DashboardShell role={role}>{children}</DashboardShell>
+        <AdminGuard>
+          <DashboardShell role={role}>{children}</DashboardShell>
+        </AdminGuard>
       </Suspense>
     </AppStoreProvider>
   );
