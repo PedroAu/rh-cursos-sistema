@@ -15,6 +15,17 @@ import {
   toDbEnrollmentStatus,
   toDbLeadStatus,
 } from "../_shared/admin-mappers.ts";
+import {
+  blogPostSchema,
+  classSchema,
+  courseSchema,
+  deleteIdSchema,
+  enrollmentStatusSchema,
+  instructorSchema,
+  leadSchema,
+  leadStatusUpdateSchema,
+  studentSchema,
+} from "../_shared/admin-validation.ts";
 
 type ResourceKey =
   | "courses"
@@ -29,6 +40,38 @@ type AdminMutation =
   | { resource: ResourceKey; action: "upsert"; payload: Record<string, unknown> }
   | { resource: ResourceKey; action: "delete"; id: string }
   | { resource: ResourceKey; action: "update-status"; id: string; status: string };
+
+function validateMutation(mutation: AdminMutation): string | null {
+  try {
+    if (mutation.action === "delete") {
+      deleteIdSchema.parse({ id: mutation.id });
+      return null;
+    }
+
+    if (mutation.action === "update-status") {
+      if (mutation.resource === "leads") leadStatusUpdateSchema.parse({ status: mutation.status });
+      if (mutation.resource === "enrollments") enrollmentStatusSchema.parse({ status: mutation.status });
+      return null;
+    }
+
+    const p = mutation.payload;
+    if (mutation.resource === "courses") courseSchema.parse(p);
+    else if (mutation.resource === "classes") classSchema.parse(p);
+    else if (mutation.resource === "students") studentSchema.parse(p);
+    else if (mutation.resource === "leads") leadSchema.parse(p);
+    else if (mutation.resource === "enrollments") enrollmentStatusSchema.parse(p);
+    else if (mutation.resource === "instructors") instructorSchema.parse(p);
+    else if (mutation.resource === "blog") blogPostSchema.parse(p);
+
+    return null;
+  } catch (err) {
+    if (err && typeof err === "object" && "errors" in err) {
+      const issues = (err as { errors: Array<{ message: string }> }).errors;
+      return issues.map((i) => i.message).join("; ");
+    }
+    return "Payload inválido.";
+  }
+}
 
 async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolean }> {
   const supabase = adminClient();
@@ -93,9 +136,40 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
   } else if (mutation.resource === "blog") {
     const { error } = await supabase.from("post_blog").upsert(blogPostToUpsert(p));
     if (error) throw error;
+  } else if (mutation.resource === "leads") {
+    const update: Record<string, unknown> = {
+      nome: p.name,
+      email: p.email,
+      telefone: p.phone,
+      orgao: p.organization,
+      num_participantes: p.teamSize,
+      tema_interesse: p.courseInterest,
+      origem: p.origin,
+      modalidade_preferida: p.preferredModality,
+      objetivo_treinamento: p.trainingObjective,
+      desafios_principais: p.mainChallenges,
+    };
+    if (typeof p.status === "string") {
+      update.status_crm = toDbLeadStatus(p.status);
+    }
+    const { error } = await supabase
+      .from("lead")
+      .update(update)
+      .eq("id", (p.id as string) ?? "");
+    if (error) throw error;
   }
 
   return { skipped: false };
+}
+
+const SENSITIVE_FIELDS = new Set(["cpf", "password", "token", "secret"]);
+
+function sanitizePayloadForAudit(
+  payload: Record<string, unknown>
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(payload).filter(([key]) => !SENSITIVE_FIELDS.has(key.toLowerCase()))
+  );
 }
 
 Deno.serve(async (request) => {
@@ -132,8 +206,38 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Mutação inválida." }, 400, request);
   }
 
+  const validationError = validateMutation(mutation);
+  if (validationError) {
+    return jsonResponse({ ok: false, error: validationError }, 422, request);
+  }
+
   try {
     const result = await applyMutation(mutation);
+
+    // Audit log assíncrono — não bloqueia a resposta nem falha a requisição
+    const resourceId =
+      mutation.action === "delete" || mutation.action === "update-status"
+        ? mutation.id
+        : (mutation.payload as Record<string, unknown>)?.id as string | undefined;
+
+    const safePayload =
+      mutation.action === "upsert"
+        ? sanitizePayloadForAudit(mutation.payload as Record<string, unknown>)
+        : null;
+
+    adminClient()
+      .from("admin_audit_log")
+      .insert({
+        admin_email: session.email,
+        action: mutation.action,
+        resource: mutation.resource,
+        resource_id: resourceId ?? null,
+        payload: safePayload,
+      })
+      .then(({ error }) => {
+        if (error) console.warn("audit log insert failed:", error.message);
+      });
+
     return jsonResponse({ ok: true, ...result }, 200, request);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao persistir recurso.";

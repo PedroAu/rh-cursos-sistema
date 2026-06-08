@@ -1,7 +1,7 @@
 import type * as React from "react";
 import { useState } from "react";
 
-import { Pencil, Trash2, ChevronUp, ChevronDown } from "lucide-react";
+import { Pencil, Trash2, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,6 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+
+const PAGE_SIZE = 20;
 
 type Column<T> = {
   key: string;
@@ -35,8 +37,10 @@ export function DataTable<T extends { id: string }>({
 }) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [confirmDeleteBulk, setConfirmDeleteBulk] = useState(false);
+  const [confirmDeleteRow, setConfirmDeleteRow] = useState<T | null>(null);
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
 
   const handleSort = (key: string) => {
     if (sortKey === key) {
@@ -45,6 +49,7 @@ export function DataTable<T extends { id: string }>({
       setSortKey(key);
       setSortDir("asc");
     }
+    setPage(1);
   };
 
   const sortedData = [...data].sort((a, b) => {
@@ -60,6 +65,11 @@ export function DataTable<T extends { id: string }>({
     }
     return 0;
   });
+
+  const totalPages = Math.max(1, Math.ceil(sortedData.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageData = sortedData.slice(pageStart, pageStart + PAGE_SIZE);
 
   const toggleRow = (id: string) => {
     const newSelected = new Set(selectedIds);
@@ -87,6 +97,7 @@ export function DataTable<T extends { id: string }>({
     setSelectedIds(new Set());
     setConfirmDeleteBulk(false);
   };
+
   return (
     <>
       {selectedIds.size > 0 && (
@@ -132,7 +143,7 @@ export function DataTable<T extends { id: string }>({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedData.map((row) => (
+          {pageData.map((row) => (
             <TableRow key={row.id}>
               {onDelete && (
                 <TableCell>
@@ -154,7 +165,7 @@ export function DataTable<T extends { id: string }>({
                     </Button>
                   ) : null}
                   {onDelete ? (
-                    <Button size="icon" variant="outline" onClick={() => onDelete(row)}>
+                    <Button size="icon" variant="outline" onClick={() => setConfirmDeleteRow(row)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   ) : null}
@@ -164,6 +175,37 @@ export function DataTable<T extends { id: string }>({
           ))}
         </TableBody>
       </Table>
+
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, sortedData.length)} de {sortedData.length} registros
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              aria-label="Página anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="px-3">
+              {safePage} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              aria-label="Próxima página"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AlertDialog open={confirmDeleteBulk} onOpenChange={setConfirmDeleteBulk}>
         <AlertDialogContent>
@@ -175,8 +217,30 @@ export function DataTable<T extends { id: string }>({
           </AlertDialogHeader>
           <div className="flex justify-end gap-3">
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleBulkDelete}>
+              Deletar
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!confirmDeleteRow} onOpenChange={(open) => { if (!open) setConfirmDeleteRow(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deletar este item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex justify-end gap-3">
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleBulkDelete}
+              onClick={() => {
+                if (confirmDeleteRow && onDelete) {
+                  onDelete(confirmDeleteRow);
+                }
+                setConfirmDeleteRow(null);
+              }}
             >
               Deletar
             </AlertDialogAction>
