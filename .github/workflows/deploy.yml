@@ -10,6 +10,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     name: Build Static Export
+    environment: production
 
     steps:
       - name: Checkout code

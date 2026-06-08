@@ -37,12 +37,15 @@ type ResourceKey =
   | "blog";
 
 type AdminMutation =
+  | { resource: ResourceKey; action: "list" }
   | { resource: ResourceKey; action: "upsert"; payload: Record<string, unknown> }
   | { resource: ResourceKey; action: "delete"; id: string }
   | { resource: ResourceKey; action: "update-status"; id: string; status: string };
 
 function validateMutation(mutation: AdminMutation): string | null {
   try {
+    if (mutation.action === "list") return null;
+
     if (mutation.action === "delete") {
       deleteIdSchema.parse({ id: mutation.id });
       return null;
@@ -73,8 +76,21 @@ function validateMutation(mutation: AdminMutation): string | null {
   }
 }
 
-async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolean }> {
+async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolean; data?: unknown }> {
   const supabase = adminClient();
+
+  if (mutation.action === "list") {
+    if (mutation.resource === "leads") {
+      const { data, error } = await supabase
+        .from("lead")
+        .select("*")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return { skipped: false, data };
+    }
+    return { skipped: true };
+  }
 
   if (mutation.action === "delete") {
     const tableByResource: Record<string, string> = {
