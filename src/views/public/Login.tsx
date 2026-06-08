@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Info, Copy, Check } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
 
@@ -12,159 +12,108 @@ import { setSessionToken } from "@/lib/supabase/session-token";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const { demoAccessList, setSession } = useAppStore();
+  const { setSession } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [copiedField, setCopiedField] = useState<string | null>(null);
-
-  const autofill = () => {
-    const access = demoAccessList.find((item) => item.role === "admin");
-    if (!access) return;
-    setEmail(access.email);
-    setPassword(access.password);
-  };
-
-  const copyToClipboard = (text: string, field: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedField(field);
-    toast.success("Copiado para a área de transferência");
-    setTimeout(() => setCopiedField(null), 2000);
-  };
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    setError(null);
+
     if (!email || !password) {
-      toast.error("Preencha e-mail e senha para continuar.");
+      setError("Preencha e-mail e senha para continuar.");
       return;
     }
 
     if (!isFunctionsConfigured) {
-      toast.error("Autenticação indisponível: Supabase Functions não configurado.");
+      setError("Autenticação indisponível no momento. Tente novamente mais tarde.");
       return;
     }
 
-    const response = await invokeFunction("auth-session", {
-      body: { role: "admin", email, password }
-    });
+    setIsSubmitting(true);
 
-    if (!response.ok) {
-      toast.error("Credenciais inválidas para este perfil.");
-      return;
+    try {
+      const response = await invokeFunction("auth-session", {
+        body: { role: "admin", email, password }
+      });
+
+      if (!response.ok) {
+        setError("E-mail ou senha incorretos. Verifique seus dados e tente novamente.");
+        return;
+      }
+
+      const data = (await response.json()) as {
+        session: { role: "admin"; email: string; name: string };
+        token: string;
+      };
+
+      setSessionToken(data.token);
+      setSession(data.session);
+
+      navigate("/admin");
+    } catch {
+      setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const data = (await response.json()) as {
-      session: { role: "admin"; email: string; name: string };
-      token: string;
-    };
-
-    setSessionToken(data.token);
-    setSession(data.session);
-
-    navigate("/admin");
   };
 
   return (
     <section className="page-section">
-      <div className="container grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <div className="hidden overflow-hidden rounded-xl border border-slate-200 shadow-card lg:block">
-          <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD7DebIlmzv9LgUlHDHU5X_rejTalnViMi8_wOJ-MInrVZ6DzGOOydKcGVECWGh37BP50Ve2zNK-Wtthr56fd8BmP_fe347liuNsVSXTIdNDqvQWwWAS016wCanv4rV9rpliUnssELG4jRvJ-2YROMrG5WzNlAdo9ojV_B-ynuQQn_HdUHagoUOB_vlhxy1Ud-u3cnvbGaMW9M9m8L7cY9-E3eZk3beW6JoKIdKNNLX9WWb96WN__ksDLNe0EV27a59B81x1SkWpgE"
-            alt="Profissional em ambiente corporativo"
-            className="h-[680px] w-full object-cover"
-          />
-        </div>
-        <Card className="w-full">
+      <div className="container flex justify-center">
+        <Card className="w-full max-w-md">
           <CardContent className="space-y-6 p-8">
-            <div className="space-y-3">
+            <div className="space-y-3 text-center">
               <span className="eyebrow">Administração</span>
-              <h1 className="text-4xl font-extrabold text-primary">Acesse o painel admin</h1>
+              <h1 className="text-4xl font-extrabold text-primary">Entrar</h1>
               <p className="text-base leading-7 text-muted-foreground">
-                Entre para administrar cursos, turmas, datas, leads, inscrições e conteúdos do site.
+                Acesse sua conta para gerenciar o painel administrativo.
               </p>
             </div>
 
-            <div className="rounded-lg bg-secondary/60 p-4 text-sm text-primary">
-              <div className="flex items-start gap-3">
-                <Info className="mt-0.5 h-4 w-4" />
-                <p>Ambiente demonstrativo com acesso restrito para administração.</p>
+            {error && (
+              <div
+                role="alert"
+                aria-live="assertive"
+                className="flex items-start gap-3 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive"
+              >
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <p>{error}</p>
               </div>
-            </div>
-
-            <div className="grid gap-3">
-              {demoAccessList
-                .filter((item) => item.role === "admin")
-                .map((access) => (
-                  <button
-                    key={access.role}
-                    type="button"
-                    onClick={autofill}
-                    className="rounded-lg border border-border bg-white p-4 text-left transition hover:border-accent hover:bg-secondary/40"
-                  >
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <div className="text-sm font-semibold text-foreground">
-                          Login de teste: Admin
-                        </div>
-                        <div className="mt-1 text-sm text-muted-foreground">{access.description}</div>
-                      </div>
-                      <div className="flex flex-col gap-2 text-xs">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyToClipboard(access.email, "email");
-                          }}
-                          className="flex items-center gap-2 rounded px-2 py-1.5 text-primary hover:bg-secondary/40 transition"
-                        >
-                          {copiedField === "email" ? (
-                            <>
-                              <Check className="h-4 w-4" />
-                              Copiado
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-4 w-4" />
-                              {access.email}
-                            </>
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyToClipboard(access.password, "password");
-                          }}
-                          className="flex items-center gap-2 rounded px-2 py-1.5 text-primary hover:bg-secondary/40 transition"
-                        >
-                          {copiedField === "password" ? (
-                            <>
-                              <Check className="h-4 w-4" />
-                              Copiado
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-4 w-4" />
-                              Copiar senha
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-            </div>
+            )}
 
             <div className="grid gap-4">
-              <Input placeholder="E-mail" value={email} onChange={(event) => setEmail(event.target.value)} />
-              <Input type="password" placeholder="Senha" value={password} onChange={(event) => setPassword(event.target.value)} />
+              <Input
+                placeholder="E-mail"
+                value={email}
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                  if (error) setError(null);
+                }}
+                onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
+              />
+              <Input
+                type="password"
+                placeholder="Senha"
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value);
+                  if (error) setError(null);
+                }}
+                onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
+              />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button onClick={handleSubmit}>Entrar</Button>
-              <Button variant="outline" onClick={() => toast.success("Link de recuperação simulado enviado.")}>
+            <div className="flex flex-col gap-3">
+              <Button onClick={handleSubmit} disabled={isSubmitting}>
+                {isSubmitting ? "Entrando..." : "Entrar"}
+              </Button>
+              <Button variant="outline" onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}>
                 Esqueci minha senha
               </Button>
               <Button variant="ghost" onClick={() => navigate("/cursos")}>
-                Voltar aos cursos
+                Voltar ao site
               </Button>
             </div>
           </CardContent>
