@@ -1,5 +1,11 @@
 import { expect, test } from "@playwright/test";
 
+// Modelo estático (Locaweb) + backend em Supabase Edge Functions.
+// No export estático não há middleware/proxy de servidor nem rotas /api:
+// - todas as páginas (inclusive /admin) são servidas como HTML estático (200);
+// - a proteção do /admin é client-side (redirect via app-store após hidratação);
+// - autenticação e mutações vivem nas Edge Functions (testadas à parte).
+
 const publicPaths = [
   "/",
   "/cursos",
@@ -9,16 +15,18 @@ const publicPaths = [
   "/sobre",
   "/contato",
   "/login",
-  "/cursos/esocial-na-administracao-publica",
-  "/blog/3-sinais-de-que-seu-esocial-precisa-de-revisao"
+  "/admin"
 ];
 
-const protectedPaths = [
-  { path: "/admin", role: "admin", email: "admin@rhcursos.demo", password: "admin123" }
+// Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
+// catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
+const dynamicPaths = [
+  "/cursos/analise-de-demonstracoes-contabeis-interpretacao-de-balancos-e-tomada-de-decisao",
+  "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
 
 test.describe("rotas publicas", () => {
-  for (const path of publicPaths) {
+  for (const path of [...publicPaths, ...dynamicPaths]) {
     test(`${path} responde 200`, async ({ request }) => {
       const response = await request.get(path);
       expect(response.status()).toBe(200);
@@ -38,42 +46,13 @@ test.describe("rotas publicas", () => {
   });
 });
 
-test.describe("autenticacao por papel", () => {
-  for (const { path } of protectedPaths) {
-    test(`${path} redireciona sem sessao`, async ({ request }) => {
-      const response = await request.get(path, { maxRedirects: 0 });
-      expect(response.status()).toBe(307);
-      expect(response.headers().location).toContain("/login?status=required");
-    });
-  }
-
-  for (const session of protectedPaths) {
-    test(`${session.path} permite papel correto`, async ({ request }) => {
-      const login = await request.post("/api/auth/session", {
-        data: {
-          role: session.role,
-          email: session.email,
-          password: session.password
-        }
-      });
-
-      expect(login.status()).toBe(200);
-
-      const response = await request.get(session.path, { maxRedirects: 0 });
-      expect(response.status()).toBe(200);
-    });
-  }
-
-  test("rejeita papeis fora do escopo de publicacao", async ({ request }) => {
-    const login = await request.post("/api/auth/session", {
-      data: {
-        role: "student",
-        email: "ana.silva1@mockmail.com",
-        password: "aluno123"
-      }
-    });
-
-    expect(login.status()).toBe(400);
+test.describe("protecao do admin no export estatico", () => {
+  // O HTML do /admin é servido estaticamente (200), mas o AdminGuard redireciona
+  // para /login quando não há sessão admin após a hidratação. A proteção dos
+  // DADOS permanece na Edge Function `admin-resources` (token HMAC).
+  test("/admin sem sessao redireciona para /login (client-side)", async ({ page }) => {
+    await page.goto("/admin");
+    await expect(page).toHaveURL(/\/login/);
   });
 
   test("rotas de portal aluno e instrutor nao existem nesta publicacao", async ({ request }) => {

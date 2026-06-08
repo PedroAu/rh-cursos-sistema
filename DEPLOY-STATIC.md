@@ -53,13 +53,14 @@ Acesse: `https://www.rhcursos.com.br`
 ✅ Sem dependências no servidor
 ✅ FTP simples
 
-## Limitações
+## Backend no modelo híbrido
 
-⚠️ Sem servidor backend (APIs dinâmicas)
-⚠️ Conteúdo estático apenas
-⚠️ Sem autenticação de servidor
-⚠️ Sem acesso a banco de dados
+O frontend é estático, mas o backend **não** foi descartado: as operações
+dinâmicas (leads, inscrições, login admin e mutações administrativas) são
+servidas por **Supabase Edge Functions**.
 
-Se precisar de funcionalidades dinâmicas, considere:
-- APIs externas (Supabase, Firebase, etc)
-- Alternativas: Vercel, Netlify, Render
+➡️ Ver [DEPLOY-HYBRID.md](DEPLOY-HYBRID.md) para a arquitetura completa,
+as 4 functions e o processo de deploy do backend.
+
+> As antigas rotas `app/api/*` não funcionam no export estático (são
+> descartadas no build) — por isso a lógica vive nas Edge Functions.

@@ -7,7 +7,9 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:3000"
   },
   webServer: {
-    command: "npm run start -- --hostname 127.0.0.1 --port 3000",
+    // Serve o export estático (pasta out/) — reflete o deploy real na Locaweb.
+    // `next start` não funciona com output: 'export'. Requer `npm run build` antes.
+    command: "npx serve out -l 3000 --no-clipboard",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000

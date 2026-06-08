@@ -5,11 +5,27 @@
       "Bash(npm run *)",
       "Bash(npx *)",
       "Bash(git *)",
-      "Bash(node *)"
+      "Bash(node *)",
+      "Bash(gh issue *)",
+      "Read(//Users/pedroaugusto/Documents/Site\\\\ RH\\\\ Cursos/site-rh-cursos/app/cursos/**)",
+      "Bash(php -r \"echo 'Token para hoje: setup-' . date\\('Y-m-d'\\) . \\\\\"\\\\\\\\n\\\\\";\")",
+      "Read(//Users/pedroaugusto/Documents/Site\\\\ RH\\\\ Cursos/site-rh-cursos/.github/workflows/**)",
+      "Bash(cat .github/workflows/deploy.yml)",
+      "Bash(python3)",
+      "Bash(curl -s -o /dev/null -w \"HTTP: %{http_code}\\\\nSize: %{size_download} bytes\\\\n\" https://www.rhcursos.com.br/)",
+      "Bash(curl -s https://www.rhcursos.com.br/)",
+      "Bash(AUTH_SESSION_SECRET=\"build-default-secret-32chars-minimum-length\" NEXT_PUBLIC_SUPABASE_URL=\"https://example.supabase.co\" NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=\"build-anon-key\" npm run build)",
+      "Bash(grep -rn \"fetch\\(\\\\\"/api\\\\|fetch\\('/api\\\\|fetch\\(\\\\`/api\" app src --include=\"*.ts\" --include=\"*.tsx\")",
+      "Bash(find tests *)",
+      "Bash(grep -rln \"/api/\" tests)",
+      "Bash(grep -l \"server.js\\\\|install-node\\\\|deploy.php\\\\|npm start\" DEPLOYMENT.md)",
+      "Bash(curl -s -o /tmp/auth-test.json -w 'HTTP %{http_code}\\\\n' -X POST __TRACKED_VAR__/functions/v1/auth-session -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json' -H 'Origin: https://www.rhcursos.com.br' -d '{\"role\":\"admin\",\"email\":\"__TRACKED_VAR__\",\"password\":\"__TRACKED_VAR__\"}')",
+      "Bash(curl -s -o /dev/null -w 'HTTP %{http_code}\\\\n' -X POST __TRACKED_VAR__/functions/v1/admin-resources -H 'Authorization: Bearer __TRACKED_VAR__' -H 'Content-Type: application/json' -H 'Origin: https://www.rhcursos.com.br' -d '{\"resource\":\"leads\",\"action\":\"update-status\",\"id\":\"x\",\"status\":\"Novo\"}')",
+      "Bash(curl -s -o /tmp/admin-test.json -w 'HTTP %{http_code}\\\\n' -X POST __TRACKED_VAR__/functions/v1/admin-resources -H 'Authorization: Bearer __TRACKED_VAR__' -H 'x-rh-session: __TRACKED_VAR__' -H 'Content-Type: application/json' -H 'Origin: https://www.rhcursos.com.br' -d '{\"resource\":\"leads\",\"action\":\"update-status\",\"id\":\"00000000-0000-0000-0000-000000000000\",\"status\":\"Novo\"}')",
+      "Bash(AUTH_SESSION_SECRET=\"build-default-secret-32chars-minimum-length\" NEXT_PUBLIC_SUPABASE_URL=\"https://example.supabase.co\" NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=\"build-anon-key\" SUPABASE_SERVICE_ROLE_KEY=\"build-service-key\" SUPABASE_DB_URL=\"postgresql://user:pass@localhost:5432/postgres\" NEXT_PUBLIC_APP_URL=\"https://www.rhcursos.com.br\" npm run build)"
     ],
     "deny": []
   },
-  "language": "portuguese",
   "hooks": {
     "SessionStart": [
       {
@@ -103,5 +119,6 @@
         ]
       }
     ]
-  }
+  },
+  "language": "portuguese"
 }

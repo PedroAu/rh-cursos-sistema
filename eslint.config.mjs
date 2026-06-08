@@ -15,6 +15,7 @@ const eslintConfig = [
       "node_modules/**",
       "playwright-report/**",
       "test-results/**",
+      "supabase/functions/**",
       "next-env.d.ts"
     ]
   },
