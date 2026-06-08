@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./public-static/
-          server-dir: /
+          server-dir: /public_html/
           dangerous-clean-slate: false
 
       - name: Verify deployment
