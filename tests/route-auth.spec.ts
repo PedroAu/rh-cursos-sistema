@@ -21,7 +21,7 @@ const publicPaths = [
 // Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
 // catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
 const dynamicPaths = [
-  "/cursos/analise-de-demonstracoes-contabeis-interpretacao-de-balancos-e-tomada-de-decisao",
+  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
 
