@@ -39,12 +39,14 @@ jobs:
           supabase secrets set \
             AUTH_SESSION_SECRET="$AUTH_SESSION_SECRET" \
             PUBLIC_APP_URL="$PUBLIC_APP_URL" \
+            EXTRA_ALLOWED_ORIGINS="$EXTRA_ALLOWED_ORIGINS" \
             --project-ref "$SUPABASE_PROJECT_REF"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
           PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          EXTRA_ALLOWED_ORIGINS: ${{ secrets.EXTRA_ALLOWED_ORIGINS }}
 
       - name: Deploy functions
         run: |
