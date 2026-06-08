@@ -50,6 +50,7 @@ jobs:
             package-lock.json
             server.js
             install-node.sh
+            deploy.php
           retention-days: 1
           if-no-files-found: error
 
@@ -73,7 +74,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./build-artifacts/
-          server-dir: /app/
+          server-dir: /
           dangerous-clean-slate: false
           exclude: |
             **/.git*

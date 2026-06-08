@@ -31,14 +31,9 @@ if ($secret_key !== 'prod2026') {
     <pre>
 <?php
 
-// Get current directory
+// Get current directory (should be /home/rhcursos2/public_html)
 $cwd = getcwd();
 echo "Current Directory: $cwd\n\n";
-
-// Check if we're in the right place
-$app_dir = dirname(__DIR__);
-chdir($app_dir);
-echo "App Directory: " . getcwd() . "\n\n";
 
 // Step 1: Check Node.js
 echo "=== Step 1: Check Node.js ===\n";
