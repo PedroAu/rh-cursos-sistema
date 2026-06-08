@@ -22,7 +22,7 @@ export function SectionTitle({
       className={align === "center" ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}
     >
       {eyebrow ? <span className="eyebrow">{eyebrow}</span> : null}
-      <h2 className="mt-4 max-w-4xl font-display text-4xl font-bold leading-[1.22] text-deep-navy">
+      <h2 className="mt-4 max-w-4xl font-display text-h2 font-bold leading-tight text-deep-navy">
         {title}
       </h2>
       {description ? (

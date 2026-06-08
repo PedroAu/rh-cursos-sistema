@@ -21,12 +21,12 @@ export function ClassCard({
       <CardContent className="space-y-6 p-6">
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
-            <span className="inline-flex rounded-full border border-accent bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white">
+            <span className="inline-flex rounded-full border border-accent bg-accent px-3 py-1 text-badge font-bold uppercase tracking-[0.08em] text-white">
               {course.pathName}
             </span>
             <StatusBadge status={trainingClass.status} />
           </div>
-          <h3 className="text-[24px] font-bold leading-[1.2] text-deep-navy">{course.title}</h3>
+          <h3 className="text-article font-bold text-deep-navy">{course.title}</h3>
         </div>
 
         <div className="grid gap-3 text-sm text-muted-foreground">

@@ -7,6 +7,7 @@
  */
 
 const SESSION_TOKEN_KEY = "rh_cursos_admin_token";
+const SUPABASE_SESSION_KEY = "rh_cursos_supabase_session";
 
 export function getSessionToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -21,6 +22,35 @@ export function setSessionToken(token: string): void {
 export function clearSessionToken(): void {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(SESSION_TOKEN_KEY);
+  window.localStorage.removeItem(SUPABASE_SESSION_KEY);
+}
+
+/**
+ * Par de tokens do Supabase Auth. Persistimos junto do token HMAC para reidratar
+ * a sessão do cliente JS no boot (`supabase.auth.setSession`), o que faz o cliente
+ * operar como role `authenticated` e habilita leitura direta sob RLS.
+ */
+export type SupabaseSessionTokens = {
+  access_token: string;
+  refresh_token: string;
+};
+
+export function getSupabaseSession(): SupabaseSessionTokens | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(SUPABASE_SESSION_KEY);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<SupabaseSessionTokens>;
+    if (!parsed.access_token || !parsed.refresh_token) return null;
+    return { access_token: parsed.access_token, refresh_token: parsed.refresh_token };
+  } catch {
+    return null;
+  }
+}
+
+export function setSupabaseSession(tokens: SupabaseSessionTokens): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(SUPABASE_SESSION_KEY, JSON.stringify(tokens));
 }
 
 type DecodedSession = {

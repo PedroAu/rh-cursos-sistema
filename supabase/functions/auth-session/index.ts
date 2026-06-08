@@ -82,7 +82,22 @@ Deno.serve(async (request) => {
 
     const token = await encodeSession(session);
 
-    return jsonResponse({ ok: true, session, token }, 200, request);
+    // Além do token HMAC (usado pelo header x-rh-session nas Edge Functions),
+    // devolvemos o par de tokens do Supabase Auth. O frontend reidrata a sessão
+    // no cliente JS via supabase.auth.setSession(), passando a operar como role
+    // `authenticated` — assim as policies RLS (is_admin) liberam leitura direta.
+    const supabaseSession = result.data.session
+      ? {
+          access_token: result.data.session.access_token,
+          refresh_token: result.data.session.refresh_token,
+        }
+      : null;
+
+    return jsonResponse(
+      { ok: true, session, token, supabaseSession },
+      200,
+      request
+    );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro na autenticação.";
     console.error("auth-session error:", message);

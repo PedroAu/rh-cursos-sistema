@@ -103,7 +103,7 @@ export function CoursesPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-prestige-gold" />
             Programas profissionais
           </span>
-          <h1 className="mt-6 max-w-4xl font-display text-[40px] font-extrabold leading-[1.08] text-white sm:text-[56px]">
+          <h1 className="mt-6 max-w-4xl font-display text-h1-alt font-extrabold text-white sm:text-hero">
             Encontre a formação certa para sua equipe evoluir com segurança.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
@@ -194,8 +194,8 @@ export function CoursesPage() {
                     className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${!filters.path ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
                   >
                     <span className="flex items-center justify-between gap-3">
-                      <span className="text-[11px] font-bold uppercase tracking-[0.05em] opacity-70">Todas</span>
-                      <span className="rounded bg-surface-muted px-2 py-1 text-[11px] font-bold text-deep-navy">{courses.length}</span>
+                      <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Todas</span>
+                      <span className="rounded bg-surface-muted px-2 py-1 text-badge font-bold text-deep-navy">{courses.length}</span>
                     </span>
                     <span className="mt-1 block text-sm font-bold leading-tight">Todas as trilhas</span>
                   </button>
@@ -207,8 +207,8 @@ export function CoursesPage() {
                       className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${filters.path === path.id ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
                     >
                       <span className="flex items-center justify-between gap-3">
-                        <span className="text-[11px] font-bold uppercase tracking-[0.05em] opacity-70">Trilha</span>
-                        <span className={`rounded px-2 py-1 text-[11px] font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
+                        <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Trilha</span>
+                        <span className={`rounded px-2 py-1 text-badge font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
                           {path.courseCount}
                         </span>
                       </span>

@@ -101,11 +101,11 @@ export function ContactPage() {
     <>
       <section className="bg-deep-navy py-20 text-white">
         <div className="ea-container">
-          <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-white">Contato</span>
+          <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Contato</span>
           <h1 className="mt-4 max-w-3xl text-white">
             Fale com a RH Cursos e encontre a capacitação certa.
           </h1>
-          <p className="mt-6 max-w-2xl text-[18px] leading-[1.6] text-white/78">
+          <p className="mt-6 max-w-2xl text-lead text-white/78">
             Tire dúvidas sobre cursos, trilhas, agenda, propostas in company e atendimento para órgãos públicos.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-white/62">
@@ -164,7 +164,7 @@ export function ContactPage() {
           <Card className="border-outline-variant bg-white/95 shadow-card">
             <CardContent className="grid gap-5 p-8 md:p-10">
               <div>
-                <h2 className="font-display text-[32px] font-bold leading-[1.2] text-deep-navy">
+                <h2 className="font-display text-h2-compact font-bold text-deep-navy">
                   Envie sua mensagem
                 </h2>
                 <p className="mt-3 text-sm leading-7 text-text-muted">

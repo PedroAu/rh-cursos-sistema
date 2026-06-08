@@ -30,7 +30,7 @@ function WhatsAppSupport() {
       <DialogTrigger asChild>
         <button
           id="atendimento"
-          className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-white shadow-card transition hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-white shadow-card transition hover:-translate-y-0.5 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           aria-label="Abrir atendimento"
         >
           <MessageCircle className="h-6 w-6" />
