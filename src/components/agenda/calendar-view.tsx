@@ -127,7 +127,7 @@ export function CalendarView({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+          <div className="grid grid-cols-7 gap-1 text-center text-micro font-bold uppercase tracking-[0.08em] text-muted-foreground">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
               <div key={label} className="py-2">{label}</div>
             ))}

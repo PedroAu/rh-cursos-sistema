@@ -25,7 +25,7 @@ export function DashboardShell({ role, children }: { role: "admin"; children?: R
   return (
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen flex-col lg:flex-row">
-        <aside className="border-r border-slate-200 bg-surface-muted lg:w-72">
+        <aside className="border-r border-outline-variant bg-surface-muted lg:w-72">
           <div className="border-b p-6">
             <Link to="/" className="flex items-center gap-3">
               <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-14 w-auto" />
@@ -42,7 +42,7 @@ export function DashboardShell({ role, children }: { role: "admin"; children?: R
                 <User className="h-5 w-5" />
               </div>
               <div>
-                <div className="font-semibold text-slate-950">{currentSession?.name ?? "Usuário demo"}</div>
+                <div className="font-semibold text-text-main">{currentSession?.name ?? "Usuário demo"}</div>
                 <div className="text-sm text-muted-foreground">{currentSession?.email}</div>
               </div>
             </div>
@@ -86,7 +86,7 @@ export function DashboardShell({ role, children }: { role: "admin"; children?: R
         </aside>
 
         <main className="flex-1">
-          <div className="border-b border-slate-200 bg-white px-6 py-4">
+          <div className="border-b border-outline-variant bg-white px-6 py-4">
             <div className="container flex items-center justify-between gap-4">
               <div>
                 <div className="text-sm uppercase tracking-[0.16em] text-muted-foreground">Administração</div>

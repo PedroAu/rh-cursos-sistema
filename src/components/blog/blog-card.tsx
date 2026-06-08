@@ -14,7 +14,7 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
       }`}
     >
       <div className={`h-40 border-b ${featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30"} p-6`}>
-        <div className={`inline-flex rounded px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] ${
+        <div className={`inline-flex rounded px-4 py-2 text-badge font-semibold uppercase tracking-[0.16em] ${
           featured ? "bg-white/12 text-white" : "bg-accent/12 text-accent"
         }`}>
           {post.category}
@@ -22,7 +22,7 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
       </div>
       <CardContent className="space-y-5 p-6">
         <div className="space-y-3">
-          <h3 className={`text-[24px] font-bold leading-[1.2] ${featured ? "text-white" : ""}`}>
+          <h3 className={`text-article font-bold ${featured ? "text-white" : ""}`}>
             {post.title}
           </h3>
           <p className={`text-sm leading-7 ${featured ? "text-white/75" : "text-muted-foreground"}`}>

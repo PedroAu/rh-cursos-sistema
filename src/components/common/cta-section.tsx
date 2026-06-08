@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 export function CTASection() {
   return (
     <Card className="mx-auto max-w-4xl overflow-hidden border-primary/10 bg-primary text-primary-foreground shadow-card">
-      <CardContent className="space-y-7 p-8 md:p-10">
+      <CardContent className="space-y-8 p-8 md:p-10">
         <div className="max-w-3xl space-y-4">
           <h3 className="max-w-xl text-white">Pronto para ser referência?</h3>
           <p className="text-sm leading-8 text-white/75 md:text-base">

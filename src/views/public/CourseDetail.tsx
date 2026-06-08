@@ -102,7 +102,7 @@ export function CourseDetailPage() {
               </div>
             </div>
 
-            <div className="group relative aspect-video overflow-hidden rounded-lg border border-outline-variant bg-slate-200 shadow-card">
+            <div className="group relative aspect-video overflow-hidden rounded-lg border border-outline-variant bg-surface-container shadow-card">
                 <img
                   src={course.image}
                   alt={course.title}
@@ -180,10 +180,10 @@ export function CourseDetailPage() {
               </Card>
             </div>
 
-            <Card className="h-fit border-slate-200 bg-deep-navy text-white lg:sticky lg:top-24">
+            <Card className="h-fit border-outline-variant bg-deep-navy text-white lg:sticky lg:top-24">
               <CardContent className="space-y-5 p-6">
                 <div className="space-y-1">
-                  <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
+                  <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
                   <div className="text-4xl font-extrabold text-prestige-gold">{currency(course.price)}</div>
                 </div>
                 <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => setOpenCheckout(true)}>

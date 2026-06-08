@@ -60,7 +60,7 @@ export function AgendaPage() {
         <div className="container grid gap-6 py-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-center">
           <div className="max-w-3xl">
             <span className="eyebrow">Agenda de turmas</span>
-            <h1 className="mt-4 max-w-3xl font-display text-[34px] font-extrabold leading-[1.12] text-deep-navy md:text-[44px]">
+            <h1 className="mt-4 max-w-3xl font-display text-h1-mobile font-extrabold text-deep-navy md:text-display">
               Consulte datas, modalidades e vagas das próximas turmas.
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-text-muted">

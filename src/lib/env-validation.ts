@@ -4,6 +4,11 @@
  */
 
 function validateEnvironment(): void {
+  // Este app é um SITE ESTÁTICO (`output: 'export'`): não há servidor Node em
+  // produção. Só as variáveis `NEXT_PUBLIC_*` são embutidas no bundle e chegam
+  // ao navegador. Segredos de servidor (SUPABASE_DB_URL, SERVICE_ROLE_KEY)
+  // vivem nas Edge Functions do Supabase, NÃO aqui — exigi-los no build do
+  // site estático estava errado e quebrava o build local e o CI.
   const isProduction = process.env.NODE_ENV === "production";
   const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -11,51 +16,38 @@ function validateEnvironment(): void {
   const warnings: string[] = [];
 
   // ============================================
-  // PRODUCTION REQUIREMENTS (CRITICAL)
+  // VARIÁVEIS PÚBLICAS — embutidas no bundle estático (sempre exigidas)
+  // ============================================
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    errors.push("🔴 CRITICAL: NEXT_PUBLIC_SUPABASE_URL must be set");
+  }
+
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!publishableKey) {
+    errors.push(
+      "🔴 CRITICAL: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (ou _ANON_KEY) must be set"
+    );
+  }
+
+  if (!process.env.NEXT_PUBLIC_APP_URL) {
+    errors.push("🔴 CRITICAL: NEXT_PUBLIC_APP_URL must be set");
+  } else {
+    // HTTPS só é exigido para URLs reais de produção — localhost em dev é ok.
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const isLocalUrl = /^https?:\/\/(localhost|127\.0\.0\.1)/.test(appUrl);
+    if (isProduction && !isLocalUrl && !appUrl.startsWith("https://")) {
+      errors.push("🔴 CRITICAL: NEXT_PUBLIC_APP_URL must use HTTPS in production");
+    }
+  }
+
+  // ============================================
+  // AVISOS DE SEGURANÇA (não bloqueiam o build estático)
   // ============================================
 
   if (isProduction) {
-    // AUTH_SESSION_SECRET is mandatory in production
-    if (!process.env.AUTH_SESSION_SECRET) {
-      errors.push(
-        "🔴 CRITICAL: AUTH_SESSION_SECRET must be set in production"
-      );
-    } else if (process.env.AUTH_SESSION_SECRET.length < 32) {
-      errors.push(
-        "🔴 CRITICAL: AUTH_SESSION_SECRET must be at least 32 characters"
-      );
-    }
-
-    // Supabase configuration
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      errors.push(
-        "🔴 CRITICAL: NEXT_PUBLIC_SUPABASE_URL must be set in production"
-      );
-    }
-
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      errors.push(
-        "🔴 CRITICAL: SUPABASE_SERVICE_ROLE_KEY must be set in production"
-      );
-    }
-
-    // Database URL
-    if (!process.env.SUPABASE_DB_URL) {
-      errors.push("🔴 CRITICAL: SUPABASE_DB_URL must be set in production");
-    }
-
-    // App URL for CORS
-    if (!process.env.NEXT_PUBLIC_APP_URL) {
-      errors.push(
-        "🔴 CRITICAL: NEXT_PUBLIC_APP_URL must be set in production"
-      );
-    } else if (!process.env.NEXT_PUBLIC_APP_URL.startsWith("https://")) {
-      errors.push(
-        "🔴 CRITICAL: NEXT_PUBLIC_APP_URL must use HTTPS in production"
-      );
-    }
-
-    // Demo auth should be disabled in production
     if (process.env.DEMO_AUTH_ENABLED === "true") {
       warnings.push(
         "⚠️ WARNING: DEMO_AUTH_ENABLED is true in production - this should be false"

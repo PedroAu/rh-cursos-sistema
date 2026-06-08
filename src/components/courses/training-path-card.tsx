@@ -27,12 +27,12 @@ export function TrainingPathCard({ path }: { path: TrainingPath }) {
           <div className="rounded-lg bg-secondary/70 p-3 text-primary" aria-hidden="true">
             <Icon className="h-5 w-5" />
           </div>
-          <span className="rounded bg-accent px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-white">
+          <span className="rounded bg-accent px-3 py-1.5 text-badge font-semibold uppercase tracking-[0.12em] text-white">
             {path.courseCount} cursos
           </span>
         </div>
         <div className="space-y-3">
-          <h3 className="text-[24px] font-bold leading-[1.2]">{path.name}</h3>
+          <h3 className="text-article font-bold">{path.name}</h3>
           <p className="text-sm leading-7 text-muted-foreground">{path.description}</p>
         </div>
         <Button asChild variant="outline">

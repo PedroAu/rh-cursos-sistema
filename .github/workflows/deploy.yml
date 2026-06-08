@@ -25,6 +25,31 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Falha CEDO e com mensagem clara se algum secret de produção estiver
+      # faltando. Sem isso, o build usava fallbacks ('example.supabase.co') e
+      # publicava um site apontando para um Supabase inexistente — quebrando
+      # em produção sem nenhum erro no deploy.
+      - name: Validate required production secrets
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+        run: |
+          missing=0
+          for var in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY NEXT_PUBLIC_APP_URL AUTH_SESSION_SECRET; do
+            if [ -z "${!var}" ]; then
+              echo "❌ Secret obrigatório ausente: $var"
+              missing=1
+            fi
+          done
+          if [ "$missing" -eq 1 ]; then
+            echo ""
+            echo "Configure os secrets em: Settings > Secrets and variables > Actions"
+            exit 1
+          fi
+          echo "✅ Todos os secrets de produção estão presentes."
+
       - name: Run type check
         run: npm run typecheck
 
@@ -34,12 +59,12 @@ jobs:
       - name: Build static export
         run: npm run build
         env:
-          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET || 'build-default-secret-32chars-minimum-length' }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'build-anon-key' }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'build-default-key' }}
-          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL || 'postgresql://user:pass@localhost/db' }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'https://localhost:3000' }}
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
 
       - name: Upload static files
         uses: actions/upload-artifact@v4

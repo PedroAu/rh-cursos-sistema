@@ -26,11 +26,15 @@ import {
 } from "@/data";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
-import { getSessionToken, clearSessionToken, decodeSessionToken } from "@/lib/supabase/session-token";
-import { fetchPublicCatalogFromSupabase } from "@/lib/supabase/rh-cursos-api";
-import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
+import {
+  getSessionToken,
+  clearSessionToken,
+  decodeSessionToken,
+  getSupabaseSession,
+} from "@/lib/supabase/session-token";
+import { fetchPublicCatalogFromSupabase, fetchLeadsFromSupabase } from "@/lib/supabase/rh-cursos-api";
 import type {
   BlogPost,
   Course,
@@ -194,16 +198,22 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.error("Não foi possível carregar o catálogo do Supabase. Usando dados locais.");
       });
 
-    const sessionToken = getSessionToken();
-    if (sessionToken && isFunctionsConfigured) {
-      invokeFunction("admin-resources", {
-        body: { resource: "leads", action: "list" },
-        sessionToken,
-      })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((json: { data?: LeadRow[] } | null) => {
-          if (!active || !json?.data?.length) return;
-          setState((current) => ({ ...current, leads: json.data!.map(mapLead) }));
+    // Reidrata a sessão do Supabase Auth (JWT em localStorage) e, com o cliente
+    // já autenticado como `authenticated`, busca os leads diretamente via RLS
+    // (policy lead_admin_select / is_admin). Sem JWT, nenhuma leitura admin ocorre.
+    const stored = getSupabaseSession();
+    if (stored && supabase) {
+      supabase.auth
+        .setSession({
+          access_token: stored.access_token,
+          refresh_token: stored.refresh_token,
+        })
+        .then(({ error }) => {
+          if (!active || error) return;
+          return fetchLeadsFromSupabase().then((leads) => {
+            if (!active || !leads?.length) return;
+            setState((current) => ({ ...current, leads }));
+          });
         })
         .catch(() => undefined);
     }
@@ -248,6 +258,9 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
   const logout = useCallback<AppStoreValue["logout"]>(() => {
     if (isFunctionsConfigured) {
       void invokeFunction("auth-session", { method: "DELETE" }).catch(() => undefined);
+    }
+    if (supabase) {
+      void supabase.auth.signOut().catch(() => undefined);
     }
     clearSessionToken();
     setState((current) => ({ ...current, currentSession: null }));

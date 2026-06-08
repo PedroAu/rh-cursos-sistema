@@ -50,6 +50,26 @@
     --ea-section-padding: 80px;
     --ea-shadow-soft: 0 8px 22px rgba(0, 23, 54, 0.07);
     --ea-shadow-card: 0 18px 42px rgba(0, 23, 54, 0.14);
+
+    /* Typography scale */
+    --ea-font-size-micro: 0.625rem;    /* 10px — micro labels */
+    --ea-font-size-badge: 0.6875rem;   /* 11px — badges, chips */
+    --ea-font-size-label: 0.75rem;     /* 12px — eyebrows, labels */
+    --ea-font-size-sm: 0.875rem;       /* 14px — body small */
+    --ea-font-size-base: 1rem;         /* 16px — body */
+    --ea-font-size-lead: 1.125rem;     /* 18px — lead paragraphs */
+    --ea-font-size-card: 1.625rem;     /* 26px — card titles */
+    --ea-font-size-feature: 1.5625rem; /* 25px — feature card titles */
+    --ea-font-size-article: 1.5rem;    /* 24px — article/section card titles */
+    --ea-font-size-stat: 1.75rem;      /* 28px — stat numbers */
+    --ea-font-size-quote: 1.875rem;    /* 30px — quotes base */
+    --ea-font-size-h2-compact: 2rem;   /* 32px — h2 compact sections */
+    --ea-font-size-h1-mobile: 2.125rem;/* 34px — h1 mobile */
+    --ea-font-size-h2: 2.25rem;        /* 36px — section headings / blockquote md */
+    --ea-font-size-section: 2.375rem;  /* 38px — primary section headings */
+    --ea-font-size-h1-alt: 2.5rem;     /* 40px — alternate page headings */
+    --ea-font-size-display: 2.75rem;   /* 44px — display section / h1 mobile large */
+    --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
   }
 
   * {
@@ -137,7 +157,7 @@
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 border border-outline-variant bg-white px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-prestige-gold;
+    @apply inline-flex items-center gap-2 border border-outline-variant bg-white px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-prestige-gold;
     border-radius: var(--ea-radius-default);
   }
 
@@ -176,7 +196,7 @@
   }
 
   .ea-label {
-    @apply text-[12px] font-bold uppercase tracking-[0.05em] text-prestige-gold;
+    @apply text-label font-bold uppercase tracking-[0.05em] text-prestige-gold;
   }
 
   .ea-card {

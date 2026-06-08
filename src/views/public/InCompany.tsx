@@ -1,4 +1,5 @@
 import { CheckCircle2, Clock3, GraduationCap, TrendingUp } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -148,9 +149,9 @@ export function InCompanyPage() {
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,23,54,0.98),rgba(0,23,54,0.88)_39%,rgba(0,23,54,0.28)_100%)]" />
         <div className="ea-container relative grid gap-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(520px,1.12fr)] lg:items-center">
           <div className="max-w-3xl">
-            <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.05em] text-white">Excelência Corporativa</span>
+            <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Excelência Corporativa</span>
             <h1 className="mt-4 text-white">Soluções de capacitação para quem precisa transformar equipes, processos e resultados.</h1>
-            <p className="mt-6 max-w-xl text-[18px] leading-[1.6] text-white/80">
+            <p className="mt-6 max-w-xl text-lead text-white/80">
               Programas adaptados aos objetivos estratégicos da organização, com trilhas, turmas e relatórios de impacto mensurável.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
@@ -176,7 +177,7 @@ export function InCompanyPage() {
               <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
                 <TrendingUp className="h-5 w-5" />
               </div>
-              <p className="font-display text-[28px] font-extrabold leading-none text-deep-navy">98%</p>
+              <p className="font-display text-stat font-extrabold leading-none text-deep-navy">98%</p>
               <p className="mt-1 font-display text-base font-bold text-deep-navy">de satisfação</p>
               <p className="mt-2 text-xs leading-5 text-text-muted">Avaliação de equipes após programas in company.</p>
             </div>
@@ -202,7 +203,7 @@ export function InCompanyPage() {
                     <p className={index === 1 || index === 2 ? "mt-3 text-sm leading-7 text-white/75" : "mt-3 text-sm leading-7 text-text-muted"}>{benefit.description}</p>
                   </div>
                   {benefit.image ? (
-                    <img src={benefit.image} alt="" className="h-48 w-full rounded-lg object-cover md:w-64" />
+                    <Image src={benefit.image} alt="" width={256} height={192} className="h-48 w-full rounded-lg object-cover md:w-64" />
                   ) : null}
                 </CardContent>
               </Card>

@@ -8,7 +8,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
 import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
-import { setSessionToken } from "@/lib/supabase/session-token";
+import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
+import { supabase } from "@/lib/supabase/client";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -46,9 +47,21 @@ export function LoginPage() {
       const data = (await response.json()) as {
         session: { role: "admin"; email: string; name: string };
         token: string;
+        supabaseSession: { access_token: string; refresh_token: string } | null;
       };
 
       setSessionToken(data.token);
+
+      // Reidrata o cliente Supabase com o JWT do Auth → role `authenticated`.
+      // Com isso as leituras admin passam pelo RLS (is_admin) sem Edge Function.
+      if (data.supabaseSession && supabase) {
+        setSupabaseSession(data.supabaseSession);
+        await supabase.auth.setSession({
+          access_token: data.supabaseSession.access_token,
+          refresh_token: data.supabaseSession.refresh_token,
+        });
+      }
+
       setSession(data.session);
 
       navigate("/admin");
