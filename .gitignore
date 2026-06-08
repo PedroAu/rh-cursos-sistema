@@ -20,6 +20,10 @@ out/
 *.log
 logs/
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # IDE & OS (AIOX)
 .DS_Store
 Thumbs.db
