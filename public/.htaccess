@@ -1,25 +1,21 @@
-# Roteamento para Next.js static export (App Router)
-# O export gera arquivos flat (login.html) E pastas (login/ com RSC .txt).
-# Sem tratamento, o Apache redireciona /login -> /login/ e lista o diretório.
+# Roteamento para Next.js static export com trailingSlash: true.
+# Cada rota gera uma pasta com index.html (login/index.html, cursos/<slug>/index.html),
+# que o Apache serve nativamente — sem listagem de diretório.
 Options -Indexes
-
-# Não redirecionar /rota -> /rota/ (evita cair na pasta sem index.html)
-DirectorySlash Off
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # 1. /rota -> /rota.html quando o arquivo .html existe.
-  #    Tem PRIORIDADE sobre a pasta de mesmo nome (login.html vence login/).
-  RewriteCond %{REQUEST_FILENAME}.html -f
-  RewriteRule ^(.+?)/?$ $1.html [L]
-
-  # 2. Arquivos e diretórios reais (assets, _next/, .txt) servidos diretamente.
+  # Arquivos e diretórios reais servidos diretamente (assets, _next/, pastas com index.html)
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # 3. Fallback: 404 do Next para rotas inexistentes.
+  # Tenta servir /rota.html (compat com qualquer arquivo flat remanescente)
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+
+  # Fallback: página 404 do Next
   RewriteRule ^ /404.html [L]
 </IfModule>

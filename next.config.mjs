@@ -3,6 +3,7 @@ const rootDir = process.cwd();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  trailingSlash: true,
   turbopack: {
     root: rootDir
   },
