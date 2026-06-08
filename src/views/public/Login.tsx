@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
+import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
+import { setSessionToken } from "@/lib/supabase/session-token";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -35,12 +37,13 @@ export function LoginPage() {
       return;
     }
 
-    const response = await fetch("/api/auth/session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ role: "admin", email, password })
+    if (!isFunctionsConfigured) {
+      toast.error("Autenticação indisponível: Supabase Functions não configurado.");
+      return;
+    }
+
+    const response = await invokeFunction("auth-session", {
+      body: { role: "admin", email, password }
     });
 
     if (!response.ok) {
@@ -50,8 +53,10 @@ export function LoginPage() {
 
     const data = (await response.json()) as {
       session: { role: "admin"; email: string; name: string };
+      token: string;
     };
 
+    setSessionToken(data.token);
     setSession(data.session);
 
     navigate("/admin");

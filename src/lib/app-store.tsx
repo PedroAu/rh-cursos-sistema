@@ -25,6 +25,8 @@ import {
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
+import { getSessionToken, clearSessionToken } from "@/lib/supabase/session-token";
 import {
   fetchLeadsFromSupabase,
   fetchPublicCatalogFromSupabase
@@ -118,12 +120,11 @@ function readInitialState() {
 }
 
 function persistAdminMutation(mutation: AdminMutation) {
-  if (!isSupabaseConfigured) return;
+  if (!isFunctionsConfigured) return;
 
-  void fetch("/api/admin/resources", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(mutation)
+  void invokeFunction("admin-resources", {
+    body: mutation,
+    sessionToken: getSessionToken() ?? undefined
   }).then((response) => {
     if (!response.ok) {
       toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
@@ -210,27 +211,26 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Login realizado.");
       },
       logout: () => {
-        void fetch("/api/auth/session", { method: "DELETE" });
+        if (isFunctionsConfigured) {
+          void invokeFunction("auth-session", { method: "DELETE" }).catch(() => undefined);
+        }
+        clearSessionToken();
         setState((current) => ({ ...current, currentSession: null }));
-        toast.success("Sessão simulada encerrada.");
+        toast.success("Sessão encerrada.");
       },
       createEnrollment: (payload) => {
         const enrollmentId = `enrollment-${Date.now()}`;
         const studentId = `student-sim-${Date.now()}`;
 
-        void fetch("/api/enrollments", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }).then((response) => {
-          if (!response.ok && isSupabaseConfigured) {
+        if (isFunctionsConfigured) {
+          void invokeFunction("enrollments", { body: payload }).then((response) => {
+            if (!response.ok) {
+              toast.error("Inscrição salva localmente, mas não foi enviada ao Supabase.");
+            }
+          }).catch(() => {
             toast.error("Inscrição salva localmente, mas não foi enviada ao Supabase.");
-          }
-        }).catch(() => {
-          if (isSupabaseConfigured) {
-            toast.error("Inscrição salva localmente, mas não foi enviada ao Supabase.");
-          }
-        });
+          });
+        }
 
         setState((current) => ({
           ...current,
@@ -276,19 +276,15 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         toast.success("Inscrição realizada com sucesso.");
       },
       createLead: (payload) => {
-        void fetch("/api/leads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        }).then((response) => {
-          if (!response.ok && isSupabaseConfigured) {
+        if (isFunctionsConfigured) {
+          void invokeFunction("leads", { body: payload }).then((response) => {
+            if (!response.ok) {
+              toast.error("Lead salvo localmente, mas não foi enviado ao Supabase.");
+            }
+          }).catch(() => {
             toast.error("Lead salvo localmente, mas não foi enviado ao Supabase.");
-          }
-        }).catch(() => {
-          if (isSupabaseConfigured) {
-            toast.error("Lead salvo localmente, mas não foi enviado ao Supabase.");
-          }
-        });
+          });
+        }
 
         setState((current) => ({
           ...current,
