@@ -1,11 +1,27 @@
+# Roteamento para Next.js static export (arquivos .html flat: login.html, cursos.html)
+Options -Indexes
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
-  # Allow direct access to real files and directories
-  RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
+  # 1. Arquivos e diretórios reais são servidos diretamente
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
 
-  # Rewrite requests to index.html for client-side routing
-  RewriteRule ^(.*)$ index.html [L]
+  # 2. /rota → /rota.html  (padrão do export: /login → login.html)
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+
+  # 3. Páginas dinâmicas (SSG): /cursos/slug → /cursos/slug.html
+  #    já coberto pela regra 2 acima.
+
+  # 4. Fallback: 404 do Next para rotas inexistentes
+  RewriteRule ^ /404.html [L]
+</IfModule>
+
+# Tipos corretos
+<IfModule mod_mime.c>
+  AddType text/html .html
 </IfModule>
