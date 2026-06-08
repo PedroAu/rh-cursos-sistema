@@ -55,10 +55,12 @@ export async function invokeFunction(
     headers["x-rh-session"] = sessionToken;
   }
 
+  // Sem credentials:"include" — a sessão admin trafega via header x-rh-session
+  // (localStorage), não por cookies. Evita a fricção de CORS com credenciais
+  // (cookies __cf_bm do Cloudflare) que bloqueava a resposta no browser.
   return fetch(`${base}/${name}`, {
     method,
     headers,
-    credentials: "include",
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 }
