@@ -380,6 +380,21 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Edge Functions do modelo híbrido (site estático Locaweb + backend no Supabase).
+# verify_jwt = false: a autenticação é feita dentro de cada function
+# (validação de origin, rate-limit e, no admin, token HMAC via x-rh-session).
+[functions.leads]
+verify_jwt = false
+
+[functions.enrollments]
+verify_jwt = false
+
+[functions.auth-session]
+verify_jwt = false
+
+[functions.admin-resources]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327

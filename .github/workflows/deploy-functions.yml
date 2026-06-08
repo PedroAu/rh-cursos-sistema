@@ -1,0 +1,63 @@
+name: Deploy Supabase Edge Functions
+
+# Modelo híbrido: o site estático vai para a Locaweb (deploy.yml) e o backend
+# (Edge Functions) é publicado no Supabase por este workflow.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/config.toml'
+      - '.github/workflows/deploy-functions.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-functions:
+    runs-on: ubuntu-latest
+    name: Deploy Edge Functions
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Set function secrets
+        run: |
+          supabase secrets set \
+            AUTH_SESSION_SECRET="$AUTH_SESSION_SECRET" \
+            PUBLIC_APP_URL="$PUBLIC_APP_URL" \
+            --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+          PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+
+      - name: Deploy functions
+        run: |
+          supabase functions deploy leads --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy enrollments --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy auth-session --project-ref "$SUPABASE_PROJECT_REF"
+          supabase functions deploy admin-resources --project-ref "$SUPABASE_PROJECT_REF"
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+
+      - name: Summary
+        run: |
+          echo "✅ Edge Functions publicadas no Supabase!"
+          echo "  leads, enrollments, auth-session, admin-resources"
+          echo "  Commit: ${{ github.sha }}"
