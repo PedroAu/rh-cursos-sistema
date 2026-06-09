@@ -19,7 +19,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="group h-full overflow-hidden border-outline-variant bg-white/95 hover:-translate-y-1 hover:border-accent hover:shadow-card">
-        <div className={`relative overflow-hidden ${compact ? "h-48" : "aspect-video"}`}>
+        <div className={`relative overflow-hidden ${compact ? "aspect-[16/10]" : "aspect-video"}`}>
           <Image
             src={course.image}
             alt={course.title}

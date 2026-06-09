@@ -44,37 +44,41 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Busca rápida</DialogTitle>
-        </DialogHeader>
-        <SearchInput
-          autoFocus
-          placeholder="Procure páginas, cursos ou atalhos..."
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <div className="mt-4 grid max-h-[420px] gap-2 overflow-y-auto">
-          {results.map((item) => {
-            const Icon = item.icon;
-            return (
-              <button
-                key={`${item.href}-${item.label}`}
-                type="button"
-                onClick={() => {
-                  navigate(item.href);
-                  setOpen(false);
-                  setQuery("");
-                }}
-                className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 text-left transition hover:border-primary/30 hover:bg-secondary"
-              >
-                <div className="rounded-full bg-secondary p-2 text-primary">
-                  <Icon className="h-4 w-4" />
-                </div>
-                <div className="text-sm font-medium">{item.label}</div>
-              </button>
-            );
-          })}
+      <DialogContent className="max-w-2xl p-0">
+        <div className="flex max-h-[calc(100vh-2rem)] flex-col">
+          <DialogHeader className="border-b border-border px-6 py-5">
+            <DialogTitle>Busca rápida</DialogTitle>
+          </DialogHeader>
+          <div className="px-6 py-5">
+            <SearchInput
+              autoFocus
+              placeholder="Procure páginas, cursos ou atalhos..."
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+            />
+          </div>
+          <div className="grid max-h-[min(420px,calc(100vh-12rem))] gap-2 overflow-y-auto px-6 pb-6">
+            {results.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={`${item.href}-${item.label}`}
+                  type="button"
+                  onClick={() => {
+                    navigate(item.href);
+                    setOpen(false);
+                    setQuery("");
+                  }}
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 text-left transition hover:border-primary/30 hover:bg-secondary"
+                >
+                  <div className="rounded-full bg-secondary p-2 text-primary">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="text-sm font-medium">{item.label}</div>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

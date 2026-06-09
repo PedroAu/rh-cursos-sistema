@@ -31,7 +31,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
+  const rate = await checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
@@ -67,8 +67,7 @@ Deno.serve(async (request) => {
 
     return jsonResponse({ ok: true }, 201, request);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro ao criar lead.";
-    console.error("leads.create error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    console.error("leads.create error:", error instanceof Error ? error.message : error);
+    return jsonResponse({ ok: false, error: "Erro ao criar lead." }, 500, request);
   }
 });

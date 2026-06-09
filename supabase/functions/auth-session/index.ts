@@ -33,7 +33,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
+  const rate = await checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas de login. Aguarde alguns minutos." },
@@ -99,8 +99,7 @@ Deno.serve(async (request) => {
       request
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro na autenticação.";
-    console.error("auth-session error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    console.error("auth-session error:", error instanceof Error ? error.message : error);
+    return jsonResponse({ ok: false, error: "Erro na autenticação." }, 500, request);
   }
 });

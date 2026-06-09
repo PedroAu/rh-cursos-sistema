@@ -37,7 +37,7 @@ function WhatsAppSupport() {
           <MessageCircle className="h-6 w-6" />
         </button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Atendimento rápido</DialogTitle>
         </DialogHeader>

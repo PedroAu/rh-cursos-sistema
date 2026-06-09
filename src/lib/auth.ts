@@ -89,6 +89,15 @@ async function signPayload(payload: string) {
   return toBase64Url(signature);
 }
 
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
 function isDashboardRole(value: unknown): value is DashboardRole {
   return value === "admin";
 }
@@ -106,7 +115,7 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
   if (!payload || !signature) return null;
 
   const expectedSignature = await signPayload(payload);
-  if (signature !== expectedSignature) return null;
+  if (!timingSafeEqual(signature, expectedSignature)) return null;
 
   const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
   if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;

@@ -23,6 +23,9 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - O deploy atual ficou dividido entre Cloudflare Pages para o frontend estatico e GitHub Actions + Supabase CLI para as Edge Functions.
 - Os formulários públicos passaram a depender do retorno real das Edge Functions; a UI não confirma mais lead/inscrição quando o backend falha.
 - A validação de inscrição foi alinhada com os IDs textuais do banco (`varchar(80)`), eliminando a rejeição incorreta por UUID.
+- O modal de CRUD admin foi padronizado com shell responsivo, corpo scrollavel e grid consistente para reduzir variacao visual entre formularios curtos e longos.
+- Modais e containers secundários receberam ajustes de responsividade para evitar clipping, compressao horizontal e listas inacessiveis em viewports menores.
+- Alturas fixas em graficos, cards e hero foram substituidas por proporcoes/responsividade para reduzir cortes e saltos visuais entre breakpoints.
 
 ## File List
 - `.claude/settings.json`
@@ -47,6 +50,8 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `src/lib/auth.ts`
 - `src/lib/app-store.tsx`
 - `src/lib/admin-resource-configs.tsx`
+- `src/components/ui/dialog.tsx`
+- `src/components/ui/sheet.tsx`
 - `src/lib/supabase/functions-client.ts`
 - `src/types/index.ts`
 - `src/lib/validation.ts`
@@ -62,8 +67,14 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `src/views/instructor/InstructorDashboard.tsx`
 - `src/components/layout/public-layout.tsx`
 - `src/components/common/command-palette.tsx`
+- `src/components/admin/data-table.tsx`
+- `src/components/admin/chart-card.tsx`
 - `src/components/layout/dashboard-shell.tsx`
 - `src/components/next-page-shell.tsx`
+- `src/views/admin/AdminResourcePage.tsx`
+- `src/components/courses/course-card.tsx`
+- `src/components/blog/blog-card.tsx`
+- `src/views/public/Home.tsx`
 - `src/views/public/CourseDetail.tsx`
 - `src/views/public/EnrollmentSuccess.tsx`
 - `src/components/common/faq-accordion.tsx`

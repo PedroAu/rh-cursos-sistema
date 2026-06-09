@@ -116,7 +116,7 @@ export function DataTable<T extends { id: string }>({
           </Button>
         </div>
       )}
-      <Table>
+      <Table className="min-w-[720px]">
         <TableHeader>
           <TableRow>
             {onDelete && (
@@ -158,17 +158,19 @@ export function DataTable<T extends { id: string }>({
                 <TableCell key={column.key}>{column.render(row)}</TableCell>
               ))}
               {(onEdit || onDelete) ? (
-                <TableCell className="flex justify-end gap-2">
-                  {onEdit ? (
-                    <Button size="icon" variant="outline" onClick={() => onEdit(row)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  ) : null}
-                  {onDelete ? (
-                    <Button size="icon" variant="outline" onClick={() => setConfirmDeleteRow(row)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  ) : null}
+                <TableCell className="whitespace-nowrap text-right">
+                  <div className="flex justify-end gap-2">
+                    {onEdit ? (
+                      <Button size="icon" variant="outline" onClick={() => onEdit(row)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                    {onDelete ? (
+                      <Button size="icon" variant="outline" onClick={() => setConfirmDeleteRow(row)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    ) : null}
+                  </div>
                 </TableCell>
               ) : null}
             </TableRow>
@@ -215,7 +217,7 @@ export function DataTable<T extends { id: string }>({
               Você tem certeza que deseja deletar {selectedIds.size} item{selectedIds.size !== 1 ? "ns" : ""}? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleBulkDelete}>
               Deletar
@@ -232,7 +234,7 @@ export function DataTable<T extends { id: string }>({
               Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {

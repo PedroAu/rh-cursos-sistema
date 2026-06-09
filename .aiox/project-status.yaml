@@ -1,21 +1,18 @@
 status:
-  branch: main
+  branch: chore/react-19-node-pin
   modifiedFiles:
     - .aiox/project-status.yaml
-    - .mcp.json
-    - docs/database/rh-cursos-schema-analysis.md
-    - docs/stories/2026-05-12-supabase-database-implementation.md
-    - docs/stories/2026-05-13-next-migration-hardening.md
-  modifiedFilesTotalCount: 68
+    - .claude/scheduled_tasks.lock
+    - .claude/settings.json
+    - outputs/
+  modifiedFilesTotalCount: 4
   recentCommits:
-    - 'feat: implement form improvements - Phase 1 quick wins'
-    - >-
-      feat: expand course form with description, image, level, objectives,
-      benefits, and modules
+    - 'fix: alinhar ids mock ao seed publico'
+    - 'fix: alinhar formularios publicos ao backend'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-04T18:53:08.600Z'
+  lastUpdate: '2026-06-09T03:10:31.176Z'
   isGitRepo: true
-timestamp: 1780599188601
+timestamp: 1780974631177
 ttl: 60
-gitFingerprint: 1777055364708.749:1780591593152.7002
+gitFingerprint: 1780957652654.5256:1780969653255.4812

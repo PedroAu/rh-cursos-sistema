@@ -207,7 +207,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`admin:${session.email}:${ip}`, rateLimitConfigs.admin);
+  const rate = await checkRateLimit(`admin:${session.email}:${ip}`, rateLimitConfigs.admin);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas requisições. Aguarde um momento." },
