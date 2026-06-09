@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "npm run typecheck && npm run build && playwright test",
-    "seed:admin": "node --env-file=.env scripts/seed-admin.js"
+    "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

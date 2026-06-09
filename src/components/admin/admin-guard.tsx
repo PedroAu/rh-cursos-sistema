@@ -8,7 +8,7 @@ import { useAppStore } from "@/lib/app-store";
 /**
  * Guard de sessão para o painel admin no export estático.
  *
- * Como o HTML do /admin é servido publicamente pela Locaweb, esta é a barreira
+ * Como o HTML do /admin é servido publicamente no export estático, esta é a barreira
  * de UX: se não houver sessão admin após a hidratação, redireciona para /login.
  * A proteção real dos DADOS permanece na Edge Function `admin-resources`
  * (token HMAC) — este guard apenas evita exibir a interface sem sessão.

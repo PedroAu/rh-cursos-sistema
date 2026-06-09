@@ -1,0 +1,49 @@
+name: CI
+
+# Gate de qualidade. O DEPLOY do site é feito pelo Cloudflare Pages (Git
+# integration) — não há mais publicação via FTP/Locaweb aqui. Este workflow
+# apenas valida typecheck, lint e build em PRs e pushes para main.
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    name: Typecheck, Lint & Build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run typecheck
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build static export
+        run: npm run build
+        env:
+          # Variáveis públicas necessárias para o build estático.
+          # Em produção, o build real roda no Cloudflare Pages com as vars do painel.
+          # Aqui usamos os GitHub Secrets só para validar que o build passa.
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}

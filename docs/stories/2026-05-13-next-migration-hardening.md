@@ -45,12 +45,13 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - Ajuste visual solicitado na pagina `/cursos`: a hero passou a exibir somente a acao de busca, os indicadores foram centralizados, os tres atalhos grandes de trilhas foram removidos e o resumo de resultados foi simplificado sem a label de matricula/orcamento.
 - Refinamento posterior da hero de `/cursos`: conteudo, CTA e indicadores passaram a compor um unico painel central em navy/dourado, alinhado a linguagem institucional da Home.
 - Foram criadas seis capas editoriais locais para os cursos, uma por trilha, substituindo imagens externas aleatorias no catalogo e fornecendo fallback consistente para registros do Supabase sem `imagem_capa`.
-- ESLint real foi adicionado via `eslint.config.mjs`. Avisos restantes são majoritariamente uso de `<img>` em telas aprovadas; foram mantidos para evitar alteração visual neste passo.
+- ESLint real foi adicionado via `eslint.config.mjs`.
+- O hardening posterior removeu os warnings restantes do lint, incluindo imagens migradas para `next/image`, imports/variaveis nao usados e diretivas ESLint obsoletas.
 - `npm audit --omit=dev` ainda reporta vulnerabilidade moderada em `next` por `postcss` interno. `npm audit fix` atualizou para `next@16.2.6`, mas o fix restante sugerido pelo npm é `--force` com downgrade para `next@9.3.3`, portanto foi recusado.
 
 ## Quality Gates
 - [x] `npm run typecheck` passou.
-- [x] `npm run lint` passou.
+- [x] `npm run lint` passou sem warnings.
 - [x] `npm run build` passou.
 - [x] `npm test` passou, executando `npm run typecheck`, `npm run build` e `playwright test`.
 - [x] Playwright passou com 19 cenários, incluindo a ausência de códigos internos das trilhas e o uso de capas locais nos cards públicos.
@@ -95,7 +96,12 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `app/api/auth/session/route.ts`
 - `app/api/leads/route.ts`
 - `app/api/enrollments/route.ts`
+- `scripts/check-schema.js`
+- `scripts/load-seed-data.js`
 - `src/`
+- `src/components/admin/form-fields.tsx`
+- `src/components/courses/course-card.tsx`
+- `src/components/ui/alert-dialog.tsx`
 - `public/images/courses/departamento-pessoal-esocial.jpg`
 - `public/images/courses/licitacoes-contratos.jpg`
 - `public/images/courses/pessoas-lideranca.jpg`
@@ -110,12 +116,18 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `src/components/next-page-shell.tsx`
 - `src/components/courses/training-path-card.tsx`
 - `src/lib/auth.ts`
+- `src/lib/admin-form-validation.ts`
 - `src/lib/router-compat.tsx`
 - `src/lib/supabase/client.ts`
 - `src/lib/supabase/server.ts`
 - `src/lib/supabase/mappers.ts`
+- `src/lib/validation.ts`
 - `src/lib/app-store.tsx`
+- `src/views/admin/AdminResourcePage.tsx`
 - `src/views/public/Login.tsx`
 - `src/views/public/Courses.tsx`
+- `src/views/public/CourseDetail.tsx`
+- `src/views/public/InCompany.tsx`
+- `next.config.mjs`
 - `tests/route-auth.spec.ts`
 - `docs/stories/2026-05-13-next-migration-hardening.md`

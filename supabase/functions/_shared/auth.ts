@@ -1,6 +1,6 @@
 // Sessão admin assinada via HMAC-SHA256 (WebCrypto).
 // Portado de src/lib/auth.ts para o runtime Deno das Edge Functions.
-// Em vez de cookie httpOnly (que não cruza o domínio Locaweb → supabase.co),
+// Em vez de cookie httpOnly (que não cruza o domínio do frontend → supabase.co),
 // o token é devolvido no corpo e reenviado pelo header `x-rh-session`.
 
 export type DashboardRole = "admin";

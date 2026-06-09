@@ -1,5 +1,6 @@
 import { Clock3, Star, Users } from "lucide-react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Link } from "@/lib/router-compat";
 
 import { StatusBadge } from "@/components/common/status-badge";
@@ -19,9 +20,11 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
       <Card className="group h-full overflow-hidden border-outline-variant bg-white/95 hover:-translate-y-1 hover:border-accent hover:shadow-card">
         <div className={`relative overflow-hidden ${compact ? "h-48" : "aspect-video"}`}>
-          <img
+          <Image
             src={course.image}
             alt={course.title}
+            fill
+            sizes={compact ? "(min-width: 1024px) 384px, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
           <div className="absolute left-4 top-4 rounded bg-white/92 px-3 py-1 text-micro font-bold uppercase tracking-[0.12em] text-primary shadow-sm backdrop-blur">

@@ -1,5 +1,3 @@
-import type { Course, TrainingClass, Student, Lead, Enrollment, Instructor, BlogPost } from "@/types";
-
 export type ValidationError = {
   field: string;
   message: string;

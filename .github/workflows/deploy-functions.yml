@@ -1,7 +1,7 @@
 name: Deploy Supabase Edge Functions
 
-# Modelo híbrido: o site estático vai para a Locaweb (deploy.yml) e o backend
-# (Edge Functions) é publicado no Supabase por este workflow.
+# Modelo atual: frontend estático no Cloudflare Pages e backend em Edge
+# Functions publicadas no Supabase por este workflow.
 
 on:
   push:

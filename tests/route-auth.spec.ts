@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Modelo estático (Locaweb) + backend em Supabase Edge Functions.
+// Modelo estático + backend em Supabase Edge Functions.
 // No export estático não há middleware/proxy de servidor nem rotas /api:
 // - todas as páginas (inclusive /admin) são servidas como HTML estático (200);
 // - a proteção do /admin é client-side (redirect via app-store após hidratação);
