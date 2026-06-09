@@ -1,9 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 // Mensagens de erro da página de login (/login).
-// O export estático serve o HTML; a validação de campos vazios é client-side
-// (não chama a Edge Function), enquanto credenciais inválidas e falhas de rede
-// dependem da resposta de `auth-session` — interceptada aqui para isolar a UI.
+// Campos vazios são validados no cliente; credenciais inválidas e falhas de rede
+// dependem da rota interna `/api/auth/session`, interceptada aqui para isolar a UI.
 
 // O Next.js injeta um <div role="alert" id="__next-route-announcer__"> interno
 // que está sempre presente. Excluímos esse nó por id para isolar o alerta do
@@ -24,8 +23,8 @@ test.describe("mensagens de erro do login", () => {
   });
 
   test("credenciais invalidas exibem alerta", async ({ page }) => {
-    // Força a Edge Function a responder com erro (não-ok).
-    await page.route("**/functions/v1/auth-session", (route) =>
+    // Força a rota interna a responder com erro (não-ok).
+    await page.route("**/api/auth/session", (route) =>
       route.fulfill({ status: 401, contentType: "application/json", body: "{}" })
     );
 
@@ -42,7 +41,7 @@ test.describe("mensagens de erro do login", () => {
 
   test("falha de rede exibe alerta de conexao", async ({ page }) => {
     // Aborta a requisição para simular indisponibilidade de rede.
-    await page.route("**/functions/v1/auth-session", (route) => route.abort());
+    await page.route("**/api/auth/session", (route) => route.abort());
 
     await page.goto("/login");
     await page.getByPlaceholder("E-mail").fill("admin@rhcursos.com.br");

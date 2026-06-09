@@ -68,7 +68,6 @@ export type Database = {
           foto_url: string | null;
           formacao: string | null;
           especialidade: string | null;
-          areas_atuacao: Json;
           rating: number;
           status: "Ativo" | "Inativo";
           created_at: string;
@@ -84,7 +83,6 @@ export type Database = {
           foto_url?: string | null;
           formacao?: string | null;
           especialidade?: string | null;
-          areas_atuacao?: Json;
           rating?: number;
           status?: "Ativo" | "Inativo";
         };
@@ -107,7 +105,6 @@ export type Database = {
           categoria: string | null;
           trilha_id: string | null;
           trilha_nome: string | null;
-          tipo_publico: string | null;
           preco_base: number;
           status: "Ativo" | "Inativo" | "Destaque" | "EmBreve" | "Rascunho" | "Arquivado";
           destaque: boolean;
@@ -134,7 +131,6 @@ export type Database = {
           categoria?: string | null;
           trilha_id?: string | null;
           trilha_nome?: string | null;
-          tipo_publico?: string | null;
           preco_base?: number;
           status?: "Ativo" | "Inativo" | "Destaque" | "EmBreve" | "Rascunho" | "Arquivado";
           destaque?: boolean;

@@ -19,7 +19,7 @@ export async function fetchPublicCatalogFromSupabase() {
   const [coursesResult, classesResult, instructorsResult, courseInstructorsResult] = await Promise.all([
     supabase
       .from("curso")
-      .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,trilha_id,trilha_nome,tipo_publico,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+      .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
       .order("titulo"),
     supabase
       .from("turma")
@@ -27,7 +27,7 @@ export async function fetchPublicCatalogFromSupabase() {
       .order("data_inicio"),
     supabase
       .from("instrutor")
-      .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,areas_atuacao,rating,status")
+      .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
       .order("nome"),
     supabase
       .from("curso_instrutor")

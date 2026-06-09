@@ -62,7 +62,7 @@ export function BlogPostPage() {
                 </p>
                 {relatedCourse ? (
                   <Button asChild className="bg-white text-primary hover:bg-white/90">
-                    <Link to={`/cursos/${relatedCourse.slug}`}>
+                    <Link to={`/curso?slug=${relatedCourse.slug}`}>
                       Ver curso relacionado
                       <ArrowRight className="h-4 w-4" />
                     </Link>

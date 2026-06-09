@@ -1,10 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-// Modelo estático + backend em Supabase Edge Functions.
-// No export estático não há middleware/proxy de servidor nem rotas /api:
-// - todas as páginas (inclusive /admin) são servidas como HTML estático (200);
-// - a proteção do /admin é client-side (redirect via app-store após hidratação);
-// - autenticação e mutações vivem nas Edge Functions (testadas à parte).
+// Modelo híbrido:
+// - páginas públicas seguem acessíveis por SSR/SSG;
+// - login usa rota interna `/api/auth/session`;
+// - `/admin` exige sessão no servidor e redireciona antes de renderizar o painel;
+// - mutações administrativas continuam nas Edge Functions do Supabase.
 
 const publicPaths = [
   "/",
@@ -14,13 +14,13 @@ const publicPaths = [
   "/in-company",
   "/sobre",
   "/contato",
-  "/login",
-  "/admin"
+  "/login"
 ];
 
 // Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
 // catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
 const dynamicPaths = [
+  "/curso?slug=introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
@@ -46,13 +46,14 @@ test.describe("rotas publicas", () => {
   });
 });
 
-test.describe("protecao do admin no export estatico", () => {
-  // O HTML do /admin é servido estaticamente (200), mas o AdminGuard redireciona
-  // para /login quando não há sessão admin após a hidratação. A proteção dos
-  // DADOS permanece na Edge Function `admin-resources` (token HMAC).
-  test("/admin sem sessao redireciona para /login (client-side)", async ({ page }) => {
+test.describe("protecao server-side do admin", () => {
+  test("/admin sem sessao redireciona para /login (server-side)", async ({ page, request }) => {
+    const response = await request.get("/admin/", { maxRedirects: 0 });
+    expect(response.status()).toBe(307);
+    expect(response.headers().location).toContain("/login?status=required&next=/admin");
+
     await page.goto("/admin");
-    await expect(page).toHaveURL(/\/login/);
+    await expect(page).toHaveURL(/\/login\/\?status=required&next=%2Fadmin/);
   });
 
   test("rotas de portal aluno e instrutor nao existem nesta publicacao", async ({ request }) => {

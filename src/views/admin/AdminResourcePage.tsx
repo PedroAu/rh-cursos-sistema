@@ -1,3 +1,5 @@
+"use client";
+
 import { Plus, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -347,6 +349,39 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                                 }
                                 className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
                               />
+                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "file") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <div className="flex flex-col gap-2">
+                              <label className="text-sm font-medium">
+                                {field.label}
+                                {field.required && <span className="ml-1 text-destructive">*</span>}
+                              </label>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => {
+                                  const file = event.target.files?.[0];
+                                  if (!file) return;
+                                  const reader = new FileReader();
+                                  reader.onload = () => {
+                                    if (typeof reader.result === "string") {
+                                      setForm((current) => ({ ...current, [field.key]: reader.result }));
+                                    }
+                                  };
+                                  reader.readAsDataURL(file);
+                                }}
+                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                              />
+                              {form[field.key] ? (
+                                <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
+                              ) : null}
                               {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
                             </div>
                           </div>

@@ -1,7 +1,6 @@
-# Cloudflare Pages — security headers para todo o site.
-# No static export (`output: 'export'`) não há servidor Node aplicando os headers
-# de src/lib/security-headers.ts; o Cloudflare Pages aplica estes nativamente.
-# Mantenha em sincronia com CSP_POLICIES.production em src/lib/security-headers.ts.
+# Headers de segurança ativos agora são aplicados no runtime via `middleware.ts`.
+# Este arquivo fica apenas como fallback documental/compatibilidade para assets
+# estáticos servidos fora do Worker principal.
 
 /*
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https: blob:; font-src 'self' https:; connect-src 'self' https://api.rhcursos.com.br https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests

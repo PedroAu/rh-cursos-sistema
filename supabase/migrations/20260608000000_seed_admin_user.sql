@@ -1,7 +1,7 @@
 -- Garante profiles.role = 'admin' para o usuário admin (modelo híbrido)
 -- ─────────────────────────────────────────────────────────────────────────────
 -- O usuário admin é criado pela API admin oficial (scripts/seed-admin.js), que
--- define email_confirm + user_metadata.role='admin' (usado pela Edge Function
+-- define email_confirm + app_metadata.role='admin' (usado pela autenticação)
 -- auth-session). Esta migration apenas alinha a SEGUNDA camada de autorização:
 -- public.profiles.role = 'admin', consumida pelas policies RLS via is_admin().
 --

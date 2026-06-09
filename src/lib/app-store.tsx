@@ -1,3 +1,5 @@
+"use client";
+
 import {
   createContext,
   useCallback,
@@ -108,21 +110,49 @@ const initialState: AppState = {
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
-function readInitialState() {
+function readInitialState(initialSession?: CurrentSession | null) {
+  const fallbackState = initialSession
+    ? { ...initialState, currentSession: initialSession }
+    : initialState;
+
   if (typeof window === "undefined") {
-    return initialState;
+    return fallbackState;
   }
 
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (!stored) {
-    return initialState;
+    return fallbackState;
   }
 
   try {
-    return JSON.parse(stored) as AppState;
+    const parsed = JSON.parse(stored) as AppState;
+    return initialSession ? { ...parsed, currentSession: initialSession } : parsed;
   } catch {
-    return initialState;
+    return fallbackState;
   }
+}
+
+function countConfirmedEnrollments(enrollments: Enrollment[], classId: string) {
+  return enrollments.filter(
+    (item) =>
+      item.classId === classId &&
+      (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
+  ).length;
+}
+
+function deriveClassCapacity(trainingClass: TrainingClass, enrollments: Enrollment[]) {
+  const siteFilledSeats = countConfirmedEnrollments(enrollments, trainingClass.id);
+  const manualFilledSeats = Math.max(
+    trainingClass.manualFilledSeats ?? trainingClass.filledSeats - siteFilledSeats,
+    0
+  );
+  const filledSeats = Math.min(trainingClass.totalSeats, manualFilledSeats + siteFilledSeats);
+
+  return {
+    manualFilledSeats,
+    filledSeats,
+    availableSeats: Math.max(0, trainingClass.totalSeats - filledSeats),
+  };
 }
 
 function persistAdminMutation(mutation: AdminMutation): Promise<void> {
@@ -151,8 +181,11 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
-export function AppStoreProvider({ children }: PropsWithChildren) {
-  const [state, setState] = useState<AppState>(readInitialState);
+export function AppStoreProvider({
+  children,
+  initialSession = null
+}: PropsWithChildren<{ initialSession?: CurrentSession | null }>) {
+  const [state, setState] = useState<AppState>(() => readInitialState(initialSession));
 
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
   // recriar sua identidade a cada mudança (evita re-renders em cascata).
@@ -163,9 +196,25 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
-  // Reconciliação de sessão na inicialização (export estático, sem cookie
-  // server-side): a sessão é derivada do token HMAC persistido em localStorage.
+  // Reconciliação de sessão na inicialização: a sessão server-side do admin
+  // entra por prop; como fallback, reidratamos o payload do token HMAC salvo no
+  // browser para manter consistência com as Edge Functions existentes.
   useEffect(() => {
+    if (initialSession) {
+      setState((current) => {
+        if (
+          current.currentSession?.role === initialSession.role &&
+          current.currentSession?.email === initialSession.email &&
+          current.currentSession?.name === initialSession.name
+        ) {
+          return current;
+        }
+
+        return { ...current, currentSession: initialSession };
+      });
+      return;
+    }
+
     const decoded = decodeSessionToken(getSessionToken());
 
     setState((current) => {
@@ -188,7 +237,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
       }
       return current;
     });
-  }, []);
+  }, [initialSession]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -268,9 +317,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
   }, []);
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
-    if (isFunctionsConfigured) {
-      void invokeFunction("auth-session", { method: "DELETE" }).catch(() => undefined);
-    }
+    void fetch("/api/auth/session", { method: "DELETE" }).catch(() => undefined);
     if (supabase) {
       void supabase.auth.signOut().catch(() => undefined);
     }
@@ -291,46 +338,49 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
     const enrollmentId = `enrollment-${Date.now()}`;
     const studentId = `student-sim-${Date.now()}`;
 
-    setState((current) => ({
-      ...current,
-      enrollments: [
+    setState((current) => {
+      const enrollments = [
         {
           id: enrollmentId,
           createdAt: new Date().toISOString(),
-          status: "Confirmada",
+          status: "Confirmada" as const,
           ...payload
         },
         ...current.enrollments
-      ],
-      students: [
-        {
-          id: studentId,
-          name: payload.studentName,
-          email: payload.email,
-          phone: payload.phone,
-          cpf: payload.cpf,
-          organization: payload.organization,
-          jobTitle: payload.jobTitle,
-          courseId: payload.courseId,
-          classId: payload.classId,
-          enrollmentStatus: "Confirmada",
-          certificateIssued: false,
-          enrolledAt: new Date().toISOString(),
-          paymentMethod: payload.paymentMethod
-        },
-        ...current.students
-      ],
-      classes: current.classes.map((item) =>
-        item.id === payload.classId
-          ? {
-              ...item,
-              filledSeats: item.filledSeats + 1,
-              availableSeats: Math.max(0, item.availableSeats - 1),
-              status: item.availableSeats - 1 <= 5 ? "Poucas vagas" : item.status
-            }
-          : item
-      )
-    }));
+      ];
+
+      return {
+        ...current,
+        enrollments,
+        students: [
+          {
+            id: studentId,
+            name: payload.studentName,
+            email: payload.email,
+            phone: payload.phone,
+            cpf: payload.cpf,
+            organization: payload.organization,
+            jobTitle: payload.jobTitle,
+            courseId: payload.courseId,
+            classId: payload.classId,
+            enrollmentStatus: "Confirmada",
+            certificateIssued: false,
+            enrolledAt: new Date().toISOString(),
+            paymentMethod: payload.paymentMethod
+          },
+          ...current.students
+        ],
+        classes: current.classes.map((item) => {
+          if (item.id !== payload.classId) return item;
+          const capacity = deriveClassCapacity(item, enrollments);
+          return {
+            ...item,
+            ...capacity,
+            status: capacity.availableSeats <= 5 ? "Poucas vagas" : item.status
+          };
+        })
+      };
+    });
 
     toast.success(
       isFunctionsConfigured
@@ -398,11 +448,13 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
           pathName:
             trainingPaths.find((item) => item.id === (course.pathId ?? trainingPaths[0].id))?.name ??
             trainingPaths[0].name,
-          modality: course.modality ?? "Ao vivo online",
+          modality: course.modality ?? course.modalities?.[0] ?? "Ao vivo online",
+          modalities: course.modalities ?? (course.modality ? [course.modality] : ["Ao vivo online"]),
           durationLabel: course.durationLabel ?? "8h",
           durationHours: course.durationHours ?? 8,
           level: course.level ?? "Básico",
-          publicType: course.publicType ?? "Profissionais",
+          category: course.category ?? course.categories?.[0] ?? trainingPaths[0].shortName,
+          categories: course.categories ?? (course.category ? [course.category] : [trainingPaths[0].shortName]),
           price: course.price ?? 0,
           shortDescription: course.shortDescription ?? "Descrição curta do curso.",
           fullDescription: course.fullDescription ?? "Descrição completa do curso.",
@@ -416,6 +468,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
           studentsCount: course.studentsCount ?? 0,
           status: course.status ?? "Ativo",
           featured: course.featured ?? false,
+          featuredCourseIds: course.featuredCourseIds ?? [],
           nextClassId: course.nextClassId ?? snapshot.classes[0]?.id ?? ""
         } as Course);
 
@@ -460,24 +513,29 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
   const upsertClass = useCallback<AppStoreValue["upsertClass"]>((trainingClass) => {
     const snapshot = stateRef.current;
     const exists = trainingClass.id && snapshot.classes.some((item) => item.id === trainingClass.id);
-    const nextClass: TrainingClass = exists
+    const baseClass: TrainingClass = exists
       ? ({ ...snapshot.classes.find((item) => item.id === trainingClass.id)!, ...trainingClass } as TrainingClass)
       : ({
           id: `class-${Date.now()}`,
           courseId: trainingClass.courseId ?? snapshot.courses[0]?.id ?? "",
           startDate: trainingClass.startDate ?? new Date().toISOString(),
-          endDate: trainingClass.endDate ?? new Date().toISOString(),
+          endDate: trainingClass.endDate ?? trainingClass.startDate ?? new Date().toISOString(),
           time: trainingClass.time ?? "09:00 às 17:00",
           modality: trainingClass.modality ?? "Ao vivo online",
           location: trainingClass.location ?? "Online",
           instructorId: trainingClass.instructorId ?? snapshot.instructors[0]?.id ?? "",
           totalSeats: trainingClass.totalSeats ?? 30,
+          manualFilledSeats: trainingClass.manualFilledSeats ?? trainingClass.filledSeats ?? 0,
           filledSeats: trainingClass.filledSeats ?? 0,
           availableSeats: trainingClass.availableSeats ?? 30,
           status: trainingClass.status ?? "Inscrições abertas",
           price: trainingClass.price ?? 0,
           notes: trainingClass.notes ?? "Turma criada no modo simulado."
         } as TrainingClass);
+    const nextClass = {
+      ...baseClass,
+      ...deriveClassCapacity(baseClass, snapshot.enrollments)
+    };
 
     setState((current) => ({
       ...current,
@@ -502,17 +560,30 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
     const snapshot = stateRef.current;
     const exists = instructor.id && snapshot.instructors.some((item) => item.id === instructor.id);
     const nextInstructor: Instructor = exists
-      ? ({ ...snapshot.instructors.find((item) => item.id === instructor.id)!, ...instructor } as Instructor)
+      ? ({
+          ...snapshot.instructors.find((item) => item.id === instructor.id)!,
+          ...instructor,
+          avatar:
+            instructor.photoUrl ||
+            instructor.avatar ||
+            snapshot.instructors.find((item) => item.id === instructor.id)!.avatar,
+        } as Instructor)
       : ({
           id: `inst-${Date.now()}`,
           name: instructor.name ?? "Novo instrutor",
-          email: instructor.email ?? "instrutor@mock.com",
+          email: instructor.email ?? "",
           phone: instructor.phone ?? company.phones.primary,
-          specialty: instructor.specialty ?? "Especialidade",
+          specialty: instructor.specialty ?? "",
           bio: instructor.bio ?? "Mini bio do instrutor.",
+          education: instructor.education ?? "",
+          photoUrl: instructor.photoUrl ?? "",
           courseIds: instructor.courseIds ?? [],
           rating: instructor.rating ?? 4.8,
-          avatar: instructor.avatar ?? "NI",
+          avatar:
+            instructor.photoUrl ??
+            instructor.avatar ??
+            instructor.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() ??
+            "NI",
           status: instructor.status ?? "Ativo"
         } as Instructor);
 
@@ -545,10 +616,18 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
   }, []);
 
   const updateEnrollmentStatus = useCallback<AppStoreValue["updateEnrollmentStatus"]>((id, status) => {
-    setState((current) => ({
-      ...current,
-      enrollments: current.enrollments.map((item) => (item.id === id ? { ...item, status } : item))
-    }));
+    setState((current) => {
+      const enrollments = current.enrollments.map((item) => (item.id === id ? { ...item, status } : item));
+
+      return {
+        ...current,
+        enrollments,
+        classes: current.classes.map((item) => ({
+          ...item,
+          ...deriveClassCapacity(item, enrollments)
+        }))
+      };
+    });
     toast.success("Status da inscrição atualizado.");
     return persistAdminMutation({ resource: "enrollments", action: "update-status", id, status });
   }, []);

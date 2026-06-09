@@ -1,8 +1,8 @@
 name: CI
 
-# Gate de qualidade. O DEPLOY do site é feito pelo Cloudflare Pages (Git
-# integration) — não há mais publicação via FTP/Locaweb aqui. Este workflow
-# apenas valida typecheck, lint e build em PRs e pushes para main.
+# Gate de qualidade. O deploy do site é feito em Cloudflare Workers com
+# OpenNext; este workflow valida a aplicação e também o empacotamento para o
+# runtime da Cloudflare antes do merge.
 
 on:
   push:
@@ -37,12 +37,17 @@ jobs:
       - name: Run linting
         run: npm run lint
 
-      - name: Build static export
+      - name: Build Next.js app
         run: npm run build
         env:
-          # Variáveis públicas necessárias para o build estático.
-          # Em produção, o build real roda no Cloudflare Pages com as vars do painel.
-          # Aqui usamos os GitHub Secrets só para validar que o build passa.
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+
+      - name: Package Cloudflare Worker
+        run: npm run build:workers
+        env:
           AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}

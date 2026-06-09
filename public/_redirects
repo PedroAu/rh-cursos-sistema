@@ -1,7 +1,3 @@
-# Cloudflare Pages — redirects.
-# Canonicaliza o apex para www (padrão de produção do site).
-# HTTPS já é forçado pelo Cloudflare (Always Use HTTPS) + HSTS em _headers.
-# O roteamento de static export (trailingSlash + index.html por pasta) e o
-# fallback 404 são nativos do Cloudflare Pages — não precisam de regra aqui.
-
-https://rhcursos.com.br/* https://www.rhcursos.com.br/:splat 301
+# Arquivo mantido apenas para compatibilidade de assets.
+# No runtime atual (Cloudflare Workers + OpenNext), o redirect do apex
+# para `www` é aplicado em `middleware.ts`.

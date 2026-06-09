@@ -2,7 +2,7 @@
 
 Deploy atual do projeto:
 
-- Frontend: Next.js estático publicado no Cloudflare Pages
+- Frontend: Next.js publicado no Cloudflare Workers via OpenNext
 - Backend: Supabase Edge Functions publicadas via GitHub Actions
 
 ## Frontend
@@ -13,14 +13,13 @@ Fluxo:
 
 1. `push` em `main`
 2. `npm ci`
-3. `npm run build`
-4. upload do diretório `out/` para o Cloudflare Pages
+3. `npm run deploy:workers -- --keep-vars`
+4. `npm run verify:workers`
 
 Secrets necessários no GitHub:
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
-- `CLOUDFLARE_PAGES_PROJECT_NAME`
 - `AUTH_SESSION_SECRET`
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
@@ -28,9 +27,17 @@ Secrets necessários no GitHub:
 
 Observações:
 
-- `public/_headers` define os headers de segurança no Cloudflare Pages.
-- `public/_redirects` mantém o redirect do apex para `www`.
-- O build gera export estático em `out/` via `next.config.mjs`.
+- O empacotamento para Workers é feito pelo adapter `@opennextjs/cloudflare`.
+- `wrangler.jsonc` define o Worker principal e o binding de assets gerado em `.open-next/`.
+- O Worker de produção fica preso aos domínios `www.rhcursos.com.br` e `rhcursos.com.br` via Workers Routes na zona `rhcursos.com.br`.
+- `workers.dev` e Preview URLs ficam desabilitados em produção para reduzir superfície pública.
+- O projeto legado do Cloudflare Pages foi removido; o tráfego público do frontend agora entra apenas pelo Worker.
+- O deploy usa `--keep-vars`, então as variáveis de runtime configuradas no painel da Cloudflare não são apagadas pelo pipeline.
+- Os headers de segurança (`CSP`, `HSTS`, `X-Frame-Options` etc.) são aplicados pelo runtime em `middleware.ts`.
+- O redirect do apex `rhcursos.com.br` para `www.rhcursos.com.br` é aplicado pelo próprio app, sem depender de Redirect Rules do Pages.
+- A fase 3 automatiza a validação pós-deploy com `scripts/verify-workers-deploy.js`, conferindo homepage canônica, redirect do apex, proteção do `/admin/` e headers de segurança.
+- `public/_headers` permanece apenas como fallback documental para assets estáticos.
+- `public/_redirects` não participa do deploy em Workers.
 
 ## Edge Functions
 
@@ -51,13 +58,18 @@ Functions publicadas:
 - `auth-session`
 - `admin-resources`
 
-## Configuração no Cloudflare Pages
+## Configuração no Cloudflare Workers
 
-- Framework preset: `None`
-- Build command: `npm run build`
-- Build output directory: `out`
-- Production branch: `main`
-- Node.js version: `24`
+- Worker name: definido em `wrangler.jsonc`
+- Workers Routes: `www.rhcursos.com.br/*` e `rhcursos.com.br/*`
+- Build/deploy command em CI: `npm run deploy:workers -- --keep-vars`
+- Post-deploy verify em CI: `npm run verify:workers`
+- Runtime: Cloudflare Workers com `nodejs_compat`
+- Node.js local/CI: `24`
 
-As variáveis `NEXT_PUBLIC_*` devem existir também no painel do Cloudflare Pages para builds feitos pelo próprio provedor.
+Variáveis no painel da Cloudflare:
 
+- Runtime vars/secrets do Worker devem ser configuradas no dashboard da Cloudflare Workers.
+- Em produção, `NEXT_PUBLIC_APP_URL` deve ser `https://www.rhcursos.com.br`.
+- O verificador usa `DEPLOY_CANONICAL_URL` e `DEPLOY_APEX_URL`; no workflow de produção, `DEPLOY_CANONICAL_URL` reaproveita `NEXT_PUBLIC_APP_URL`.
+- Se optar por Workers Builds no futuro, repita também essas variáveis em `Build variables and secrets`, porque o build do Next precisa delas para SSG e inline de `NEXT_PUBLIC_*`.

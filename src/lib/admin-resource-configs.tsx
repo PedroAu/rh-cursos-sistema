@@ -34,7 +34,7 @@ export type ResourceKey =
 export type FieldConfig = {
   key: string;
   label: string;
-  type?: "text" | "textarea" | "select" | "array" | "modules" | "multiselect" | "number" | "date";
+  type?: "text" | "textarea" | "select" | "array" | "modules" | "multiselect" | "number" | "date" | "file";
   options?: Array<{ value: string; label: string }>;
   required?: boolean;
 };
@@ -73,6 +73,11 @@ type ConfigDeps = {
 
 import React from "react";
 
+function normalizeDateTimeForStorage(value?: string, fallbackHour = "09:00:00.000Z") {
+  if (!value) return new Date().toISOString();
+  return `${value}T${fallbackHour}`;
+}
+
 export function buildResourceConfig(
   resource: ResourceKey,
   store: ReturnType<typeof useAppStore>,
@@ -94,6 +99,7 @@ export function buildResourceConfig(
         { value: "Híbrido", label: "Híbrido" },
         { value: "Gravado", label: "Gravado" },
       ];
+      const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = [
         { value: "Ativo", label: "Ativo" },
         { value: "Inativo", label: "Inativo" },
@@ -116,7 +122,7 @@ export function buildResourceConfig(
           setForm({
             title: row.title,
             pathId: row.pathId,
-            modality: row.modality,
+            modalities: row.modalities?.length ? row.modalities : [row.modality],
             durationLabel: row.durationLabel,
             price: String(row.price),
             status: row.status,
@@ -124,6 +130,10 @@ export function buildResourceConfig(
             fullDescription: row.fullDescription,
             image: row.image,
             level: row.level,
+            targetAudience: row.targetAudience || [],
+            categories: row.categories?.length ? row.categories : row.category ? [row.category] : [],
+            featuredCourseIds: row.featuredCourseIds || [],
+            featured: row.featured ? "Sim" : "Não",
             objectives: row.objectives || [],
             benefits: row.benefits || [],
             modules: row.modules || [],
@@ -134,7 +144,15 @@ export function buildResourceConfig(
         onDelete: (row: Course) => store.deleteCourse(row.id),
         onSave: async () => {
           const validation = validateCourse(
-            { ...form, objectives: JSON.stringify(form.objectives), benefits: JSON.stringify(form.benefits) },
+            {
+              ...form,
+              modality: form.modalities?.[0] ?? "",
+              modalities: JSON.stringify(form.modalities || []),
+              categories: JSON.stringify(form.categories || []),
+              targetAudience: JSON.stringify(form.targetAudience || []),
+              objectives: JSON.stringify(form.objectives),
+              benefits: JSON.stringify(form.benefits),
+            },
             form.modules
           );
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
@@ -143,7 +161,8 @@ export function buildResourceConfig(
               id: editingId ?? undefined,
               title: form.title,
               pathId: form.pathId,
-              modality: form.modality as Course["modality"],
+              modality: (form.modalities?.[0] ?? "Ao vivo online") as Course["modality"],
+              modalities: (form.modalities || []) as Course["modality"][],
               durationLabel: form.durationLabel,
               durationHours: Number(form.durationLabel?.replace(/\D/g, "") || 8),
               price: Number(form.price || 0),
@@ -152,6 +171,11 @@ export function buildResourceConfig(
               fullDescription: form.fullDescription,
               image: form.image,
               level: form.level as Course["level"],
+              targetAudience: form.targetAudience || [],
+              category: form.categories?.[0],
+              categories: form.categories || [],
+              featured: form.featured === "Sim",
+              featuredCourseIds: form.featuredCourseIds || [],
               objectives: form.objectives || [],
               benefits: form.benefits || [],
               modules: form.modules || [],
@@ -165,7 +189,7 @@ export function buildResourceConfig(
         fields: [
           { key: "title", label: "Nome do curso", type: "text", required: true },
           { key: "pathId", label: "Trilha", type: "select", options: pathOptions, required: true },
-          { key: "modality", label: "Modalidade", type: "select", options: modalityOptions, required: true },
+          { key: "modalities", label: "Modalidades", type: "multiselect", options: modalityOptions, required: true },
           {
             key: "level", label: "Nível", type: "select", required: true,
             options: [
@@ -176,9 +200,22 @@ export function buildResourceConfig(
             ],
           },
           { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+          {
+            key: "featured",
+            label: "Curso destaque",
+            type: "select",
+            options: [
+              { value: "Não", label: "Não" },
+              { value: "Sim", label: "Sim" },
+            ],
+            required: true,
+          },
           { key: "durationLabel", label: "Carga horária", type: "text", required: true },
           { key: "price", label: "Preço (R$)", type: "number", required: true },
           { key: "image", label: "URL da imagem", type: "text" },
+          { key: "targetAudience", label: "Público-alvo", type: "array" },
+          { key: "categories", label: "Categorias", type: "array" },
+          { key: "featuredCourseIds", label: "Cursos destaque relacionados", type: "multiselect", options: featuredCourseOptions },
           { key: "shortDescription", label: "Descrição curta", type: "textarea", required: true },
           { key: "fullDescription", label: "Descrição completa", type: "textarea", required: true },
           { key: "objectives", label: "Objetivos", type: "array" },
@@ -194,13 +231,15 @@ export function buildResourceConfig(
         return courseName.toLowerCase().includes(search.toLowerCase());
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
-      const modalityOptions = [
-        { value: "Ao vivo online", label: "Ao vivo online" },
-        { value: "Presencial", label: "Presencial" },
-        { value: "In company", label: "In company" },
-        { value: "Híbrido", label: "Híbrido" },
-        { value: "Gravado", label: "Gravado" },
-      ];
+      const selectedCourse = store.courses.find((c) => c.id === form.courseId);
+      const modalityOptions = selectedCourse
+        ? [{ value: selectedCourse.modality, label: selectedCourse.modality }]
+        : courseOptions.length
+          ? store.courses
+              .map((course) => course.modality)
+              .filter((value, index, list) => list.indexOf(value) === index)
+              .map((value) => ({ value, label: value }))
+          : [];
       const classStatusOptions = [
         { value: "Inscrições abertas", label: "Inscrições abertas" },
         { value: "Poucas vagas", label: "Poucas vagas" },
@@ -208,13 +247,19 @@ export function buildResourceConfig(
         { value: "Em breve", label: "Em breve" },
       ];
       const instructorOptions = store.instructors.map((i) => ({ value: i.id, label: i.name }));
+      const confirmedEnrollments = editingId
+        ? store.enrollments.filter(
+            (item) =>
+              item.classId === editingId &&
+              (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
+          ).length
+        : 0;
 
       return {
         title: "Gestão de turmas",
         description: "Editar calendário, status, instrutores e vagas das turmas.",
         rows,
         columns: [
-          { key: "id", label: "ID", render: (row: TrainingClass) => row.id },
           {
             key: "course", label: "Curso",
             render: (row: TrainingClass) =>
@@ -225,17 +270,30 @@ export function buildResourceConfig(
             render: (row: TrainingClass) =>
               new Intl.DateTimeFormat("pt-BR").format(new Date(row.startDate)),
           },
+          {
+            key: "filledSeats", label: "Vagas preenchidas",
+            render: (row: TrainingClass) => `${row.filledSeats}/${row.totalSeats}`,
+          },
           { key: "status", label: "Status", render: (row: TrainingClass) => row.status },
         ],
         onEdit: (row: TrainingClass) => {
+          const rowConfirmedEnrollments = store.enrollments.filter(
+            (item) =>
+              item.classId === row.id &&
+              (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
+          ).length;
           setEditingId(row.id);
           setForm({
             courseId: row.courseId,
             startDate: row.startDate.slice(0, 10),
+            endDate: row.endDate.slice(0, 10),
+            time: row.time || "",
             modality: row.modality,
             status: row.status,
             location: row.location,
             instructorId: row.instructorId || "",
+            totalSeats: String(row.totalSeats),
+            manualFilledSeats: String(row.manualFilledSeats ?? Math.max(row.filledSeats - rowConfirmedEnrollments, 0)),
           });
           setValidationErrors([]);
           setOpen(true);
@@ -245,15 +303,22 @@ export function buildResourceConfig(
           const validation = validateClass(form);
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
+            const totalSeats = Number(form.totalSeats || 0);
+            const manualFilledSeats = Number(form.manualFilledSeats || 0);
             await store.upsertClass({
               id: editingId ?? undefined,
               courseId: form.courseId,
-              startDate: `${form.startDate}T09:00:00.000Z`,
-              endDate: `${form.startDate}T18:00:00.000Z`,
+              startDate: normalizeDateTimeForStorage(form.startDate),
+              endDate: normalizeDateTimeForStorage(form.endDate, "18:00:00.000Z"),
+              time: form.time,
               modality: form.modality as TrainingClass["modality"],
               status: form.status as TrainingClass["status"],
               location: form.location,
               instructorId: form.instructorId || undefined,
+              totalSeats,
+              manualFilledSeats,
+              filledSeats: Math.min(totalSeats, confirmedEnrollments + manualFilledSeats),
+              availableSeats: Math.max(0, totalSeats - (confirmedEnrollments + manualFilledSeats)),
             });
             setOpen(false);
             setValidationErrors([]);
@@ -264,7 +329,11 @@ export function buildResourceConfig(
         fields: [
           { key: "courseId", label: "Curso", type: "select", options: courseOptions, required: true },
           { key: "startDate", label: "Data de início", type: "date", required: true },
+          { key: "endDate", label: "Data final", type: "date", required: true },
+          { key: "time", label: "Horário(s)", type: "text", required: true },
           { key: "modality", label: "Modalidade", type: "select", options: modalityOptions, required: true },
+          { key: "totalSeats", label: "Quantidade de vagas", type: "number", required: true },
+          { key: "manualFilledSeats", label: "Vagas preenchidas manualmente", type: "number" },
           { key: "status", label: "Status", type: "select", options: classStatusOptions, required: true },
           { key: "instructorId", label: "Instrutor", type: "select", options: instructorOptions },
           { key: "location", label: "Local", type: "text" },
@@ -517,6 +586,8 @@ export function buildResourceConfig(
             phone: row.phone || "",
             specialty: row.specialty,
             bio: row.bio || "",
+            education: row.education || "",
+            photoUrl: row.photoUrl || (row.avatar.startsWith("/") || row.avatar.startsWith("http") ? row.avatar : ""),
             status: row.status,
             courseIds: row.courseIds || [],
           });
@@ -533,8 +604,10 @@ export function buildResourceConfig(
               name: form.name,
               email: form.email,
               phone: form.phone || undefined,
-              specialty: form.specialty,
+              specialty: form.specialty || undefined,
               bio: form.bio || undefined,
+              education: form.education || undefined,
+              photoUrl: form.photoUrl || undefined,
               status: form.status as Instructor["status"],
               courseIds: form.courseIds || [],
             });
@@ -546,9 +619,11 @@ export function buildResourceConfig(
         },
         fields: [
           { key: "name", label: "Nome", type: "text", required: true },
-          { key: "email", label: "E-mail", type: "text", required: true },
+          { key: "email", label: "E-mail", type: "text" },
           { key: "phone", label: "Telefone", type: "text" },
-          { key: "specialty", label: "Especialidade", type: "text", required: true },
+          { key: "specialty", label: "Especialidade", type: "text" },
+          { key: "education", label: "Formação", type: "textarea" },
+          { key: "photoUrl", label: "Foto do professor", type: "file" },
           { key: "bio", label: "Biografia", type: "textarea" },
           { key: "status", label: "Status", type: "select", options: instructorStatusOptions, required: true },
         ],

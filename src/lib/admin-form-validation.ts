@@ -26,8 +26,8 @@ export function validateCourse(
     addError(errors, "pathId", "Selecione uma trilha");
   }
 
-  if (!form.modality?.trim()) {
-    addError(errors, "modality", "Selecione uma modalidade");
+  if (!form.modality?.trim() && !form.modalities?.trim()) {
+    addError(errors, "modalities", "Selecione pelo menos uma modalidade");
   }
 
   if (!form.durationLabel?.trim()) {
@@ -42,6 +42,28 @@ export function validateCourse(
 
   if (!form.level?.trim()) {
     addError(errors, "level", "Nível é obrigatório");
+  }
+
+  if (form.categories && form.categories !== "[]") {
+    try {
+      const categories = JSON.parse(form.categories);
+      if (!Array.isArray(categories)) {
+        addError(errors, "categories", "Categorias deve ser um array válido");
+      }
+    } catch {
+      addError(errors, "categories", "Formato inválido nas categorias");
+    }
+  }
+
+  if (form.targetAudience && form.targetAudience !== "[]") {
+    try {
+      const targetAudience = JSON.parse(form.targetAudience);
+      if (!Array.isArray(targetAudience)) {
+        addError(errors, "targetAudience", "Público-alvo deve ser um array válido");
+      }
+    } catch {
+      addError(errors, "targetAudience", "Formato inválido no público-alvo");
+    }
   }
 
   if (!form.status?.trim()) {
@@ -110,10 +132,19 @@ export function validateClass(form: Record<string, string>): ValidationResult {
 
   if (!form.startDate?.trim()) {
     addError(errors, "startDate", "Data de início é obrigatória");
-  } else {
-    const date = new Date(form.startDate);
-    if (isNaN(date.getTime())) {
-      addError(errors, "startDate", "Data inválida");
+  } else if (!isValidDateInput(form.startDate)) {
+    addError(errors, "startDate", "Data de início inválida");
+  }
+
+  if (!form.endDate?.trim()) {
+    addError(errors, "endDate", "Data final é obrigatória");
+  } else if (!isValidDateInput(form.endDate)) {
+    addError(errors, "endDate", "Data final inválida");
+  }
+
+  if (isValidDateInput(form.startDate) && isValidDateInput(form.endDate)) {
+    if (new Date(form.endDate) < new Date(form.startDate)) {
+      addError(errors, "endDate", "Data final deve ser igual ou posterior à data de início");
     }
   }
 
@@ -127,6 +158,22 @@ export function validateClass(form: Record<string, string>): ValidationResult {
 
   if (!form.location?.trim() && form.modality === "Presencial") {
     addError(errors, "location", "Local é obrigatório para turmas presenciais");
+  }
+
+  if (!form.time?.trim()) {
+    addError(errors, "time", "Horário é obrigatório");
+  }
+
+  if (!form.totalSeats?.trim()) {
+    addError(errors, "totalSeats", "Quantidade de vagas é obrigatória");
+  } else if (isNaN(Number(form.totalSeats)) || Number(form.totalSeats) < 0) {
+    addError(errors, "totalSeats", "Quantidade de vagas deve ser um número válido");
+  }
+
+  if (form.manualFilledSeats?.trim()) {
+    if (isNaN(Number(form.manualFilledSeats)) || Number(form.manualFilledSeats) < 0) {
+      addError(errors, "manualFilledSeats", "Vagas manuais preenchidas deve ser um número válido");
+    }
   }
 
   return {
@@ -209,14 +256,8 @@ export function validateInstructor(form: Record<string, string>): ValidationResu
     addError(errors, "name", "Nome é obrigatório");
   }
 
-  if (!form.email?.trim()) {
-    addError(errors, "email", "Email é obrigatório");
-  } else if (!isValidEmail(form.email)) {
+  if (form.email?.trim() && !isValidEmail(form.email)) {
     addError(errors, "email", "Email inválido");
-  }
-
-  if (!form.specialty?.trim()) {
-    addError(errors, "specialty", "Especialidade é obrigatória");
   }
 
   return {
@@ -265,6 +306,12 @@ export function validateBlogPost(form: Record<string, string>): ValidationResult
 function isValidEmail(email: string): boolean {
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return re.test(email);
+}
+
+function isValidDateInput(value?: string): boolean {
+  if (!value?.trim()) return false;
+  const normalized = new Date(`${value}T12:00:00`);
+  return !isNaN(normalized.getTime());
 }
 
 export function getErrorMessage(errors: ValidationError[], field: string): string | undefined {

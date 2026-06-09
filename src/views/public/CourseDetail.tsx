@@ -21,8 +21,10 @@ export function CourseDetailPage() {
   const [params] = useSearchParams();
   const { courses, classes, instructors, testimonials } = useAppStore();
   const [openCheckout, setOpenCheckout] = useState(false);
+  const slugParam = Array.isArray(slug) ? slug[0] : slug;
+  const querySlug = params.get("slug") ?? "";
 
-  const course = courses.find((item) => item.slug === slug);
+  const course = courses.find((item) => item.slug === (slugParam || querySlug));
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course?.id), [classes, course?.id]);
   const relatedTestimonials = testimonials.filter((item) => item.course === course?.title).slice(0, 3);
   const instructor = instructors.find((item) => item.id === course?.instructorId);
