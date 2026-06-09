@@ -3,7 +3,6 @@
 import * as React from "react";
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 export function ArrayInput({
   label,
@@ -133,8 +132,14 @@ export function ModulesBuilder({
     topics: string[];
     duration: string;
   }>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onChange: (v: any[]) => void;
+  onChange: (
+    v: Array<{
+      title: string;
+      description: string;
+      topics: string[];
+      duration: string;
+    }>
+  ) => void;
   error?: string;
 }) {
   return (

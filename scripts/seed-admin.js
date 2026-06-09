@@ -14,7 +14,7 @@
  *   ADMIN_EMAIL=admin@rhcursos.com.br ADMIN_PASSWORD='SenhaForte#2026' \
  *     node scripts/seed-admin.js
  *
- * Requer no ambiente (.env):
+ * Requer no ambiente (.env.local ou variaveis exportadas):
  *   NEXT_PUBLIC_SUPABASE_URL
  *   SUPABASE_SERVICE_ROLE_KEY
  */
@@ -34,7 +34,9 @@ function fail(message) {
 }
 
 if (!supabaseUrl || !serviceKey) {
-  fail("Defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no ambiente (.env).");
+  fail(
+    "Defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no ambiente (.env.local ou variaveis exportadas)."
+  );
 }
 
 if (!password) {

@@ -140,9 +140,11 @@ export function InCompanyPage() {
     <>
       <section className="relative overflow-hidden bg-deep-navy py-24 text-white">
         <div className="absolute inset-0 opacity-45">
-          <img
+          <Image
             src="/images/in-company-hero-ai.png"
             alt="Equipe corporativa em programa de capacitação in company"
+            fill
+            sizes="100vw"
             className="h-full w-full object-cover"
           />
         </div>
@@ -166,10 +168,12 @@ export function InCompanyPage() {
           </div>
 
           <div className="relative hidden lg:block">
-            <div className="aspect-[5/4] overflow-hidden rounded-lg border border-white/10 shadow-card xl:-mr-10">
-              <img
+            <div className="relative aspect-[5/4] overflow-hidden rounded-lg border border-white/10 shadow-card xl:-mr-10">
+              <Image
                 src="/images/in-company-hero-ai.png"
                 alt="Equipe em treinamento corporativo in company"
+                fill
+                sizes="(min-width: 1280px) 40vw, 0px"
                 className="h-full w-full object-cover"
               />
             </div>

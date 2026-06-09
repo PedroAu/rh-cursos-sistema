@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Download, MessageCircle, Play, ShieldCheck, Star, Users } from "lucide-react";
+import Image from "next/image";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
 
 import { EmptyState } from "@/components/common/empty-state";
@@ -103,9 +104,11 @@ export function CourseDetailPage() {
             </div>
 
             <div className="group relative aspect-video overflow-hidden rounded-lg border border-outline-variant bg-surface-container shadow-card">
-                <img
+                <Image
                   src={course.image}
                   alt={course.title}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-primary/35">
@@ -234,11 +237,21 @@ export function CourseDetailPage() {
               <CardContent className="space-y-6 p-6">
                 {instructor?.avatar && (
                   <div className="flex justify-center">
-                    <img
-                      src={instructor.avatar}
-                      alt={instructor.name}
-                      className="h-24 w-24 rounded-full object-cover border-2 border-outline-variant"
-                    />
+                    {instructor.avatar.startsWith("http") || instructor.avatar.startsWith("/") ? (
+                      <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-outline-variant">
+                        <Image
+                          src={instructor.avatar}
+                          alt={instructor.name}
+                          fill
+                          sizes="96px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-outline-variant bg-surface-container text-xl font-semibold text-primary">
+                        {instructor.avatar}
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="text-sm text-muted-foreground">Especialidade: {instructor?.specialty}</div>

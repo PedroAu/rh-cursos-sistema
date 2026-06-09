@@ -1,7 +1,7 @@
 /**
  * Cliente para as Supabase Edge Functions (arquitetura híbrida).
  *
- * No deploy estático (Locaweb) não existe `/api/*` — as mutações são servidas
+ * No deploy estático do frontend não existe `/api/*` — as mutações são servidas
  * por Edge Functions hospedadas no Supabase. Este helper centraliza a montagem
  * da URL e dos headers (incluindo a anon key, exigida pelo gateway das functions).
  */

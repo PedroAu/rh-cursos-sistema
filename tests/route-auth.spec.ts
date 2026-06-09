@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Modelo estático (Locaweb) + backend em Supabase Edge Functions.
+// Modelo estático + backend em Supabase Edge Functions.
 // No export estático não há middleware/proxy de servidor nem rotas /api:
 // - todas as páginas (inclusive /admin) são servidas como HTML estático (200);
 // - a proteção do /admin é client-side (redirect via app-store após hidratação);
@@ -21,7 +21,7 @@ const publicPaths = [
 // Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
 // catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
 const dynamicPaths = [
-  "/cursos/analise-de-demonstracoes-contabeis-interpretacao-de-balancos-e-tomada-de-decisao",
+  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
 

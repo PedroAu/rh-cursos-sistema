@@ -103,7 +103,6 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         setValidationErrors,
         setOpen,
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [editingId, resource, search, store, form]
   );
 
