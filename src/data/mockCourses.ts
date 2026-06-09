@@ -168,12 +168,6 @@ const modalities: Course["modality"][] = [
   "Gravado"
 ];
 
-function levelToPublicType(level: Course["level"]): Course["publicType"] {
-  if (level === "Básico") return "Iniciantes";
-  if (level === "Avançado" || level.includes("Avançado")) return "Avançado";
-  return "Profissionais";
-}
-
 function buildModules(title: string, level: Course["level"]): CourseModule[] {
   return [
     {
@@ -216,11 +210,13 @@ export const mockCourses: Course[] = trainingPaths.flatMap((path, pathIndex) =>
       title: course.title,
       pathId: path.id,
       pathName: path.name,
+      category: path.shortName,
+      categories: [path.shortName],
       modality,
+      modalities: [modality],
       durationLabel: `${durationHours}h`,
       durationHours,
       level: course.level,
-      publicType: levelToPublicType(course.level),
       price: 0,
       shortDescription: `Capacitação ${course.level.toLowerCase()} da trilha ${path.shortName}, com foco em aplicação prática, clareza técnica e aderência ao contexto público.`,
       fullDescription: `Este curso faz parte da trilha ${path.name} e usa o nome SEO recomendado no portfólio RH Cursos. Foi desenhado para transformar o tema "${course.title}" em aprendizado aplicável, com exemplos, checklists e orientação para execução segura.`,
@@ -247,6 +243,7 @@ export const mockCourses: Course[] = trainingPaths.flatMap((path, pathIndex) =>
       studentsCount: 90 + pathIndex * 80 + index * 23,
       status,
       featured: index < 2,
+      featuredCourseIds: [],
       nextClassId: seededIds?.classId ?? `class-${Math.floor(globalIndex / 5) + 1}-${(globalIndex % 5) + 1}`
     };
   })

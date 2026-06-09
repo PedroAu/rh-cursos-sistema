@@ -26,6 +26,9 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - O modal de CRUD admin foi padronizado com shell responsivo, corpo scrollavel e grid consistente para reduzir variacao visual entre formularios curtos e longos.
 - Modais e containers secundários receberam ajustes de responsividade para evitar clipping, compressao horizontal e listas inacessiveis em viewports menores.
 - Alturas fixas em graficos, cards e hero foram substituidas por proporcoes/responsividade para reduzir cortes e saltos visuais entre breakpoints.
+- O detalhe de curso ganhou rota estatica auxiliar (`/curso?slug=`) para evitar 404 em cursos exibidos pelo store durante o export estatico.
+- O CRUD de turmas passou a separar vagas preenchidas manualmente da contagem derivada das inscricoes, evitando divergencia entre admin e site.
+- O cadastro administrativo de instrutores/professores foi ampliado com foto, formacao, modalidades, publico-alvo, categorias e cursos destaque; os campos legados `tipo_publico` e `areas_atuacao` foram removidos do contrato atual.
 
 ## File List
 - `.claude/settings.json`
@@ -86,3 +89,17 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `supabase/functions/_shared/validation.ts`
 - `supabase/functions/leads/index.ts`
 - `tests/route-auth.spec.ts`
+- `app/curso/page.tsx`
+- `src/components/agenda/class-card.tsx`
+- `src/lib/admin-form-validation.ts`
+- `src/lib/supabase/admin-resources.ts`
+- `src/lib/supabase/database.types.ts`
+- `src/lib/supabase/mappers.ts`
+- `src/lib/supabase/rh-cursos-api.ts`
+- `src/views/public/BlogPost.tsx`
+- `supabase/functions/_shared/admin-mappers.ts`
+- `supabase/functions/_shared/admin-validation.ts`
+- `supabase/migrations/20260605000000_seed_initial_data.sql`
+- `supabase/migrations/20260609120000_remove_legacy_course_instructor_fields.sql`
+- `supabase/sql/create_all_rh_cursos_schema.sql`
+- `supabase/sql/seed_rh_cursos_demo.sql`

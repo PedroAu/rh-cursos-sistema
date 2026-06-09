@@ -1,5 +1,7 @@
 "use client";
 
+"use client";
+
 import NextLink from "next/link";
 import { useParams as useNextParams, usePathname, useRouter, useSearchParams as useNextSearchParams } from "next/navigation";
 import { createElement, type AnchorHTMLAttributes, type ReactNode } from "react";

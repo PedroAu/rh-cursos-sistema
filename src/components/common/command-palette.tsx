@@ -1,3 +1,5 @@
+"use client";
+
 import { BookOpen, CalendarDays, Home, LockKeyhole, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
@@ -34,7 +36,7 @@ export function CommandPalette() {
       ...baseRoutes,
       ...courses.slice(0, 10).map((course) => ({
         label: course.title,
-        href: `/cursos/${course.slug}`,
+        href: `/curso?slug=${course.slug}`,
         icon: BookOpen
       }))
     ];

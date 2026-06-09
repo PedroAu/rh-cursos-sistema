@@ -1,3 +1,5 @@
+"use client";
+
 import { LockKeyhole, Menu, MessageCircle, PhoneCall, Search } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState, type ReactNode } from "react";

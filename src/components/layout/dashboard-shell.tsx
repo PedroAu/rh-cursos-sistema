@@ -1,3 +1,5 @@
+"use client";
+
 import { BookOpen, LayoutDashboard, LogOut, Settings, User } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";

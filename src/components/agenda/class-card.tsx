@@ -49,10 +49,10 @@ export function ClassCard({
         </div>
         <div className="grid gap-2 border-t border-border/70 pt-6 sm:grid-cols-2">
           <Button asChild variant="outline">
-            <Link to={`/cursos/${course.slug}`}>Ver curso</Link>
+            <Link to={`/curso?slug=${course.slug}`}>Ver curso</Link>
           </Button>
           <Button asChild>
-            <Link to={`/cursos/${course.slug}?checkout=1`}>Inscrever-se</Link>
+            <Link to={`/curso?slug=${course.slug}&checkout=1`}>Inscrever-se</Link>
           </Button>
         </div>
       </CardContent>
