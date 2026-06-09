@@ -74,7 +74,7 @@ export function InCompanyPage() {
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (!form.name.trim()) {
       toast.error("Preencha o nome completo.");
       return;
@@ -120,20 +120,24 @@ export function InCompanyPage() {
       return;
     }
 
-    createLead({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      courseInterest: "Treinamento In-Company",
-      organization: form.company,
-      teamSize: Number(form.groupSize),
-      preferredModality: form.modality,
-      trainingObjective: form.trainingObjective,
-      mainChallenges: form.mainChallenges,
-      origin: "Site",
-      message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
-    });
-    toast.success("Proposta registrada para atendimento consultivo.");
+    try {
+      await createLead({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        courseInterest: "Treinamento In-Company",
+        organization: form.company,
+        teamSize: Number(form.groupSize),
+        preferredModality: form.modality,
+        trainingObjective: form.trainingObjective,
+        mainChallenges: form.mainChallenges,
+        origin: "Site",
+        message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
+      });
+      toast.success("Proposta registrada para atendimento consultivo.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a proposta.");
+    }
   };
 
   return (

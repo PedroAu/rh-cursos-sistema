@@ -61,6 +61,7 @@ type AppState = {
 };
 
 type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
+type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
 
 type AppStoreValue = AppState & {
   trainingPaths: typeof trainingPaths;
@@ -68,8 +69,8 @@ type AppStoreValue = AppState & {
   login: (role: CurrentSession["role"], email: string, password: string, name?: string) => boolean;
   setSession: (session: CurrentSession) => void;
   logout: () => void;
-  createEnrollment: (payload: EnrollmentPayload) => void;
-  createLead: (payload: Omit<Lead, "id" | "createdAt" | "status">) => void;
+  createEnrollment: (payload: EnrollmentPayload) => Promise<void>;
+  createLead: (payload: LeadPayload) => Promise<void>;
   updateLeadStatus: (id: string, status: Lead["status"]) => Promise<void>;
   updateLead: (payload: Partial<Lead> & { id: string }) => Promise<void>;
   upsertCourse: (course: Partial<Course>) => Promise<void>;
@@ -137,6 +138,17 @@ function persistAdminMutation(mutation: AdminMutation): Promise<void> {
   }).catch(() => {
     toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
   });
+}
+
+async function getFunctionErrorMessage(response: Response, fallback: string) {
+  try {
+    const payload = (await response.json()) as { error?: string };
+    if (payload?.error) return payload.error;
+  } catch {
+    // Ignora payloads não JSON e usa fallback.
+  }
+
+  return fallback;
 }
 
 export function AppStoreProvider({ children }: PropsWithChildren) {
@@ -267,73 +279,73 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
     toast.success("Sessão encerrada.");
   }, []);
 
-  const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>((payload) => {
-        const enrollmentId = `enrollment-${Date.now()}`;
-        const studentId = `student-sim-${Date.now()}`;
+  const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("enrollments", { body: payload });
 
-        if (isFunctionsConfigured) {
-          void invokeFunction("enrollments", { body: payload }).then((response) => {
-            if (!response.ok) {
-              toast.error("Inscrição salva localmente, mas não foi enviada ao Supabase.");
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
+      }
+    }
+
+    const enrollmentId = `enrollment-${Date.now()}`;
+    const studentId = `student-sim-${Date.now()}`;
+
+    setState((current) => ({
+      ...current,
+      enrollments: [
+        {
+          id: enrollmentId,
+          createdAt: new Date().toISOString(),
+          status: "Confirmada",
+          ...payload
+        },
+        ...current.enrollments
+      ],
+      students: [
+        {
+          id: studentId,
+          name: payload.studentName,
+          email: payload.email,
+          phone: payload.phone,
+          cpf: payload.cpf,
+          organization: payload.organization,
+          jobTitle: payload.jobTitle,
+          courseId: payload.courseId,
+          classId: payload.classId,
+          enrollmentStatus: "Confirmada",
+          certificateIssued: false,
+          enrolledAt: new Date().toISOString(),
+          paymentMethod: payload.paymentMethod
+        },
+        ...current.students
+      ],
+      classes: current.classes.map((item) =>
+        item.id === payload.classId
+          ? {
+              ...item,
+              filledSeats: item.filledSeats + 1,
+              availableSeats: Math.max(0, item.availableSeats - 1),
+              status: item.availableSeats - 1 <= 5 ? "Poucas vagas" : item.status
             }
-          }).catch(() => {
-            toast.error("Inscrição salva localmente, mas não foi enviada ao Supabase.");
-          });
-        }
+          : item
+      )
+    }));
 
-        setState((current) => ({
-          ...current,
-          enrollments: [
-            {
-              id: enrollmentId,
-              createdAt: new Date().toISOString(),
-              status: "Confirmada",
-              ...payload
-            },
-            ...current.enrollments
-          ],
-          students: [
-            {
-              id: studentId,
-              name: payload.studentName,
-              email: payload.email,
-              phone: payload.phone,
-              cpf: payload.cpf,
-              organization: payload.organization,
-              jobTitle: payload.jobTitle,
-              courseId: payload.courseId,
-              classId: payload.classId,
-              enrollmentStatus: "Confirmada",
-              certificateIssued: false,
-              enrolledAt: new Date().toISOString(),
-              paymentMethod: payload.paymentMethod
-            },
-            ...current.students
-          ],
-          classes: current.classes.map((item) =>
-            item.id === payload.classId
-              ? {
-                  ...item,
-                  filledSeats: item.filledSeats + 1,
-                  availableSeats: Math.max(0, item.availableSeats - 1),
-                  status: item.availableSeats - 1 <= 5 ? "Poucas vagas" : item.status
-                }
-              : item
-          )
-        }));
-
-    toast.success("Inscrição realizada com sucesso.");
+    toast.success(
+      isFunctionsConfigured
+        ? "Inscrição realizada com sucesso."
+        : "Inscrição registrada localmente no modo de desenvolvimento."
+    );
   }, []);
 
-  const createLead = useCallback<AppStoreValue["createLead"]>((payload) => {
+  const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
     if (isFunctionsConfigured) {
-      void invokeFunction("leads", { body: payload }).then((response) => {
-        if (!response.ok) {
-          toast.error("Lead salvo localmente, mas não foi enviado ao Supabase.");
-        }
-      }).catch(() => {
-        toast.error("Lead salvo localmente, mas não foi enviado ao Supabase.");
-      });
+      const response = await invokeFunction("leads", { body: payload });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível enviar sua mensagem."));
+      }
     }
 
     setState((current) => ({
@@ -348,7 +360,11 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
         ...current.leads
       ]
     }));
-    toast.success("Lead cadastrado.");
+    toast.success(
+      isFunctionsConfigured
+        ? "Lead cadastrado."
+        : "Lead registrado localmente no modo de desenvolvimento."
+    );
   }, []);
 
   const updateLeadStatus = useCallback<AppStoreValue["updateLeadStatus"]>((id, status) => {

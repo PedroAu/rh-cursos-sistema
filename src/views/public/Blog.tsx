@@ -53,21 +53,25 @@ export function BlogPage() {
 
   const featuredPost = posts[0];
 
-  const submitNewsletter = () => {
+  const submitNewsletter = async () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
       toast.error("Informe um e-mail válido para continuar.");
       return;
     }
 
-    createLead({
-      name: newsletterEmail.split("@")[0],
-      email: newsletterEmail,
-      phone: "",
-      courseInterest: "Newsletter",
-      origin: "Blog",
-      message: "Cadastro de newsletter pelo blog."
-    });
-    setNewsletterEmail("");
+    try {
+      await createLead({
+        name: newsletterEmail.split("@")[0],
+        email: newsletterEmail,
+        phone: "",
+        courseInterest: "Newsletter",
+        origin: "Blog",
+        message: "Cadastro de newsletter pelo blog."
+      });
+      setNewsletterEmail("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível concluir o cadastro.");
+    }
   };
 
   return (

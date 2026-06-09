@@ -21,6 +21,8 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - "Aluno" e "Instrutor" continuam como entidades administrativas, mas nao como portais autenticados.
 - O setup local continua em Node.js + Next.js + React com `npm run dev`, usando `.env.local` como arquivo operacional; `.env`, `.env.security` e backups locais sairam do fluxo.
 - O deploy atual ficou dividido entre Cloudflare Pages para o frontend estatico e GitHub Actions + Supabase CLI para as Edge Functions.
+- Os formulários públicos passaram a depender do retorno real das Edge Functions; a UI não confirma mais lead/inscrição quando o backend falha.
+- A validação de inscrição foi alinhada com os IDs textuais do banco (`varchar(80)`), eliminando a rejeição incorreta por UUID.
 
 ## File List
 - `.claude/settings.json`
@@ -44,10 +46,16 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `src/components/admin/admin-guard.tsx`
 - `src/lib/auth.ts`
 - `src/lib/app-store.tsx`
+- `src/lib/admin-resource-configs.tsx`
 - `src/lib/supabase/functions-client.ts`
 - `src/types/index.ts`
+- `src/lib/validation.ts`
 - `src/data/mockAccess.ts`
+- `src/components/checkout/checkout-modal.tsx`
 - `src/views/public/Login.tsx`
+- `src/views/public/Contact.tsx`
+- `src/views/public/InCompany.tsx`
+- `src/views/public/Blog.tsx`
 - `src/views/student/StudentDashboard.tsx`
 - `src/views/instructor/InstructorDashboard.tsx`
 - `src/components/layout/public-layout.tsx`
@@ -62,4 +70,6 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `scripts/setup-prod.sh`
 - `supabase/config.toml`
 - `supabase/functions/_shared/auth.ts`
+- `supabase/functions/_shared/validation.ts`
+- `supabase/functions/leads/index.ts`
 - `tests/route-auth.spec.ts`
