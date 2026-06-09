@@ -9,15 +9,20 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:workers": "opennextjs-cloudflare build",
     "start": "next start",
     "preview": "next start",
-    "preview:static": "next build && npx --yes serve out -l 3000",
+    "preview:workers": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy:workers": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "verify:workers": "node scripts/verify-workers-deploy.js",
+    "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "npm run typecheck && npm run build && playwright test",
     "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.19.11",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.11",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -53,6 +58,7 @@
     "eslint-config-next": "^16.2.6",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.99.0"
   }
 }

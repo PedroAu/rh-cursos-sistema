@@ -1,8 +1,11 @@
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
 const rootDir = process.cwd();
+
+initOpenNextCloudflareForDev();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   trailingSlash: true,
   turbopack: {
     root: rootDir

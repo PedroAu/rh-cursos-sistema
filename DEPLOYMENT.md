@@ -14,6 +14,7 @@ Fluxo:
 1. `push` em `main`
 2. `npm ci`
 3. `npm run deploy:workers -- --keep-vars`
+4. `npm run verify:workers`
 
 Secrets necessários no GitHub:
 
@@ -34,6 +35,7 @@ Observações:
 - O deploy usa `--keep-vars`, então as variáveis de runtime configuradas no painel da Cloudflare não são apagadas pelo pipeline.
 - Os headers de segurança (`CSP`, `HSTS`, `X-Frame-Options` etc.) são aplicados pelo runtime em `middleware.ts`.
 - O redirect do apex `rhcursos.com.br` para `www.rhcursos.com.br` é aplicado pelo próprio app, sem depender de Redirect Rules do Pages.
+- A fase 3 automatiza a validação pós-deploy com `scripts/verify-workers-deploy.js`, conferindo homepage canônica, redirect do apex, proteção do `/admin/` e headers de segurança.
 - `public/_headers` permanece apenas como fallback documental para assets estáticos.
 - `public/_redirects` não participa do deploy em Workers.
 
@@ -61,6 +63,7 @@ Functions publicadas:
 - Worker name: definido em `wrangler.jsonc`
 - Workers Routes: `www.rhcursos.com.br/*` e `rhcursos.com.br/*`
 - Build/deploy command em CI: `npm run deploy:workers -- --keep-vars`
+- Post-deploy verify em CI: `npm run verify:workers`
 - Runtime: Cloudflare Workers com `nodejs_compat`
 - Node.js local/CI: `24`
 
@@ -68,4 +71,5 @@ Variáveis no painel da Cloudflare:
 
 - Runtime vars/secrets do Worker devem ser configuradas no dashboard da Cloudflare Workers.
 - Em produção, `NEXT_PUBLIC_APP_URL` deve ser `https://www.rhcursos.com.br`.
+- O verificador usa `DEPLOY_CANONICAL_URL` e `DEPLOY_APEX_URL`; no workflow de produção, `DEPLOY_CANONICAL_URL` reaproveita `NEXT_PUBLIC_APP_URL`.
 - Se optar por Workers Builds no futuro, repita também essas variáveis em `Build variables and secrets`, porque o build do Next precisa delas para SSG e inline de `NEXT_PUBLIC_*`.

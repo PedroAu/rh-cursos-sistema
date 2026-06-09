@@ -16,10 +16,12 @@ node_modules
 dist/
 build/
 .next/
+.open-next/
 out/
 *.tsbuildinfo
 *.log
 logs/
+.wrangler/
 
 # Test artifacts
 test-results/
