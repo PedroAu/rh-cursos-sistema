@@ -119,7 +119,7 @@ export function HomePage() {
   return (
     <>
       <section className="executive-hero min-h-[calc(100svh-160px)] overflow-hidden py-14 text-white md:py-20">
-        <div className="ea-container flex min-h-[560px] items-center">
+        <div className="ea-container flex min-h-[clamp(440px,calc(100svh-160px),560px)] items-center">
           <div className="max-w-3xl space-y-8">
             <div className="space-y-6">
               <span className="inline-flex rounded-full border border-prestige-gold bg-prestige-gold px-4 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">

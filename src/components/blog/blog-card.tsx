@@ -13,7 +13,7 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
         featured ? "border-primary/10 bg-primary text-white" : "border-primary/10"
       }`}
     >
-      <div className={`h-40 border-b ${featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30"} p-6`}>
+      <div className={`min-h-40 border-b ${featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30"} p-6`}>
         <div className={`inline-flex rounded px-4 py-2 text-badge font-semibold uppercase tracking-[0.16em] ${
           featured ? "bg-white/12 text-white" : "bg-accent/12 text-accent"
         }`}>

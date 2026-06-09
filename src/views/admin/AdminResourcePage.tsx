@@ -118,6 +118,19 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     }
   }
 
+  function getFieldSpanClass(field: (typeof config.fields)[number]) {
+    if (
+      field.type === "textarea" ||
+      field.type === "array" ||
+      field.type === "modules" ||
+      field.type === "multiselect"
+    ) {
+      return "md:col-span-2";
+    }
+
+    return "";
+  }
+
   return (
     <section className="page-section">
       <div className="container space-y-6">
@@ -190,170 +203,189 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{editingId ? "Editar item" : "Criar novo item"}</DialogTitle>
-              <DialogDescription>Preencha os campos obrigatórios marcados com *</DialogDescription>
-            </DialogHeader>
+          <DialogContent className="w-[min(96vw,980px)] max-w-4xl p-0 sm:min-h-[36rem]">
+            <div className="flex h-full max-h-[calc(100vh-2rem)] flex-col">
+              <DialogHeader className="border-b border-border px-6 py-5">
+                <DialogTitle>{editingId ? "Editar item" : "Criar novo item"}</DialogTitle>
+                <DialogDescription>Preencha os campos obrigatórios marcados com *</DialogDescription>
+              </DialogHeader>
 
-            {validationErrors.length > 0 && (
-              <div className="rounded-md bg-destructive/10 p-3 border border-destructive/20">
-                <p className="text-sm font-medium text-destructive mb-2">Erros encontrados:</p>
-                <ul className="text-xs text-destructive space-y-1">
-                  {validationErrors.map((error, i) => (
-                    <li key={i} className="flex gap-2">
-                      <span>•</span>
-                      <span>{error.message}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <div className="grid gap-4">
-              {config.fields.map((field) => {
-                const fieldError = errorsByField[field.key];
-
-                if (field.type === "modules") {
-                  return (
-                    <ModulesBuilder
-                      key={field.key}
-                      label={field.label}
-                      value={form[field.key] || []}
-                      onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                      error={fieldError}
-                    />
-                  );
-                }
-
-                if (field.type === "array") {
-                  return (
-                    <ArrayInput
-                      key={field.key}
-                      label={field.label}
-                      value={form[field.key] || []}
-                      onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                      error={fieldError}
-                    />
-                  );
-                }
-
-                if (field.type === "multiselect" && field.options) {
-                  return (
-                    <MultiSelectField
-                      key={field.key}
-                      label={field.label}
-                      value={form[field.key] || []}
-                      options={field.options}
-                      onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                      error={fieldError}
-                    />
-                  );
-                }
-
-                if (field.type === "select" && field.options) {
-                  return (
-                    <SelectField
-                      key={field.key}
-                      label={field.label}
-                      value={form[field.key] ?? ""}
-                      options={field.options}
-                      onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                      required={field.required}
-                      error={fieldError}
-                    />
-                  );
-                }
-
-                if (field.type === "textarea") {
-                  return (
-                    <div key={field.key} className="flex flex-col gap-2">
-                      <label className="text-sm font-medium">
-                        {field.label}
-                        {field.required && <span className="text-destructive ml-1">*</span>}
-                      </label>
-                      <textarea
-                        placeholder={field.label}
-                        value={form[field.key] ?? ""}
-                        onChange={(event) =>
-                          setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                        }
-                        className="min-h-24 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+              <div className="flex-1 overflow-y-auto px-6 py-5">
+                <div className="space-y-5">
+                  {validationErrors.length > 0 && (
+                    <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
+                      <p className="mb-2 text-sm font-medium text-destructive">Erros encontrados:</p>
+                      <ul className="space-y-1 text-xs text-destructive">
+                        {validationErrors.map((error, i) => (
+                          <li key={i} className="flex gap-2">
+                            <span>•</span>
+                            <span>{error.message}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                  );
-                }
+                  )}
 
-                if (field.type === "number") {
-                  return (
-                    <div key={field.key} className="flex flex-col gap-2">
-                      <label className="text-sm font-medium">
-                        {field.label}
-                        {field.required && <span className="text-destructive ml-1">*</span>}
-                      </label>
-                      <input
-                        type="number"
-                        placeholder={field.label}
-                        value={form[field.key] ?? ""}
-                        onChange={(event) =>
-                          setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                        }
-                        className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                    </div>
-                  );
-                }
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {config.fields.map((field) => {
+                      const fieldError = errorsByField[field.key];
+                      const fieldSpanClass = getFieldSpanClass(field);
 
-                if (field.type === "date") {
-                  return (
-                    <div key={field.key} className="flex flex-col gap-2">
-                      <label className="text-sm font-medium">
-                        {field.label}
-                        {field.required && <span className="text-destructive ml-1">*</span>}
-                      </label>
-                      <input
-                        type="date"
-                        value={form[field.key] ?? ""}
-                        onChange={(event) =>
-                          setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                        }
-                        className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                      />
-                      {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={field.key} className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">
-                      {field.label}
-                      {field.required && <span className="text-destructive ml-1">*</span>}
-                    </label>
-                    <Input
-                      placeholder={field.label}
-                      value={form[field.key] ?? ""}
-                      onChange={(event) =>
-                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                      if (field.type === "modules") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <ModulesBuilder
+                              label={field.label}
+                              value={form[field.key] || []}
+                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                              error={fieldError}
+                            />
+                          </div>
+                        );
                       }
-                    />
-                    {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                  </div>
-                );
-              })}
-            </div>
 
-            <div className="flex justify-end gap-3">
-              <DialogClose asChild>
-                <Button variant="outline" disabled={isSaving}>
-                  Cancelar
+                      if (field.type === "array") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <ArrayInput
+                              label={field.label}
+                              value={form[field.key] || []}
+                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                              error={fieldError}
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "multiselect" && field.options) {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <MultiSelectField
+                              label={field.label}
+                              value={form[field.key] || []}
+                              options={field.options}
+                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                              error={fieldError}
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "select" && field.options) {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <SelectField
+                              label={field.label}
+                              value={form[field.key] ?? ""}
+                              options={field.options}
+                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                              required={field.required}
+                              error={fieldError}
+                            />
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "textarea") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <div className="flex flex-col gap-2">
+                              <label className="text-sm font-medium">
+                                {field.label}
+                                {field.required && <span className="ml-1 text-destructive">*</span>}
+                              </label>
+                              <textarea
+                                placeholder={field.label}
+                                value={form[field.key] ?? ""}
+                                onChange={(event) =>
+                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                }
+                                className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              />
+                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "number") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <div className="flex flex-col gap-2">
+                              <label className="text-sm font-medium">
+                                {field.label}
+                                {field.required && <span className="ml-1 text-destructive">*</span>}
+                              </label>
+                              <input
+                                type="number"
+                                placeholder={field.label}
+                                value={form[field.key] ?? ""}
+                                onChange={(event) =>
+                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                }
+                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                              />
+                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      if (field.type === "date") {
+                        return (
+                          <div key={field.key} className={fieldSpanClass}>
+                            <div className="flex flex-col gap-2">
+                              <label className="text-sm font-medium">
+                                {field.label}
+                                {field.required && <span className="ml-1 text-destructive">*</span>}
+                              </label>
+                              <input
+                                type="date"
+                                value={form[field.key] ?? ""}
+                                onChange={(event) =>
+                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                }
+                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                              />
+                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+                            </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={field.key} className={fieldSpanClass}>
+                          <div className="flex flex-col gap-2">
+                            <label className="text-sm font-medium">
+                              {field.label}
+                              {field.required && <span className="ml-1 text-destructive">*</span>}
+                            </label>
+                            <Input
+                              placeholder={field.label}
+                              value={form[field.key] ?? ""}
+                              onChange={(event) =>
+                                setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                              }
+                            />
+                            {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">
+                <DialogClose asChild>
+                  <Button variant="outline" disabled={isSaving}>
+                    Cancelar
+                  </Button>
+                </DialogClose>
+                <Button onClick={handleSave} disabled={isSaving}>
+                  {isSaving ? "Salvando…" : "Salvar"}
                 </Button>
-              </DialogClose>
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? "Salvando…" : "Salvar"}
-              </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

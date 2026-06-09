@@ -8,7 +8,9 @@ export function ChartCard({ title, children }: { title: string; children: ReactN
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
-      <CardContent className="h-[320px]">{children}</CardContent>
+      <CardContent className="aspect-[4/3] min-h-72 sm:aspect-video xl:aspect-[16/9]">
+        {children}
+      </CardContent>
     </Card>
   );
 }
