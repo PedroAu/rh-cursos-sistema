@@ -76,8 +76,7 @@ Deno.serve(async (request) => {
       "X-RateLimit-Remaining": rate.remaining.toString(),
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro ao registrar inscrição.";
-    console.error("enrollments.create error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    console.error("enrollments.create error:", error instanceof Error ? error.message : error);
+    return jsonResponse({ ok: false, error: "Erro ao registrar inscrição." }, 500, request);
   }
 });
