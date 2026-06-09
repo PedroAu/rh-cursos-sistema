@@ -110,20 +110,25 @@ const initialState: AppState = {
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
-function readInitialState() {
+function readInitialState(initialSession?: CurrentSession | null) {
+  const fallbackState = initialSession
+    ? { ...initialState, currentSession: initialSession }
+    : initialState;
+
   if (typeof window === "undefined") {
-    return initialState;
+    return fallbackState;
   }
 
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (!stored) {
-    return initialState;
+    return fallbackState;
   }
 
   try {
-    return JSON.parse(stored) as AppState;
+    const parsed = JSON.parse(stored) as AppState;
+    return initialSession ? { ...parsed, currentSession: initialSession } : parsed;
   } catch {
-    return initialState;
+    return fallbackState;
   }
 }
 
@@ -176,8 +181,11 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
-export function AppStoreProvider({ children }: PropsWithChildren) {
-  const [state, setState] = useState<AppState>(readInitialState);
+export function AppStoreProvider({
+  children,
+  initialSession = null
+}: PropsWithChildren<{ initialSession?: CurrentSession | null }>) {
+  const [state, setState] = useState<AppState>(() => readInitialState(initialSession));
 
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
   // recriar sua identidade a cada mudança (evita re-renders em cascata).
@@ -188,9 +196,25 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
-  // Reconciliação de sessão na inicialização (export estático, sem cookie
-  // server-side): a sessão é derivada do token HMAC persistido em localStorage.
+  // Reconciliação de sessão na inicialização: a sessão server-side do admin
+  // entra por prop; como fallback, reidratamos o payload do token HMAC salvo no
+  // browser para manter consistência com as Edge Functions existentes.
   useEffect(() => {
+    if (initialSession) {
+      setState((current) => {
+        if (
+          current.currentSession?.role === initialSession.role &&
+          current.currentSession?.email === initialSession.email &&
+          current.currentSession?.name === initialSession.name
+        ) {
+          return current;
+        }
+
+        return { ...current, currentSession: initialSession };
+      });
+      return;
+    }
+
     const decoded = decodeSessionToken(getSessionToken());
 
     setState((current) => {
@@ -213,7 +237,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
       }
       return current;
     });
-  }, []);
+  }, [initialSession]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -293,9 +317,7 @@ export function AppStoreProvider({ children }: PropsWithChildren) {
   }, []);
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
-    if (isFunctionsConfigured) {
-      void invokeFunction("auth-session", { method: "DELETE" }).catch(() => undefined);
-    }
+    void fetch("/api/auth/session", { method: "DELETE" }).catch(() => undefined);
     if (supabase) {
       void supabase.auth.signOut().catch(() => undefined);
     }

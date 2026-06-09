@@ -1,3 +1,5 @@
+"use client";
+
 import type * as React from "react";
 import { createContext, useContext } from "react";
 

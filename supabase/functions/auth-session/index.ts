@@ -63,7 +63,7 @@ Deno.serve(async (request) => {
       return jsonResponse({ ok: false, error: "Credenciais inválidas." }, 401, request);
     }
 
-    const metadataRole = normalizeRole(result.data.user.user_metadata?.role);
+    const metadataRole = normalizeRole(result.data.user.app_metadata?.role);
     // Sem role admin nos metadados → acesso negado (não confiar no role pedido).
     if (!metadataRole) {
       return jsonResponse({ ok: false, error: "Acesso não autorizado." }, 403, request);

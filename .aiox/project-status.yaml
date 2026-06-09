@@ -2,17 +2,18 @@ status:
   branch: chore/react-19-node-pin
   modifiedFiles:
     - .aiox/project-status.yaml
-    - .claude/scheduled_tasks.lock
-    - .claude/settings.json
-    - outputs/
-  modifiedFilesTotalCount: 4
+    - app/admin/alunos/page.tsx
+    - app/admin/blog/page.tsx
+    - app/admin/cursos/page.tsx
+    - app/admin/inscricoes/page.tsx
+  modifiedFilesTotalCount: 32
   recentCommits:
-    - 'fix: alinhar ids mock ao seed publico'
-    - 'fix: alinhar formularios publicos ao backend'
+    - 'chore: complete cloudflare workers deploy pipeline'
+    - 'chore: harden cloudflare workers production runtime'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-09T03:10:31.176Z'
+  lastUpdate: '2026-06-09T20:10:50.663Z'
   isGitRepo: true
-timestamp: 1780974631177
+timestamp: 1781035850665
 ttl: 60
-gitFingerprint: 1780957652654.5256:1780969653255.4812
+gitFingerprint: 1780957652654.5256:1781035562437.1165

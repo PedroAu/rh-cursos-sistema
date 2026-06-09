@@ -4,7 +4,7 @@
  *
  * Cria (ou atualiza) o admin em auth.users com:
  *   - email_confirm: true        → login imediato, sem confirmação por e-mail
- *   - user_metadata.role: admin  → libera o login na Edge Function auth-session
+ *   - app_metadata.role: admin   → libera o login com claim de autorização segura
  *   - user_metadata.name
  *
  * A consistência com as policies RLS (public.profiles.role = 'admin') é
@@ -71,7 +71,8 @@ async function main() {
     const { error } = await supabase.auth.admin.updateUserById(existing.id, {
       password,
       email_confirm: true,
-      user_metadata: { ...existing.user_metadata, role: "admin", name },
+      app_metadata: { ...existing.app_metadata, role: "admin" },
+      user_metadata: { ...existing.user_metadata, name },
     });
     if (error) fail(`Falha ao atualizar admin: ${error.message}`);
     console.log(`✅ Admin atualizado (id: ${existing.id}).`);
@@ -81,7 +82,8 @@ async function main() {
       email,
       password,
       email_confirm: true,
-      user_metadata: { role: "admin", name },
+      app_metadata: { role: "admin" },
+      user_metadata: { name },
     });
     if (error) fail(`Falha ao criar admin: ${error.message}`);
     console.log(`✅ Admin criado (id: ${data.user.id}).`);

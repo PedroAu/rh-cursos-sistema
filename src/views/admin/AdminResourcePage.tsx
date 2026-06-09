@@ -1,3 +1,5 @@
+"use client";
+
 import { Plus, Download } from "lucide-react";
 import { useMemo, useState } from "react";
 

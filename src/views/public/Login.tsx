@@ -3,18 +3,19 @@
 import { useState } from "react";
 import { AlertCircle } from "lucide-react";
 import { useNavigate } from "@/lib/router-compat";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
-import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
 import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
 import { supabase } from "@/lib/supabase/client";
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const searchParams = useSearchParams();
   const { setSession } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,16 +30,15 @@ export function LoginPage() {
       return;
     }
 
-    if (!isFunctionsConfigured) {
-      setError("Autenticação indisponível no momento. Tente novamente mais tarde.");
-      return;
-    }
-
     setIsSubmitting(true);
 
     try {
-      const response = await invokeFunction("auth-session", {
-        body: { role: "admin", email, password }
+      const response = await fetch("/api/auth/session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ role: "admin", email, password })
       });
 
       if (!response.ok) {
@@ -66,7 +66,7 @@ export function LoginPage() {
 
       setSession(data.session);
 
-      navigate("/admin");
+      navigate(searchParams.get("next") || "/admin");
     } catch {
       setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
     } finally {

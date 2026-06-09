@@ -96,7 +96,8 @@
       "Bash(grep -iE \"\\\\.env$|\\\\.env\\\\.local|backup\")",
       "Bash(npm --version)",
       "mcp__context7__query-docs",
-      "Bash(npm test *)"
+      "Bash(npm test *)",
+      "Bash(npm -v)"
     ],
     "deny": [],
     "additionalDirectories": [
