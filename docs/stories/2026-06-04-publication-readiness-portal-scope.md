@@ -51,6 +51,8 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `src/types/index.ts`
 - `src/lib/validation.ts`
 - `src/data/mockAccess.ts`
+- `src/data/mockCourses.ts`
+- `src/data/mockClasses.ts`
 - `src/components/checkout/checkout-modal.tsx`
 - `src/views/public/Login.tsx`
 - `src/views/public/Contact.tsx`

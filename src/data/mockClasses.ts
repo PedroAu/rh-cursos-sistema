@@ -2,6 +2,7 @@ import { addDays, formatISO } from "date-fns";
 
 import { mockCourses } from "@/data/mockCourses";
 import { mockInstructors } from "@/data/mockInstructors";
+import { seededCatalogIdsBySlug } from "@/data/mockCourses";
 import type { ClassStatus, TrainingClass } from "@/types";
 
 const locations = [
@@ -21,9 +22,10 @@ export const mockClasses: TrainingClass[] = mockCourses.map((course, index) => {
   const filledSeats = Math.min(totalSeats, 10 + (index % 17));
   const status = statuses[index % statuses.length];
   const instructor = mockInstructors.find((item) => item.id === course.instructorId) ?? mockInstructors[0];
+  const seededClassId = seededCatalogIdsBySlug[course.slug]?.classId;
 
   return {
-    id: `class-${Math.floor(index / 5) + 1}-${(index % 5) + 1}`,
+    id: seededClassId ?? `class-${Math.floor(index / 5) + 1}-${(index % 5) + 1}`,
     courseId: course.id,
     startDate: formatISO(start),
     endDate: formatISO(end),

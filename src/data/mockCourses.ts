@@ -9,6 +9,62 @@ type CatalogCourse = {
   level: Course["level"];
 };
 
+type SeededCatalogIds = {
+  courseId: string;
+  classId: string;
+};
+
+export const seededCatalogIdsBySlug: Record<string, SeededCatalogIds> = {
+  "departamento-pessoal-para-a-administracao-publica-fundamentos-e-legislacao": {
+    courseId: "course-dp-1",
+    classId: "class-1-1"
+  },
+  "legislacao-trabalhista-e-previdenciaria-para-servidores-publicos-regime-estatutario": {
+    courseId: "course-dp-2",
+    classId: "class-1-2"
+  },
+  "introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico": {
+    courseId: "course-licitacoes-1",
+    classId: "class-1-3"
+  },
+  "nova-lei-de-licitacoes-na-pratica-lei-no-14-133-2021-teoria-aplicacao-e-casos-reais": {
+    courseId: "course-licitacoes-2",
+    classId: "class-1-4"
+  },
+  "inteligencia-emocional-no-trabalho-autoconhecimento-regulacao-e-relacoes-profissionais": {
+    courseId: "course-pessoas-1",
+    classId: "class-1-5"
+  },
+  "lideranca-estrategica-para-gestores-publicos-visao-influencia-e-tomada-de-decisao": {
+    courseId: "course-pessoas-2",
+    classId: "class-2-1"
+  },
+  "redacao-oficial-e-documentos-tecnicos-na-administracao-publica-novas-normas-e-praticas": {
+    courseId: "course-comunicacao-1",
+    classId: "class-2-2"
+  },
+  "atendimento-ao-publico-na-administracao-publica-qualidade-empatia-e-gestao-de-conflitos": {
+    courseId: "course-comunicacao-2",
+    classId: "class-2-3"
+  },
+  "contabilidade-aplicada-ao-setor-publico-casp-e-administracao-financeira-e-orcamentaria-afo-fundamentos": {
+    courseId: "course-auditoria-1",
+    classId: "class-2-4"
+  },
+  "auditoria-baseada-em-riscos-metodologia-planejamento-e-relatorios-de-auditoria": {
+    courseId: "course-auditoria-2",
+    classId: "class-2-5"
+  },
+  "excel-intermediario-tabelas-dinamicas-graficos-avancados-e-funcoes-de-busca": {
+    courseId: "course-tech-1",
+    classId: "class-3-1"
+  },
+  "power-bi-para-iniciantes-e-intermediarios-dashboards-relatorios-e-visualizacao-de-dados": {
+    courseId: "course-tech-2",
+    classId: "class-3-2"
+  }
+};
+
 const courseCatalog: Record<string, CatalogCourse[]> = {
   "path-dp": [
     { title: "Departamento Pessoal para a Administração Pública: Fundamentos e Legislação", level: "Básico" },
@@ -146,6 +202,8 @@ export const mockCourses: Course[] = trainingPaths.flatMap((path, pathIndex) =>
     const globalIndex = trainingPaths
       .slice(0, pathIndex)
       .reduce((total, currentPath) => total + courseCatalog[currentPath.id].length, 0) + index;
+    const slug = slugify(course.title);
+    const seededIds = seededCatalogIdsBySlug[slug];
     const modality = modalities[(pathIndex + index) % modalities.length];
     const instructor = mockInstructors[(pathIndex + index) % mockInstructors.length];
     const status: CourseStatus =
@@ -153,8 +211,8 @@ export const mockCourses: Course[] = trainingPaths.flatMap((path, pathIndex) =>
     const durationHours = course.level === "Avançado" || course.level.includes("Avançado") ? 24 : course.level === "Básico" ? 8 : 16;
 
     return {
-      id: `course-${path.code.toLowerCase()}-${index + 1}`,
-      slug: slugify(course.title),
+      id: seededIds?.courseId ?? `course-${path.code.toLowerCase()}-${index + 1}`,
+      slug,
       title: course.title,
       pathId: path.id,
       pathName: path.name,
@@ -189,7 +247,7 @@ export const mockCourses: Course[] = trainingPaths.flatMap((path, pathIndex) =>
       studentsCount: 90 + pathIndex * 80 + index * 23,
       status,
       featured: index < 2,
-      nextClassId: `class-${Math.floor(globalIndex / 5) + 1}-${(globalIndex % 5) + 1}`
+      nextClassId: seededIds?.classId ?? `class-${Math.floor(globalIndex / 5) + 1}-${(globalIndex % 5) + 1}`
     };
   })
 );
