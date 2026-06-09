@@ -28,7 +28,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`enrollment:${ip}`, rateLimitConfigs.enrollment);
+  const rate = await checkRateLimit(`enrollment:${ip}`, rateLimitConfigs.enrollment);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },

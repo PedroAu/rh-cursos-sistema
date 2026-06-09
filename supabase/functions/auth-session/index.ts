@@ -33,7 +33,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
+  const rate = await checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas de login. Aguarde alguns minutos." },

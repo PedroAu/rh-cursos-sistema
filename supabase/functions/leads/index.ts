@@ -31,7 +31,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
+  const rate = await checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
