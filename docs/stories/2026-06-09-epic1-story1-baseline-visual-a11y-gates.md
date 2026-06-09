@@ -1,7 +1,7 @@
 # Story 1.1: Baseline Visual & Gates de Acessibilidade
 
 ## Status
-Ready for Review
+On Hold — aguardando decisão de arquitetura (migração static export → runtime SSR)
 
 ## Épica
 Épica 1 — Fundação Visual & Baseline A11y (`docs/epics/epic-1-fundacao-visual-baseline-a11y.md`)
@@ -118,6 +118,9 @@ Claude (dev/Dex) — modo Pre-Flight
 - 2026-06-09 — @po (Pax) — Validação 10-pontos: GO (9.5/10). Rotas críticas confirmadas em `app/`. Corrigida mitigação de risco do `/admin` (specs atuais não autenticam) + adicionada subtarefa de helper de login de teste. Status Draft → Ready.
 - 2026-06-09 — @po (Pax) — Decisão D6 (solicitante): baseline visual apenas captura+commit nesta story, sem falhar gate por diff. Comparação estrita movida para Épica 6. AC5 atualizado.
 - 2026-06-09 — @dev (Dex) — Implementação completa. Adicionado `@axe-core/playwright`; criados 4 specs de baseline (a11y, teclado, visual, contraste); config Playwright com projetos desktop/mobile; 14 screenshots + relatório de contraste (70 violações reais). Gate `npm test` 63/63 verde, lint+typecheck limpos. Desvio: baseline `/admin` autenticado → story 1.1b. Status Ready → Ready for Review.
+- 2026-06-09 — @qa (Quinn) — QA Gate: PASS (7/7) na base de desenvolvimento. `npm test` 63/63 sem flaky.
+- 2026-06-09 — @devops (Gage) — Preparação de push: resolvido C1 (working tree poluído com outra story → stash) e divergência de base. Criada branch limpa `story/1.1-baseline-a11y-clean` (cherry-pick de só a 1.1 sobre `origin/main`); conflitos resolvidos (`playwright.config.ts` → webServer da main/static export + 3 projetos da 1.1; `package-lock.json` regenerado). **Push SUSPENSO:** revalidação na base real expôs FAIL em 2 testes (`/admin` 307 vs 200 no static export). Status Ready for Review → Blocked. Devolvida ao @dev para fix do spec. Branch limpa e stash preservados.
+- 2026-06-09 — @dev (Dex) — Fix do spec aplicado (não commitado): bloco `/admin` em `a11y.baseline.spec.ts` alinhado ao export estático (200 + redirect client-side via AdminGuard, espelhando `route-auth.spec.ts`). **PAUSA:** solicitante decidiu migrar a arquitetura de static export → runtime SSR. Como isso reverte o terreno (deploy, guard, config), a 1.1 entra On Hold até a migração definir o modelo. Fix preservado no working tree; baselines/contraste regenerados pelo gate foram descartados (são específicos do modelo de render). Status Blocked → On Hold. Acionados @architect + @pm para planejar o épico de migração runtime.
 
 ## Dev Notes
 
@@ -128,4 +131,16 @@ Claude (dev/Dex) — modo Pre-Flight
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+**Gate (base de desenvolvimento): PASS** ✅ — @qa (Quinn), 2026-06-09 — 7/7 checks, `npm test` 63/63 verde, lint+typecheck limpos.
+
+**Bloqueio descoberto no push (base real `origin/main`): FAIL** ❌ — @devops (Gage), 2026-06-09
+
+Ao rebasear a Story 1.1 sobre `origin/main` para push, a re-validação na arquitetura real do repositório revelou uma regressão que o QA na base de desenvolvimento não pegou:
+
+- O QA rodou contra `playwright.config.ts` com `next start` (SSR, `:3100`), onde `/admin` retorna **307** server-side.
+- A `main` atual usa **static export** (`output: 'export'`, `serve out/` em `:3000`), onde `/admin` é servido como **200** (HTML estático) e a proteção é **client-side** (AdminGuard pós-hidratação) — exatamente como `tests/route-auth.spec.ts` (linhas 49-54) já documenta.
+- Resultado na base real: **61/63 passam**; falham `a11y.baseline.spec.ts:68` (desktop + mobile), que afirmam `expect(/admin → 307)`.
+
+**Ação requerida (@dev):** corrigir a asserção do bloco "estado do admin (não autenticado)" em `tests/a11y.baseline.spec.ts` para refletir o export estático (200 + redirect client-side via AdminGuard), seguindo o padrão de `route-auth.spec.ts`. Atualizar também as Dev Notes (a premissa "`next start` / `:3100`" está obsoleta — a base usa `serve out/` / `:3000`).
+
+**Veredicto:** push suspenso. Retorna ao @dev. Após fix + revalidação 63/63 na base estática, @devops retoma o push.
