@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -66,16 +67,20 @@ function WhatsAppSupport() {
           />
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button
-              onClick={() =>
-                createLead({
+              onClick={async () => {
+                try {
+                  await createLead({
                   name: "Lead do atendimento",
                   email: company.email,
                   phone: company.phones.whatsapp,
                   courseInterest: "Atendimento geral",
                   origin: "WhatsApp",
                   message: message || "Solicitação enviada pelo atendimento rápido"
-                })
-              }
+                  });
+                } catch (error) {
+                  toast.error(error instanceof Error ? error.message : "Não foi possível enviar a solicitação.");
+                }
+              }}
             >
               <PhoneCall className="h-4 w-4" />
               Enviar solicitação

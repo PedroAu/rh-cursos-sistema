@@ -83,28 +83,32 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
     setStep((current) => Math.min(4, current + 1));
   };
 
-  const finish = () => {
+  const finish = async () => {
     if (!form.classId) {
       toast.error("Selecione uma turma para concluir.");
       return;
     }
 
-    createEnrollment({
-      ...form,
-      courseId: course.id,
-      notes: "Inscrição gerada pelo checkout simulado."
-    });
-
-    onOpenChange(false);
-    navigate("/inscricao-confirmada", {
-      state: {
+    try {
+      await createEnrollment({
+        ...form,
         courseId: course.id,
-        classId: form.classId,
-        studentName: form.studentName,
-        paymentMethod: form.paymentMethod,
-        redirectFrom: location.pathname
-      }
-    });
+        notes: "Inscrição gerada pelo checkout simulado."
+      });
+
+      onOpenChange(false);
+      navigate("/inscricao-confirmada", {
+        state: {
+          courseId: course.id,
+          classId: form.classId,
+          studentName: form.studentName,
+          paymentMethod: form.paymentMethod,
+          redirectFrom: location.pathname
+        }
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível concluir a inscrição.");
+    }
   };
 
   return (

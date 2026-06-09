@@ -64,7 +64,7 @@ export function ContactPage() {
     }
   };
 
-  const submit = () => {
+  const submit = async () => {
     if (!form.name.trim() || form.name.trim().length < 3) {
       toast.error("Nome deve ter no mínimo 3 caracteres.");
       return;
@@ -85,16 +85,20 @@ export function ContactPage() {
       return;
     }
 
-    createLead({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      courseInterest: "Contato pelo site",
-      origin: "Site",
-      message: form.message
-    });
-    toast.success("Mensagem registrada para atendimento.");
-    setForm({ name: "", email: "", phone: "", message: "" });
+    try {
+      await createLead({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        courseInterest: "Contato pelo site",
+        origin: "Site",
+        message: form.message
+      });
+      toast.success("Mensagem registrada para atendimento.");
+      setForm({ name: "", email: "", phone: "", message: "" });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.");
+    }
   };
 
   return (

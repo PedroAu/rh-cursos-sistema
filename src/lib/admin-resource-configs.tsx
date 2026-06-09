@@ -403,7 +403,7 @@ export function buildResourceConfig(
                 mainChallenges: form.mainChallenges || undefined,
               });
             } else {
-              store.createLead({
+              await store.createLead({
                 name: form.name,
                 email: form.email,
                 phone: form.phone || "(61) 90000-0000",

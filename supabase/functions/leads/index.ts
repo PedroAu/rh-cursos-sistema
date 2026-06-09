@@ -49,7 +49,7 @@ Deno.serve(async (request) => {
 
   try {
     const supabase = anonClient();
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("lead")
       .insert({
         nome: payload.name,
@@ -61,13 +61,11 @@ Deno.serve(async (request) => {
         origem: payload.origin,
         mensagem: payload.message,
         status_crm: "Novo",
-      })
-      .select("*")
-      .single();
+      });
 
     if (error) throw error;
 
-    return jsonResponse({ ok: true, lead: data }, 201, request);
+    return jsonResponse({ ok: true }, 201, request);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Erro ao criar lead.";
     console.error("leads.create error:", message);
