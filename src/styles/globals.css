@@ -244,6 +244,36 @@
     border-radius: var(--ea-radius-xl);
   }
 
+  .material-app-bar {
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
+    box-shadow: 0 1px 0 rgba(0, 23, 54, 0.05);
+  }
+
+  .material-drawer {
+    box-shadow: inset -1px 0 0 rgba(0, 23, 54, 0.06);
+  }
+
+  .material-nav-item {
+    border-radius: 1rem;
+  }
+
+  .material-nav-card {
+    border-radius: 1rem;
+  }
+
+  .material-nav-trigger {
+    border-radius: 1rem;
+  }
+
+  .material-bottom-nav {
+    box-shadow: 0 -10px 32px rgba(0, 23, 54, 0.1);
+  }
+
+  .material-bottom-nav-item {
+    min-height: 4rem;
+  }
+
   .skip-link {
     @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-white px-4 py-3 text-sm font-bold text-primary shadow-card transition;
   }

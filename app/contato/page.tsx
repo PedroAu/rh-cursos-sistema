@@ -1,7 +1,7 @@
 "use client";
 
 import { PublicPageShell } from "@/components/next-page-shell";
-import { ContactPage } from "@/views/public/Contact";
+import { ContactPage } from "@/features/public/contact/contact-page";
 
 export default function Page() {
   return (

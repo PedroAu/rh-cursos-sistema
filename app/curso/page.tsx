@@ -1,7 +1,7 @@
 "use client";
 
 import { PublicPageShell } from "@/components/next-page-shell";
-import { CourseDetailPage } from "@/views/public/CourseDetail";
+import { CourseDetailPage } from "@/features/public/course-detail/course-detail-page";
 
 export default function Page() {
   return (

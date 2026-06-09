@@ -1,7 +1,7 @@
 "use client";
 
 import { DashboardPageShell } from "@/components/next-page-shell";
-import { AdminDashboardPage } from "@/views/admin/AdminDashboard";
+import { AdminDashboardPage } from "@/features/admin/dashboard/admin-dashboard-page";
 
 export default function Page() {
   return (
