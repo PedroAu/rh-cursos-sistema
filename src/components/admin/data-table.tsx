@@ -163,12 +163,12 @@ export function DataTable<T extends { id: string }>({
                 <TableCell className="whitespace-nowrap text-right">
                   <div className="flex justify-end gap-2">
                     {onEdit ? (
-                      <Button size="icon" variant="outline" onClick={() => onEdit(row)}>
+                      <Button size="icon" variant="outline" aria-label={`Editar item ${row.id}`} title="Editar item" onClick={() => onEdit(row)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                     ) : null}
                     {onDelete ? (
-                      <Button size="icon" variant="outline" onClick={() => setConfirmDeleteRow(row)}>
+                      <Button size="icon" variant="outline" aria-label={`Excluir item ${row.id}`} title="Excluir item" onClick={() => setConfirmDeleteRow(row)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     ) : null}

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { company } from "@/lib/company";
 import { useAppStore } from "@/lib/app-store";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 const supportOptions = [
@@ -36,6 +36,9 @@ export function WhatsAppSupport() {
       <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Atendimento rápido</DialogTitle>
+          <DialogDescription>
+            Escolha um assunto inicial ou escreva sua solicitação para a equipe de atendimento.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-2 sm:grid-cols-2">

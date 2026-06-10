@@ -4,7 +4,7 @@ import { BookOpen, CalendarDays, Home, LockKeyhole, Search } from "lucide-react"
 import { useMemo, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SearchInput } from "@/components/common/search-input";
 import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
@@ -50,6 +50,9 @@ export function CommandPalette() {
         <div className="flex max-h-[calc(100vh-2rem)] flex-col">
           <DialogHeader className="border-b border-border px-6 py-5">
             <DialogTitle>Busca rápida</DialogTitle>
+            <DialogDescription>
+              Procure páginas, cursos e atalhos do site sem sair da navegação atual.
+            </DialogDescription>
           </DialogHeader>
           <div className="px-6 py-5">
             <SearchInput

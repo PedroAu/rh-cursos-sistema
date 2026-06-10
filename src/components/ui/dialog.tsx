@@ -12,8 +12,12 @@ export const DialogClose = DialogPrimitive.Close;
 export function DialogContent({
   className,
   children,
+  initialFocusRef,
+  onOpenAutoFocus,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>) {
+}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
+}) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-deep-navy/45 backdrop-blur-sm" />
@@ -22,6 +26,14 @@ export function DialogContent({
           "fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-2rem)] w-[min(92vw,760px)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border bg-white p-6 shadow-card focus:outline-none",
           className
         )}
+        onOpenAutoFocus={(event) => {
+          onOpenAutoFocus?.(event);
+          if (event.defaultPrevented) return;
+          if (initialFocusRef?.current) {
+            event.preventDefault();
+            initialFocusRef.current.focus();
+          }
+        }}
         {...props}
       >
         {children}
@@ -57,4 +69,11 @@ export function DialogDescription({
       {...props}
     />
   );
+}
+
+export function DialogFooter({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col gap-3 sm:flex-row sm:justify-end", className)} {...props} />;
 }

@@ -42,7 +42,9 @@ test.describe("rotas publicas", () => {
 
   test("exibe capas locais nos cards de cursos", async ({ page }) => {
     await page.goto("/cursos");
-    await expect(page.locator('img[src^="/images/courses/"]').first()).toBeVisible();
+    await expect(
+      page.locator('img[src^="/images/courses/"], img[src*="%2Fimages%2Fcourses%2F"]').first()
+    ).toBeVisible();
   });
 });
 

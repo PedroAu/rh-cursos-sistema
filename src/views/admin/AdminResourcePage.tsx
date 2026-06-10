@@ -11,10 +11,12 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogClose,
 } from "@/components/ui/dialog";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import {
   ArrayInput,
@@ -291,21 +293,21 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                       if (field.type === "textarea") {
                         return (
                           <div key={field.key} className={fieldSpanClass}>
-                            <div className="flex flex-col gap-2">
-                              <label className="text-sm font-medium">
-                                {field.label}
-                                {field.required && <span className="ml-1 text-destructive">*</span>}
-                              </label>
-                              <textarea
-                                placeholder={field.label}
-                                value={form[field.key] ?? ""}
-                                onChange={(event) =>
-                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                }
-                                className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              />
-                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                            </div>
+                            <FormField error={fieldError} label={field.label} required={field.required}>
+                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                <textarea
+                                  id={fieldId}
+                                  placeholder={`Ex.: ${field.label}`}
+                                  value={form[field.key] ?? ""}
+                                  aria-describedby={ariaDescribedBy}
+                                  aria-invalid={ariaInvalid}
+                                  onChange={(event) =>
+                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                  }
+                                  className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                />
+                              )}
+                            </FormField>
                           </div>
                         );
                       }
@@ -313,22 +315,22 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                       if (field.type === "number") {
                         return (
                           <div key={field.key} className={fieldSpanClass}>
-                            <div className="flex flex-col gap-2">
-                              <label className="text-sm font-medium">
-                                {field.label}
-                                {field.required && <span className="ml-1 text-destructive">*</span>}
-                              </label>
-                              <input
-                                type="number"
-                                placeholder={field.label}
-                                value={form[field.key] ?? ""}
-                                onChange={(event) =>
-                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                }
-                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                              />
-                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                            </div>
+                            <FormField error={fieldError} label={field.label} required={field.required}>
+                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                <input
+                                  id={fieldId}
+                                  type="number"
+                                  placeholder={`Ex.: ${field.label}`}
+                                  value={form[field.key] ?? ""}
+                                  aria-describedby={ariaDescribedBy}
+                                  aria-invalid={ariaInvalid}
+                                  onChange={(event) =>
+                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                  }
+                                  className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                />
+                              )}
+                            </FormField>
                           </div>
                         );
                       }
@@ -336,21 +338,21 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                       if (field.type === "date") {
                         return (
                           <div key={field.key} className={fieldSpanClass}>
-                            <div className="flex flex-col gap-2">
-                              <label className="text-sm font-medium">
-                                {field.label}
-                                {field.required && <span className="ml-1 text-destructive">*</span>}
-                              </label>
-                              <input
-                                type="date"
-                                value={form[field.key] ?? ""}
-                                onChange={(event) =>
-                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                }
-                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                              />
-                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                            </div>
+                            <FormField error={fieldError} label={field.label} required={field.required}>
+                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                <input
+                                  id={fieldId}
+                                  type="date"
+                                  value={form[field.key] ?? ""}
+                                  aria-describedby={ariaDescribedBy}
+                                  aria-invalid={ariaInvalid}
+                                  onChange={(event) =>
+                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                  }
+                                  className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                />
+                              )}
+                            </FormField>
                           </div>
                         );
                       }
@@ -358,52 +360,54 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                       if (field.type === "file") {
                         return (
                           <div key={field.key} className={fieldSpanClass}>
-                            <div className="flex flex-col gap-2">
-                              <label className="text-sm font-medium">
-                                {field.label}
-                                {field.required && <span className="ml-1 text-destructive">*</span>}
-                              </label>
-                              <input
-                                type="file"
-                                accept="image/*"
-                                onChange={(event) => {
-                                  const file = event.target.files?.[0];
-                                  if (!file) return;
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    if (typeof reader.result === "string") {
-                                      setForm((current) => ({ ...current, [field.key]: reader.result }));
-                                    }
-                                  };
-                                  reader.readAsDataURL(file);
-                                }}
-                                className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                              />
-                              {form[field.key] ? (
-                                <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
-                              ) : null}
-                              {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                            </div>
+                            <FormField error={fieldError} label={field.label} required={field.required}>
+                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                <>
+                                  <input
+                                    id={fieldId}
+                                    type="file"
+                                    accept="image/*"
+                                    aria-describedby={ariaDescribedBy}
+                                    aria-invalid={ariaInvalid}
+                                    onChange={(event) => {
+                                      const file = event.target.files?.[0];
+                                      if (!file) return;
+                                      const reader = new FileReader();
+                                      reader.onload = () => {
+                                        if (typeof reader.result === "string") {
+                                          setForm((current) => ({ ...current, [field.key]: reader.result }));
+                                        }
+                                      };
+                                      reader.readAsDataURL(file);
+                                    }}
+                                    className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                  />
+                                  {form[field.key] ? (
+                                    <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
+                                  ) : null}
+                                </>
+                              )}
+                            </FormField>
                           </div>
                         );
                       }
 
                       return (
                         <div key={field.key} className={fieldSpanClass}>
-                          <div className="flex flex-col gap-2">
-                            <label className="text-sm font-medium">
-                              {field.label}
-                              {field.required && <span className="ml-1 text-destructive">*</span>}
-                            </label>
-                            <Input
-                              placeholder={field.label}
-                              value={form[field.key] ?? ""}
-                              onChange={(event) =>
-                                setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                              }
-                            />
-                            {fieldError && <p className="text-xs text-destructive">{fieldError}</p>}
-                          </div>
+                          <FormField error={fieldError} label={field.label} required={field.required}>
+                            {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                              <Input
+                                id={fieldId}
+                                placeholder={`Ex.: ${field.label}`}
+                                value={form[field.key] ?? ""}
+                                aria-describedby={ariaDescribedBy}
+                                aria-invalid={ariaInvalid}
+                                onChange={(event) =>
+                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                }
+                              />
+                            )}
+                          </FormField>
                         </div>
                       );
                     })}
@@ -411,16 +415,16 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">
+              <DialogFooter className="border-t border-border px-6 py-4">
                 <DialogClose asChild>
                   <Button variant="outline" disabled={isSaving}>
                     Cancelar
                   </Button>
                 </DialogClose>
-                <Button onClick={handleSave} disabled={isSaving}>
-                  {isSaving ? "Salvando…" : "Salvar"}
+                <Button onClick={handleSave} loading={isSaving}>
+                  Salvar
                 </Button>
-              </div>
+              </DialogFooter>
             </div>
           </DialogContent>
         </Dialog>

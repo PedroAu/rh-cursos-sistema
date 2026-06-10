@@ -8,13 +8,18 @@ import { cn } from "@/lib/utils";
 export const Sheet = DialogPrimitive.Root;
 export const SheetTrigger = DialogPrimitive.Trigger;
 export const SheetClose = DialogPrimitive.Close;
+export const SheetTitle = DialogPrimitive.Title;
+export const SheetDescription = DialogPrimitive.Description;
 
 export function SheetContent({
   className,
   children,
+  initialFocusRef,
+  onOpenAutoFocus,
   side = "right",
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
   side?: "left" | "right";
 }) {
   return (
@@ -26,6 +31,14 @@ export function SheetContent({
           side === "right" ? "right-0" : "left-0",
           className
         )}
+        onOpenAutoFocus={(event) => {
+          onOpenAutoFocus?.(event);
+          if (event.defaultPrevented) return;
+          if (initialFocusRef?.current) {
+            event.preventDefault();
+            initialFocusRef.current.focus();
+          }
+        }}
         {...props}
       >
         {children}
@@ -35,4 +48,11 @@ export function SheetContent({
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
   );
+}
+
+export function SheetHeader({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("mb-6 flex flex-col gap-2 pr-10", className)} {...props} />;
 }

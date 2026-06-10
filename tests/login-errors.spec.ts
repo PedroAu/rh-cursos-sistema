@@ -8,7 +8,7 @@ import { expect, test } from "@playwright/test";
 // que está sempre presente. Excluímos esse nó por id para isolar o alerta do
 // formulário de login.
 const loginAlert = (page: import("@playwright/test").Page) =>
-  page.locator('[role="alert"]:not(#__next-route-announcer__)');
+  page.locator('div[role="alert"]:not(#__next-route-announcer__)');
 
 const clickEntrar = (page: import("@playwright/test").Page) =>
   page.getByRole("button", { name: "Entrar", exact: true }).click();
@@ -29,8 +29,8 @@ test.describe("mensagens de erro do login", () => {
     );
 
     await page.goto("/login");
-    await page.getByPlaceholder("E-mail").fill("errado@rhcursos.com.br");
-    await page.getByPlaceholder("Senha").fill("senha-incorreta");
+    await page.getByLabel("E-mail").fill("errado@rhcursos.com.br");
+    await page.getByLabel("Senha").fill("senha-incorreta");
     await clickEntrar(page);
 
     await expect(loginAlert(page)).toBeVisible();
@@ -44,8 +44,8 @@ test.describe("mensagens de erro do login", () => {
     await page.route("**/api/auth/session", (route) => route.abort());
 
     await page.goto("/login");
-    await page.getByPlaceholder("E-mail").fill("admin@rhcursos.com.br");
-    await page.getByPlaceholder("Senha").fill("alguma-senha");
+    await page.getByLabel("E-mail").fill("admin@rhcursos.com.br");
+    await page.getByLabel("Senha").fill("alguma-senha");
     await clickEntrar(page);
 
     await expect(loginAlert(page)).toBeVisible();
@@ -57,7 +57,8 @@ test.describe("mensagens de erro do login", () => {
     await clickEntrar(page);
     await expect(loginAlert(page)).toBeVisible();
 
-    await page.getByPlaceholder("E-mail").fill("a");
+    await page.getByLabel("E-mail").fill("a");
     await expect(loginAlert(page)).toHaveCount(0);
+    await expect(page.getByText("Preencha a senha para continuar.")).toBeVisible();
   });
 });

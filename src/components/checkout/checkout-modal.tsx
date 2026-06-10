@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppStore } from "@/lib/app-store";
@@ -47,47 +48,54 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
     paymentMethod: "Pix" as const,
     classId: ""
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course.id), [classes, course.id]);
 
   const nextStep = () => {
+    const nextErrors: Record<string, string> = {};
+
     if (step === 1) {
       if (!form.studentName.trim() || form.studentName.trim().length < 3) {
-        toast.error("Nome deve ter no mínimo 3 caracteres.");
-        return;
+        nextErrors.studentName = "Nome deve ter no mínimo 3 caracteres.";
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-        toast.error("E-mail inválido.");
-        return;
+        nextErrors.email = "Informe um e-mail válido.";
       }
       if (form.phone.replace(/\D/g, "").length < 10) {
-        toast.error("Telefone deve ter no mínimo 10 dígitos.");
-        return;
+        nextErrors.phone = "Telefone deve ter no mínimo 10 dígitos.";
       }
       if (form.cpf.replace(/\D/g, "").length !== 11) {
-        toast.error("CPF deve ter 11 dígitos.");
-        return;
+        nextErrors.cpf = "CPF deve ter 11 dígitos.";
       }
     }
 
     if (step === 2 && (!form.organization || !form.jobTitle)) {
-      toast.error("Preencha os dados profissionais para continuar.");
-      return;
+      if (!form.organization) nextErrors.organization = "Informe a empresa ou órgão.";
+      if (!form.jobTitle) nextErrors.jobTitle = "Informe o cargo.";
     }
 
     if (step === 3 && !form.classId) {
-      toast.error("Escolha uma turma antes de avançar.");
-      return;
+      nextErrors.classId = "Escolha uma turma antes de avançar.";
     }
+
+    setFieldErrors(nextErrors);
+    setSubmitError(null);
+    if (Object.keys(nextErrors).length > 0) return;
 
     setStep((current) => Math.min(4, current + 1));
   };
 
   const finish = async () => {
     if (!form.classId) {
-      toast.error("Selecione uma turma para concluir.");
+      setFieldErrors({ classId: "Selecione uma turma para concluir." });
       return;
     }
+
+    setIsSaving(true);
+    setSubmitError(null);
 
     try {
       await createEnrollment({
@@ -107,7 +115,11 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
         }
       });
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível concluir a inscrição.");
+      const message = error instanceof Error ? error.message : "Não foi possível concluir a inscrição.";
+      setSubmitError(message);
+      toast.error(message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -117,6 +129,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
         <div className="flex max-h-[calc(100vh-2rem)] flex-col">
           <DialogHeader className="border-b border-border px-6 py-5">
             <DialogTitle>Secure Enrollment</DialogTitle>
+            <DialogDescription>Preencha seus dados, escolha a turma e confirme a forma de pagamento.</DialogDescription>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto px-6 py-5">
             <div className="grid gap-6">
@@ -135,37 +148,91 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
 
               {step === 1 ? (
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Input placeholder="Nome completo" value={form.studentName} onChange={(event) => setForm((current) => ({ ...current, studentName: event.target.value }))} />
-                  <Input type="email" placeholder="E-mail" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
-                  <Input type="tel" placeholder="Telefone / WhatsApp" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: formatPhone(event.target.value) }))} />
-                  <Input placeholder="CPF" value={form.cpf} onChange={(event) => setForm((current) => ({ ...current, cpf: formatCPF(event.target.value) }))} />
+                  <FormField error={fieldErrors.studentName} label="Nome completo" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} placeholder="Ex.: João da Silva" value={form.studentName} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, studentName: "" }));
+                        setForm((current) => ({ ...current, studentName: event.target.value }));
+                      }} />
+                    )}
+                  </FormField>
+                  <FormField error={fieldErrors.email} label="E-mail" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} type="email" placeholder="voce@empresa.com.br" value={form.email} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, email: "" }));
+                        setForm((current) => ({ ...current, email: event.target.value }));
+                      }} />
+                    )}
+                  </FormField>
+                  <FormField error={fieldErrors.phone} label="Telefone / WhatsApp" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} type="tel" placeholder="(61) 99999-9999" value={form.phone} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, phone: "" }));
+                        setForm((current) => ({ ...current, phone: formatPhone(event.target.value) }));
+                      }} />
+                    )}
+                  </FormField>
+                  <FormField error={fieldErrors.cpf} label="CPF" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} placeholder="000.000.000-00" value={form.cpf} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, cpf: "" }));
+                        setForm((current) => ({ ...current, cpf: formatCPF(event.target.value) }));
+                      }} />
+                    )}
+                  </FormField>
                 </div>
               ) : null}
 
               {step === 2 ? (
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Input placeholder="Empresa / órgão" value={form.organization} onChange={(event) => setForm((current) => ({ ...current, organization: event.target.value }))} />
-                  <Input placeholder="Cargo" value={form.jobTitle} onChange={(event) => setForm((current) => ({ ...current, jobTitle: event.target.value }))} />
-                  <Select value={form.enrollmentType} onValueChange={(value) => setForm((current) => ({ ...current, enrollmentType: value as typeof form.enrollmentType }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tipo de inscrição" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pessoa física">Pessoa física</SelectItem>
-                      <SelectItem value="Empresa">Empresa</SelectItem>
-                      <SelectItem value="Órgão público">Órgão público</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <FormField error={fieldErrors.organization} label="Empresa / órgão" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} placeholder="Ex.: Câmara Municipal..." value={form.organization} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, organization: "" }));
+                        setForm((current) => ({ ...current, organization: event.target.value }));
+                      }} />
+                    )}
+                  </FormField>
+                  <FormField error={fieldErrors.jobTitle} label="Cargo" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input id={fieldId} placeholder="Ex.: Analista de DP" value={form.jobTitle} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => {
+                        setFieldErrors((current) => ({ ...current, jobTitle: "" }));
+                        setForm((current) => ({ ...current, jobTitle: event.target.value }));
+                      }} />
+                    )}
+                  </FormField>
+                  <FormField label="Tipo de inscrição" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Select value={form.enrollmentType} onValueChange={(value) => setForm((current) => ({ ...current, enrollmentType: value as typeof form.enrollmentType }))}>
+                        <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
+                          <SelectValue placeholder="Selecione o tipo de inscrição" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pessoa física">Pessoa física</SelectItem>
+                          <SelectItem value="Empresa">Empresa</SelectItem>
+                          <SelectItem value="Órgão público">Órgão público</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </FormField>
                 </div>
               ) : null}
 
               {step === 3 ? (
                 <div className="grid gap-4">
+                  {fieldErrors.classId ? (
+                    <div className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+                      {fieldErrors.classId}
+                    </div>
+                  ) : null}
                   {courseClasses.map((trainingClass) => (
                     <button
                       key={trainingClass.id}
                       type="button"
-                      onClick={() => setForm((current) => ({ ...current, classId: trainingClass.id }))}
+                      onClick={() => {
+                        setFieldErrors((current) => ({ ...current, classId: "" }));
+                        setForm((current) => ({ ...current, classId: trainingClass.id }));
+                      }}
                       className={`rounded-lg border p-4 text-left transition ${
                         form.classId === trainingClass.id ? "border-primary bg-secondary/60" : "border-border bg-white hover:border-accent"
                       }`}
@@ -181,17 +248,26 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
 
               {step === 4 ? (
                 <div className="grid gap-4">
-                  <Select value={form.paymentMethod} onValueChange={(value) => setForm((current) => ({ ...current, paymentMethod: value as typeof form.paymentMethod }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Forma de pagamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Pix">Pix</SelectItem>
-                      <SelectItem value="Cartão">Cartão</SelectItem>
-                      <SelectItem value="Boleto">Boleto</SelectItem>
-                      <SelectItem value="Empenho">Empenho / nota</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {submitError ? (
+                    <div className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+                      {submitError}
+                    </div>
+                  ) : null}
+                  <FormField label="Forma de pagamento" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Select value={form.paymentMethod} onValueChange={(value) => setForm((current) => ({ ...current, paymentMethod: value as typeof form.paymentMethod }))}>
+                        <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
+                          <SelectValue placeholder="Selecione a forma de pagamento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Pix">Pix</SelectItem>
+                          <SelectItem value="Cartão">Cartão</SelectItem>
+                          <SelectItem value="Boleto">Boleto</SelectItem>
+                          <SelectItem value="Empenho">Empenho / nota</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </FormField>
                   <div className="rounded-lg border border-outline-variant bg-surface-muted p-4 text-sm leading-6 text-text-muted">
                     Pagamento protegido com confirmação de inscrição e envio de próximos passos por e-mail.
                   </div>
@@ -208,12 +284,12 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
               ) : null}
             </div>
           </div>
-          <div className="flex flex-col gap-3 border-t border-border px-6 py-4 sm:flex-row sm:justify-between">
+          <DialogFooter className="border-t border-border px-6 py-4 sm:justify-between">
             <Button variant="outline" onClick={() => setStep((current) => Math.max(1, current - 1))}>
               Voltar
             </Button>
-            {step < 4 ? <Button onClick={nextStep}>Continuar</Button> : <Button onClick={finish}>Finalizar inscrição</Button>}
-          </div>
+            {step < 4 ? <Button onClick={nextStep}>Continuar</Button> : <Button loading={isSaving} onClick={finish}>Finalizar inscrição</Button>}
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

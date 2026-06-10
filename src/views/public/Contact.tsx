@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
@@ -55,8 +56,13 @@ export function ContactPage() {
     phone: "",
     message: ""
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const update = (key: keyof typeof form, value: string) => {
+    setErrors((current) => ({ ...current, [key]: undefined }));
+    setSubmitError(null);
     if (key === "phone") {
       setForm((current) => ({ ...current, [key]: formatPhone(value) }));
     } else {
@@ -64,27 +70,30 @@ export function ContactPage() {
     }
   };
 
-  const submit = async () => {
+  const validate = () => {
+    const nextErrors: Partial<Record<keyof typeof form, string>> = {};
+
     if (!form.name.trim() || form.name.trim().length < 3) {
-      toast.error("Nome deve ter no mínimo 3 caracteres.");
-      return;
+      nextErrors.name = "Nome deve ter no mínimo 3 caracteres.";
     }
-
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      toast.error("Informe um e-mail válido.");
-      return;
+      nextErrors.email = "Informe um e-mail válido.";
     }
-
     if (form.phone && getPhoneDigits(form.phone).length < 10) {
-      toast.error("Informe um telefone válido (mínimo 10 dígitos).");
-      return;
+      nextErrors.phone = "Informe um telefone válido com pelo menos 10 dígitos.";
     }
-
     if (!form.message.trim() || form.message.trim().length < 10) {
-      toast.error("Mensagem deve ter no mínimo 10 caracteres.");
-      return;
+      nextErrors.message = "Mensagem deve ter no mínimo 10 caracteres.";
     }
 
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
+
+    setIsSubmitting(true);
     try {
       await createLead({
         name: form.name,
@@ -96,8 +105,14 @@ export function ContactPage() {
       });
       toast.success("Mensagem registrada para atendimento.");
       setForm({ name: "", email: "", phone: "", message: "" });
+      setErrors({});
+      setSubmitError(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.");
+      const message = error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.";
+      setSubmitError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -175,30 +190,63 @@ export function ContactPage() {
                   Conte o que você procura e retornaremos com orientação objetiva.
                 </p>
               </div>
-              <Input
-                placeholder="Nome completo"
-                value={form.name}
-                onChange={(event) => update("name", event.target.value)}
-              />
-              <Input
-                type="email"
-                placeholder="E-mail"
-                value={form.email}
-                onChange={(event) => update("email", event.target.value)}
-              />
-              <Input
-                type="tel"
-                inputMode="tel"
-                placeholder="Telefone"
-                value={form.phone}
-                onChange={(event) => update("phone", event.target.value)}
-              />
-              <Textarea
-                placeholder="Como podemos ajudar?"
-                value={form.message}
-                onChange={(event) => update("message", event.target.value)}
-              />
-              <Button size="lg" onClick={submit}>
+              {submitError ? (
+                <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                  {submitError}
+                </div>
+              ) : null}
+              <FormField error={errors.name} label="Nome completo" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    placeholder="Ex.: Maria Oliveira"
+                    value={form.name}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("name", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField error={errors.email} label="E-mail" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    type="email"
+                    placeholder="voce@empresa.com.br"
+                    value={form.email}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("email", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField error={errors.phone} hint="Opcional, mas recomendado para agilizar o retorno." label="Telefone">
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="(61) 99999-9999"
+                    value={form.phone}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("phone", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField error={errors.message} label="Mensagem" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Textarea
+                    id={fieldId}
+                    placeholder="Explique o que você procura, seu contexto e o tipo de ajuda desejada."
+                    value={form.message}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("message", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <Button size="lg" loading={isSubmitting} onClick={submit}>
                 <PhoneCall className="h-4 w-4" />
                 Enviar mensagem
               </Button>

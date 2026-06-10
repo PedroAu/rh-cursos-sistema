@@ -7,7 +7,7 @@ import { publicNavItems } from "@/features/public-shell/config/public-navigation
 import { company } from "@/lib/company";
 import { Link } from "@/lib/router-compat";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export function PublicMobileNavigation() {
   return (
@@ -23,12 +23,16 @@ export function PublicMobileNavigation() {
         </Button>
       </SheetTrigger>
       <SheetContent className="space-y-6 border-primary/10 bg-background">
-        <div>
+        <SheetHeader>
+          <SheetTitle className="sr-only">Menu principal</SheetTitle>
+          <SheetDescription className="sr-only">
+            Acesso rápido às principais áreas públicas do site.
+          </SheetDescription>
           <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-20 w-auto" />
           <p className="mt-2 text-sm leading-7 text-muted-foreground">
             Acesso rápido às principais áreas do site.
           </p>
-        </div>
+        </SheetHeader>
         <div className="grid gap-3">
           {publicNavItems.map((item) => (
             <Link

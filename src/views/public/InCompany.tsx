@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
@@ -69,57 +70,37 @@ export function InCompanyPage() {
     trainingTheme: "",
     mainChallenges: ""
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const update = (key: keyof typeof form, value: string) => {
+    setErrors((current) => ({ ...current, [key]: undefined }));
+    setSubmitError(null);
     setForm((current) => ({ ...current, [key]: value }));
   };
 
+  const validate = () => {
+    const nextErrors: Partial<Record<keyof typeof form, string>> = {};
+
+    if (!form.name.trim()) nextErrors.name = "Preencha o nome completo.";
+    if (!isValidEmail(form.email)) nextErrors.email = "Informe um e-mail corporativo válido.";
+    if (!form.company.trim()) nextErrors.company = "Preencha o nome da empresa.";
+    if (getPhoneDigits(form.phone).length < 10) nextErrors.phone = "Informe um telefone ou WhatsApp válido.";
+    if (!form.groupSize || Number(form.groupSize) <= 0) nextErrors.groupSize = "Informe o tamanho da equipe.";
+    if (!form.modality) nextErrors.modality = "Selecione a modalidade.";
+    if (!form.trainingObjective.trim()) nextErrors.trainingObjective = "Informe o objetivo do treinamento.";
+    if (!form.trainingTheme.trim()) nextErrors.trainingTheme = "Informe o tema a ser abordado.";
+    if (!form.mainChallenges.trim()) nextErrors.mainChallenges = "Informe os desafios principais.";
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
   const submit = async () => {
-    if (!form.name.trim()) {
-      toast.error("Preencha o nome completo.");
-      return;
-    }
+    if (!validate()) return;
 
-    if (!isValidEmail(form.email)) {
-      toast.error("Informe um e-mail corporativo válido.");
-      return;
-    }
-
-    if (!form.company.trim()) {
-      toast.error("Preencha o nome da empresa.");
-      return;
-    }
-
-    if (getPhoneDigits(form.phone).length < 10) {
-      toast.error("Informe um telefone/WhatsApp válido.");
-      return;
-    }
-
-    if (!form.groupSize || Number(form.groupSize) <= 0) {
-      toast.error("Informe o tamanho da equipe.");
-      return;
-    }
-
-    if (!form.modality) {
-      toast.error("Selecione a modalidade.");
-      return;
-    }
-
-    if (!form.trainingObjective.trim()) {
-      toast.error("Informe o objetivo do treinamento.");
-      return;
-    }
-
-    if (!form.trainingTheme.trim()) {
-      toast.error("Informe o tema a ser abordado.");
-      return;
-    }
-
-    if (!form.mainChallenges.trim()) {
-      toast.error("Informe os desafios principais.");
-      return;
-    }
-
+    setIsSubmitting(true);
     try {
       await createLead({
         name: form.name,
@@ -135,8 +116,13 @@ export function InCompanyPage() {
         message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
       });
       toast.success("Proposta registrada para atendimento consultivo.");
+      setSubmitError(null);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a proposta.");
+      const message = error instanceof Error ? error.message : "Não foi possível enviar a proposta.";
+      setSubmitError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -229,25 +215,66 @@ export function InCompanyPage() {
             align="center"
           />
           <div className="apple-surface mt-10 grid gap-6 p-8 md:grid-cols-2 md:p-12">
-            <Input placeholder="Nome completo" value={form.name} onChange={(event) => update("name", event.target.value)} />
-            <Input type="email" inputMode="email" placeholder="E-mail corporativo" value={form.email} onChange={(event) => update("email", event.target.value.trim().toLowerCase())} />
-            <Input placeholder="Nome da empresa" value={form.company} onChange={(event) => update("company", event.target.value)} />
-            <Input inputMode="tel" placeholder="Telefone/WhatsApp" value={form.phone} onChange={(event) => update("phone", formatPhone(event.target.value))} />
-            <Input inputMode="numeric" placeholder="Tamanho da equipe" value={form.groupSize} onChange={(event) => update("groupSize", formatTeamSize(event.target.value))} />
-            <Select value={form.modality} onValueChange={(value) => update("modality", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Modalidade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Presencial">Presencial</SelectItem>
-                <SelectItem value="Online ao vivo">Online ao vivo</SelectItem>
-                <SelectItem value="Híbrido">Híbrido</SelectItem>
-              </SelectContent>
-            </Select>
-            <Textarea placeholder="Objetivo do treinamento" value={form.trainingObjective} onChange={(event) => update("trainingObjective", event.target.value)} />
-            <Textarea placeholder="Tema que será abordado" value={form.trainingTheme} onChange={(event) => update("trainingTheme", event.target.value)} />
-            <Textarea className="md:col-span-2" placeholder="Desafios principais" value={form.mainChallenges} onChange={(event) => update("mainChallenges", event.target.value)} />
-            <Button className="md:col-span-2" size="lg" onClick={submit}>
+            {submitError ? (
+              <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger md:col-span-2">
+                {submitError}
+              </div>
+            ) : null}
+            <FormField error={errors.name} label="Nome completo" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Input id={fieldId} placeholder="Ex.: Ana Souza" value={form.name} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("name", event.target.value)} />
+              )}
+            </FormField>
+            <FormField error={errors.email} label="E-mail corporativo" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Input id={fieldId} type="email" inputMode="email" placeholder="voce@empresa.com.br" value={form.email} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("email", event.target.value.trim().toLowerCase())} />
+              )}
+            </FormField>
+            <FormField error={errors.company} label="Nome da empresa" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Input id={fieldId} placeholder="Ex.: Prefeitura de..." value={form.company} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("company", event.target.value)} />
+              )}
+            </FormField>
+            <FormField error={errors.phone} label="Telefone ou WhatsApp" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Input id={fieldId} inputMode="tel" placeholder="(61) 99999-9999" value={form.phone} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("phone", formatPhone(event.target.value))} />
+              )}
+            </FormField>
+            <FormField error={errors.groupSize} label="Tamanho da equipe" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Input id={fieldId} inputMode="numeric" placeholder="Ex.: 35" value={form.groupSize} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("groupSize", formatTeamSize(event.target.value))} />
+              )}
+            </FormField>
+            <FormField error={errors.modality} label="Modalidade preferida" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Select value={form.modality} onValueChange={(value) => update("modality", value)}>
+                  <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
+                    <SelectValue placeholder="Selecione a modalidade desejada" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Presencial">Presencial</SelectItem>
+                    <SelectItem value="Online ao vivo">Online ao vivo</SelectItem>
+                    <SelectItem value="Híbrido">Híbrido</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </FormField>
+            <FormField error={errors.trainingObjective} label="Objetivo do treinamento" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Textarea id={fieldId} placeholder="Ex.: atualizar a equipe para nova legislação e reduzir retrabalho." value={form.trainingObjective} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("trainingObjective", event.target.value)} />
+              )}
+            </FormField>
+            <FormField error={errors.trainingTheme} label="Tema a ser abordado" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Textarea id={fieldId} placeholder="Ex.: eSocial, DP estratégico, licitações, liderança..." value={form.trainingTheme} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("trainingTheme", event.target.value)} />
+              )}
+            </FormField>
+            <FormField className="md:col-span-2" error={errors.mainChallenges} label="Desafios principais" required>
+              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                <Textarea id={fieldId} className="md:col-span-2" placeholder="Descreva os principais gargalos, riscos ou objetivos da equipe." value={form.mainChallenges} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("mainChallenges", event.target.value)} />
+              )}
+            </FormField>
+            <Button className="md:col-span-2" size="lg" loading={isSubmitting} onClick={submit}>
               Enviar solicitação de proposta
             </Button>
           </div>

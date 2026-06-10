@@ -8,6 +8,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
 import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
@@ -19,13 +20,23 @@ export function LoginPage() {
   const { setSession } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     setError(null);
+    const nextErrors: { email?: string; password?: string } = {};
 
-    if (!email || !password) {
+    if (!email) {
+      nextErrors.email = "Preencha o e-mail para continuar.";
+    }
+    if (!password) {
+      nextErrors.password = "Preencha a senha para continuar.";
+    }
+    setFieldErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
       setError("Preencha e-mail e senha para continuar.");
       return;
     }
@@ -99,30 +110,46 @@ export function LoginPage() {
             )}
 
             <div className="grid gap-4">
-              <Input
-                placeholder="E-mail"
-                value={email}
-                onChange={(event) => {
-                  setEmail(event.target.value);
-                  if (error) setError(null);
-                }}
-                onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
-              />
-              <Input
-                type="password"
-                placeholder="Senha"
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  if (error) setError(null);
-                }}
-                onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
-              />
+              <FormField error={fieldErrors.email} label="E-mail" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    placeholder="admin@empresa.com.br"
+                    value={email}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setFieldErrors((current) => ({ ...current, email: undefined }));
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
+                  />
+                )}
+              </FormField>
+              <FormField error={fieldErrors.password} label="Senha" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    type="password"
+                    placeholder="Sua senha de acesso"
+                    value={password}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setFieldErrors((current) => ({ ...current, password: undefined }));
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={(event) => event.key === "Enter" && handleSubmit()}
+                  />
+                )}
+              </FormField>
             </div>
 
             <div className="flex flex-col gap-3">
-              <Button onClick={handleSubmit} disabled={isSubmitting}>
-                {isSubmitting ? "Entrando..." : "Entrar"}
+              <Button onClick={handleSubmit} loading={isSubmitting}>
+                Entrar
               </Button>
               <Button variant="outline" onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}>
                 Esqueci minha senha
