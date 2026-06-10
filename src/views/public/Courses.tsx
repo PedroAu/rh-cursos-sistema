@@ -93,6 +93,14 @@ export function CoursesPage() {
   const activeFiltersCount = [query, filters.path, filters.modality, filters.duration, filters.level].filter(Boolean).length;
   const featuredCoursesCount = courses.filter((course) => course.featured).length;
   const activePathName = trainingPaths.find((path) => path.id === filters.path)?.shortName;
+  const upcomingClassesCount = classes.filter((item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas").length;
+  const activeFilterLabels = [
+    query ? `Busca: ${query}` : null,
+    activePathName ? `Trilha: ${activePathName}` : null,
+    filters.modality ? `Modalidade: ${filters.modality}` : null,
+    filters.duration ? `Carga: ${filters.duration}` : null,
+    filters.level ? `Nível: ${filters.level}` : null,
+  ].filter(Boolean) as string[];
 
   return (
     <>
@@ -159,7 +167,7 @@ export function CoursesPage() {
     <section className="bg-surface-muted">
       <div className="ea-container py-10">
         <div className="grid gap-8 lg:grid-cols-[340px_1fr] lg:items-start">
-          <aside className="apple-surface p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+          <aside className="surface-card p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
             <div className="mb-6 flex items-center justify-between gap-4 border-b border-outline-variant pb-5">
               <span className="eyebrow">Filtros</span>
               <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-label font-bold text-deep-navy">
@@ -265,9 +273,9 @@ export function CoursesPage() {
           </aside>
 
           <div className="space-y-5">
-            <div className="apple-surface overflow-hidden">
+            <div className="surface-card overflow-hidden">
               <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+                <div aria-live="polite">
                   <span className="ea-label">Cursos disponíveis</span>
                   <h2 className="mt-2 flex items-baseline gap-2 font-display font-bold text-deep-navy">
                     <span className="text-4xl leading-none">{filtered.length}</span>
@@ -280,6 +288,32 @@ export function CoursesPage() {
                   {activePathName ? `Trilha: ${activePathName}` : "Todas as trilhas"}
                 </div>
               </div>
+
+              <div className="grid gap-px border-t border-outline-variant bg-outline-variant md:grid-cols-3">
+                {[
+                  { label: "Turmas abertas", value: upcomingClassesCount },
+                  { label: "Programas em destaque", value: featuredCoursesCount },
+                  { label: "Filtros ativos", value: activeFiltersCount },
+                ].map((item) => (
+                  <div key={item.label} className="bg-surface-raised px-6 py-4">
+                    <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                    <p className="mt-2 text-2xl font-semibold text-foreground">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {activeFilterLabels.length > 0 ? (
+                <div className="flex flex-wrap gap-2 border-t border-outline-variant px-6 py-4">
+                  {activeFilterLabels.map((item) => (
+                    <span
+                      key={item}
+                      className="rounded-full border border-outline-variant bg-surface-muted px-3 py-1.5 text-label font-bold text-deep-navy"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             {loading ? (

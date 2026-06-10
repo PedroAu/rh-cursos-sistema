@@ -23,6 +23,9 @@ export function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedRole] = useState<"admin">("admin");
+  const status = searchParams.get("status");
+  const nextPath = searchParams.get("next");
 
   const handleSubmit = async () => {
     setError(null);
@@ -88,7 +91,7 @@ export function LoginPage() {
   return (
     <section className="page-section">
       <div className="container flex justify-center">
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-xl border-outline-variant">
           <CardContent className="space-y-6 p-8">
             <div className="space-y-3 text-center">
               <span className="eyebrow">Administração</span>
@@ -96,6 +99,47 @@ export function LoginPage() {
               <p className="text-base leading-7 text-muted-foreground">
                 Acesse sua conta para gerenciar o painel administrativo.
               </p>
+            </div>
+
+            {status === "required" ? (
+              <div className="rounded-lg border border-accent/20 bg-accent/10 p-4 text-sm leading-6 text-accent">
+                Faça login para acessar {nextPath || "/admin"}. Nesta publicação, somente o papel administrativo está disponível.
+              </div>
+            ) : null}
+
+            <div className="grid gap-3 md:grid-cols-3">
+              {[
+                {
+                  label: "Administração",
+                  description: "Acesso ao painel operacional e cadastro.",
+                  active: true
+                },
+                {
+                  label: "Aluno",
+                  description: "Portal fora do escopo desta publicação.",
+                  active: false
+                },
+                {
+                  label: "Instrutor",
+                  description: "Portal fora do escopo desta publicação.",
+                  active: false
+                }
+              ].map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  disabled={!item.active}
+                  aria-pressed={item.active}
+                  className={`rounded-xl border p-4 text-left ${
+                    item.active
+                      ? "border-deep-navy bg-deep-navy text-white"
+                      : "border-outline-variant bg-surface-muted text-text-muted opacity-80"
+                  }`}
+                >
+                  <p className="text-sm font-bold">{item.label}</p>
+                  <p className={`mt-2 text-sm leading-6 ${item.active ? "text-white/78" : "text-text-muted"}`}>{item.description}</p>
+                </button>
+              ))}
             </div>
 
             {error && (
@@ -110,7 +154,7 @@ export function LoginPage() {
             )}
 
             <div className="grid gap-4">
-              <FormField error={fieldErrors.email} label="E-mail" required>
+              <FormField error={fieldErrors.email} hint="Conta autorizada para o papel selecionado." label="E-mail" required>
                 {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                   <Input
                     id={fieldId}
@@ -127,7 +171,7 @@ export function LoginPage() {
                   />
                 )}
               </FormField>
-              <FormField error={fieldErrors.password} label="Senha" required>
+              <FormField error={fieldErrors.password} hint={`Perfil atual: ${selectedRole === "admin" ? "Administração" : selectedRole}.`} label="Senha" required>
                 {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                   <Input
                     id={fieldId}

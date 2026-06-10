@@ -14,7 +14,8 @@ const publicPaths = [
   "/in-company",
   "/sobre",
   "/contato",
-  "/login"
+  "/login",
+  "/inscricao-confirmada"
 ];
 
 // Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de

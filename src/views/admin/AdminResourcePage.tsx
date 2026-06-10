@@ -1,7 +1,7 @@
 "use client";
 
 import { Plus, Download } from "lucide-react";
-import { useMemo, useState } from "react";
+import { isValidElement, useMemo, useState } from "react";
 
 import { DataTable } from "@/components/admin/data-table";
 import { EmptyState } from "@/components/common/empty-state";
@@ -31,6 +31,15 @@ import type { ValidationError } from "@/lib/admin-form-validation";
 
 type CsvColumn = { label: string; render: (row: unknown) => unknown };
 
+function toExportableValue(value: unknown): string {
+  if (value == null) return "";
+  if (Array.isArray(value)) return value.map((item) => toExportableValue(item)).join("; ");
+  if (isValidElement<{ children?: unknown }>(value)) {
+    return toExportableValue(value.props.children);
+  }
+  return String(value);
+}
+
 function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
   if (data.length === 0) return;
 
@@ -40,8 +49,7 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
       columns
         .map((col) => {
           const value = col.render(row);
-          if (Array.isArray(value)) return `"${value.join("; ")}"`;
-          return `"${String(value ?? "").replace(/"/g, '""')}"`;
+          return `"${toExportableValue(value).replace(/"/g, '""')}"`;
         })
         .join(",")
     ),
@@ -124,6 +132,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
 
   function getFieldSpanClass(field: (typeof config.fields)[number]) {
     if (
+      field.type === "readonly" ||
       field.type === "textarea" ||
       field.type === "array" ||
       field.type === "modules" ||
@@ -134,6 +143,29 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
 
     return "";
   }
+
+  function inferSectionTitle(field: (typeof config.fields)[number]) {
+    if (field.section) return field.section;
+    if (field.type === "readonly") return "Contexto";
+    if (field.key === "status") return "Ação operacional";
+    if (field.type === "textarea" || field.type === "array" || field.type === "modules") {
+      return "Conteúdo e detalhamento";
+    }
+    return "Dados principais";
+  }
+
+  const fieldSections = config.fields.reduce<Array<{ title: string; fields: Array<(typeof config.fields)[number]> }>>((sections, field) => {
+    const title = inferSectionTitle(field);
+    const existing = sections.find((section) => section.title === title);
+
+    if (existing) {
+      existing.fields.push(field);
+      return sections;
+    }
+
+    sections.push({ title, fields: [field] });
+    return sections;
+  }, []);
 
   return (
     <section className="page-section">
@@ -146,7 +178,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               {config.description}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {config.rows.length > 0 && (
               <Button
                 variant="outline"
@@ -171,12 +203,50 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
           </div>
         </div>
 
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="surface-card p-5">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Registros visíveis</p>
+            <p className="mt-3 text-3xl font-semibold text-foreground">{rows.length}</p>
+            <p className="mt-2 text-sm leading-6 text-label-secondary">
+              {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual desta área."}
+            </p>
+          </div>
+          <div className="surface-card p-5">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Modo de operação</p>
+            <p className="mt-3 text-2xl font-semibold text-foreground">
+              {canCreate ? "CRUD completo" : "Atualização supervisionada"}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-label-secondary">
+              {canCreate
+                ? "Criação, edição e exclusão disponíveis com busca e exportação."
+                : "Fluxo restrito a contexto e atualização segura de registros existentes."}
+            </p>
+          </div>
+          <div className="surface-card p-5">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Atalho</p>
+            <p className="mt-3 text-2xl font-semibold text-foreground">N para novo item</p>
+            <p className="mt-2 text-sm leading-6 text-label-secondary">
+              Disponível nas áreas com criação manual para acelerar operação recorrente.
+            </p>
+          </div>
+        </div>
+
         <div className="surface-card space-y-4 p-5">
-          <SearchInput
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por nome, título ou referência..."
-          />
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-xl space-y-1">
+              <p className="text-sm font-semibold text-foreground">Busca operacional</p>
+              <p className="text-sm leading-6 text-label-secondary">
+                Filtre por nome, título ou referência para reduzir ruído antes de editar.
+              </p>
+            </div>
+            <div className="w-full lg:max-w-md">
+              <SearchInput
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Buscar por nome, título ou referência..."
+              />
+            </div>
+          </div>
           {rows.length ? (
             <DataTable
               data={rows}
@@ -215,7 +285,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               </DialogHeader>
 
               <div className="flex-1 overflow-y-auto px-6 py-5">
-                <div className="space-y-5">
+                <div className="space-y-6">
                   {validationErrors.length > 0 && (
                     <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
                       <p className="mb-2 text-sm font-medium text-destructive">Erros encontrados:</p>
@@ -230,188 +300,216 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    {config.fields.map((field) => {
-                      const fieldError = errorsByField[field.key];
-                      const fieldSpanClass = getFieldSpanClass(field);
+                  {fieldSections.map((section) => (
+                    <div key={section.title} className="space-y-4">
+                      <div className="space-y-1">
+                        <h3 className="text-lg font-semibold text-foreground">{section.title}</h3>
+                        <p className="text-sm leading-6 text-label-secondary">
+                          {section.title === "Ação operacional"
+                            ? "Atualize apenas o que interfere na operação do time."
+                            : "Revise os dados antes de salvar para evitar retrabalho operacional."}
+                        </p>
+                      </div>
 
-                      if (field.type === "modules") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <ModulesBuilder
-                              label={field.label}
-                              value={form[field.key] || []}
-                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                              error={fieldError}
-                            />
-                          </div>
-                        );
-                      }
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        {section.fields.map((field) => {
+                          const fieldError = errorsByField[field.key];
+                          const fieldSpanClass = getFieldSpanClass(field);
 
-                      if (field.type === "array") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <ArrayInput
-                              label={field.label}
-                              value={form[field.key] || []}
-                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                              error={fieldError}
-                            />
-                          </div>
-                        );
-                      }
+                          if (field.type === "readonly") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <div className="h-full rounded-xl border border-border bg-surface-muted/50 p-4">
+                                  <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">
+                                    {field.label}
+                                  </p>
+                                  <p className="mt-3 text-sm leading-6 text-foreground">
+                                    {String(form[field.key] ?? "—")}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          }
 
-                      if (field.type === "multiselect" && field.options) {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <MultiSelectField
-                              label={field.label}
-                              value={form[field.key] || []}
-                              options={field.options}
-                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                              error={fieldError}
-                            />
-                          </div>
-                        );
-                      }
-
-                      if (field.type === "select" && field.options) {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <SelectField
-                              label={field.label}
-                              value={form[field.key] ?? ""}
-                              options={field.options}
-                              onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                              required={field.required}
-                              error={fieldError}
-                            />
-                          </div>
-                        );
-                      }
-
-                      if (field.type === "textarea") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <FormField error={fieldError} label={field.label} required={field.required}>
-                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                <textarea
-                                  id={fieldId}
-                                  placeholder={`Ex.: ${field.label}`}
-                                  value={form[field.key] ?? ""}
-                                  aria-describedby={ariaDescribedBy}
-                                  aria-invalid={ariaInvalid}
-                                  onChange={(event) =>
-                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                  }
-                                  className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                          if (field.type === "modules") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <ModulesBuilder
+                                  label={field.label}
+                                  value={form[field.key] || []}
+                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                                  error={fieldError}
                                 />
-                              )}
-                            </FormField>
-                          </div>
-                        );
-                      }
+                              </div>
+                            );
+                          }
 
-                      if (field.type === "number") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <FormField error={fieldError} label={field.label} required={field.required}>
-                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                <input
-                                  id={fieldId}
-                                  type="number"
-                                  placeholder={`Ex.: ${field.label}`}
-                                  value={form[field.key] ?? ""}
-                                  aria-describedby={ariaDescribedBy}
-                                  aria-invalid={ariaInvalid}
-                                  onChange={(event) =>
-                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                  }
-                                  className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                          if (field.type === "array") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <ArrayInput
+                                  label={field.label}
+                                  value={form[field.key] || []}
+                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                                  error={fieldError}
                                 />
-                              )}
-                            </FormField>
-                          </div>
-                        );
-                      }
+                              </div>
+                            );
+                          }
 
-                      if (field.type === "date") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <FormField error={fieldError} label={field.label} required={field.required}>
-                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                <input
-                                  id={fieldId}
-                                  type="date"
-                                  value={form[field.key] ?? ""}
-                                  aria-describedby={ariaDescribedBy}
-                                  aria-invalid={ariaInvalid}
-                                  onChange={(event) =>
-                                    setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                  }
-                                  className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                          if (field.type === "multiselect" && field.options) {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <MultiSelectField
+                                  label={field.label}
+                                  value={form[field.key] || []}
+                                  options={field.options}
+                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                                  error={fieldError}
                                 />
-                              )}
-                            </FormField>
-                          </div>
-                        );
-                      }
+                              </div>
+                            );
+                          }
 
-                      if (field.type === "file") {
-                        return (
-                          <div key={field.key} className={fieldSpanClass}>
-                            <FormField error={fieldError} label={field.label} required={field.required}>
-                              {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                <>
-                                  <input
+                          if (field.type === "select" && field.options) {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <SelectField
+                                  label={field.label}
+                                  value={form[field.key] ?? ""}
+                                  options={field.options}
+                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
+                                  required={field.required}
+                                  error={fieldError}
+                                />
+                              </div>
+                            );
+                          }
+
+                          if (field.type === "textarea") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <FormField error={fieldError} label={field.label} required={field.required}>
+                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                    <textarea
+                                      id={fieldId}
+                                      placeholder={`Ex.: ${field.label}`}
+                                      value={form[field.key] ?? ""}
+                                      aria-describedby={ariaDescribedBy}
+                                      aria-invalid={ariaInvalid}
+                                      onChange={(event) =>
+                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                      }
+                                      className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                    />
+                                  )}
+                                </FormField>
+                              </div>
+                            );
+                          }
+
+                          if (field.type === "number") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <FormField error={fieldError} label={field.label} required={field.required}>
+                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                    <input
+                                      id={fieldId}
+                                      type="number"
+                                      placeholder={`Ex.: ${field.label}`}
+                                      value={form[field.key] ?? ""}
+                                      aria-describedby={ariaDescribedBy}
+                                      aria-invalid={ariaInvalid}
+                                      onChange={(event) =>
+                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                      }
+                                      className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                                    />
+                                  )}
+                                </FormField>
+                              </div>
+                            );
+                          }
+
+                          if (field.type === "date") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <FormField error={fieldError} label={field.label} required={field.required}>
+                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                    <input
+                                      id={fieldId}
+                                      type="date"
+                                      value={form[field.key] ?? ""}
+                                      aria-describedby={ariaDescribedBy}
+                                      aria-invalid={ariaInvalid}
+                                      onChange={(event) =>
+                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                      }
+                                      className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                    />
+                                  )}
+                                </FormField>
+                              </div>
+                            );
+                          }
+
+                          if (field.type === "file") {
+                            return (
+                              <div key={field.key} className={fieldSpanClass}>
+                                <FormField error={fieldError} label={field.label} required={field.required}>
+                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                    <>
+                                      <input
+                                        id={fieldId}
+                                        type="file"
+                                        accept="image/*"
+                                        aria-describedby={ariaDescribedBy}
+                                        aria-invalid={ariaInvalid}
+                                        onChange={(event) => {
+                                          const file = event.target.files?.[0];
+                                          if (!file) return;
+                                          const reader = new FileReader();
+                                          reader.onload = () => {
+                                            if (typeof reader.result === "string") {
+                                              setForm((current) => ({ ...current, [field.key]: reader.result }));
+                                            }
+                                          };
+                                          reader.readAsDataURL(file);
+                                        }}
+                                        className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                      />
+                                      {form[field.key] ? (
+                                        <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
+                                      ) : null}
+                                    </>
+                                  )}
+                                </FormField>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div key={field.key} className={fieldSpanClass}>
+                              <FormField error={fieldError} label={field.label} required={field.required}>
+                                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                                  <Input
                                     id={fieldId}
-                                    type="file"
-                                    accept="image/*"
+                                    placeholder={`Ex.: ${field.label}`}
+                                    value={form[field.key] ?? ""}
                                     aria-describedby={ariaDescribedBy}
                                     aria-invalid={ariaInvalid}
-                                    onChange={(event) => {
-                                      const file = event.target.files?.[0];
-                                      if (!file) return;
-                                      const reader = new FileReader();
-                                      reader.onload = () => {
-                                        if (typeof reader.result === "string") {
-                                          setForm((current) => ({ ...current, [field.key]: reader.result }));
-                                        }
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }}
-                                    className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
+                                    onChange={(event) =>
+                                      setForm((current) => ({ ...current, [field.key]: event.target.value }))
+                                    }
                                   />
-                                  {form[field.key] ? (
-                                    <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
-                                  ) : null}
-                                </>
-                              )}
-                            </FormField>
-                          </div>
-                        );
-                      }
-
-                      return (
-                        <div key={field.key} className={fieldSpanClass}>
-                          <FormField error={fieldError} label={field.label} required={field.required}>
-                            {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                              <Input
-                                id={fieldId}
-                                placeholder={`Ex.: ${field.label}`}
-                                value={form[field.key] ?? ""}
-                                aria-describedby={ariaDescribedBy}
-                                aria-invalid={ariaInvalid}
-                                onChange={(event) =>
-                                  setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                }
-                              />
-                            )}
-                          </FormField>
-                        </div>
-                      );
-                    })}
-                  </div>
+                                )}
+                              </FormField>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 

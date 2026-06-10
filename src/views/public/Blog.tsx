@@ -52,6 +52,15 @@ export function BlogPage() {
   );
 
   const featuredPost = posts[0];
+  const visiblePosts = featuredPost ? posts.slice(1) : posts;
+  const categorySummary = categories
+    .filter((item) => item !== "Todos")
+    .map((item) => ({
+      label: item,
+      count: blogPosts.filter((post) => post.status !== "Arquivado" && post.category === item).length,
+    }))
+    .filter((item) => item.count > 0)
+    .slice(0, 3);
 
   const submitNewsletter = async () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
@@ -106,6 +115,36 @@ export function BlogPage() {
           </div>
         </div>
 
+        <div className="grid gap-4 md:grid-cols-3">
+          <div className="surface-card p-5" aria-live="polite">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Artigos visíveis</p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">{posts.length}</p>
+            <p className="mt-2 text-sm leading-6 text-label-secondary">
+              {query ? `Busca ativa para “${query}”.` : "Explore temas para apoiar sua decisão."}
+            </p>
+          </div>
+          <div className="surface-card p-5">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Categoria ativa</p>
+            <p className="mt-2 text-2xl font-semibold text-foreground">{category}</p>
+            <p className="mt-2 text-sm leading-6 text-label-secondary">
+              Troque a categoria para comparar pautas técnicas e editoriais.
+            </p>
+          </div>
+          <div className="surface-card p-5">
+            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Temas em destaque</p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {categorySummary.map((item) => (
+                <span
+                  key={item.label}
+                  className="rounded-full border border-outline-variant bg-surface-muted px-3 py-1.5 text-label font-bold text-deep-navy"
+                >
+                  {item.label} · {item.count}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {featuredPost ? (
           <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
             <BlogCard post={featuredPost} featured />
@@ -136,15 +175,15 @@ export function BlogPage() {
           </div>
         ) : null}
 
-        {posts.length ? (
+        {visiblePosts.length ? (
           <div className="grid gap-5 xl:grid-cols-3">
-            {posts.slice(1).map((post) => (
+            {visiblePosts.map((post) => (
               <BlogCard key={post.id} post={post} />
             ))}
           </div>
-        ) : (
+        ) : !posts.length ? (
           <EmptyState title="Nenhum post encontrado." description="Ajuste a busca ou escolha outra categoria para visualizar conteúdos." />
-        )}
+        ) : null}
       </div>
     </section>
   );

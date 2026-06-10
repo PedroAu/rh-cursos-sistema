@@ -16,6 +16,18 @@ export function AboutPage() {
               title="Cursos, consultoria e treinamento empresarial desde 2007."
               description={`${company.brandName} atua em Brasília - DF com capacitação profissional, consultoria e treinamentos para setor público e privado, com foco em aplicação prática e desenvolvimento de competências.`}
             />
+            <div className="grid gap-4 md:grid-cols-3">
+              {[
+                { label: "Atuação", value: "Pública + privada" },
+                { label: "Entrega", value: "Cursos e consultoria" },
+                { label: "Base", value: "Brasília - DF" }
+              ].map((item) => (
+                <div key={item.label} className="surface-card p-5">
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                  <p className="mt-2 font-display text-2xl font-bold text-deep-navy">{item.value}</p>
+                </div>
+              ))}
+            </div>
             <div className="grid gap-4 md:grid-cols-2">
               {[
                 "Conteúdo técnico e aplicável",
@@ -54,7 +66,15 @@ export function AboutPage() {
       </section>
 
       <section className="page-section bg-white">
-        <div className="container grid gap-5 xl:grid-cols-3">
+        <div className="container space-y-8">
+          <div className="max-w-3xl">
+            <SectionTitle
+              eyebrow="Leitura institucional"
+              title="Clareza sobre quem somos, como operamos e onde geramos valor."
+              description="A trajetória da RH Cursos combina proximidade consultiva, densidade técnica e formatos adaptados a contextos distintos de equipe, carreira e gestão pública."
+            />
+          </div>
+          <div className="grid gap-5 xl:grid-cols-3">
           {[
             {
               title: "Missão",
@@ -73,6 +93,33 @@ export function AboutPage() {
               <CardContent className="space-y-3 p-6">
                 <h3 className="text-2xl font-semibold">{item.title}</h3>
                 <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="page-section">
+        <div className="container grid gap-5 lg:grid-cols-3">
+          {[
+            {
+              title: "1. Diagnóstico",
+              description: "Entendemos contexto, papel profissional e objetivo da turma antes de sugerir a trilha."
+            },
+            {
+              title: "2. Curadoria",
+              description: "Conectamos cursos, agenda, formato e instrutores com aderência operacional."
+            },
+            {
+              title: "3. Aplicação",
+              description: "Priorizamos conteúdos que saem do campo conceitual e entram na rotina de execução."
+            }
+          ].map((item) => (
+            <Card key={item.title} className="border-outline-variant bg-surface-muted">
+              <CardContent className="space-y-3 p-6">
+                <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.title}</p>
+                <p className="text-sm leading-7 text-text-muted">{item.description}</p>
               </CardContent>
             </Card>
           ))}

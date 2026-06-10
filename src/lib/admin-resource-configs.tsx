@@ -1,5 +1,6 @@
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/lib/app-store";
 import {
   validateBlogPost,
@@ -34,9 +35,20 @@ export type ResourceKey =
 export type FieldConfig = {
   key: string;
   label: string;
-  type?: "text" | "textarea" | "select" | "array" | "modules" | "multiselect" | "number" | "date" | "file";
+  type?:
+    | "text"
+    | "textarea"
+    | "select"
+    | "array"
+    | "modules"
+    | "multiselect"
+    | "number"
+    | "date"
+    | "file"
+    | "readonly";
   options?: Array<{ value: string; label: string }>;
   required?: boolean;
+  section?: string;
 };
 
 export type ColumnConfig<T> = {
@@ -78,6 +90,87 @@ function normalizeDateTimeForStorage(value?: string, fallbackHour = "09:00:00.00
   return `${value}T${fallbackHour}`;
 }
 
+function formatAdminDate(value?: string) {
+  if (!value) return "—";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function getBadgeVariant(value: string) {
+  if (
+    value === "Confirmada" ||
+    value === "Concluída" ||
+    value === "Ativo" ||
+    value === "Publicado" ||
+    value === "Convertido" ||
+    value === "Inscrições abertas"
+  ) {
+    return "success" as const;
+  }
+
+  if (
+    value === "Aguardando pagamento" ||
+    value === "Poucas vagas" ||
+    value === "Em atendimento" ||
+    value === "Em breve"
+  ) {
+    return "warning" as const;
+  }
+
+  if (
+    value === "Cancelada" ||
+    value === "Inativo" ||
+    value === "Arquivado" ||
+    value === "Perdido" ||
+    value === "Encerrada"
+  ) {
+    return "danger" as const;
+  }
+
+  return "muted" as const;
+}
+
+function renderStatusBadge(value: string) {
+  return <Badge variant={getBadgeVariant(value)}>{value}</Badge>;
+}
+
+function deriveEnrollmentOperationalStatus(
+  enrollment: Enrollment,
+  trainingClass?: TrainingClass
+) {
+  if (enrollment.status === "Cancelada") return "Cancelada pelo atendimento.";
+  if (enrollment.status === "Concluída") return "Concluída e pronta para pós-curso.";
+
+  if (!trainingClass) {
+    return `${enrollment.status} com turma não localizada.`;
+  }
+
+  const now = Date.now();
+  const startsAt = new Date(trainingClass.startDate).getTime();
+  const endsAt = new Date(trainingClass.endDate).getTime();
+
+  if (enrollment.status === "Confirmada") {
+    if (endsAt < now) return "Confirmada em turma encerrada. Revisar conclusão.";
+    if (startsAt <= now) return "Confirmada em turma em andamento.";
+    return "Confirmada para turma futura.";
+  }
+
+  if (enrollment.status === "Aguardando pagamento") {
+    if (startsAt <= now) return "Pagamento pendente com turma em andamento.";
+    return "Pagamento pendente antes do início da turma.";
+  }
+
+  if (enrollment.status === "Pendente") {
+    if (startsAt <= now) return "Aguardando confirmação com turma ativa.";
+    return "Aguardando confirmação comercial.";
+  }
+
+  return enrollment.status;
+}
+
 export function buildResourceConfig(
   resource: ResourceKey,
   store: ReturnType<typeof useAppStore>,
@@ -114,8 +207,8 @@ export function buildResourceConfig(
         columns: [
           { key: "title", label: "Curso", render: (row: Course) => row.title },
           { key: "pathName", label: "Trilha", render: (row: Course) => row.pathName },
-          { key: "modality", label: "Modalidade", render: (row: Course) => row.modality },
-          { key: "status", label: "Status", render: (row: Course) => row.status },
+          { key: "modality", label: "Modalidade", render: (row: Course) => <Badge variant="muted">{row.modality}</Badge> },
+          { key: "status", label: "Status", render: (row: Course) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Course) => {
           setEditingId(row.id);
@@ -274,7 +367,7 @@ export function buildResourceConfig(
             key: "filledSeats", label: "Vagas preenchidas",
             render: (row: TrainingClass) => `${row.filledSeats}/${row.totalSeats}`,
           },
-          { key: "status", label: "Status", render: (row: TrainingClass) => row.status },
+          { key: "status", label: "Status", render: (row: TrainingClass) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: TrainingClass) => {
           const rowConfirmedEnrollments = store.enrollments.filter(
@@ -361,7 +454,7 @@ export function buildResourceConfig(
           { key: "name", label: "Aluno", render: (row: Student) => row.name },
           { key: "email", label: "E-mail", render: (row: Student) => row.email },
           { key: "organization", label: "Empresa/órgão", render: (row: Student) => row.organization },
-          { key: "status", label: "Status", render: (row: Student) => row.enrollmentStatus },
+          { key: "status", label: "Status", render: (row: Student) => renderStatusBadge(row.enrollmentStatus) },
         ],
         onEdit: (row: Student) => {
           setEditingId(row.id);
@@ -428,9 +521,9 @@ export function buildResourceConfig(
         rows,
         columns: [
           { key: "name", label: "Lead", render: (row: Lead) => row.name },
-          { key: "origin", label: "Origem", render: (row: Lead) => row.origin },
+          { key: "origin", label: "Origem", render: (row: Lead) => <Badge variant="muted">{row.origin}</Badge> },
           { key: "courseInterest", label: "Interesse", render: (row: Lead) => row.courseInterest },
-          { key: "status", label: "Status", render: (row: Lead) => row.status },
+          { key: "status", label: "Status", render: (row: Lead) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Lead) => {
           setEditingId(row.id);
@@ -531,12 +624,31 @@ export function buildResourceConfig(
             render: (row: Enrollment) =>
               store.courses.find((course) => course.id === row.courseId)?.title ?? "--",
           },
-          { key: "paymentMethod", label: "Pagamento", render: (row: Enrollment) => row.paymentMethod },
-          { key: "status", label: "Status", render: (row: Enrollment) => row.status },
+          {
+            key: "paymentMethod",
+            label: "Pagamento",
+            render: (row: Enrollment) => <Badge variant="muted">{row.paymentMethod}</Badge>,
+          },
+          { key: "status", label: "Status", render: (row: Enrollment) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Enrollment) => {
+          const selectedCourse = store.courses.find((course) => course.id === row.courseId);
+          const selectedClass = store.classes.find((item) => item.id === row.classId);
+
           setEditingId(row.id);
-          setForm({ status: row.status });
+          setForm({
+            studentName: row.studentName,
+            studentEmail: row.email,
+            courseTitle: selectedCourse?.title ?? "Curso não localizado",
+            classLabel: selectedClass
+              ? `${formatAdminDate(selectedClass.startDate)} • ${selectedClass.modality}`
+              : "Turma não localizada",
+            createdAtLabel: formatAdminDate(row.createdAt),
+            paymentMethod: row.paymentMethod,
+            enrollmentType: row.enrollmentType,
+            derivedStatus: deriveEnrollmentOperationalStatus(row, selectedClass),
+            status: row.status,
+          });
           setValidationErrors([]);
           setOpen(true);
         },
@@ -554,7 +666,22 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "status", label: "Status", type: "select", options: enrollmentStatusOptions, required: true },
+          { key: "studentName", label: "Aluno", type: "readonly", section: "Contexto da inscrição" },
+          { key: "studentEmail", label: "E-mail", type: "readonly", section: "Contexto da inscrição" },
+          { key: "courseTitle", label: "Curso", type: "readonly", section: "Contexto da inscrição" },
+          { key: "classLabel", label: "Turma", type: "readonly", section: "Contexto da inscrição" },
+          { key: "createdAtLabel", label: "Data da inscrição", type: "readonly", section: "Contexto da inscrição" },
+          { key: "paymentMethod", label: "Pagamento", type: "readonly", section: "Contexto da inscrição" },
+          { key: "enrollmentType", label: "Tipo de inscrição", type: "readonly", section: "Contexto da inscrição" },
+          { key: "derivedStatus", label: "Status derivado", type: "readonly", section: "Contexto da inscrição" },
+          {
+            key: "status",
+            label: "Atualizar status",
+            type: "select",
+            options: enrollmentStatusOptions,
+            required: true,
+            section: "Ação operacional",
+          },
         ],
       };
     }
@@ -576,7 +703,7 @@ export function buildResourceConfig(
           { key: "name", label: "Instrutor", render: (row: Instructor) => row.name },
           { key: "email", label: "E-mail", render: (row: Instructor) => row.email },
           { key: "specialty", label: "Especialidade", render: (row: Instructor) => row.specialty },
-          { key: "status", label: "Status", render: (row: Instructor) => row.status },
+          { key: "status", label: "Status", render: (row: Instructor) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Instructor) => {
           setEditingId(row.id);
@@ -655,9 +782,9 @@ export function buildResourceConfig(
         rows,
         columns: [
           { key: "title", label: "Post", render: (row: BlogPost) => row.title },
-          { key: "category", label: "Categoria", render: (row: BlogPost) => row.category },
+          { key: "category", label: "Categoria", render: (row: BlogPost) => <Badge variant="muted">{row.category}</Badge> },
           { key: "author", label: "Autor", render: (row: BlogPost) => row.author },
-          { key: "status", label: "Status", render: (row: BlogPost) => row.status },
+          { key: "status", label: "Status", render: (row: BlogPost) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: BlogPost) => {
           setEditingId(row.id);

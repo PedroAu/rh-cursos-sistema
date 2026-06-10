@@ -28,6 +28,8 @@ export function CourseDetailPage() {
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course?.id), [classes, course?.id]);
   const relatedTestimonials = testimonials.filter((item) => item.course === course?.title).slice(0, 3);
   const instructor = instructors.find((item) => item.id === course?.instructorId);
+  const nextClass = courseClasses[0];
+  const openClassesCount = courseClasses.filter((item) => item.status !== "Encerrada").length;
 
   useEffect(() => {
     if (params.get("checkout") === "1") {
@@ -103,6 +105,34 @@ export function CourseDetailPage() {
                   <p className="mt-1 font-bold text-primary">Profissional</p>
                 </div>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {[
+                  {
+                    label: "Próxima janela",
+                    value: nextClass
+                      ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(nextClass.startDate))
+                      : "Em breve",
+                    helper: nextClass ? `${nextClass.modality} • ${nextClass.location}` : "Atendimento consultivo disponível."
+                  },
+                  {
+                    label: "Turmas abertas",
+                    value: openClassesCount,
+                    helper: "Escolha a agenda com melhor aderência ao seu calendário."
+                  },
+                  {
+                    label: "Benefícios-chave",
+                    value: course.benefits.slice(0, 2).length,
+                    helper: "Resumo direto do que está incluído antes da matrícula."
+                  }
+                ].map((item) => (
+                  <div key={item.label} className="surface-card p-5">
+                    <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                    <p className="mt-2 font-display text-3xl font-bold text-deep-navy">{item.value}</p>
+                    <p className="mt-2 text-sm leading-6 text-text-muted">{item.helper}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="group relative aspect-video overflow-hidden rounded-lg border border-outline-variant bg-surface-container shadow-card">
@@ -142,6 +172,33 @@ export function CourseDetailPage() {
 
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="space-y-8">
+              <Card className="border-outline-variant bg-white">
+                <CardContent className="space-y-6 p-6">
+                  <SectionTitle eyebrow="Decisão rápida" title="O que avaliar antes de se inscrever" />
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[
+                      {
+                        title: "Perfil ideal",
+                        description: "Compare o público-alvo com sua função atual para acelerar aplicação prática."
+                      },
+                      {
+                        title: "Agenda",
+                        description: "Revise turma, horário e formato antes de reservar a vaga."
+                      },
+                      {
+                        title: "Investimento",
+                        description: "Veja o valor total e alinhe forma de pagamento logo no checkout."
+                      }
+                    ].map((item) => (
+                      <div key={item.title} className="rounded-xl border border-outline-variant bg-surface-muted p-4">
+                        <h3 className="text-base font-bold text-deep-navy">{item.title}</h3>
+                        <p className="mt-2 text-sm leading-6 text-text-muted">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardContent className="space-y-6 p-6">
                   <SectionTitle eyebrow="Público-alvo" title="Para quem é este curso" />
@@ -197,6 +254,20 @@ export function CourseDetailPage() {
                 <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm font-medium text-white">
                   Próxima turma disponível: {courseClasses[0] ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(courseClasses[0].startDate)) : "Em breve"}
                 </div>
+                <div className="grid gap-3 rounded-lg border border-white/15 bg-white/8 p-4 text-sm text-white/80">
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Formato</span>
+                    <strong className="text-white">{course.modality}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Carga horária</span>
+                    <strong className="text-white">{course.durationLabel}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Vagas abertas</span>
+                    <strong className="text-white">{nextClass ? nextClass.availableSeats : "Sob consulta"}</strong>
+                  </div>
+                </div>
                 <ul className="space-y-3 text-sm text-white/80">
                   {course.benefits.slice(0, 4).map((benefit) => (
                     <li key={benefit} className="flex gap-3">
@@ -231,7 +302,7 @@ export function CourseDetailPage() {
         </div>
       </section>
 
-      <section className="page-section">
+      <section id="atendimento" className="page-section">
         <div className="container grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <SectionTitle eyebrow="Instrutor" title={instructor?.name ?? "Instrutor"} description={instructor?.bio} />
@@ -265,6 +336,22 @@ export function CourseDetailPage() {
           <div className="space-y-6">
             <SectionTitle eyebrow="FAQ do curso" title="Dúvidas frequentes antes da inscrição" />
             <FAQAccordion />
+            <Card className="border-outline-variant bg-surface-muted">
+              <CardContent className="space-y-4 p-6">
+                <h3 className="font-display text-2xl font-bold text-deep-navy">Prefere validar com a equipe antes da matrícula?</h3>
+                <p className="text-sm leading-6 text-text-muted">
+                  Fale com atendimento para confirmar aderência do conteúdo, política comercial e formato ideal para sua turma.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild>
+                    <Link to="/contato">Solicitar orientação</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/in-company">Ver solução in company</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

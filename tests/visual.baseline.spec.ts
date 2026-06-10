@@ -16,11 +16,18 @@ import { join } from "node:path";
 const routes = [
   { path: "/", name: "home" },
   { path: "/cursos", name: "cursos" },
+  {
+    path: "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
+    name: "curso-detalhe"
+  },
   { path: "/agenda", name: "agenda" },
   { path: "/blog", name: "blog" },
+  { path: "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial", name: "blog-artigo" },
   { path: "/in-company", name: "in-company" },
+  { path: "/sobre", name: "sobre" },
   { path: "/contato", name: "contato" },
-  { path: "/login", name: "login" }
+  { path: "/login", name: "login" },
+  { path: "/inscricao-confirmada", name: "inscricao-confirmada" }
 ];
 
 test.describe("baseline visual — rotas públicas", () => {

@@ -99,6 +99,12 @@ const journeySteps = [
   }
 ];
 
+const discoveryLinks = [
+  { href: "/cursos", label: "Catálogo", description: "Compare trilhas, nível e modalidades." },
+  { href: "/agenda", label: "Próximas turmas", description: "Veja datas, vagas e formatos disponíveis." },
+  { href: "/blog", label: "Conteúdo", description: "Leia artigos para decidir com mais contexto." }
+];
+
 export function HomePage() {
   const { trainingPaths, testimonials } = useAppStore();
   const [testimonialPage, setTestimonialPage] = useState(0);
@@ -143,6 +149,21 @@ export function HomePage() {
                   Falar com especialista
                 </a>
               </Button>
+            </div>
+
+            <div className="grid gap-3 border-t border-white/10 pt-6 md:grid-cols-3">
+              {discoveryLinks.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="rounded-xl border border-white/12 bg-white/6 p-4 transition hover:border-prestige-gold/60 hover:bg-white/10"
+                >
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-prestige-gold">
+                    {item.label}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-white/78">{item.description}</p>
+                </Link>
+              ))}
             </div>
 
             <div className="grid items-stretch gap-4 border-t border-white/10 pt-8 sm:grid-cols-3">

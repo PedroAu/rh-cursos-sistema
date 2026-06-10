@@ -58,3 +58,23 @@ export function buildDashboardMetrics({
     { label: "Cursos populares", value: topCoursesCount || courses.length, helper: "Cursos com 3 ou mais inscrições." }
   ];
 }
+
+export type ChartSummaryItem = {
+  label: string;
+  value: string | number;
+};
+
+export function buildChartSummaryItems(items: Array<{ name: string; value: number }>): ChartSummaryItem[] {
+  return items.map((item) => ({ label: item.name, value: item.value }));
+}
+
+export function buildRevenueSummaryItems(items: Array<{ month: string; value: number }>): ChartSummaryItem[] {
+  return items.map((item) => ({
+    label: item.month,
+    value: new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 0,
+    }).format(item.value),
+  }));
+}

@@ -103,15 +103,15 @@ export function DataTable<T extends { id: string }>({
   return (
     <>
       {selectedIds.size > 0 && (
-        <div className="mb-4 flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4">
-          <span className="text-sm font-medium text-red-800">
+        <div className="mb-4 flex flex-col gap-3 rounded-xl border border-danger/20 bg-danger/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm font-medium text-danger">
             {selectedIds.size} item{selectedIds.size !== 1 ? "ns" : ""} selecionado{selectedIds.size !== 1 ? "s" : ""}
           </span>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setConfirmDeleteBulk(true)}
-            className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
+            className="bg-danger text-white hover:bg-danger/90 hover:text-white"
           >
             <Trash2 className="h-4 w-4" />
             Deletar selecionados
@@ -132,13 +132,20 @@ export function DataTable<T extends { id: string }>({
               </TableHead>
             )}
             {columns.map((column) => (
-              <TableHead key={column.key} className="cursor-pointer hover:bg-muted" onClick={() => handleSort(column.key)}>
-                <div className="flex items-center gap-2">
-                  {column.label}
-                  {sortKey === column.key && (
+              <TableHead
+                key={column.key}
+                aria-sort={sortKey === column.key ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
+              >
+                <button
+                  type="button"
+                  className="flex w-full items-center gap-2 rounded-md px-1 py-1 text-left transition hover:bg-muted"
+                  onClick={() => handleSort(column.key)}
+                >
+                  <span>{column.label}</span>
+                  {sortKey === column.key ? (
                     sortDir === "asc" ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
-                  )}
-                </div>
+                  ) : null}
+                </button>
               </TableHead>
             ))}
             {(onEdit || onDelete) ? <TableHead className="text-right">Ações</TableHead> : null}
@@ -181,7 +188,7 @@ export function DataTable<T extends { id: string }>({
       </Table>
 
       {totalPages > 1 && (
-        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+        <div className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <span>
             {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, sortedData.length)} de {sortedData.length} registros
           </span>

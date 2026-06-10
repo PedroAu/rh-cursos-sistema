@@ -46,6 +46,9 @@ export function AgendaPage() {
   const loading = useSimulatedLoading([query, path, courseId, modality, status], 400);
   const activeFiltersCount = [query, path, courseId, modality, status].filter(Boolean).length;
   const courseOptions = path ? courses.filter((item) => item.pathId === path) : courses;
+  const openClassesCount = filteredClasses.filter((item) => item.status === "Inscrições abertas").length;
+  const urgentClassesCount = filteredClasses.filter((item) => item.status === "Poucas vagas").length;
+  const presencialCount = filteredClasses.filter((item) => item.modality === "Presencial").length;
   const clearFilters = () => {
     setQuery("");
     setPath("");
@@ -68,7 +71,7 @@ export function AgendaPage() {
               modalidade, local e status de inscrição.
             </p>
           </div>
-          <div className="apple-surface p-5">
+          <div className="surface-card p-5" aria-live="polite">
             <div className="flex items-center gap-3">
               <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-secondary text-primary">
                 <CalendarDays className="h-6 w-6" />
@@ -87,7 +90,20 @@ export function AgendaPage() {
       </div>
 
       <div className="container space-y-8 py-10">
-        <div className="apple-surface space-y-5 p-5 md:p-6">
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { label: "Inscrições abertas", value: openClassesCount },
+            { label: "Poucas vagas", value: urgentClassesCount },
+            { label: "Turmas presenciais", value: presencialCount },
+          ].map((item) => (
+            <div key={item.label} className="surface-card p-5">
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+              <p className="mt-2 text-2xl font-semibold text-foreground">{item.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="surface-card space-y-5 p-5 md:p-6">
           <div className="flex flex-col gap-4 border-b border-outline-variant pb-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/70 text-primary">

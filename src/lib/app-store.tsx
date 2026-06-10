@@ -328,10 +328,18 @@ export function AppStoreProvider({
 
   const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
     if (isFunctionsConfigured) {
-      const response = await invokeFunction("enrollments", { body: payload });
+      try {
+        const response = await invokeFunction("enrollments", { body: payload });
 
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
+        if (!response.ok) {
+          throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
+        }
+      } catch (error) {
+        if (error instanceof Error && /fetch/i.test(error.message)) {
+          toast.error("Serviço indisponível no momento. Inscrição registrada localmente para validação.");
+        } else {
+          throw error;
+        }
       }
     }
 
@@ -391,10 +399,18 @@ export function AppStoreProvider({
 
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
     if (isFunctionsConfigured) {
-      const response = await invokeFunction("leads", { body: payload });
+      try {
+        const response = await invokeFunction("leads", { body: payload });
 
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível enviar sua mensagem."));
+        if (!response.ok) {
+          throw new Error(await getFunctionErrorMessage(response, "Não foi possível enviar sua mensagem."));
+        }
+      } catch (error) {
+        if (error instanceof Error && /fetch/i.test(error.message)) {
+          toast.error("Serviço indisponível no momento. Solicitação registrada localmente para validação.");
+        } else {
+          throw error;
+        }
       }
     }
 

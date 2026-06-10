@@ -73,10 +73,12 @@ export function InCompanyPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const update = (key: keyof typeof form, value: string) => {
     setErrors((current) => ({ ...current, [key]: undefined }));
     setSubmitError(null);
+    setSubmitSuccess(null);
     setForm((current) => ({ ...current, [key]: value }));
   };
 
@@ -115,7 +117,20 @@ export function InCompanyPage() {
         origin: "Site",
         message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
       });
+      setForm({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        groupSize: "",
+        modality: "",
+        trainingObjective: "",
+        trainingTheme: "",
+        mainChallenges: ""
+      });
+      setErrors({});
       toast.success("Proposta registrada para atendimento consultivo.");
+      setSubmitSuccess("Solicitação registrada. A equipe retorna com recomendação de formato, trilha e próximos passos.");
       setSubmitError(null);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível enviar a proposta.";
@@ -214,10 +229,40 @@ export function InCompanyPage() {
             description="Preparamos uma recomendação consultiva de trilha, modalidade e próximos passos."
             align="center"
           />
-          <div className="apple-surface mt-10 grid gap-6 p-8 md:grid-cols-2 md:p-12">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                label: "Escopo coletado",
+                value: "Equipe + objetivo",
+                helper: "O briefing já sai com tamanho da turma, modalidade e desafios."
+              },
+              {
+                label: "Retorno",
+                value: "Consultivo",
+                helper: "A resposta considera agenda, público e aderência do conteúdo."
+              },
+              {
+                label: "Formato",
+                value: "Sob medida",
+                helper: "Presencial, online ao vivo ou híbrido conforme a operação."
+              }
+            ].map((item) => (
+              <div key={item.label} className="surface-card p-5">
+                <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                <p className="mt-2 font-display text-2xl font-bold text-deep-navy">{item.value}</p>
+                <p className="mt-2 text-sm leading-6 text-text-muted">{item.helper}</p>
+              </div>
+            ))}
+          </div>
+          <div className="surface-card mt-6 grid gap-6 p-8 md:grid-cols-2 md:p-12">
             {submitError ? (
               <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger md:col-span-2">
                 {submitError}
+              </div>
+            ) : null}
+            {submitSuccess ? (
+              <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success md:col-span-2">
+                {submitSuccess}
               </div>
             ) : null}
             <FormField error={errors.name} label="Nome completo" required>
@@ -240,7 +285,7 @@ export function InCompanyPage() {
                 <Input id={fieldId} inputMode="tel" placeholder="(61) 99999-9999" value={form.phone} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("phone", formatPhone(event.target.value))} />
               )}
             </FormField>
-            <FormField error={errors.groupSize} label="Tamanho da equipe" required>
+            <FormField error={errors.groupSize} hint="Ajuda a estimar dinâmica, carga e proposta comercial." label="Tamanho da equipe" required>
               {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                 <Input id={fieldId} inputMode="numeric" placeholder="Ex.: 35" value={form.groupSize} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("groupSize", formatTeamSize(event.target.value))} />
               )}
@@ -259,12 +304,12 @@ export function InCompanyPage() {
                 </Select>
               )}
             </FormField>
-            <FormField error={errors.trainingObjective} label="Objetivo do treinamento" required>
+            <FormField error={errors.trainingObjective} hint="Exponha o resultado esperado pela liderança ou área demandante." label="Objetivo do treinamento" required>
               {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                 <Textarea id={fieldId} placeholder="Ex.: atualizar a equipe para nova legislação e reduzir retrabalho." value={form.trainingObjective} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("trainingObjective", event.target.value)} />
               )}
             </FormField>
-            <FormField error={errors.trainingTheme} label="Tema a ser abordado" required>
+            <FormField error={errors.trainingTheme} hint="Liste conteúdos, normas ou competências que precisam entrar no programa." label="Tema a ser abordado" required>
               {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                 <Textarea id={fieldId} placeholder="Ex.: eSocial, DP estratégico, licitações, liderança..." value={form.trainingTheme} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid} onChange={(event) => update("trainingTheme", event.target.value)} />
               )}

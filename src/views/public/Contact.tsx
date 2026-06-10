@@ -54,15 +54,19 @@ export function ContactPage() {
     name: "",
     email: "",
     phone: "",
+    organization: "",
+    courseInterest: "",
     message: ""
   });
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const update = (key: keyof typeof form, value: string) => {
     setErrors((current) => ({ ...current, [key]: undefined }));
     setSubmitError(null);
+    setSubmitSuccess(null);
     if (key === "phone") {
       setForm((current) => ({ ...current, [key]: formatPhone(value) }));
     } else {
@@ -99,14 +103,17 @@ export function ContactPage() {
         name: form.name,
         email: form.email,
         phone: form.phone,
-        courseInterest: "Contato pelo site",
+        courseInterest: form.courseInterest.trim() || "Contato pelo site",
+        organization: form.organization.trim() || undefined,
         origin: "Site",
         message: form.message
       });
+      const successMessage = "Mensagem registrada. Nossa equipe retorna com orientação inicial e próximos passos.";
       toast.success("Mensagem registrada para atendimento.");
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm({ name: "", email: "", phone: "", organization: "", courseInterest: "", message: "" });
       setErrors({});
       setSubmitError(null);
+      setSubmitSuccess(successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.";
       setSubmitError(message);
@@ -141,6 +148,26 @@ export function ContactPage() {
               title="Canais diretos para falar com a nossa equipe."
               description="Escolha o melhor canal ou envie uma mensagem pelo formulário. Um especialista poderá orientar o próximo passo."
             />
+            <div className="grid gap-4 md:grid-cols-2">
+              {[
+                {
+                  label: "Retorno orientado",
+                  value: "Consultivo",
+                  helper: "Receba direcionamento sobre trilha, turma ou atendimento corporativo."
+                },
+                {
+                  label: "Uso do formulário",
+                  value: "B2B + individual",
+                  helper: "Coletamos tema, empresa e contexto para reduzir trocas posteriores."
+                }
+              ].map((item) => (
+                <div key={item.label} className="surface-card p-5">
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                  <p className="mt-2 font-display text-2xl font-bold text-deep-navy">{item.value}</p>
+                  <p className="mt-2 text-sm leading-6 text-text-muted">{item.helper}</p>
+                </div>
+              ))}
+            </div>
             <div className="grid gap-4">
               {contactItems.map((item) => {
                 const Icon = item.icon;
@@ -195,6 +222,11 @@ export function ContactPage() {
                   {submitError}
                 </div>
               ) : null}
+              {submitSuccess ? (
+                <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
+                  {submitSuccess}
+                </div>
+              ) : null}
               <FormField error={errors.name} label="Nome completo" required>
                 {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
                   <Input
@@ -217,6 +249,30 @@ export function ContactPage() {
                     aria-describedby={ariaDescribedBy}
                     aria-invalid={ariaInvalid}
                     onChange={(event) => update("email", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField hint="Opcional, útil para atendimento a órgãos públicos e empresas." label="Empresa / órgão">
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    placeholder="Ex.: Secretaria Municipal de..."
+                    value={form.organization}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("organization", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField hint="Opcional, para direcionarmos o retorno com mais objetividade." label="Curso ou tema de interesse">
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    placeholder="Ex.: eSocial, liderança, licitações..."
+                    value={form.courseInterest}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("courseInterest", event.target.value)}
                   />
                 )}
               </FormField>
