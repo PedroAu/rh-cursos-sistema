@@ -1,0 +1,372 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Sobre Nós | RH Cursos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        body {
+            scroll-behavior: smooth;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#1d648e",
+                      "on-secondary-fixed": "#261a00",
+                      "surface-dim": "#dadadc",
+                      "on-primary-fixed-variant": "#004b70",
+                      "primary-fixed-dim": "#91cdfd",
+                      "secondary-fixed": "#ffdfa0",
+                      "on-primary-container": "#99d2ff",
+                      "on-error": "#ffffff",
+                      "background": "#f9f9fc",
+                      "outline-variant": "#c0c7cf",
+                      "inverse-on-surface": "#f0f0f3",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-primary": "#ffffff",
+                      "surface": "#f9f9fc",
+                      "on-surface": "#1a1c1e",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed-dim": "#f6be39",
+                      "error": "#ba1a1a",
+                      "warning": "#E67E22",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e2e2e5",
+                      "primary-container": "#0d5b85",
+                      "on-tertiary-fixed-variant": "#434749",
+                      "surface-container-high": "#e8e8ea",
+                      "tertiary-fixed": "#e0e3e5",
+                      "surface-container": "#eeeef0",
+                      "surface-container-highest": "#e2e2e5",
+                      "tertiary-container": "#535759",
+                      "inverse-surface": "#2f3133",
+                      "tertiary": "#3b4041",
+                      "outline": "#71787f",
+                      "info": "#0D5B85",
+                      "on-tertiary-container": "#c9ccce",
+                      "on-primary-fixed": "#001e30",
+                      "inverse-primary": "#91cdfd",
+                      "on-secondary-fixed-variant": "#5c4300",
+                      "on-error-container": "#93000a",
+                      "surface-bright": "#f9f9fc",
+                      "secondary-container": "#ffc641",
+                      "primary": "#004364",
+                      "surface-dark": "#083B56",
+                      "on-background": "#1a1c1e",
+                      "on-secondary-container": "#715300",
+                      "error-container": "#ffdad6",
+                      "secondary": "#795900",
+                      "success": "#2D8A39",
+                      "on-tertiary-fixed": "#181c1e",
+                      "on-surface-variant": "#41484e",
+                      "primary-fixed": "#cae6ff",
+                      "surface-container-low": "#f3f3f6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "section-padding-sm": "48px",
+                      "section-padding-lg": "80px",
+                      "container-max": "1200px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Montserrat"],
+                      "display-lg": ["Montserrat"],
+                      "headline-md": ["Montserrat"],
+                      "headline-lg": ["Montserrat"],
+                      "caption": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-bold": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- TopAppBar -->
+<nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter py-4 max-w-container-max mx-auto bg-surface-container-lowest shadow-sm border-b border-outline-variant">
+<div class="text-headline-md font-headline-md font-bold text-primary">RH Cursos</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors duration-200" href="#">Cursos</a>
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors duration-200" href="#">In Company</a>
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors duration-200" href="#">Agenda</a>
+<a class="text-primary font-bold border-b-2 border-secondary-container font-label-bold text-label-bold" href="#">Sobre</a>
+<a class="text-on-surface-variant font-label-bold text-label-bold hover:text-primary transition-colors duration-200" href="#">Contato</a>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all">
+            Área do Aluno
+        </button>
+</nav>
+<main class="mt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[614px] flex items-center overflow-hidden bg-primary">
+
+<div class="relative z-10 max-w-container-max mx-auto px-gutter w-full">
+<div class="max-w-2xl">
+<span class="text-secondary-fixed font-label-bold text-label-bold uppercase tracking-widest mb-4 block">Desde 2007</span>
+<h1 class="text-on-primary font-display-lg text-display-lg md:text-display-lg text-headline-lg-mobile mb-6">Formando quem transforma o setor público.</h1>
+<p class="text-on-primary-container font-body-lg text-body-lg opacity-90">Somos parceiros estratégicos na capacitação de gestores e profissionais de Recursos Humanos, entregando conhecimento prático e soluções inovadoras para a administração moderna.</p>
+</div>
+</div>
+</section>
+<!-- Mission, Vision, Values (Bento Grid) -->
+<section class="py-section-padding-lg max-w-container-max mx-auto px-gutter">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Mission -->
+<div class="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="bg-primary-fixed w-12 h-12 flex items-center justify-center rounded-lg mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-2xl">target</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-4">Missão</h3>
+<p class="text-on-surface-variant font-body-md text-body-md">Capacitar profissionais através de treinamentos de alta performance, unindo teoria robusta e prática aplicável para elevar o padrão da gestão pública no Brasil.</p>
+</div>
+<!-- Vision -->
+<div class="bg-surface-dark p-10 rounded-xl shadow-lg md:row-span-2 flex flex-col justify-between">
+<div>
+<div class="bg-secondary-container w-12 h-12 flex items-center justify-center rounded-lg mb-6">
+<span class="material-symbols-outlined text-on-secondary-container text-2xl">visibility</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-secondary-fixed mb-4">Visão</h3>
+<p class="text-surface-variant font-body-md text-body-md opacity-90 leading-relaxed">Ser a principal referência nacional em educação corporativa para o setor público, reconhecida pela excelência técnica e pelo impacto transformador em cada aluno e instituição atendida.</p>
+</div>
+<div class="mt-8 pt-8 border-t border-outline border-opacity-30">
+<div class="flex items-center gap-4">
+<div class="h-1 bg-secondary-container flex-grow"></div>
+<span class="text-secondary-fixed font-label-bold text-label-bold">PROGRESSO</span>
+</div>
+</div>
+</div>
+<!-- Values -->
+<div class="bg-surface-container-lowest p-10 rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-shadow group">
+<div class="bg-primary-fixed w-12 h-12 flex items-center justify-center rounded-lg mb-6 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-2xl">verified_user</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-4">Valores</h3>
+<ul class="space-y-3">
+<li class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span> Excelência Técnica
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span> Ética e Transparência
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span> Foco em Resultados
+                        </li>
+<li class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary-container"></span> Inovação Contínua
+                        </li>
+</ul>
+</div>
+<!-- Numbers/Impact -->
+<div class="bg-primary-container p-10 rounded-xl flex items-center justify-center text-center">
+<div>
+<div class="text-secondary-fixed font-display-lg text-display-lg mb-2">15k+</div>
+<div class="text-on-primary-container font-label-bold text-label-bold uppercase">Alunos Formados</div>
+</div>
+</div>
+</div>
+</section>
+<!-- History Timeline -->
+<section class="bg-surface-container-low py-section-padding-lg">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="md:w-1/3 sticky top-32">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-6">Nossa Trajetória</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg">Desde a nossa fundação em 2007, evoluímos junto com as necessidades da administração pública brasileira.</p>
+<div class="mt-8">
+<img class="rounded-xl shadow-lg w-full aspect-video object-cover" data-alt="A professional high-end corporate office interior with glass walls and modern minimalist furniture under bright natural sunlight. The atmosphere is clean and sophisticated, featuring a palette of cool whites and subtle navy blue accents. High-quality corporate environment that reflects the established and reliable nature of an educational institution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdtwX-Ft1-C85tX2_LDctXV1330XyNhvvLo2Mld_9SJMIjHeDxMJNI-5Fuq-hgRwXJwav6zoHMV4QuHBkeoxevbSJzaOzHc8RAc05QiNSExk8s3DzOQq1UbxHsNjlJQ034qJWcPt9bDRRycXPSMfcfo993dYnBr4cHxzF4J-vwSfAvI72szGrVAMQkQcvXOZGhkH1QCNyDw3aOeLyVQANrqKtxyOX6xdsTvnAsz7kJ_lVj85i_AK2KqjmbWamRqr1NT96OEVRpmdyk">
+</div>
+</div>
+<div class="md:w-2/3 space-y-12">
+<!-- 2007 -->
+<div class="relative pl-12 border-l-2 border-primary-fixed">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-primary ring-4 ring-primary-fixed"></div>
+<span class="text-primary font-display-lg text-display-lg opacity-20 absolute -right-4 top-0 select-none">2007</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Fundação</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Iniciamos nossas atividades com o propósito de suprir a carência de treinamentos específicos para RH no setor público em Brasília.</p>
+</div>
+<!-- 2012 -->
+<div class="relative pl-12 border-l-2 border-primary-fixed">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-primary ring-4 ring-primary-fixed"></div>
+<span class="text-primary font-display-lg text-display-lg opacity-20 absolute -right-4 top-0 select-none">2012</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Expansão Nacional</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Consolidação como referência no Centro-Oeste e início dos primeiros treinamentos In Company em outros estados brasileiros.</p>
+</div>
+<!-- 2018 -->
+<div class="relative pl-12 border-l-2 border-primary-fixed">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-primary ring-4 ring-primary-fixed"></div>
+<span class="text-primary font-display-lg text-display-lg opacity-20 absolute -right-4 top-0 select-none">2018</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Transformação Digital</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Lançamento da plataforma de EAD própria, democratizando o acesso a cursos de alta qualidade para municípios remotos.</p>
+</div>
+<!-- Today -->
+<div class="relative pl-12 border-l-2 border-primary-fixed">
+<div class="absolute -left-[11px] top-0 w-5 h-5 rounded-full bg-primary ring-4 ring-primary-fixed"></div>
+<span class="text-primary font-display-lg text-display-lg opacity-20 absolute -right-4 top-0 select-none">HOJE</span>
+<h4 class="font-headline-md text-headline-md text-primary mb-2">Liderança em Capacitação</h4>
+<p class="text-on-surface-variant font-body-md text-body-md">Com mais de 15 mil alunos e parcerias com os maiores órgãos públicos, seguimos inovando com metodologias 100% práticas.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Leadership Section -->
+<section class="py-section-padding-lg max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-16">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-4">Nossa Liderança</h2>
+<p class="text-on-surface-variant font-body-lg text-body-lg max-w-2xl mx-auto">Especialistas comprometidos com a excelência acadêmica e a transformação institucional.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Leader 1 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl mb-4 aspect-[3/4]">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Professional portrait of a male corporate executive in a sharp navy blue suit, standing confidently in a modern glass-walled office environment. Soft, cinematic lighting highlights a sense of authority and approachability. The aesthetic is clean, high-end, and executive-focused with a balanced color palette of deep blues and professional neutrals." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATfW5Q79qis6yW3l7_tdv1ANb_nu7MWJVAl68DtCU6oJsxbWXHVhJYCGlsyd1EhPDd_4yBxJao0KlNso1r4-qnCRR_0mfWDFPafZxn4CQETNL1dpINUUp0UBBh0tMzBVc-DN9wo3bcsGdYooxsrUaaVW901ScckBAm4mGKTJ3faV11TDAfmin2uPBuKphnnOnvDC_DiiU9dV0cL1LPrGuetvBXW0zaEeI72AR2cw5rEUFEXAoWb7sAhLUlfG08omevMWQvyrvdCaZZ">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+<p class="text-on-primary text-caption font-caption">Especialista em Gestão de Pessoas com 20 anos de experiência no setor público.</p>
+</div>
+</div>
+<h5 class="font-headline-md text-headline-md text-on-surface">Dr. Ricardo Henrique</h5>
+<p class="text-primary font-label-bold text-label-bold">Diretor Executivo</p>
+</div>
+<!-- Leader 2 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl mb-4 aspect-[3/4]">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Portrait of a professional female executive with a confident smile, wearing a sophisticated charcoal grey blazer in a bright, modern corporate setting. The background is a soft-focus office with light-mode colors and clean lines. Lighting is natural and flattering, emphasizing a mood of reliability and expertise in an educational leadership context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk9k4UHmUhHUM7x5PZNBx-28rJZSxMhEQff0Yrg8ymIxVS-7iYkHR4Oi5v5Yqt5iCA2h1G9yS6bA49-EGeR60gz79WUGVS8tsksAepfdtn2nU2Z96AQVZRRa-s_zDvbmGJ8nB6sTWdlJGSMRPVdXeNBfhJbX27tLQ-rAGuxvKzQF0vMHt1idrt9NxKU2-25PjFY1eL2C5YkLYdM2JmNrjEwUi1tsl2MZgfHY74Al6DP6_yDsPteP9q9spmlWI4DsGDw_zsumv7DOEt">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+<p class="text-on-primary text-caption font-caption">Mestre em Administração Pública e coordenadora de projetos In Company.</p>
+</div>
+</div>
+<h5 class="font-headline-md text-headline-md text-on-surface">Dra. Ana Silveira</h5>
+<p class="text-primary font-label-bold text-label-bold">Diretora Acadêmica</p>
+</div>
+<!-- Leader 3 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl mb-4 aspect-[3/4]">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Professional portrait of a male senior consultant in business casual attire, sitting in a contemporary lounge area of a corporate building. The scene is bright and airy with architectural details in the background. The lighting is crisp and modern, projecting a sense of innovative thinking and professional stability. Visual style is high-end corporate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDa7TvrkfFHuhvjxdSD4FvY6UFQO7hLwdvooqz0rG7r90--u2nAIPV5BXHdE2fA3P57RxuknN60lxfowrLCXJlCtv8gz3x2F0Fdn1Bk1i5bDnaEEaVhFyC7u4ji98QPut-bQv6ogVmqeNKqMxh-zVZTYvNZpPkuM_d0xp8acXl1bPpuumUfLK57WFyZ8py7WtBoCmiVea8DdS26qhp5uLwFVBPcGXD13Xl-rmEMAQgxQBdG2fBuGi7gza5XrbZzIjFWW8frsjp_1bMU">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+<p class="text-on-primary text-caption font-caption">Consultor sênior focado em inovação e novas tecnologias para governo.</p>
+</div>
+</div>
+<h5 class="font-headline-md text-headline-md text-on-surface">Marcus Oliveira</h5>
+<p class="text-primary font-label-bold text-label-bold">Head de Inovação</p>
+</div>
+<!-- Leader 4 -->
+<div class="group">
+<div class="relative overflow-hidden rounded-xl mb-4 aspect-[3/4]">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="Portrait of a female corporate professional with a friendly yet authoritative expression, standing in a brightly lit modern office corridor. The environment features minimalist design and a professional color scheme. Soft high-key lighting creates a positive and welcoming professional atmosphere, suitable for a leading training company leadership team." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZcI5PP6XBMrsMZrufRkWCUirb1EcNKkK2u9JPyHKSSgwdicQpkCh62pdzx_00LY-wyRvxaGEi910Jc9yZluBBP9ccWuJYbuysXy2ALaiqJ46YEXzm5tyMIYylrxeMo0XCo57Y0f1YXwAIBvrdnlP9OHjycXQC5JDt0ZqAih2Y-_qMXgP8XrBnaCSLrK3VxhIAToRWBp8Ag1ZmZSrAioI3JUH1TWRZCsnqxqhGpBQlj3gnBAAl4BTnIHek1QOyYF3tNz6t_Ez6B8UH">
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+<p class="text-on-primary text-caption font-caption">Especialista em atendimento ao cliente e suporte estratégico a órgãos federais.</p>
+</div>
+</div>
+<h5 class="font-headline-md text-headline-md text-on-surface">Carla Mendes</h5>
+<p class="text-primary font-label-bold text-label-bold">Relacionamento Institucional</p>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-section-padding-lg bg-surface-dark relative overflow-hidden">
+<div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+<svg class="text-secondary-fixed w-full h-full" fill="currentColor" viewBox="0 0 100 100">
+<path d="M0,100 L100,100 L100,0 Z"></path>
+</svg>
+</div>
+<div class="max-w-container-max mx-auto px-gutter text-center relative z-10">
+<h2 class="text-on-primary font-headline-lg text-headline-lg mb-6">Pronto para transformar sua gestão?</h2>
+<p class="text-surface-variant font-body-lg text-body-lg mb-10 max-w-2xl mx-auto">Conheça nossos cursos ou solicite uma proposta personalizada para sua instituição.</p>
+<div class="flex flex-col sm:flex-row justify-center gap-4">
+<button class="bg-secondary-container text-on-secondary-container px-10 py-4 rounded-lg font-label-bold text-label-bold hover:brightness-105 transition-all shadow-lg active:scale-95">
+                        Ver Catálogo de Cursos
+                    </button>
+<button class="border border-secondary-fixed text-secondary-fixed px-10 py-4 rounded-lg font-label-bold text-label-bold hover:bg-secondary-fixed/10 transition-all active:scale-95">
+                        Falar com Consultor
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark w-full py-section-padding-lg px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="col-span-1 md:col-span-1">
+<div class="text-headline-md font-headline-md font-bold text-surface-container-lowest mb-6">RH Cursos</div>
+<p class="text-surface-variant opacity-80 font-body-md text-body-md mb-6">Excelência em capacitação para o setor público desde 2007.</p>
+<div class="flex gap-4">
+<a class="text-secondary-fixed hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-secondary-fixed hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="text-secondary-fixed hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">call</span></a>
+</div>
+</div>
+<div>
+<h6 class="text-secondary-fixed font-label-bold text-label-bold uppercase mb-6">Navegação</h6>
+<ul class="space-y-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">Home</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">Cursos</a></li>
+<li><a class="text-secondary-fixed font-bold font-body-md text-body-md" href="#">Sobre</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">Agenda</a></li>
+</ul>
+</div>
+<div>
+<h6 class="text-secondary-fixed font-label-bold text-label-bold uppercase mb-6">Links Úteis</h6>
+<ul class="space-y-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">In Company</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">Administração</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">WhatsApp</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md transition-all" href="#">Catálogo de cursos</a></li>
+</ul>
+</div>
+<div>
+<h6 class="text-secondary-fixed font-label-bold text-label-bold uppercase mb-6">Contato</h6>
+<p class="text-surface-variant opacity-80 font-body-md text-body-md mb-2">contato@rhcursos.com.br</p>
+<p class="text-surface-variant opacity-80 font-body-md text-body-md">0800 123 4567</p>
+<p class="text-surface-variant opacity-80 font-caption text-caption mt-8">RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90</p>
+</div>
+</div>
+</footer>
+<script>
+        // Smooth reveal animation for timeline items on scroll
+        const timelineItems = document.querySelectorAll('.border-l-2');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-x-0');
+                    entry.target.classList.remove('opacity-0', '-translate-x-4');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        timelineItems.forEach(item => {
+            item.classList.add('transition-all', 'duration-700', 'opacity-0', '-translate-x-4');
+            observer.observe(item);
+        });
+    </script>
+</body></html>

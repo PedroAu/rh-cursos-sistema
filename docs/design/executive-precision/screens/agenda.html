@@ -1,0 +1,448 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Agenda de Cursos | RH Cursos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#1d648e",
+                        "on-secondary-fixed": "#261a00",
+                        "surface-dim": "#dadadc",
+                        "on-primary-fixed-variant": "#004b70",
+                        "primary-fixed-dim": "#91cdfd",
+                        "secondary-fixed": "#ffdfa0",
+                        "on-primary-container": "#99d2ff",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fc",
+                        "outline-variant": "#c0c7cf",
+                        "inverse-on-surface": "#f0f0f3",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-primary": "#ffffff",
+                        "surface": "#f9f9fc",
+                        "on-surface": "#1a1c1e",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#f6be39",
+                        "error": "#ba1a1a",
+                        "warning": "#E67E22",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "primary-container": "#0d5b85",
+                        "on-tertiary-fixed-variant": "#434749",
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-fixed": "#e0e3e5",
+                        "surface-container": "#eeeef0",
+                        "surface-container-highest": "#e2e2e5",
+                        "tertiary-container": "#535759",
+                        "inverse-surface": "#2f3133",
+                        "tertiary": "#3b4041",
+                        "outline": "#71787f",
+                        "info": "#0D5B85",
+                        "on-tertiary-container": "#c9ccce",
+                        "on-primary-fixed": "#001e30",
+                        "inverse-primary": "#91cdfd",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f9f9fc",
+                        "secondary-container": "#ffc641",
+                        "primary": "#004364",
+                        "surface-dark": "#083B56",
+                        "on-background": "#1a1c1e",
+                        "on-secondary-container": "#715300",
+                        "error-container": "#ffdad6",
+                        "secondary": "#795900",
+                        "success": "#2D8A39",
+                        "on-tertiary-fixed": "#181c1e",
+                        "on-surface-variant": "#41484e",
+                        "primary-fixed": "#cae6ff",
+                        "surface-container-low": "#f3f3f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "section-padding-sm": "48px",
+                        "section-padding-lg": "80px",
+                        "container-max": "1200px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Montserrat"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-bold": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        .day-cell {
+            aspect-ratio: 1 / 1;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-dark border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="max-w-container-max mx-auto px-gutter py-4 flex justify-between items-center">
+<a class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed" href="/">RH Cursos</a>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-low transition-colors duration-200" href="#">Cursos</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-low transition-colors duration-200" href="#">In Company</a>
+<a class="font-label-bold text-label-bold text-primary dark:text-secondary-fixed font-bold border-b-2 border-secondary-container hover:bg-surface-container-low transition-colors duration-200" href="#">Agenda</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-low transition-colors duration-200" href="#">Sobre</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary hover:bg-surface-container-low transition-colors duration-200" href="#">Contato</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold hover:bg-primary-container transition-all active:scale-95">Área do Aluno</button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-32 pb-section-padding-lg">
+<!-- Hero Section / Title -->
+<section class="max-w-container-max mx-auto px-gutter mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="text-primary font-label-bold text-label-bold uppercase tracking-widest mb-2 block">Calendário 2024</span>
+<h1 class="font-display-lg text-display-lg text-primary mb-4">Agenda de Treinamentos</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Acompanhe as próximas turmas presenciais, treinamentos ao vivo e eventos exclusivos para profissionais de RH e gestão pública.</p>
+</div>
+<div class="flex gap-2">
+<button class="p-3 bg-primary text-on-primary rounded-lg shadow-sm flex items-center gap-2 font-label-bold text-label-bold transition-all active:scale-95" id="view-calendar">
+<span class="material-symbols-outlined">calendar_month</span>
+                        Calendário
+                    </button>
+<button class="p-3 bg-surface-container-high text-on-surface rounded-lg flex items-center gap-2 font-label-bold text-label-bold transition-all active:scale-95" id="view-list">
+<span class="material-symbols-outlined">list</span>
+                        Lista
+                    </button>
+</div>
+</div>
+</section>
+<!-- Main Content Area: Asymmetric Layout / Bento Grid -->
+<section class="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Calendar & Filters (Mobile First) -->
+<div class="lg:col-span-8">
+<!-- Calendar View Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-6 mb-8 overflow-hidden">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-md text-headline-md text-primary flex items-center gap-3">
+                            Maio 2024
+                        </h2>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-2 hover:bg-surface-container-low rounded-full transition-colors"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="calendar-grid text-center font-label-bold text-label-bold text-on-surface-variant mb-4 opacity-70">
+<div>DOM</div><div>SEG</div><div>TER</div><div>QUA</div><div>QUI</div><div>SEX</div><div>SÁB</div>
+</div>
+<div class="calendar-grid border-t border-l border-outline-variant">
+<!-- Calendar Days Generation -->
+<!-- Day 1-3 (Prev Month Placeholder) -->
+<div class="day-cell p-2 border-r border-b border-outline-variant bg-surface-container-low opacity-30 flex items-start justify-end"><span class="font-label-bold text-label-bold">28</span></div>
+<div class="day-cell p-2 border-r border-b border-outline-variant bg-surface-container-low opacity-30 flex items-start justify-end"><span class="font-label-bold text-label-bold">29</span></div>
+<div class="day-cell p-2 border-r border-b border-outline-variant bg-surface-container-low opacity-30 flex items-start justify-end"><span class="font-label-bold text-label-bold">30</span></div>
+<!-- Month Days -->
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">01</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer bg-primary-fixed/30 hover:bg-primary-fixed transition-colors">
+<span class="font-label-bold text-label-bold text-primary">02</span>
+<div class="w-full bg-primary h-1 rounded-full md:block hidden"></div>
+<div class="w-2 h-2 bg-primary rounded-full md:hidden"></div>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">03</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">04</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">05</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer bg-secondary-container/20 hover:bg-secondary-container/40 transition-colors">
+<span class="font-label-bold text-label-bold text-secondary">06</span>
+<div class="w-full bg-secondary h-1 rounded-full md:block hidden"></div>
+<div class="w-2 h-2 bg-secondary rounded-full md:hidden"></div>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">07</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer bg-primary-fixed/30 hover:bg-primary-fixed transition-colors">
+<span class="font-label-bold text-label-bold text-primary">08</span>
+<div class="w-full bg-primary h-1 rounded-full md:block hidden"></div>
+<div class="w-2 h-2 bg-primary rounded-full md:hidden"></div>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">09</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">10</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">11</span>
+</div>
+<!-- ... More days ... -->
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">12</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">13</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer bg-primary-container/10 border-primary border-2 shadow-inner">
+<span class="font-label-bold text-label-bold text-primary">14</span>
+<div class="w-full bg-primary h-1 rounded-full md:block hidden"></div>
+<p class="text-[10px] text-primary font-bold text-right leading-tight hidden md:block">Gestão de Folha</p>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">15</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">16</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">17</span>
+</div>
+<div class="day-cell p-2 border-r border-b border-outline-variant flex flex-col items-end gap-1 relative group cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-label-bold text-label-bold">18</span>
+</div>
+</div>
+</div>
+<!-- Event Details List (Horizontal Scroll / Grid) -->
+<div class="space-y-6">
+<h3 class="font-headline-md text-headline-md text-on-surface">Próximos Destaques</h3>
+<!-- Event Row Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col md:flex-row hover:shadow-md transition-all duration-300 group">
+<div class="md:w-1/4 bg-primary text-on-primary p-6 flex flex-col justify-center items-center text-center">
+<span class="text-4xl font-bold font-display-lg">14</span>
+<span class="uppercase tracking-widest font-label-bold text-label-bold">Maio</span>
+<span class="font-body-md text-body-md mt-2 opacity-80">Terça-feira</span>
+</div>
+<div class="md:w-3/4 p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[12px] font-bold uppercase mb-2 inline-block">Online • Ao Vivo</span>
+<h4 class="font-headline-md text-headline-md text-primary group-hover:text-primary-container transition-colors">Gestão de Folha de Pagamento no Setor Público</h4>
+</div>
+<div class="text-right">
+<span class="text-success flex items-center gap-1 font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                                        Vagas Abertas
+                                    </span>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant pt-4">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                                        09:00 - 18:00
+                                    </div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-primary">person</span>
+                                        Prof. Ricardo Neves
+                                    </div>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-label-bold text-label-bold hover:shadow-lg transition-all active:scale-95">Inscrever-se</button>
+</div>
+</div>
+</div>
+<!-- Event Row Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col md:flex-row hover:shadow-md transition-all duration-300 group">
+<div class="md:w-1/4 bg-surface-dark text-on-primary p-6 flex flex-col justify-center items-center text-center">
+<span class="text-4xl font-bold font-display-lg">22</span>
+<span class="uppercase tracking-widest font-label-bold text-label-bold">Maio</span>
+<span class="font-body-md text-body-md mt-2 opacity-80">Quarta-feira</span>
+</div>
+<div class="md:w-3/4 p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[12px] font-bold uppercase mb-2 inline-block">Presencial • São Paulo</span>
+<h4 class="font-headline-md text-headline-md text-primary group-hover:text-primary-container transition-colors">Liderança e Inteligência Emocional para RH</h4>
+</div>
+<div class="text-right">
+<span class="text-warning flex items-center gap-1 font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">warning</span>
+                                        Últimas Vagas
+                                    </span>
+</div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant pt-4">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-primary">schedule</span>
+                                        14:00 - 21:00
+                                    </div>
+<div class="flex items-center gap-2 text-on-surface-variant font-body-md text-body-md">
+<span class="material-symbols-outlined text-primary">person</span>
+                                        Dra. Ana Paula Silva
+                                    </div>
+</div>
+<button class="bg-secondary-container text-on-secondary-container px-6 py-2 rounded-lg font-label-bold text-label-bold hover:shadow-lg transition-all active:scale-95">Inscrever-se</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Sidebar / Filters -->
+<aside class="lg:col-span-4 space-y-8">
+<!-- Filter Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-6">
+<h3 class="font-headline-md text-headline-md text-primary mb-6">Filtrar Agenda</h3>
+<div class="space-y-6">
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface mb-2">Categoria</label>
+<select class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-body-md text-body-md">
+<option>Todas as Categorias</option>
+<option>Gestão Pública</option>
+<option>Recursos Humanos</option>
+<option>Liderança</option>
+<option>Técnico / Operacional</option>
+</select>
+</div>
+<div>
+<label class="block font-label-bold text-label-bold text-on-surface mb-2">Modalidade</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 bg-primary text-on-primary rounded-full text-caption font-label-bold">Todos</button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface-variant rounded-full text-caption font-label-bold hover:border-primary hover:text-primary transition-colors">Presencial</button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface-variant rounded-full text-caption font-label-bold hover:border-primary hover:text-primary transition-colors">Ao Vivo</button>
+<button class="px-4 py-2 border border-outline-variant text-on-surface-variant rounded-full text-caption font-label-bold hover:border-primary hover:text-primary transition-colors">Gravado</button>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant">
+<button class="w-full bg-surface-container-high text-primary font-label-bold text-label-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+                                Limpar Filtros
+                            </button>
+</div>
+</div>
+</div>
+<!-- Call to Action Card -->
+<div class="bg-primary rounded-xl p-8 text-on-primary relative overflow-hidden group shadow-xl">
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary-container rounded-full opacity-20 group-hover:scale-110 transition-transform duration-700"></div>
+<div class="relative z-10">
+<h4 class="font-headline-md text-headline-md mb-4">Treinamento In-Company?</h4>
+<p class="font-body-md text-body-md mb-6 opacity-90">Personalizamos nossos cursos para atender às necessidades específicas da sua organização ou prefeitura.</p>
+<button class="w-full bg-secondary-container text-on-secondary-container py-3 rounded-lg font-label-bold text-label-bold hover:bg-secondary-fixed transition-all active:scale-95">Solicitar Proposta</button>
+</div>
+</div>
+<!-- Upcoming Info -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-6">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-12 h-12 bg-secondary-container/20 rounded-full flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<h5 class="font-headline-md text-headline-md text-on-surface">Fique por dentro</h5>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">Receba as atualizações da agenda e novos cursos diretamente no seu e-mail.</p>
+<div class="flex flex-col gap-3">
+<input class="w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary font-body-md text-body-md" placeholder="Seu melhor e-mail" type="email">
+<button class="bg-primary text-on-primary py-3 rounded-lg font-label-bold text-label-bold hover:bg-primary-container transition-all">Assinar Newsletter</button>
+</div>
+</div>
+</aside>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark dark:bg-inverse-surface w-full py-section-padding-lg px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="flex flex-col gap-6">
+<div class="text-headline-md font-headline-md font-bold text-surface-container-lowest">RH Cursos</div>
+<p class="text-surface-variant opacity-80 font-body-md text-body-md">Liderança em treinamentos para gestão de pessoas e administração pública no Brasil.</p>
+<div class="flex gap-4">
+<a class="text-surface-variant hover:text-secondary-fixed transition-all scale-105" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-surface-variant hover:text-secondary-fixed transition-all scale-105" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="text-surface-variant hover:text-secondary-fixed transition-all scale-105" href="#"><span class="material-symbols-outlined">mail</span></a>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-secondary-fixed font-bold font-label-bold text-label-bold uppercase">Links Rápidos</h6>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Home</a>
+<a class="text-secondary-fixed font-bold font-body-md text-body-md" href="#">Agenda de turmas</a>
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Catálogo de cursos</a>
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">In Company</a>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-secondary-fixed font-bold font-label-bold text-label-bold uppercase">Suporte</h6>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Sobre</a>
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Contato</a>
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">E-mail</a>
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">WhatsApp</a>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<h6 class="text-secondary-fixed font-bold font-label-bold text-label-bold uppercase">Legal</h6>
+<div class="flex flex-col gap-2">
+<a class="text-surface-variant opacity-80 hover:opacity-100 font-body-md text-body-md" href="#">Administração</a>
+<p class="text-surface-variant opacity-60 font-caption text-caption mt-4">RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90</p>
+</div>
+</div>
+</div>
+</footer>
+<script>
+        // Simple View Toggler Logic
+        const calendarBtn = document.getElementById('view-calendar');
+        const listBtn = document.getElementById('view-list');
+        
+        calendarBtn.addEventListener('click', () => {
+            calendarBtn.classList.replace('bg-surface-container-high', 'bg-primary');
+            calendarBtn.classList.replace('text-on-surface', 'text-on-primary');
+            listBtn.classList.replace('bg-primary', 'bg-surface-container-high');
+            listBtn.classList.replace('text-on-primary', 'text-on-surface');
+        });
+
+        listBtn.addEventListener('click', () => {
+            listBtn.classList.replace('bg-surface-container-high', 'bg-primary');
+            listBtn.classList.replace('text-on-surface', 'text-on-primary');
+            calendarBtn.classList.replace('bg-primary', 'bg-surface-container-high');
+            calendarBtn.classList.replace('text-on-primary', 'text-on-surface');
+        });
+    </script>
+</body></html>

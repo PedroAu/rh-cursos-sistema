@@ -1,0 +1,438 @@
+<!DOCTYPE html><html lang="pt-BR" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Cursos - RH Cursos</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Montserrat:wght@100..900&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#1d648e",
+                    "on-secondary-fixed": "#261a00",
+                    "surface-dim": "#dadadc",
+                    "on-primary-fixed-variant": "#004b70",
+                    "primary-fixed-dim": "#91cdfd",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-primary-container": "#99d2ff",
+                    "on-error": "#ffffff",
+                    "background": "#f9f9fc",
+                    "outline-variant": "#c0c7cf",
+                    "inverse-on-surface": "#f0f0f3",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-primary": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "on-surface": "#1a1c1e",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#f6be39",
+                    "error": "#ba1a1a",
+                    "warning": "#E67E22",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e2e2e5",
+                    "primary-container": "#0d5b85",
+                    "on-tertiary-fixed-variant": "#434749",
+                    "surface-container-high": "#e8e8ea",
+                    "tertiary-fixed": "#e0e3e5",
+                    "surface-container": "#eeeef0",
+                    "surface-container-highest": "#e2e2e5",
+                    "tertiary-container": "#535759",
+                    "inverse-surface": "#2f3133",
+                    "tertiary": "#3b4041",
+                    "outline": "#71787f",
+                    "info": "#0D5B85",
+                    "on-tertiary-container": "#c9ccce",
+                    "on-primary-fixed": "#001e30",
+                    "inverse-primary": "#91cdfd",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f9f9fc",
+                    "secondary-container": "#ffc641",
+                    "primary": "#004364",
+                    "surface-dark": "#083B56",
+                    "on-background": "#1a1c1e",
+                    "on-secondary-container": "#715300",
+                    "error-container": "#ffdad6",
+                    "secondary": "#795900",
+                    "success": "#2D8A39",
+                    "on-tertiary-fixed": "#181c1e",
+                    "on-surface-variant": "#41484e",
+                    "primary-fixed": "#cae6ff",
+                    "surface-container-low": "#f3f3f6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "section-padding-sm": "48px",
+                    "section-padding-lg": "80px",
+                    "container-max": "1200px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg-mobile": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg": ["Montserrat"],
+                    "caption": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filter-chip-active {
+            background-color: #004364;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-dark border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="max-w-container-max mx-auto px-gutter py-4 flex justify-between items-center">
+
+<div class="hidden md:flex items-center gap-8">
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200" href="#">Home</a>
+<a class="font-label-bold text-label-bold text-primary dark:text-secondary-fixed font-bold border-b-2 border-secondary-container transition-all" href="#">Cursos</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200" href="#">In Company</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200" href="#">Agenda</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200" href="#">Sobre</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200" href="#">Contato</a>
+</div>
+<button class="bg-primary-container text-on-primary-container px-6 py-2 rounded-lg font-label-bold text-label-bold hover:opacity-90 active:scale-95 transition-all">
+                Área do Aluno
+            </button>
+</div>
+</nav>
+<main class="pt-24">
+<!-- Hero Section -->
+<section class="relative h-64 md:h-80 flex items-center bg-primary overflow-hidden">
+<div class="absolute inset-0 opacity-20">
+
+</div>
+<div class="max-w-container-max mx-auto px-gutter relative z-10">
+<h1 class="font-headline-lg text-headline-lg md:text-display-lg text-surface-container-lowest">Catálogo de Cursos</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed mt-4 max-w-2xl">
+                    Capacitação de excelência para profissionais de RH e Gestão Pública com foco em resultados práticos e conformidade legal.
+                </p>
+</div>
+</section>
+<!-- Filters & Search Section -->
+<section class="py-12 bg-surface-container-low border-b border-outline-variant">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+<!-- Filter Chips -->
+<div class="flex flex-wrap gap-2" id="filter-container">
+<button class="filter-chip-active px-4 py-2 rounded-full font-label-bold text-label-bold transition-all border border-outline-variant hover:border-primary" onclick="filterCourses('all')">Todos</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-4 py-2 rounded-full font-label-bold text-label-bold transition-all border border-outline-variant hover:border-primary" onclick="filterCourses('dp')">Departamento Pessoal</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-4 py-2 rounded-full font-label-bold text-label-bold transition-all border border-outline-variant hover:border-primary" onclick="filterCourses('licitacoes')">Licitações</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-4 py-2 rounded-full font-label-bold text-label-bold transition-all border border-outline-variant hover:border-primary" onclick="filterCourses('gestao')">Gestão de Pessoas</button>
+<button class="bg-surface-container-lowest text-on-surface-variant px-4 py-2 rounded-full font-label-bold text-label-bold transition-all border border-outline-variant hover:border-primary" onclick="filterCourses('juridico')">Jurídico</button>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full md:w-80">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary bg-surface-container-lowest text-body-md font-body-md" placeholder="Buscar curso..." type="text">
+</div>
+</div>
+</div>
+</section>
+<!-- Course Grid -->
+<section class="py-section-padding-lg">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Course Card 1 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="dp">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A professional workspace with a clean wooden desk featuring a laptop and a neatly organized notebook. The lighting is natural and bright, conveying a sense of corporate productivity and educational focus. The aesthetic is modern and minimalist, aligning with high-level professional training environments." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYIGkKUl_oavldGIEqutECvchFM_vds8J3vMHsuLoMB8k6R9NU3J3MswMlxLhx0hJ4ZeAAjnsuPfm62yVHMEIV0WOuagFtN5T8rGaNgJ5RSiprNTisBH0QtadvOZM5iPhv0FNm-nYPM5CmlAsr58AQu7P8EbuDcl4QDRsfR7OTJ0Ihi5I8EuajzHBojdkWcZX91MoaSwBDFnLeDVwBoX9m6bjOmExP0jn21KvsqaPo9pZC4M0QURy2Q-7lVbLnwaPask4eXcfF8Igq">
+<div class="absolute top-4 left-4 bg-primary text-surface-container-lowest px-3 py-1 rounded-full text-caption font-label-bold uppercase tracking-wider">Novo</div>
+</div>
+<div class="p-6 flex-grow border-t-4 border-primary">
+<div class="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+                                Departamento Pessoal
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">eSocial na Prática: Atualização 2024</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Domine as novas regras e simplificações do eSocial para o setor público e privado com foco em auditoria preventiva.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    24h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Course Card 2 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="licitacoes">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A legal gavel resting on a stack of professional documents within a brightly lit, modern office space. The composition uses shallow depth of field to focus on the textures of the wood and paper. The atmosphere is authoritative and scholarly, representing public bidding and legal compliance training." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPa-owKEQalp2v8kXm032aLdSMf3NMLGmp2GbkQO_4lguJd67ICD4cSlC7JIQFDFpEBibRsYMZYh8YkMX8QH6VKnt-t1WV5Vuj386xz9FfEl9vfoFGgJ_BeiOTl1VqjSp0VNS4NtWS4P7QAXXZjhD5iHnOQtj059e4Ee4NLkeYsJEJSTDR6VYC51eSSA1PeFgB0VOooGBSHCpe0DsKvTJ_adHZFkCgQ02ZsX2AMEMN65t8v_7kK_T2RxAYVHCFSqfsWYsUg-7JE4ph">
+</div>
+<div class="p-6 flex-grow border-t-4 border-secondary-container">
+<div class="flex items-center gap-2 text-secondary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+                                Licitações
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">Nova Lei de Licitações (14.133/21)</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Curso avançado sobre a implementação prática da nova lei, abordando o planejamento e a fase externa da contratação.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    40h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Course Card 3 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="gestao">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A diverse team of professionals engaged in a collaborative strategy meeting around a large white table in a sunlit conference room. The image captures a moment of active communication and leadership development. The lighting is clean and vibrant, emphasizing a positive and professional organizational culture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmmX5TTEutzs74FYpHfZlH9BVl9dh9xIfAiQywW1HUKfmO7PCg4bshNBxjtvxteq3c33bWwC83CpZ7UliQ6qNcq0SSpsz2dLFASdpaPEirM7bSlu0m4hePLyDDg1bGNWXi6gsVqxfMqdPtaE8DFcco-MTu1iNi_FiJCwkgKlp3ZhKcY8PgYay7roZ9L2kQxCVDrbCXMHUSnPe5WeViKprBcr6VeRU2bKMFVgs7LQu1XnmlTZp5l9_HF89J2CJEOeEdXBU4oi-azOtY">
+</div>
+<div class="p-6 flex-grow border-t-4 border-primary">
+<div class="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">groups</span>
+                                Gestão de Pessoas
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">Liderança e Gestão de Equipes de Alto Desempenho</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Desenvolva soft skills cruciais para liderar em ambientes complexos, focando em inteligência emocional e feedback.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    16h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Course Card 4 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="dp">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close up of a professional signing an official legal document with a high-quality fountain pen. The focus is on the precision and importance of the act, with a clean corporate background. The scene is bright and professional, utilizing a neutral color palette with hints of executive gold and deep navy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZTTzTRN0CL-T85dY0Q8jFmn87s2rFL6LPG-whwyCyLjqko1wZK9xtM_-DJxqtlGjBnBnIq_TlXMhGA1A32oF9v3GCINexva7GmydrlELMiWD1iq89H0OwDLhYtWkOgXx9NGQLRu4MPFxCpih41OwWFbifnKlMCg_Rm8HXa8KfH73n8lo3vQ83zs11JZ-s-oWtZtiJfrpix6A9sk-oSXPA8eWaV8s8ffCnOvGu6CcUQ_FqVjaw6-XRMCN0DHq_ubrpTx0w1AI6QdQX">
+</div>
+<div class="p-6 flex-grow border-t-4 border-primary">
+<div class="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">folder</span>
+                                Departamento Pessoal
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">Reforma Trabalhista e seus Impactos</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Análise técnica detalhada das mudanças na CLT e como aplicá-las com segurança jurídica no dia a dia da empresa.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    20h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Course Card 5 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="juridico">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An expansive library of legal books in a modern, architecturally impressive office. The lighting is soft and distributed, creating an atmosphere of deep knowledge and professional authority. The visual style is clean and high-contrast, representing serious academic and professional legal study." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxT3-SATqgxNiAKorg7G5edZR5WUafRoY1gXq4vnQAQQmDSpXiOpDurk9Es9m8fA7q6V2mtTgxEqyj2NCjo7Q2VGGOPyEiFDTFMUL_SKHm9WdVjCaPq7RFCFFZ-CyHdKzvchcC-nmVXV_wCulj_wgY8ahHIoV16CaT3432FIGT30G897q2TKBAnjnGuyOp7kPQhC9HC7_uZYA_LlNchG6HGbZjKtCmFCKX2QSqjuPDBe9SgQEZMEpYIyIbLOES1zzxfl3cGcCoYOX0">
+</div>
+<div class="p-6 flex-grow border-t-4 border-secondary-container">
+<div class="flex items-center gap-2 text-secondary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">balance</span>
+                                Jurídico
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">LGPD aplicada ao RH e Administração</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Como adequar o tratamento de dados pessoais de colaboradores e candidatos às exigências da Lei Geral de Proteção de Dados.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    12h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Course Card 6 -->
+<div class="course-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm hover:shadow-md transition-all flex flex-col group" data-category="gestao">
+<div class="h-48 w-full relative overflow-hidden rounded-t-xl">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern data dashboard displayed on a tablet screen, held by a professional in a corporate setting. The interface shows clear, colorful charts and metrics representing performance indicators. The setting is bright and forward-thinking, emphasizing the transition from traditional to data-driven management." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLj7Gm2Lqt0imvZyN-NCFu3sREL1j-p_dpPRdMm-VIg8HsgjodFzFImZUXCxl_l51ZNQd9pOVRHzilCJtLZiIDHeJDTwt74Gx8hDi_aA4UYBRAhoe13LOAnc8fCNJe3pBbLuANKLzlcGVmnLdGBvHU4B97YCiZMT7UwiborwBTbZ523rSYyRCFFIOgP3Bl3rC1wdbxJ-CW3r3YgEltwi8bEKOu_nfuUTPMIB8FQn-aZdznWnGzcLeaC3B1t_9uNAEfR9YHJPqkSzHg">
+</div>
+<div class="p-6 flex-grow border-t-4 border-primary">
+<div class="flex items-center gap-2 text-primary font-label-bold text-label-bold mb-3">
+<span class="material-symbols-outlined text-[18px]">monitoring</span>
+                                Gestão de Pessoas
+                            </div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-3">People Analytics: Decisões com Dados</h3>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-3 mb-6">
+                                Transforme seu RH através do uso estratégico de dados para recrutamento, retenção e desenvolvimento de talentos.
+                            </p>
+<div class="flex items-center justify-between mt-auto pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                                    32h
+                                </div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-1 hover:gap-2 transition-all">
+                                    Saiba Mais
+                                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-section-padding-lg bg-surface-dark text-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-gutter text-center">
+<h2 class="font-headline-lg text-headline-lg mb-6">Precisa de um treinamento personalizado?</h2>
+<p class="font-body-lg text-body-lg text-surface-variant max-w-2xl mx-auto mb-10">
+                    Nossas soluções "In Company" são adaptadas às necessidades específicas da sua organização ou órgão público.
+                </p>
+<div class="flex flex-col sm:flex-row justify-center gap-4">
+<button class="bg-secondary-container text-on-secondary-container px-8 py-3 rounded-lg font-label-bold text-label-bold hover:opacity-90 transition-all">Solicitar Proposta</button>
+<button class="border-2 border-surface-container-lowest text-surface-container-lowest px-8 py-3 rounded-lg font-label-bold text-label-bold hover:bg-surface-container-lowest hover:text-surface-dark transition-all">Ver Catálogo Completo</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark dark:bg-inverse-surface">
+<div class="max-w-container-max mx-auto w-full py-section-padding-lg px-gutter grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="col-span-1 md:col-span-1">
+<div class="text-headline-md font-headline-md font-bold text-surface-container-lowest mb-6">
+                    RH Cursos
+                </div>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 mb-6">
+                    Excelência em capacitação profissional para o setor público e privado.
+                </p>
+<div class="flex gap-4">
+<a class="text-secondary-fixed hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">public</span></a>
+<a class="text-secondary-fixed hover:scale-110 transition-transform" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase tracking-wider">Navegação</h4>
+<ul class="space-y-4">
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Home</a></li>
+<li class=""><a class="font-body-md text-body-md text-secondary-fixed font-bold" href="#">Cursos</a></li>
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Sobre</a></li>
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Contato</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase tracking-wider">Serviços</h4>
+<ul class="space-y-4">
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">In Company</a></li>
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Agenda de turmas</a></li>
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Administração</a></li>
+<li class=""><a class="font-body-md text-body-md text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Catálogo PDF</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase tracking-wider">Contato</h4>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 mb-2">WhatsApp: (00) 00000-0000</p>
+<p class="font-body-md text-body-md text-surface-variant opacity-80 mb-6">Email: contato@rhcursos.com.br</p>
+<p class="font-caption text-caption text-surface-variant opacity-60">
+                    RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90
+                </p>
+</div>
+</div>
+</footer>
+<script>
+        function filterCourses(category) {
+            const cards = document.querySelectorAll('.course-card');
+            const buttons = document.querySelectorAll('#filter-container button');
+            
+            // Update buttons
+            buttons.forEach(btn => {
+                btn.classList.remove('filter-chip-active', 'bg-primary', 'text-surface-container-lowest');
+                btn.classList.add('bg-surface-container-lowest', 'text-on-surface-variant');
+            });
+            
+            event.currentTarget.classList.add('filter-chip-active');
+            event.currentTarget.classList.remove('bg-surface-container-lowest', 'text-on-surface-variant');
+
+            // Filter cards with animation
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'flex';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        // Search interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.course-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const desc = card.querySelector('p').textContent.toLowerCase();
+                
+                if (title.includes(term) || desc.includes(term)) {
+                    card.style.display = 'flex';
+                    card.style.opacity = '1';
+                } else {
+                    card.style.display = 'none';
+                    card.style.opacity = '0';
+                }
+            });
+        });
+    </script>
+</body></html>

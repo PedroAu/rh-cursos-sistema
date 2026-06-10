@@ -1,0 +1,510 @@
+<!DOCTYPE html><html class="light" lang="pt-br"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RH Cursos - Painel Administrativo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001e30",
+                    "tertiary-container": "#535759",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eeeef0",
+                    "outline": "#71787f",
+                    "secondary-container": "#ffc641",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-secondary-fixed": "#261a00",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#f9f9fc",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#f6be39",
+                    "tertiary-fixed": "#e0e3e5",
+                    "background": "#f9f9fc",
+                    "on-surface-variant": "#41484e",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-dark": "#083B56",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#715300",
+                    "on-background": "#1a1c1e",
+                    "warning": "#E67E22",
+                    "surface": "#f9f9fc",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-tertiary-fixed": "#181c1e",
+                    "info": "#0D5B85",
+                    "secondary": "#795900",
+                    "primary-container": "#0d5b85",
+                    "on-surface": "#1a1c1e",
+                    "on-primary-fixed-variant": "#004b70",
+                    "surface-dim": "#dadadc",
+                    "success": "#2D8A39",
+                    "on-tertiary-container": "#c9ccce",
+                    "outline-variant": "#c0c7cf",
+                    "surface-variant": "#e2e2e5",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-surface": "#2f3133",
+                    "on-error": "#ffffff",
+                    "tertiary": "#3b4041",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed": "#cae6ff",
+                    "on-primary-container": "#99d2ff",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#91cdfd",
+                    "surface-tint": "#1d648e",
+                    "on-tertiary-fixed-variant": "#434749",
+                    "primary-fixed-dim": "#91cdfd",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f0f3",
+                    "primary": "#004364"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "section-padding-lg": "80px",
+                    "gutter": "24px",
+                    "container-max": "1200px",
+                    "margin-mobile": "16px",
+                    "section-padding-sm": "48px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9fc;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-active {
+            background-color: #ffdfa0;
+            color: #261a00;
+            font-weight: 600;
+        }
+        .card-shadow {
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="text-on-background bg-background">
+<!-- Layout Wrapper -->
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-64 bg-surface-dark text-white flex-col hidden md:flex fixed h-full z-40">
+<div class="p-gutter">
+<span class="text-headline-md font-headline-md font-bold text-surface-container-lowest">RH Cursos</span>
+</div>
+<nav class="flex-grow mt-4 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all sidebar-active" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-bold text-label-bold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all text-surface-variant opacity-80 hover:opacity-100 hover:bg-white/10" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="font-label-bold text-label-bold">Cursos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all text-surface-variant opacity-80 hover:opacity-100 hover:bg-white/10" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-bold text-label-bold">Turmas</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all text-surface-variant opacity-80 hover:opacity-100 hover:bg-white/10" href="#">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+<span class="font-label-bold text-label-bold">Leads</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all text-surface-variant opacity-80 hover:opacity-100 hover:bg-white/10" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-bold text-label-bold">Alunos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded transition-all text-surface-variant opacity-80 hover:opacity-100 hover:bg-white/10" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-bold text-label-bold">Configurações</span>
+</a>
+</nav>
+<div class="p-6 mt-auto border-t border-white/10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold">
+                        A
+                    </div>
+<div>
+<p class="font-label-bold text-label-bold">Admin</p>
+<p class="text-xs opacity-60">Diretoria</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-grow md:ml-64 min-h-screen">
+<!-- Top Bar -->
+<header class="h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-gutter sticky top-0 z-30">
+<div class="flex items-center gap-4">
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary">Visão Geral</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Buscar aluno ou curso..." type="text">
+</div>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<span class="material-symbols-outlined cursor-pointer hover:text-primary" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-primary" data-icon="help_outline">help_outline</span>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-gutter max-w-container-max mx-auto space-y-8">
+<!-- KPI Grid -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- KPI Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant card-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase">Total de Alunos</span>
+<div class="p-2 bg-primary-container/10 rounded-lg text-primary">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+</div>
+<div>
+<p class="text-3xl font-bold text-on-surface">1,284</p>
+<p class="text-success text-sm flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                                +12% este mês
+                            </p>
+</div>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant card-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase">Cursos Ativos</span>
+<div class="p-2 bg-secondary-container/10 rounded-lg text-secondary">
+<span class="material-symbols-outlined" data-icon="library_books">library_books</span>
+</div>
+</div>
+<div>
+<p class="text-3xl font-bold text-on-surface">42</p>
+<p class="text-on-surface-variant text-sm mt-1">8 novos lançamentos</p>
+</div>
+</div>
+<!-- KPI Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant card-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase">Vendas do Mês</span>
+<div class="p-2 bg-success/10 rounded-lg text-success">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</div>
+</div>
+<div>
+<p class="text-3xl font-bold text-on-surface">R$ 84.200</p>
+<p class="text-success text-sm flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="trending_up">trending_up</span>
+                                Meta: 92% atingida
+                            </p>
+</div>
+</div>
+<!-- KPI Card 4 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant card-shadow flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-on-surface-variant font-label-bold text-label-bold uppercase">Novos Leads</span>
+<div class="p-2 bg-warning/10 rounded-lg text-warning">
+<span class="material-symbols-outlined" data-icon="ads_click">ads_click</span>
+</div>
+</div>
+<div>
+<p class="text-3xl font-bold text-on-surface">156</p>
+<p class="text-error text-sm flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-sm" data-icon="trending_down">trending_down</span>
+                                -4% vs semana passada
+                            </p>
+</div>
+</div>
+</section>
+<!-- Management & Activities Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Course Management (CRUD View) -->
+<section class="lg:col-span-2 space-y-4">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-primary">Gerenciar Cursos</h2>
+<button class="flex items-center gap-2 px-6 py-2 rounded-full font-label-bold text-white transition-all hover:opacity-90" style="background-color: #d4a017;"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;">person_add</span>Novo Cadastro</button>
+</div>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant card-shadow overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant text-on-surface-variant">
+<th class="px-6 py-4 font-label-bold text-label-bold uppercase">Título</th>
+<th class="px-6 py-4 font-label-bold text-label-bold uppercase">Categoria</th>
+<th class="px-6 py-4 font-label-bold text-label-bold uppercase">Status</th>
+<th class="px-6 py-4 font-label-bold text-label-bold uppercase text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<p class="font-bold text-on-surface">Liderança na Gestão Pública</p>
+<p class="text-xs text-on-surface-variant">ID: #4059</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm px-3 py-1 bg-primary-container/10 text-primary rounded-full">Recursos Humanos</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="text-sm">Ativo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right space-x-2">
+<button class="p-2 text-outline hover:text-primary hover:bg-primary/5 rounded">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-outline hover:text-error hover:bg-error/5 rounded">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<p class="font-bold text-on-surface">Nova Lei de Licitações</p>
+<p class="text-xs text-on-surface-variant">ID: #4060</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm px-3 py-1 bg-primary-container/10 text-primary rounded-full">Jurídico</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="text-sm">Ativo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right space-x-2">
+<button class="p-2 text-outline hover:text-primary hover:bg-primary/5 rounded">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-outline hover:text-error hover:bg-error/5 rounded">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<p class="font-bold text-on-surface">Treinamento em PowerBI</p>
+<p class="text-xs text-on-surface-variant">ID: #4061</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm px-3 py-1 bg-primary-container/10 text-primary rounded-full">Tecnologia</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-warning"></span>
+<span class="text-sm">Rascunho</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right space-x-2">
+<button class="p-2 text-outline hover:text-primary hover:bg-primary/5 rounded">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-outline hover:text-error hover:bg-error/5 rounded">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="px-6 py-4">
+<p class="font-bold text-on-surface">Soft Skills para RH</p>
+<p class="text-xs text-on-surface-variant">ID: #4062</p>
+</td>
+<td class="px-6 py-4">
+<span class="text-sm px-3 py-1 bg-primary-container/10 text-primary rounded-full">Recursos Humanos</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success"></span>
+<span class="text-sm">Ativo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right space-x-2">
+<button class="p-2 text-outline hover:text-primary hover:bg-primary/5 rounded">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-outline hover:text-error hover:bg-error/5 rounded">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="p-4 bg-surface-container-low flex justify-between items-center text-on-surface-variant text-sm">
+<span>Mostrando 4 de 42 cursos</span>
+<div class="flex gap-2">
+<button class="p-1 border border-outline-variant rounded hover:bg-white transition-all disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="p-1 border border-outline-variant rounded hover:bg-white transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Activity -->
+<section class="space-y-4">
+<h2 class="font-headline-md text-headline-md text-primary">Atividades Recentes</h2>
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant card-shadow p-6 space-y-6">
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-success/10 text-success flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-body-md"><span class="font-bold">João Silva</span> se inscreveu no curso de Liderança.</p>
+<p class="text-xs text-on-surface-variant">há 12 minutos</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-body-md"><span class="font-bold">Pagamento Aprovado:</span> Maria Fernandes (ID: #TRX-998)</p>
+<p class="text-xs text-on-surface-variant">há 45 minutos</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-body-md"><span class="font-bold">Novo Lead:</span> Prefeitura de São Paulo interessada em In-Company.</p>
+<p class="text-xs text-on-surface-variant">há 2 horas</p>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-shrink-0 w-10 h-10 rounded-full bg-tertiary-container/10 text-tertiary flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="assignment_turned_in">assignment_turned_in</span>
+</div>
+<div class="space-y-1">
+<p class="text-sm font-body-md"><span class="font-bold">Curso Atualizado:</span> 'Nova Lei de Licitações' agora possui novos módulos.</p>
+<p class="text-xs text-on-surface-variant">há 5 horas</p>
+</div>
+</div>
+<button class="w-full py-2 text-primary font-label-bold text-label-bold hover:bg-primary/5 rounded transition-all">Ver todo o histórico</button>
+</div>
+</section>
+</div>
+<!-- Bottom Insight Card (Asymmetric Layout Example) -->
+<section class="bg-surface-dark rounded-2xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden">
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-primary rounded-full opacity-20 blur-3xl"></div>
+<div class="absolute -left-16 -bottom-16 w-48 h-48 bg-secondary-container rounded-full opacity-10 blur-3xl"></div>
+<div class="relative z-10 max-w-lg">
+<h3 class="font-headline-lg text-headline-lg mb-2">Relatório de Performance</h3>
+<p class="opacity-80 text-body-md mb-6">Analise o engajamento dos alunos por departamento e identifique as turmas com melhor aproveitamento do conteúdo.</p>
+<div class="flex gap-4">
+<button class="bg-secondary-container text-on-secondary-container px-6 py-3 rounded-lg font-label-bold hover:scale-105 transition-transform">Gerar Relatório PDF</button>
+<button class="border border-white/30 text-white px-6 py-3 rounded-lg font-label-bold hover:bg-white/10 transition-all">Configurar Alertas</button>
+</div>
+</div>
+<div class="relative z-10 grid grid-cols-2 gap-4 w-full md:w-auto">
+<div class="bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
+<p class="text-xs uppercase opacity-60 mb-1">Satisfação</p>
+<p class="text-2xl font-bold">4.8/5.0</p>
+</div>
+<div class="bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
+<p class="text-xs uppercase opacity-60 mb-1">Retenção</p>
+<p class="text-2xl font-bold">92%</p>
+</div>
+<div class="bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
+<p class="text-xs uppercase opacity-60 mb-1">Conclusão</p>
+<p class="text-2xl font-bold">78%</p>
+</div>
+<div class="bg-white/10 p-4 rounded-xl border border-white/10 backdrop-blur-sm">
+<p class="text-xs uppercase opacity-60 mb-1">NPS</p>
+<p class="text-2xl font-bold">+74</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Simple Footer (from Shared Components reference) -->
+<footer class="w-full py-12 px-gutter mt-12 bg-surface-dark text-white border-t border-white/5">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="space-y-4">
+<span class="text-headline-md font-headline-md font-bold text-surface-container-lowest">RH Cursos</span>
+<p class="text-surface-variant opacity-80 text-sm">Especialistas em treinamento para o setor público e gestão estratégica de pessoas.</p>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-4">Administração</h4>
+<ul class="space-y-2 text-sm text-surface-variant opacity-80">
+<li><a class="hover:text-secondary-fixed" href="#">Relatórios Fiscais</a></li>
+<li><a class="hover:text-secondary-fixed" href="#">Gestão de Instrutores</a></li>
+<li><a class="hover:text-secondary-fixed" href="#">Logs de Acesso</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-4">Links Rápidos</h4>
+<ul class="space-y-2 text-sm text-surface-variant opacity-80">
+<li><a class="hover:text-secondary-fixed" href="#">Catálogo de cursos</a></li>
+<li><a class="hover:text-secondary-fixed" href="#">Agenda de turmas</a></li>
+<li><a class="hover:text-secondary-fixed" href="#">Suporte Admin</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-4">Contato</h4>
+<ul class="space-y-2 text-sm text-surface-variant opacity-80">
+<li>WhatsApp: (11) 99999-9999</li>
+<li>E-mail: admin@rhcursos.com.br</li>
+</ul>
+</div>
+</div>
+<div class="max-w-container-max mx-auto mt-12 pt-8 border-t border-white/10 text-center text-xs opacity-50">
+                    RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90 • © 2024
+                </div>
+</footer>
+</main>
+</div>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Toggle mobile menu (simplified)
+        document.querySelector('[data-icon="menu"]')?.parentElement.addEventListener('click', () => {
+            const sidebar = document.querySelector('aside');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('fixed');
+            sidebar.classList.toggle('w-full');
+            sidebar.classList.toggle('left-0');
+        });
+
+        // Add subtle hover effect for cards
+        document.querySelectorAll('.card-shadow').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.transition = 'transform 0.2s ease-out';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

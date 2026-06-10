@@ -1,0 +1,464 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>eSocial na Prática: Atualização 2024 - RH Cursos</title>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;family=Montserrat:wght@100..900&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001e30",
+                    "tertiary-container": "#535759",
+                    "error": "#ba1a1a",
+                    "surface-container": "#eeeef0",
+                    "outline": "#71787f",
+                    "secondary-container": "#ffc641",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-secondary-fixed": "#261a00",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-bright": "#f9f9fc",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#f6be39",
+                    "tertiary-fixed": "#e0e3e5",
+                    "background": "#f9f9fc",
+                    "on-surface-variant": "#41484e",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-dark": "#083B56",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#715300",
+                    "on-background": "#1a1c1e",
+                    "warning": "#E67E22",
+                    "surface": "#f9f9fc",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-tertiary-fixed": "#181c1e",
+                    "info": "#0D5B85",
+                    "secondary": "#795900",
+                    "primary-container": "#0d5b85",
+                    "on-surface": "#1a1c1e",
+                    "on-primary-fixed-variant": "#004b70",
+                    "surface-dim": "#dadadc",
+                    "success": "#2D8A39",
+                    "on-tertiary-container": "#c9ccce",
+                    "outline-variant": "#c0c7cf",
+                    "surface-variant": "#e2e2e5",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-surface": "#2f3133",
+                    "on-error": "#ffffff",
+                    "tertiary": "#3b4041",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed": "#cae6ff",
+                    "on-primary-container": "#99d2ff",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#91cdfd",
+                    "surface-tint": "#1d648e",
+                    "on-tertiary-fixed-variant": "#434749",
+                    "primary-fixed-dim": "#91cdfd",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f0f0f3",
+                    "primary": "#004364"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "section-padding-lg": "80px",
+                    "gutter": "24px",
+                    "container-max": "1200px",
+                    "margin-mobile": "16px",
+                    "section-padding-sm": "48px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "caption": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-bold": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hero-pattern {
+            background-image: radial-gradient(circle at 2px 2px, rgba(0, 75, 112, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-dark border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="max-w-container-max mx-auto flex justify-between items-center px-gutter py-4">
+<a class="text-headline-md font-headline-md font-bold text-primary dark:text-primary-fixed" href="/">RH Cursos</a>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-primary dark:text-secondary-fixed font-bold border-b-2 border-secondary-container font-label-bold text-label-bold" href="#">Cursos</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200 font-label-bold text-label-bold" href="#">In Company</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200 font-label-bold text-label-bold" href="#">Agenda</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200 font-label-bold text-label-bold" href="#">Sobre</a>
+<a class="text-on-surface-variant dark:text-on-tertiary-container hover:text-primary transition-colors duration-200 font-label-bold text-label-bold" href="#">Contato</a>
+</nav>
+<button class="bg-primary text-on-primary px-6 py-2 rounded font-label-bold text-label-bold hover:bg-primary-container transition-all active:scale-95 uppercase tracking-wider">
+                Área do Aluno
+            </button>
+</div>
+</header>
+<main class="pt-[72px]">
+<!-- Hero Section -->
+<section class="bg-surface-container-low py-section-padding-sm md:py-section-padding-lg hero-pattern border-b border-outline-variant">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col gap-4 max-w-3xl">
+<div class="flex items-center gap-2">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-bold text-label-bold">Gestão &amp; DP</span>
+<span class="text-outline font-label-bold text-label-bold">•</span>
+<span class="text-on-surface-variant font-label-bold text-label-bold">Atualização 2024</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary leading-tight">
+                        eSocial na Prática: Atualização 2024 e Impactos no FGTS Digital
+                    </h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">
+                        Domine as recentes mudanças legislativas e operacionais do eSocial com foco em conformidade e redução de riscos trabalhistas.
+                    </p>
+<div class="flex flex-wrap gap-6 mt-4">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary">schedule</span>
+<span class="font-label-bold text-label-bold">16 Horas</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary" data-weight="fill" style="font-variation-settings: 'FILL' 1;">video_library</span>
+<span class="font-label-bold text-label-bold">Online Ao Vivo</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="material-symbols-outlined text-primary">workspace_premium</span>
+<span class="font-label-bold text-label-bold">Certificado Incluso</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content & Sidebar Grid -->
+<section class="py-section-padding-sm md:py-section-padding-lg">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 lg:grid-cols-12 gap-12">
+<!-- Main Content (8 columns) -->
+<div class="lg:col-span-8 flex flex-col gap-12">
+<!-- About -->
+<article class="scroll-mt-32" id="sobre">
+<h2 class="font-headline-md text-headline-md text-primary mb-6 flex items-center gap-3">
+<span class="w-8 h-1 bg-secondary-container rounded-full"></span>
+                            Sobre o curso
+                        </h2>
+<div class="space-y-4 text-on-surface-variant text-body-md leading-relaxed">
+<p>O eSocial continua sendo um dos maiores desafios para os profissionais de Recursos Humanos e Departamento Pessoal. Com a implementação do FGTS Digital e as constantes simplificações de leiautes, manter-se atualizado não é apenas uma escolha, mas uma necessidade de sobrevivência profissional.</p>
+<p>Este curso foi desenhado para profissionais que já possuem uma base e precisam entender profundamente as nuances das atualizações de 2024. Abordaremos desde o envio de eventos até o cruzamento de dados que a Receita Federal utiliza para fiscalização automatizada.</p>
+</div>
+</article>
+<!-- Quem deve fazer -->
+<article class="bg-surface-container-low p-8 rounded-xl border border-outline-variant" id="publico">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Quem deve fazer</h2>
+<ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<span class="text-body-md">Gestores de RH e DP</span>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<span class="text-body-md">Contadores e Auditores</span>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<span class="text-body-md">Analistas e Assistentes de DP</span>
+</li>
+<li class="flex gap-3">
+<span class="material-symbols-outlined text-success">check_circle</span>
+<span class="text-body-md">Consultores Trabalhistas</span>
+</li>
+</ul>
+</article>
+<!-- Curriculum -->
+<article id="curriculo">
+<h2 class="font-headline-md text-headline-md text-primary mb-8">O que você vai aprender</h2>
+<div class="space-y-4">
+<!-- Module 1 -->
+<details class="group bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden" open="">
+<summary class="flex justify-between items-center p-6 cursor-pointer list-none hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<span class="bg-primary text-on-primary w-8 h-8 flex items-center justify-center rounded-full font-label-bold">01</span>
+<h3 class="font-label-bold text-label-bold text-on-surface">Layouts S-1.2 e Mudanças Recentes</h3>
+</div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="p-6 pt-0 border-t border-outline-variant bg-surface-container-lowest">
+<ul class="space-y-3 pl-12 text-on-surface-variant text-body-md">
+<li>• Análise detalhada das simplificações do Layout S-1.2</li>
+<li>• Eventos de processos trabalhistas (S-2500, S-2501, S-3500)</li>
+<li>• Novos prazos e validações de fechamento</li>
+</ul>
+</div>
+</details>
+<!-- Module 2 -->
+<details class="group bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<summary class="flex justify-between items-center p-6 cursor-pointer list-none hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<span class="bg-primary text-on-primary w-8 h-8 flex items-center justify-center rounded-full font-label-bold">02</span>
+<h3 class="font-label-bold text-label-bold text-on-surface">FGTS Digital na Prática</h3>
+</div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="p-6 pt-0 border-t border-outline-variant bg-surface-container-lowest">
+<ul class="space-y-3 pl-12 text-on-surface-variant text-body-md">
+<li>• Integração eSocial x FGTS Digital</li>
+<li>• Geração de guias e novos fluxos de pagamento via PIX</li>
+<li>• Tratamento de parcelamentos e débitos antigos</li>
+</ul>
+</div>
+</details>
+<!-- Module 3 -->
+<details class="group bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<summary class="flex justify-between items-center p-6 cursor-pointer list-none hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4">
+<span class="bg-primary text-on-primary w-8 h-8 flex items-center justify-center rounded-full font-label-bold">03</span>
+<h3 class="font-label-bold text-label-bold text-on-surface">Segurança e Saúde no Trabalho (SST)</h3>
+</div>
+<span class="material-symbols-outlined group-open:rotate-180 transition-transform">expand_more</span>
+</summary>
+<div class="p-6 pt-0 border-t border-outline-variant bg-surface-container-lowest">
+<ul class="space-y-3 pl-12 text-on-surface-variant text-body-md">
+<li>• Eventos S-2210, S-2220 e S-2240</li>
+<li>• Principais erros no preenchimento e como evitá-los</li>
+<li>• Cruzamento com o PPP Eletrônico</li>
+</ul>
+</div>
+</details>
+</div>
+</article>
+<!-- Instructor -->
+<article class="flex flex-col md:flex-row gap-8 items-start" id="instrutor">
+<div class="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 border-4 border-secondary-container">
+<img alt="Instructor Profile" class="w-full h-full object-cover" data-alt="A professional male instructor in his late 40s wearing a sharp navy blue business suit and a friendly, confident expression. He is photographed in a high-key corporate office environment with a soft, blurred background that suggests a modern architectural space. The lighting is clean and balanced, emphasizing professional authority and trust, perfectly aligning with a corporate educational brand's visual identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuASlmTTxzOVkOkUWiIKWPiHxD128sy5qpbJjC6cDWR1NLktO9CSulq3doWOJkaTWeZWK_FvCZzjZzBmCcus7-ZslXU352vZYrmcQyhQoxPzbO-rxTBDbhNJGRBlRGefxS_FJmvPTHKSZSsmMymQbYo15HowaQSRzdhjfFBK3EqLBBUZjNV5uG-z7Vc57WR5lnTz_Z1oYzg4bjqu5YD5nNQDsxg-BRCAj3DhGYwCn2vva2RzyAvQaYuUZ70DCR2O7hEw0di2gUHpzE2o">
+</div>
+<div class="flex flex-col gap-4">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary">Dr. Ricardo Mendes</h2>
+<p class="text-on-surface-variant font-label-bold text-label-bold">Especialista em Direito do Trabalho e Consultor de DP</p>
+</div>
+<p class="text-on-surface-variant text-body-md">Com mais de 20 anos de experiência, Dr. Ricardo é referência nacional em implantação de eSocial para órgãos públicos e grandes empresas. Autor de diversos artigos técnicos e palestrante requisitado nos principais congressos de RH do país.</p>
+<div class="flex gap-4">
+<a class="text-primary hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">link</span>
+</a>
+<a class="text-primary hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined">description</span>
+</a>
+</div>
+</div>
+</article>
+</div>
+<!-- Sidebar (4 columns) -->
+<aside class="lg:col-span-4">
+<div class="sticky top-24 flex flex-col gap-6">
+<!-- CTA Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-6 overflow-hidden relative">
+<div class="absolute top-0 left-0 w-full h-1 bg-secondary-container"></div>
+<div class="flex flex-col gap-4">
+<div>
+<p class="text-outline font-label-bold text-label-bold uppercase tracking-widest">Investimento</p>
+<div class="flex items-baseline gap-2">
+<span class="text-headline-lg font-headline-lg text-primary">R$ 890,00</span>
+<span class="text-on-surface-variant text-body-md">à vista</span>
+</div>
+<p class="text-success font-label-bold text-label-bold mt-1">Ou em até 10x de R$ 98,50</p>
+</div>
+<button class="w-full bg-secondary-container text-on-secondary-container py-4 rounded-lg font-headline-md text-headline-md font-bold hover:brightness-95 transition-all shadow-md active:scale-[0.98]">
+                                    Inscreva-se Agora
+                                </button>
+<button class="w-full border border-primary text-primary py-4 rounded-lg font-label-bold text-label-bold hover:bg-surface-container-low transition-all">
+                                    Solicitar Orçamento In-Company
+                                </button>
+<div class="pt-4 border-t border-outline-variant mt-4">
+<h4 class="font-label-bold text-label-bold text-on-surface mb-4">O que está incluído:</h4>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-on-surface-variant text-body-md">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                            Material didático em PDF
+                                        </li>
+<li class="flex items-center gap-3 text-on-surface-variant text-body-md">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                            Certificado de conclusão
+                                        </li>
+<li class="flex items-center gap-3 text-on-surface-variant text-body-md">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                            Gravação disponível por 30 dias
+                                        </li>
+<li class="flex items-center gap-3 text-on-surface-variant text-body-md">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                            Plantão de dúvidas exclusivo
+                                        </li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Metadata Card -->
+<div class="bg-surface-container-low rounded-xl p-6">
+<h4 class="font-label-bold text-label-bold text-on-surface mb-4 uppercase tracking-widest">Detalhes do Curso</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-on-surface-variant text-body-md">Duração</span>
+<span class="font-label-bold text-label-bold">16 Horas</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-on-surface-variant text-body-md">Formato</span>
+<span class="font-label-bold text-label-bold">Online / Ao Vivo</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-outline-variant/30">
+<span class="text-on-surface-variant text-body-md">Certificação</span>
+<span class="font-label-bold text-label-bold">MEC/Extensão</span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-on-surface-variant text-body-md">Idioma</span>
+<span class="font-label-bold text-label-bold">Português</span>
+</div>
+</div>
+</div>
+<!-- Promotion -->
+<div class="bg-primary text-on-primary p-6 rounded-xl relative overflow-hidden group">
+<div class="relative z-10">
+<h4 class="font-headline-md text-headline-md mb-2">Turmas Fechadas</h4>
+<p class="text-on-primary-container mb-4 text-body-md">Leve este treinamento para dentro da sua empresa com condições exclusivas.</p>
+<a class="inline-flex items-center gap-2 text-secondary-fixed font-label-bold text-label-bold hover:underline" href="#">
+                                    Saber mais <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-10 scale-150 group-hover:rotate-12 transition-transform duration-500">
+<span class="material-symbols-outlined text-[120px]">groups</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</section>
+<!-- Related Courses -->
+<section class="bg-surface-container-low py-section-padding-sm border-t border-outline-variant">
+<div class="max-w-container-max mx-auto px-gutter">
+<h2 class="font-headline-md text-headline-md text-primary mb-8">Outros cursos recomendados</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Related Card 1 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant hover:shadow-lg transition-all group">
+<span class="text-outline font-label-bold text-label-bold mb-2 block uppercase">Legislação</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4 group-hover:text-primary transition-colors">Cálculos Trabalhistas Avançados</h3>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-on-surface-variant text-body-md">20 Horas</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">trending_flat</span>
+</div>
+</div>
+<!-- Related Card 2 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant hover:shadow-lg transition-all group">
+<span class="text-outline font-label-bold text-label-bold mb-2 block uppercase">Gestão</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4 group-hover:text-primary transition-colors">Liderança em Tempos de Mudança</h3>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-on-surface-variant text-body-md">12 Horas</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">trending_flat</span>
+</div>
+</div>
+<!-- Related Card 3 -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant hover:shadow-lg transition-all group">
+<span class="text-outline font-label-bold text-label-bold mb-2 block uppercase">Auditoria</span>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4 group-hover:text-primary transition-colors">Auditoria Interna de RH</h3>
+<div class="flex justify-between items-center mt-auto">
+<span class="text-on-surface-variant text-body-md">24 Horas</span>
+<span class="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 transition-opacity">trending_flat</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark dark:bg-inverse-surface py-section-padding-lg px-gutter max-w-container-max mx-auto text-on-tertiary-container">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1">
+<span class="text-headline-md font-headline-md font-bold text-surface-container-lowest block mb-6">RH Cursos</span>
+<p class="text-surface-variant opacity-80 text-body-md leading-relaxed">Capacitando profissionais de RH e Gestão Pública com as melhores práticas de mercado e conformidade legal.</p>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase">Institucional</h4>
+<ul class="flex flex-col gap-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">Sobre</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">In Company</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">Agenda de turmas</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">Catálogo de cursos</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase">Suporte</h4>
+<ul class="flex flex-col gap-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">WhatsApp</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">E-mail</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">Administração</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 transition-all font-body-md" href="#">Contato</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-secondary-fixed mb-6 uppercase">Newsletter</h4>
+<p class="text-surface-variant opacity-80 text-body-md mb-4">Receba atualizações legislativas e convites para webinários.</p>
+<div class="flex flex-col gap-2">
+<input class="bg-transparent border border-outline-variant rounded p-3 text-on-tertiary focus:border-secondary-container focus:ring-1 focus:ring-secondary-container outline-none transition-all" placeholder="Seu melhor e-mail" type="email">
+<button class="bg-secondary-fixed text-on-secondary-fixed font-label-bold text-label-bold py-3 rounded hover:brightness-90 transition-all">Inscrever</button>
+</div>
+</div>
+</div>
+<div class="mt-16 pt-8 border-t border-outline-variant text-center">
+<p class="text-surface-variant opacity-60 text-caption">RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90 © 2024. Todos os direitos reservados.</p>
+</div>
+</footer>
+<script>
+        // Micro-interaction for the CTA button scale on click
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+
+        // Simple scroll spy for header transparency (optional effect)
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 20) {
+                header.classList.add('bg-opacity-95', 'backdrop-blur-md');
+            } else {
+                header.classList.remove('bg-opacity-95', 'backdrop-blur-md');
+            }
+        });
+    </script>
+</body></html>

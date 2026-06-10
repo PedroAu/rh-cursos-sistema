@@ -1,0 +1,318 @@
+<!DOCTYPE html><html class="light" lang="pt-br"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Login | RH Cursos &amp; Soluções</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2f3133",
+                    "on-surface-variant": "#41484e",
+                    "surface-tint": "#1d648e",
+                    "on-tertiary-container": "#c9ccce",
+                    "primary": "#004364",
+                    "info": "#0D5B85",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#f6be39",
+                    "on-primary-fixed-variant": "#004b70",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-background": "#1a1c1e",
+                    "surface-bright": "#f9f9fc",
+                    "surface-container": "#eeeef0",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e2e2e5",
+                    "outline-variant": "#c0c7cf",
+                    "outline": "#71787f",
+                    "inverse-on-surface": "#f0f0f3",
+                    "primary-container": "#0d5b85",
+                    "surface-dark": "#083B56",
+                    "warning": "#E67E22",
+                    "success": "#2D8A39",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#91cdfd",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e2e2e5",
+                    "tertiary": "#3b4041",
+                    "on-tertiary-fixed-variant": "#434749",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-secondary-container": "#715300",
+                    "primary-fixed": "#cae6ff",
+                    "surface-container-high": "#e8e8ea",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-surface": "#1a1c1e",
+                    "background": "#f9f9fc",
+                    "primary-fixed-dim": "#91cdfd",
+                    "on-primary-container": "#99d2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ffc641",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dadadc",
+                    "tertiary-container": "#535759",
+                    "on-primary-fixed": "#001e30",
+                    "on-tertiary-fixed": "#181c1e",
+                    "secondary": "#795900",
+                    "on-secondary-fixed": "#261a00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1200px",
+                    "section-padding-sm": "48px",
+                    "gutter": "24px",
+                    "section-padding-lg": "80px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Montserrat"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "caption": ["Inter"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .auth-transition {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-overlay {
+            background: rgba(8, 59, 86, 0.7);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+<style>
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        </style><style>
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        </style></head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex items-stretch overflow-hidden">
+<!-- Left Side: Visual/Branding -->
+<section class="hidden lg:flex lg:w-1/2 relative bg-surface-dark items-center justify-center overflow-hidden">
+<img alt="Corporate Office" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60 scale-105" data-alt="A wide-angle shot of a high-end, minimalist corporate office interior with floor-to-ceiling windows overlooking a modern skyline at dusk. The lighting is sophisticated, with cool blue tones and warm golden accents reflecting off polished marble floors. Professionals are subtly visible in the background, conveying a sense of collaboration and institutional stability. The overall aesthetic is clean, authoritative, and deeply rooted in corporate modernism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1z4VUxQ-eqP11yoch1-WTrW1nQVev2QA7B5oubSROqCec9KLtUPYgFS1ih0ImRG1WBARAzNO13NaU_-DOmv8adKy5NIdi0x_r9X16JzC_2I7b5meo3bTc5rZZ0U9qrY_IqAabgyGdrl_hmm4BYD5QX75GV0ghMPIS2QTkDFt3mv0LHTvIo3kmVjTUzxdtgZr9NXCR4Eg8SgSqeXsVLji4Lc33kF4LTOdJVONHWe7p-XnIq9IAAVvBf5fS97jmzcvkI3-mGQ-0Ep_Q">
+<div class="relative z-10 px-gutter max-w-lg text-center lg:text-left">
+<h1 class="font-display-lg text-display-lg text-surface-container-lowest mb-6">
+                RH Cursos
+            </h1>
+<p class="font-body-lg text-body-lg text-secondary-fixed opacity-90 mb-8">
+                Capacitação estratégica para profissionais que transformam a gestão pública e empresarial.
+            </p>
+<div class="flex items-center gap-4 text-on-primary-container bg-primary-container/20 p-4 rounded-xl border border-outline-variant/30 backdrop-blur-sm">
+<span class="material-symbols-outlined text-4xl text-secondary-container">verified_user</span>
+<div class="text-left">
+<p class="font-label-bold text-label-bold text-white">Certificado Reconhecido</p>
+<p class="text-caption text-surface-variant">Qualidade técnica com foco em resultados práticos.</p>
+</div>
+</div>
+</div>
+<!-- Decorative Element -->
+<div class="absolute bottom-0 left-0 w-full h-1 bg-secondary-container"></div>
+</section>
+<!-- Right Side: Auth Form -->
+<main class="w-full lg:w-1/2 flex flex-col bg-surface-container-lowest overflow-y-auto">
+<!-- Mobile Header (Visible only on small screens) -->
+<div class="lg:hidden p-gutter flex justify-between items-center bg-surface-dark text-white">
+<span class="font-headline-md text-headline-md font-bold">RH Cursos</span>
+<span class="material-symbols-outlined">school</span>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center px-6 py-section-padding-sm md:px-12 lg:px-24">
+<div class="w-full max-w-md auth-transition" id="auth-container">
+<!-- Login View -->
+<div id="login-form">
+<header class="mb-10 text-center lg:text-left">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Acesse sua conta</h2>
+<p class="text-on-surface-variant font-body-md">Bem-vindo de volta. Entre com suas credenciais.</p>
+</header>
+<form class="space-y-6" onsubmit="event.preventDefault();">
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface" for="email">E-mail Corporativo</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="email" name="email" placeholder="exemplo@rhcursos.com.br" required="" type="email">
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-bold text-label-bold text-on-surface" for="password">Senha</label>
+<a class="text-caption font-label-bold text-info hover:underline" href="#">Esqueceu a senha?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">lock</span>
+<input class="w-full pl-10 pr-12 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all outline-none" id="password" name="password" placeholder="••••••••" required="" type="password">
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-primary" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center">
+<input class="w-4 h-4 text-primary border-outline-variant rounded focus:ring-primary" id="remember" type="checkbox">
+<label class="ml-2 text-label-bold text-on-surface-variant cursor-pointer select-none" for="remember">Mantenha-me conectado</label>
+</div>
+<button class="w-full py-4 bg-primary text-on-primary font-headline-md text-headline-md rounded-lg shadow-sm hover:bg-primary-container active:scale-[0.98] transition-all flex justify-center items-center gap-2 group" type="submit">
+                            Entrar na Plataforma
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<div class="mt-10 pt-8 border-t border-outline-variant text-center">
+<p class="font-body-md text-on-surface-variant">
+                            Ainda não possui uma conta? 
+                            <button class="font-label-bold text-primary hover:text-info ml-1 underline decoration-2 underline-offset-4" onclick="toggleAuth('signup')">
+                                Cadastre-se agora
+                            </button>
+</p>
+</div>
+</div>
+<!-- Signup View (Hidden by Default) -->
+<div class="hidden" id="signup-form">
+<header class="mb-10 text-center lg:text-left">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Crie sua conta</h2>
+<p class="text-on-surface-variant font-body-md">Inicie sua jornada de capacitação hoje mesmo.</p>
+</header>
+<form class="space-y-4" onsubmit="event.preventDefault();">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Nome Completo</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="João Silva" required="" type="text">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">CPF/CNPJ</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="000.000.000-00" required="" type="text">
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">E-mail Corporativo</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="exemplo@rhcursos.com.br" required="" type="email">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Sua Senha</label>
+<input class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="Mínimo 8 caracteres" required="" type="password">
+</div>
+<div class="p-4 bg-surface-container text-caption text-on-surface-variant rounded-lg flex gap-3">
+<span class="material-symbols-outlined text-info">info</span>
+<p>Ao se cadastrar, você concorda com nossos Termos de Uso e Política de Privacidade de dados.</p>
+</div>
+<button class="w-full py-4 bg-secondary-container text-on-secondary-container font-headline-md text-headline-md rounded-lg shadow-sm hover:brightness-95 active:scale-[0.98] transition-all" type="submit">
+                            Finalizar Cadastro
+                        </button>
+</form>
+<div class="mt-10 pt-8 border-t border-outline-variant text-center">
+<p class="font-body-md text-on-surface-variant">
+                            Já possui acesso? 
+                            <button class="font-label-bold text-primary hover:text-info ml-1 underline decoration-2 underline-offset-4" onclick="toggleAuth('login')">
+                                Voltar ao login
+                            </button>
+</p>
+</div>
+</div>
+</div>
+<footer class="mt-12 text-center text-caption text-outline">
+                © 2024 RH Cursos &amp; Soluções LTDA • Todos os direitos reservados.
+            </footer>
+</div>
+</main>
+<script>
+        function toggleAuth(view) {
+            const container = document.getElementById('auth-container');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+
+            // Simple transition effect
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                if (view === 'signup') {
+                    loginForm.classList.add('hidden');
+                    signupForm.classList.remove('hidden');
+                } else {
+                    signupForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                }
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 300);
+        }
+
+        // Ripple Effect for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.background = 'rgba(255,255,255,0.3)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.left = `${x - 50}px`;
+                ripple.style.top = `${y - 50}px`;
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add keyframes for ripple
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes ripple {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body></html>
