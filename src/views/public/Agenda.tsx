@@ -115,7 +115,7 @@ export function AgendaPage() {
           ))}
         </div>
 
-        <div className="surface-card space-y-5 p-5 md:p-6">
+        <div className="surface-card space-y-5 p-5 md:p-6" data-testid="ui-agenda-filters">
           <div className="flex flex-col gap-4 border-b border-outline-variant pb-5 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-3">
               <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/70 text-primary">
@@ -169,7 +169,7 @@ export function AgendaPage() {
                   setCourseId("");
                 }}
               >
-                <SelectTrigger><SelectValue placeholder="Trilha" /></SelectTrigger>
+                <SelectTrigger aria-label="Filtrar agenda por trilha"><SelectValue placeholder="Trilha" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all-paths">Todas as trilhas</SelectItem>
                   {trainingPaths.map((item) => <SelectItem key={item.id} value={item.id}>{item.shortName}</SelectItem>)}
@@ -179,7 +179,7 @@ export function AgendaPage() {
             <div>
               <span className="ea-label mb-2 block">Curso</span>
               <Select value={courseId || "all-courses"} onValueChange={(value) => setCourseId(value === "all-courses" ? "" : value)}>
-                <SelectTrigger><SelectValue placeholder="Curso" /></SelectTrigger>
+                <SelectTrigger aria-label="Filtrar agenda por curso"><SelectValue placeholder="Curso" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all-courses">Todos os cursos</SelectItem>
                   {courseOptions.map((item) => <SelectItem key={item.id} value={item.id}>{item.title}</SelectItem>)}
@@ -189,7 +189,7 @@ export function AgendaPage() {
             <div>
               <span className="ea-label mb-2 block">Modalidade</span>
               <Select value={modality || "all-modalities"} onValueChange={(value) => setModality(value === "all-modalities" ? "" : value)}>
-                <SelectTrigger><SelectValue placeholder="Modalidade" /></SelectTrigger>
+                <SelectTrigger aria-label="Filtrar agenda por modalidade"><SelectValue placeholder="Modalidade" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all-modalities">Todas</SelectItem>
                   {["Ao vivo online", "Presencial", "In company", "Híbrido", "Gravado"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
@@ -199,7 +199,7 @@ export function AgendaPage() {
             <div>
               <span className="ea-label mb-2 block">Status</span>
               <Select value={status || "all-status"} onValueChange={(value) => setStatus(value === "all-status" ? "" : value)}>
-                <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+                <SelectTrigger aria-label="Filtrar agenda por status"><SelectValue placeholder="Status" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all-status">Todos</SelectItem>
                   {["Inscrições abertas", "Poucas vagas", "Encerrada", "Em breve"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}

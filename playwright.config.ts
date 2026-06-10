@@ -27,7 +27,7 @@ export default defineConfig({
   ],
   webServer: {
     // Usa o bundle de produção do Next.js já gerado por `npm run build`.
-    command: "npx next start -p 3100",
+    command: "node scripts/start-test-server.mjs",
     url: "http://127.0.0.1:3100",
     reuseExistingServer: false,
     timeout: 120_000

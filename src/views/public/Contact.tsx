@@ -207,7 +207,7 @@ export function ContactPage() {
             </div>
           </div>
 
-          <Card className="border-outline-variant bg-white/95 shadow-card">
+          <Card className="border-outline-variant bg-white/95 shadow-card" data-testid="ui-contact-form">
             <CardContent className="grid gap-5 p-8 md:p-10">
               <div>
                 <h2 className="font-display text-h2-compact font-bold text-deep-navy">

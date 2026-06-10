@@ -54,11 +54,11 @@ Sem tokens/tipografia consistentes, qualquer FormField (Épica 2), polish de adm
 
 ## Critérios de aceite da épica
 
-- [ ] Baseline visual + a11y capturado antes de qualquer mudança de token (mitiga risco "mudança sem prova").
-- [ ] S4 — nenhum texto funcional abaixo do mínimo.
-- [ ] S5 — combinações textuais principais passam WCAG AA.
-- [ ] S6 (parcial) — tokens compartilháveis entre público e admin.
-- [ ] Material documentado por camada.
+- [x] Baseline visual + a11y capturado antes de qualquer mudança de token (mitiga risco "mudança sem prova").
+- [x] S4 — nenhum texto funcional abaixo do mínimo.
+- [x] S5 — combinações textuais principais passam WCAG AA.
+- [x] S6 (parcial) — tokens compartilháveis entre público e admin.
+- [x] Material documentado por camada.
 
 ## Gates
 

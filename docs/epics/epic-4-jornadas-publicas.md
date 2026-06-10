@@ -41,10 +41,10 @@ Migrar páginas antes de ter tokens/FormField gera retrabalho. Componentes compa
 
 ## Critérios de aceite da épica
 
-- [ ] Cada jornada revisada (desktop/mobile/teclado/leitor de tela/motion/contraste) antes da próxima.
-- [ ] S2 (conversão) — atrito reduzido nos fluxos de captura.
-- [ ] S3 — formulários públicos com label persistente e erro inline.
-- [ ] Sem regressão de fluxo durante migração.
+- [x] Cada jornada revisada (desktop/mobile/teclado/leitor de tela/motion/contraste) antes da próxima.
+- [x] S2 (conversão) — atrito reduzido nos fluxos de captura.
+- [x] S3 — formulários públicos com label persistente e erro inline.
+- [x] Sem regressão de fluxo durante migração.
 
 ## Gates
 

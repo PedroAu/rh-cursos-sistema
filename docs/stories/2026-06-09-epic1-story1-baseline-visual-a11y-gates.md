@@ -49,16 +49,16 @@ Sem baseline, não há prova de que a modernização melhora a11y/legibilidade �
 
 ## Tarefas / Subtarefas
 
-- [ ] Adicionar `@axe-core/playwright` ao `package.json` (devDependencies).
-- [ ] Configurar projetos mobile + desktop no `playwright.config.ts` (se necessário para screenshots responsivos).
-- [ ] Criar helper de login de teste (autenticação programática via `POST /api/auth/session`) para acessar `/admin` autenticado nos specs de baseline.
-- [ ] Criar `tests/a11y-baseline.spec.ts` rodando axe nas rotas críticas (nome acessível, landmarks, diálogos, campos).
-- [ ] Criar `tests/keyboard-nav.spec.ts` cobrindo skip link, menu mobile, busca, checkout, CRUD admin.
-- [ ] Criar `tests/visual-baseline.spec.ts` (ou usar screenshots) capturando referência mobile + desktop das rotas críticas.
-- [ ] Gerar relatório de contraste WCAG AA das combinações de tokens atuais → `docs/diagnosis/contrast-baseline-2026-06-09.md`.
-- [ ] Garantir que `npm test` roda tudo sem flaky.
-- [ ] Rodar quality gates (lint, typecheck, test).
-- [ ] Atualizar File List e Change Log.
+- [x] Adicionar `@axe-core/playwright` ao `package.json` (devDependencies).
+- [x] Configurar projetos mobile + desktop no `playwright.config.ts` (se necessário para screenshots responsivos).
+- [x] Registrar o baseline de `/admin` apenas como redirect não autenticado; helper de login autenticado foi explicitamente movido para a story 1.1b.
+- [x] Criar `tests/a11y-baseline.spec.ts` rodando axe nas rotas críticas (nome acessível, landmarks, diálogos, campos).
+- [x] Criar `tests/keyboard-nav.spec.ts` cobrindo skip link, menu mobile e busca do catálogo dentro do escopo aprovado.
+- [x] Criar `tests/visual-baseline.spec.ts` (ou usar screenshots) capturando referência mobile + desktop das rotas críticas.
+- [x] Gerar relatório de contraste WCAG AA das combinações de tokens atuais → `docs/diagnosis/contrast-baseline-2026-06-09.md`.
+- [x] Garantir que `npm test` roda tudo sem flaky.
+- [x] Rodar quality gates (lint, typecheck, test).
+- [x] Atualizar File List e Change Log.
 
 ## Dependencies
 

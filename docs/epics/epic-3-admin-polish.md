@@ -41,10 +41,10 @@ A descoberta de 2026-06-09 confirmou que o grosso da Fase 2/3 do plano original 
 
 ## Critérios de aceite da épica
 
-- [ ] S1 e S2 protegidos por teste (regressão-guard).
-- [ ] Superfícies admin consistentes com tokens da Épica 1 (S6).
-- [ ] Inscrições com contexto read-only.
-- [ ] Gráficos acessíveis.
+- [x] S1 e S2 protegidos por teste (regressão-guard).
+- [x] Superfícies admin consistentes com tokens da Épica 1 (S6).
+- [x] Inscrições com contexto read-only.
+- [x] Gráficos acessíveis.
 
 ## Gates
 

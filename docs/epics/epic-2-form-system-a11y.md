@@ -48,10 +48,10 @@ O **admin já tem** ArrayInput, ModulesBuilder, SelectField, MultiSelect e valid
 
 ## Critérios de aceite da épica
 
-- [ ] S3 — todos os formulários com label persistente, erro inline, navegação por teclado.
-- [ ] Controles compartilhados têm estados e semântica documentados.
-- [ ] Erros associados ao campo, não só toast.
-- [ ] Admin existente NÃO regrediu (guard de S1/S2).
+- [x] S3 — todos os formulários com label persistente, erro inline, navegação por teclado.
+- [x] Controles compartilhados têm estados e semântica documentados.
+- [x] Erros associados ao campo, não só toast.
+- [x] Admin existente NÃO regrediu (guard de S1/S2).
 
 ## Gates
 

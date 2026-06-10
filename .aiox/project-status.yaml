@@ -1,19 +1,19 @@
 status:
-  branch: chore/react-19-node-pin
+  branch: story/1.2-tokens-semanticos
   modifiedFiles:
     - .aiox/project-status.yaml
-    - app/admin/alunos/page.tsx
-    - app/admin/blog/page.tsx
-    - app/admin/cursos/page.tsx
-    - app/admin/inscricoes/page.tsx
-  modifiedFilesTotalCount: 32
+    - DEPLOYMENT.md
+    - docs/epics/epic-1-fundacao-visual-baseline-a11y.md
+    - docs/epics/epic-2-form-system-a11y.md
+    - docs/epics/epic-3-admin-polish.md
+  modifiedFilesTotalCount: 31
   recentCommits:
-    - 'chore: complete cloudflare workers deploy pipeline'
-    - 'chore: harden cloudflare workers production runtime'
+    - 'feat: implement epic 5 search motion and loading polish'
+    - 'feat: implement epic 3 and conclude epic 4 public journeys'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-09T20:10:50.663Z'
+  lastUpdate: '2026-06-10T18:19:30.404Z'
   isGitRepo: true
-timestamp: 1781035850665
+timestamp: 1781115570405
 ttl: 60
-gitFingerprint: 1780957652654.5256:1781035562437.1165
+gitFingerprint: 1781047614259.2688:1781115562863.108

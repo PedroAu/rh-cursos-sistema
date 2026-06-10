@@ -91,7 +91,7 @@ export function LoginPage() {
   return (
     <section className="page-section">
       <div className="container flex justify-center">
-        <Card className="w-full max-w-xl border-outline-variant">
+        <Card className="w-full max-w-xl border-outline-variant" data-testid="ui-login-card">
           <CardContent className="space-y-6 p-8">
             <div className="space-y-3 text-center">
               <span className="eyebrow">Administração</span>

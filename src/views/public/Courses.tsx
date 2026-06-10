@@ -171,7 +171,10 @@ export function CoursesPage() {
     <section className="bg-surface-muted">
       <div className="ea-container py-10">
         <div className="grid gap-8 lg:grid-cols-[340px_1fr] lg:items-start">
-          <aside className="surface-card p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+          <aside
+            className="surface-card p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto"
+            data-testid="ui-courses-filters"
+          >
             <div className="mb-6 flex items-center justify-between gap-4 border-b border-outline-variant pb-5">
               <span className="eyebrow">Filtros</span>
               <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-label font-bold text-deep-navy">
@@ -241,7 +244,7 @@ export function CoursesPage() {
               <div>
                 <span className="ea-label mb-3 block">Modalidade</span>
                 <Select value={filters.modality || "all-modalities"} onValueChange={(value) => setFilter("modality", value)}>
-                  <SelectTrigger><SelectValue placeholder="Modalidade" /></SelectTrigger>
+                  <SelectTrigger aria-label="Filtrar por modalidade"><SelectValue placeholder="Modalidade" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all-modalities">Todas</SelectItem>
                     {["Ao vivo online", "Presencial", "In company", "Híbrido", "Gravado"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
@@ -252,7 +255,7 @@ export function CoursesPage() {
               <div>
                 <span className="ea-label mb-3 block">Carga horária</span>
                 <Select value={filters.duration || "all-durations"} onValueChange={(value) => setFilter("duration", value)}>
-                  <SelectTrigger><SelectValue placeholder="Carga horária" /></SelectTrigger>
+                  <SelectTrigger aria-label="Filtrar por carga horária"><SelectValue placeholder="Carga horária" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all-durations">Qualquer carga</SelectItem>
                     {["Até 8h", "De 9h a 16h", "De 17h a 24h", "Mais de 24h"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
@@ -263,7 +266,7 @@ export function CoursesPage() {
               <div>
                 <span className="ea-label mb-3 block">Nível</span>
                 <Select value={filters.level || "all-levels"} onValueChange={(value) => setFilter("level", value)}>
-                  <SelectTrigger><SelectValue placeholder="Nível" /></SelectTrigger>
+                  <SelectTrigger aria-label="Filtrar por nível"><SelectValue placeholder="Nível" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all-levels">Todos</SelectItem>
                     {["Básico", "Intermediário", "Avançado"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}

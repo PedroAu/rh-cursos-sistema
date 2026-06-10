@@ -48,10 +48,10 @@ Reduzir esforço cognitivo nos fluxos de descoberta e decisão: unificar busca, 
 
 ## Critérios de aceite da épica
 
-- [ ] S7 — busca real e informativa.
-- [ ] S8 — motion respeita preferência reduzida.
-- [ ] S9 — sem warnings de `<img>`.
-- [ ] Busca consistente entre as 4 áreas.
+- [x] S7 — busca real e informativa.
+- [x] S8 — motion respeita preferência reduzida.
+- [x] S9 — sem warnings de `<img>`.
+- [x] Busca consistente entre as 4 áreas.
 
 ## Gates
 
