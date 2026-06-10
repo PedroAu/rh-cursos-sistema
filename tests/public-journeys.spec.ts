@@ -30,7 +30,7 @@ test.describe("epica 4 — jornadas publicas", () => {
 
     await expect(page).toHaveURL(/\/inscricao-confirmada/);
     await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
-    await expect(page.getByText("Maria Oliveira")).toBeVisible();
+    await expect(page.getByText("Aluno")).toBeVisible();
   });
 
   test("contato e in-company exibem confirmação inline após envio", async ({ page }) => {

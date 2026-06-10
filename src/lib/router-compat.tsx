@@ -4,7 +4,9 @@
 
 import NextLink from "next/link";
 import { useParams as useNextParams, usePathname, useRouter, useSearchParams as useNextSearchParams } from "next/navigation";
-import { createElement, type AnchorHTMLAttributes, type ReactNode } from "react";
+import { createElement, useCallback, type AnchorHTMLAttributes, type ReactNode } from "react";
+
+const NAVIGATION_STATE_STORAGE_KEY = "__router_compat_navigation_state__";
 
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "className"> & {
   to: string;
@@ -61,7 +63,13 @@ export function useNavigate() {
 
   return (to: string, options?: { replace?: boolean; state?: unknown }) => {
     if (options?.state && typeof window !== "undefined") {
-      window.history.replaceState(options.state, "", window.location.href);
+      window.sessionStorage.setItem(
+        NAVIGATION_STATE_STORAGE_KEY,
+        JSON.stringify({
+          to,
+          state: options.state
+        })
+      );
     }
 
     if (options?.replace) {
@@ -76,7 +84,24 @@ export function useLocation() {
   const pathname = usePathname();
   const params = useNextSearchParams();
   const search = params.toString() ? `?${params.toString()}` : "";
-  const state = typeof window !== "undefined" ? window.history.state : null;
+  let state = typeof window !== "undefined" ? window.history.state : null;
+
+  if (typeof window !== "undefined") {
+    const storedValue = window.sessionStorage.getItem(NAVIGATION_STATE_STORAGE_KEY);
+
+    if (storedValue) {
+      try {
+        const parsed = JSON.parse(storedValue) as { to?: string; state?: unknown };
+        const currentPath = `${pathname}${search}`;
+
+        if (parsed.to === currentPath || parsed.to === pathname) {
+          state = parsed.state ?? null;
+        }
+      } catch {
+        // Mantém o state atual caso o payload armazenado esteja inválido.
+      }
+    }
+  }
 
   return { pathname, search, state };
 }
@@ -91,11 +116,11 @@ export function useSearchParams(): [URLSearchParams, (next: URLSearchParams | Re
   const params = useNextSearchParams();
   const current = new URLSearchParams(params.toString());
 
-  const setParams = (next: URLSearchParams | Record<string, string>) => {
+  const setParams = useCallback((next: URLSearchParams | Record<string, string>) => {
     const normalized = next instanceof URLSearchParams ? next : new URLSearchParams(next);
     const query = normalized.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
-  };
+  }, [pathname, router]);
 
   return [current, setParams];
 }

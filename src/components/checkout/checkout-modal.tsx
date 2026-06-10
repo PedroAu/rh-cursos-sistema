@@ -52,6 +52,8 @@ const checkoutSteps = [
   { title: "Confirmação", description: "Revise o pedido e defina o pagamento." }
 ] as const;
 
+const ENROLLMENT_SUCCESS_STORAGE_KEY = "__latest_enrollment_success__";
+
 export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -131,8 +133,26 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
         notes: "Inscrição gerada pelo checkout simulado."
       });
 
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(
+          ENROLLMENT_SUCCESS_STORAGE_KEY,
+          JSON.stringify({
+            courseId: course.id,
+            classId: form.classId,
+            studentName: form.studentName,
+            paymentMethod: form.paymentMethod
+          })
+        );
+      }
+
       onOpenChange(false);
-      navigate("/inscricao-confirmada", {
+      const successParams = new URLSearchParams({
+        courseId: course.id,
+        classId: form.classId,
+        studentName: form.studentName,
+        paymentMethod: form.paymentMethod
+      });
+      navigate(`/inscricao-confirmada?${successParams.toString()}`, {
         state: {
           courseId: course.id,
           classId: form.classId,

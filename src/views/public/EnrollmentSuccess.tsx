@@ -1,4 +1,6 @@
-import { useLocation } from "@/lib/router-compat";
+"use client";
+
+import { useLocation, useSearchParams } from "@/lib/router-compat";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,12 +8,51 @@ import { useAppStore } from "@/lib/app-store";
 import { formatDate } from "@/lib/utils";
 import { Link } from "@/lib/router-compat";
 
+const ENROLLMENT_SUCCESS_STORAGE_KEY = "__latest_enrollment_success__";
+
 export function EnrollmentSuccessPage() {
   const location = useLocation();
-  const { courses, classes } = useAppStore();
-  const state = location.state as
+  const [params] = useSearchParams();
+  const { courses, classes, enrollments } = useAppStore();
+  const navigationState = location.state as
     | { courseId: string; classId: string; studentName: string; paymentMethod: string }
     | undefined;
+  const queryState =
+    params.get("courseId") && params.get("classId")
+      ? {
+          courseId: params.get("courseId") ?? "",
+          classId: params.get("classId") ?? "",
+          studentName: params.get("studentName") ?? "",
+          paymentMethod: params.get("paymentMethod") ?? ""
+        }
+      : undefined;
+  const persistedState =
+    typeof window !== "undefined"
+      ? (() => {
+          const stored = window.sessionStorage.getItem(ENROLLMENT_SUCCESS_STORAGE_KEY);
+          if (!stored) return undefined;
+
+          try {
+            return JSON.parse(stored) as {
+              courseId: string;
+              classId: string;
+              studentName: string;
+              paymentMethod: string;
+            };
+          } catch {
+            return undefined;
+          }
+        })()
+      : undefined;
+  const latestEnrollment = enrollments[0];
+  const state = queryState ?? navigationState ?? persistedState ?? (latestEnrollment
+    ? {
+        courseId: latestEnrollment.courseId,
+        classId: latestEnrollment.classId,
+        studentName: latestEnrollment.studentName,
+        paymentMethod: latestEnrollment.paymentMethod
+      }
+    : undefined);
 
   const course = courses.find((item) => item.id === state?.courseId);
   const trainingClass = classes.find((item) => item.id === state?.classId);

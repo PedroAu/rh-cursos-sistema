@@ -243,7 +243,14 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               <SearchInput
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
+                onClear={() => setSearch("")}
+                clearLabel={`Limpar busca de ${config.title.toLowerCase()}`}
                 placeholder="Buscar por nome, título ou referência..."
+                resultsLabel={
+                  search
+                    ? `${rows.length} registro${rows.length === 1 ? "" : "s"} visível${rows.length === 1 ? "" : "eis"} para “${search}”.`
+                    : "A busca operacional filtra o recurso atual por nome, título ou referência."
+                }
               />
             </div>
           </div>

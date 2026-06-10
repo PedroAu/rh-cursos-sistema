@@ -1,5 +1,5 @@
 import { CalendarDays, CheckCircle2, Filter, Search, X } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { CalendarView } from "@/components/agenda/calendar-view";
 import { SearchInput } from "@/components/common/search-input";
@@ -8,14 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+import { useSearchParams } from "@/lib/router-compat";
 
 export function AgendaPage() {
   const { classes, courses, instructors, trainingPaths } = useAppStore();
-  const [query, setQuery] = useState("");
-  const [path, setPath] = useState("");
-  const [courseId, setCourseId] = useState("");
-  const [modality, setModality] = useState("");
-  const [status, setStatus] = useState("");
+  const [params, setParams] = useSearchParams();
+  const [query, setQuery] = useState(params.get("q") ?? "");
+  const [path, setPath] = useState(params.get("path") ?? "");
+  const [courseId, setCourseId] = useState(params.get("courseId") ?? "");
+  const [modality, setModality] = useState(params.get("modality") ?? "");
+  const [status, setStatus] = useState(params.get("status") ?? "");
   const searchRef = useRef<HTMLInputElement>(null);
 
   useHotkey(
@@ -56,6 +58,16 @@ export function AgendaPage() {
     setModality("");
     setStatus("");
   };
+
+  useEffect(() => {
+    const next: Record<string, string> = {};
+    if (query) next.q = query;
+    if (path) next.path = path;
+    if (courseId) next.courseId = courseId;
+    if (modality) next.modality = modality;
+    if (status) next.status = status;
+    setParams(next);
+  }, [courseId, modality, path, query, setParams, status]);
 
   return (
     <section className="bg-surface-muted">
@@ -137,6 +149,14 @@ export function AgendaPage() {
                 placeholder="Curso, instrutor ou local"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
+                onClear={() => setQuery("")}
+                clearLabel="Limpar busca da agenda"
+                resultsLabel={
+                  query
+                    ? `${filteredClasses.length} turma${filteredClasses.length === 1 ? "" : "s"} encontrada${filteredClasses.length === 1 ? "" : "s"} para “${query}”.`
+                    : "Busque por curso, instrutor ou local para reduzir a agenda."
+                }
+                loading={loading}
               />
             </div>
             <div>

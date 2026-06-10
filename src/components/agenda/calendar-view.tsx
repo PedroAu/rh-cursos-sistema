@@ -170,7 +170,7 @@ export function CalendarView({
       </Card>
 
       <div className="space-y-5">
-        <div className="apple-surface flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="surface-card flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <span className="inline-flex rounded bg-prestige-gold px-2 py-1.5 text-label font-bold uppercase tracking-[0.08em] text-white">
               {selectedLabel}
@@ -187,7 +187,7 @@ export function CalendarView({
         </div>
 
         {loading ? (
-          <LoadingBlocks count={6} />
+          <LoadingBlocks count={6} summary="Atualizando agenda filtrada..." />
         ) : visibleClasses.length ? (
           <div className="grid gap-5 2xl:grid-cols-2">
             {visibleClasses.map((trainingClass) => {

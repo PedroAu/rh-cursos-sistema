@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpenCheck,
   CheckCircle2,
@@ -53,6 +53,10 @@ export function CoursesPage() {
     }
     setParams(next);
   };
+
+  useEffect(() => {
+    setQuery(params.get("q") ?? "");
+  }, [params]);
 
   const clearFilters = () => {
     setQuery("");
@@ -186,7 +190,15 @@ export function CoursesPage() {
                   ref={searchRef}
                   value={query}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Buscar cursos"
+                  onClear={() => setSearch("")}
+                  clearLabel="Limpar busca do catálogo"
+                  placeholder="Buscar cursos, temas ou trilhas"
+                  resultsLabel={
+                    query
+                      ? `${filtered.length} resultado${filtered.length === 1 ? "" : "s"} para “${query}”.`
+                      : "Digite um termo para filtrar o catálogo por curso, tema ou trilha."
+                  }
+                  loading={loading}
                 />
               </div>
 
@@ -317,7 +329,7 @@ export function CoursesPage() {
             </div>
 
             {loading ? (
-              <LoadingBlocks count={6} />
+              <LoadingBlocks count={6} summary="Atualizando cursos do catálogo..." />
             ) : filtered.length ? (
               <div className="grid items-stretch gap-6 lg:grid-cols-2">
                 {filtered.map((course) => (

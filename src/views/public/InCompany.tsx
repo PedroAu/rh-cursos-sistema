@@ -150,6 +150,7 @@ export function InCompanyPage() {
             alt="Equipe corporativa em programa de capacitação in company"
             fill
             sizes="100vw"
+            priority
             className="h-full w-full object-cover"
           />
         </div>

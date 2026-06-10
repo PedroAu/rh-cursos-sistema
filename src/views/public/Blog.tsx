@@ -5,6 +5,7 @@ import { useSearchParams } from "@/lib/router-compat";
 
 import { BlogCard } from "@/components/blog/blog-card";
 import { EmptyState } from "@/components/common/empty-state";
+import { LoadingBlocks } from "@/components/common/loading-blocks";
 import { SearchInput } from "@/components/common/search-input";
 import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
+import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 
 const categories = ["Todos", "Departamento Pessoal", "eSocial", "Gestão Pública", "Liderança", "Tecnologia", "Assédio e Compliance"] as const;
 
@@ -23,6 +25,7 @@ export function BlogPage() {
     (searchParams.get("category") as (typeof categories)[number]) || "Todos"
   );
   const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -53,6 +56,7 @@ export function BlogPage() {
 
   const featuredPost = posts[0];
   const visiblePosts = featuredPost ? posts.slice(1) : posts;
+  const loading = useSimulatedLoading([query, category]);
   const categorySummary = categories
     .filter((item) => item !== "Todos")
     .map((item) => ({
@@ -69,6 +73,7 @@ export function BlogPage() {
     }
 
     try {
+      setIsSubmittingNewsletter(true);
       await createLead({
         name: newsletterEmail.split("@")[0],
         email: newsletterEmail,
@@ -80,6 +85,8 @@ export function BlogPage() {
       setNewsletterEmail("");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível concluir o cadastro.");
+    } finally {
+      setIsSubmittingNewsletter(false);
     }
   };
 
@@ -98,6 +105,14 @@ export function BlogPage() {
             placeholder="Busque por tema, categoria ou assunto"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onClear={() => setQuery("")}
+            clearLabel="Limpar busca do blog"
+            resultsLabel={
+              query
+                ? `${posts.length} artigo${posts.length === 1 ? "" : "s"} encontrado${posts.length === 1 ? "" : "s"} para “${query}”.`
+                : "Busque por tema, categoria ou assunto para refinar a leitura."
+            }
+            loading={loading}
           />
           <div className="flex flex-wrap gap-2">
             {categories.map((item) => (
@@ -166,6 +181,7 @@ export function BlogPage() {
                 />
                 <Button
                   className="w-full"
+                  loading={isSubmittingNewsletter}
                   onClick={submitNewsletter}
                 >
                   Quero receber conteúdos
@@ -175,7 +191,9 @@ export function BlogPage() {
           </div>
         ) : null}
 
-        {visiblePosts.length ? (
+        {loading ? (
+          <LoadingBlocks count={3} summary="Atualizando seleção editorial..." />
+        ) : visiblePosts.length ? (
           <div className="grid gap-5 xl:grid-cols-3">
             {visiblePosts.map((post) => (
               <BlogCard key={post.id} post={post} />

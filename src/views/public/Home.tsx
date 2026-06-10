@@ -14,7 +14,7 @@ import {
   Star,
   TrendingUp
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useRef, useState } from "react";
 import { Link } from "@/lib/router-compat";
 
@@ -109,6 +109,7 @@ export function HomePage() {
   const { trainingPaths, testimonials } = useAppStore();
   const [testimonialPage, setTestimonialPage] = useState(0);
   const testimonialsTrackRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const itemsPerPage = 3;
   const totalPages = Math.ceil(testimonials.length / itemsPerPage);
@@ -403,9 +404,10 @@ export function HomePage() {
             {journeySteps.map((step, index) => (
               <motion.div
                 key={step.title}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+                whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={prefersReducedMotion ? undefined : { once: true }}
+                transition={prefersReducedMotion ? undefined : { duration: 0.25 }}
               >
                 <Card className="h-full border-primary/10 bg-white shadow-soft hover:-translate-y-1 hover:shadow-card">
                   <CardContent className="flex h-full flex-col items-center gap-5 p-7 text-center">
