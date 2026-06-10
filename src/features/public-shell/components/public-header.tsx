@@ -14,7 +14,7 @@ export function PublicHeader() {
   const isHome = location.pathname === "/";
 
   return (
-    <header className={`material-app-bar sticky top-0 z-30 border-b border-outline-variant ${isHome ? "apple-material" : "bg-white/92"}`}>
+    <header className={`material-app-bar sticky top-0 z-30 border-b border-outline-variant ${isHome ? "bg-white/78" : "bg-white/92"}`}>
       <div className="ea-container flex min-h-[72px] items-center justify-between gap-8">
         <Link to="/" className="flex items-center gap-3">
           <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-12 w-auto" priority />
@@ -44,7 +44,7 @@ export function PublicHeader() {
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
             <input
               aria-label="Buscar cursos"
-              className="h-11 w-52 rounded-xl border border-outline-variant bg-white/90 pl-10 pr-4 text-sm outline-none transition focus:border-prestige-gold focus:ring-2 focus:ring-ring/25"
+              className="h-11 w-52 rounded-xl border border-outline-variant bg-white/92 pl-10 pr-4 text-sm outline-none transition focus:border-prestige-gold focus:ring-2 focus:ring-ring/25"
               placeholder="Buscar cursos..."
             />
           </div>

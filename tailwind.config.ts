@@ -28,7 +28,7 @@ const config: Config = {
           foreground: "var(--ea-color-on-secondary-container)"
         },
         accent: {
-          DEFAULT: "var(--ea-color-prestige-gold)",
+          DEFAULT: "var(--ea-color-accent)",
           foreground: "var(--ea-color-primary)"
         },
         muted: {
@@ -42,9 +42,9 @@ const config: Config = {
         border: "var(--ea-color-outline-variant)",
         input: "var(--ea-color-outline-variant)",
         ring: "var(--ea-color-prestige-gold)",
-        warning: "var(--ea-color-secondary-fixed-dim)",
-        success: "var(--ea-color-success-green)",
-        danger: "var(--ea-color-error)",
+        warning: "var(--ea-color-warning)",
+        success: "var(--ea-color-success)",
+        danger: "var(--ea-color-danger)",
         "deep-navy": "var(--ea-color-deep-navy)",
         "prestige-gold": "var(--ea-color-prestige-gold)",
         surface: "var(--ea-color-surface)",
@@ -52,7 +52,14 @@ const config: Config = {
         "surface-container": "var(--ea-color-surface-container)",
         "text-main": "var(--ea-color-text-main)",
         "text-muted": "var(--ea-color-text-muted)",
-        "outline-variant": "var(--ea-color-outline-variant)"
+        "outline-variant": "var(--ea-color-outline-variant)",
+        // Camada semântica (Story 1.2). `label` vira `label-primary`/`label-secondary`
+        // porque `text-label` já é um utilitário de fontSize (colisão de classe).
+        "label-primary": "var(--ea-color-label)",
+        "label-secondary": "var(--ea-color-secondary-label)",
+        separator: "var(--ea-color-separator)",
+        "surface-raised": "var(--ea-color-surface-raised)",
+        control: "var(--ea-color-control)"
       },
       borderRadius: {
         DEFAULT: "var(--ea-radius-default)",

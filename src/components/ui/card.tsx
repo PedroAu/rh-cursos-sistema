@@ -27,7 +27,7 @@ export function CardDescription({
   className,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("text-sm leading-7 text-muted-foreground", className)} {...props} />;
+  return <p className={cn("text-sm leading-7 text-label-secondary", className)} {...props} />;
 }
 
 export function CardContent({

@@ -27,7 +27,7 @@ export function TrainingPathCard({ path }: { path: TrainingPath }) {
           <div className="rounded-lg bg-secondary/70 p-3 text-primary" aria-hidden="true">
             <Icon className="h-5 w-5" />
           </div>
-          <span className="rounded bg-accent px-3 py-1.5 text-badge font-semibold uppercase tracking-[0.12em] text-white">
+          <span className="rounded bg-accent px-3 py-1.5 text-label font-semibold uppercase tracking-[0.12em] text-white">
             {path.courseCount} cursos
           </span>
         </div>

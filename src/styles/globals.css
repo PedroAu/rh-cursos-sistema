@@ -27,7 +27,7 @@
     --ea-color-secondary-container: #f4d277;
     --ea-color-secondary-fixed-dim: #d6aa45;
     --ea-color-on-secondary-container: #3f2b00;
-    --ea-color-success-green: #008a3d;
+    --ea-color-success-green: #007a36; /* AA: era #008a3d (4.47:1 com branco) */
     --ea-color-error: #ba1a1a;
     --ea-color-surface: #f5f5f7;
     --ea-color-background: #f5f5f7;
@@ -50,6 +50,22 @@
     --ea-section-padding: 80px;
     --ea-shadow-soft: 0 8px 22px rgba(0, 23, 54, 0.07);
     --ea-shadow-card: 0 18px 42px rgba(0, 23, 54, 0.14);
+
+    /*
+     * Camada semântica (Story 1.2) — consome a paleta acima por indireção.
+     * Dark mode futuro (D4): redefinir APENAS este bloco (ex.: [data-theme="dark"]),
+     * sem tocar na paleta nem nos componentes.
+     * Matriz de contraste: docs/design/tokens-cor-superficie.md
+     */
+    --ea-color-label: var(--ea-color-text-main);            /* texto principal */
+    --ea-color-secondary-label: var(--ea-color-text-muted); /* texto de apoio, metadata */
+    --ea-color-separator: var(--ea-color-outline-variant);  /* divisores, bordas sutis */
+    --ea-color-surface-raised: var(--ea-color-surface-container-lowest); /* cards, painéis */
+    --ea-color-control: var(--ea-color-surface-container);  /* chips, inputs, segmentados */
+    --ea-color-accent: var(--ea-color-prestige-gold);       /* ação/destaque institucional */
+    --ea-color-success: var(--ea-color-success-green);
+    --ea-color-warning: #7a5600; /* AA: warning textual/interativo; era #d6aa45 (1.94:1 com branco) */
+    --ea-color-danger: var(--ea-color-error);
 
     /* Typography scale */
     --ea-font-size-micro: 0.625rem;    /* 10px — micro labels */
@@ -95,27 +111,27 @@
   }
 
   h1 {
-    font-size: 48px;
-    line-height: 1.2;
+    font-size: clamp(var(--ea-font-size-h1-mobile), 4vw, var(--ea-font-size-display));
+    line-height: 1.1;
     font-weight: 800;
     letter-spacing: 0;
   }
 
   h2 {
-    font-size: 36px;
-    line-height: 1.3;
+    font-size: clamp(var(--ea-font-size-h2), 3vw, var(--ea-font-size-section));
+    line-height: 1.15;
     font-weight: 700;
   }
 
   h3 {
-    font-size: 24px;
-    line-height: 1.4;
+    font-size: var(--ea-font-size-article);
+    line-height: 1.2;
     font-weight: 700;
   }
 
   h4 {
-    font-size: 1.875rem;
-    line-height: 1.18;
+    font-size: var(--ea-font-size-lead);
+    line-height: 1.25;
     font-weight: 700;
   }
 
@@ -152,7 +168,7 @@
   }
 
   .surface-card {
-    @apply border border-outline-variant bg-white/95 shadow-soft transition-all duration-300;
+    @apply border border-separator bg-surface-raised text-label-primary shadow-soft transition-all duration-300;
     border-radius: var(--ea-radius-xl);
   }
 
@@ -167,7 +183,7 @@
   }
 
   .section-panel {
-    @apply border border-outline-variant bg-white p-8 shadow-soft md:p-10;
+    @apply border border-separator bg-surface-raised p-8 shadow-soft md:p-10;
     border-radius: var(--ea-radius-xl);
   }
 
@@ -200,7 +216,7 @@
   }
 
   .ea-card {
-    @apply border border-outline-variant bg-white/95 shadow-sm transition-all duration-300;
+    @apply border border-separator bg-surface-raised shadow-sm transition-all duration-300;
     border-radius: var(--ea-radius-xl);
   }
 
@@ -240,11 +256,12 @@
   }
 
   .apple-surface {
-    @apply border border-outline-variant bg-white/90 shadow-soft;
+    @apply border border-separator bg-surface-raised shadow-soft;
     border-radius: var(--ea-radius-xl);
   }
 
   .material-app-bar {
+    background: rgba(255, 255, 255, 0.82);
     -webkit-backdrop-filter: saturate(180%) blur(20px);
     backdrop-filter: saturate(180%) blur(20px);
     box-shadow: 0 1px 0 rgba(0, 23, 54, 0.05);

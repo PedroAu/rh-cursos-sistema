@@ -27,13 +27,13 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
             sizes={compact ? "(min-width: 1024px) 384px, 100vw" : "(min-width: 1024px) 33vw, 100vw"}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
-          <div className="absolute left-4 top-4 rounded bg-white/92 px-3 py-1 text-micro font-bold uppercase tracking-[0.12em] text-primary shadow-sm backdrop-blur">
+          <div className="absolute left-4 top-4 rounded bg-white/96 px-3 py-1.5 text-label font-bold uppercase tracking-[0.12em] text-primary shadow-sm">
             {course.pathName}
           </div>
         </div>
         <div className="border-b border-outline-variant bg-white p-6">
           <div className="space-y-2">
-            <div className="inline-flex rounded bg-accent px-2 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white">
+            <div className="inline-flex rounded bg-accent px-2 py-1.5 text-label font-semibold uppercase tracking-[0.16em] text-white">
               {course.level}
             </div>
             <StatusBadge status={course.status} />
@@ -41,7 +41,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
         </div>
         <CardContent className="space-y-6 p-6">
           <div className="space-y-3">
-            <h3 className="line-clamp-2 text-primary font-bold">{course.title}</h3>
+            <h3 className="line-clamp-2 text-card font-bold text-primary">{course.title}</h3>
             <p className="line-clamp-3 text-sm leading-7 text-muted-foreground">
               {course.shortDescription}
             </p>

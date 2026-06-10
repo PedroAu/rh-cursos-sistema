@@ -152,7 +152,7 @@ export function HomePage() {
                 return (
                   <div
                     key={item.label}
-                    className="apple-material-dark flex min-h-[148px] flex-col justify-between rounded-lg border border-white/20 bg-white/5 backdrop-blur p-4 shadow-soft"
+                    className="flex min-h-[148px] flex-col justify-between rounded-lg border border-white/14 bg-deep-navy/78 p-4 shadow-soft"
                   >
                     {item.featured ? (
                       <div className="flex gap-1 text-prestige-gold">
@@ -170,7 +170,7 @@ export function HomePage() {
                     )}
                     <div>
                       <p className="text-xl font-bold text-white">{item.value}</p>
-                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.05em] text-white/70">{item.label}</p>
+                      <p className="mt-1 text-label font-bold uppercase tracking-[0.05em] text-white/70">{item.label}</p>
                     </div>
                   </div>
                 );
@@ -241,7 +241,7 @@ export function HomePage() {
                       <h3 className="text-feature font-bold text-deep-navy">{item.title}</h3>
                       <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
                     </div>
-                    <div className="mt-auto inline-flex w-fit rounded bg-accent px-3 py-2 text-xs font-bold uppercase tracking-[0.05em] text-white">
+                    <div className="mt-auto inline-flex w-fit rounded bg-accent px-3 py-2 text-label font-bold uppercase tracking-[0.05em] text-white">
                       {item.proof}
                     </div>
                   </CardContent>

@@ -181,13 +181,13 @@ export function InCompanyPage() {
                 className="h-full w-full object-cover"
               />
             </div>
-            <div className="apple-material absolute -bottom-5 -left-5 max-w-[240px] rounded-lg border border-white p-4 shadow-card">
+            <div className="surface-card absolute -bottom-5 -left-5 max-w-[240px] p-4 shadow-card">
               <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
                 <TrendingUp className="h-5 w-5" />
               </div>
               <p className="font-display text-stat font-extrabold leading-none text-deep-navy">98%</p>
               <p className="mt-1 font-display text-base font-bold text-deep-navy">de satisfação</p>
-              <p className="mt-2 text-xs leading-5 text-text-muted">Avaliação de equipes após programas in company.</p>
+              <p className="mt-2 text-label leading-5 text-text-muted">Avaliação de equipes após programas in company.</p>
             </div>
           </div>
         </div>

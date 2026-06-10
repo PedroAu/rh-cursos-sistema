@@ -99,7 +99,7 @@ export function CoursesPage() {
     <section className="bg-deep-navy px-4 py-12 text-white sm:px-6 sm:py-14">
       <div className="ea-container overflow-hidden rounded-xl bg-deep-navy px-6 py-12 text-white shadow-card sm:px-10 sm:py-14">
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-prestige-gold/45 bg-prestige-gold/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-secondary">
+          <span className="inline-flex items-center gap-2 rounded-full border border-prestige-gold/45 bg-prestige-gold/15 px-4 py-2 text-label font-bold uppercase tracking-[0.08em] text-secondary">
             <span className="h-1.5 w-1.5 rounded-full bg-prestige-gold" />
             Programas profissionais
           </span>
@@ -162,7 +162,7 @@ export function CoursesPage() {
           <aside className="apple-surface p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
             <div className="mb-6 flex items-center justify-between gap-4 border-b border-outline-variant pb-5">
               <span className="eyebrow">Filtros</span>
-              <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-xs font-bold text-deep-navy">
+              <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-label font-bold text-deep-navy">
                 <CheckCircle2 className="h-4 w-4 text-accent" />
                 {filtered.length}/{courses.length}
               </div>
@@ -194,8 +194,8 @@ export function CoursesPage() {
                     className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${!filters.path ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
                   >
                     <span className="flex items-center justify-between gap-3">
-                      <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Todas</span>
-                      <span className="rounded bg-surface-muted px-2 py-1 text-badge font-bold text-deep-navy">{courses.length}</span>
+                      <span className={`text-label font-bold uppercase tracking-[0.05em] ${!filters.path ? "text-white/75" : "text-text-muted"}`}>Todas</span>
+                      <span className="rounded bg-surface-muted px-2 py-1 text-label font-bold text-deep-navy">{courses.length}</span>
                     </span>
                     <span className="mt-1 block text-sm font-bold leading-tight">Todas as trilhas</span>
                   </button>
@@ -207,8 +207,8 @@ export function CoursesPage() {
                       className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${filters.path === path.id ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
                     >
                       <span className="flex items-center justify-between gap-3">
-                        <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Trilha</span>
-                        <span className={`rounded px-2 py-1 text-badge font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
+                        <span className={`text-label font-bold uppercase tracking-[0.05em] ${filters.path === path.id ? "text-white/75" : "text-text-muted"}`}>Trilha</span>
+                        <span className={`rounded px-2 py-1 text-label font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
                           {path.courseCount}
                         </span>
                       </span>

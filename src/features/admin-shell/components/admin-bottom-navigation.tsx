@@ -21,7 +21,7 @@ export function AdminBottomNavigation() {
               to={item.to}
               end={item.to === "/admin"}
               className={({ isActive }) =>
-                `material-bottom-nav-item flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition ${
+                `material-bottom-nav-item flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-label font-semibold transition ${
                   isActive ? "bg-primary text-white shadow-soft" : "text-muted-foreground hover:bg-secondary/70 hover:text-primary"
                 }`
               }

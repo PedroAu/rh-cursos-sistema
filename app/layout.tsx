@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
+import { MotionProvider } from "@/components/providers/motion-provider";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
 
@@ -28,7 +29,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

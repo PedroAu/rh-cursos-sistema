@@ -13,6 +13,26 @@ import { dirname, join } from "node:path";
 
 const routes = ["/", "/cursos", "/agenda", "/blog", "/in-company", "/contato", "/login"];
 
+// Story 1.2: sem reduced motion, o axe captura texto NO MEIO das animações de
+// entrada (framer-motion anima opacity via inline style) e reporta cores
+// mescladas que não existem no código — as 70 falsas violações do baseline
+// original eram 100% isso. A emulação é feita via page.emulateMedia() dentro
+// do teste (test.use({ reducedMotion }) não chegou à página neste setup);
+// o MotionProvider lê a preferência e ativa MotionGlobalConfig.skipAnimations.
+
+/** Aguarda todas as opacidades inline (framer-motion) estabilizarem em 0 ou 1. */
+async function waitForMotionSettle(page: import("@playwright/test").Page) {
+  await page.waitForFunction(
+    () =>
+      Array.from(document.querySelectorAll<HTMLElement>("[style*='opacity']")).every((el) => {
+        const opacity = getComputedStyle(el).opacity;
+        return opacity === "0" || opacity === "1";
+      }),
+    undefined,
+    { timeout: 10_000 }
+  );
+}
+
 type ContrastFinding = {
   route: string;
   selector: string;
@@ -25,10 +45,16 @@ type ContrastFinding = {
 test("gera relatório de contraste WCAG AA (baseline)", async ({ page }) => {
   const findings: ContrastFinding[] = [];
 
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
   for (const route of routes) {
     await page.goto(route, { waitUntil: "domcontentloaded" });
     await page.locator("body").waitFor({ state: "visible" });
-    await page.waitForTimeout(500);
+    await page.evaluate(() => document.fonts.ready);
+    // Espera a hidratação + animações de entrada (com reduced motion são
+    // instantâneas; a janela cobre a chegada da hidratação em si).
+    await page.waitForTimeout(1500);
+    await waitForMotionSettle(page);
 
     const results = await new AxeBuilder({ page })
       .withRules(["color-contrast"])

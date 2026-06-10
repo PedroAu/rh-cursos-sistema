@@ -127,7 +127,7 @@ export function CalendarView({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-micro font-bold uppercase tracking-[0.08em] text-muted-foreground">
+          <div className="grid grid-cols-7 gap-1 text-center text-label font-bold uppercase tracking-[0.08em] text-muted-foreground">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
               <div key={label} className="py-2">{label}</div>
             ))}
@@ -162,7 +162,7 @@ export function CalendarView({
             })}
           </div>
 
-          <div className="mt-5 flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-xs font-semibold text-text-muted">
+          <div className="mt-5 flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-label font-semibold text-text-muted">
             <CalendarDays className="h-4 w-4 text-primary" />
             Clique em uma data para filtrar os cards ao lado.
           </div>
@@ -172,7 +172,7 @@ export function CalendarView({
       <div className="space-y-5">
         <div className="apple-surface flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span className="inline-flex rounded bg-prestige-gold px-2 py-1 text-xs font-bold uppercase tracking-[0.08em] text-white">
+            <span className="inline-flex rounded bg-prestige-gold px-2 py-1.5 text-label font-bold uppercase tracking-[0.08em] text-white">
               {selectedLabel}
             </span>
             <h2 className="mt-1 font-display text-2xl font-bold text-deep-navy">
