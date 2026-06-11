@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { company } from "@/lib/company";
+import { trackEvent } from "@/lib/analytics";
 import { useAppStore } from "@/lib/app-store";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -70,6 +71,7 @@ export function WhatsAppSupport() {
                     origin: "WhatsApp",
                     message: message || "Solicitação enviada pelo atendimento rápido"
                   });
+                  trackEvent("lead_enviado", { origin: "atendimento_rapido" });
                 } catch (error) {
                   toast.error(error instanceof Error ? error.message : "Não foi possível enviar a solicitação.");
                 }

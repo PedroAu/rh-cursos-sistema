@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Montserrat } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
 import { MotionProvider } from "@/components/providers/motion-provider";
+import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
 
@@ -54,6 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${inter.variable} ${montserrat.variable} ${legacyManrope.variable}`}>
         <MotionProvider>{children}</MotionProvider>
       </body>
+      {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>
   );
 }

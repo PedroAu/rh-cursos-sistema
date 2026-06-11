@@ -11,7 +11,7 @@ import { Outlet } from "@/lib/router-compat";
 
 export function PublicLayout({ children }: { children?: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div data-theme="executive" className="min-h-screen bg-background">
       <a className="skip-link" href="#main-content">
         Pular para o conteúdo
       </a>

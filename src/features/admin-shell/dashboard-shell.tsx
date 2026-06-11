@@ -10,7 +10,7 @@ import { Outlet } from "@/lib/router-compat";
 
 export function DashboardShell({ role, children }: { role: "admin"; children?: ReactNode }) {
   return (
-    <div className="min-h-screen bg-background">
+    <div data-theme="executive" className="min-h-screen bg-background">
       <div className="flex min-h-screen flex-col lg:flex-row">
         <AdminSidebar role={role} />
 

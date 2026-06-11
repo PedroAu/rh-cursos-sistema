@@ -267,6 +267,25 @@
     --ea-footer-bg: var(--m3-surface-dark);
   }
 
+  /*
+   * Correção de contraste AA do tema Executive Precision (EP-1.1).
+   * O gold #ffc641 reprova AA com texto branco e reprova como texto sobre
+   * branco. Conteúdo ainda não reskinado (fases 2-4) usa `bg-prestige-gold
+   * text-white` e `text-prestige-gold`; estes overrides escopados ao tema
+   * forçam o par navy validado na F0, sem tocar o legado (:root) nem as views.
+   */
+  [data-theme="executive"] .bg-prestige-gold.text-white {
+    color: var(--m3-on-gold);
+  }
+
+  [data-theme="executive"] .text-prestige-gold {
+    color: var(--m3-secondary);
+  }
+
+  [data-theme="executive"] .eyebrow {
+    color: var(--m3-secondary);
+  }
+
   * {
     @apply border-border;
   }

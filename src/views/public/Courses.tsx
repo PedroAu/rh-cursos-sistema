@@ -125,7 +125,6 @@ export function CoursesPage() {
           <div className="mt-8">
             <Button
               type="button"
-              variant="secondary"
               size="lg"
               className="gap-2 px-8"
               onClick={() => {

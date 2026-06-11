@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, MessageCircle, Play, ShieldCheck, Star, Users } from "lucide-react";
 import Image from "next/image";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
@@ -9,6 +9,7 @@ import { SectionTitle } from "@/components/common/section-title";
 import { TestimonialCard } from "@/components/common/testimonial-card";
 import { ClassCard } from "@/components/agenda/class-card";
 import { CheckoutModal } from "@/components/checkout/checkout-modal";
+import { trackEvent } from "@/lib/analytics";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,11 +32,20 @@ export function CourseDetailPage() {
   const nextClass = courseClasses[0];
   const openClassesCount = courseClasses.filter((item) => item.status !== "Encerrada").length;
 
+  const startCheckout = useCallback(
+    (origin: "hero_cta" | "sidebar_cta" | "deeplink") => {
+      trackEvent("inscricao_cta", { course: course?.slug ?? "", origin });
+      trackEvent("checkout_iniciado", { course: course?.slug ?? "", origin });
+      setOpenCheckout(true);
+    },
+    [course?.slug]
+  );
+
   useEffect(() => {
     if (params.get("checkout") === "1") {
-      setOpenCheckout(true);
+      startCheckout("deeplink");
     }
-  }, [params]);
+  }, [params, startCheckout]);
 
   if (!course) {
     return (
@@ -78,7 +88,7 @@ export function CourseDetailPage() {
               </div>
 
               <div className="flex flex-wrap gap-4 pt-2">
-                <Button size="lg" onClick={() => setOpenCheckout(true)}>
+                <Button size="lg" onClick={() => startCheckout("hero_cta")}>
                   Inscrever-se agora
                 </Button>
                 <Button variant="outline" size="lg">
@@ -248,7 +258,7 @@ export function CourseDetailPage() {
                   <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
                   <div className="text-4xl font-extrabold text-prestige-gold">{currency(course.price)}</div>
                 </div>
-                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => setOpenCheckout(true)}>
+                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => startCheckout("sidebar_cta")}>
                   Inscrever-se agora
                 </Button>
                 <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm font-medium text-white">
