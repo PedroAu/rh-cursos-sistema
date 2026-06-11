@@ -11,19 +11,36 @@ import {
   YAxis
 } from "recharts";
 
+import { BookOpen, type LucideIcon, TrendingUp, Users, Wallet } from "lucide-react";
+
 import {
   buildChartSummaryItems,
   buildDashboardMetrics,
   buildRevenueSummaryItems,
 } from "@/features/admin/dashboard/model/dashboard-metrics";
+import {
+  buildPerformanceStats,
+  buildRecentActivities,
+} from "@/features/admin/dashboard/model/dashboard-activity";
 import { ChartCard } from "@/components/admin/chart-card";
 import { DashboardCard } from "@/components/dashboard/dashboard-card";
+import { PerformanceReportCard } from "@/components/admin/performance-report-card";
+import { RecentActivitiesCard } from "@/components/admin/recent-activities-card";
 import { useAppStore, useDashboardCharts } from "@/lib/app-store";
+
+const metricIcons: Record<string, { icon: LucideIcon; trend?: "up" | "down" }> = {
+  "Total de cursos": { icon: BookOpen },
+  "Total de turmas": { icon: TrendingUp, trend: "up" },
+  "Total de alunos": { icon: Users, trend: "up" },
+  "Receita total": { icon: Wallet, trend: "up" },
+};
 
 export function AdminDashboardPage() {
   const { courses, classes, students, leads, enrollments } = useAppStore();
   const charts = useDashboardCharts();
   const metrics = buildDashboardMetrics({ courses, classes, students, leads, enrollments });
+  const activities = buildRecentActivities({ enrollments, leads, courses });
+  const performanceStats = buildPerformanceStats({ enrollments, leads });
 
   const chartSummaryClassName = "space-y-2 text-sm leading-6 text-label-secondary";
 
@@ -56,9 +73,26 @@ export function AdminDashboardPage() {
         </div>
 
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {metrics.map((metric) => (
-            <DashboardCard key={metric.label} label={metric.label} value={metric.value} helper={metric.helper} />
-          ))}
+          {metrics.map((metric) => {
+            const decoration = metricIcons[metric.label];
+            return (
+              <DashboardCard
+                key={metric.label}
+                label={metric.label}
+                value={metric.value}
+                helper={metric.helper}
+                icon={decoration?.icon}
+                trend={decoration?.trend}
+              />
+            );
+          })}
+        </div>
+
+        <div className="grid gap-5 xl:grid-cols-3">
+          <div className="xl:col-span-2">
+            <RecentActivitiesCard activities={activities} />
+          </div>
+          <PerformanceReportCard stats={performanceStats} />
         </div>
 
         <div className="grid gap-5 xl:grid-cols-2">

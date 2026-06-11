@@ -15,6 +15,11 @@ import {
   buildChartSummaryItems,
   buildRevenueSummaryItems,
 } from "@/features/admin/dashboard/model/dashboard-metrics";
+import {
+  buildPerformanceStats,
+  buildRecentActivities,
+  formatRelativeTime,
+} from "@/features/admin/dashboard/model/dashboard-activity";
 import { buildResourceConfig } from "@/lib/admin-resource-configs";
 
 function createStoreSnapshot() {
@@ -102,5 +107,51 @@ test.describe("epica 3 — admin polish", () => {
     ]);
     expect(revenueSummary[0]?.label).toBe("jun/26");
     expect(String(revenueSummary[0]?.value)).toContain("R$");
+  });
+
+  test("atividades recentes combinam inscrições e leads ordenados por data", () => {
+    const store = createStoreSnapshot();
+    const activities = buildRecentActivities(
+      { enrollments: store.enrollments, leads: store.leads, courses: store.courses },
+      5
+    );
+
+    expect(activities.length).toBeGreaterThan(0);
+    expect(activities.length).toBeLessThanOrEqual(5);
+
+    // Ordenado do mais recente para o mais antigo.
+    for (let i = 1; i < activities.length; i += 1) {
+      expect(activities[i - 1].timestamp).toBeGreaterThanOrEqual(activities[i].timestamp);
+    }
+
+    // Cada atividade carrega rótulo textual e tipo conhecido.
+    for (const activity of activities) {
+      expect(activity.title).not.toHaveLength(0);
+      expect(activity.description).not.toHaveLength(0);
+      expect(["enrollment", "payment", "lead"]).toContain(activity.kind);
+    }
+  });
+
+  test("performance stats derivam percentuais reais do funil", () => {
+    const store = createStoreSnapshot();
+    const stats = buildPerformanceStats({ enrollments: store.enrollments, leads: store.leads });
+
+    const labels = stats.map((stat) => stat.label);
+    expect(labels).toEqual(["Conclusão", "Confirmação", "Conversão", "Inscrições"]);
+
+    // Percentuais terminam em "%" ou são "—" quando não há denominador.
+    for (const stat of stats.slice(0, 3)) {
+      expect(stat.value === "—" || stat.value.endsWith("%")).toBe(true);
+    }
+    // Volume de inscrições é numérico.
+    expect(Number.isNaN(Number(stats[3].value))).toBe(false);
+  });
+
+  test("formatRelativeTime é determinístico em relação à data de referência", () => {
+    const now = new Date("2026-06-11T12:00:00.000Z").getTime();
+
+    expect(formatRelativeTime("2026-06-11T10:00:00.000Z", now)).toContain("hora");
+    expect(formatRelativeTime("2026-06-10T12:00:00.000Z", now)).toMatch(/dia|ontem/);
+    expect(formatRelativeTime("data-invalida", now)).toBe("data indisponível");
   });
 });
