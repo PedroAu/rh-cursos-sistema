@@ -184,7 +184,7 @@ export function CourseDetailPage() {
             <div className="space-y-8">
               <Card className="border-outline-variant bg-white">
                 <CardContent className="space-y-6 p-6">
-                  <SectionTitle eyebrow="Decisão rápida" title="O que avaliar antes de se inscrever" />
+                  <SectionTitle accentBar eyebrow="Decisão rápida" title="O que avaliar antes de se inscrever" />
                   <div className="grid gap-4 md:grid-cols-3">
                     {[
                       {
@@ -211,7 +211,7 @@ export function CourseDetailPage() {
 
               <Card>
                 <CardContent className="space-y-6 p-6">
-                  <SectionTitle eyebrow="Público-alvo" title="Para quem é este curso" />
+                  <SectionTitle accentBar eyebrow="Público-alvo" title="Para quem é este curso" />
                   {course.targetAudience && course.targetAudience.length > 0 ? (
                     <div className="grid gap-3 sm:grid-cols-2">
                       {course.targetAudience.map((audience) => (
@@ -229,7 +229,7 @@ export function CourseDetailPage() {
 
               <Card>
                 <CardContent className="space-y-6 p-6">
-                  <SectionTitle title="Conteúdo programático" description="Módulos organizados em acordeon, com tópicos e duração." />
+                  <SectionTitle accentBar title="Conteúdo programático" description="Módulos organizados em acordeon, com tópicos e duração." />
                   <Accordion type="multiple" className="w-full">
                     {course.modules.map((module, index) => (
                       <AccordionItem key={module.title} value={`module-${index}`}>
