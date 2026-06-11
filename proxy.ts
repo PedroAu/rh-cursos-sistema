@@ -8,6 +8,20 @@ const APEX_HOST = "rhcursos.com.br";
 
 export function proxy(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase();
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/curso" || pathname === "/curso/") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/cursos";
+    redirectUrl.search = "";
+
+    if (host === APEX_HOST) {
+      redirectUrl.protocol = "https";
+      redirectUrl.host = CANONICAL_HOST;
+    }
+
+    return applySecurityHeaders(NextResponse.redirect(redirectUrl, 301));
+  }
 
   if (host === APEX_HOST) {
     const redirectUrl = request.nextUrl.clone();

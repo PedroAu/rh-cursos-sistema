@@ -78,10 +78,10 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
             <div className="border-t border-border/70 pt-6">
               <div className="grid gap-2 sm:grid-cols-2">
                 <Button asChild variant="outline" className="w-full min-w-0 whitespace-normal px-4 text-center leading-tight">
-                  <Link to={`/curso?slug=${course.slug}`}>Ver detalhes</Link>
+                  <Link to={`/cursos/${course.slug}`}>Ver detalhes</Link>
                 </Button>
                 <Button asChild className="w-full min-w-0 whitespace-normal px-4 text-center leading-tight">
-                  <Link to={`/curso?slug=${course.slug}&checkout=1`}>Inscrever-se</Link>
+                  <Link to={`/cursos/${course.slug}?checkout=1`}>Inscrever-se</Link>
                 </Button>
               </div>
             </div>
@@ -148,10 +148,10 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           <div className="border-t border-border/70 pt-6">
             <div className="grid gap-2 sm:grid-cols-2">
               <Button asChild variant="outline" className="w-full min-w-0 whitespace-normal px-4 text-center leading-tight">
-                <Link to={`/curso?slug=${course.slug}`}>Ver detalhes</Link>
+                <Link to={`/cursos/${course.slug}`}>Ver detalhes</Link>
               </Button>
               <Button asChild className="w-full min-w-0 whitespace-normal px-4 text-center leading-tight">
-                <Link to={`/curso?slug=${course.slug}&checkout=1`}>Inscrever-se</Link>
+                <Link to={`/cursos/${course.slug}?checkout=1`}>Inscrever-se</Link>
               </Button>
             </div>
             <button

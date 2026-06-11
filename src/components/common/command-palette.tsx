@@ -36,7 +36,7 @@ export function CommandPalette() {
       ...baseRoutes,
       ...courses.slice(0, 10).map((course) => ({
         label: course.title,
-        href: `/curso?slug=${course.slug}`,
+        href: `/cursos/${course.slug}`,
         icon: BookOpen
       }))
     ];

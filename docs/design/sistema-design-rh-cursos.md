@@ -6,7 +6,7 @@ Este documento consolida os contratos visuais e de acessibilidade que passaram a
 
 ## Identidade Executive Precision (Épico 7)
 
-A Fundação Executive Precision (EP-0.1 a EP-0.4) reentona a camada semântica das Épicas 1-6 sem recriar componentes. A identidade só fica ativa sob `[data-theme="executive"]`; a ativação por rota acontece nas fases seguintes. Base de referência: `src/styles/globals.css` (bloco `[data-theme="executive"]`), `docs/design/executive-precision/DESIGN.md` e `docs/design/tokens-cor-superficie.md`.
+A Fundação Executive Precision (EP-0.1 a EP-0.4) reentona a camada semântica das Épicas 1-6 sem recriar componentes. A identidade foi promovida para a base global na auditoria final do Épico 7, e o antigo scope `[data-theme="executive"]` ficou apenas como referência histórica nas stories. Base de referência: `src/styles/globals.css`, `docs/design/executive-precision/DESIGN.md` e `docs/design/tokens-cor-superficie.md`.
 
 ### Paleta (Material 3)
 

@@ -7,6 +7,7 @@ initOpenNextCloudflareForDev();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   turbopack: {
     root: rootDir
   },

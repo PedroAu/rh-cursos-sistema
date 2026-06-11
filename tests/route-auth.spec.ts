@@ -21,7 +21,6 @@ const publicPaths = [
 // Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
 // catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
 const dynamicPaths = [
-  "/curso?slug=introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
@@ -33,6 +32,12 @@ test.describe("rotas publicas", () => {
       expect(response.status()).toBe(200);
     });
   }
+
+  test("rota legada /curso redireciona para o catalogo", async ({ request }) => {
+    const response = await request.get("/curso", { maxRedirects: 0 });
+    expect(response.status()).toBe(301);
+    expect(response.headers().location).toBe("/cursos");
+  });
 
   test("nao exibe codigos internos das trilhas", async ({ page }) => {
     for (const path of ["/", "/cursos"]) {
@@ -56,7 +61,7 @@ test.describe("protecao server-side do admin", () => {
     expect(response.headers().location).toContain("/login?status=required&next=/admin");
 
     await page.goto("/admin");
-    await expect(page).toHaveURL(/\/login\/\?status=required&next=%2Fadmin/);
+    await expect(page).toHaveURL(/\/login\?status=required&next=\/admin/);
   });
 
   test("rotas de portal aluno e instrutor nao existem nesta publicacao", async ({ request }) => {

@@ -21,7 +21,7 @@ Use este checklist em toda story que altere interface, fluxo visual ou component
 - [ ] Texto sobre fundo gold `#ffc641` usa o navy escuro validado em AA (nunca `#715300`).
 - [ ] Fontes Montserrat/Inter vêm de `next/font/google` self-hosted, sem `@import` de CDN.
 - [ ] Nenhuma variante `dark:` ou `[data-theme="dark"]` nova foi introduzida.
-- [ ] `data-theme="executive"` só é aplicado nas rotas previstas pela fase corrente.
+- [ ] O re-apontamento Executive Precision segue a base global definida pela auditoria final, sem reintroduzir scopes de tema por rota.
 
 ## Acessibilidade
 

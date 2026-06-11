@@ -174,7 +174,7 @@
 
     /*
      * Camada semântica (Story 1.2) — consome a paleta acima por indireção.
-     * Executive Precision redefine apenas este bloco via [data-theme="executive"].
+     * Executive Precision promove estes tokens no bloco :root abaixo (EP-6.3).
      * Matriz de contraste: docs/design/tokens-cor-superficie.md
      */
     --ea-color-label: var(--ea-color-text-main);            /* texto principal */
@@ -208,7 +208,12 @@
     --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
   }
 
-  [data-theme="executive"] {
+  /*
+   * Executive Precision é agora o único tema do produto (dark mode excluído,
+   * decisão #9). Os tokens M3 são promovidos a :root — este bloco sobrescreve a
+   * base legada acima por ordem de origem, preservando o render das fases 0-5.
+   */
+  :root {
     --ea-font-sans: var(--m3-font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --ea-font-display: var(--m3-font-display), var(--ea-font-sans);
     --ea-container-max: var(--m3-container-max);
@@ -268,21 +273,20 @@
   }
 
   /*
-   * Correção de contraste AA do tema Executive Precision (EP-1.1).
-   * O gold #ffc641 reprova AA com texto branco e reprova como texto sobre
-   * branco. Conteúdo ainda não reskinado (fases 2-4) usa `bg-prestige-gold
-   * text-white` e `text-prestige-gold`; estes overrides escopados ao tema
-   * forçam o par navy validado na F0, sem tocar o legado (:root) nem as views.
+   * Correção de contraste AA (EP-1.1). O gold #ffc641 reprova AA com texto
+   * branco e como texto sobre branco; estes overrides forçam o par navy
+   * validado na F0. Prefixo :root mantém a especificidade dos antigos seletores
+   * escopados ao tema agora que data-theme foi removido (EP-6.3).
    */
-  [data-theme="executive"] .bg-prestige-gold.text-white {
+  :root .bg-prestige-gold.text-white {
     color: var(--m3-on-gold);
   }
 
-  [data-theme="executive"] .text-prestige-gold {
+  :root .text-prestige-gold {
     color: var(--m3-secondary);
   }
 
-  [data-theme="executive"] .eyebrow {
+  :root .eyebrow {
     color: var(--m3-secondary);
   }
 
@@ -458,28 +462,6 @@
   .ea-input:focus {
     border-color: var(--ea-focus);
     --tw-ring-color: var(--ea-focus-ring);
-  }
-
-  .ea-dark-panel {
-    @apply bg-deep-navy text-white;
-    border-radius: var(--ea-radius-xl);
-  }
-
-  .apple-material {
-    background: rgba(255, 255, 255, 0.82);
-    -webkit-backdrop-filter: saturate(180%) blur(22px);
-    backdrop-filter: saturate(180%) blur(22px);
-  }
-
-  .apple-material-dark {
-    background: rgba(0, 23, 54, 0.72);
-    -webkit-backdrop-filter: saturate(160%) blur(24px);
-    backdrop-filter: saturate(160%) blur(24px);
-  }
-
-  .apple-surface {
-    @apply border border-separator bg-surface-raised shadow-soft;
-    border-radius: var(--ea-radius-xl);
   }
 
   .material-app-bar {
