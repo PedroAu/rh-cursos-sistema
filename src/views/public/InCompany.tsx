@@ -16,8 +16,7 @@ const benefits = [
   {
     title: "Programa sob medida",
     description: "Cada módulo é adaptado aos desafios, indicadores e maturidade da equipe.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCCxTUJIFi9FBUVhCytkWZGRIpKW8h9QpDo9nzq3jSJjoDxGuAg3jiYwazwjX3mNbWSxng_y0PI7TMD9eZYdf8HZY6CaPuR7J-2lI4qWIp4Jt0lMq8YiZPUCaNpg3zK8HUxyJXlWU6ofUKbw8tTx_mHbxVLyIN-yBrQ3e513eUCFlHB7jnu5bRvMJah61TRv17ZtpKuVheXMMdlxdSSBnk5WsrpeHLT93L643YFwCGO_4bdqqrORYYwZ3efmOLMxxMTeQR2jXKb-Ws"
+    image: "/images/in-company-hero-ai.png"
   },
   {
     title: "Entrega Personalizada",
@@ -30,8 +29,7 @@ const benefits = [
   {
     title: "Instrutores especialistas",
     description: "Os melhores profissionais do mercado com experiência prática, preparados para transformar sua equipe.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAvPzGaDxombDDeqjt0KTF9QyG8Yq3Dbqo9UC8jbD7aFMx85PCEvD1rpHdtb2jjuZ4GEq2OXD4YFwUyVOAtBlBbG4teTlRiG4enWHB1D8ANNVbiItiTPMfVfjbHgJAQvAU03bXOqpuiOn8LAlxSIM3KG9gS4gIImbr-aLYd8n6KObW27WYm9nkhe-HeUTJiyPQUAevemRd91-5wQfXtlyVX8WplejipGC0hlSP09mNSR5WWdYCGD3zt5y2CdALAXQ-VYopioeSQBz0"
+    image: "/images/in-company-hero-ai.png"
   }
 ];
 
@@ -219,6 +217,41 @@ export function InCompanyPage() {
               </Card>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="page-section bg-surface-muted">
+        <div className="ea-container">
+          <SectionTitle
+            eyebrow="Como funciona"
+            title="Como funciona a implementação"
+            description="Do diagnóstico à medição de eficácia, conduzimos cada etapa junto com a sua equipe."
+            align="center"
+          />
+          <ol className="mt-12 grid gap-6 md:grid-cols-3">
+            {[
+              {
+                title: "Diagnóstico",
+                description: "Análise profunda das necessidades e lacunas de competência da equipe."
+              },
+              {
+                title: "Personalização",
+                description: "Adaptação do programa pedagógico e seleção do instrutor especialista no tema."
+              },
+              {
+                title: "Execução e avaliação",
+                description: "Entrega do treinamento com suporte contínuo e medição de eficácia pós-curso."
+              }
+            ].map((step, index) => (
+              <li key={step.title} className="surface-card relative p-6" data-accent="top">
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-deep-navy font-display text-lg font-bold text-white">
+                  {index + 1}
+                </span>
+                <h3 className="mt-4 font-display text-xl font-bold text-deep-navy">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-text-muted">{step.description}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
