@@ -8,7 +8,7 @@ import {
   Target,
   X
 } from "lucide-react";
-import { useSearchParams } from "@/lib/router-compat";
+import { Link, useSearchParams } from "@/lib/router-compat";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { LoadingBlocks } from "@/components/common/loading-blocks";
@@ -209,32 +209,28 @@ export function CoursesPage() {
                   <SlidersHorizontal className="h-3.5 w-3.5" />
                   Trilhas
                 </span>
-                <div className="grid gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={() => setFilter("path", "")}
-                    className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${!filters.path ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
+                    aria-pressed={!filters.path}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-label font-bold transition-all duration-200 hover:border-prestige-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${!filters.path ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-raised text-text-main"}`}
                   >
-                    <span className="flex items-center justify-between gap-3">
-                      <span className={`text-label font-bold uppercase tracking-[0.05em] ${!filters.path ? "text-white/75" : "text-text-muted"}`}>Todas</span>
-                      <span className="rounded bg-surface-muted px-2 py-1 text-label font-bold text-deep-navy">{courses.length}</span>
-                    </span>
-                    <span className="mt-1 block text-sm font-bold leading-tight">Todas as trilhas</span>
+                    Todas
+                    <span className={`rounded-full px-2 py-0.5 text-caption font-bold ${!filters.path ? "bg-white/15 text-white" : "bg-surface-muted text-deep-navy"}`}>{courses.length}</span>
                   </button>
                   {trainingPaths.map((path) => (
                     <button
                       key={path.id}
                       type="button"
                       onClick={() => setFilter("path", path.id)}
-                      className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${filters.path === path.id ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
+                      aria-pressed={filters.path === path.id}
+                      className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-label font-bold transition-all duration-200 hover:border-prestige-gold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${filters.path === path.id ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-raised text-text-main"}`}
                     >
-                      <span className="flex items-center justify-between gap-3">
-                        <span className={`text-label font-bold uppercase tracking-[0.05em] ${filters.path === path.id ? "text-white/75" : "text-text-muted"}`}>Trilha</span>
-                        <span className={`rounded px-2 py-1 text-label font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
-                          {path.courseCount}
-                        </span>
+                      {path.shortName}
+                      <span className={`rounded-full px-2 py-0.5 text-caption font-bold ${filters.path === path.id ? "bg-white/15 text-white" : "bg-surface-muted text-deep-navy"}`}>
+                        {path.courseCount}
                       </span>
-                      <span className="mt-1 block text-sm font-bold leading-tight">{path.shortName}</span>
                     </button>
                   ))}
                 </div>
@@ -347,6 +343,30 @@ export function CoursesPage() {
               />
             )}
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section className="bg-deep-navy text-white">
+      <div className="ea-container py-16 text-center sm:py-20">
+        <h2 className="mx-auto max-w-3xl font-display text-h1-alt font-extrabold text-white">
+          Precisa de um treinamento personalizado?
+        </h2>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">
+          Nossas soluções In Company são adaptadas às necessidades específicas da sua organização ou órgão público.
+        </p>
+        <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
+          <Button asChild size="lg" className="px-8">
+            <Link to="/in-company">Solicitar proposta</Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="border-white/30 bg-white/5 px-8 text-white hover:bg-white/10 hover:text-white"
+          >
+            <Link to="/agenda">Ver agenda de turmas</Link>
+          </Button>
         </div>
       </div>
     </section>

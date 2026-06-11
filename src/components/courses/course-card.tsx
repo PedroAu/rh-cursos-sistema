@@ -104,7 +104,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
             {course.pathName}
           </div>
         </div>
-        <div className="border-b border-outline-variant bg-white p-6">
+        <div className="border-t-4 border-primary border-b border-b-outline-variant bg-white p-6">
           <div className="space-y-2">
             <div className="inline-flex rounded bg-accent px-2 py-1.5 text-label font-semibold uppercase tracking-[0.16em] text-white">
               {course.level}
