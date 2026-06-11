@@ -73,13 +73,24 @@ const config: Config = {
         card: "var(--ea-shadow-card)"
       },
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "Inter", "system-ui", "sans-serif"],
-        display: ["-apple-system", "BlinkMacSystemFont", "Manrope", "Inter", "system-ui", "sans-serif"]
+        sans: ["var(--ea-font-sans)"],
+        display: ["var(--ea-font-display)"]
       },
       fontSize: {
         micro: ["var(--ea-font-size-micro)", { lineHeight: "1.4" }],
         badge: ["var(--ea-font-size-badge)", { lineHeight: "1.4" }],
         label: ["var(--ea-font-size-label)", { lineHeight: "1.4" }],
+        caption: ["var(--m3-type-caption-size)", { lineHeight: "var(--m3-type-caption-line-height)" }],
+        "label-bold": ["var(--m3-type-label-bold-size)", { lineHeight: "var(--m3-type-label-bold-line-height)" }],
+        "body-md": ["var(--m3-type-body-md-size)", { lineHeight: "var(--m3-type-body-md-line-height)" }],
+        "body-lg": ["var(--m3-type-body-lg-size)", { lineHeight: "var(--m3-type-body-lg-line-height)" }],
+        "headline-md": ["var(--m3-type-headline-md-size)", { lineHeight: "var(--m3-type-headline-md-line-height)" }],
+        "headline-lg-mobile": [
+          "var(--m3-type-headline-lg-mobile-size)",
+          { lineHeight: "var(--m3-type-headline-lg-mobile-line-height)" }
+        ],
+        "headline-lg": ["var(--m3-type-headline-lg-size)", { lineHeight: "var(--m3-type-headline-lg-line-height)" }],
+        "display-lg": ["var(--m3-type-display-lg-size)", { lineHeight: "var(--m3-type-display-lg-line-height)" }],
         lead: ["var(--ea-font-size-lead)", { lineHeight: "1.6" }],
         card: ["var(--ea-font-size-card)", { lineHeight: "1.2" }],
         feature: ["var(--ea-font-size-feature)", { lineHeight: "1.2" }],

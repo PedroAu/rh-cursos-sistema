@@ -6,17 +6,19 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--ea-button-radius)] text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ea-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-soft hover:-translate-y-0.5 hover:bg-deep-navy",
+          "bg-[var(--ea-button-primary-bg)] text-[var(--ea-button-primary-fg)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--ea-button-primary-hover)]",
         secondary:
-          "bg-accent text-white shadow-soft hover:-translate-y-0.5 hover:bg-warning hover:text-white",
+          "border border-[var(--ea-button-secondary-border)] bg-[var(--ea-button-secondary-bg)] text-[var(--ea-button-secondary-fg)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--ea-button-secondary-hover)]",
         outline:
-          "border border-primary/20 bg-white text-primary hover:-translate-y-0.5 hover:border-accent hover:bg-surface-muted",
-        ghost: "text-foreground hover:bg-primary/[0.05]",
+          "border border-[var(--ea-button-ghost-border)] bg-[var(--ea-button-ghost-bg)] text-[var(--ea-button-ghost-fg)] hover:-translate-y-0.5 hover:bg-[var(--ea-button-ghost-hover-bg)]",
+        ghost: "text-[var(--ea-button-ghost-fg)] hover:bg-[var(--ea-button-ghost-hover-bg)]",
+        tertiary:
+          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--ea-button-ghost-fg)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
         success: "bg-success text-white hover:-translate-y-0.5 hover:bg-success/90",
         danger: "bg-danger text-white hover:bg-danger/90"
       },

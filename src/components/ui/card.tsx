@@ -2,11 +2,16 @@ import type * as React from "react";
 
 import { cn } from "@/lib/utils";
 
+type CardProps = React.HTMLAttributes<HTMLDivElement> & {
+  accent?: "none" | "top";
+};
+
 export function Card({
+  accent = "none",
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("surface-card", className)} {...props} />;
+}: CardProps) {
+  return <div className={cn("surface-card", className)} data-accent={accent === "top" ? "top" : undefined} {...props} />;
 }
 
 export function CardHeader({

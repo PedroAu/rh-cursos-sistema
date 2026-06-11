@@ -1,4 +1,4 @@
-# Tokens de Cor e Superfície — Camada Semântica (Story 1.2)
+# Tokens de Cor e Superfície — Camada Semântica
 
 > Gerado por `node scripts/contrast-matrix.mjs` a partir dos valores reais de
 > `src/styles/globals.css`. Regere após qualquer mudança de token.
@@ -7,11 +7,13 @@
 
 | Camada | Onde | Papel |
 |--------|------|-------|
-| **Paleta** | `--ea-color-*` (valores hex) | Cores brutas da marca/Material |
-| **Semântica** | `--ea-color-label`, `--ea-color-surface-raised`, … | Papel funcional; referencia a paleta via `var()` |
+| **Paleta atual** | `--ea-color-*` (valores hex) | Cores brutas da marca/Material atual |
+| **Paleta Executive Precision** | `--m3-*` (valores hex) | Fonte canônica do frontmatter de `docs/design/executive-precision/DESIGN.md` |
+| **Semântica** | `--ea-color-label`, `--ea-color-surface-raised`, ... | Papel funcional; referencia uma paleta via `var()` |
 
-Dark mode futuro (decisão D4): redefinir **apenas** o bloco semântico
-(ex.: `[data-theme="dark"]`), sem tocar em paleta ou componentes.
+O tema Executive Precision é ativado por rota/layout com
+`data-theme="executive"` no contêiner que envolve a rota. Esta story apenas
+declara o scope; nenhuma rota recebe o atributo aqui.
 
 ## Tokens semânticos
 
@@ -32,7 +34,21 @@ Dark mode futuro (decisão D4): redefinir **apenas** o bloco semântico
 > `label-secondary` porque `text-label` já é um utilitário de **fontSize**
 > (`--ea-font-size-label`) — expor a cor com o mesmo nome colidiria a classe.
 
-## Matriz de contraste — texto sobre superfícies claras
+## Mapeamento semântico — Executive Precision
+
+| Token semântico | Valor no scope `[data-theme="executive"]` | Papel |
+|-----------------|---------------------------------------------|-------|
+| `label` | `--m3-on-surface` #1a1c1e | Texto principal |
+| `secondary-label` | `--m3-on-surface-variant` #41484e | Texto de apoio |
+| `separator` | `--m3-outline-variant` #c0c7cf | Bordas sutis |
+| `surface-raised` | `--m3-surface-container-lowest` #ffffff | Cards e painéis |
+| `control` | `--m3-surface-container` #eeeef0 | Inputs, chips e controles |
+| `accent` | `--m3-secondary` #795900 | Dourado textual/interativo |
+| `success` | `--m3-success-text` #24732f | Estado positivo textual/filled AA |
+| `warning` | `--m3-warning-text` #795900 | Alerta textual/filled AA |
+| `danger` | `--m3-error` #ba1a1a | Erro/destrutivo |
+
+## Matriz atual — texto sobre superfícies claras
 
 AA texto normal: ≥ 4.5:1 · AA texto grande (≥18pt/14pt bold): ≥ 3:1
 
@@ -60,7 +76,7 @@ AA texto normal: ≥ 4.5:1 · AA texto grande (≥18pt/14pt bold): ≥ 3:1
 | `primary` #002b5b | `surface-raised` #ffffff | 14.03 | ✅ | ✅ |
 | `primary` #002b5b | `control` #e9e9ec | 11.58 | ✅ | ✅ |
 
-## Matriz de contraste — branco sobre fundos escuros/saturados
+## Matriz atual — branco sobre fundos preenchidos
 
 | Texto | Fundo | Razão | AA normal | AA grande |
 |-------|-------|-------|-----------|-----------|
@@ -71,12 +87,66 @@ AA texto normal: ≥ 4.5:1 · AA texto grande (≥18pt/14pt bold): ≥ 3:1
 | branco #ffffff | `warning` #7a5600 | 6.65 | ✅ | ✅ |
 | branco #ffffff | `danger` #ba1a1a | 6.46 | ✅ | ✅ |
 
+## Matriz Executive Precision — texto sobre superfícies claras
+
+| Texto | Fundo | Razão | AA normal | AA grande |
+|-------|-------|-------|-----------|-----------|
+| `label` #1a1c1e | `surface` #f9f9fc | 16.26 | ✅ | ✅ |
+| `label` #1a1c1e | `surface-raised` #ffffff | 17.09 | ✅ | ✅ |
+| `label` #1a1c1e | `control` #eeeef0 | 14.75 | ✅ | ✅ |
+| `secondary-label` #41484e | `surface` #f9f9fc | 8.84 | ✅ | ✅ |
+| `secondary-label` #41484e | `surface-raised` #ffffff | 9.28 | ✅ | ✅ |
+| `secondary-label` #41484e | `control` #eeeef0 | 8.01 | ✅ | ✅ |
+| `accent` #795900 | `surface` #f9f9fc | 6.16 | ✅ | ✅ |
+| `accent` #795900 | `surface-raised` #ffffff | 6.48 | ✅ | ✅ |
+| `accent` #795900 | `control` #eeeef0 | 5.59 | ✅ | ✅ |
+| `success` #24732f | `surface` #f9f9fc | 5.60 | ✅ | ✅ |
+| `success` #24732f | `surface-raised` #ffffff | 5.89 | ✅ | ✅ |
+| `success` #24732f | `control` #eeeef0 | 5.08 | ✅ | ✅ |
+| `warning` #795900 | `surface` #f9f9fc | 6.16 | ✅ | ✅ |
+| `warning` #795900 | `surface-raised` #ffffff | 6.48 | ✅ | ✅ |
+| `warning` #795900 | `control` #eeeef0 | 5.59 | ✅ | ✅ |
+| `danger` #ba1a1a | `surface` #f9f9fc | 6.15 | ✅ | ✅ |
+| `danger` #ba1a1a | `surface-raised` #ffffff | 6.46 | ✅ | ✅ |
+| `danger` #ba1a1a | `control` #eeeef0 | 5.58 | ✅ | ✅ |
+| `primary` #004364 | `surface` #f9f9fc | 10.06 | ✅ | ✅ |
+| `primary` #004364 | `surface-raised` #ffffff | 10.57 | ✅ | ✅ |
+| `primary` #004364 | `control` #eeeef0 | 9.12 | ✅ | ✅ |
+
+## Matriz Executive Precision — branco sobre fundos preenchidos
+
+| Texto | Fundo | Razão | AA normal | AA grande |
+|-------|-------|-------|-----------|-----------|
+| branco #ffffff | `primary` #004364 | 10.57 | ✅ | ✅ |
+| branco #ffffff | `surface-dark` #083b56 | 11.86 | ✅ | ✅ |
+| branco #ffffff | `accent-text` #795900 | 6.48 | ✅ | ✅ |
+| branco #ffffff | `success` #24732f | 5.89 | ✅ | ✅ |
+| branco #ffffff | `warning` #795900 | 6.48 | ✅ | ✅ |
+| branco #ffffff | `danger` #ba1a1a | 6.46 | ✅ | ✅ |
+
+## Texto sobre gold — Executive Precision
+
+| Texto | Fundo gold | Razão | AA normal | AA grande |
+|-------|------------|-------|-----------|-----------|
+| `on-gold` #083b56 | `secondary-container` #ffc641 | 7.57 | ✅ | ✅ |
+| `on-gold` #083b56 | `secondary-fixed-dim` #f6be39 | 6.97 | ✅ | ✅ |
+
+### Par vetado do protótipo
+
+| Texto | Fundo gold | Razão | Status | Decisão |
+|-------|------------|-------|--------|---------|
+| `on-secondary-container` #715300 | `secondary-container` #ffc641 | 4.56 | Passa apenas neste fundo | Vetado para texto sobre gold |
+| `on-secondary-container` #715300 | `secondary-fixed-dim` #f6be39 | 4.20 | Reprova texto normal | Vetado para texto sobre gold |
+
 ## Ajustes de valor aplicados nesta story (auditoria AA)
 
 | Token | Antes | Depois | Motivo |
 |-------|-------|--------|--------|
 | `success` (`--ea-color-success-green`) | #008a3d | #007a36 | Branco sobre success era 4.47:1 (reprovava AA normal em `bg-success text-white` do Button) |
 | `warning` | #d6aa45 (`secondary-fixed-dim`) | #7a5600 | Branco sobre warning era 1.94:1 (`hover:bg-warning text-white` nos Buttons); novo valor também funciona como texto sobre superfícies claras |
+| `--m3-on-gold` | #715300 (`--m3-on-secondary-container`) | #083b56 (`--m3-surface-dark`) | #715300 reprova AA normal sobre `--m3-secondary-fixed-dim`; navy escuro passa sobre as duas variantes gold |
+| `--m3-success-text` | #2d8a39 (`--m3-success`) | #24732f | O valor fonte reprova como texto sobre `--m3-control` e como fundo com branco |
+| `--m3-warning-text` | #e67e22 (`--m3-warning`) | #795900 (`--m3-secondary`) | O valor fonte reprova como texto e como fundo com branco; token textual dedicado mantém AA |
 
 ## Observações da auditoria
 

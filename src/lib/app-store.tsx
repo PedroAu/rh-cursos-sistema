@@ -111,24 +111,26 @@ const initialState: AppState = {
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
 function readInitialState(initialSession?: CurrentSession | null) {
-  const fallbackState = initialSession
+  return initialSession
     ? { ...initialState, currentSession: initialSession }
     : initialState;
+}
 
+function readStoredState(initialSession?: CurrentSession | null) {
   if (typeof window === "undefined") {
-    return fallbackState;
+    return null;
   }
 
   const stored = window.localStorage.getItem(STORAGE_KEY);
   if (!stored) {
-    return fallbackState;
+    return null;
   }
 
   try {
     const parsed = JSON.parse(stored) as AppState;
     return initialSession ? { ...parsed, currentSession: initialSession } : parsed;
   } catch {
-    return fallbackState;
+    return null;
   }
 }
 
@@ -186,6 +188,7 @@ export function AppStoreProvider({
   initialSession = null
 }: PropsWithChildren<{ initialSession?: CurrentSession | null }>) {
   const [state, setState] = useState<AppState>(() => readInitialState(initialSession));
+  const [isStoreHydrated, setIsStoreHydrated] = useState(false);
 
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
   // recriar sua identidade a cada mudança (evita re-renders em cascata).
@@ -193,8 +196,18 @@ export function AppStoreProvider({
 
   useEffect(() => {
     stateRef.current = state;
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+    if (isStoreHydrated) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+  }, [isStoreHydrated, state]);
+
+  useEffect(() => {
+    const storedState = readStoredState(initialSession);
+    if (storedState) {
+      setState(storedState);
+    }
+    setIsStoreHydrated(true);
+  }, [initialSession]);
 
   // Reconciliação de sessão na inicialização: a sessão server-side do admin
   // entra por prop; como fallback, reidratamos o payload do token HMAC salvo no

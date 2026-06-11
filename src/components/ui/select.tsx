@@ -16,7 +16,7 @@ export function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "group flex h-12 w-full items-center justify-between rounded-lg border border-input bg-white/[0.88] px-4 text-sm shadow-sm outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/70 hover:shadow-soft focus:border-accent focus:ring-2 focus:ring-ring/30 data-[state=open]:-translate-y-0.5 data-[state=open]:border-accent data-[state=open]:shadow-soft data-[state=open]:ring-2 data-[state=open]:ring-ring/25",
+        "group flex h-12 w-full items-center justify-between rounded-[var(--ea-control-radius)] border border-input bg-white/[0.88] px-4 text-sm shadow-sm outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--ea-focus)] hover:shadow-soft focus:border-[var(--ea-focus)] focus:ring-2 focus:ring-[var(--ea-focus-ring)] data-[state=open]:-translate-y-0.5 data-[state=open]:border-[var(--ea-focus)] data-[state=open]:shadow-soft data-[state=open]:ring-2 data-[state=open]:ring-[var(--ea-focus-ring)]",
         className
       )}
       {...props}
@@ -38,7 +38,7 @@ export function SelectContent({
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         className={cn(
-          "z-50 overflow-hidden rounded-lg border border-white/70 bg-white/96 shadow-card backdrop-blur-sm data-[state=open]:animate-[selectContentIn_160ms_ease-out]",
+          "z-50 overflow-hidden rounded-[var(--m3-radius-lg)] border border-white/70 bg-white/96 shadow-card backdrop-blur-sm data-[state=open]:animate-[selectContentIn_160ms_ease-out]",
           className
         )}
         {...props}

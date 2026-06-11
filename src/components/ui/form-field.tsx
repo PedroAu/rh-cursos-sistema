@@ -37,7 +37,7 @@ export function FormField({
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <label className="text-sm font-medium text-label-primary" htmlFor={fieldId}>
+      <label className="text-label-bold font-semibold uppercase tracking-[0.05em] text-label-primary" htmlFor={fieldId}>
         {label}
         {required ? <span className="ml-1 text-danger">*</span> : null}
       </label>

@@ -6,7 +6,7 @@ import { Link } from "@/lib/router-compat";
 
 export function PublicFooter() {
   return (
-    <footer className="relative overflow-hidden bg-primary text-white">
+    <footer className="relative overflow-hidden bg-[var(--ea-footer-bg)] text-white">
       <div className="ea-container relative py-20">
         <div className="grid gap-8 border-b border-white/10 pb-12 xl:grid-cols-[1.3fr_repeat(3,minmax(0,1fr))]">
           <div className="space-y-5">

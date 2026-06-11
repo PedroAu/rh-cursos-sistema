@@ -1,10 +1,32 @@
 import type { Metadata } from "next";
+import { Inter, Manrope, Montserrat } from "next/font/google";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
+
+const inter = Inter({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"]
+});
+
+const montserrat = Montserrat({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["600", "700", "800"]
+});
+
+const legacyManrope = Manrope({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-legacy-manrope",
+  weight: ["600", "700", "800"]
+});
 
 export const metadata: Metadata = {
   title: "RH Cursos & Soluções",
@@ -29,7 +51,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body>
+      <body className={`${inter.variable} ${montserrat.variable} ${legacyManrope.variable}`}>
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
