@@ -1,4 +1,4 @@
-import { Clock3, Star, Users } from "lucide-react";
+import { Building2, Clock3, Star, Users } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import { Link } from "@/lib/router-compat";
@@ -6,6 +6,7 @@ import { Link } from "@/lib/router-compat";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useQuoteModal } from "@/components/in-company/quote-modal";
 import { currency } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
 
@@ -17,6 +18,7 @@ type CourseCardProps = {
 
 export function CourseCard({ course, nextClass, compact = false }: CourseCardProps) {
   const prefersReducedMotion = useReducedMotion();
+  const { openQuote } = useQuoteModal();
 
   if (prefersReducedMotion) {
     return (
@@ -152,6 +154,14 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
                 <Link to={`/curso?slug=${course.slug}&checkout=1`}>Inscrever-se</Link>
               </Button>
             </div>
+            <button
+              type="button"
+              onClick={() => openQuote(course)}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              <Building2 className="h-4 w-4" />
+              Orçamento In Company
+            </button>
           </div>
         </CardContent>
       </Card>

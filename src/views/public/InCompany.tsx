@@ -4,6 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { SectionTitle } from "@/components/common/section-title";
+import { useQuoteModal } from "@/components/in-company/quote-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form-field";
@@ -57,6 +58,7 @@ function getPhoneDigits(value: string) {
 
 export function InCompanyPage() {
   const { createLead } = useAppStore();
+  const { openQuote } = useQuoteModal();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -160,9 +162,17 @@ export function InCompanyPage() {
             <p className="mt-6 max-w-xl text-lead text-white/80">
               Programas adaptados aos objetivos estratégicos da organização, com trilhas, turmas e relatórios de impacto mensurável.
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild variant="secondary" size="lg">
-                <a href="#proposta">Solicitar Proposta</a>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Button type="button" variant="secondary" size="lg" onClick={() => openQuote()}>
+                Solicitar orçamento
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+              >
+                <a href="#proposta">Briefing detalhado</a>
               </Button>
               <div className="flex items-center gap-3 font-medium text-white/90">
                 <CheckCircle2 className="h-5 w-5 text-white" />

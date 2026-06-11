@@ -6,6 +6,7 @@ import { PublicFooter } from "@/features/public-shell/components/public-footer";
 import { PublicHeader } from "@/features/public-shell/components/public-header";
 import { WhatsAppSupport } from "@/features/public-shell/components/whatsapp-support";
 import { CommandPalette } from "@/components/common/command-palette";
+import { QuoteModalProvider } from "@/components/in-company/quote-modal";
 import { AppToaster } from "@/components/ui/toaster";
 import { Outlet } from "@/lib/router-compat";
 
@@ -16,15 +17,17 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
         Pular para o conteúdo
       </a>
 
-      <PublicHeader />
+      <QuoteModalProvider>
+        <PublicHeader />
 
-      <main id="main-content">
-        {children ?? <Outlet />}
-      </main>
+        <main id="main-content">
+          {children ?? <Outlet />}
+        </main>
 
-      <PublicFooter />
-      <WhatsAppSupport />
-      <CommandPalette />
+        <PublicFooter />
+        <WhatsAppSupport />
+        <CommandPalette />
+      </QuoteModalProvider>
       <AppToaster />
     </div>
   );
