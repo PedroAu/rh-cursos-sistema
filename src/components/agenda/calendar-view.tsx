@@ -140,22 +140,29 @@ export function CalendarView({
                 selectedDate &&
                 format(day, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
 
+              const hasClasses = items.length > 0;
+              const inMonth = isSameMonth(day, monthStart);
+
               return (
                 <button
                   key={day.toISOString()}
                   type="button"
                   onClick={() => setSelectedDate(day)}
-                  className={`min-h-14 rounded-lg border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    isSameMonth(day, monthStart)
-                      ? "bg-white hover:border-primary/30 hover:bg-secondary/50"
+                  aria-label={`${format(day, "d 'de' MMMM", { locale: ptBR })}${hasClasses ? ` — ${items.length} turma${items.length === 1 ? "" : "s"}` : ""}`}
+                  aria-pressed={isSelected ? true : undefined}
+                  className={`flex min-h-14 flex-col justify-between rounded-lg border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                    inMonth
+                      ? hasClasses
+                        ? "bg-primary/8 hover:bg-primary/15"
+                        : "bg-white hover:border-primary/30 hover:bg-secondary/50"
                       : "bg-background text-muted-foreground/70"
                   } ${isToday(day) ? "border-primary shadow-soft" : "border-border"} ${
                     isSelected ? "bg-deep-navy text-white hover:bg-deep-navy" : ""
                   }`}
                 >
-                  <div className="text-xs font-bold">{format(day, "d")}</div>
-                  {items.length ? (
-                    <div className={`mt-1 h-1.5 w-1.5 rounded-full ${isSelected ? "bg-accent" : "bg-accent"}`} />
+                  <div className="self-end text-xs font-bold">{format(day, "d")}</div>
+                  {hasClasses ? (
+                    <div className={`mt-1 h-1 w-full rounded-full ${isSelected ? "bg-prestige-gold" : "bg-primary"}`} />
                   ) : null}
                 </button>
               );
