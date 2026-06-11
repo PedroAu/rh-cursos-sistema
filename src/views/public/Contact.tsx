@@ -191,6 +191,32 @@ export function ContactPage() {
                 );
               })}
             </div>
+            <Card className="overflow-hidden border-outline-variant bg-deep-navy text-white">
+              <CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white/10 text-prestige-gold">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="text-label font-bold uppercase tracking-[0.08em] text-white/70">Localização</p>
+                    <p className="mt-1 font-semibold">{company.address.full}</p>
+                    <p className="mt-1 text-sm leading-6 text-white/70">
+                      Atendimento de segunda a sexta, das 08h às 18h.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  asChild
+                  className="shrink-0 border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white"
+                  variant="outline"
+                >
+                  <a href={company.links.maps} target="_blank" rel="noreferrer">
+                    <MapPin className="h-4 w-4" />
+                    Ver no mapa
+                  </a>
+                </Button>
+              </CardContent>
+            </Card>
             <div className="flex flex-wrap gap-3">
               <Button asChild>
                 <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
