@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Newspaper,
   ReceiptText,
+  Settings,
   ShieldUser,
   Users
 } from "lucide-react";
@@ -25,5 +26,6 @@ export const adminNavItems: AdminNavItem[] = [
   { to: "/admin/leads", label: "Leads", mobileLabel: "Leads", icon: Users },
   { to: "/admin/inscricoes", label: "Inscrições", mobileLabel: "Inscrições", icon: ReceiptText },
   { to: "/admin/instrutores", label: "Instrutores", mobileLabel: "Equipe", icon: ShieldUser },
-  { to: "/admin/blog", label: "Blog", mobileLabel: "Blog", icon: Newspaper }
+  { to: "/admin/blog", label: "Blog", mobileLabel: "Blog", icon: Newspaper },
+  { to: "/admin/configuracoes", label: "Configurações", mobileLabel: "Config.", icon: Settings }
 ];

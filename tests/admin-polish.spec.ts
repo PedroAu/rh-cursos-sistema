@@ -21,6 +21,10 @@ import {
   formatRelativeTime,
 } from "@/features/admin/dashboard/model/dashboard-activity";
 import { buildResourceConfig } from "@/lib/admin-resource-configs";
+import {
+  getDefaultAdminSettings,
+  loadAdminSettings,
+} from "@/features/admin/settings/model/admin-settings";
 
 function createStoreSnapshot() {
   return {
@@ -205,6 +209,27 @@ test.describe("epica 3 — admin polish", () => {
     const exported = nameColumn?.exportValue?.(firstStudent as never) ?? "";
     expect(exported).toContain(firstStudent.name);
     expect(exported).toContain(firstStudent.email);
+  });
+
+  test("configurações admin têm defaults completos e load tolerante", () => {
+    const defaults = getDefaultAdminSettings();
+
+    expect(defaults.identity.siteName).not.toHaveLength(0);
+    expect(defaults.identity.contactEmail).toContain("@");
+    expect(Object.keys(defaults.notifications)).toEqual([
+      "newEnrollments",
+      "confirmedPayments",
+      "monthlyReports",
+    ]);
+    expect(defaults.admins.length).toBeGreaterThanOrEqual(3);
+    for (const admin of defaults.admins) {
+      expect(admin.name).not.toHaveLength(0);
+      expect(admin.email).toContain("@");
+      expect(typeof admin.active).toBe("boolean");
+    }
+
+    // Sem window (contexto Node) load cai nos defaults sem lançar.
+    expect(loadAdminSettings()).toEqual(defaults);
   });
 
   test("formatRelativeTime é determinístico em relação à data de referência", () => {
