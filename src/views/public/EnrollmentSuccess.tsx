@@ -111,7 +111,7 @@ export function EnrollmentSuccessPage() {
 
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild variant="outline"><Link to="/cursos">Ver outros cursos</Link></Button>
-              <Button asChild variant="ghost"><a href="#atendimento">Falar com atendimento</a></Button>
+              <Button asChild variant="ghost"><Link to="/falar-com-especialista">Falar com atendimento</Link></Button>
             </div>
           </CardContent>
         </Card>
