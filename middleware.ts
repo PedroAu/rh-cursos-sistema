@@ -6,7 +6,7 @@ import { applySecurityHeaders } from "@/lib/security-headers";
 const CANONICAL_HOST = "www.rhcursos.com.br";
 const APEX_HOST = "rhcursos.com.br";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase();
   const { pathname } = request.nextUrl;
 
