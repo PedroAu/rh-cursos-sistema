@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ShieldCheck } from "lucide-react";
+import Image from "next/image";
 import { useNavigate } from "@/lib/router-compat";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -89,8 +90,37 @@ export function LoginPage() {
   };
 
   return (
-    <section className="page-section">
-      <div className="container flex justify-center">
+    <section className="grid min-h-[calc(100vh-4rem)] lg:grid-cols-2">
+      <aside className="relative hidden overflow-hidden bg-deep-navy lg:block">
+        <Image
+          src="/images/in-company-hero-ai.png"
+          alt="Ambiente corporativo moderno da RH Cursos"
+          fill
+          sizes="50vw"
+          className="object-cover opacity-35"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-deep-navy via-deep-navy/80 to-deep-navy/40" />
+        <div className="relative flex h-full flex-col justify-between p-12 text-white">
+          <span className="font-display text-3xl font-bold">RH Cursos</span>
+          <div className="space-y-6">
+            <p className="max-w-md text-lg leading-8 text-white/85">
+              Capacitação estratégica para profissionais que transformam a gestão pública e empresarial.
+            </p>
+            <div className="flex items-start gap-4 rounded-2xl border border-white/12 bg-white/8 p-5">
+              <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-prestige-gold" />
+              <div>
+                <p className="font-bold">Certificado reconhecido</p>
+                <p className="mt-1 text-sm leading-6 text-white/75">
+                  Qualidade técnica com foco em resultados práticos.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex items-center justify-center px-6 py-12">
         <Card className="w-full max-w-xl border-outline-variant" data-testid="ui-login-card">
           <CardContent className="space-y-6 p-8">
             <div className="space-y-3 text-center">
