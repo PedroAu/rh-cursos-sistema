@@ -119,7 +119,7 @@ export type Lead = {
   preferredModality?: string;
   trainingObjective?: string;
   mainChallenges?: string;
-  origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn";
+  origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn" | "Especialista" | "Orçamento In Company";
   status: LeadStatus;
   message: string;
   createdAt: string;

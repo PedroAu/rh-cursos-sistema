@@ -23,10 +23,10 @@ export function CTASection() {
             variant="outline"
             className="border border-white/12 bg-white/10 text-white hover:bg-white/15"
           >
-            <a href="#atendimento">
+            <Link to="/falar-com-especialista">
               <MessageCircle className="h-4 w-4" />
               Falar com especialista
-            </a>
+            </Link>
           </Button>
         </div>
       </CardContent>

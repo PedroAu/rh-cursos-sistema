@@ -8,6 +8,7 @@ const a11yRoutes = [
   "/cursos?q=esocial",
   "/agenda?q=bras%C3%ADlia",
   "/contato",
+  "/falar-com-especialista",
   "/login?status=required&next=/admin"
 ];
 
