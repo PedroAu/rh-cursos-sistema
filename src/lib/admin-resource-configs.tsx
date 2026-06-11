@@ -1,6 +1,8 @@
+import { BookOpen, CalendarCheck, type LucideIcon, TrendingUp, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
+import { SeatProgress } from "@/components/admin/seat-progress";
 import { useAppStore } from "@/lib/app-store";
 import {
   validateBlogPost,
@@ -57,10 +59,19 @@ export type ColumnConfig<T> = {
   render: (row: T) => React.ReactNode;
 };
 
+export type ResourceStat = {
+  label: string;
+  value: string;
+  helper: string;
+  icon?: LucideIcon;
+};
+
 export type ResourceConfig = {
   title: string;
   description: string;
   rows: Array<{ id: string }>;
+  /** Stats bento opcionais — substituem os cards genéricos quando presentes. */
+  stats?: ResourceStat[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnConfig<any>[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -200,10 +211,46 @@ export function buildResourceConfig(
         { value: "Em breve", label: "Em breve" },
       ];
 
+      const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
+      const enrolledStudents = store.students.length;
+      const upcomingClasses = store.classes.filter((item) => {
+        const startsAt = new Date(item.startDate).getTime();
+        return startsAt >= Date.now();
+      }).length;
+      const completedEnrollments = store.enrollments.filter((item) => item.status === "Concluída").length;
+      const totalEnrollments = store.enrollments.length;
+      const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
+
       return {
         title: "Gestão de cursos",
         description: "Criar, editar, duplicar, ativar e organizar cursos da plataforma.",
         rows,
+        stats: [
+          {
+            label: "Cursos ativos",
+            value: String(activeCourses),
+            helper: "Cursos com status Ativo ou Destaque.",
+            icon: BookOpen,
+          },
+          {
+            label: "Alunos matriculados",
+            value: String(enrolledStudents),
+            helper: "Alunos com ao menos uma inscrição.",
+            icon: Users,
+          },
+          {
+            label: "Turmas futuras",
+            value: String(upcomingClasses),
+            helper: "Turmas com início agendado.",
+            icon: CalendarCheck,
+          },
+          {
+            label: "Taxa de conclusão",
+            value: `${completionRate}%`,
+            helper: "Inscrições concluídas sobre o total.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
           { key: "title", label: "Curso", render: (row: Course) => row.title },
           { key: "pathName", label: "Trilha", render: (row: Course) => row.pathName },
@@ -348,10 +395,48 @@ export function buildResourceConfig(
           ).length
         : 0;
 
+      const activeClasses = store.classes.filter(
+        (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
+      ).length;
+      const startingClasses = store.classes.filter((item) => {
+        const startsAt = new Date(item.startDate).getTime();
+        const now = Date.now();
+        return startsAt >= now && startsAt <= now + 30 * 86400_000;
+      }).length;
+      const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
+      const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
+      const occupancyRate = totalSeatsAll > 0 ? Math.round((filledSeatsAll / totalSeatsAll) * 100) : 0;
+
       return {
         title: "Gestão de turmas",
         description: "Editar calendário, status, instrutores e vagas das turmas.",
         rows,
+        stats: [
+          {
+            label: "Turmas ativas",
+            value: String(activeClasses),
+            helper: "Com inscrições abertas ou poucas vagas.",
+            icon: CalendarCheck,
+          },
+          {
+            label: "Cursos no catálogo",
+            value: String(store.courses.length),
+            helper: "Total de cursos cadastrados.",
+            icon: BookOpen,
+          },
+          {
+            label: "Iniciando em 30 dias",
+            value: String(startingClasses),
+            helper: "Turmas com início no próximo mês.",
+            icon: Users,
+          },
+          {
+            label: "Taxa de ocupação",
+            value: `${occupancyRate}%`,
+            helper: "Vagas preenchidas sobre o total ofertado.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
           {
             key: "course", label: "Curso",
@@ -364,8 +449,8 @@ export function buildResourceConfig(
               new Intl.DateTimeFormat("pt-BR").format(new Date(row.startDate)),
           },
           {
-            key: "filledSeats", label: "Vagas preenchidas",
-            render: (row: TrainingClass) => `${row.filledSeats}/${row.totalSeats}`,
+            key: "filledSeats", label: "Inscritos",
+            render: (row: TrainingClass) => <SeatProgress filled={row.filledSeats} total={row.totalSeats} />,
           },
           { key: "status", label: "Status", render: (row: TrainingClass) => renderStatusBadge(row.status) },
         ],

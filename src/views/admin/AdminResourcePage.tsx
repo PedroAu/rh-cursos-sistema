@@ -203,33 +203,55 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
           </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="surface-card p-5">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Registros visíveis</p>
-            <p className="mt-3 text-3xl font-semibold text-foreground">{rows.length}</p>
-            <p className="mt-2 text-sm leading-6 text-label-secondary">
-              {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual desta área."}
-            </p>
+        {config.stats ? (
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {config.stats.map((stat) => {
+              const Icon = stat.icon;
+              return (
+                <div key={stat.label} className="surface-card p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{stat.label}</p>
+                    {Icon ? (
+                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
+                        <Icon className="size-5" aria-hidden="true" />
+                      </span>
+                    ) : null}
+                  </div>
+                  <p className="mt-3 text-3xl font-semibold text-foreground">{stat.value}</p>
+                  <p className="mt-2 text-sm leading-6 text-label-secondary">{stat.helper}</p>
+                </div>
+              );
+            })}
           </div>
-          <div className="surface-card p-5">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Modo de operação</p>
-            <p className="mt-3 text-2xl font-semibold text-foreground">
-              {canCreate ? "CRUD completo" : "Atualização supervisionada"}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-label-secondary">
-              {canCreate
-                ? "Criação, edição e exclusão disponíveis com busca e exportação."
-                : "Fluxo restrito a contexto e atualização segura de registros existentes."}
-            </p>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="surface-card p-5">
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Registros visíveis</p>
+              <p className="mt-3 text-3xl font-semibold text-foreground">{rows.length}</p>
+              <p className="mt-2 text-sm leading-6 text-label-secondary">
+                {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual desta área."}
+              </p>
+            </div>
+            <div className="surface-card p-5">
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Modo de operação</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">
+                {canCreate ? "CRUD completo" : "Atualização supervisionada"}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-label-secondary">
+                {canCreate
+                  ? "Criação, edição e exclusão disponíveis com busca e exportação."
+                  : "Fluxo restrito a contexto e atualização segura de registros existentes."}
+              </p>
+            </div>
+            <div className="surface-card p-5">
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Atalho</p>
+              <p className="mt-3 text-2xl font-semibold text-foreground">N para novo item</p>
+              <p className="mt-2 text-sm leading-6 text-label-secondary">
+                Disponível nas áreas com criação manual para acelerar operação recorrente.
+              </p>
+            </div>
           </div>
-          <div className="surface-card p-5">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Atalho</p>
-            <p className="mt-3 text-2xl font-semibold text-foreground">N para novo item</p>
-            <p className="mt-2 text-sm leading-6 text-label-secondary">
-              Disponível nas áreas com criação manual para acelerar operação recorrente.
-            </p>
-          </div>
-        </div>
+        )}
 
         <div className="surface-card space-y-4 p-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">

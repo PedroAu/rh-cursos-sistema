@@ -147,6 +147,38 @@ test.describe("epica 3 — admin polish", () => {
     expect(Number.isNaN(Number(stats[3].value))).toBe(false);
   });
 
+  test("configs de cursos e turmas expõem stats bento com ícone", () => {
+    const store = createStoreSnapshot();
+    const noop = () => undefined;
+    const deps = {
+      search: "",
+      editingId: null,
+      form: {},
+      setForm: noop,
+      setEditingId: noop,
+      setValidationErrors: noop,
+      setOpen: noop,
+    };
+
+    const courseConfig = buildResourceConfig("courses", store as never, deps as never);
+    const classConfig = buildResourceConfig("classes", store as never, deps as never);
+
+    expect(courseConfig.stats).toHaveLength(4);
+    expect(classConfig.stats).toHaveLength(4);
+
+    for (const stat of [...(courseConfig.stats ?? []), ...(classConfig.stats ?? [])]) {
+      expect(stat.label).not.toHaveLength(0);
+      expect(stat.value).not.toHaveLength(0);
+      expect(stat.helper).not.toHaveLength(0);
+      expect(stat.icon).toBeTruthy();
+    }
+
+    // A coluna de inscritos das turmas renderiza a barra de progresso (elemento React).
+    const seatColumn = classConfig.columns.find((column) => column.key === "filledSeats");
+    expect(seatColumn).toBeTruthy();
+    expect(seatColumn?.label).toBe("Inscritos");
+  });
+
   test("formatRelativeTime é determinístico em relação à data de referência", () => {
     const now = new Date("2026-06-11T12:00:00.000Z").getTime();
 
