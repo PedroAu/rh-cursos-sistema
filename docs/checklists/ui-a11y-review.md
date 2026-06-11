@@ -16,6 +16,13 @@ Use este checklist em toda story que altere interface, fluxo visual ou component
 - [ ] Busca usa `SearchInput` com resumo textual e ação de limpar quando aplicável.
 - [ ] Submissão e carregamento exibem feedback textual, não apenas spinner.
 
+## Executive Precision (Épico 7)
+
+- [ ] Texto sobre fundo gold `#ffc641` usa o navy escuro validado em AA (nunca `#715300`).
+- [ ] Fontes Montserrat/Inter vêm de `next/font/google` self-hosted, sem `@import` de CDN.
+- [ ] Nenhuma variante `dark:` ou `[data-theme="dark"]` nova foi introduzida.
+- [ ] `data-theme="executive"` só é aplicado nas rotas previstas pela fase corrente.
+
 ## Acessibilidade
 
 - [ ] Contraste continua dentro do padrão WCAG AA para texto e controles.

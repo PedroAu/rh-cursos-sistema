@@ -2,7 +2,38 @@
 
 ## Objetivo
 
-Este documento consolida os contratos visuais e de acessibilidade que passaram a reger a UI após as Épicas 1-6. Toda alteração de interface deve partir destes tokens, componentes e padrões antes de criar variações locais.
+Este documento consolida os contratos visuais e de acessibilidade que passaram a reger a UI após as Épicas 1-6 e a Fundação "Executive Precision" (Épico 7, FASE 0). Toda alteração de interface deve partir destes tokens, componentes e padrões antes de criar variações locais.
+
+## Identidade Executive Precision (Épico 7)
+
+A Fundação Executive Precision (EP-0.1 a EP-0.4) reentona a camada semântica das Épicas 1-6 sem recriar componentes. A identidade só fica ativa sob `[data-theme="executive"]`; a ativação por rota acontece nas fases seguintes. Base de referência: `src/styles/globals.css` (bloco `[data-theme="executive"]`), `docs/design/executive-precision/DESIGN.md` e `docs/design/tokens-cor-superficie.md`.
+
+### Paleta (Material 3)
+
+| Cor | Valor | Papel |
+|-----|-------|-------|
+| Navy primário | `#004364` | superfícies institucionais, header/footer, sidebar admin, CTA navy |
+| Navy escuro | `#083b56` | sidebar admin e blocos de maior profundidade |
+| Gold | `#ffc641` | ação primária e destaques premium (CTA gold) |
+| Texto sobre gold | navy escuro dedicado | **obrigatório** — o par gold/`#715300` reprova AA; texto sobre gold usa o navy escuro validado na matriz |
+
+> O par gold + texto navy é o único contrato textual aprovado sobre fundo gold. Validado em AA pela matriz (`scripts/contrast-matrix.mjs` → `docs/design/tokens-cor-superficie.md`). Nenhum gate de contraste afrouxa para acomodar o gold.
+
+### Tipografia
+
+| Família | Fonte | Uso |
+|---------|-------|-----|
+| Display/heading | Montserrat (self-hosted via `next/font/google`, `subsets: ["latin"]`) | headings, eyebrow, números de destaque |
+| Corpo | Inter (self-hosted via `next/font/google`) | texto corrido, labels, controles |
+
+Fontes são self-hosted (sem `@import` de CDN) — requisito do Cloudflare Workers/OpenNext. Pesos limitados aos efetivamente usados.
+
+### Shape e componentes
+
+- Cards com top-accent navy e elevação Level 1 (borda 1px + `0 4px 12px rgba(0,0,0,0.05)`).
+- Botões: primário gold/navy, secundário ghost navy, terciário text-button — todas as variantes legadas preservadas.
+- Chips/badges em formato pill com tint de baixa saturação.
+- Inputs outlined com label `label-bold` acima e foco azul com glow.
 
 ## Tokens
 
