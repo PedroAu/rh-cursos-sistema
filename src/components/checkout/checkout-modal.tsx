@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, CircleHelp, ShieldCheck } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Barcode, CheckCircle2, CircleHelp, CreditCard, FileText, QrCode, ShieldCheck } from "lucide-react";
 import { useLocation, useNavigate } from "@/lib/router-compat";
 import { toast } from "sonner";
 
@@ -40,8 +40,8 @@ const initialForm = {
   cpf: "",
   organization: "",
   jobTitle: "",
-  enrollmentType: "Pessoa física" as const,
-  paymentMethod: "Pix" as const,
+  enrollmentType: "Pessoa física" as "Pessoa física" | "Empresa" | "Órgão público",
+  paymentMethod: "Pix" as PaymentMethod,
   classId: ""
 };
 
@@ -53,6 +53,77 @@ const checkoutSteps = [
 ] as const;
 
 const ENROLLMENT_SUCCESS_STORAGE_KEY = "__latest_enrollment_success__";
+
+type PaymentMethod = "Pix" | "Cartão" | "Boleto" | "Empenho";
+
+const paymentMethods: { value: PaymentMethod; label: string; icon: typeof CreditCard }[] = [
+  { value: "Cartão", label: "Cartão", icon: CreditCard },
+  { value: "Pix", label: "Pix", icon: QrCode },
+  { value: "Boleto", label: "Boleto", icon: Barcode },
+  { value: "Empenho", label: "Empenho", icon: FileText }
+];
+
+function PaymentSelector({
+  value,
+  onChange
+}: {
+  value: PaymentMethod;
+  onChange: (value: PaymentMethod) => void;
+}) {
+  const refs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const focusIndex = (index: number) => {
+    const normalized = (index + paymentMethods.length) % paymentMethods.length;
+    const method = paymentMethods[normalized];
+    onChange(method.value);
+    refs.current[normalized]?.focus();
+  };
+
+  return (
+    <div
+      role="radiogroup"
+      aria-label="Forma de pagamento"
+      className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+    >
+      {paymentMethods.map((method, index) => {
+        const Icon = method.icon;
+        const selected = value === method.value;
+
+        return (
+          <button
+            key={method.value}
+            ref={(node) => {
+              refs.current[index] = node;
+            }}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            aria-label={method.label}
+            tabIndex={selected ? 0 : -1}
+            onClick={() => onChange(method.value)}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+                event.preventDefault();
+                focusIndex(index + 1);
+              } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+                event.preventDefault();
+                focusIndex(index - 1);
+              }
+            }}
+            className={`flex h-full flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              selected
+                ? "border-primary bg-secondary/60"
+                : "border-outline-variant bg-white hover:bg-surface-muted"
+            }`}
+          >
+            <Icon className="h-6 w-6 text-primary" aria-hidden />
+            <span className="text-sm font-bold text-deep-navy">{method.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps) {
   const navigate = useNavigate();
@@ -420,24 +491,18 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                         </div>
                       </dl>
                     </div>
-                    <FormField hint="A equipe confirma a forma escolhida no contato de pós-inscrição." label="Forma de pagamento" required>
-                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                        <Select
-                          value={form.paymentMethod}
-                          onValueChange={(value) => setForm((current) => ({ ...current, paymentMethod: value as typeof form.paymentMethod }))}
-                        >
-                          <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
-                            <SelectValue placeholder="Selecione a forma de pagamento" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Pix">Pix</SelectItem>
-                            <SelectItem value="Cartão">Cartão</SelectItem>
-                            <SelectItem value="Boleto">Boleto</SelectItem>
-                            <SelectItem value="Empenho">Empenho</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    </FormField>
+                    <div className="grid gap-3">
+                      <div>
+                        <p className="text-sm font-bold text-deep-navy">Forma de pagamento</p>
+                        <p className="mt-1 text-sm leading-6 text-text-muted">
+                          A equipe confirma a forma escolhida no contato de pós-inscrição.
+                        </p>
+                      </div>
+                      <PaymentSelector
+                        value={form.paymentMethod}
+                        onChange={(value) => setForm((current) => ({ ...current, paymentMethod: value }))}
+                      />
+                    </div>
                   </div>
                 ) : null}
               </div>
