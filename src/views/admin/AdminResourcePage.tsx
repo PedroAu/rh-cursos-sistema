@@ -29,7 +29,11 @@ import { useHotkey } from "@/hooks/use-hotkey";
 import { buildResourceConfig, type ResourceKey } from "@/lib/admin-resource-configs";
 import type { ValidationError } from "@/lib/admin-form-validation";
 
-type CsvColumn = { label: string; render: (row: unknown) => unknown };
+type CsvColumn = {
+  label: string;
+  render: (row: unknown) => unknown;
+  exportValue?: (row: unknown) => string;
+};
 
 function toExportableValue(value: unknown): string {
   if (value == null) return "";
@@ -48,7 +52,7 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
     ...data.map((row) =>
       columns
         .map((col) => {
-          const value = col.render(row);
+          const value = col.exportValue ? col.exportValue(row) : col.render(row);
           return `"${toExportableValue(value).replace(/"/g, '""')}"`;
         })
         .join(",")

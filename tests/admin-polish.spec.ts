@@ -179,6 +179,34 @@ test.describe("epica 3 — admin polish", () => {
     expect(seatColumn?.label).toBe("Inscritos");
   });
 
+  test("config de alunos expõe KPIs e tabela com avatar preservando o CSV", () => {
+    const store = createStoreSnapshot();
+    const noop = () => undefined;
+    const deps = {
+      search: "",
+      editingId: null,
+      form: {},
+      setForm: noop,
+      setEditingId: noop,
+      setValidationErrors: noop,
+      setOpen: noop,
+    };
+
+    const config = buildResourceConfig("students", store as never, deps as never);
+
+    expect(config.stats).toHaveLength(4);
+    expect(config.stats?.map((stat) => stat.label)).toContain("Ativos");
+
+    const nameColumn = config.columns.find((column) => column.key === "name");
+    expect(nameColumn?.label).toBe("Aluno");
+
+    // O CSV continua exportando nome e e-mail via exportValue dedicado.
+    const firstStudent = store.students[0];
+    const exported = nameColumn?.exportValue?.(firstStudent as never) ?? "";
+    expect(exported).toContain(firstStudent.name);
+    expect(exported).toContain(firstStudent.email);
+  });
+
   test("formatRelativeTime é determinístico em relação à data de referência", () => {
     const now = new Date("2026-06-11T12:00:00.000Z").getTime();
 

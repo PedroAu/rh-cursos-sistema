@@ -1,8 +1,17 @@
-import { BookOpen, CalendarCheck, type LucideIcon, TrendingUp, Users } from "lucide-react";
+import {
+  BookOpen,
+  CalendarCheck,
+  type LucideIcon,
+  TrendingUp,
+  UserCheck,
+  Users,
+  UserX,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
 import { SeatProgress } from "@/components/admin/seat-progress";
+import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
 import {
   validateBlogPost,
@@ -57,6 +66,8 @@ export type ColumnConfig<T> = {
   key: string;
   label: string;
   render: (row: T) => React.ReactNode;
+  /** Valor textual usado no export CSV quando `render` produz markup composto. */
+  exportValue?: (row: T) => string;
 };
 
 export type ResourceStat = {
@@ -531,14 +542,51 @@ export function buildResourceConfig(
         { value: "Concluída", label: "Concluída" },
       ];
 
+      const activeStudents = store.students.filter(
+        (item) => item.enrollmentStatus === "Confirmada" || item.enrollmentStatus === "Concluída"
+      ).length;
+      const inactiveStudents = store.students.length - activeStudents;
+      const certifiedStudents = store.students.filter((item) => item.certificateIssued).length;
+
       return {
         title: "Gestão de alunos",
         description: "Visualizar dados, curso, turma e status de inscrição.",
         rows,
+        stats: [
+          {
+            label: "Total de alunos",
+            value: String(store.students.length),
+            helper: "Cadastros com ao menos uma inscrição.",
+            icon: Users,
+          },
+          {
+            label: "Ativos",
+            value: String(activeStudents),
+            helper: "Inscrições confirmadas ou concluídas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Inativos",
+            value: String(inactiveStudents),
+            helper: "Pendentes, aguardando pagamento ou cancelados.",
+            icon: UserX,
+          },
+          {
+            label: "Certificados emitidos",
+            value: String(certifiedStudents),
+            helper: "Alunos com certificado já liberado.",
+            icon: UserCheck,
+          },
+        ],
         columns: [
-          { key: "name", label: "Aluno", render: (row: Student) => row.name },
-          { key: "email", label: "E-mail", render: (row: Student) => row.email },
+          {
+            key: "name",
+            label: "Aluno",
+            render: (row: Student) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Student) => `${row.name} <${row.email}>`,
+          },
           { key: "organization", label: "Empresa/órgão", render: (row: Student) => row.organization },
+          { key: "jobTitle", label: "Cargo", render: (row: Student) => row.jobTitle || "—" },
           { key: "status", label: "Status", render: (row: Student) => renderStatusBadge(row.enrollmentStatus) },
         ],
         onEdit: (row: Student) => {
