@@ -100,6 +100,50 @@ export function AboutPage() {
         </div>
       </section>
 
+      <section className="page-section bg-surface-muted">
+        <div className="container space-y-10">
+          <div className="max-w-3xl">
+            <SectionTitle
+              eyebrow="Progresso"
+              title="Nossa trajetória"
+              description="Desde a fundação em 2007, evoluímos junto com as necessidades da administração pública e privada brasileira."
+            />
+          </div>
+          <ol className="relative space-y-8 border-l-2 border-outline-variant pl-8">
+            {[
+              {
+                marker: "2007",
+                title: "Fundação",
+                description: "Início das atividades com o propósito de suprir a carência de treinamentos específicos para RH no setor público em Brasília."
+              },
+              {
+                marker: "Expansão",
+                title: "Expansão nacional",
+                description: "Consolidação como referência no Centro-Oeste e início dos primeiros treinamentos in company em outros estados brasileiros."
+              },
+              {
+                marker: "Digital",
+                title: "Transformação digital",
+                description: "Lançamento da plataforma própria de ensino, democratizando o acesso a cursos de alta qualidade para municípios remotos."
+              },
+              {
+                marker: "Hoje",
+                title: "Liderança em capacitação",
+                description: "Com milhares de alunos e parcerias com órgãos públicos, seguimos inovando com metodologias práticas."
+              }
+            ].map((item) => (
+              <li key={item.title} className="relative">
+                <span className="absolute -left-[2.6rem] flex h-8 min-w-8 items-center justify-center rounded-full bg-deep-navy px-2 text-label font-bold text-white">
+                  {item.marker}
+                </span>
+                <h3 className="font-display text-xl font-bold text-deep-navy">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-text-muted">{item.description}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       <section className="page-section">
         <div className="container grid gap-5 lg:grid-cols-3">
           {[
