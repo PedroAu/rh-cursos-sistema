@@ -1,7 +1,12 @@
 import {
   BookOpen,
   CalendarCheck,
+  Clock,
+  FileText,
   type LucideIcon,
+  Newspaper,
+  Tag,
+  Target,
   TrendingUp,
   UserCheck,
   Users,
@@ -648,12 +653,50 @@ export function buildResourceConfig(
         { value: "Perdido", label: "Perdido" },
       ];
 
+      const newLeads = store.leads.filter((item) => item.status === "Novo").length;
+      const inProgressLeads = store.leads.filter(
+        (item) => item.status === "Em atendimento" || item.status === "Proposta enviada"
+      ).length;
+      const convertedLeads = store.leads.filter((item) => item.status === "Convertido").length;
+      const leadConversionRate = store.leads.length > 0 ? Math.round((convertedLeads / store.leads.length) * 100) : 0;
+
       return {
         title: "Gestão de leads",
         description: "Funil com origem, interesse e estágio comercial.",
         rows,
+        stats: [
+          {
+            label: "Total de leads",
+            value: String(store.leads.length),
+            helper: "Contatos registrados no funil.",
+            icon: Users,
+          },
+          {
+            label: "Novos",
+            value: String(newLeads),
+            helper: "Ainda sem primeiro atendimento.",
+            icon: UserCheck,
+          },
+          {
+            label: "Em atendimento",
+            value: String(inProgressLeads),
+            helper: "Em contato ou com proposta enviada.",
+            icon: Clock,
+          },
+          {
+            label: "Taxa de conversão",
+            value: `${leadConversionRate}%`,
+            helper: "Leads convertidos sobre o total.",
+            icon: Target,
+          },
+        ],
         columns: [
-          { key: "name", label: "Lead", render: (row: Lead) => row.name },
+          {
+            key: "name",
+            label: "Lead",
+            render: (row: Lead) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Lead) => `${row.name} <${row.email}>`,
+          },
           { key: "origin", label: "Origem", render: (row: Lead) => <Badge variant="muted">{row.origin}</Badge> },
           { key: "courseInterest", label: "Interesse", render: (row: Lead) => row.courseInterest },
           { key: "status", label: "Status", render: (row: Lead) => renderStatusBadge(row.status) },
@@ -746,12 +789,51 @@ export function buildResourceConfig(
         { value: "Concluída", label: "Concluída" },
       ];
 
+      const confirmedEnrollmentsTotal = store.enrollments.filter(
+        (item) => item.status === "Confirmada" || item.status === "Concluída"
+      ).length;
+      const awaitingPaymentEnrollments = store.enrollments.filter(
+        (item) => item.status === "Aguardando pagamento"
+      ).length;
+      const completedEnrollmentsTotal = store.enrollments.filter((item) => item.status === "Concluída").length;
+
       return {
         title: "Gestão de inscrições",
         description: "Acompanhar inscrição, curso, turma e forma de pagamento simulada.",
         rows,
+        stats: [
+          {
+            label: "Total de inscrições",
+            value: String(store.enrollments.length),
+            helper: "Inscrições registradas na plataforma.",
+            icon: Users,
+          },
+          {
+            label: "Confirmadas",
+            value: String(confirmedEnrollmentsTotal),
+            helper: "Confirmadas ou já concluídas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Aguardando pagamento",
+            value: String(awaitingPaymentEnrollments),
+            helper: "Pendentes de confirmação financeira.",
+            icon: Clock,
+          },
+          {
+            label: "Concluídas",
+            value: String(completedEnrollmentsTotal),
+            helper: "Capacitações finalizadas.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
-          { key: "studentName", label: "Aluno", render: (row: Enrollment) => row.studentName },
+          {
+            key: "studentName",
+            label: "Aluno",
+            render: (row: Enrollment) => <UserCell name={row.studentName} email={row.email} />,
+            exportValue: (row: Enrollment) => `${row.studentName} <${row.email}>`,
+          },
           {
             key: "course", label: "Curso",
             render: (row: Enrollment) =>
@@ -828,13 +910,49 @@ export function buildResourceConfig(
         { value: "Inativo", label: "Inativo" },
       ];
 
+      const activeInstructors = store.instructors.filter((item) => item.status === "Ativo").length;
+      const inactiveInstructors = store.instructors.length - activeInstructors;
+      const linkedCourseIds = new Set(
+        store.instructors.flatMap((item) => item.courseIds || [])
+      );
+
       return {
         title: "Gestão de instrutores",
         description: "Criar, editar, vincular cursos e acompanhar especialidades.",
         rows,
+        stats: [
+          {
+            label: "Total de instrutores",
+            value: String(store.instructors.length),
+            helper: "Especialistas cadastrados.",
+            icon: Users,
+          },
+          {
+            label: "Ativos",
+            value: String(activeInstructors),
+            helper: "Disponíveis para novas turmas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Inativos",
+            value: String(inactiveInstructors),
+            helper: "Sem vínculo ativo no momento.",
+            icon: UserX,
+          },
+          {
+            label: "Cursos vinculados",
+            value: String(linkedCourseIds.size),
+            helper: "Cursos com instrutor designado.",
+            icon: BookOpen,
+          },
+        ],
         columns: [
-          { key: "name", label: "Instrutor", render: (row: Instructor) => row.name },
-          { key: "email", label: "E-mail", render: (row: Instructor) => row.email },
+          {
+            key: "name",
+            label: "Instrutor",
+            render: (row: Instructor) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Instructor) => `${row.name} <${row.email}>`,
+          },
           { key: "specialty", label: "Especialidade", render: (row: Instructor) => row.specialty },
           { key: "status", label: "Status", render: (row: Instructor) => renderStatusBadge(row.status) },
         ],
@@ -909,10 +1027,42 @@ export function buildResourceConfig(
       ];
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
 
+      const publishedPosts = store.blogPosts.filter((item) => item.status === "Publicado").length;
+      const draftPosts = store.blogPosts.filter((item) => item.status === "Rascunho").length;
+      const activeCategories = new Set(
+        store.blogPosts.filter((item) => item.status === "Publicado").map((item) => item.category)
+      );
+
       return {
         title: "Gestão do blog",
         description: "CRUD local para posts, categorias e status editoriais.",
         rows,
+        stats: [
+          {
+            label: "Total de posts",
+            value: String(store.blogPosts.length),
+            helper: "Conteúdos no acervo editorial.",
+            icon: Newspaper,
+          },
+          {
+            label: "Publicados",
+            value: String(publishedPosts),
+            helper: "Visíveis no blog público.",
+            icon: FileText,
+          },
+          {
+            label: "Rascunhos",
+            value: String(draftPosts),
+            helper: "Em produção, ainda não publicados.",
+            icon: Clock,
+          },
+          {
+            label: "Categorias ativas",
+            value: String(activeCategories.size),
+            helper: "Categorias com post publicado.",
+            icon: Tag,
+          },
+        ],
         columns: [
           { key: "title", label: "Post", render: (row: BlogPost) => row.title },
           { key: "category", label: "Categoria", render: (row: BlogPost) => <Badge variant="muted">{row.category}</Badge> },
