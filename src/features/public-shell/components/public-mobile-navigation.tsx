@@ -68,7 +68,7 @@ export function PublicMobileNavigation() {
           </Button>
 
           <Button component={NextLink} href="/login" aria-label="Área do Aluno" color="rhBlue" onClick={close}>
-            <span className="rh-nav-visual-label" data-label={`Área do Al\u200buno`} />
+            Área do Aluno
           </Button>
 
           <Button
