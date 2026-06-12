@@ -1,15 +1,14 @@
 "use client";
 
-import { MessageCircle, PhoneCall } from "lucide-react";
 import { useState } from "react";
+import { Button, Group, Modal, SimpleGrid, Stack, Text, Textarea, ThemeIcon, UnstyledButton } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { MessageCircle, PhoneCall } from "lucide-react";
 import { toast } from "sonner";
 
 import { company } from "@/lib/company";
 import { trackEvent } from "@/lib/analytics";
 import { useAppStore } from "@/lib/app-store";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
 
 const supportOptions = [
   "Quero saber sobre cursos",
@@ -21,46 +20,68 @@ const supportOptions = [
 
 export function WhatsAppSupport() {
   const { createLead } = useAppStore();
+  const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState("");
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          id="atendimento"
-          className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent text-white shadow-card transition hover:-translate-y-0.5 hover:shadow-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-label="Abrir atendimento"
-        >
+    <>
+      <UnstyledButton
+        id="atendimento"
+        onClick={open}
+        aria-label="Abrir atendimento"
+        className="fixed bottom-5 right-5 z-40"
+      >
+        <ThemeIcon radius="xl" size={58} color="rhGold" c="#0a2038" style={{ boxShadow: "0 16px 36px rgba(10, 32, 56, 0.2)" }}>
           <MessageCircle className="h-6 w-6" />
-        </button>
-      </DialogTrigger>
-      <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Atendimento rápido</DialogTitle>
-          <DialogDescription>
+        </ThemeIcon>
+      </UnstyledButton>
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        keepMounted={false}
+        title="Atendimento rápido"
+        centered
+        size="lg"
+        styles={{ body: { paddingTop: 0 } }}
+      >
+        <Stack gap="md">
+          <Text c="dimmed">
             Escolha um assunto inicial ou escreva sua solicitação para a equipe de atendimento.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4">
-          <div className="grid gap-2 sm:grid-cols-2">
+          </Text>
+
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
             {supportOptions.map((option) => (
-              <button
+              <UnstyledButton
                 key={option}
-                type="button"
                 onClick={() => setMessage(option)}
-                className="rounded-xl border border-border bg-muted px-4 py-3 text-left text-sm font-medium hover:border-accent hover:bg-secondary/60"
+                style={{
+                  border: "1px solid var(--mantine-color-gray-3)",
+                  borderRadius: "10px",
+                  padding: "14px 16px",
+                  background: "#f8fafc",
+                  fontSize: "0.92rem",
+                  fontWeight: 600,
+                  textAlign: "left"
+                }}
               >
                 {option}
-              </button>
+              </UnstyledButton>
             ))}
-          </div>
+          </SimpleGrid>
+
           <Textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             placeholder="Escreva sua mensagem para a equipe de atendimento"
+            minRows={4}
+            autosize
           />
-          <div className="flex flex-col gap-3 sm:flex-row">
+
+          <Group grow>
             <Button
+              color="rhBlue"
+              leftSection={<PhoneCall className="h-4 w-4" />}
               onClick={async () => {
                 try {
                   await createLead({
@@ -72,22 +93,22 @@ export function WhatsAppSupport() {
                     message: message || "Solicitação enviada pelo atendimento rápido"
                   });
                   trackEvent("lead_enviado", { origin: "atendimento_rapido" });
+                  toast.success("A equipe vai retornar pelo canal institucional.");
+                  close();
+                  setMessage("");
                 } catch (error) {
                   toast.error(error instanceof Error ? error.message : "Não foi possível enviar a solicitação.");
                 }
               }}
             >
-              <PhoneCall className="h-4 w-4" />
               Enviar solicitação
             </Button>
-            <Button asChild variant="outline">
-              <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
-                Ir para WhatsApp
-              </a>
+            <Button component="a" href={company.links.whatsapp} target="_blank" rel="noreferrer" variant="light" color="rhBlue">
+              Ir para WhatsApp
             </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </Group>
+        </Stack>
+      </Modal>
+    </>
   );
 }

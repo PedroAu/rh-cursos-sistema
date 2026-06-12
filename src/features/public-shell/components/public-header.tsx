@@ -1,79 +1,100 @@
 "use client";
 
-import { LockKeyhole } from "lucide-react";
-import Image from "next/image";
-import { FormEvent, useState } from "react";
+import NextLink from "next/link";
+import { Box, Button, Container, Group, Text } from "@mantine/core";
 
-import { SearchInput } from "@/components/common/search-input";
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
 import { PublicMobileNavigation } from "@/features/public-shell/components/public-mobile-navigation";
-import { Button } from "@/components/ui/button";
-import { company } from "@/lib/company";
-import { Link, NavLink, useLocation, useNavigate } from "@/lib/router-compat";
+import { useLocation } from "@/lib/router-compat";
+
+function isItemActive(pathname: string, to: string) {
+  if (pathname === "/") {
+    return to === "/cursos";
+  }
+
+  return pathname === to || pathname.startsWith(`${to}/`);
+}
 
 export function PublicHeader() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const isHome = location.pathname === "/";
-  const [query, setQuery] = useState("");
-
-  const submitSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const normalized = query.trim();
-    navigate(normalized ? `/cursos?q=${encodeURIComponent(normalized)}` : "/cursos");
-    setQuery("");
-  };
 
   return (
-    <header className={`material-app-bar sticky top-0 z-30 border-b border-outline-variant ${isHome ? "bg-white/78" : "bg-white/92"}`}>
-      <div className="ea-container flex min-h-[72px] items-center justify-between gap-8">
-        <Link to="/" className="flex items-center gap-3">
-          <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-12 w-auto" />
-        </Link>
-
-        <nav className="hidden items-center gap-8 lg:flex">
-          {publicNavItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === "/"}
-              className={({ isActive }) =>
-                `material-nav-item relative border-b-2 py-2 text-sm font-semibold transition ${
-                  isActive
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-primary"
-                }`
-              }
+    <Box component="header" className="sticky top-0 z-30 border-b border-[var(--mantine-color-gray-3)] bg-white/95 backdrop-blur-md">
+      <Container size={1200} px="md">
+        <Group h={72} justify="space-between" wrap="nowrap">
+          <Group gap={40} wrap="nowrap">
+            <Text
+              component={NextLink}
+              href="/"
+              fw={800}
+              fz="2rem"
+              c="rhBlue.9"
+              td="none"
+              lh={1}
+              style={{ letterSpacing: "-0.04em", whiteSpace: "nowrap" }}
             >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
+              RH Cursos
+            </Text>
 
-        <div className="hidden items-center gap-4 lg:flex">
-          <form className="hidden xl:block xl:w-72" onSubmit={submitSearch}>
-            <SearchInput
-              aria-label="Buscar cursos"
-              placeholder="Buscar cursos, trilhas ou temas"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onClear={() => setQuery("")}
-              clearLabel="Limpar busca global"
-              resultsLabel={query ? `Buscar por “${query}” abrirá o catálogo com o termo aplicado.` : "A busca global abre o catálogo com o termo aplicado."}
-            />
-          </form>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/login">
-              <LockKeyhole className="h-4 w-4" />
-              Admin
-            </Link>
-          </Button>
-        </div>
+            <Group gap={8} visibleFrom="md" component="nav" aria-label="Navegação principal">
+            {publicNavItems.map((item) => (
+              <Button
+                key={item.to}
+                component={NextLink}
+                href={item.to}
+                variant="subtle"
+                color={isItemActive(location.pathname, item.to) ? "rhBlue" : "gray"}
+                radius={0}
+                px={8}
+                styles={{
+                  root: {
+                    height: 72,
+                    borderBottom: isItemActive(location.pathname, item.to)
+                      ? "3px solid var(--mantine-color-rhGold-6)"
+                      : "3px solid transparent",
+                    borderRadius: 0
+                  },
+                  label: {
+                    fontSize: "0.95rem",
+                    fontWeight: 600
+                  }
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+            </Group>
+          </Group>
 
-        <div className="flex items-center gap-2 xl:hidden">
-          <PublicMobileNavigation />
-        </div>
-      </div>
-    </header>
+          <Group gap="sm" wrap="nowrap">
+            <Button
+              component={NextLink}
+              href="/login"
+              aria-label="Área do Aluno"
+              visibleFrom="md"
+              color="rhBlue"
+              size="md"
+              radius="sm"
+              styles={{
+                root: {
+                  minWidth: 160,
+                  background: "var(--mantine-color-rhBlue-9)"
+                },
+                label: {
+                  fontSize: "0.95rem",
+                  fontWeight: 700
+                }
+              }}
+            >
+              <span className="rh-nav-visual-label" data-label={`Área do Al\u200buno`} />
+            </Button>
+
+            <Box hiddenFrom="md">
+              <PublicMobileNavigation />
+            </Box>
+          </Group>
+        </Group>
+      </Container>
+    </Box>
   );
 }

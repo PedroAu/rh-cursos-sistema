@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Montserrat } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "@/styles/globals.css";
+import { AppMantineProvider } from "@/components/providers/mantine-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
@@ -52,9 +56,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript defaultColorScheme="light" />
+      </head>
       <body className={`${inter.variable} ${montserrat.variable} ${legacyManrope.variable}`}>
-        <MotionProvider>{children}</MotionProvider>
+        <AppMantineProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </AppMantineProvider>
       </body>
       {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>

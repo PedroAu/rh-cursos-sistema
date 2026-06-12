@@ -14,7 +14,7 @@ const baseRoutes = [
   { label: "Cursos", href: "/cursos", icon: BookOpen },
   { label: "Agenda", href: "/agenda", icon: CalendarDays },
   { label: "Blog", href: "/blog", icon: Search },
-  { label: "Admin", href: "/login", icon: LockKeyhole }
+  { label: "Área do Aluno", href: "/login", icon: LockKeyhole }
 ];
 
 export function CommandPalette() {

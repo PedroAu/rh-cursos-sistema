@@ -1,128 +1,119 @@
-import Image from "next/image";
+import NextLink from "next/link";
+import { Mail, MessageCircle, Phone } from "lucide-react";
+import { ActionIcon, Box, Container, Grid, Group, Stack, Text } from "@mantine/core";
 
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
 import { company } from "@/lib/company";
-import { Link } from "@/lib/router-compat";
+
+const quickLinks = [
+  { label: "Administração", to: "/login" },
+  { label: "Catálogo de cursos", to: "/cursos" },
+  { label: "Agenda de turmas", to: "/agenda" }
+];
 
 export function PublicFooter() {
   return (
-    <footer className="relative overflow-hidden bg-[var(--ea-footer-bg)] text-white">
-      <div className="ea-container relative py-20">
-        <div className="grid gap-8 border-b border-white/10 pb-12 xl:grid-cols-[1.3fr_repeat(3,minmax(0,1fr))]">
-          <div className="space-y-5">
-            <div className="space-y-3">
-              <div className="inline-flex rounded-lg bg-white p-3">
-                <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-24 w-auto" />
-              </div>
-              <p className="max-w-md text-sm leading-7 text-white/70">
-                Desde {company.foundedYear}, cursos, consultoria e treinamento empresarial.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <a
-                href={company.links.whatsapp}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center rounded-lg border border-white/12 bg-white/10 px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/12"
-              >
-                WhatsApp
-              </a>
-              <a
-                href={company.links.email}
-                className="inline-flex items-center rounded-lg border border-white/12 bg-white/10 px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/12"
-              >
-                E-mail
-              </a>
-            </div>
-          </div>
+    <Box component="footer" bg="#0a4b72" c="white" py={56}>
+      <Container size={1200} px="md">
+        <Grid gap="xl">
+          <Grid.Col span={{ base: 12, md: 3.5 }}>
+            <Stack gap="md">
+              <Text fw={800} fz="2rem" lh={1} style={{ letterSpacing: "-0.04em" }}>
+                RH Cursos
+              </Text>
+              <Text c="rgba(255,255,255,0.78)" maw={280}>
+                Desenvolvemos cursos, consultoria e treinamento empresarial com foco em resultados práticos.
+              </Text>
+              <Group gap="sm">
+                <ActionIcon
+                  component="a"
+                  href={company.links.email}
+                  aria-label="Contato institucional por correio eletrônico"
+                  variant="subtle"
+                  color="white"
+                  radius="xl"
+                >
+                  <Mail className="h-4 w-4" />
+                </ActionIcon>
+                <ActionIcon
+                  component="a"
+                  href={company.links.whatsapp}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Contato institucional por WhatsApp"
+                  variant="subtle"
+                  color="white"
+                  radius="xl"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </ActionIcon>
+                <ActionIcon
+                  component="a"
+                  href="tel:+556139651929"
+                  aria-label="Contato institucional por telefone"
+                  variant="subtle"
+                  color="white"
+                  radius="xl"
+                >
+                  <Phone className="h-4 w-4" />
+                </ActionIcon>
+              </Group>
+            </Stack>
+          </Grid.Col>
 
-          <div className="space-y-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
-              Navegação
-            </div>
-            <div className="grid gap-3 text-sm text-white/80">
-              {publicNavItems.map((item) => (
-                <Link key={item.to} to={item.to} className="transition hover:text-white">
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
+          <Grid.Col span={{ base: 6, md: 2.5 }}>
+            <Stack gap="sm">
+              <Text fw={700} fz="sm" c="#f5c13a">
+                Navegação
+              </Text>
+              <Stack gap={8} component="nav" aria-label="Navegação do rodapé">
+                {publicNavItems.map((item) => (
+                  <Text key={item.to} component={NextLink} href={item.to} td="none" c="rgba(255,255,255,0.86)">
+                    {item.label}
+                  </Text>
+                ))}
+              </Stack>
+            </Stack>
+          </Grid.Col>
 
-          <div className="space-y-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
-              Atendimento
-            </div>
-            <div className="grid gap-3 text-sm text-white/80">
-              <span>{company.phones.primary} / {company.phones.secondary}</span>
-              <span>{company.phones.whatsapp}</span>
-              <span>{company.address.district}, {company.address.cityState}</span>
-              <span>Turmas abertas e in company</span>
-              <span>Resposta em até 24h úteis</span>
-            </div>
-          </div>
+          <Grid.Col span={{ base: 6, md: 3 }}>
+            <Stack gap="sm">
+              <Text fw={700} fz="sm" c="#f5c13a">
+                Atendimento
+              </Text>
+              <Text c="rgba(255,255,255,0.86)">{company.phones.primary}</Text>
+              <Text c="rgba(255,255,255,0.86)">{company.phones.secondary}</Text>
+              <Text c="rgba(255,255,255,0.7)">
+                {company.address.district}, {company.address.cityState}
+              </Text>
+            </Stack>
+          </Grid.Col>
 
-          <div className="space-y-4">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">
-              Acesso rápido
-            </div>
-            <div className="grid gap-3 text-sm text-white/80">
-              <Link to="/login" className="transition hover:text-white">
-                Administração
-              </Link>
-              <Link to="/cursos" className="transition hover:text-white">
-                Catálogo de cursos
-              </Link>
-              <Link to="/agenda" className="transition hover:text-white">
-                Agenda de turmas
-              </Link>
-              <Link to="/blog" className="transition hover:text-white">
-                Conteúdos do Blog
-              </Link>
-            </div>
-          </div>
-        </div>
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            <Stack gap="sm">
+              <Text fw={700} fz="sm" c="#f5c13a">
+                Acesso rápido
+              </Text>
+              <Stack gap={8} component="nav" aria-label="Acesso rápido do rodapé">
+                {quickLinks.map((item) => (
+                  <Text key={item.to} component={NextLink} href={item.to} td="none" c="rgba(255,255,255,0.86)">
+                    {item.label}
+                  </Text>
+                ))}
+              </Stack>
+            </Stack>
+          </Grid.Col>
+        </Grid>
 
-        <form
-          className="mt-12 grid gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-8 md:grid-cols-[1.4fr_minmax(0,1fr)] md:items-end"
-          onSubmit={(event) => event.preventDefault()}
-          aria-labelledby="footer-newsletter-title"
-        >
-          <div className="space-y-2">
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">Newsletter</div>
-            <h2 id="footer-newsletter-title" className="text-xl font-semibold text-white">
-              Receba turmas abertas e conteúdos
-            </h2>
-            <p className="max-w-md text-sm leading-7 text-white/70">
-              Novidades de cursos, agenda de turmas e materiais — sem spam.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <label htmlFor="footer-newsletter-email" className="sr-only">
-              Assinar a newsletter
-            </label>
-            <input
-              id="footer-newsletter-email"
-              type="email"
-              name="email"
-              autoComplete="email"
-              placeholder="seu@email.com"
-              className="h-12 w-full rounded-lg border border-white/15 bg-white/10 px-4 text-sm text-white placeholder:text-white/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-            />
-            <button
-              type="submit"
-              className="h-12 shrink-0 rounded-lg bg-[var(--ea-button-primary-bg,#ffc641)] px-6 text-sm font-semibold text-[var(--ea-button-primary-fg,#083b56)] transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-            >
-              Inscrever
-            </button>
-          </div>
-        </form>
-
-        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-8 text-sm text-white/60 md:flex-row md:items-center md:justify-between">
-          <span>{company.legalName} • CNPJ {company.cnpj}</span>
-          <span>Plataforma institucional para cursos, turmas e atendimento.</span>
-        </div>
-      </div>
-    </footer>
+        <Group justify="space-between" mt={48} pt={18} style={{ borderTop: "1px solid rgba(255,255,255,0.16)" }}>
+          <Text c="rgba(255,255,255,0.68)" fz="sm">
+            {company.legalName} • CNPJ {company.cnpj}
+          </Text>
+          <Text c="rgba(255,255,255,0.72)" fz="sm">
+            Plataforma institucional para cursos, turmas e atendimento.
+          </Text>
+        </Group>
+      </Container>
+    </Box>
   );
 }

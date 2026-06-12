@@ -1,19 +1,19 @@
 status:
-  branch: story/1.2-tokens-semanticos
+  branch: redesign/ep-0-fundacao
   modifiedFiles:
     - .aiox/project-status.yaml
-    - DEPLOYMENT.md
-    - docs/epics/epic-1-fundacao-visual-baseline-a11y.md
-    - docs/epics/epic-2-form-system-a11y.md
-    - docs/epics/epic-3-admin-polish.md
-  modifiedFilesTotalCount: 31
+    - docs/design/apple-hig-application-plan-2026-05-26.md
+    - docs/diagnosis/contrast-baseline-2026-06-09.md
+    - docs/stories/2026-06-09-epic3-story1-densidade-visual-hierarquia-crud.md
+    - docs/stories/2026-06-09-epic3-story3-graficos-admin-acessiveis.md
+  modifiedFilesTotalCount: 65
   recentCommits:
-    - 'feat: implement epic 5 search motion and loading polish'
-    - 'feat: implement epic 3 and conclude epic 4 public journeys'
+    - fix workers middleware deploy
+    - refine specialist contact page
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-10T18:19:30.404Z'
+  lastUpdate: '2026-06-12T17:34:14.081Z'
   isGitRepo: true
-timestamp: 1781115570405
+timestamp: 1781285654083
 ttl: 60
-gitFingerprint: 1781047614259.2688:1781115562863.108
+gitFingerprint: 1781135664872.7634:1781228479562.7383

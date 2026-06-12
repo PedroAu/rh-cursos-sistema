@@ -1,194 +1,331 @@
 "use client";
 
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  LabelList,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis
-} from "recharts";
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Divider,
+  Group,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  ThemeIcon,
+  Title
+} from "@mantine/core";
+import { ArrowRight, BookOpen, CircleDollarSign, Pencil, TrendingUp, Trash2, UserPlus, Users } from "lucide-react";
 
-import { BookOpen, type LucideIcon, TrendingUp, Users, Wallet } from "lucide-react";
-
-import {
-  buildChartSummaryItems,
-  buildDashboardMetrics,
-  buildRevenueSummaryItems,
-} from "@/features/admin/dashboard/model/dashboard-metrics";
 import {
   buildPerformanceStats,
   buildRecentActivities,
+  formatRelativeTime,
+  type DashboardActivity
 } from "@/features/admin/dashboard/model/dashboard-activity";
-import { ChartCard } from "@/components/admin/chart-card";
-import { DashboardCard } from "@/components/dashboard/dashboard-card";
-import { PerformanceReportCard } from "@/components/admin/performance-report-card";
-import { RecentActivitiesCard } from "@/components/admin/recent-activities-card";
-import { useAppStore, useDashboardCharts } from "@/lib/app-store";
+import { buildDashboardMetrics } from "@/features/admin/dashboard/model/dashboard-metrics";
+import { useAppStore } from "@/lib/app-store";
+import { Link } from "@/lib/router-compat";
 
-const metricIcons: Record<string, { icon: LucideIcon; trend?: "up" | "down" }> = {
-  "Total de cursos": { icon: BookOpen },
-  "Total de turmas": { icon: TrendingUp, trend: "up" },
-  "Total de alunos": { icon: Users, trend: "up" },
-  "Receita total": { icon: Wallet, trend: "up" },
-};
+function pickMetric(
+  metrics: ReturnType<typeof buildDashboardMetrics>,
+  label: string,
+  fallbackValue = "0",
+  fallbackHelper = ""
+) {
+  return metrics.find((metric) => metric.label === label) ?? { label, value: fallbackValue, helper: fallbackHelper };
+}
+
+function getActivityIcon(kind: DashboardActivity["kind"]) {
+  if (kind === "lead") return UserPlus;
+  if (kind === "payment") return CircleDollarSign;
+  return BookOpen;
+}
+
+function getActivityTone(kind: DashboardActivity["kind"]) {
+  if (kind === "lead") return { background: "#fff2dc", color: "#b56d06" };
+  if (kind === "payment") return { background: "#e7f5ec", color: "#2d8a4f" };
+  return { background: "#eaf3fb", color: "#0b4668" };
+}
 
 export function AdminDashboardPage() {
   const { courses, classes, students, leads, enrollments } = useAppStore();
-  const charts = useDashboardCharts();
   const metrics = buildDashboardMetrics({ courses, classes, students, leads, enrollments });
   const activities = buildRecentActivities({ enrollments, leads, courses });
   const performanceStats = buildPerformanceStats({ enrollments, leads });
 
-  const chartSummaryClassName = "space-y-2 text-sm leading-6 text-label-secondary";
-
-  const renderSummaryList = (
-    items: Array<{ label: string; value: number | string }>,
-    emptyMessage: string
-  ) => {
-    if (items.length === 0) {
-      return <p className="text-sm leading-6 text-label-secondary">{emptyMessage}</p>;
+  const kpis = [
+    {
+      label: "TOTAL DE ALUNOS",
+      value: pickMetric(metrics, "Total de alunos").value,
+      helper: pickMetric(metrics, "Total de alunos").helper,
+      accent: "+12% este mês",
+      accentTone: "#2f8b4f",
+      icon: Users,
+      iconTone: { background: "#edf5fb", color: "#0b4668" }
+    },
+    {
+      label: "CURSOS ATIVOS",
+      value: pickMetric(metrics, "Total de cursos").value,
+      helper: "Catálogo publicado",
+      accent: `${courses.filter((course) => course.status === "Ativo" || course.status === "Destaque").length} em destaque`,
+      accentTone: "#4b5563",
+      icon: BookOpen,
+      iconTone: { background: "#fff8e2", color: "#8f6a00" }
+    },
+    {
+      label: "VENDAS DO MÊS",
+      value: pickMetric(metrics, "Receita total").value,
+      helper: "Receita confirmada",
+      accent: `${pickMetric(metrics, "Taxa de conversão").value} de conversão`,
+      accentTone: "#2f8b4f",
+      icon: CircleDollarSign,
+      iconTone: { background: "#e8f5ea", color: "#2f8b4f" }
+    },
+    {
+      label: "NOVOS LEADS",
+      value: pickMetric(metrics, "Leads").value,
+      helper: "Funil comercial",
+      accent: `${leads.filter((lead) => lead.status === "Novo").length} aguardando retorno`,
+      accentTone: "#cc4f4f",
+      icon: TrendingUp,
+      iconTone: { background: "#fff1f1", color: "#d17a00" }
     }
+  ];
 
-    return (
-      <ul className={chartSummaryClassName}>
-        {items.map((item) => (
-          <li key={item.label} className="flex items-start justify-between gap-4">
-            <span className="font-medium text-foreground">{item.label}</span>
-            <span>{item.value}</span>
-          </li>
-        ))}
-      </ul>
-    );
-  };
+  const highlightedCourses = courses.slice(0, 4).map((course) => {
+    const courseEnrollments = enrollments.filter((item) => item.courseId === course.id);
+    const category = course.pathName ?? course.category ?? "Geral";
+    const isDraft = course.status === "Em breve" || course.status === "Inativo";
+
+    return {
+      id: course.id,
+      title: course.title,
+      category,
+      status: isDraft ? "Rascunho" : "Ativo",
+      tone: isDraft ? "#d17a00" : "#2f8b4f",
+      detail: `ID: #${course.id.replace(/\D/g, "").slice(-4) || course.id.slice(-4)}`,
+      students: `${courseEnrollments.length} inscriç${courseEnrollments.length === 1 ? "ão" : "ões"}`
+    };
+  });
 
   return (
-    <section className="page-section">
-      <div className="container space-y-8">
-        <div className="space-y-2">
-          <span className="eyebrow">Dashboard admin</span>
-          <h1 className="text-4xl font-semibold">Visão geral da operação</h1>
-        </div>
+    <Stack gap="xl">
+      <Box>
+        <Title order={1} c="#0b4668" fw={800}>
+          Visão Geral
+        </Title>
+      </Box>
 
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-          {metrics.map((metric) => {
-            const decoration = metricIcons[metric.label];
-            return (
-              <DashboardCard
-                key={metric.label}
-                label={metric.label}
-                value={metric.value}
-                helper={metric.helper}
-                icon={decoration?.icon}
-                trend={decoration?.trend}
-              />
-            );
-          })}
-        </div>
+      <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="lg">
+        {kpis.map((metric) => {
+          const Icon = metric.icon;
 
-        <div className="grid gap-5 xl:grid-cols-3">
-          <div className="xl:col-span-2">
-            <RecentActivitiesCard activities={activities} />
-          </div>
-          <PerformanceReportCard stats={performanceStats} />
-        </div>
+          return (
+            <Paper key={metric.label} radius="xl" p="xl" withBorder shadow="xs">
+              <Group justify="space-between" align="flex-start">
+                <Text maw={140} size="0.9rem" fw={800} c="#303744">
+                  {metric.label}
+                </Text>
+                <ThemeIcon
+                  radius="md"
+                  size={48}
+                  variant="light"
+                  style={{ background: metric.iconTone.background, color: metric.iconTone.color }}
+                >
+                  <Icon size={20} />
+                </ThemeIcon>
+              </Group>
+              <Text mt="xl" fz="2.2rem" fw={800} c="#101828">
+                {metric.value}
+              </Text>
+              <Text mt={6} fw={600} c={metric.accentTone}>
+                {metric.accent}
+              </Text>
+              <Text mt={4} size="sm" c="#667085">
+                {metric.helper}
+              </Text>
+            </Paper>
+          );
+        })}
+      </SimpleGrid>
 
-        <div className="grid gap-5 xl:grid-cols-2">
-          <ChartCard
-            title="Leads por status"
-            description="Mostra a distribuição atual do funil com valores visíveis por barra e resumo textual."
-            summary={renderSummaryList(
-              buildChartSummaryItems(charts.leadsByStatus),
-              "Nenhum lead registrado até o momento."
-            )}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={charts.leadsByStatus}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#123f7a" radius={[10, 10, 0, 0]}>
-                  <LabelList dataKey="value" position="top" className="fill-foreground text-xs font-semibold" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-          <ChartCard
-            title="Inscrições por trilha"
-            description="Facilita comparar volume entre trilhas sem depender apenas de cor ou tooltip."
-            summary={renderSummaryList(
-              buildChartSummaryItems(charts.enrollmentsByPath),
-              "Nenhuma inscrição registrada nas trilhas."
-            )}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={charts.enrollmentsByPath}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} angle={-12} textAnchor="end" height={70} />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#3ea76a" radius={[10, 10, 0, 0]}>
-                  <LabelList dataKey="value" position="top" className="fill-foreground text-xs font-semibold" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-          <ChartCard
-            title="Receita por mês"
-            description="Apresenta tendência mensal com valores formatados em real no gráfico e no resumo textual."
-            summary={renderSummaryList(
-              buildRevenueSummaryItems(charts.revenueByMonth),
-              "Sem receita confirmada registrada."
-            )}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={charts.revenueByMonth}>
-                <CartesianGrid vertical={false} strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(value)} />
-                <Bar dataKey="value" fill="#74a7e6" radius={[10, 10, 0, 0]}>
-                  <LabelList
-                    dataKey="value"
-                    position="top"
-                    formatter={(value: number) =>
-                      new Intl.NumberFormat("pt-BR", {
-                        notation: "compact",
-                        compactDisplay: "short",
-                        maximumFractionDigits: 1,
-                      }).format(value)
-                    }
-                    className="fill-foreground text-xs font-semibold"
-                  />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-          <ChartCard
-            title="Turmas por modalidade"
-            description="A modalidade aparece como eixo rotulado, com contagem por barra e resumo textual abaixo."
-            summary={renderSummaryList(
-              buildChartSummaryItems(charts.classesByModality),
-              "Nenhuma turma cadastrada nas modalidades."
-            )}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={charts.classesByModality} layout="vertical" margin={{ left: 16, right: 16 }}>
-                <CartesianGrid horizontal={false} strokeDasharray="3 3" />
-                <XAxis type="number" allowDecimals={false} />
-                <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="value" fill="#123f7a" radius={[0, 10, 10, 0]}>
-                  <LabelList dataKey="value" position="right" className="fill-foreground text-xs font-semibold" />
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartCard>
-        </div>
-      </div>
-    </section>
+      <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="lg" verticalSpacing="lg" style={{ alignItems: "start" }}>
+        <Stack gap="md">
+          <Group justify="space-between" align="center">
+            <Title order={2} c="#0b4668">
+              Gerenciar Cursos
+            </Title>
+            <Button color="rhGold" c="white" radius="xl" leftSection={<Users size={16} />}>
+              Novo Cadastro
+            </Button>
+          </Group>
+
+          <Paper radius="xl" withBorder shadow="xs" style={{ overflow: "hidden" }}>
+            <Table.ScrollContainer minWidth={720}>
+              <Table verticalSpacing="lg" horizontalSpacing="xl">
+                <Table.Thead bg="#f8fafc">
+                  <Table.Tr>
+                    <Table.Th>Título</Table.Th>
+                    <Table.Th>Categoria</Table.Th>
+                    <Table.Th>Status</Table.Th>
+                    <Table.Th style={{ textAlign: "right" }}>Ações</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {highlightedCourses.map((course) => (
+                    <Table.Tr key={course.id}>
+                      <Table.Td>
+                        <Text fw={700} c="#111827">
+                          {course.title}
+                        </Text>
+                        <Text size="sm" c="#5f6876" mt={4}>
+                          {course.detail}
+                        </Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge radius="xl" color="rhBlue" variant="light">
+                          {course.category}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Stack gap={4}>
+                          <Group gap={8}>
+                            <Box
+                              style={{
+                                width: 10,
+                                height: 10,
+                                borderRadius: 999,
+                                background: course.tone
+                              }}
+                            />
+                            <Text fw={600} c={course.tone}>
+                              {course.status}
+                            </Text>
+                          </Group>
+                          <Text size="sm" c="#667085">
+                            {course.students}
+                          </Text>
+                        </Stack>
+                      </Table.Td>
+                      <Table.Td>
+                        <Group justify="flex-end" gap="xs">
+                          <ActionIcon variant="subtle" color="dark" aria-label={`Editar ${course.title}`}>
+                            <Pencil size={18} />
+                          </ActionIcon>
+                          <ActionIcon variant="subtle" color="red" aria-label={`Excluir ${course.title}`}>
+                            <Trash2 size={18} />
+                          </ActionIcon>
+                        </Group>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+
+            <Group justify="space-between" px="xl" py="md">
+              <Text size="sm" c="#5f6876">
+                Mostrando {highlightedCourses.length} de {courses.length} cursos
+              </Text>
+              <Group gap="xs">
+                <ActionIcon variant="default" aria-label="Página anterior">
+                  <Text component="span">‹</Text>
+                </ActionIcon>
+                <ActionIcon variant="default" color="rhBlue" aria-label="Próxima página">
+                  <Text component="span">›</Text>
+                </ActionIcon>
+              </Group>
+            </Group>
+          </Paper>
+        </Stack>
+
+        <Stack gap="md">
+          <Title order={2} c="#0b4668">
+            Atividades Recentes
+          </Title>
+          <Paper radius="xl" withBorder shadow="xs" p="lg">
+            <Stack gap="lg">
+              {activities.map((activity) => {
+                const Icon = getActivityIcon(activity.kind);
+                const tone = getActivityTone(activity.kind);
+
+                return (
+                  <Group key={activity.id} align="flex-start" wrap="nowrap">
+                    <ThemeIcon radius="md" size={44} variant="light" style={{ background: tone.background, color: tone.color }}>
+                      <Icon size={20} />
+                    </ThemeIcon>
+                    <Box>
+                      <Text fw={500} lh={1.55} c="#111827">
+                        {activity.description}
+                      </Text>
+                      <Text size="sm" c="#5f6876" mt={4}>
+                        {formatRelativeTime(new Date(activity.timestamp).toISOString())}
+                      </Text>
+                    </Box>
+                  </Group>
+                );
+              })}
+            </Stack>
+            <Button
+              component={Link}
+              to="/admin/leads"
+              variant="subtle"
+              color="rhBlue"
+              mt="lg"
+              px={0}
+              rightSection={<ArrowRight size={16} />}
+            >
+              Ver todo o histórico
+            </Button>
+          </Paper>
+        </Stack>
+      </SimpleGrid>
+
+      <Paper radius="xl" p="xl" shadow="sm" style={{ background: "#0b4668", color: "#ffffff" }}>
+        <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="xl">
+          <Stack gap="lg">
+            <Box>
+              <Title order={2} c="white">
+                Relatório de Performance
+              </Title>
+              <Text mt="md" size="lg" c="rgba(255,255,255,0.82)" maw={760}>
+                Analise o engajamento dos alunos por departamento e identifique as turmas com melhor aproveitamento do conteúdo.
+              </Text>
+            </Box>
+            <Group>
+              <Button color="rhGold" c="#5f4700" radius="md">
+                Gerar Relatório PDF
+              </Button>
+              <Button variant="outline" color="gray" radius="md">
+                Configurar Alertas
+              </Button>
+            </Group>
+          </Stack>
+
+          <SimpleGrid cols={2} spacing="md">
+            {performanceStats.map((stat) => (
+              <Paper
+                key={stat.label}
+                radius="lg"
+                p="md"
+                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
+              >
+                <Text size="xs" fw={700} c="rgba(255,255,255,0.74)">
+                  {stat.label}
+                </Text>
+                <Text mt="sm" fz="2rem" fw={800}>
+                  {stat.value}
+                </Text>
+                <Divider my="sm" color="rgba(255,255,255,0.1)" />
+                <Text size="sm" c="rgba(255,255,255,0.74)">
+                  {stat.helper}
+                </Text>
+              </Paper>
+            ))}
+          </SimpleGrid>
+        </SimpleGrid>
+      </Paper>
+    </Stack>
   );
 }

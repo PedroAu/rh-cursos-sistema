@@ -16,13 +16,10 @@ function readProjectFiles(dir: string, predicate: (path: string) => boolean, acc
 }
 
 test.describe("epica 5 — busca, loading, motion e imagens", () => {
-  test("busca global do header redireciona para o catálogo com o termo aplicado", async ({ page }) => {
-    await page.goto("/");
-    await page.getByLabel("Buscar cursos").fill("licitações");
-    await page.getByLabel("Buscar cursos").press("Enter");
+  test("header público não exibe mais a barra de busca global", async ({ page }) => {
+    await page.goto("/contato");
 
-    await expect(page).toHaveURL(/\/cursos\/?\?q=licita%C3%A7%C3%B5es/);
-    await expect(page.getByText(/Busca: licitações/)).toBeVisible();
+    await expect(page.locator("header").first().getByLabel("Buscar cursos")).toHaveCount(0);
   });
 
   test("buscas locais expõem limpar e resumo de resultados", async ({ page }) => {

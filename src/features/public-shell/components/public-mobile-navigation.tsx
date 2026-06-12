@@ -1,64 +1,88 @@
 "use client";
 
-import { Menu, MessageCircle } from "lucide-react";
-import Image from "next/image";
+import NextLink from "next/link";
+import { Burger, Button, Divider, Drawer, Stack, Text } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { MessageCircle } from "lucide-react";
 
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
-import { company } from "@/lib/company";
-import { Link } from "@/lib/router-compat";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export function PublicMobileNavigation() {
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
-    <Sheet>
-      <SheetTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          aria-label="Abrir menu"
-          className="material-nav-trigger border-primary/20 bg-white/90"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="space-y-6 border-primary/10 bg-background">
-        <SheetHeader>
-          <SheetTitle className="sr-only">Menu principal</SheetTitle>
-          <SheetDescription className="sr-only">
-            Acesso rápido às principais áreas públicas do site.
-          </SheetDescription>
-          <Image src={company.logo.src} alt={company.logo.alt} width={453} height={285} className="h-20 w-auto" />
-          <p className="mt-2 text-sm leading-7 text-muted-foreground">
-            Acesso rápido às principais áreas do site.
-          </p>
-        </SheetHeader>
-        <div className="grid gap-3">
+    <>
+      <Burger opened={opened} onClick={open} aria-label="Abrir menu" color="var(--mantine-color-rhBlue-9)" />
+
+      <Drawer
+        opened={opened}
+        onClose={close}
+        keepMounted={false}
+        position="right"
+        title={
+          <Stack gap={2}>
+            <Text fw={800} fz="1.4rem" c="rhBlue.9" style={{ letterSpacing: "-0.04em" }}>
+              RH Cursos
+            </Text>
+            <Text c="dimmed" fz="sm">
+              Navegue pelas áreas principais da plataforma.
+            </Text>
+          </Stack>
+        }
+        styles={{
+          content: { background: "#f8fafc" },
+          header: { background: "#f8fafc" }
+        }}
+      >
+        <Stack gap="sm">
           {publicNavItems.map((item) => (
-            <Link
+            <Button
               key={item.to}
-              to={item.to}
-              className="material-nav-card rounded-xl border border-primary/10 bg-white px-4 py-4 font-medium text-foreground shadow-soft"
+              component={NextLink}
+              href={item.to}
+              justify="space-between"
+              variant="default"
+              color="gray"
+              onClick={close}
+              styles={{
+                root: {
+                  height: 52,
+                  borderColor: "var(--mantine-color-gray-3)",
+                  background: "#ffffff"
+                },
+                label: {
+                  fontSize: "0.95rem",
+                  fontWeight: 700,
+                  color: "var(--mantine-color-rhBlue-9)"
+                }
+              }}
             >
               {item.label}
-            </Link>
+            </Button>
           ))}
-        </div>
-        <div className="grid gap-3">
-          <Button asChild variant="secondary" className="w-full">
-            <Link to="/cursos">Ver cursos</Link>
+
+          <Divider my="xs" />
+
+          <Button component={NextLink} href="/cursos" color="rhGold" c="#0a2038" onClick={close}>
+            Ver cursos
           </Button>
-          <Button asChild className="w-full">
-            <Link to="/login">Admin</Link>
+
+          <Button component={NextLink} href="/login" aria-label="Área do Aluno" color="rhBlue" onClick={close}>
+            <span className="rh-nav-visual-label" data-label={`Área do Al\u200buno`} />
           </Button>
-          <Button asChild variant="ghost" className="w-full">
-            <a href="#atendimento">
-              <MessageCircle className="h-4 w-4" />
-              Falar com atendimento
-            </a>
+
+          <Button
+            component="a"
+            href="#atendimento"
+            variant="light"
+            color="rhBlue"
+            onClick={close}
+            leftSection={<MessageCircle className="h-4 w-4" />}
+          >
+            Falar com atendimento
           </Button>
-        </div>
-      </SheetContent>
-    </Sheet>
+        </Stack>
+      </Drawer>
+    </>
   );
 }

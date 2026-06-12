@@ -1,33 +1,37 @@
 "use client";
 
-import { Plus, Download } from "lucide-react";
-import { isValidElement, useMemo, useState } from "react";
+import {
+  ActionIcon,
+  Alert,
+  Box,
+  Button,
+  CloseButton,
+  FileInput,
+  Grid,
+  Group,
+  Modal,
+  MultiSelect,
+  NumberInput,
+  Paper,
+  ScrollArea,
+  Select,
+  SimpleGrid,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+  Textarea,
+  ThemeIcon,
+  Title
+} from "@mantine/core";
+import { Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { isValidElement, useMemo, useState, type ReactNode } from "react";
 
-import { DataTable } from "@/components/admin/data-table";
-import { EmptyState } from "@/components/common/empty-state";
-import { SearchInput } from "@/components/common/search-input";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { FormField } from "@/components/ui/form-field";
-import { Input } from "@/components/ui/input";
-import {
-  ArrayInput,
-  SelectField,
-  ModulesBuilder,
-  MultiSelectField,
-} from "@/components/admin/form-fields";
-import { useAppStore } from "@/lib/app-store";
+import { ArrayInput, ModulesBuilder } from "@/components/admin/form-fields";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { buildResourceConfig, type ResourceKey } from "@/lib/admin-resource-configs";
 import type { ValidationError } from "@/lib/admin-form-validation";
+import { buildResourceConfig, type FieldConfig, type ResourceKey } from "@/lib/admin-resource-configs";
+import { useAppStore } from "@/lib/app-store";
 
 type CsvColumn = {
   label: string;
@@ -53,10 +57,10 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
       columns
         .map((col) => {
           const value = col.exportValue ? col.exportValue(row) : col.render(row);
-          return `"${toExportableValue(value).replace(/"/g, '""')}"`;
+          return `"${toExportableValue(value).replace(/"/g, '""')}"`
         })
         .join(",")
-    ),
+    )
   ].join("\n");
 
   const blob = new Blob(["﻿" + csvContent], { type: "text/csv;charset=utf-8;" });
@@ -70,20 +74,43 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
   document.body.removeChild(link);
 }
 
+function getPageTitle(resource: ResourceKey, fallback: string) {
+  if (resource === "classes") return "Gestão de Cursos e Turmas";
+  if (resource === "students") return "Gestão de Cadastros";
+  if (resource === "courses") return "Gestão de Cursos";
+  return fallback;
+}
+
+function getPageDescription(resource: ResourceKey, fallback: string) {
+  if (resource === "classes") {
+    return "Administre o catálogo educacional, monitore inscrições em tempo real e organize o cronograma das próximas turmas presenciais e online.";
+  }
+  if (resource === "students") {
+    return "Gerencie alunos, instrutores e acessos operacionais com a mesma linguagem visual do novo painel administrativo.";
+  }
+  return fallback;
+}
+
+function getSearchPlaceholder(resource: ResourceKey) {
+  if (resource === "students") return "Filtrar por nome, CPF ou e-mail.";
+  if (resource === "classes") return "Buscar turma, curso ou modalidade.";
+  if (resource === "courses") return "Buscar curso ou trilha.";
+  return "Buscar por nome, título ou referência.";
+}
+
 export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const store = useAppStore();
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [form, setForm] = useState<Record<string, any>>({});
+  const [form, setForm] = useState<Record<string, unknown>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
 
   const errorsByField = useMemo(() => {
     const result: Record<string, string> = {};
-    validationErrors.forEach((e) => {
-      if (!result[e.field]) result[e.field] = e.message;
+    validationErrors.forEach((error) => {
+      if (!result[error.field]) result[error.field] = error.message;
     });
     return result;
   }, [validationErrors]);
@@ -95,9 +122,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       if (open) return false;
       const target = event.target as HTMLElement | null;
       const tag = target?.tagName;
-      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) {
-        return false;
-      }
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || target?.isContentEditable) return false;
       return true;
     },
     (event) => {
@@ -117,13 +142,15 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         setForm,
         setEditingId,
         setValidationErrors,
-        setOpen,
+        setOpen
       }),
-    [editingId, resource, search, store, form]
+    [editingId, form, resource, search, store]
   );
 
   const rows = config.rows as Array<{ id: string }>;
   const canCreate = resource !== "students" && resource !== "enrollments";
+  const pageTitle = getPageTitle(resource, config.title);
+  const pageDescription = getPageDescription(resource, config.description);
 
   async function handleSave() {
     setIsSaving(true);
@@ -134,7 +161,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     }
   }
 
-  function getFieldSpanClass(field: (typeof config.fields)[number]) {
+  function getFieldSpan(field: FieldConfig) {
     if (
       field.type === "readonly" ||
       field.type === "textarea" ||
@@ -142,23 +169,21 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       field.type === "modules" ||
       field.type === "multiselect"
     ) {
-      return "md:col-span-2";
+      return 12;
     }
 
-    return "";
+    return 6;
   }
 
-  function inferSectionTitle(field: (typeof config.fields)[number]) {
+  function inferSectionTitle(field: FieldConfig) {
     if (field.section) return field.section;
     if (field.type === "readonly") return "Contexto";
     if (field.key === "status") return "Ação operacional";
-    if (field.type === "textarea" || field.type === "array" || field.type === "modules") {
-      return "Conteúdo e detalhamento";
-    }
+    if (field.type === "textarea" || field.type === "array" || field.type === "modules") return "Conteúdo e detalhamento";
     return "Dados principais";
   }
 
-  const fieldSections = config.fields.reduce<Array<{ title: string; fields: Array<(typeof config.fields)[number]> }>>((sections, field) => {
+  const fieldSections = config.fields.reduce<Array<{ title: string; fields: FieldConfig[] }>>((sections, field) => {
     const title = inferSectionTitle(field);
     const existing = sections.find((section) => section.title === title);
 
@@ -172,394 +197,408 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   }, []);
 
   return (
-    <section className="page-section">
-      <div className="container space-y-6">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <span className="eyebrow">{config.title}</span>
-            <h1 className="mt-3 text-4xl font-semibold">{config.title}</h1>
-            <p className="mt-2 max-w-3xl text-base leading-7 text-muted-foreground">
-              {config.description}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {config.rows.length > 0 && (
+    <Stack gap="xl">
+      <Group justify="space-between" align="flex-start">
+        <Box maw={780}>
+          <Title order={1} c="#0b4668" fw={800}>
+            {pageTitle}
+          </Title>
+          <Text mt="sm" size="lg" lh={1.7} c="#4b5563">
+            {pageDescription}
+          </Text>
+        </Box>
+
+        {canCreate ? (
+          <Button
+            color="rhGold"
+            c="white"
+            radius="xl"
+            leftSection={<Plus size={16} />}
+            onClick={() => {
+              setEditingId(null);
+              setForm({});
+              setOpen(true);
+            }}
+          >
+            Novo Cadastro
+          </Button>
+        ) : null}
+      </Group>
+
+      {config.stats ? (
+        <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="lg">
+          {config.stats.map((stat, index) => {
+            const Icon = stat.icon;
+            const accentTone = index === 2 ? "#d17a00" : "#2f8b4f";
+
+            return (
+              <Paper key={stat.label} radius="xl" withBorder shadow="xs" p="xl">
+                <Group justify="space-between" align="flex-start">
+                  <Text maw={160} size="0.95rem" fw={800} c="#414a58">
+                    {stat.label}
+                  </Text>
+                  {Icon ? (
+                    <ThemeIcon size={48} radius="md" variant="light" color="rhBlue">
+                      <Icon size={20} />
+                    </ThemeIcon>
+                  ) : null}
+                </Group>
+                <Text mt="xl" fz="2.2rem" fw={800} c="#111827">
+                  {stat.value}
+                </Text>
+                <Text mt={6} fw={600} c={accentTone}>
+                  {stat.helper}
+                </Text>
+              </Paper>
+            );
+          })}
+        </SimpleGrid>
+      ) : (
+        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
+          <Paper radius="xl" withBorder shadow="xs" p="xl">
+            <Text size="0.95rem" fw={800} c="#414a58">
+              Registros visíveis
+            </Text>
+            <Text mt="xl" fz="2.2rem" fw={800} c="#111827">
+              {rows.length}
+            </Text>
+            <Text mt={6} fw={600} c="#2f8b4f">
+              {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual."}
+            </Text>
+          </Paper>
+          <Paper radius="xl" withBorder shadow="xs" p="xl">
+            <Text size="0.95rem" fw={800} c="#414a58">
+              Modo de operação
+            </Text>
+            <Text mt="xl" fz="2.2rem" fw={800} c="#111827">
+              {canCreate ? "CRUD" : "Supervisionado"}
+            </Text>
+            <Text mt={6} fw={600} c="#2f8b4f">
+              {canCreate ? "Criação e edição liberadas" : "Atualização sob controle"}
+            </Text>
+          </Paper>
+          <Paper radius="xl" withBorder shadow="xs" p="xl">
+            <Text size="0.95rem" fw={800} c="#414a58">
+              Atalho
+            </Text>
+            <Text mt="xl" fz="2.2rem" fw={800} c="#111827">
+              N
+            </Text>
+            <Text mt={6} fw={600} c="#2f8b4f">
+              Cria um novo registro rapidamente
+            </Text>
+          </Paper>
+        </SimpleGrid>
+      )}
+
+      <Paper radius="xl" withBorder shadow="xs" p="lg">
+        <Group justify="space-between" align="flex-end" mb="lg">
+          <Box>
+            <Title order={2} c="#0b4668">
+              {resource === "classes" ? "Listagem de Turmas Ativas" : resource === "students" ? "Gerenciar Usuários" : config.title}
+            </Title>
+          </Box>
+          <Group align="flex-end">
+            <TextInput
+              value={search}
+              onChange={(event) => setSearch(event.currentTarget.value)}
+              placeholder={getSearchPlaceholder(resource)}
+              leftSection={<Search size={18} />}
+              rightSection={
+                search ? <CloseButton aria-label="Limpar busca" onClick={() => setSearch("")} /> : null
+              }
+              styles={{ root: { minWidth: 320 } }}
+            />
+            {rows.length > 0 ? (
               <Button
-                variant="outline"
+                variant="default"
+                leftSection={<Download size={16} />}
                 onClick={() => exportToCSV(config.rows, config.columns as CsvColumn[], resource)}
               >
-                <Download className="h-4 w-4" />
-                Exportar CSV
+                Exportar
               </Button>
-            )}
-            {canCreate && (
-              <Button
-                onClick={() => {
-                  setEditingId(null);
-                  setForm({});
-                  setOpen(true);
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                Novo item
-              </Button>
-            )}
-          </div>
-        </div>
+            ) : null}
+          </Group>
+        </Group>
 
-        {config.stats ? (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {config.stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div key={stat.label} className="surface-card p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{stat.label}</p>
-                    {Icon ? (
-                      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/8 text-primary">
-                        <Icon className="size-5" aria-hidden="true" />
-                      </span>
-                    ) : null}
-                  </div>
-                  <p className="mt-3 text-3xl font-semibold text-foreground">{stat.value}</p>
-                  <p className="mt-2 text-sm leading-6 text-label-secondary">{stat.helper}</p>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="surface-card p-5">
-              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Registros visíveis</p>
-              <p className="mt-3 text-3xl font-semibold text-foreground">{rows.length}</p>
-              <p className="mt-2 text-sm leading-6 text-label-secondary">
-                {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual desta área."}
-              </p>
-            </div>
-            <div className="surface-card p-5">
-              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Modo de operação</p>
-              <p className="mt-3 text-2xl font-semibold text-foreground">
-                {canCreate ? "CRUD completo" : "Atualização supervisionada"}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-label-secondary">
-                {canCreate
-                  ? "Criação, edição e exclusão disponíveis com busca e exportação."
-                  : "Fluxo restrito a contexto e atualização segura de registros existentes."}
-              </p>
-            </div>
-            <div className="surface-card p-5">
-              <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Atalho</p>
-              <p className="mt-3 text-2xl font-semibold text-foreground">N para novo item</p>
-              <p className="mt-2 text-sm leading-6 text-label-secondary">
-                Disponível nas áreas com criação manual para acelerar operação recorrente.
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="surface-card space-y-4 p-5">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-            <div className="max-w-xl space-y-1">
-              <p className="text-sm font-semibold text-foreground">Busca operacional</p>
-              <p className="text-sm leading-6 text-label-secondary">
-                Filtre por nome, título ou referência para reduzir ruído antes de editar.
-              </p>
-            </div>
-            <div className="w-full lg:max-w-md">
-              <SearchInput
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                onClear={() => setSearch("")}
-                clearLabel={`Limpar busca de ${config.title.toLowerCase()}`}
-                placeholder="Buscar por nome, título ou referência..."
-                resultsLabel={
-                  search
-                    ? `${rows.length} registro${rows.length === 1 ? "" : "s"} visível${rows.length === 1 ? "" : "eis"} para “${search}”.`
-                    : "A busca operacional filtra o recurso atual por nome, título ou referência."
-                }
-              />
-            </div>
-          </div>
-          {rows.length ? (
-            <DataTable
-              data={rows}
-              columns={config.columns as never}
-              onEdit={config.onEdit as never}
-              onDelete={config.onDelete as never}
-            />
-          ) : (
-            <EmptyState
-              title="Nenhum registro encontrado."
-              description={
-                canCreate
-                  ? "Crie um novo item para validar o CRUD local desta área."
-                  : "Os registros aparecem aqui conforme são gerados pelas inscrições."
-              }
-              actionLabel={canCreate ? "Criar agora" : undefined}
-              onAction={
-                canCreate
-                  ? () => {
-                      setEditingId(null);
-                      setForm({});
-                      setOpen(true);
-                    }
-                  : undefined
-              }
-            />
-          )}
-        </div>
-
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="w-[min(96vw,980px)] max-w-4xl p-0 sm:min-h-[36rem]">
-            <div className="flex h-full max-h-[calc(100vh-2rem)] flex-col">
-              <DialogHeader className="border-b border-border px-6 py-5">
-                <DialogTitle>{editingId ? "Editar item" : "Criar novo item"}</DialogTitle>
-                <DialogDescription>Preencha os campos obrigatórios marcados com *</DialogDescription>
-              </DialogHeader>
-
-              <div className="flex-1 overflow-y-auto px-6 py-5">
-                <div className="space-y-6">
-                  {validationErrors.length > 0 && (
-                    <div className="rounded-md border border-destructive/20 bg-destructive/10 p-3">
-                      <p className="mb-2 text-sm font-medium text-destructive">Erros encontrados:</p>
-                      <ul className="space-y-1 text-xs text-destructive">
-                        {validationErrors.map((error, i) => (
-                          <li key={i} className="flex gap-2">
-                            <span>•</span>
-                            <span>{error.message}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {fieldSections.map((section) => (
-                    <div key={section.title} className="space-y-4">
-                      <div className="space-y-1">
-                        <h3 className="text-lg font-semibold text-foreground">{section.title}</h3>
-                        <p className="text-sm leading-6 text-label-secondary">
-                          {section.title === "Ação operacional"
-                            ? "Atualize apenas o que interfere na operação do time."
-                            : "Revise os dados antes de salvar para evitar retrabalho operacional."}
-                        </p>
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {section.fields.map((field) => {
-                          const fieldError = errorsByField[field.key];
-                          const fieldSpanClass = getFieldSpanClass(field);
-
-                          if (field.type === "readonly") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <div className="h-full rounded-xl border border-border bg-surface-muted/50 p-4">
-                                  <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">
-                                    {field.label}
-                                  </p>
-                                  <p className="mt-3 text-sm leading-6 text-foreground">
-                                    {String(form[field.key] ?? "—")}
-                                  </p>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "modules") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <ModulesBuilder
-                                  label={field.label}
-                                  value={form[field.key] || []}
-                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                                  error={fieldError}
-                                />
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "array") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <ArrayInput
-                                  label={field.label}
-                                  value={form[field.key] || []}
-                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                                  error={fieldError}
-                                />
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "multiselect" && field.options) {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <MultiSelectField
-                                  label={field.label}
-                                  value={form[field.key] || []}
-                                  options={field.options}
-                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                                  error={fieldError}
-                                />
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "select" && field.options) {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <SelectField
-                                  label={field.label}
-                                  value={form[field.key] ?? ""}
-                                  options={field.options}
-                                  onChange={(v) => setForm((current) => ({ ...current, [field.key]: v }))}
-                                  required={field.required}
-                                  error={fieldError}
-                                />
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "textarea") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <FormField error={fieldError} label={field.label} required={field.required}>
-                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                    <textarea
-                                      id={fieldId}
-                                      placeholder={`Ex.: ${field.label}`}
-                                      value={form[field.key] ?? ""}
-                                      aria-describedby={ariaDescribedBy}
-                                      aria-invalid={ariaInvalid}
-                                      onChange={(event) =>
-                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                      }
-                                      className="min-h-32 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                    />
-                                  )}
-                                </FormField>
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "number") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <FormField error={fieldError} label={field.label} required={field.required}>
-                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                    <input
-                                      id={fieldId}
-                                      type="number"
-                                      placeholder={`Ex.: ${field.label}`}
-                                      value={form[field.key] ?? ""}
-                                      aria-describedby={ariaDescribedBy}
-                                      aria-invalid={ariaInvalid}
-                                      onChange={(event) =>
-                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                      }
-                                      className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                                    />
-                                  )}
-                                </FormField>
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "date") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <FormField error={fieldError} label={field.label} required={field.required}>
-                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                    <input
-                                      id={fieldId}
-                                      type="date"
-                                      value={form[field.key] ?? ""}
-                                      aria-describedby={ariaDescribedBy}
-                                      aria-invalid={ariaInvalid}
-                                      onChange={(event) =>
-                                        setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                      }
-                                      className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                                    />
-                                  )}
-                                </FormField>
-                              </div>
-                            );
-                          }
-
-                          if (field.type === "file") {
-                            return (
-                              <div key={field.key} className={fieldSpanClass}>
-                                <FormField error={fieldError} label={field.label} required={field.required}>
-                                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                    <>
-                                      <input
-                                        id={fieldId}
-                                        type="file"
-                                        accept="image/*"
-                                        aria-describedby={ariaDescribedBy}
-                                        aria-invalid={ariaInvalid}
-                                        onChange={(event) => {
-                                          const file = event.target.files?.[0];
-                                          if (!file) return;
-                                          const reader = new FileReader();
-                                          reader.onload = () => {
-                                            if (typeof reader.result === "string") {
-                                              setForm((current) => ({ ...current, [field.key]: reader.result }));
-                                            }
-                                          };
-                                          reader.readAsDataURL(file);
-                                        }}
-                                        className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-                                      />
-                                      {form[field.key] ? (
-                                        <p className="text-xs text-muted-foreground">Imagem carregada com sucesso.</p>
-                                      ) : null}
-                                    </>
-                                  )}
-                                </FormField>
-                              </div>
-                            );
-                          }
-
-                          return (
-                            <div key={field.key} className={fieldSpanClass}>
-                              <FormField error={fieldError} label={field.label} required={field.required}>
-                                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                                  <Input
-                                    id={fieldId}
-                                    placeholder={`Ex.: ${field.label}`}
-                                    value={form[field.key] ?? ""}
-                                    aria-describedby={ariaDescribedBy}
-                                    aria-invalid={ariaInvalid}
-                                    onChange={(event) =>
-                                      setForm((current) => ({ ...current, [field.key]: event.target.value }))
-                                    }
-                                  />
-                                )}
-                              </FormField>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+        {rows.length ? (
+          <ScrollArea>
+            <Table highlightOnHover verticalSpacing="lg" horizontalSpacing="xl" miw={860}>
+              <Table.Thead bg="#f7f8fb">
+                <Table.Tr>
+                  {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
+                    <Table.Th key={column.key}>{column.label}</Table.Th>
                   ))}
-                </div>
-              </div>
-
-              <DialogFooter className="border-t border-border px-6 py-4">
-                <DialogClose asChild>
-                  <Button variant="outline" disabled={isSaving}>
-                    Cancelar
-                  </Button>
-                </DialogClose>
-                <Button onClick={handleSave} loading={isSaving}>
-                  Salvar
+                  <Table.Th style={{ textAlign: "right" }}>Ações</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {rows.map((row) => (
+                  <Table.Tr key={row.id}>
+                    {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
+                      <Table.Td key={`${row.id}-${column.key}`}>{column.render(row) as ReactNode}</Table.Td>
+                    ))}
+                    <Table.Td>
+                      <Group justify="flex-end" gap="xs">
+                        <ActionIcon
+                          variant="subtle"
+                          color="dark"
+                          aria-label={`Editar item ${row.id}`}
+                          onClick={() => config.onEdit(row)}
+                        >
+                          <Pencil size={18} />
+                        </ActionIcon>
+                        {config.onDelete ? (
+                          <ActionIcon
+                            variant="subtle"
+                            color="red"
+                            aria-label={`Excluir item ${row.id}`}
+                            onClick={() => config.onDelete?.(row)}
+                          >
+                            <Trash2 size={18} />
+                          </ActionIcon>
+                        ) : null}
+                      </Group>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+        ) : (
+          <Paper radius="lg" p="xl" bg="#f8fafc">
+            <Stack align="center" gap="sm">
+              <Text fw={700} c="#111827">
+                Nenhum registro encontrado.
+              </Text>
+              <Text size="sm" c="#667085" ta="center">
+                {canCreate
+                  ? "Crie um novo item para iniciar a operação desta área."
+                  : "Os registros aparecem aqui conforme são gerados pelos fluxos do sistema."}
+              </Text>
+              {canCreate ? (
+                <Button
+                  color="rhBlue"
+                  onClick={() => {
+                    setEditingId(null);
+                    setForm({});
+                    setOpen(true);
+                  }}
+                >
+                  Criar agora
                 </Button>
-              </DialogFooter>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </section>
+              ) : null}
+            </Stack>
+          </Paper>
+        )}
+      </Paper>
+
+      <Modal
+        opened={open}
+        onClose={() => setOpen(false)}
+        size="xl"
+        title={editingId ? "Editar registro" : "Criar novo registro"}
+        centered
+        scrollAreaComponent={ScrollArea.Autosize}
+      >
+        <Stack gap="lg">
+          {validationErrors.length > 0 ? (
+            <Alert color="red" variant="light" title="Erros encontrados">
+              <Stack gap={4}>
+                {validationErrors.map((error, index) => (
+                  <Text key={`${error.field}-${index}`} size="sm">
+                    {error.message}
+                  </Text>
+                ))}
+              </Stack>
+            </Alert>
+          ) : null}
+
+          {fieldSections.map((section) => (
+            <Paper key={section.title} radius="lg" withBorder p="md">
+              <Stack gap="md">
+                <Box>
+                  <Text fw={700} c="#111827">
+                    {section.title}
+                  </Text>
+                  <Text size="sm" c="#667085" mt={4}>
+                    {section.title === "Ação operacional"
+                      ? "Atualize apenas o que interfere na operação do time."
+                      : "Revise os dados antes de salvar para evitar retrabalho operacional."}
+                  </Text>
+                </Box>
+
+                <Grid>
+                  {section.fields.map((field) => (
+                    <Grid.Col key={field.key} span={{ base: 12, md: getFieldSpan(field) }}>
+                      <RenderField
+                        field={field}
+                        form={form}
+                        setForm={setForm}
+                        error={errorsByField[field.key]}
+                      />
+                    </Grid.Col>
+                  ))}
+                </Grid>
+              </Stack>
+            </Paper>
+          ))}
+
+          <Group justify="flex-end">
+            <Button variant="default" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+            <Button color="rhBlue" loading={isSaving} onClick={handleSave}>
+              {editingId ? "Salvar alterações" : "Criar registro"}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </Stack>
+  );
+}
+
+function RenderField({
+  field,
+  form,
+  setForm,
+  error
+}: {
+  field: FieldConfig;
+  form: Record<string, unknown>;
+  setForm: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
+  error?: string;
+}) {
+  if (field.type === "readonly") {
+    return (
+      <Paper radius="md" p="md" bg="#f7f9fc" withBorder>
+        <Text size="xs" fw={800} c="#667085">
+          {field.label}
+        </Text>
+        <Text size="sm" c="#111827" mt="sm">
+          {String(form[field.key] ?? "—")}
+        </Text>
+      </Paper>
+    );
+  }
+
+  if (field.type === "modules") {
+    return (
+      <ModulesBuilder
+        label={field.label}
+        value={(form[field.key] as never[]) || []}
+        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        error={error}
+      />
+    );
+  }
+
+  if (field.type === "array") {
+    return (
+      <ArrayInput
+        label={field.label}
+        value={(form[field.key] as string[]) || []}
+        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        error={error}
+      />
+    );
+  }
+
+  if (field.type === "multiselect" && field.options) {
+    return (
+      <MultiSelect
+        label={field.label}
+        required={field.required}
+        data={field.options}
+        value={(form[field.key] as string[]) || []}
+        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        error={error}
+        searchable
+      />
+    );
+  }
+
+  if (field.type === "select" && field.options) {
+    return (
+      <Select
+        label={field.label}
+        required={field.required}
+        data={field.options}
+        value={String(form[field.key] ?? "")}
+        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value ?? "" }))}
+        error={error}
+      />
+    );
+  }
+
+  if (field.type === "textarea") {
+    return (
+      <Textarea
+        label={field.label}
+        required={field.required}
+        value={String(form[field.key] ?? "")}
+        placeholder={`Ex.: ${field.label}`}
+        onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+        error={error}
+        minRows={5}
+      />
+    );
+  }
+
+  if (field.type === "number") {
+    return (
+      <NumberInput
+        label={field.label}
+        required={field.required}
+        value={typeof form[field.key] === "number" ? (form[field.key] as number) : Number(form[field.key] || 0)}
+        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        error={error}
+      />
+    );
+  }
+
+  if (field.type === "date") {
+    return (
+      <TextInput
+        label={field.label}
+        required={field.required}
+        type="date"
+        value={String(form[field.key] ?? "")}
+        onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+        error={error}
+      />
+    );
+  }
+
+  if (field.type === "file") {
+    return (
+      <FileInput
+        label={field.label}
+        required={field.required}
+        accept="image/*"
+        error={error}
+        onChange={(file) => {
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = () => {
+            if (typeof reader.result === "string") {
+              setForm((current) => ({ ...current, [field.key]: reader.result }));
+            }
+          };
+          reader.readAsDataURL(file);
+        }}
+      />
+    );
+  }
+
+  return (
+    <TextInput
+      label={field.label}
+      required={field.required}
+      value={String(form[field.key] ?? "")}
+      placeholder={`Ex.: ${field.label}`}
+      onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+      error={error}
+    />
   );
 }

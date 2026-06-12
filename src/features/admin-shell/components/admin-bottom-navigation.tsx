@@ -1,37 +1,67 @@
 "use client";
 
+import { Paper, SimpleGrid, Text, UnstyledButton } from "@mantine/core";
+
 import { adminNavItems } from "@/features/admin-shell/config/admin-navigation";
-import { NavLink } from "@/lib/router-compat";
+import { Link, useLocation } from "@/lib/router-compat";
 
 const mobileNavItems = adminNavItems.slice(0, 5);
 
 export function AdminBottomNavigation() {
+  const location = useLocation();
+
   return (
-    <nav
+    <Paper
+      component="nav"
       aria-label="Navegação administrativa"
-      className="material-bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-outline-variant bg-white/96 px-2 pb-[calc(env(safe-area-inset-bottom,0px)+0.35rem)] pt-2 backdrop-blur lg:hidden"
+      hiddenFrom="lg"
+      radius={0}
+      px="xs"
+      pt="xs"
+      pb="calc(env(safe-area-inset-bottom,0px) + 0.4rem)"
+      shadow="lg"
+      style={{
+        position: "fixed",
+        insetInline: 0,
+        bottom: 0,
+        zIndex: 120,
+        borderTop: "1px solid #d5dae2",
+        background: "rgba(255,255,255,0.98)"
+      }}
     >
-      <div className="grid grid-cols-5 gap-1">
+      <SimpleGrid cols={5} spacing={6}>
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
+          const isActive =
+            item.to === "/admin"
+              ? location.pathname === item.to
+              : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 
           return (
-            <NavLink
+            <UnstyledButton
               key={item.to}
+              component={Link}
               to={item.to}
-              end={item.to === "/admin"}
-              className={({ isActive }) =>
-                `material-bottom-nav-item flex min-h-16 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-label font-semibold transition ${
-                  isActive ? "bg-primary text-white shadow-soft" : "text-muted-foreground hover:bg-secondary/70 hover:text-primary"
-                }`
-              }
+              style={{
+                minHeight: 68,
+                borderRadius: 16,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+                backgroundColor: isActive ? "#0e4666" : "transparent",
+                color: isActive ? "#ffffff" : "#5f6876"
+              }}
             >
-              <Icon className="h-4 w-4" />
-              <span>{item.mobileLabel}</span>
-            </NavLink>
+              <Icon size={17} />
+              <Text size="0.68rem" fw={700}>
+                {item.mobileLabel}
+              </Text>
+            </UnstyledButton>
           );
         })}
-      </div>
-    </nav>
+      </SimpleGrid>
+    </Paper>
   );
 }
