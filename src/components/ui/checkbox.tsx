@@ -1,45 +1,28 @@
-import React from "react";
-import { Check, Minus } from "lucide-react";
+"use client";
 
-type CheckboxProps = {
-  checked?: boolean;
-  indeterminate?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
-  "aria-label"?: string;
-  disabled?: boolean;
-};
+import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check } from "lucide-react";
 
-const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ checked, indeterminate, onCheckedChange, "aria-label": ariaLabel, disabled }, ref) => (
-    <label className="flex items-center gap-2 cursor-pointer">
-      <div className="relative">
-        <input
-          type="checkbox"
-          ref={ref}
-          className="sr-only"
-          checked={checked}
-          onChange={(e) => onCheckedChange?.(e.target.checked)}
-          aria-label={ariaLabel}
-          disabled={disabled}
-        />
-        <div className={`
-          h-5 w-5 rounded border-2 border-outline-variant bg-white
-          transition-all duration-200
-          ${checked ? "bg-primary border-primary" : ""}
-          ${indeterminate ? "bg-primary border-primary" : ""}
-          ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-        `}>
-          {checked && !indeterminate && (
-            <Check className="h-4 w-4 text-white absolute top-0.5 left-0.5" />
-          )}
-          {indeterminate && (
-            <Minus className="h-4 w-4 text-white absolute top-0.5 left-0.5" />
-          )}
-        </div>
-      </div>
-    </label>
-  )
-);
-Checkbox.displayName = "Checkbox";
+import { cn } from "@/lib/utils";
+
+const Checkbox = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
+>(({ className, ...props }, ref) => (
+  <CheckboxPrimitive.Root
+    className={cn(
+      "peer size-4 shrink-0 rounded-sm border border-primary shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=indeterminate]:bg-primary data-[state=indeterminate]:text-primary-foreground",
+      className,
+    )}
+    ref={ref}
+    {...props}
+  >
+    <CheckboxPrimitive.Indicator className="flex items-center justify-center text-current">
+      <Check className="size-3" />
+    </CheckboxPrimitive.Indicator>
+  </CheckboxPrimitive.Root>
+));
+Checkbox.displayName = CheckboxPrimitive.Root.displayName;
 
 export { Checkbox };

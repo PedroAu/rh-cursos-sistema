@@ -1,0 +1,150 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), sans-serif;
+  --font-heading: var(--font-montserrat), var(--font-inter), sans-serif;
+  --breakpoint-xs: 36em;
+  --breakpoint-sm: 48em;
+  --breakpoint-md: 62em;
+  --breakpoint-lg: 75em;
+  --breakpoint-xl: 88em;
+  --spacing: 0.25rem;
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand-navy-50: #e7f1f7;
+  --color-brand-navy-100: #cfe2ee;
+  --color-brand-navy-200: #9fc4dd;
+  --color-brand-navy-300: #6ba6cc;
+  --color-brand-navy-400: #3f8cbe;
+  --color-brand-navy-500: #0d5b85;
+  --color-brand-navy-600: #004364;
+  --color-brand-navy-700: #083b56;
+  --color-brand-navy-800: #062c41;
+  --color-brand-navy-900: #083b56;
+  --color-brand-gold-50: #fdf6e3;
+  --color-brand-gold-100: #f9e9bf;
+  --color-brand-gold-200: #f3d77f;
+  --color-brand-gold-300: #eec64a;
+  --color-brand-gold-400: #e3b324;
+  --color-brand-gold-500: #d9ab2d;
+  --color-brand-gold: #d4a017;
+  --color-brand-gold-700: #bd8c10;
+  --color-brand-gold-800: #9c720c;
+  --color-brand-gold-900: #5c4300;
+
+  /* ---- Design System: containers (geram max-w-page/admin/content-*) ----
+     NOTA: usamos o namespace `content`, não `prose`, porque o Tailwind v4 já
+     define `--max-width-prose: 65ch` nativo, que teria precedência e sobrescreveria
+     max-w-prose. `content` é nome livre, sem colisão. */
+  --container-page: 82.5rem;        /* 1320px — marketing/corpo de página */
+  --container-admin: 75rem;         /* 1200px — área admin */
+  --container-wide: 75rem;          /* 1200px — páginas públicas largas (inscrição/checkout) */
+  --container-content-lg: 52.5rem;  /* 840px — título+descrição largos (hero) */
+  --container-content: 47.5rem;     /* 760px — conteúdo/prosa padrão */
+  --container-content-sm: 42.5rem;  /* 680px — conteúdo/prosa estreito */
+
+  /* ---- Design System: tipografia micro (badges/contadores) ---- */
+  --text-2xs: 0.625rem;             /* 10px — substitui text-[10px]/text-[9px] */
+}
+
+/* ---- Design System: avatares fora da escala nativa (size-* não é nomeável por token) ---- */
+@utility size-avatar-xl {
+  width: 5.5rem;   /* 88px */
+  height: 5.5rem;
+}
+@utility size-avatar-2xl {
+  width: 13.75rem; /* 220px */
+  height: 13.75rem;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer base {
+  a {
+    color: inherit;
+  }
+}
+
+:root {  --background: #f8f9fa;
+  --foreground: #101113;
+  --card: #ffffff;
+  --card-foreground: #101113;
+  --popover: #ffffff;
+  --popover-foreground: #101113;
+  --primary: #004364;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f3f5;
+  --secondary-foreground: #101113;
+  --muted: #f1f3f5;
+  --muted-foreground: #495057;
+  --accent: #e7f1f7;
+  --accent-foreground: #083b56;
+  --destructive: #c92a2a;
+  --destructive-foreground: #ffffff;
+  --border: #dee2e6;
+  --input: #ced4da;
+  --ring: #0d5b85;
+}
+
+/* Foco visível consistente em todos os elementos interativos (NFR-1). */
+:where(a, button, [role="button"], input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #0d5b85;
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #083b56;
+  color: white;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 16px;
+}

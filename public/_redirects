@@ -1,3 +1,0 @@
-# Arquivo mantido apenas para compatibilidade de assets.
-# No runtime atual (Cloudflare Workers + OpenNext), o redirect do apex
-# para `www` é aplicado em `middleware.ts`.

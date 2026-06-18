@@ -1,0 +1,89 @@
+<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#061B31"/>
+      <stop offset="0.5" stop-color="#082E4B"/>
+      <stop offset="1" stop-color="#0B4366"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="white" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.04"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFD46A"/>
+      <stop offset="1" stop-color="#B97E07"/>
+    </linearGradient>
+    <radialGradient id="leftFade" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(240 320) rotate(27.8) scale(783 542)">
+      <stop stop-color="#082847" stop-opacity="0"/>
+      <stop offset="1" stop-color="#061B31"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="980" height="900" fill="url(#leftFade)"/>
+
+  <g opacity="0.22">
+    <path d="M0 130L582 0V900H0V130Z" fill="#0F3B60"/>
+    <path d="M0 235L720 0V900H0V235Z" fill="#12456E"/>
+  </g>
+
+  <g opacity="0.3">
+    <rect x="826" y="112" width="292" height="490" rx="10" fill="url(#glass)" stroke="rgba(255,255,255,0.18)"/>
+    <rect x="1110" y="112" width="278" height="490" rx="10" fill="url(#glass)" stroke="rgba(255,255,255,0.12)"/>
+    <path d="M972 112V602" stroke="rgba(255,255,255,0.20)"/>
+    <path d="M1248 112V602" stroke="rgba(255,255,255,0.16)"/>
+    <path d="M826 264H1388" stroke="rgba(255,255,255,0.16)"/>
+  </g>
+
+  <g opacity="0.78">
+    <rect x="1032" y="145" width="92" height="324" rx="46" fill="#19344F"/>
+    <rect x="1048" y="228" width="60" height="170" rx="30" fill="#35506B"/>
+    <rect x="1056" y="170" width="44" height="54" rx="22" fill="#E2B27C"/>
+    <rect x="1039" y="209" width="78" height="88" rx="22" fill="#214A73"/>
+    <rect x="1033" y="297" width="90" height="122" rx="24" fill="#183753"/>
+  </g>
+
+  <g opacity="0.94">
+    <ellipse cx="1260" cy="650" rx="254" ry="118" fill="#0A2034"/>
+    <rect x="1058" y="554" width="454" height="134" rx="16" fill="#5A4126"/>
+    <rect x="1076" y="568" width="418" height="14" rx="7" fill="#876240"/>
+    <rect x="1390" y="573" width="70" height="44" rx="8" fill="#C8D4E2"/>
+    <rect x="1242" y="606" width="84" height="52" rx="8" fill="#0F2336"/>
+  </g>
+
+  <g>
+    <circle cx="1178" cy="516" r="28" fill="#D7A46C"/>
+    <rect x="1148" y="544" width="60" height="112" rx="26" fill="#253E58"/>
+    <rect x="1210" y="544" width="20" height="94" rx="10" fill="#D7A46C"/>
+
+    <circle cx="1288" cy="502" r="26" fill="#D8A974"/>
+    <rect x="1258" y="530" width="60" height="126" rx="28" fill="#1D324A"/>
+
+    <circle cx="1362" cy="520" r="25" fill="#D6A06B"/>
+    <rect x="1335" y="547" width="54" height="118" rx="24" fill="#244764"/>
+
+    <circle cx="1460" cy="518" r="24" fill="#E0B582"/>
+    <rect x="1434" y="546" width="52" height="108" rx="24" fill="#E2E6EC"/>
+
+    <circle cx="1102" cy="534" r="26" fill="#C68F63"/>
+    <rect x="1074" y="562" width="56" height="108" rx="25" fill="#253E58"/>
+  </g>
+
+  <g opacity="0.92">
+    <rect x="1440" y="132" width="112" height="218" rx="8" fill="#1B3147"/>
+    <rect x="1456" y="166" width="80" height="4" rx="2" fill="#E9BB5E"/>
+    <rect x="1456" y="210" width="80" height="4" rx="2" fill="#E9BB5E"/>
+    <rect x="1456" y="254" width="80" height="4" rx="2" fill="#E9BB5E"/>
+    <circle cx="1488" cy="194" r="10" fill="#10283B"/>
+    <rect x="1478" y="240" width="20" height="12" rx="3" fill="#10283B"/>
+    <rect x="1508" y="232" width="20" height="20" rx="3" fill="#33526D"/>
+    <circle cx="1496" cy="292" r="12" fill="#476A55"/>
+  </g>
+
+  <g opacity="0.68">
+    <rect x="1145" y="88" width="366" height="6" rx="3" fill="white"/>
+    <rect x="1068" y="112" width="420" height="5" rx="2.5" fill="white" fill-opacity="0.7"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#leftFade)"/>
+</svg>

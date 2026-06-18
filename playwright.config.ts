@@ -1,35 +1,24 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./tests",
-  reporter: "list",
+  testDir: "./e2e",
   use: {
-    baseURL: "http://127.0.0.1:3100"
+    baseURL: "http://localhost:3000",
+    trace: "on-first-retry",
   },
+  // Single chromium project with default viewport. Per-spec, ST4 tests set
+  // 375 / 768 / 1440 viewports via test.use({ viewport }) instead of
+  // declaring 3 separate projects here, to keep the project list lean.
   projects: [
-    // Specs funcionais existentes (auth, rotas) — rodam uma vez, viewport padrão.
     {
-      name: "functional",
-      testIgnore: /baseline\.spec\.ts/,
-      use: { ...devices["Desktop Chrome"] }
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
     },
-    // Baseline visual/a11y — capturado em desktop e mobile.
-    {
-      name: "baseline-desktop",
-      testMatch: /baseline\.spec\.ts/,
-      use: { ...devices["Desktop Chrome"] }
-    },
-    {
-      name: "baseline-mobile",
-      testMatch: /baseline\.spec\.ts/,
-      use: { ...devices["Pixel 5"] }
-    }
   ],
   webServer: {
-    // Usa o bundle de produção do Next.js já gerado por `npm run build`.
-    command: "npx next start -p 3100",
-    url: "http://127.0.0.1:3100",
-    reuseExistingServer: false,
-    timeout: 120_000
-  }
+    command: "npm run dev",
+    url: "http://localhost:3000",
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
 });

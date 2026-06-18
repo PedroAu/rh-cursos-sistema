@@ -1,0 +1,8 @@
+{
+  "operationName": "RH Cursos",
+  "commercialEmail": "atendimento@rhcursos.com.br",
+  "notifyEnrollments": true,
+  "notifyLeads": true,
+  "dataSource": "Supabase",
+  "priorityChannel": "Site institucional"
+}
