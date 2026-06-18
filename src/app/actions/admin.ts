@@ -1026,6 +1026,6 @@ export async function saveAdminSettingsAction(
 
   return {
     error: null,
-    success: "Configurações salvas no armazenamento local do projeto.",
+    success: "Configurações salvas com sucesso.",
   };
 }

@@ -303,7 +303,7 @@ describe("admin actions", () => {
 
     expect(result).toEqual({
       error: null,
-      success: "Configurações salvas no armazenamento local do projeto.",
+      success: "Configurações salvas com sucesso.",
     });
     expect(writeAdminSettings).toHaveBeenCalledWith({
       operationName: "RH Cursos",

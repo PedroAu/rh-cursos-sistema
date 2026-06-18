@@ -1,5 +1,3 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export type AdminSettings = {
@@ -19,12 +17,6 @@ export const defaultAdminSettings: AdminSettings = {
   dataSource: "Supabase",
   priorityChannel: "Site institucional",
 };
-
-const settingsFilePath = path.join(
-  process.cwd(),
-  "data",
-  "admin-settings.json",
-);
 
 const SETTINGS_KEY = "default";
 
@@ -53,17 +45,7 @@ export async function readAdminSettings() {
     return databaseSettings;
   }
 
-  try {
-    const raw = await readFile(settingsFilePath, "utf8");
-    const parsed = JSON.parse(raw) as Partial<AdminSettings>;
-
-    return {
-      ...defaultAdminSettings,
-      ...parsed,
-    };
-  } catch {
-    return defaultAdminSettings;
-  }
+  return defaultAdminSettings;
 }
 
 export async function writeAdminSettings(settings: AdminSettings) {
@@ -74,10 +56,7 @@ export async function writeAdminSettings(settings: AdminSettings) {
     updated_at: new Date().toISOString(),
   });
 
-  if (!databaseResult.error) {
-    return;
+  if (databaseResult.error) {
+    throw new Error(`Unable to save admin settings: ${databaseResult.error.message}`);
   }
-
-  await mkdir(path.dirname(settingsFilePath), { recursive: true });
-  await writeFile(settingsFilePath, JSON.stringify(settings, null, 2));
 }
