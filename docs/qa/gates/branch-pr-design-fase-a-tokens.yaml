@@ -1,0 +1,186 @@
+# QA Gate — Diff review da branch pr/design-fase-a-tokens
+# Revisor: Quinn (QA / Test Architect)
+# Modo: YOLO autônomo
+
+schema: 1
+scope: "diff branch pr/design-fase-a-tokens (2 commits vs origin/main + working tree)"
+reviewed_at: "2026-06-19"
+reviewer: "Quinn (qa)"
+related_stories:
+  - "1.1.asaas-webhook-payment-reconciliation"
+  - "1.3.service-role-usage-audit"
+  - "1.7.e2e-critical-flows-coverage"
+  - "1.8.admin-data-module-decomposition-plan"
+
+gate: CONCERNS
+# PASS = sem problemas relevantes | CONCERNS = mergeável com ressalvas rastreadas
+# FAIL = bloqueia | WAIVED = aceito apesar dos problemas
+
+quality_gates:
+  typecheck: PASS   # tsc --noEmit limpo
+  lint: PASS        # eslint limpo
+  tests: PASS       # 33 arquivos / 107 testes verdes (4.87s)
+
+top_issues:
+  - id: WEBHOOK-IDEMPOTENCY-001
+    severity: HIGH
+    finding: >
+      Ordem audit-antes-de-side-effect quebra a garantia de redelivery. O handler
+      insere payment_events (marca o evento como processado) ANTES do update de
+      status. Se o update falhar (retorna 500), o Asaas reentrega; na reentrega o
+      insert colide em asaas_event_id (23505) e o handler retorna
+      {ok:true, duplicate:true} SEM reaplicar o update. Resultado: status do
+      pagamento fica permanentemente defasado. O comportamento está inclusive
+      codificado nos testes (route.test.ts:127 e :206), então é design deliberado
+      porém falho. Contradiz o comentário da migration 20260617120000_payments.sql
+      que promete "redelivery a safe no-op" com reaplicação segura.
+    file: "src/app/api/payments/webhook/route.ts:106-131"
+    suggestion: >
+      Aplicar o side-effect (update de status) e o audit atomicamente — RPC/transação
+      Postgres que faça UPSERT do evento + update do payment numa unidade — ou
+      reordenar para idempotência por estado (reprocessar quando o evento existe mas
+      o status ainda não bate). Não confiar na ordem insert→update não transacional.
+
+  - id: WEBHOOK-ORDERING-002
+    severity: MEDIUM
+    finding: >
+      Entrega fora de ordem não é tratada. O handler sobrescreve status com o que o
+      Asaas mandar, sem guarda de ordenação/timestamp. Asaas entrega at-least-once e
+      sem ordem garantida — um evento PENDING/OVERDUE atrasado pode sobrescrever um
+      CONFIRMED já recebido.
+    file: "src/app/api/payments/webhook/route.ts:122-126"
+    suggestion: >
+      Ignorar transições regressivas (ex.: não voltar de CONFIRMED/RECEIVED para
+      PENDING) ou ordenar por timestamp do evento antes de aplicar.
+
+  - id: WEBHOOK-ENUM-003
+    severity: LOW
+    finding: >
+      payments.status é enum fixo (payment_status), mas o webhook grava a string crua
+      do Asaas. Um status novo/desconhecido faz o update falhar com 500 e entra em
+      loop de redelivery sem resolução. O comentário da migration ("store whatever
+      Asaas sends") conflita com a restrição de enum.
+    file: "supabase/migrations/20260617120000_payments.sql:19-24"
+    suggestion: "Mapear status desconhecido para um fallback seguro ou relaxar o enum."
+
+  - id: WEBHOOK-DEDUP-DOC-004
+    severity: LOW
+    finding: >
+      Migration documenta "INSERT ... ON CONFLICT (asaas_event_id) DO NOTHING", mas a
+      rota usa insert simples + catch do 23505. Mesmo efeito, porém o fallback
+      isDuplicateEventError casa por substring da mensagem ("asaas_event_id") — frágil
+      a mudanças de texto de erro do Postgres/PostgREST.
+    file: "src/app/api/payments/webhook/route.ts:65-70"
+    suggestion: "Alinhar doc ao código e confiar só no code 23505, não na mensagem."
+
+  - id: PII-URL-005
+    severity: LOW  # pre-existente, não introduzido por este diff
+    finding: >
+      CPF e nome do cliente trafegam via query string em /pagamento/[slug]
+      (?nome=&cpf=), persistindo em histórico de browser, logs de servidor e referrer.
+    file: "src/app/(marketing)/pagamento/[slug]/page.tsx:20,39"
+    suggestion: "Mover identidade do cliente para POST/sessão; manter fora da URL."
+
+  - id: WEBHOOK-TIMING-006
+    severity: LOW
+    finding: >
+      Comparação de token do webhook é non-constant-time (receivedToken !== expected).
+      Risco de timing-attack baixo para token estático, mas é fácil endurecer.
+    file: "src/app/api/payments/webhook/route.ts:76"
+    suggestion: "Usar comparação de tempo constante (crypto.timingSafeEqual)."
+
+positives:
+  - "Autenticação do webhook por token presente e testada (401 sem escrever no Supabase)."
+  - "Mock de checkout e2e corretamente restrito a NODE_ENV !== production."
+  - "Guardrail de fronteira service-role (admin-boundary.test.ts) impede import de createAdminClient em client components — reforça Story 1.3."
+  - "createAdminClient marcado com import 'server-only'."
+  - "RLS nas tabelas payments/payment_events sem policy de insert/update p/ anon/authenticated — autoridade de valor é server-only; nenhum dado de cartão (PAN) persistido (SAQ-A)."
+  - "Valor cobrado derivado de courses.preco no servidor, nunca do cliente (amount_cents)."
+  - "Decomposição resolveCourseForPayment extraída p/ src/lib/payments/course-identity.ts com teste — fronteira legacy/payment explícita (Story 1.8)."
+  - "e2e de Pix/Boleto cobre o fluxo crítico sem chamar gateway real (Story 1.7)."
+
+decision_rationale: >
+  Fundação sólida: todos os gates verdes, boa cobertura de testes, separação de
+  segurança correta (service-role, RLS, mock gating). O gate é CONCERNS — não FAIL —
+  porque os problemas estão concentrados na lógica de idempotência/ordenação do
+  webhook (WEBHOOK-IDEMPOTENCY-001 é HIGH), que é exatamente o objetivo da Story 1.1
+  (reconciliação confiável). Recomenda-se endereçar 001 e 002 antes de confiar o
+  webhook em produção; 003-006 podem virar dívida técnica rastreada.
+
+# =============================================================
+# RE-REVIEW (QA Loop iteração 1) — após fixes do @dev
+# =============================================================
+re_review:
+  reviewed_at: "2026-06-19"
+  gate: PASS_WITH_ADVISORIES
+  quality_gates:
+    typecheck: PASS   # re-verificado pelo QA (tsc limpo)
+    lint: PASS        # re-verificado pelo QA (eslint limpo)
+    tests: PASS       # re-verificado pelo QA: 34 arquivos / 111 testes (+1)
+  resolved:
+    - id: WEBHOOK-IDEMPOTENCY-001
+      status: RESOLVED
+      evidence: >
+        RPC public.apply_payment_webhook_event (migration 20260619195800) faz
+        INSERT ... ON CONFLICT (asaas_event_id) DO NOTHING + UPDATE condicional
+        numa única função plpgsql (uma transação). Falha no update agora dá
+        rollback do audit junto → reentrega reaplica. Rota chama supabase.rpc().
+        Verificado por leitura física de route.ts e do .sql.
+    - id: WEBHOOK-ORDERING-002
+      status: RESOLVED
+      evidence: >
+        payment_status_rank() + guarda "rank(new) >= rank(current)" no UPDATE.
+        Evento regressivo (PENDING após CONFIRMED) não rebaixa.
+    - id: WEBHOOK-ENUM-003
+      status: RESOLVED
+      evidence: >
+        Rota valida contra knownPaymentStatuses; status desconhecido vira
+        p_new_status=null, RPC pula o update, retorna 200 — sem loop de redelivery,
+        auditoria preservada.
+    - id: WEBHOOK-DEDUP-DOC-004
+      status: RESOLVED
+      evidence: "isDuplicateEventError removido; comentário da migration alinhado à RPC."
+    - id: WEBHOOK-TIMING-006
+      status: RESOLVED
+      evidence: >
+        constantTimeEquals usa crypto.timingSafeEqual com short-circuit de
+        comprimento. Novo teste cobre token errado de mesmo comprimento.
+  new_advisories:
+    - id: RPC-BEHAVIOR-COVERAGE-007
+      severity: MEDIUM
+      finding: >
+        A lógica financeira de maior risco não é exercida contra um Postgres real.
+        route.test.ts mocka a RPC inteira (testa branching da rota);
+        payment-webhook-rpc.test.ts faz string-match no arquivo .sql (testa
+        presença de substrings, não comportamento). Rollback transacional, guarda
+        de rank e ON CONFLICT nunca rodam de fato em teste.
+      file: "supabase/migrations/payment-webhook-rpc.test.ts"
+      suggestion: >
+        Adicionar teste de integração (pgTAP ou Supabase local em CI) que aplique a
+        migration e exercite: reentrega pós-erro consolida; evento regressivo não
+        rebaixa; unknown audita sem update. Não bloqueia o merge, mas é a próxima
+        camada de confiança antes de produção real.
+    - id: STATUS-RANK-BUSINESS-008
+      severity: LOW  # escalado, requer decisão de negócio (não é defeito de código)
+      finding: >
+        FAILED(140) é o rank mais alto → uma vez FAILED, nenhum evento posterior
+        (nem RECEIVED) atualiza o status. Se Asaas puder mandar FAILED transitório
+        seguido de CONFIRMED, o pagamento trava como falho. @dev corretamente NÃO
+        alterou os ranks e escalou.
+      owner: "@architect / @data-engineer"
+      suggestion: "Validar semântica de FAILED no Asaas e a política de irreversibilidade de estornos."
+    - id: RESPONSE-ECHO-009
+      severity: LOW  # cosmético
+      finding: >
+        Quando a guarda de rank pula o update, a resposta ainda ecoa
+        status: payload.payment.status (ex.: PENDING) — sugere persistência que não
+        ocorreu. É só um ACK, não fonte de verdade; sem impacto funcional.
+      file: "src/app/api/payments/webhook/route.ts:142"
+      suggestion: "Opcional: ecoar o status efetivamente aplicado (retorno da RPC)."
+  re_review_rationale: >
+    Todos os problemas bloqueantes/relevantes da primeira revisão (001-004, 006)
+    estão RESOLVIDOS e verificados fisicamente pelo QA, com gates re-executados
+    verdes. O gate sobe de CONCERNS para PASS_WITH_ADVISORIES. As advisories
+    restantes não são regressões: 007 é uma camada de teste recomendada (não
+    bloqueante), 008 é decisão de negócio escalada, 009 é cosmético. Apto a seguir
+    para @devops (push/PR) a critério da direção.
