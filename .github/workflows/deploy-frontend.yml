@@ -1,0 +1,61 @@
+name: Deploy Frontend to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'next.config.ts'
+      - 'open-next.config.ts'
+      - 'wrangler.jsonc'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'scripts/verify-workers-deploy.js'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend-production
+  cancel-in-progress: true
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Frontend
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Cloudflare Workers
+        run: npm run deploy:workers -- --keep-vars
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ASAAS_BASE_URL: ${{ secrets.ASAAS_BASE_URL }}
+          ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
+          ASAAS_USER_AGENT: ${{ secrets.ASAAS_USER_AGENT }}
+          ASAAS_WEBHOOK_AUTH_TOKEN: ${{ secrets.ASAAS_WEBHOOK_AUTH_TOKEN }}
+
+      - name: Verify production Worker routes
+        run: npm run verify:workers
+        env:
+          DEPLOY_CANONICAL_URL: https://www.rhcursos.com.br
+          DEPLOY_APEX_URL: https://rhcursos.com.br
+          WORKERS_VERIFY_ATTEMPTS: '18'
+          WORKERS_VERIFY_DELAY_MS: '5000'

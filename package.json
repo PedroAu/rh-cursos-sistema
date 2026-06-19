@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "next dev",
@@ -14,7 +14,9 @@
     "typecheck": "tsc --noEmit",
     "deploy:check": "npm run lint && npm run typecheck && npm run test && npm run build:cloudflare",
     "deploy:cloudflare": "opennextjs-cloudflare deploy",
+    "deploy:workers": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview:cloudflare": "npm run build:cloudflare && wrangler dev",
+    "verify:workers": "node scripts/verify-workers-deploy.js",
     "test": "node ./scripts/run-vitest.mjs run",
     "test:watch": "node ./scripts/run-vitest.mjs",
     "test:e2e": "playwright test"
