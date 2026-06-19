@@ -18,4 +18,15 @@ describe("PublicHeader", () => {
       "/login",
     );
   });
+
+  it("renders the configured public logo and operation name", () => {
+    mockedUsePathname.mockReturnValue("/");
+
+    const { container } = renderWithProviders(
+      <PublicHeader mainLogoUrl="/uploads/logo-rh.svg" operationName="Academia RH" />,
+    );
+
+    expect(screen.getByText("Academia RH")).toBeInTheDocument();
+    expect(container.querySelector('[style*="/uploads/logo-rh.svg"]')).toBeInTheDocument();
+  });
 });

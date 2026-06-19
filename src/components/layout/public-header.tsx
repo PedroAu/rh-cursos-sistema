@@ -15,7 +15,15 @@ import {
 import { marketingNavItems } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
-export function PublicHeader() {
+type PublicHeaderProps = {
+  mainLogoUrl?: string;
+  operationName?: string;
+};
+
+export function PublicHeader({
+  mainLogoUrl = "",
+  operationName = "RH Cursos",
+}: PublicHeaderProps) {
   const pathname = usePathname();
   const [opened, setOpened] = useState(false);
 
@@ -29,12 +37,20 @@ export function PublicHeader() {
               className="flex shrink-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               href="/"
             >
-              <span className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-navy-700 to-brand-navy-500 text-sm font-extrabold text-white shadow-lg shadow-sky-950/15">
-                RH
-              </span>
+              {mainLogoUrl ? (
+                <span
+                  aria-hidden="true"
+                  className="h-11 w-32 shrink-0 bg-contain bg-left bg-no-repeat"
+                  style={{ backgroundImage: `url(${mainLogoUrl})` }}
+                />
+              ) : (
+                <span className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-brand-navy-700 to-brand-navy-500 text-sm font-extrabold text-white shadow-lg shadow-sky-950/15">
+                  RH
+                </span>
+              )}
               <span className="hidden xs:block">
                 <span className="block font-heading text-base font-extrabold leading-tight tracking-tight text-brand-navy-900">
-                  RH Cursos
+                  {operationName}
                 </span>
                 <span className="block text-xs text-muted-foreground">Capacitação aplicada</span>
               </span>

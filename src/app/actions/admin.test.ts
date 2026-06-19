@@ -43,6 +43,16 @@ function buildFormData(entries: Record<string, string>) {
   return formData;
 }
 
+function buildSettingsFormData(entries: Record<string, string | File>) {
+  const formData = new FormData();
+
+  for (const [key, value] of Object.entries(entries)) {
+    formData.set(key, value);
+  }
+
+  return formData;
+}
+
 function buildSystemUserAdminClient(options: {
   createUserResult?: { error: unknown; data: { user: { id: string } | null } };
   updateUserByIdResult?: { error: unknown };
@@ -284,6 +294,8 @@ describe("admin actions", () => {
     readAdminSettings.mockResolvedValue({
       operationName: "Operacao anterior",
       commercialEmail: "old@example.com",
+      mainLogoUrl: "",
+      faviconUrl: "/favicon.ico",
       notifyEnrollments: false,
       notifyLeads: false,
       dataSource: "crm",
@@ -295,6 +307,8 @@ describe("admin actions", () => {
       buildFormData({
         operationName: "RH Cursos",
         commercialEmail: "comercial@rhcursos.com",
+        mainLogoUrl: "/uploads/logo-rh.svg",
+        faviconUrl: "/uploads/favicon.png",
         dataSource: "supabase",
         priorityChannel: "whatsapp",
         notifyEnrollments: "on",
@@ -308,12 +322,120 @@ describe("admin actions", () => {
     expect(writeAdminSettings).toHaveBeenCalledWith({
       operationName: "RH Cursos",
       commercialEmail: "comercial@rhcursos.com",
+      mainLogoUrl: "/uploads/logo-rh.svg",
+      faviconUrl: "/uploads/favicon.png",
       notifyEnrollments: true,
       notifyLeads: false,
       dataSource: "supabase",
       priorityChannel: "whatsapp",
     });
     expect(revalidatePath).toHaveBeenCalledWith("/admin/configuracoes");
+    expect(revalidatePath).toHaveBeenCalledWith("/", "layout");
+  });
+
+  it("uploads selected logo and favicon files before saving admin settings", async () => {
+    readAdminSettings.mockResolvedValue({
+      operationName: "Operacao anterior",
+      commercialEmail: "old@example.com",
+      mainLogoUrl: "",
+      faviconUrl: "/favicon.ico",
+      notifyEnrollments: false,
+      notifyLeads: false,
+      dataSource: "crm",
+      priorityChannel: "email",
+    });
+
+    const getBucket = vi.fn().mockResolvedValue({ data: { name: "admin-assets" }, error: null });
+    const upload = vi
+      .fn()
+      .mockResolvedValueOnce({ data: { path: "logo/generated.svg" }, error: null })
+      .mockResolvedValueOnce({ data: { path: "favicon/generated.png" }, error: null });
+    const getPublicUrl = vi
+      .fn()
+      .mockReturnValueOnce({
+        data: { publicUrl: "https://cdn.example.com/logo/generated.svg" },
+      })
+      .mockReturnValueOnce({
+        data: { publicUrl: "https://cdn.example.com/favicon/generated.png" },
+      });
+    const fromStorage = vi.fn(() => ({
+      upload,
+      getPublicUrl,
+    }));
+    createAdminClient.mockReturnValue({
+      storage: {
+        getBucket,
+        createBucket: vi.fn(),
+        from: fromStorage,
+      },
+    });
+
+    const result = await saveAdminSettingsAction(
+      { error: null, success: null },
+      buildSettingsFormData({
+        operationName: "RH Cursos",
+        commercialEmail: "comercial@rhcursos.com",
+        mainLogoUrl: "",
+        faviconUrl: "/favicon.ico",
+        mainLogoFile: new File(["<svg />"], "logo-rh.svg", {
+          type: "image/svg+xml",
+        }),
+        faviconFile: new File(["icon"], "favicon.png", {
+          type: "image/png",
+        }),
+        dataSource: "supabase",
+        priorityChannel: "whatsapp",
+      }),
+    );
+
+    expect(result).toEqual({
+      error: null,
+      success: "Configurações salvas com sucesso.",
+    });
+    expect(fromStorage).toHaveBeenCalledWith("admin-assets");
+    expect(upload).toHaveBeenCalledTimes(2);
+    expect(writeAdminSettings).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mainLogoUrl: "https://cdn.example.com/logo/generated.svg",
+        faviconUrl: "https://cdn.example.com/favicon/generated.png",
+      }),
+    );
+  });
+
+  it("rejects invalid admin logo and favicon URLs", async () => {
+    const invalidLogoResult = await saveAdminSettingsAction(
+      { error: null, success: null },
+      buildFormData({
+        operationName: "RH Cursos",
+        commercialEmail: "comercial@rhcursos.com",
+        mainLogoUrl: "javascript:alert(1)",
+        faviconUrl: "/uploads/favicon.ico",
+        dataSource: "supabase",
+        priorityChannel: "whatsapp",
+      }),
+    );
+
+    const invalidFaviconResult = await saveAdminSettingsAction(
+      { error: null, success: null },
+      buildFormData({
+        operationName: "RH Cursos",
+        commercialEmail: "comercial@rhcursos.com",
+        mainLogoUrl: "/uploads/logo.webp",
+        faviconUrl: "/uploads/favicon.gif",
+        dataSource: "supabase",
+        priorityChannel: "whatsapp",
+      }),
+    );
+
+    expect(invalidLogoResult).toEqual({
+      error: "Informe uma URL válida para o logo principal em SVG, PNG, JPG ou WebP.",
+      success: null,
+    });
+    expect(invalidFaviconResult).toEqual({
+      error: "Informe uma URL válida para o favicon em ICO, PNG ou SVG.",
+      success: null,
+    });
+    expect(writeAdminSettings).not.toHaveBeenCalled();
   });
 
   describe("createSystemUserAction", () => {
