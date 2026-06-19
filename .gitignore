@@ -47,3 +47,44 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment & Secrets (AIOX)
+.env
+.env.local
+.env.*.local
+*.key
+
+# Dependencies (AIOX)
+node_modules/
+
+# Build & Logs (AIOX)
+dist/
+build/
+*.log
+logs/
+
+# IDE & OS (AIOX)
+Thumbs.db
+.idea/
+*.swp
+
+# AIOX Local (AIOX)
+.aiox-core/local/
+.aiox-core/node_modules/
+.agent/.DS_Store
+.aiox/project-status.yaml
+.aiox/environment-report.yaml
+.aiox/handoffs/*.yaml
+.claude/settings.local.json
+.aiox/install-log.txt
+
+# AI tooling / agent frameworks (not part of project source)
+.agent/
+.aiox-core/
+.antigravity/
+.claude/
+.codex/
+.cursor/
+.gemini/
+.kimi/
+.github/agents/

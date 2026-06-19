@@ -7,7 +7,19 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./src/test/setup.ts"],
     css: true,
-    exclude: ["**/node_modules/**", "**/e2e/**"],
+    exclude: [
+      "**/node_modules/**",
+      "**/e2e/**",
+      "**/.agent/**",
+      "**/.aiox/**",
+      "**/.aiox-core/**",
+      "**/.antigravity/**",
+      "**/.claude/**",
+      "**/.codex/**",
+      "**/.cursor/**",
+      "**/.gemini/**",
+      "**/.kimi/**",
+    ],
     coverage: {
       reporter: ["text", "html"],
     },
@@ -15,6 +27,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "server-only": path.resolve(__dirname, "./src/test/server-only.ts"),
     },
   },
 });
