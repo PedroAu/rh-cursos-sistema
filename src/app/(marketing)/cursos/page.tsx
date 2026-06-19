@@ -1,4 +1,6 @@
 import { CtaSection } from "@/components/shared/cta-section";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { CourseCatalogFilters } from "@/components/shared/course-catalog-filters";
 import { CourseArticleCard } from "@/components/shared/course-article-card";
 import { PageHero } from "@/components/shared/page-hero";
@@ -149,7 +151,7 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps = {
         showPanel={false}
       />
 
-      <section className="relative z-[2] mx-auto -mt-6 w-full max-w-page px-6 xl:-mt-8">
+      <Container as="section" className="relative z-[2] -mt-6 xl:-mt-8">
         <CourseCatalogFilters
           key={`${currentTrail}:${searchQuery}`}
           trails={trails}
@@ -167,10 +169,10 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps = {
           searchQuery={searchQuery}
           resultsCount={filteredCourses.length}
         />
-      </section>
+      </Container>
 
-      <section className="mx-auto w-full max-w-page px-6 py-8 md:py-12 xl:py-16">
-        <div className="space-y-8">
+      <Section size="sm">
+        <Container className="space-y-8">
           <h2 className="font-heading text-3xl font-bold text-foreground">Cursos disponíveis</h2>
 
           {filteredCourses.length > 0 ? (
@@ -218,17 +220,19 @@ export default async function CoursesPage({ searchParams }: CoursesPageProps = {
               </CardContent>
             </Card>
           )}
-        </div>
-      </section>
+        </Container>
+      </Section>
 
-      <section className="mx-auto w-full max-w-page px-6 py-16 md:py-24 xl:py-32">
-        <CtaSection
-          title="Precisa de um treinamento personalizado?"
-          text="Nossas soluções In Company são adaptadas às necessidades específicas da sua organização ou órgão público."
-          primaryHref="/in-company"
-          primaryLabel="Solicitar Proposta"
-        />
-      </section>
+      <Section size="lg">
+        <Container>
+          <CtaSection
+            title="Precisa de um treinamento personalizado?"
+            text="Nossas soluções In Company são adaptadas às necessidades específicas da sua organização ou órgão público."
+            primaryHref="/in-company"
+            primaryLabel="Solicitar Proposta"
+          />
+        </Container>
+      </Section>
     </>
   );
 }
