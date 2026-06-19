@@ -38,3 +38,14 @@ export type AsaasPixQrCode = {
 export type AsaasIdentificationField = {
   identificationField: string; // linha digitável
 };
+
+export type AsaasWebhookPayment = {
+  id: string; // pay_...
+  status: string;
+};
+
+export type AsaasWebhookPayload = {
+  id: string; // evt_...
+  event: string;
+  payment: AsaasWebhookPayment;
+};

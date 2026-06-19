@@ -51,6 +51,13 @@ async function canUseCourseEnrollmentsTable() {
   return !result.error;
 }
 
+function logEnrollmentFallback(target: "course_enrollments" | "lead") {
+  console.warn("[enrollment-fallback]", {
+    reason: "registrar_inscricao_publica_failed",
+    target,
+  });
+}
+
 async function registerEnrollmentViaRpc(input: {
   nome: string;
   email: string;
@@ -235,6 +242,8 @@ export async function submitEnrollmentAction(
   const supabase = createAdminClient();
 
   if (await canUseCourseEnrollmentsTable()) {
+    logEnrollmentFallback("course_enrollments");
+
     const { error } = await supabase.from("course_enrollments").insert({
       id: `enr-${Date.now()}`,
       course_id: courseId,
@@ -271,6 +280,8 @@ export async function submitEnrollmentAction(
       success: "Inscrição registrada com sucesso.",
     };
   }
+
+  logEnrollmentFallback("lead");
 
   const { error } = await supabase.from("lead").insert({
     nome,
