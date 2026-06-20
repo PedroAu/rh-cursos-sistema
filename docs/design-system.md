@@ -457,10 +457,21 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 ## ✅ FASE 3 — Status Atual (2026-06-20)
 
 **Execução em andamento:**
-- ✅ Tokens CSS implementados: `--container-page/admin/content-*`, `--text-2xs`, `@utility size-avatar-xl/2xl`
-- ✅ Componentes `Container` e `Section` em uso em 30 arquivos (marcadores: 8 Container, 22 Section)
-- ✅ Arbitrários `max-w-[1320px]` e `py-[..px]` limpos (0 restantes)
+- ✅ Tokens CSS implementados E em uso: `--container-page/admin/content-*`, `--text-2xs` (2 usos), `@utility size-avatar-xl/2xl` (2 usos)
+- ✅ Componentes em uso: `Container` 6 arquivos / 8 ocorrências · `Section` 12 arquivos / 22 ocorrências
+- ✅ Arbitrários limpos: `max-w-[..px]` 0, `py-[..px]` 0, `min-h-[..px]` 0, `text-[..px]` 0
+- 🔄 `size-[..px]` reduzido de 9 → **2 residuais** (apenas os de arredondamento, ver abaixo)
 - ✅ Quality gates: lint ✓, typecheck ✓, tests 114/114 ✓, build ✓
+
+**Migração de avatares/ícones (2026-06-20) — EXATA, zero mudança visual:**
+- `size-[52px]` ×6 → `size-13` nativo (52px exato)
+- `size-[88px]` → `size-avatar-xl` (88px exato)
+- `size-[220px]` → `size-avatar-2xl` (220px exato)
+- `text-[10px]` (admin-agenda-calendar) → `text-2xs`
+
+**⚠️ 2 outliers de avatar AINDA pendentes (exigem inspeção visual — decisão humana #5):**
+- `size-[76px]` em [page.tsx:300](../src/app/(marketing)/page.tsx) — entre `avatar-md`(64) e `avatar-xl`(88), sem step exato. NÃO auto-arredondado.
+- `size-[104px]` em [cursos/[slug]/page.tsx:289](../src/app/(marketing)/cursos/[slug]/page.tsx) — entre `avatar-lg`(64) e `avatar-xl`(88). NÃO auto-arredondado.
 
 **Decisões finalizadas (Seção 10):**
 1. ✅ Breakpoints: MANTER em `em` (acessibilidade), documentar mapeamento 375/768/1440
