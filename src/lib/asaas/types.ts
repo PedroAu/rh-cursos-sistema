@@ -47,5 +47,6 @@ export type AsaasWebhookPayment = {
 export type AsaasWebhookPayload = {
   id: string; // evt_...
   event: string;
+  dateCreated?: string;
   payment: AsaasWebhookPayment;
 };

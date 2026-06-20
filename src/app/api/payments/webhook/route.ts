@@ -62,6 +62,16 @@ function constantTimeEquals(first: string, second: string) {
   return timingSafeEqual(firstBytes, secondBytes);
 }
 
+function getEventCreatedAt(payload: unknown) {
+  const candidate = payload as { dateCreated?: unknown };
+
+  if (typeof candidate.dateCreated !== "string") {
+    return null;
+  }
+
+  return Number.isNaN(Date.parse(candidate.dateCreated)) ? null : candidate.dateCreated;
+}
+
 function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
   if (!payload || typeof payload !== "object") {
     return null;
@@ -70,6 +80,7 @@ function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
   const candidate = payload as {
     id?: unknown;
     event?: unknown;
+    dateCreated?: unknown;
     payment?: { id?: unknown; status?: unknown };
   };
 
@@ -86,6 +97,7 @@ function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
   return {
     id: candidate.id,
     event: candidate.event,
+    dateCreated: typeof candidate.dateCreated === "string" ? candidate.dateCreated : undefined,
     payment: {
       id: candidate.payment.id,
       status: candidate.payment.status,
@@ -125,6 +137,7 @@ export async function POST(request: Request) {
       p_asaas_charge_id: payload.payment.id,
       p_event_type: payload.event,
       p_new_status: knownStatus,
+      p_event_created_at: getEventCreatedAt(rawPayload),
       p_raw_event: rawPayload,
     })
     .maybeSingle<ApplyWebhookEventResult>();

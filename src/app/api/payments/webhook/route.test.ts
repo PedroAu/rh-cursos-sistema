@@ -26,6 +26,7 @@ function buildPayload(overrides: Record<string, unknown> = {}) {
   return {
     id: "evt_123",
     event: "PAYMENT_CONFIRMED",
+    dateCreated: "2026-06-19T18:00:00-03:00",
     payment: {
       id: "pay_123",
       status: "CONFIRMED",
@@ -105,6 +106,7 @@ describe("POST /api/payments/webhook", () => {
       p_asaas_charge_id: "pay_123",
       p_event_type: "PAYMENT_CONFIRMED",
       p_new_status: "CONFIRMED",
+      p_event_created_at: "2026-06-19T18:00:00-03:00",
       p_raw_event: buildPayload(),
     });
   });
@@ -143,6 +145,7 @@ describe("POST /api/payments/webhook", () => {
       expect.objectContaining({
         p_asaas_charge_id: "pay_123",
         p_new_status: "CONFIRMED",
+        p_event_created_at: "2026-06-19T18:00:00-03:00",
       }),
     );
   });
@@ -168,6 +171,7 @@ describe("POST /api/payments/webhook", () => {
     expect(supabase.rpc).toHaveBeenCalledWith(
       "apply_payment_webhook_event",
       expect.objectContaining({
+        p_event_created_at: "2026-06-19T18:00:00-03:00",
         p_new_status: null,
         p_raw_event: payload,
       }),
@@ -216,6 +220,30 @@ describe("POST /api/payments/webhook", () => {
       paymentId: "payment-uuid",
       status: "RECEIVED",
     });
+  });
+
+  it("falls back to apply ordering when the webhook timestamp is missing or invalid", async () => {
+    const supabase = buildSupabaseMock({
+      rpcData: { payment_id: "payment-uuid", duplicate: false, applied_status: "RECEIVED" },
+    });
+    createAdminClient.mockReturnValue(supabase);
+    const { POST } = await import("./route");
+    const payloadWithoutUsableDate = buildPayload({
+      dateCreated: "not-a-date",
+      event: "PAYMENT_RECEIVED",
+      payment: { id: "pay_123", status: "RECEIVED" },
+    });
+
+    const response = await POST(buildRequest(payloadWithoutUsableDate));
+
+    expect(response.status).toBe(200);
+    expect(supabase.rpc).toHaveBeenCalledWith(
+      "apply_payment_webhook_event",
+      expect.objectContaining({
+        p_event_created_at: null,
+        p_new_status: "RECEIVED",
+      }),
+    );
   });
 
   it("can process a redelivery after a previous transaction failure", async () => {

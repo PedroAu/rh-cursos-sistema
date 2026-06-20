@@ -184,3 +184,97 @@ re_review:
     restantes não são regressões: 007 é uma camada de teste recomendada (não
     bloqueante), 008 é decisão de negócio escalada, 009 é cosmético. Apto a seguir
     para @devops (push/PR) a critério da direção.
+
+# =============================================================
+# ARCHITECTURE VERDICT — STATUS-RANK-BUSINESS-008 (escalado ao @architect)
+# Inverte a conclusão do re-review sobre WEBHOOK-ORDERING-002.
+# ADR: docs/architecture/payment-status-ordering.md
+# =============================================================
+architecture_verdict:
+  reviewed_at: "2026-06-19"
+  by: "@architect (Aria)"
+  adr: "docs/architecture/payment-status-ordering.md"
+  gate_override: CONCERNS   # rebaixa de PASS_WITH_ADVISORIES
+  finding: >
+    A guarda de rank introduzida no FIX 2 (WEBHOOK-ORDERING-002) é uma REGRESSÃO
+    financeira, não uma correção. Evidência da doc oficial Asaas v3:
+    (1) Asaas entrega webhooks EM ORDEM cronológica via fila de sincronização que
+    PAUSA após falhas — não há entrega fora de ordem; o cenário que o rank defende
+    não ocorre. (2) Não existe status FAILED no Asaas (é evento); dar a ele o rank
+    máximo foi a causa raiz. (3) O ciclo é não-linear (OVERDUE→CONFIRMED→RECEIVED e
+    CHARGEBACK_*→...→RECEIVED), que um rank linear único não modela.
+  money_losing_transitions:
+    - "FAILED(140) → CONFIRMED(60): guard REJEITA → cobrança paga fica FAILED"
+    - "FAILED(140) → RECEIVED(80): guard REJEITA → dinheiro entra, aluno como não-pago"
+    - "AWAITING_CHARGEBACK_REVERSAL(130) → RECEIVED(80): disputa vencida nunca restaura RECEIVED"
+  note: >
+    Ironia técnica: o código ORIGINAL (overwrite cego, pré-FIX) aplicaria CONFIRMED
+    após FAILED corretamente. O FIX 2 piorou esse caso ao adicionar o lock. WEBHOOK-
+    ORDERING-002 é REABERTO.
+  recommendation:
+    option: D
+    summary: >
+      Remover payment_status_rank e ordenar por dateCreated do evento (mais novo
+      vence; replays ignorados pelo UNIQUE(asaas_event_id) já existente). Nova
+      migration: coluna payments.status_event_at + RPC revisada; rota extrai
+      dateCreated do payload; AsaasWebhookPayload ganha campo timestamp opcional
+      com fallback "aplica" se ausente.
+    interim_zero_schema: >
+      Se o dono quiser zero-migration neste ciclo: rebaixar FAILED para ~5 (abaixo
+      de PENDING) e isentar do guard transições cujo alvo seja CONFIRMED/RECEIVED/
+      RECEIVED_IN_CASH. Estanca o bug financeiro já, mas deixa o caso de chargeback
+      e é dívida técnica vs. D.
+  reopens: WEBHOOK-ORDERING-002
+
+final_gate: PASS_WITH_ADVISORIES
+final_gate_rationale: >
+  O gate FINAL sobe para PASS_WITH_ADVISORIES: a Option D recomendada pelo
+  @architect foi implementada com coluna payments.status_event_at, nova assinatura
+  da RPC, extração de dateCreated na rota e remoção do payment_status_rank do caminho
+  ativo. O defeito financeiro STATUS-RANK-BUSINESS-008 não permanece reproduzível
+  por leitura de código/migration: FAILED ou AWAITING_CHARGEBACK_REVERSAL não travam
+  mais transições válidas para CONFIRMED/RECEIVED por rank linear. Gates locais
+  reexecutados pelo QA em 2026-06-19: lint PASS, typecheck PASS, testes focados
+  PASS (2 arquivos/15 testes), npm test PASS (34 arquivos/114 testes), build
+  Cloudflare PASS. Advisory remanescente: RPC-BEHAVIOR-COVERAGE-007, pois a lógica
+  SQL crítica ainda é validada por inspeção/string-match e deveria ganhar teste
+  comportamental contra Postgres/Supabase local antes de produção financeira real.
+
+# =============================================================
+# FINAL RE-REVIEW (QA Loop iteração 2) — após Option D do @dev
+# =============================================================
+final_re_review:
+  reviewed_at: "2026-06-19"
+  gate: PASS_WITH_ADVISORIES
+  quality_gates:
+    focused_tests: PASS  # 2 arquivos / 15 testes
+    lint: PASS           # eslint limpo
+    typecheck: PASS      # tsc --noEmit limpo
+    tests: PASS          # 34 arquivos / 114 testes
+    build_cloudflare: PASS
+  resolved:
+    - id: STATUS-RANK-BUSINESS-008
+      status: RESOLVED
+      evidence: >
+        Migration 20260619203000 adiciona payments.status_event_at, revisa
+        public.apply_payment_webhook_event(..., p_event_created_at, ...) e remove a
+        dependência de payment_status_rank no update. route.ts passa dateCreated
+        validado como p_event_created_at e continua retornando applied_status
+        persistido pela RPC.
+    - id: WEBHOOK-ORDERING-002
+      status: RESOLVED
+      evidence: >
+        A ordenação deixou de ser rank linear e passou a aceitar somente evento
+        sem timestamp, primeiro evento timestamped, ou evento com dateCreated >=
+        status_event_at atual. Replays continuam protegidos por
+        UNIQUE(asaas_event_id) via ON CONFLICT DO NOTHING.
+  remaining_advisories:
+    - id: RPC-BEHAVIOR-COVERAGE-007
+      severity: MEDIUM
+      finding: >
+        O comportamento transacional/temporal da função PL/pgSQL ainda não roda
+        contra Postgres real em CI; os testes atuais validam presença de SQL e a
+        rota mocka a RPC.
+      suggestion: >
+        Adicionar teste de integração Supabase local/pgTAP para eventos novo vs.
+        antigo, duplicate delivery, status desconhecido e rollback após falha.
