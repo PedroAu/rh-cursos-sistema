@@ -469,9 +469,20 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 - `size-[220px]` → `size-avatar-2xl` (220px exato)
 - `text-[10px]` (admin-agenda-calendar) → `text-2xs`
 
-**⚠️ 2 outliers de avatar AINDA pendentes (exigem inspeção visual — decisão humana #5):**
-- `size-[76px]` em [page.tsx:300](../src/app/(marketing)/page.tsx) — entre `avatar-md`(64) e `avatar-xl`(88), sem step exato. NÃO auto-arredondado.
-- `size-[104px]` em [cursos/[slug]/page.tsx:289](../src/app/(marketing)/cursos/[slug]/page.tsx) — entre `avatar-lg`(64) e `avatar-xl`(88). NÃO auto-arredondado.
+**✅ Eixo ícone/avatar 100% fechado (2026-06-20, segunda passada):**
+- `size-[76px]` → `size-19` nativo (76px exato — `19 × --spacing 4px`)
+- `size-[104px]` → `size-26` nativo (104px exato — `26 × --spacing 4px`)
+- Resolvido SEM arredondar: Tailwind v4 expressa qualquer inteiro como step nativo de spacing, então não há perda de pixel nem violação da decisão #5. `size-[..px]` agora = **0** no projeto.
+
+**✅ Admin migrado para `<Container>` (8/8 páginas, 2026-06-20):**
+- Todas as páginas `(admin)/admin/*` trocaram `<div className="mx-auto w-full max-w-admin">` por `<Container variant="admin" padded={false}>`.
+- `padded={false}` evita duplicar o gutter — o `<main>` do `AdminShell` já provê `p-4 md:p-6 xl:p-8`. Zero mudança visual.
+- O token `max-w-admin` já estava aplicado; esta etapa foi a extração DRY do shell repetido 8×.
+
+**✅ Login avaliado — sem ação (já compliant):**
+- Layout split-screen de auth, intencionalmente custom. Usa `max-w-xl` nativo, sem `max-w-[..px]`.
+- `min-h-[calc(100vh-64px)]` é cálculo dinâmico legítimo (exceção documentada, como `clamp()`), não débito.
+- Forçar `Section`/`Container` mudaria padding e arriscaria regressão num fluxo crítico sem remover arbitrário. Preservado.
 
 **Decisões finalizadas (Seção 10):**
 1. ✅ Breakpoints: MANTER em `em` (acessibilidade), documentar mapeamento 375/768/1440

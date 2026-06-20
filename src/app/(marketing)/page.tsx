@@ -297,7 +297,7 @@ export default function HomePage() {
               {processSteps.map((step, index) => (
                 <Card key={step.title} className="min-h-80">
                   <CardContent className="flex h-full flex-col items-center gap-5 p-6 text-center">
-                    <div className="flex size-[76px] items-center justify-center rounded-full bg-primary font-heading text-xl font-black text-primary-foreground">
+                    <div className="flex size-19 items-center justify-center rounded-full bg-primary font-heading text-xl font-black text-primary-foreground">
                       {index + 1}
                     </div>
                     <h2 className="text-balance font-heading text-xl font-extrabold text-brand-navy-800">

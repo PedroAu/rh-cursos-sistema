@@ -12,6 +12,7 @@ import {
   getAdminInstructorOptions,
 } from "@/lib/admin-data";
 import { getSingleSearchParam } from "@/lib/pagination";
+import { Container } from "@/components/layout/container";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -51,7 +52,7 @@ export default async function AdminAgendaPage({ searchParams }: PageProps) {
   const withoutInstructorCount = allRows.filter((row) => !row.instructorId).length;
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="TURMAS"
@@ -117,6 +118,6 @@ export default async function AdminAgendaPage({ searchParams }: PageProps) {
         </div>
         <AdminArchivedList rows={archivedRows} />
       </div>
-    </div>
+    </Container>
   );
 }

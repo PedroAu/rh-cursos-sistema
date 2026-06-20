@@ -5,6 +5,7 @@ import { AdminMetricCard } from "@/components/admin/admin-metric-card";
 import { AdminPageIntro } from "@/components/admin/admin-page-intro";
 import { getAdminCourseOptions, getAdminLeads } from "@/lib/admin-data";
 import { getSingleSearchParam } from "@/lib/pagination";
+import { Container } from "@/components/layout/container";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -39,7 +40,7 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
   ).toString()}`;
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="LEADS"
@@ -99,6 +100,6 @@ export default async function AdminLeadsPage({ searchParams }: PageProps) {
           rows={allRows}
         />
       </div>
-    </div>
+    </Container>
   );
 }
