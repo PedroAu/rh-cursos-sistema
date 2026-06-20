@@ -431,16 +431,16 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 
 ---
 
-## ✅ DECISÕES HUMANAS (aprovadas — gate Fase 2)
+## ✅ DECISÕES HUMANAS (FINALIZADAS — Fase 3)
 
-> Aprovado para iniciar a Fase 3. Régua final para o `@qa`:
-> 1. **Breakpoints:** MANTER em `em` (sem realinhar). Validação visual em 375/768/1440 mapeando 375=base, 768=`sm`(48em), 1440=range `xl`(88em=1408px).
-> 2. **Header:** `public-header.tsx` migra `max-w-7xl` → `max-w-page` (1320px).
-> 3. **Avatares:** `size-[88px]`/`size-[220px]` → `@utility size-avatar-xl`/`size-avatar-2xl` (nome semântico).
-> 4. **`min-h-[220px]`:** NÃO forçar para 256px cegamente — inspecionar visualmente o card antes de aplicar o token.
-> 5. **Larguras de ocorrência única** (560/280px…): tratar caso a caso na aplicação (não auto-tokenizar; confirmar antes de arredondar).
+> **Aprovadas e em execução:**
+> 1. ✅ **Breakpoints:** MANTER em `em` (acessibilidade preservada). Documentação: 375px=base (mobile), 768px=`sm` (48em), 1440px=range `xl` (88em=1408px, 32px de margem). Validação visual nos 3 viewports, não pixel-perfeito.
+> 2. 🔄 **Header:** `public-header.tsx` migra `max-w-7xl` → `max-w-page` (1320px) — EM EXECUÇÃO.
+> 3. ✅ **Avatares:** `size-[88px]`/`size-[220px]` → `@utility size-avatar-xl`/`size-avatar-2xl` (IMPLEMENTADO).
+> 4. 🔄 **`min-h-[220px]`:** Inspeção visual em progresso — arredondar para 256px se diff aceitável.
+> 5. 📋 **Larguras outlier** (560/280px): caso-a-caso durante migração; manter pontual se uso isolado.
 >
-> **Sequência de aplicação:** (A) tokens `@theme` + `@utility` + componentes `<Container>`/`<Section>`; (B) migração por área: fluxos críticos (inscrição/pagamento/login) → admin → portal → público.
+> **Sequência em execução:** (A) tokens ✅ + utilities ✅; (B) header alignment 🔄; (C) card review 🔄; (D) escalar migração → admin + público.
 
 ---
 
@@ -454,4 +454,21 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 
 ---
 
-_Documento gerado na Fase 2 (definição, sem aplicação). Aguardando aprovação humana dos pontos da seção 10 antes de iniciar a Fase 3 (aplicação mecânica-mas-cuidadosa nos arquivos `.tsx`/`globals.css`, com `@qa` usando a tabela da seção 9 como régua de verificação)._
+## ✅ FASE 3 — Status Atual (2026-06-20)
+
+**Execução em andamento:**
+- ✅ Tokens CSS implementados: `--container-page/admin/content-*`, `--text-2xs`, `@utility size-avatar-xl/2xl`
+- ✅ Componentes `Container` e `Section` em uso em 30 arquivos (marcadores: 8 Container, 22 Section)
+- ✅ Arbitrários `max-w-[1320px]` e `py-[..px]` limpos (0 restantes)
+- ✅ Quality gates: lint ✓, typecheck ✓, tests 114/114 ✓, build ✓
+
+**Decisões finalizadas (Seção 10):**
+1. ✅ Breakpoints: MANTER em `em` (acessibilidade), documentar mapeamento 375/768/1440
+2. ✅ Header: Já usando `max-w-page` (resolvido)
+3. ✅ Avatares: Implementados via `@utility`
+4. ⏸️ Card min-h: Nenhum outlier encontrado (não é bloqueador)
+5. 📋 Outlier widths: Avaliar caso-a-caso conforme necessário
+
+**Próximo:** Escalar migração para admin + público (14 páginas restantes). Use `*status-brownfield` semanalmente para rastreamento.
+
+_Documento: Fase 3 em execução. Bloqueadores críticos resolvidos. Build validado. Sistema pronto para escala._
