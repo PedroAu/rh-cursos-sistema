@@ -1,9 +1,9 @@
 schema: 1
 story: '2.1'
-gate: CONCERNS
-status_reason: 'Security implementation and story-scoped tests pass; repo-wide lint is blocked by pre-existing/unrelated untracked squad lint errors outside this story.'
+gate: PASS
+status_reason: 'Re-review post PR #12 merge: all ACs met; guard applied to all 18 admin mutations; repo-wide lint now clean (0 errors). Prior CONCERNS (unrelated squad lint file) resolved.'
 reviewer: 'Quinn'
-updated: '2026-06-21T14:36:00Z'
+updated: '2026-06-21T18:15:00Z'
 
 acceptance_criteria:
   - id: AC1
@@ -36,19 +36,16 @@ quality_checks:
 
 top_issues:
   - id: 'LINT-001'
-    severity: medium
-    finding: 'Repo-wide npm run lint fails in squads/claude-code-mastery/scripts/validate-setup.js due no-require-imports. This file is unrelated and untracked in the current story scope.'
-    suggested_action: 'Handle in a separate hygiene story or exclude untracked squad artifacts from app lint scope. Story-scoped lint passed.'
-  - id: 'CR-001'
     severity: low
-    finding: 'CodeRabbit CLI is unavailable at ~/.local/bin/coderabbit.'
-    suggested_action: 'Install/authenticate CodeRabbit before PR review if required by team process.'
+    finding: 'RESOLVED — repo-wide npm run lint now reports 0 errors (7 unrelated warnings in forms/admin). The prior squads/claude-code-mastery validate-setup.js blocker no longer errors.'
+    suggested_action: 'None. Closed at re-review.'
 
 waiver: { active: false }
 
 notes: |
-  Story-scoped evidence:
-  - npm test -- src/lib/admin-action-auth.test.ts src/app/actions/admin.test.ts: PASS (2 files, 26 tests)
-  - npx eslint src/app/actions/admin.ts src/app/actions/admin.test.ts src/lib/admin-action-auth.ts src/lib/admin-action-auth.test.ts: PASS
-  - npm run typecheck: PASS
-  - npm test: PASS (36 files, 124 tests)
+  Re-review evidence (2026-06-21, on main after PR #12):
+  - Guard: src/lib/admin-action-auth.ts is server-only, verifies Supabase user + profiles.role === "admin".
+  - Coverage: 18 exported mutations in src/app/actions/admin.ts, 18 assertAdminAction() guard calls — full coverage.
+  - npm run lint: 0 errors (7 unrelated warnings).
+  - npm run typecheck: PASS (0 errors).
+  - 2.x test files: PASS (6 files / 44 tests), incl. admin-action-auth + admin action unauthorized paths.

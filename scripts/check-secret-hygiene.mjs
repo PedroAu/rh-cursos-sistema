@@ -23,14 +23,29 @@ function checkTrackedEnvFiles() {
 }
 
 function checkGeneratedEnvArtifacts() {
-  const generatedEnvArtifacts = runGit(["status", "--ignored", "--short", ".next"]).filter((line) =>
-    line.endsWith("/.env"),
-  );
+  // Use find instead of git status, which collapses ignored dirs
+  // Scan both .next/ and .open-next/ for generated .env files
+  const dirsToCheck = [".next", ".open-next"];
+  const foundEnvFiles = [];
 
-  if (generatedEnvArtifacts.length > 0) {
+  for (const dir of dirsToCheck) {
+    try {
+      const envFiles = execFileSync("find", [dir, "-path", "*/.env", "-type", "f"], {
+        encoding: "utf8",
+      })
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      foundEnvFiles.push(...envFiles);
+    } catch {
+      // find returns error if dir doesn't exist, which is OK
+    }
+  }
+
+  if (foundEnvFiles.length > 0) {
     failures.push(
-      "Generated .next env artifacts must be removed before packaging: " +
-        generatedEnvArtifacts.join(", "),
+      "Generated .env artifacts must be removed before packaging: " + foundEnvFiles.join(", "),
     );
   }
 }

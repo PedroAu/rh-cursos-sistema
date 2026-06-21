@@ -13,7 +13,6 @@ const userRoles = new Set(["admin", "professor", "aluno"]);
 const ADMIN_ASSETS_BUCKET = "admin-assets";
 const MAX_BRAND_ASSET_BYTES = 250 * 1024;
 const userStatuses = new Set(["ativo", "pendente", "inativo"]);
-const studentTypes = new Set(["PF", "PJ"]);
 
 function unauthorizedAdminFormState(): AdminFormState {
   return {
@@ -49,10 +48,6 @@ function normalizeUserStatus(value: string) {
   return userStatuses.has(value) ? value : "pendente";
 }
 
-function normalizeStudentType(value: string) {
-  return studentTypes.has(value) ? value : "PF";
-}
-
 function optionalString(formData: FormData, key: string) {
   const value = formData.get(key);
 
@@ -61,36 +56,6 @@ function optionalString(formData: FormData, key: string) {
   }
 
   return value.trim();
-}
-
-function normalizeDigits(formData: FormData, key: string) {
-  const value = formData.get(key);
-
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const digits = value.replace(/\D/g, "");
-  return digits.length > 0 ? digits : null;
-}
-
-function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
-
-function isValidOptionalCpf(value: string | null) {
-  return value === null || value.length === 11;
-}
-
-function isValidOptionalPhone(value: string | null) {
-  return value === null || (value.length >= 10 && value.length <= 13);
-}
-
-function isValidOptionalUuid(value: string | null) {
-  return (
-    value === null ||
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
-  );
 }
 
 function numberFromForm(formData: FormData, key: string, fallback: number) {

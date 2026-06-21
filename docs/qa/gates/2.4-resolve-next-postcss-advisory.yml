@@ -1,0 +1,44 @@
+schema: 1
+story: '2.4'
+gate: PASS
+status_reason: 'Audit re-run live by QA (2 moderate, postcss <8.5.10 via next); no patched compatible stable Next 16 release exists; temporary waiver documented with rationale/impact/monitoring/expiration; lockfile untouched. WAIVED advisory wrapped in PASS gate.'
+reviewer: 'Quinn'
+updated: '2026-06-21T18:30:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'QA re-ran npm audit --audit-level=moderate: 2 moderate (postcss <8.5.10 via next). Captured in waiver Current Evidence.'
+  - id: AC2
+    status: PASS
+    evidence: 'Latest stable next@16.2.9 still depends on postcss 8.4.31 (vulnerable range); no patched compatible release — upgrade path correctly not taken.'
+  - id: AC3
+    status: PASS
+    evidence: 'Waiver next-postcss-ghsa-qx2v-qp2m-jg93-2026-06-21.md has rationale, impact, monitoring trigger, expiration 2026-07-21.'
+  - id: AC4
+    status: PASS
+    evidence: 'No dependency change; package-lock.json untouched.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: N/A
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: N/A
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'DEP-001'
+    severity: low
+    finding: 'Waiver expires 2026-07-21; monitoring trigger is documented but not automated.'
+    suggested_action: 'Add a CI/calendar reminder to re-run npm audit before expiry and upgrade Next when a patched release ships.'
+
+waiver:
+  active: true
+  reason: 'No patched compatible stable Next 16 release for postcss GHSA-qx2v-qp2m-jg93. Breaking downgrade rejected. Site does not process attacker-controlled CSS. Time-boxed to 2026-07-21.'
+
+notes: |
+  The deliverable is a documented risk decision, not a code change. The waiver is thorough,
+  time-boxed, and includes a concrete monitoring trigger. Residual risk (moderate PostCSS XSS
+  in CSS stringify) is accepted because the app does not pass untrusted CSS through PostCSS.

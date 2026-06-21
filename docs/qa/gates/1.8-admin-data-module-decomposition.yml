@@ -1,0 +1,65 @@
+schema: 1
+story: '1.8'
+gate: PASS
+status_reason: 'Refactor-only decomposition of admin-data.ts into bounded slices. First slice (pure filter helpers) extracted to src/lib/admin-data/filters.ts; facade at src/lib/admin-data.ts maintains backward compatibility. All 107 tests passing; 10 new tests for filters. Decomposition plan documented for future iterations. No breaking changes; no behavior changes.'
+reviewer: 'Quinn'
+updated: '2026-06-21T20:55:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'Dev Agent Record documents inventory of exports/consumers before code movement; facade pattern applied to maintain backward compatibility.'
+  - id: AC2
+    status: PASS
+    evidence: 'docs/architecture/admin-data-decomposition.md created; first slice scoped to pure filter helpers (queryMatches, exactFilters, dateRangeFilters, formatPrice, normalizeStringList).'
+  - id: AC3
+    status: PASS
+    evidence: 'src/lib/admin-data/filters.ts extracted; pure helpers have zero side effects; src/lib/admin-data.ts facade re-exports; no admin behavior changed.'
+  - id: AC4
+    status: PASS
+    evidence: 'Dev Agent: "no consumer import changes were required"; existing imports still target src/lib/admin-data.ts facade.'
+  - id: AC5
+    status: PASS
+    evidence: 'src/lib/admin-data/filters.test.ts created with 10 tests for extracted code; existing admin page tests still PASS (covers consumers).'
+  - id: AC6
+    status: PASS
+    evidence: 'admin-data-decomposition.md documents next slices (RLS policy helpers, query builders, entity formatters) and remaining large-module debt.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: PASS
+  security: PASS
+  documentation: PASS
+
+top_issues: []
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Facade pattern ensures zero breaking changes for consumers
+  - Pure helpers cleanly separated; queryMatches, filters, formatters have no side effects
+  - Test coverage comprehensive: 10 new unit tests for filters + existing tests for consumer pages (admin/alunos, admin/usuarios, leads/export)
+  - Decomposition plan documented; future iterations scoped and prioritized
+  - First slice selection is lowest-risk (no Supabase access, no public facade changes)
+  - Scope discipline: refactor-only, no feature changes
+
+  Risk Assessment: LOW
+  - No import changes required; backward compatible
+  - All 107 tests passing
+  - Refactor improves code readability without changing behavior
+  - Facade maintained; future slices can be extracted independently
+
+  Refactor Quality:
+  - Follows existing project patterns (facade pattern already used elsewhere)
+  - Pure functions extracted enable easier testing and reuse
+  - Clear module seams established for next iteration
+
+  Follow-up Work:
+  - Next slice candidates documented in admin-data-decomposition.md:
+    1. RLS policy helpers (aluno-visibility, professor-visibility, etc.)
+    2. Query builders (coursesQuery, turmasQuery, etc.)
+    3. Entity formatters (normalizeInstrutor, formatTurma, etc.)

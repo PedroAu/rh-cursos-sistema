@@ -1,0 +1,48 @@
+schema: 1
+story: '2.2'
+gate: PASS
+status_reason: 'Signed HMAC SHA-256 status token with constant-time verification; route rejects missing/invalid/expired/mismatched tokens before the service-role client; status-only response; full authorization-matrix tests pass.'
+reviewer: 'Quinn'
+updated: '2026-06-21T18:20:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'route.ts:19-25 reads token from ?token= or Authorization Bearer and calls verifyPaymentStatusToken(token, chargeId); 401 if absent/invalid.'
+  - id: AC2
+    status: PASS
+    evidence: 'chargeId alone yields 401 before createAdminClient() (route.ts:23 precedes :29).'
+  - id: AC3
+    status: PASS
+    evidence: 'invalid/mismatch/expired all collapse to a single generic {error:"unauthorized"} 401.'
+  - id: AC4
+    status: PASS
+    evidence: 'status-token.test.ts + route.test.ts + payment.test.ts cover valid/missing/invalid/mismatch/expired/unknown. 6 files / 44 tests green.'
+  - id: AC5
+    status: PASS
+    evidence: 'Service-role read token-gated, constrained to validated chargeId, returns only {status} (route.ts:29-40); documented inline + Completion Notes.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: PASS
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'SEC-OBS-001'
+    severity: low
+    finding: 'Token accepted via URL ?token= can be captured in proxy/access logs. The Authorization: Bearer path avoids this.'
+    suggested_action: 'Prefer the Authorization header for server-to-server callers. Non-blocking given 30-min TTL and status-only response.'
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - HMAC SHA-256 (status-token.ts:43), constant-time timingSafeEqual (:54), signature verified before payload decode.
+  - Payload binds chargeId + purpose + iat + exp; 30-min TTL with 30s clock skew.
+  - Authorization enforced before any service-role client creation; response is status-only.
+  - Secret (PAYMENT_STATUS_TOKEN_SECRET) validated at checkout before Supabase/Asaas side effects; .env.example updated.
+  Security: This change closes a pre-existing IDOR-style exposure where a charge id alone disclosed payment state.

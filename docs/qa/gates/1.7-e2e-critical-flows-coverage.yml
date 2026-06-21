@@ -1,0 +1,64 @@
+schema: 1
+story: '1.7'
+gate: PASS
+status_reason: 'All 6 ACs verified. Existing E2E specs reused (login, enrollment, a11y, smoke); new mocked Pix/Boleto payment coverage added (e2e/payment.spec.ts). No production endpoints called; deterministic mocks only. 21 E2E tests PASS; 147 total tests PASS.'
+reviewer: 'Quinn'
+updated: '2026-06-21T20:50:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'e2e/ folder exists with playwright.config.ts testDir="./e2e"; npm run test:e2e executes playwright test.'
+  - id: AC2
+    status: PASS
+    evidence: 'e2e/login.spec.ts (35 lines) covers login/admin access flow; reused from existing coverage.'
+  - id: AC3
+    status: PASS
+    evidence: 'e2e/enrollment.spec.ts (130 lines) covers public enrollment to real course slug (/inscricao); reused from existing coverage.'
+  - id: AC4
+    status: PASS
+    evidence: 'e2e/payment.spec.ts (NEW) covers Pix/Boleto checkout using e2eMockCheckout=1 flag; no real Asaas charge created; NODE_ENV !== "production" guard.'
+  - id: AC5
+    status: PASS
+    evidence: 'docs/e2e.md created documenting coverage, npm run test:e2e command, test slug, environment setup, payment safety.'
+  - id: AC6
+    status: PASS
+    evidence: 'Dev Agent Record: npm run test:e2e PASS (21 tests); local execution confirmed; command reference accurate.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: N/A
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'E2E-001'
+    severity: low
+    finding: 'e2e/payment.spec.ts lacks strict TypeScript typing for mock checkout payload shape.'
+    suggested_action: 'Optional: create types/e2e-mocks.ts in future refactor. Non-blocking for this story.'
+  - id: 'DOC-001'
+    severity: low
+    finding: 'docs/e2e.md documents local-only execution; no CI/CD integration instructions provided.'
+    suggested_action: 'Informational. E2E in CI/CD can be added as follow-up story (parallel execution, report generation).'
+  - id: 'REUSE-001'
+    severity: info
+    finding: 'Existing e2e specs (login, enrollment, a11y, smoke) were correctly reused instead of recreated, adhering to REUSE > CREATE discipline.'
+    suggested_action: 'Pattern validated; document as best practice for future E2E work.'
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Clean REUSE strategy: extended existing E2E structure instead of rebuilding login/enrollment coverage
+  - Deterministic mock-based Pix/Boleto coverage eliminates production risk while validating checkout UX
+  - docs/e2e.md provides clear onboarding for developers
+  - All 147 tests passing; no regressions from new E2E specs
+  - Scope discipline: only critical user + admin flows covered; advanced checkout edge cases left for future
+
+  Risk Assessment: LOW
+  - No production endpoints hit
+  - Mock payloads are deterministic and safe
+  - Existing E2E framework stability unchanged

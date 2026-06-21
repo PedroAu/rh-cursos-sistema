@@ -1,0 +1,54 @@
+schema: 1
+story: '1.10'
+gate: PASS
+status_reason: 'Docs-only build/deploy guardrail. All 6 ACs verified against real docs and package.json; deploy.md states Cloudflare/OpenNext Workers path, deploy:check remains recommended, Vercel/static-export wording corrected, runtime config untouched.'
+reviewer: 'Quinn'
+updated: '2026-06-21T17:55:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'package.json: build=next build, build:cloudflare=opennextjs-cloudflare build. Diagnostic-vs-production distinction explicit in deploy.md:17-18.'
+  - id: AC2
+    status: PASS
+    evidence: 'deploy.md:3 states "deploy no Cloudflare deve usar Workers com OpenNext"; reinforced at :18 and :57.'
+  - id: AC3
+    status: PASS
+    evidence: 'deploy.md:19 recommends npm run deploy:check; package.json deploy:check = lint && typecheck && test && build:cloudflare.'
+  - id: AC4
+    status: PASS
+    evidence: 'deploy.md:21 and :57 explicitly forbid next export / static Cloudflare Pages / Vercel as production path.'
+  - id: AC5
+    status: PASS
+    evidence: 'Commit 7b933d4 changed only docs/deploy.md (+8 lines). open-next.config.ts and wrangler.jsonc untouched.'
+  - id: AC6
+    status: PASS
+    evidence: 'Dev Agent Record documents lint/typecheck/build:cloudflare PASS; npm test skipped (docs-only) with reason; CodeRabbit skipped (free CLI rate limit).'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: N/A
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: N/A
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'DOC-001'
+    severity: low
+    finding: 'deploy.md is written without diacritics (producao, e, Configuracao). Matches existing repo doc convention (AGENTS.md is also accent-free); not introduced by this story.'
+    suggested_action: 'Optional: normalize doc accents repo-wide in a dedicated docs-hygiene pass. Out of scope for this story; non-blocking.'
+  - id: 'PROCESS-001'
+    severity: low
+    finding: 'Story content was already merged to main via Epic 1 docs commit 7b933d4 before this QA pass; the story status field lagged behind reality until now.'
+    suggested_action: 'Informational. Status corrected to Done in this gate. Keep story status in sync with merge state going forward.'
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Surgical docs-only change (+8 lines) that removes ambiguity between `next build` (framework diagnostic) and `build:cloudflare` (production OpenNext Worker artifact).
+  - Wording matches package.json scripts field-by-field; deploy:check chain verified.
+  - Scope discipline: runtime config (open-next.config.ts, wrangler.jsonc) untouched; no remote git ops by the executor.
+  Security: No attack surface — documentation only.

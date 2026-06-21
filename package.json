@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:cloudflare": "opennextjs-cloudflare build",
+    "build:cloudflare": "opennextjs-cloudflare build && node scripts/strip-secrets-from-bundle.mjs",
     "start": "wrangler dev",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",

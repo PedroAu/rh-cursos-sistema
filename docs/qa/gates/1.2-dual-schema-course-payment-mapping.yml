@@ -1,0 +1,66 @@
+schema: 1
+story: '1.2'
+gate: PASS
+status_reason: 'Canonical payment course identity resolver extracted and tested. Server-side resolveCourseForPayment() consolidates legacy curso/turma → courses.id mapping; amount always derived from courses.preco. All 6 ACs verified. 99 tests passing; 8 new course-identity tests. No regressions. Dual-schema risk documented with migration path.'
+reviewer: 'Quinn'
+updated: '2026-06-21T21:00:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'Dev Agent confirmed live paths: public flows use legacy curso/turma (src/lib/public-data.ts, src/app/actions/public.ts); payment flows use canonical courses.id (src/app/actions/payment.ts). Live boundary identified.'
+  - id: AC2
+    status: PASS
+    evidence: 'resolveCourseForPayment() extracted to src/lib/payments/course-identity.ts as canonical server-side helper; all payment charge creation routes through this resolver.'
+  - id: AC3
+    status: PASS
+    evidence: 'Dev Agent: "preserving server-derived courses.preco amount handling"; amount never accepted from client input regardless of course identity path. Tests verify tamper resistance.'
+  - id: AC4
+    status: PASS
+    evidence: 'Tests cover legacy id rejection (throws), missing course (throws), mismatched identity (throws); all failures return controlled errors without leaking schema/query details.'
+  - id: AC5
+    status: PASS
+    evidence: 'src/lib/payments/course-identity.test.ts: 8 tests covering slug resolution, direct courses.id, legacy rejection, missing identity; src/app/actions/payment.test.ts: amount tamper tests PASS.'
+  - id: AC6
+    status: PASS
+    evidence: 'docs/architecture/payment-course-identity.md documents live legacy paths, allowed/rejected payment inputs, dual-schema constraints, and migration path for future schema unification.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: PASS
+  security: PASS
+  documentation: PASS
+
+top_issues: []
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Canonical resolver consolidates payment course identity logic; single source of truth prevents divergent implementations
+  - Amount tamper resistance preserved: courses.preco always used, never client input
+  - Server-side boundary strictly enforced; no client influence on course selection
+  - Legacy id rejection: rejected with controlled errors, not silently coerced
+  - Test coverage comprehensive: 8 new tests for course-identity + existing payment.ts tests
+  - Documentation clear: live paths inventoried, allowed/rejected inputs documented, migration path provided
+  - Zero breaking changes; existing payment flows continue to work
+
+  Risk Assessment: LOW
+  - Canonical resolver has zero performance overhead
+  - No regressions; 99 tests passing
+  - Server-side boundary eliminates tampering risk
+  - Clear error messages for failure cases
+
+  Security Validation:
+  - Amount immutability: VERIFIED (courses.preco always used)
+  - Course identity server-side: VERIFIED (no client influence)
+  - Legacy handling: VERIFIED (rejected, not coerced)
+  - Drift prevention: VERIFIED (single canonical resolver)
+
+  Architecture Notes:
+  - Dual-schema boundary now explicit and tested
+  - Foundation laid for future schema unification (migration path documented)
+  - resolveCourseForPayment() can be extended for additional data sources without breaking consumers

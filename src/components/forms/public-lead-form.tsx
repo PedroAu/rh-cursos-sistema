@@ -6,7 +6,6 @@ import { CheckCircle2 } from "lucide-react";
 import { submitLeadAction, type PublicFormState } from "@/app/actions/public";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, type ButtonProps } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { TextField } from "@/components/forms/field/text-field";
 import { TextareaField } from "@/components/forms/field/textarea-field";
 import { cn } from "@/lib/utils";

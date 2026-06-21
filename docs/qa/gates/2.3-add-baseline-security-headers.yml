@@ -1,0 +1,47 @@
+schema: 1
+story: '2.3'
+gate: PASS
+status_reason: 'Global security headers added via next.config.ts headers(); baseline includes X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options and CSP frame-ancestors; CSP report-only with documented allowlist; HSTS production-gated; config tests pass.'
+reviewer: 'Quinn'
+updated: '2026-06-21T18:25:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'next.config.ts:33-49 async headers() applied to source "/:path*".'
+  - id: AC2
+    status: PASS
+    evidence: 'X-Content-Type-Options nosniff (:18), Referrer-Policy (:19), Permissions-Policy (:20-23), X-Frame-Options SAMEORIGIN (:24) + CSP frame-ancestors self (:7).'
+  - id: AC3
+    status: PASS
+    evidence: 'Content-Security-Policy-Report-Only (:25) with explicit allowlist (:3-15); report-only-first per Dev Notes.'
+  - id: AC4
+    status: PASS
+    evidence: 'HSTS pushed only when NODE_ENV === "production" (:36-41), max-age=15552000; includeSubDomains.'
+  - id: AC5
+    status: PASS
+    evidence: 'next.config.test.ts asserts header presence and HSTS env behavior; /:path* covers public/login/admin routes.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: N/A
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'CSP-001'
+    severity: low
+    finding: 'CSP is report-only and script-src allows unsafe-inline/unsafe-eval; no report-uri/report-to endpoint configured, so violations are not collected. XSS hardening is not enforced until CSP is promoted to enforcing.'
+    suggested_action: 'Follow-up: add a report endpoint, observe violations, then promote CSP to enforcing and tighten script-src. Non-blocking.'
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Sensible baseline: nosniff, strict-origin-when-cross-origin, restrictive Permissions-Policy, clickjacking covered twice (X-Frame-Options + frame-ancestors).
+  - CSP centralized and readable; object-src none, base-uri self, form-action self included.
+  - HSTS correctly production-gated to avoid breaking non-HTTPS local/dev.
+  - Report-only CSP is the correct staged rollout; cannot break current third-party flows (Supabase/Asaas).
