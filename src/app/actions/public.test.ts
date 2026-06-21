@@ -25,8 +25,15 @@ function buildFormData(entries: Record<string, string>) {
 }
 
 describe("public actions", () => {
+  let consoleWarn: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    consoleWarn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    consoleWarn.mockRestore();
   });
 
   it("stores a lead and revalidates only safe internal paths", async () => {
@@ -214,6 +221,13 @@ describe("public actions", () => {
         empresa_razao: "Empresa X",
       }),
     );
+    expect(consoleWarn).toHaveBeenCalledWith("[enrollment-fallback]", {
+      reason: "registrar_inscricao_publica_failed",
+      target: "course_enrollments",
+    });
+    expect(JSON.stringify(consoleWarn.mock.calls)).not.toContain("Maria");
+    expect(JSON.stringify(consoleWarn.mock.calls)).not.toContain("maria@example.com");
+    expect(JSON.stringify(consoleWarn.mock.calls)).not.toContain("12345678900");
   });
 
   it("falls back to lead creation when enrollment table is unavailable", async () => {
@@ -282,5 +296,60 @@ describe("public actions", () => {
       }),
     );
     expect(revalidatePath).toHaveBeenCalledWith("/inscricao/curso-x");
+    expect(consoleWarn).toHaveBeenCalledWith("[enrollment-fallback]", {
+      reason: "registrar_inscricao_publica_failed",
+      target: "lead",
+    });
+  });
+
+  it("returns a controlled error when RPC and fallback persistence fail", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: { message: "insert failed" } });
+    const limit = vi.fn().mockResolvedValue({ error: null });
+    const select = vi.fn(() => ({ limit }));
+    const from = vi.fn((table: string) => {
+      if (table === "course_enrollments") {
+        return { select, insert };
+      }
+
+      return { insert };
+    });
+
+    createAdminClient
+      .mockReturnValueOnce({
+        rpc: vi.fn().mockResolvedValue({ error: { message: "rpc disabled" } }),
+      })
+      .mockReturnValueOnce({
+        from,
+      })
+      .mockReturnValueOnce({
+        from,
+      });
+
+    const result = await submitEnrollmentAction(
+      { error: null, success: null },
+      buildFormData({
+        nome: "Maria",
+        email: "maria@example.com",
+        telefone: "11999999999",
+        cpf: "12345678900",
+        cargo: "Analista",
+        orgao: "Prefeitura",
+        course_id: "course-1",
+        turma_id: "class-1",
+        pagamento_metodo: "pix",
+        aceite_lgpd: "on",
+      }),
+    );
+
+    expect(result).toEqual({
+      error: "Não foi possível concluir a inscrição agora.",
+      success: null,
+    });
+    expect(JSON.stringify(result)).not.toContain("rpc disabled");
+    expect(JSON.stringify(result)).not.toContain("insert failed");
+    expect(consoleWarn).toHaveBeenCalledWith("[enrollment-fallback]", {
+      reason: "registrar_inscricao_publica_failed",
+      target: "course_enrollments",
+    });
   });
 });

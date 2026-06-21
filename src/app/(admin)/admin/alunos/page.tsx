@@ -6,6 +6,7 @@ import { AdminPageIntro } from "@/components/admin/admin-page-intro";
 import { AdminAlunosCrud } from "@/components/admin/entities/admin-alunos-crud";
 import { getAdminAlunos, getArchivedAdminEntities } from "@/lib/admin-data";
 import { getSingleSearchParam } from "@/lib/pagination";
+import { Container } from "@/components/layout/container";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -33,7 +34,7 @@ export default async function AdminAlunosPage({ searchParams }: PageProps) {
   const incompleteCount = allRows.filter((row) => !row.cpf || !row.phone).length;
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="ALUNOS"
@@ -81,6 +82,6 @@ export default async function AdminAlunosPage({ searchParams }: PageProps) {
         />
         <AdminArchivedList rows={archivedRows} />
       </div>
-    </div>
+    </Container>
   );
 }

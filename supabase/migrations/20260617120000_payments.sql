@@ -4,9 +4,10 @@
 --   Asaas delivers webhooks AT-LEAST-ONCE, so the same event may arrive
 --   more than once. Dedup is enforced by UNIQUE(payment_events.asaas_event_id)
 --   on the Asaas EVENT id (evt_...) — NOT on the payment id. The webhook
---   handler does INSERT ... ON CONFLICT (asaas_event_id) DO NOTHING; a
---   conflict means "already processed" and the handler returns 200 without
---   re-applying side effects. This makes redelivery a safe no-op.
+--   handler calls public.apply_payment_webhook_event(...), which inserts the
+--   audit row with ON CONFLICT (asaas_event_id) DO NOTHING and applies payment
+--   status updates in the same database transaction. Duplicate redelivery
+--   returns 200 without re-applying side effects.
 -- Approved by owner (F1 gate). enrollment linkage is text (no hard FK) because
 -- the running code writes to course_enrollments (text PK), not enrollments(uuid).
 -- =============================================================
@@ -14,8 +15,8 @@
 -- ---------- ENUMS ----------
 create type payment_billing_type as enum ('PIX', 'BOLETO', 'CREDIT_CARD');
 
--- Mirrors Asaas payment statuses (sandbox v3). Superset is intentional:
--- we store whatever Asaas sends so the audit row never loses fidelity.
+-- Mirrors known Asaas payment statuses (sandbox v3). Unknown statuses are still
+-- audited in payment_events.raw_event, but do not update payments.status.
 create type payment_status as enum (
   'PENDING', 'CONFIRMED', 'RECEIVED', 'OVERDUE', 'REFUNDED',
   'RECEIVED_IN_CASH', 'REFUND_REQUESTED', 'CHARGEBACK_REQUESTED',

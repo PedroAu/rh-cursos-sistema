@@ -286,7 +286,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
 
           <Card id="instrutor">
             <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:p-8">
-              <div className="flex size-[104px] shrink-0 items-center justify-center rounded-2xl bg-primary font-heading text-2xl font-black text-primary-foreground">
+              <div className="flex size-26 shrink-0 items-center justify-center rounded-2xl bg-primary font-heading text-2xl font-black text-primary-foreground">
                 {getInitials(course.instructor.name)}
               </div>
               <div className="space-y-4">

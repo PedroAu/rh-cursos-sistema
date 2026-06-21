@@ -121,7 +121,7 @@ export function AdminAgendaCalendar({
               >
                 <p className="text-sm font-bold">{date.date()}</p>
                 {count > 0 ? (
-                  <span className="mt-1 inline-flex rounded-full bg-brand-navy-700 px-2 py-0.5 text-[10px] font-bold text-white">
+                  <span className="mt-1 inline-flex rounded-full bg-brand-navy-700 px-2 py-0.5 text-2xs font-bold text-white">
                     {count} turma{count > 1 ? "s" : ""}
                   </span>
                 ) : null}

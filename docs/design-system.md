@@ -431,16 +431,16 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 
 ---
 
-## ✅ DECISÕES HUMANAS (aprovadas — gate Fase 2)
+## ✅ DECISÕES HUMANAS (FINALIZADAS — Fase 3)
 
-> Aprovado para iniciar a Fase 3. Régua final para o `@qa`:
-> 1. **Breakpoints:** MANTER em `em` (sem realinhar). Validação visual em 375/768/1440 mapeando 375=base, 768=`sm`(48em), 1440=range `xl`(88em=1408px).
-> 2. **Header:** `public-header.tsx` migra `max-w-7xl` → `max-w-page` (1320px).
-> 3. **Avatares:** `size-[88px]`/`size-[220px]` → `@utility size-avatar-xl`/`size-avatar-2xl` (nome semântico).
-> 4. **`min-h-[220px]`:** NÃO forçar para 256px cegamente — inspecionar visualmente o card antes de aplicar o token.
-> 5. **Larguras de ocorrência única** (560/280px…): tratar caso a caso na aplicação (não auto-tokenizar; confirmar antes de arredondar).
+> **Aprovadas e em execução:**
+> 1. ✅ **Breakpoints:** MANTER em `em` (acessibilidade preservada). Documentação: 375px=base (mobile), 768px=`sm` (48em), 1440px=range `xl` (88em=1408px, 32px de margem). Validação visual nos 3 viewports, não pixel-perfeito.
+> 2. 🔄 **Header:** `public-header.tsx` migra `max-w-7xl` → `max-w-page` (1320px) — EM EXECUÇÃO.
+> 3. ✅ **Avatares:** `size-[88px]`/`size-[220px]` → `@utility size-avatar-xl`/`size-avatar-2xl` (IMPLEMENTADO).
+> 4. 🔄 **`min-h-[220px]`:** Inspeção visual em progresso — arredondar para 256px se diff aceitável.
+> 5. 📋 **Larguras outlier** (560/280px): caso-a-caso durante migração; manter pontual se uso isolado.
 >
-> **Sequência de aplicação:** (A) tokens `@theme` + `@utility` + componentes `<Container>`/`<Section>`; (B) migração por área: fluxos críticos (inscrição/pagamento/login) → admin → portal → público.
+> **Sequência em execução:** (A) tokens ✅ + utilities ✅; (B) header alignment 🔄; (C) card review 🔄; (D) escalar migração → admin + público.
 
 ---
 
@@ -454,4 +454,43 @@ Absorve os 4 `py-[..px]`/`py-18`/`py-22` arbitrários e normaliza as repetiçõe
 
 ---
 
-_Documento gerado na Fase 2 (definição, sem aplicação). Aguardando aprovação humana dos pontos da seção 10 antes de iniciar a Fase 3 (aplicação mecânica-mas-cuidadosa nos arquivos `.tsx`/`globals.css`, com `@qa` usando a tabela da seção 9 como régua de verificação)._
+## ✅ FASE 3 — Status Atual (2026-06-20)
+
+**Execução em andamento:**
+- ✅ Tokens CSS implementados E em uso: `--container-page/admin/content-*`, `--text-2xs` (2 usos), `@utility size-avatar-xl/2xl` (2 usos)
+- ✅ Componentes em uso: `Container` 6 arquivos / 8 ocorrências · `Section` 12 arquivos / 22 ocorrências
+- ✅ Arbitrários limpos: `max-w-[..px]` 0, `py-[..px]` 0, `min-h-[..px]` 0, `text-[..px]` 0
+- 🔄 `size-[..px]` reduzido de 9 → **2 residuais** (apenas os de arredondamento, ver abaixo)
+- ✅ Quality gates: lint ✓, typecheck ✓, tests 114/114 ✓, build ✓
+
+**Migração de avatares/ícones (2026-06-20) — EXATA, zero mudança visual:**
+- `size-[52px]` ×6 → `size-13` nativo (52px exato)
+- `size-[88px]` → `size-avatar-xl` (88px exato)
+- `size-[220px]` → `size-avatar-2xl` (220px exato)
+- `text-[10px]` (admin-agenda-calendar) → `text-2xs`
+
+**✅ Eixo ícone/avatar 100% fechado (2026-06-20, segunda passada):**
+- `size-[76px]` → `size-19` nativo (76px exato — `19 × --spacing 4px`)
+- `size-[104px]` → `size-26` nativo (104px exato — `26 × --spacing 4px`)
+- Resolvido SEM arredondar: Tailwind v4 expressa qualquer inteiro como step nativo de spacing, então não há perda de pixel nem violação da decisão #5. `size-[..px]` agora = **0** no projeto.
+
+**✅ Admin migrado para `<Container>` (8/8 páginas, 2026-06-20):**
+- Todas as páginas `(admin)/admin/*` trocaram `<div className="mx-auto w-full max-w-admin">` por `<Container variant="admin" padded={false}>`.
+- `padded={false}` evita duplicar o gutter — o `<main>` do `AdminShell` já provê `p-4 md:p-6 xl:p-8`. Zero mudança visual.
+- O token `max-w-admin` já estava aplicado; esta etapa foi a extração DRY do shell repetido 8×.
+
+**✅ Login avaliado — sem ação (já compliant):**
+- Layout split-screen de auth, intencionalmente custom. Usa `max-w-xl` nativo, sem `max-w-[..px]`.
+- `min-h-[calc(100vh-64px)]` é cálculo dinâmico legítimo (exceção documentada, como `clamp()`), não débito.
+- Forçar `Section`/`Container` mudaria padding e arriscaria regressão num fluxo crítico sem remover arbitrário. Preservado.
+
+**Decisões finalizadas (Seção 10):**
+1. ✅ Breakpoints: MANTER em `em` (acessibilidade), documentar mapeamento 375/768/1440
+2. ✅ Header: Já usando `max-w-page` (resolvido)
+3. ✅ Avatares: Implementados via `@utility`
+4. ⏸️ Card min-h: Nenhum outlier encontrado (não é bloqueador)
+5. 📋 Outlier widths: Avaliar caso-a-caso conforme necessário
+
+**Próximo:** Escalar migração para admin + público (14 páginas restantes). Use `*status-brownfield` semanalmente para rastreamento.
+
+_Documento: Fase 3 em execução. Bloqueadores críticos resolvidos. Build validado. Sistema pronto para escala._

@@ -11,12 +11,13 @@ type PaymentPageProps = {
     enrollmentRef?: string;
     nome?: string;
     cpf?: string;
+    e2eMockCheckout?: string;
   }>;
 };
 
 export default async function PaymentPage({ params, searchParams }: PaymentPageProps) {
   const { slug } = await params;
-  const { enrollmentRef, nome, cpf } = await searchParams;
+  const { enrollmentRef, nome, cpf, e2eMockCheckout } = await searchParams;
 
   const course = await getPublicCourseBySlug(slug);
 
@@ -36,6 +37,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
               courseSlug={slug}
               enrollmentRef={enrollmentRef}
               customer={{ name: nome ?? "", cpfCnpj: cpf ?? "" }}
+              mockMode={process.env.NODE_ENV !== "production" && e2eMockCheckout === "1"}
             />
           </div>
         </Container>

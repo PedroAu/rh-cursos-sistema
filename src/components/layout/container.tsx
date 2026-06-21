@@ -17,13 +17,17 @@ const variantMaxWidth: Record<ContainerVariant, string> = {
 type ContainerProps = {
   variant?: ContainerVariant;
   as?: ElementType;
+  // `padded` controla o gutter horizontal (px-6). Default true para páginas que
+  // não têm layout provendo padding (marketing). Admin usa false porque o
+  // <main> do AdminShell já aplica p-4 md:p-6 xl:p-8.
+  padded?: boolean;
   className?: string;
   children: ReactNode;
 };
 
-export function Container({ variant = "page", as: Tag = "div", className, children }: ContainerProps) {
+export function Container({ variant = "page", as: Tag = "div", padded = true, className, children }: ContainerProps) {
   return (
-    <Tag className={cn("mx-auto w-full px-6", variantMaxWidth[variant], className)}>
+    <Tag className={cn("mx-auto w-full", padded && "px-6", variantMaxWidth[variant], className)}>
       {children}
     </Tag>
   );

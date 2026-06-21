@@ -1,11 +1,14 @@
 import { PublicFooter } from "@/components/layout/public-footer";
 import { PublicHeader } from "@/components/layout/public-header";
+import { readAdminSettings } from "@/lib/admin-settings";
 
-export default function MarketingLayout({
+export default async function MarketingLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await readAdminSettings();
+
   return (
     <div className="min-h-screen bg-white text-foreground">
       <a
@@ -14,7 +17,10 @@ export default function MarketingLayout({
       >
         Pular para o conteúdo
       </a>
-      <PublicHeader />
+      <PublicHeader
+        mainLogoUrl={settings.mainLogoUrl}
+        operationName={settings.operationName}
+      />
       <main id="main-content">{children}</main>
       <PublicFooter />
     </div>

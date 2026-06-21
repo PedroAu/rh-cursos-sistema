@@ -94,7 +94,7 @@ export default function AboutPage() {
         <div className="mx-auto grid w-full max-w-page gap-4 px-6 md:grid-cols-3 xl:gap-6">
           <Card className="h-full">
             <CardContent className="space-y-5 p-6 xl:p-8">
-              <span className="inline-flex size-[52px] items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy-700">
+              <span className="inline-flex size-13 items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy-700">
                 <IconTargetArrow size={26} />
               </span>
               <h2 className="font-heading text-2xl font-bold text-brand-navy-700">Missão</h2>
@@ -108,7 +108,7 @@ export default function AboutPage() {
           <Card className="min-h-96 h-full bg-brand-navy-900 text-white">
             <CardContent className="flex h-full flex-col justify-between gap-8 p-6 xl:p-8">
               <div className="space-y-5">
-                <span className="inline-flex size-[52px] items-center justify-center rounded-lg bg-brand-gold text-brand-navy-900">
+                <span className="inline-flex size-13 items-center justify-center rounded-lg bg-brand-gold text-brand-navy-900">
                   <IconChartBar size={26} />
                 </span>
                 <h2 className="font-heading text-2xl font-bold text-brand-gold-200">Visão</h2>
@@ -127,7 +127,7 @@ export default function AboutPage() {
           <div className="flex h-full flex-col gap-6">
             <Card className="flex-1">
               <CardContent className="space-y-5 p-6 xl:p-8">
-                <span className="inline-flex size-[52px] items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy-700">
+                <span className="inline-flex size-13 items-center justify-center rounded-lg bg-brand-navy-50 text-brand-navy-700">
                   <IconShieldCheck size={26} />
                 </span>
                 <h2 className="font-heading text-2xl font-bold text-brand-navy-700">Valores</h2>
@@ -158,7 +158,7 @@ export default function AboutPage() {
             />
             <Card className="min-h-64 bg-[radial-gradient(circle_at_top_right,rgba(212,160,23,0.22),transparent_26%),linear-gradient(135deg,#ffffff_0%,var(--background)_100%)]">
               <CardContent className="space-y-5 p-6 xl:p-8">
-                <span className="inline-flex size-[52px] items-center justify-center rounded-full bg-brand-navy-50 text-brand-navy-700">
+                <span className="inline-flex size-13 items-center justify-center rounded-full bg-brand-navy-50 text-brand-navy-700">
                   <IconBuildingBank size={26} />
                 </span>
                 <p className="text-lg font-extrabold leading-7 text-brand-navy-700">
@@ -200,7 +200,7 @@ export default function AboutPage() {
             {leaders.map((leader) => (
               <Card className="h-full" key={leader.name}>
                 <CardContent className="space-y-5 p-6 xl:p-8">
-                  <div className="inline-flex size-[88px] items-center justify-center rounded-full bg-brand-navy-50 font-heading text-xl font-extrabold text-brand-navy-700">
+                  <div className="inline-flex size-avatar-xl items-center justify-center rounded-full bg-brand-navy-50 font-heading text-xl font-extrabold text-brand-navy-700">
                     {leader.initials}
                   </div>
                   <div>

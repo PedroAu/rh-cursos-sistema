@@ -3,6 +3,8 @@ import { ArrowUpRight, BadgeCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { cn } from "@/lib/utils";
 
 type PageHeroPanelItem = {
@@ -43,8 +45,8 @@ export function PageHero({
   const resolvedPanelItems = panelItems ?? fallbackPanelItems;
 
   return (
-    <section className="overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(212,160,23,0.26),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_22%),linear-gradient(135deg,#0A2E45_0%,#0F4363_45%,#1D6B8D_100%)] text-white">
-      <div className="mx-auto w-full max-w-page px-6 py-16 md:py-24 xl:py-32">
+    <Section className="overflow-hidden bg-[radial-gradient(circle_at_top_right,rgba(212,160,23,0.26),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_22%),linear-gradient(135deg,#0A2E45_0%,#0F4363_45%,#1D6B8D_100%)] text-white" size="lg">
+      <Container>
         <div
           className={cn(
             "grid items-center gap-8 xl:gap-14",
@@ -132,7 +134,7 @@ export function PageHero({
             </Card>
           ) : null}
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

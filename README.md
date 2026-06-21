@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RH Cursos
 
-## Getting Started
+Aplicacao Next.js App Router para o site publico e backoffice administrativo da RH Cursos.
 
-First, run the development server:
+## O que este app faz
+
+- Site publico de marketing, catalogo de cursos, agenda, inscricao e contato.
+- Backoffice admin para cursos, turmas, leads, alunos, professores, usuarios e configuracoes.
+- Supabase para Auth, Postgres, RLS, storage administrativo e operacoes server-side com service role.
+- Asaas para criacao de cobrancas Pix/Boleto e reconciliacao por webhook.
+- Deploy em Cloudflare Workers via OpenNext.
+
+## Stack principal
+
+- Next.js 16 App Router e React 19.
+- Tailwind CSS 4 com tokens em `src/app/globals.css`.
+- Supabase SSR/admin clients em `src/lib/supabase`.
+- Asaas REST v3 em `src/lib/asaas`.
+- OpenNext Cloudflare com `wrangler.jsonc`.
+
+## Desenvolvimento local
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Comandos de verificacao:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build:cloudflare
+```
 
-## Learn More
+`npm run build` executa o build Next.js puro. Ele e util para validar compilacao do app, mas nao e o artefato de producao no Cloudflare. Para validar o build de producao deste projeto, use `npm run build:cloudflare` ou `npm run deploy:check`.
 
-To learn more about Next.js, take a look at the following resources:
+## Variaveis de ambiente
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Use `.env.example` como base. Variaveis principais:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ASAAS_BASE_URL`
+- `ASAAS_API_KEY`
+- `ASAAS_USER_AGENT`
+- `ASAAS_WEBHOOK_AUTH_TOKEN`
 
-## Deploy on Vercel
+Arquivos `.env*` locais nao devem ser versionados.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Deploy
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+O deploy de producao e Cloudflare Workers com OpenNext. Nao use Vercel como alvo padrao, `next export`, nem Cloudflare Pages estatico: o app depende de Server Actions, rotas dinamicas, cookies de auth e integracoes server-side.
+
+Fluxo recomendado:
+
+```bash
+npm ci
+npm run deploy:check
+npm run preview:cloudflare
+```
+
+Leia [docs/deploy.md](docs/deploy.md) para checklist de producao, variaveis de ambiente e comandos Cloudflare.
+
+## Documentacao relevante
+
+- [Arquitetura brownfield](docs/architecture/system-architecture.md)
+- [Deploy Cloudflare/OpenNext](docs/deploy.md)
+- [Auditoria do design system](docs/design-system-audit.md)
+- [Design system proposto](docs/design-system.md)

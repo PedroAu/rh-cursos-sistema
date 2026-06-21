@@ -48,12 +48,74 @@ type SwitchFieldProps = {
   defaultChecked?: boolean;
 };
 
+type AssetFieldProps = {
+  label: string;
+  fileName: string;
+  name: string;
+  defaultValue: string;
+  accept: string;
+  helper: string;
+  previewLabel: string;
+  previewSize: "logo" | "favicon";
+};
+
 function Field({ label, name, defaultValue, type = "text", helper }: FieldProps) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={name}>{label}</Label>
       <Input defaultValue={defaultValue} id={name} name={name} type={type} />
       {helper ? <p className="text-sm leading-6 text-muted-foreground">{helper}</p> : null}
+    </div>
+  );
+}
+
+function AssetField({
+  label,
+  fileName,
+  name,
+  defaultValue,
+  accept,
+  helper,
+  previewLabel,
+  previewSize,
+}: AssetFieldProps) {
+  const previewClassName =
+    previewSize === "logo"
+      ? "h-20 w-40 rounded-md"
+      : "size-16 rounded-lg";
+
+  return (
+    <div className="rounded-lg border border-border bg-muted/40 p-5">
+      <div className="mb-4 flex min-h-24 items-center justify-center rounded-md bg-background p-4">
+        {defaultValue ? (
+          <span
+            aria-label={previewLabel}
+            className={`${previewClassName} block bg-contain bg-center bg-no-repeat`}
+            role="img"
+            style={{ backgroundImage: `url(${defaultValue})` }}
+          />
+        ) : (
+          <span className="flex size-16 items-center justify-center rounded-md bg-primary font-heading text-lg font-extrabold text-primary-foreground">
+            RH
+          </span>
+        )}
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor={fileName}>{label}</Label>
+        <Input id={fileName} name={fileName} type="file" accept={accept} />
+        <Input
+          aria-label={`${label} atual`}
+          defaultValue={defaultValue}
+          name={name}
+          type="hidden"
+        />
+        <p className="text-sm leading-6 text-muted-foreground">{helper}</p>
+        {defaultValue ? (
+          <p className="break-all text-xs leading-5 text-muted-foreground">
+            Arquivo atual: {defaultValue}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -154,28 +216,32 @@ export function AdminSettingsForm({ settings }: AdminSettingsFormProps) {
                       <div>
                         <CardTitle>Logotipo e Favicon</CardTitle>
                         <CardDescription>
-                          Área preparada para evolução futura de upload de marca.
+                          Atualize os assets principais exibidos no site e no navegador.
                         </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-lg border border-border bg-muted/40 p-5 text-center">
-                      <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-md bg-primary font-heading text-lg font-extrabold text-primary-foreground">
-                        RH
-                      </div>
-                      <Button type="button" variant="secondary">
-                        Alterar Logo Principal
-                      </Button>
-                    </div>
-                    <div className="rounded-lg border border-border bg-muted/40 p-5 text-center">
-                      <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-md bg-primary font-heading font-extrabold text-primary-foreground">
-                        RH
-                      </div>
-                      <Button type="button" variant="secondary">
-                        Alterar Favicon
-                      </Button>
-                    </div>
+                    <AssetField
+                      accept="image/svg+xml,image/png,image/jpeg,image/webp"
+                      defaultValue={settings.mainLogoUrl}
+                      fileName="mainLogoFile"
+                      helper="Tamanho recomendado: SVG ou PNG horizontal com 320 x 96 px, fundo transparente e até 250 KB."
+                      label="Alterar logo principal"
+                      name="mainLogoUrl"
+                      previewLabel="Prévia do logo principal"
+                      previewSize="logo"
+                    />
+                    <AssetField
+                      accept="image/x-icon,image/vnd.microsoft.icon,image/png,image/svg+xml"
+                      defaultValue={settings.faviconUrl}
+                      fileName="faviconFile"
+                      helper="Tamanho recomendado: ICO, PNG ou SVG quadrado com 32 x 32 px ou 48 x 48 px."
+                      label="Alterar favicon"
+                      name="faviconUrl"
+                      previewLabel="Prévia do favicon"
+                      previewSize="favicon"
+                    />
                   </CardContent>
                 </Card>
               </div>

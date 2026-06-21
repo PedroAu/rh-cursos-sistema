@@ -9,6 +9,7 @@ import {
 } from "@/lib/asaas/client";
 import { toAmountCents, toAsaasValue } from "@/lib/asaas/money";
 import type { AsaasBillingType } from "@/lib/asaas/types";
+import { resolveCourseForPayment, type CourseForPayment } from "@/lib/payments/course-identity";
 
 export type CreatePixOrBoletoChargeInput = {
   // FLAG-A: the live checkout flow only carries a course slug / legacy text
@@ -38,65 +39,12 @@ export type CreatePixOrBoletoChargeResult =
       boleto?: { url: string | null; linhaDigitavel: string };
     };
 
-type CourseRow = {
-  id: string;
-  preco: number;
-};
-
 const DUE_DATE_DAYS_AHEAD = 3;
 
 function buildDueDate() {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + DUE_DATE_DAYS_AHEAD);
   return date.toISOString().slice(0, 10);
-}
-
-/**
- * FLAG-A: resolves the live checkout course identity (slug, or a legacy
- * text id) to a real `courses.id` uuid + `courses.preco`. The live public
- * flow (`src/lib/public-data.ts`, `src/app/actions/public.ts`) reads the
- * legacy `curso`/`turma` tables and never the uuid `courses` table that
- * `payments.course_id` requires. We therefore NEVER trust a client-supplied
- * id as the uuid — we always look it up by slug. If no slug is given, or no
- * matching `courses` row exists, we fail loudly rather than invent a price.
- */
-async function resolveCourseForCharge(
-  supabase: ReturnType<typeof createAdminClient>,
-  input: { courseId?: string; courseSlug?: string },
-): Promise<CourseRow> {
-  if (input.courseSlug) {
-    const result = await supabase
-      .from("courses")
-      .select("id,preco")
-      .eq("slug", input.courseSlug)
-      .maybeSingle<CourseRow>();
-
-    if (result.error || !result.data) {
-      throw new Error(
-        `Não foi possível resolver o curso "${input.courseSlug}" para cobrança: nenhuma linha correspondente em courses.`,
-      );
-    }
-
-    return result.data;
-  }
-
-  // If callers pass a raw id, only accept it when it is ALSO a real
-  // courses.id uuid (never assume a legacy curso.id text value is usable).
-  if (input.courseId) {
-    const result = await supabase
-      .from("courses")
-      .select("id,preco")
-      .eq("id", input.courseId)
-      .maybeSingle<CourseRow>();
-
-    if (!result.error && result.data) {
-      return result.data;
-    }
-  }
-
-  throw new Error(
-    "Não foi possível identificar o curso para cobrança: forneça um courseSlug válido (FLAG-A).",
-  );
 }
 
 async function ensureAsaasCustomer(input: {
@@ -117,9 +65,9 @@ export async function createPixOrBoletoCharge(
 
   const supabase = createAdminClient();
 
-  let course: CourseRow;
+  let course: CourseForPayment;
   try {
-    course = await resolveCourseForCharge(supabase, {
+    course = await resolveCourseForPayment(supabase, {
       courseId: input.courseId,
       courseSlug: input.courseSlug,
     });

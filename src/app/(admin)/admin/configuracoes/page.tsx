@@ -1,12 +1,13 @@
 import { AdminPageIntro } from "@/components/admin/admin-page-intro";
 import { AdminSettingsForm } from "@/components/forms/admin-settings-form";
 import { readAdminSettings } from "@/lib/admin-settings";
+import { Container } from "@/components/layout/container";
 
 export default async function AdminSettingsPage() {
   const settings = await readAdminSettings();
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="CONFIGURAÇÕES"
@@ -15,6 +16,6 @@ export default async function AdminSettingsPage() {
         />
         <AdminSettingsForm settings={settings} />
       </div>
-    </div>
+    </Container>
   );
 }

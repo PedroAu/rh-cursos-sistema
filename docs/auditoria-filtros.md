@@ -41,7 +41,7 @@ Status em 2026-06-17: correções aplicadas no código, mantendo Tailwind + shad
 | Cursos: status/modalidade separados | Implementado | Filtros de status do curso, status da turma, modalidade do curso, modalidade da turma e categoria em `/admin/cursos`. |
 | Professores: área e alocação | Implementado | Filtros adicionados em `/admin/professores` e aplicados em `src/lib/admin-data.ts`. |
 | Alunos: acesso e cadastro incompleto | Implementado | Filtros adicionados em `/admin/alunos` e aplicados em `src/lib/admin-data.ts`. |
-| Schema legado versionado | Parcial | Não foi criada migration porque o schema real do Supabase não está disponível localmente. O código agora centraliza o cruzamento por queries reais; a ação segura pendente é gerar types/snapshot direto do Supabase conectado. |
+| Schema legado versionado | Implementado | Migration idempotente adicionada em `supabase/migrations/20260619023000_production_legacy_base.sql` com `curso`, `turma`, `instrutor`, `lead`, `aluno`, índices, triggers `updated_at` e RLS. |
 
 Validação final:
 
@@ -54,10 +54,10 @@ Validação final:
 | Fonte | Evidência | Observação |
 |---|---|---|
 | Schema inicial | `supabase/migrations/20260612202319_init_schema.sql:20`, `:64`, `:77`, `:97`, `:111`, `:129` | Define `profiles`, `instructors`, `courses`, `turmas`, `enrollments`, `leads`, `settings`. |
-| Schema legado versionado | `supabase/migrations/20260613030000_legacy_support_tables.sql:1`, `:7` | Só adiciona `admin_settings` e `course_enrollments`; não cria `curso`, `turma`, `instrutor`, `lead`, `aluno`. |
+| Schema legado versionado | `supabase/migrations/20260619023000_production_legacy_base.sql:13`, `:30`, `:54`, `:78`, `:105` | Cria a base operacional legada usada pelo app: `instrutor`, `curso`, `turma`, `lead` e `aluno`. |
 | Queries operacionais | `src/lib/admin-data.ts:221`, `:309`, `:359`, `:489`, `:535`; `src/lib/public-data.ts:172`, `:180`, `:187` | O app usa tabelas legadas com colunas específicas. Como o schema completo dessas tabelas não está versionado, o cruzamento foi feito pelas queries reais do app. |
 
-Achado ALTA: o versionamento Supabase não contém o schema completo das tabelas legadas efetivamente filtradas (`curso`, `turma`, `instrutor`, `lead`, `aluno`). Isso impede uma validação 100% confiável de coluna existente apenas por migrations locais. Proposta: versionar uma migration declarativa ou snapshot de schema dessas tabelas antes de evoluir filtros por coluna.
+Achado ALTA resolvido: o versionamento Supabase agora contém uma migration declarativa para as tabelas legadas efetivamente filtradas (`curso`, `turma`, `instrutor`, `lead`, `aluno`). A aplicação local da migration ainda depende de Docker/Supabase local disponível para validação em banco.
 
 ## Inventário Completo
 
@@ -117,7 +117,7 @@ Achado ALTA: o versionamento Supabase não contém o schema completo das tabelas
 | Barra | Eixo | Achado | Evidência | Proposta |
 |---|---|---|---|---|
 | Admin global | CAMPOS / UX | Campo “Buscar aluno ou curso” aparece no header mas não tem `name`, estado, handler, submit, rota ou integração com listas. É um filtro inoperante por teclado e mouse. | `src/components/layout/admin-shell.tsx:78` a `:84` | Remover até existir busca global real ou implementar busca global com rota `/admin/search?query=...`, submit acessível e resultados. |
-| Todas as barras que filtram tabelas legadas | CAMPOS | Schema versionado não contém criação completa de `curso`, `turma`, `instrutor`, `lead`, `aluno`, embora os filtros dependam dessas colunas. | `supabase/migrations/20260613030000_legacy_support_tables.sql:1`; uso em `src/lib/admin-data.ts:221`, `:359`, `:489`, `:535` | Criar snapshot/migration de schema legado ou types gerados do Supabase para validar filtros contra colunas reais antes de ampliar filtros. |
+| Todas as barras que filtram tabelas legadas | CAMPOS | Resolvido: schema versionado contém `curso`, `turma`, `instrutor`, `lead`, `aluno` com as colunas usadas pelos filtros. | `supabase/migrations/20260619023000_production_legacy_base.sql:13`; uso em `src/lib/admin-data.ts:249`, `:341`, `:398`, `:487`, `:534` | Aplicar a migration no Supabase de produção e gerar types/snapshot conectado quando o projeto remoto estiver disponível. |
 
 ### MÉDIA
 
@@ -235,7 +235,7 @@ Criar `FilterBar` com este contrato:
 ## Ordem Sugerida de Correção
 
 1. Corrigir/remover busca global inoperante do admin (`AdminShell`).
-2. Versionar ou gerar snapshot/types do schema real Supabase legado para validar filtros com segurança.
+2. Aplicar a migration `20260619023000_production_legacy_base.sql` no Supabase de produção e gerar types/snapshot conectado para travar o contrato real.
 3. Evoluir `AdminListFilters` para `FilterBar` com chips ativos, limpar individual, `useId()` e suporte a `dateRange`/selects adicionais.
 4. Resolver duplicidade entre busca server-side e busca local do `AdminDataTable`, renomeando a busca local para “Refinar lista visível” ou tornando-a opcional por página.
 5. Ajustar filtros de Turmas: curso, professor, modalidade, status, período/mês.

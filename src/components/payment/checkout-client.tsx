@@ -13,13 +13,14 @@ export type CheckoutClientProps = {
   courseSlug: string;
   enrollmentRef?: string;
   customer: { name: string; cpfCnpj: string };
+  mockMode?: boolean;
 };
 
 type ChargeArtifacts =
   | { billingType: "PIX"; pix: { qrImage: string; payload: string } }
   | { billingType: "BOLETO"; boleto: { url: string | null; linhaDigitavel: string } };
 
-export function CheckoutClient({ courseSlug, enrollmentRef, customer }: CheckoutClientProps) {
+export function CheckoutClient({ courseSlug, enrollmentRef, customer, mockMode = false }: CheckoutClientProps) {
   const [method, setMethod] = useState<"pix" | "boleto">("pix");
   const [artifacts, setArtifacts] = useState<ChargeArtifacts | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,27 @@ export function CheckoutClient({ courseSlug, enrollmentRef, customer }: Checkout
     setArtifacts(null);
 
     startTransition(async () => {
+      if (mockMode) {
+        setArtifacts(
+          value === "pix"
+            ? {
+                billingType: "PIX",
+                pix: {
+                  qrImage: "",
+                  payload: "00020126580014BR.GOV.BCB.PIX0136rh-cursos-e2e-mock",
+                },
+              }
+            : {
+                billingType: "BOLETO",
+                boleto: {
+                  url: "https://example.com/boleto-e2e.pdf",
+                  linhaDigitavel: "34191.79001 01043.510047 91020.150008 1 00000000000000",
+                },
+              },
+        );
+        return;
+      }
+
       const result = await createPixOrBoletoCharge(
         {
           courseSlug,

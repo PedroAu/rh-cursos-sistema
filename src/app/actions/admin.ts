@@ -10,6 +10,8 @@ export type AdminFormState = {
 };
 
 const userRoles = new Set(["admin", "professor", "aluno"]);
+const ADMIN_ASSETS_BUCKET = "admin-assets";
+const MAX_BRAND_ASSET_BYTES = 250 * 1024;
 const userStatuses = new Set(["ativo", "pendente", "inativo"]);
 const studentTypes = new Set(["PF", "PJ"]);
 
@@ -993,12 +995,18 @@ export async function saveAdminSettingsAction(
 ): Promise<AdminFormState> {
   const operationName = formData.get("operationName");
   const commercialEmail = formData.get("commercialEmail");
+  const mainLogoUrl = formData.get("mainLogoUrl");
+  const faviconUrl = formData.get("faviconUrl");
+  const mainLogoFile = getOptionalFile(formData.get("mainLogoFile"));
+  const faviconFile = getOptionalFile(formData.get("faviconFile"));
   const dataSource = formData.get("dataSource");
   const priorityChannel = formData.get("priorityChannel");
 
   if (
     typeof operationName !== "string" ||
     typeof commercialEmail !== "string" ||
+    typeof mainLogoUrl !== "string" ||
+    typeof faviconUrl !== "string" ||
     typeof dataSource !== "string" ||
     typeof priorityChannel !== "string" ||
     operationName.length === 0 ||
@@ -1010,22 +1018,216 @@ export async function saveAdminSettingsAction(
     };
   }
 
-  const current = await readAdminSettings();
+  const normalizedMainLogoUrl = normalizeAssetUrl(mainLogoUrl);
+  const normalizedFaviconUrl = normalizeAssetUrl(faviconUrl);
 
-  await writeAdminSettings({
-    ...current,
-    operationName,
-    commercialEmail,
-    notifyEnrollments: formData.get("notifyEnrollments") === "on",
-    notifyLeads: formData.get("notifyLeads") === "on",
-    dataSource,
-    priorityChannel,
+  if (!isValidAssetUrl(normalizedMainLogoUrl, ["svg", "png", "jpg", "jpeg", "webp"])) {
+    return {
+      error: "Informe uma URL válida para o logo principal em SVG, PNG, JPG ou WebP.",
+      success: null,
+    };
+  }
+
+  if (!isValidAssetUrl(normalizedFaviconUrl, ["ico", "png", "svg"])) {
+    return {
+      error: "Informe uma URL válida para o favicon em ICO, PNG ou SVG.",
+      success: null,
+    };
+  }
+
+  const logoValidation = validateAssetFile(mainLogoFile, {
+    label: "logo principal",
+    allowedExtensions: ["svg", "png", "jpg", "jpeg", "webp"],
+    allowedTypes: ["image/svg+xml", "image/png", "image/jpeg", "image/webp"],
   });
 
+  if (logoValidation) {
+    return {
+      error: logoValidation,
+      success: null,
+    };
+  }
+
+  const faviconValidation = validateAssetFile(faviconFile, {
+    label: "favicon",
+    allowedExtensions: ["ico", "png", "svg"],
+    allowedTypes: ["image/x-icon", "image/vnd.microsoft.icon", "image/png", "image/svg+xml"],
+  });
+
+  if (faviconValidation) {
+    return {
+      error: faviconValidation,
+      success: null,
+    };
+  }
+
+  try {
+    const current = await readAdminSettings();
+    const supabase = mainLogoFile || faviconFile ? createAdminClient() : null;
+    const uploadedMainLogoUrl = mainLogoFile
+      ? await uploadAdminAsset(supabase, mainLogoFile, "logo")
+      : normalizedMainLogoUrl;
+    const uploadedFaviconUrl = faviconFile
+      ? await uploadAdminAsset(supabase, faviconFile, "favicon")
+      : normalizedFaviconUrl;
+
+    await writeAdminSettings({
+      ...current,
+      operationName,
+      commercialEmail,
+      mainLogoUrl: uploadedMainLogoUrl,
+      faviconUrl: uploadedFaviconUrl,
+      notifyEnrollments: formData.get("notifyEnrollments") === "on",
+      notifyLeads: formData.get("notifyLeads") === "on",
+      dataSource,
+      priorityChannel,
+    });
+  } catch (error) {
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar as configurações.",
+      success: null,
+    };
+  }
+
   revalidatePath("/admin/configuracoes");
+  revalidatePath("/", "layout");
 
   return {
     error: null,
     success: "Configurações salvas com sucesso.",
   };
+}
+
+function normalizeAssetUrl(value: string) {
+  return value.trim();
+}
+
+function isValidAssetUrl(value: string, allowedExtensions: string[]) {
+  if (value.length === 0) {
+    return true;
+  }
+
+  const path = value.startsWith("/") ? value : parseAbsoluteUrlPath(value);
+
+  if (!path || path.includes(" ")) {
+    return false;
+  }
+
+  const extension = path.split(".").pop()?.toLowerCase();
+
+  return extension ? allowedExtensions.includes(extension) : false;
+}
+
+function parseAbsoluteUrlPath(value: string) {
+  try {
+    const url = new URL(value);
+
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return null;
+    }
+
+    return url.pathname;
+  } catch {
+    return null;
+  }
+}
+
+function getOptionalFile(value: FormDataEntryValue | null) {
+  if (!(value instanceof File) || value.size === 0 || value.name.length === 0) {
+    return null;
+  }
+
+  return value;
+}
+
+function validateAssetFile(
+  file: File | null,
+  options: {
+    label: string;
+    allowedExtensions: string[];
+    allowedTypes: string[];
+  },
+) {
+  if (!file) {
+    return null;
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+
+  if (!extension || !options.allowedExtensions.includes(extension)) {
+    return `Envie um arquivo válido para o ${options.label}.`;
+  }
+
+  if (file.type && !options.allowedTypes.includes(file.type)) {
+    return `Envie um arquivo válido para o ${options.label}.`;
+  }
+
+  if (file.size > MAX_BRAND_ASSET_BYTES) {
+    return `O arquivo do ${options.label} deve ter no máximo 250 KB.`;
+  }
+
+  return null;
+}
+
+async function uploadAdminAsset(
+  supabase: ReturnType<typeof createAdminClient> | null,
+  file: File,
+  kind: "logo" | "favicon",
+) {
+  if (!supabase) {
+    throw new Error("Supabase admin client is required for uploads.");
+  }
+
+  await ensureAdminAssetsBucket(supabase);
+
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "bin";
+  const filePath = `${kind}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  const uploadResult = await supabase.storage
+    .from(ADMIN_ASSETS_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: "31536000",
+      contentType: file.type || undefined,
+      upsert: true,
+    });
+
+  if (uploadResult.error) {
+    throw new Error(`Não foi possível enviar o arquivo de ${kind}.`);
+  }
+
+  const publicUrlResult = supabase.storage
+    .from(ADMIN_ASSETS_BUCKET)
+    .getPublicUrl(uploadResult.data.path);
+
+  return publicUrlResult.data.publicUrl;
+}
+
+async function ensureAdminAssetsBucket(supabase: ReturnType<typeof createAdminClient>) {
+  const bucketResult = await supabase.storage.getBucket(ADMIN_ASSETS_BUCKET);
+
+  if (!bucketResult.error) {
+    return;
+  }
+
+  const createResult = await supabase.storage.createBucket(ADMIN_ASSETS_BUCKET, {
+    public: true,
+    fileSizeLimit: MAX_BRAND_ASSET_BYTES,
+    allowedMimeTypes: [
+      "image/svg+xml",
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "image/x-icon",
+      "image/vnd.microsoft.icon",
+    ],
+  });
+
+  if (
+    createResult.error &&
+    !createResult.error.message.toLowerCase().includes("already exists")
+  ) {
+    throw new Error("Não foi possível preparar o armazenamento de imagens.");
+  }
 }

@@ -1,4 +1,6 @@
 import { AgendaBrowser } from "@/components/shared/agenda-browser";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { PageHero } from "@/components/shared/page-hero";
 import { getAgendaItems } from "@/lib/public-data";
 
@@ -38,18 +40,20 @@ export default async function AgendaPage({ searchParams }: AgendaPageProps = {})
         showPanel={false}
       />
 
-      <section className="mx-auto w-full max-w-page px-6 py-16 md:py-24 xl:py-32">
-        <AgendaBrowser
-          key={`${getFirstParam(resolvedSearchParams.busca) ?? ""}:${initialStatus}:${initialFormat}:${initialLocation}:${initialMonth}:${initialView}`}
-          items={items}
-          initialFormat={initialFormat}
-          initialLocation={initialLocation}
-          initialMonth={initialMonth}
-          initialSearch={getFirstParam(resolvedSearchParams.busca)?.trim() ?? ""}
-          initialStatus={initialStatus}
-          initialView={initialView}
-        />
-      </section>
+      <Section size="lg">
+        <Container>
+          <AgendaBrowser
+            key={`${getFirstParam(resolvedSearchParams.busca) ?? ""}:${initialStatus}:${initialFormat}:${initialLocation}:${initialMonth}:${initialView}`}
+            items={items}
+            initialFormat={initialFormat}
+            initialLocation={initialLocation}
+            initialMonth={initialMonth}
+            initialSearch={getFirstParam(resolvedSearchParams.busca)?.trim() ?? ""}
+            initialStatus={initialStatus}
+            initialView={initialView}
+          />
+        </Container>
+      </Section>
     </>
   );
 }

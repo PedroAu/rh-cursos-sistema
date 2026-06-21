@@ -33,7 +33,7 @@ export function PixPanel({ qrImage, payload }: PixPanelProps) {
       <img
         src={`data:image/png;base64,${qrImage}`}
         alt="QR Code Pix para pagamento"
-        className="size-[220px] rounded-md border bg-white object-contain p-3"
+        className="size-avatar-2xl rounded-md border bg-white object-contain p-3"
       />
       <div className="w-full space-y-2">
         <Label htmlFor="pix-payload">Código copia e cola</Label>

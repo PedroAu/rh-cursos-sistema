@@ -6,6 +6,7 @@ import { AdminMetricCard } from "@/components/admin/admin-metric-card";
 import { AdminPageIntro } from "@/components/admin/admin-page-intro";
 import { getAdminInstructors, getArchivedAdminEntities } from "@/lib/admin-data";
 import { getSingleSearchParam } from "@/lib/pagination";
+import { Container } from "@/components/layout/container";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -32,7 +33,7 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
   const areaOptions = Array.from(new Set(allRows.flatMap((row) => row.areas))).sort();
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="PROFESSORES"
@@ -80,6 +81,6 @@ export default async function AdminTeachersPage({ searchParams }: PageProps) {
         />
         <AdminArchivedList rows={archivedRows} />
       </div>
-    </div>
+    </Container>
   );
 }

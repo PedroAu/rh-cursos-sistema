@@ -12,6 +12,14 @@ npm run preview:cloudflare
 
 `npm run deploy:check` executa lint, typecheck, testes unitarios e build de producao para Cloudflare Workers.
 
+## Guardrails de build
+
+- `npm run build` executa apenas `next build`. Use para diagnostico/framework, nao como artefato de producao deste projeto.
+- `npm run build:cloudflare` executa `opennextjs-cloudflare build` e gera `.open-next/worker.js`, que e o artefato usado pelo Worker.
+- `npm run deploy:check` e o comando recomendado antes de qualquer deploy, porque encadeia lint, typecheck, testes unitarios e build Cloudflare.
+- `npm run deploy:cloudflare` publica via OpenNext Cloudflare. Operacoes remotas devem ser feitas pelo agente/responsavel de DevOps.
+- Nao use `next export`, Cloudflare Pages estatico ou Vercel como caminho de producao padrao para este app.
+
 ## Variaveis de ambiente
 
 Configure as variaveis abaixo no provedor de deploy. Use `.env.example` como base e nao versione arquivos `.env*`.

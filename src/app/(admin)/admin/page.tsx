@@ -28,6 +28,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getAdminDashboardSnapshot } from "@/lib/admin-data";
+import { Container } from "@/components/layout/container";
 
 export default async function AdminDashboardPage() {
   const profile = await requireAdmin();
@@ -58,7 +59,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-admin">
+    <Container variant="admin" padded={false}>
       <div className="space-y-8">
         <AdminPageIntro
           badge="SESSAO PROTEGIDA"
@@ -238,6 +239,6 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Container>
   );
 }
