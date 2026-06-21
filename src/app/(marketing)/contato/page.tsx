@@ -1,23 +1,26 @@
 import { IconMapPin, IconPhone } from "@tabler/icons-react";
 import { PublicLeadForm } from "@/components/forms/public-lead-form";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function ContactPage() {
   return (
-    <section className="mx-auto w-full max-w-wide px-6 py-16 md:py-24 xl:py-32">
-      <div className="space-y-8">
-        <div className="max-w-content space-y-4">
-          <h1 className="font-heading text-4xl font-bold leading-tight text-brand-navy-700 md:text-5xl">
-            Entre em Contato
-          </h1>
-          <p className="text-lg leading-8 text-muted-foreground">
-            Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública.
-            Fale conosco através do formulário ou nossos canais diretos.
-          </p>
-        </div>
+    <Section size="lg">
+      <Container variant="wide">
+        <div className="space-y-8">
+          <div className="max-w-content space-y-4">
+            <h1 className="font-heading text-4xl font-bold leading-tight text-brand-navy-700 md:text-5xl">
+              Entre em Contato
+            </h1>
+            <p className="text-lg leading-8 text-muted-foreground">
+              Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública.
+              Fale conosco através do formulário ou nossos canais diretos.
+            </p>
+          </div>
 
-        <div className="grid items-stretch gap-6 xl:gap-8 lg:grid-cols-[0.72fr_1fr]">
-          <div className="flex h-full flex-col gap-6">
+          <div className="grid items-stretch gap-6 xl:gap-8 lg:grid-cols-[0.72fr_1fr]">
+            <div className="flex h-full flex-col gap-6">
               <Card>
                 <CardContent className="flex items-start gap-6 p-6 md:p-8">
                   <span className="inline-flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-navy-50 text-brand-navy-700">
@@ -72,45 +75,46 @@ export default function ContactPage() {
                   </div>
                 </CardContent>
               </Card>
-          </div>
+            </div>
 
-          <div>
-            <Card className="h-full">
-              <CardContent className="space-y-8 p-6 md:p-12">
-                <div className="flex items-center gap-4">
-                  <span className="h-10 w-1 bg-brand-gold" />
-                  <h2 className="font-heading text-3xl font-bold text-brand-navy-700">
-                    Envie uma mensagem
-                  </h2>
-                </div>
+            <div>
+              <Card className="h-full">
+                <CardContent className="space-y-8 p-6 md:p-12">
+                  <div className="flex items-center gap-4">
+                    <span className="h-10 w-1 bg-brand-gold" />
+                    <h2 className="font-heading text-3xl font-bold text-brand-navy-700">
+                      Envie uma mensagem
+                    </h2>
+                  </div>
 
-                <PublicLeadForm
-                  hiddenFields={{
-                    tipo: "Contato",
-                    origem: "Contato site RH Cursos",
-                    path_to_revalidate: "/contato",
-                    tema_interesse: "Contato pelo site",
-                  }}
-                  submitLabel="Enviar Mensagem"
-                  showDescriptions={false}
-                  labels={{
-                    nome: "Nome Completo",
-                    email: "E-mail Corporativo",
-                    telefone: "Telefone / WhatsApp",
-                    mensagem: "Mensagem",
-                  }}
-                  placeholders={{
-                    nome: "Seu nome",
-                    email: "email@empresa.com.br",
-                    telefone: "(00) 00000-0000",
-                    mensagem: "Como podemos ajudar sua organização?",
-                  }}
-                />
-              </CardContent>
-            </Card>
+                  <PublicLeadForm
+                    hiddenFields={{
+                      tipo: "Contato",
+                      origem: "Contato site RH Cursos",
+                      path_to_revalidate: "/contato",
+                      tema_interesse: "Contato pelo site",
+                    }}
+                    submitLabel="Enviar Mensagem"
+                    showDescriptions={false}
+                    labels={{
+                      nome: "Nome Completo",
+                      email: "E-mail Corporativo",
+                      telefone: "Telefone / WhatsApp",
+                      mensagem: "Mensagem",
+                    }}
+                    placeholders={{
+                      nome: "Seu nome",
+                      email: "email@empresa.com.br",
+                      telefone: "(00) 00000-0000",
+                      mensagem: "Como podemos ajudar sua organização?",
+                    }}
+                  />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

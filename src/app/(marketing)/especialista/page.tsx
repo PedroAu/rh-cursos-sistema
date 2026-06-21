@@ -3,6 +3,8 @@ import Link from "next/link";
 
 import { PublicLeadForm } from "@/components/forms/public-lead-form";
 import { PageHero } from "@/components/shared/page-hero";
+import { Container } from "@/components/layout/container";
+import { Section } from "@/components/layout/section";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,8 +40,8 @@ export default function SpecialistPage() {
         ]}
       />
 
-      <section className="py-12 md:py-16 xl:py-24">
-        <div className="mx-auto w-full max-w-page px-6">
+      <Section size="md">
+        <Container>
           <div className="grid items-stretch gap-8 xl:grid-cols-2 xl:gap-12">
             <div>
               <Card className="h-full">
@@ -134,33 +136,35 @@ export default function SpecialistPage() {
               </Card>
             </div>
           </div>
-        </div>
-      </section>
+        </Container>
+      </Section>
 
-      <section className="mx-auto w-full max-w-page px-6 py-12 md:py-16 xl:py-24">
-        <Card className="border-0 bg-brand-navy-700 text-white">
-          <CardContent className="flex flex-col gap-8 p-6 md:p-10 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-content space-y-4">
-              <Badge className="w-fit bg-brand-gold text-brand-navy-900" variant="gold">
-                Próximo passo
-              </Badge>
-              <h2 className="text-balance font-heading text-3xl font-bold leading-tight text-white md:text-4xl">
-                Precisa de uma orientação antes de escolher o curso?
-              </h2>
-              <p className="text-lg leading-8 text-white/80">
-                Envie sua demanda pelo formulário. A equipe da RH Cursos avalia o contexto e
-                direciona o melhor caminho para inscrição, agenda ou proposta personalizada.
-              </p>
-            </div>
-            <Button asChild size="lg" variant="gold">
-              <a href="#formulario">
-                Voltar ao formulário
-                <IconArrowRight size={18} />
-              </a>
-            </Button>
-          </CardContent>
-        </Card>
-      </section>
+      <Section size="md">
+        <Container>
+          <Card className="border-0 bg-brand-navy-700 text-white">
+            <CardContent className="flex flex-col gap-8 p-6 md:p-10 lg:flex-row lg:items-center lg:justify-between">
+              <div className="max-w-content space-y-4">
+                <Badge className="w-fit bg-brand-gold text-brand-navy-900" variant="gold">
+                  Próximo passo
+                </Badge>
+                <h2 className="text-balance font-heading text-3xl font-bold leading-tight text-white md:text-4xl">
+                  Precisa de uma orientação antes de escolher o curso?
+                </h2>
+                <p className="text-lg leading-8 text-white/80">
+                  Envie sua demanda pelo formulário. A equipe da RH Cursos avalia o contexto e
+                  direciona o melhor caminho para inscrição, agenda ou proposta personalizada.
+                </p>
+              </div>
+              <Button asChild size="lg" variant="gold">
+                <a href="#formulario">
+                  Voltar ao formulário
+                  <IconArrowRight size={18} />
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        </Container>
+      </Section>
     </>
   );
 }
