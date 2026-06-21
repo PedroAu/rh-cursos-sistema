@@ -4,6 +4,12 @@
   "name": "site-rh-cursos",
   "compatibility_date": "2026-06-18",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Variáveis públicas do Supabase (expostas ao browser). A service role key
+  // é sensível e fica como secret (wrangler secret put), nunca aqui.
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://hwpsrujkxjhmmwphqdlz.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_OHCSE9S7HlY-lckwL0-2NA_mjGg81C5"
+  },
   "workers_dev": false,
   "preview_urls": false,
   "routes": [
