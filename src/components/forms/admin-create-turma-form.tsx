@@ -6,11 +6,9 @@ import {
   createTurmaAction,
   type AdminFormState,
 } from "@/app/actions/admin";
-import {
-  ShadcnSelectField,
-  ShadcnTextareaField,
-  ShadcnTextField,
-} from "@/components/shadcn/admin/form-field";
+import { TextField } from "@/components/forms/field/text-field";
+import { SelectField } from "@/components/forms/field/select-field";
+import { TextareaField } from "@/components/forms/field/textarea-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import type { AdminSelectOption } from "@/lib/admin-data";
@@ -65,19 +63,19 @@ export function AdminCreateTurmaForm({
           </Alert>
         ) : null}
         <div className="grid gap-4 md:grid-cols-2">
-          <ShadcnSelectField label="Curso" name="curso_id" options={courseOptions} placeholder="Selecione um curso" required />
-          <ShadcnSelectField label="Instrutor" name="instrutor_id" options={instructorOptions} placeholder="Selecione um professor" required />
-          <ShadcnTextField label="Data de início" name="data_inicio" placeholder="2026-08-11" required />
-          <ShadcnTextField label="Data de fim" name="data_fim" placeholder="2026-08-12" />
-          <ShadcnTextField label="Horário" name="horario" placeholder="09:00 às 17:00" required />
-          <ShadcnTextField label="Local" name="local" placeholder="Online ao vivo" required />
-          <ShadcnSelectField defaultValue="Online" label="Modalidade" name="modalidade" options={modalityOptions} />
-          <ShadcnSelectField defaultValue="Aberta" label="Status" name="status" options={statusOptions} />
-          <ShadcnTextField defaultValue={0} label="Vagas totais" min={0} name="vagas_total" type="number" />
-          <ShadcnTextField defaultValue={0} label="Vagas preenchidas" min={0} name="vagas_preenchidas" type="number" />
-          <ShadcnTextField defaultValue={0} label="Preço da turma" min={0} name="preco_turma" type="number" />
+          <SelectField label="Curso" name="curso_id" options={courseOptions} placeholder="Selecione um curso" required />
+          <SelectField label="Instrutor" name="instrutor_id" options={instructorOptions} placeholder="Selecione um professor" required />
+          <TextField label="Data de início" name="data_inicio" placeholder="2026-08-11" required />
+          <TextField label="Data de fim" name="data_fim" placeholder="2026-08-12" />
+          <TextField label="Horário" name="horario" placeholder="09:00 às 17:00" required />
+          <TextField label="Local" name="local" placeholder="Online ao vivo" required />
+          <SelectField defaultValue="Online" label="Modalidade" name="modalidade" options={modalityOptions} />
+          <SelectField defaultValue="Aberta" label="Status" name="status" options={statusOptions} />
+          <TextField defaultValue={0} label="Vagas totais" min={0} name="vagas_total" type="number" />
+          <TextField defaultValue={0} label="Vagas preenchidas" min={0} name="vagas_preenchidas" type="number" />
+          <TextField defaultValue={0} label="Preço da turma" min={0} name="preco_turma" type="number" />
         </div>
-        <ShadcnTextareaField label="Observações" name="observacoes" />
+        <TextareaField label="Observações" name="observacoes" />
         <Button disabled={!canCreate || pending} type="submit" variant="gold">
           {pending ? "Criando turma..." : "Criar turma"}
         </Button>

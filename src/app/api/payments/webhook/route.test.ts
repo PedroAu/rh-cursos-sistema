@@ -246,6 +246,55 @@ describe("POST /api/payments/webhook", () => {
     );
   });
 
+  it("falls back to the legacy RPC signature while the timestamp migration is rolling out", async () => {
+    const timestampMaybeSingle = vi.fn().mockResolvedValue({
+      data: null,
+      error: {
+        code: "PGRST202",
+        message: "Could not find public.apply_payment_webhook_event with p_event_created_at",
+      },
+    });
+    const legacyMaybeSingle = vi.fn().mockResolvedValue({
+      data: { payment_id: "payment-uuid", duplicate: false, applied_status: "CONFIRMED" },
+      error: null,
+    });
+    const supabase = {
+      rpc: vi
+        .fn()
+        .mockReturnValueOnce({ maybeSingle: timestampMaybeSingle })
+        .mockReturnValueOnce({ maybeSingle: legacyMaybeSingle }),
+    };
+    createAdminClient.mockReturnValue(supabase);
+    const { POST } = await import("./route");
+
+    const response = await POST(buildRequest(buildPayload()));
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({
+      ok: true,
+      paymentId: "payment-uuid",
+      status: "CONFIRMED",
+    });
+    expect(supabase.rpc).toHaveBeenNthCalledWith(
+      1,
+      "apply_payment_webhook_event",
+      expect.objectContaining({
+        p_event_created_at: "2026-06-19T18:00:00-03:00",
+      }),
+    );
+    const legacyParams = supabase.rpc.mock.calls[1][1];
+    expect(legacyParams).toEqual(
+      expect.objectContaining({
+        p_asaas_event_id: "evt_123",
+        p_asaas_charge_id: "pay_123",
+        p_event_type: "PAYMENT_CONFIRMED",
+        p_new_status: "CONFIRMED",
+        p_raw_event: buildPayload(),
+      }),
+    );
+    expect(legacyParams).not.toHaveProperty("p_event_created_at");
+  });
+
   it("can process a redelivery after a previous transaction failure", async () => {
     const failingSupabase = buildSupabaseMock({
       rpcError: new Error("transaction failed"),

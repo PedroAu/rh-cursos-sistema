@@ -48,8 +48,19 @@ function buildSupabaseMock(options: {
 }
 
 describe("createPixOrBoletoCharge", () => {
+  const originalSecret = process.env.PAYMENT_STATUS_TOKEN_SECRET;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.PAYMENT_STATUS_TOKEN_SECRET = "test-payment-status-secret";
+  });
+
+  afterEach(() => {
+    if (originalSecret === undefined) {
+      delete process.env.PAYMENT_STATUS_TOKEN_SECRET;
+    } else {
+      process.env.PAYMENT_STATUS_TOKEN_SECRET = originalSecret;
+    }
   });
 
   it("derives the amount from courses.preco and ignores a forged client amount (AC-8)", async () => {
@@ -72,6 +83,9 @@ describe("createPixOrBoletoCharge", () => {
     );
 
     expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.statusToken).toEqual(expect.any(String));
+    }
 
     // Asaas charge must be created with the server-derived reais value, not the forged amount.
     expect(createCharge).toHaveBeenCalledWith(
@@ -128,6 +142,7 @@ describe("createPixOrBoletoCharge", () => {
 
     expect(result.success).toBe(true);
     if (result.success) {
+      expect(result.statusToken).toEqual(expect.any(String));
       expect(result.boleto).toEqual({
         url: "https://sandbox.asaas.com/b/pay_456.pdf",
         linhaDigitavel: "34191.79001 ...",
@@ -155,5 +170,22 @@ describe("createPixOrBoletoCharge", () => {
 
     expect(result.success).toBe(false);
     expect(supabaseMock.insert).not.toHaveBeenCalled();
+  });
+
+  it("fails before external side effects when the status token secret is missing", async () => {
+    delete process.env.PAYMENT_STATUS_TOKEN_SECRET;
+
+    const result = await createPixOrBoletoCharge(
+      { courseSlug: "curso-exemplo", billingType: "PIX" },
+      { name: "Maria", cpfCnpj: "12345678900" },
+    );
+
+    expect(result).toEqual({
+      error: "Configuração de pagamento indisponível.",
+      success: false,
+    });
+    expect(createAdminClient).not.toHaveBeenCalled();
+    expect(createCustomer).not.toHaveBeenCalled();
+    expect(createCharge).not.toHaveBeenCalled();
   });
 });

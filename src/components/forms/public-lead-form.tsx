@@ -6,9 +6,9 @@ import { CheckCircle2 } from "lucide-react";
 import { submitLeadAction, type PublicFormState } from "@/app/actions/public";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button, type ButtonProps } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { TextField } from "@/components/forms/field/text-field";
+import { TextareaField } from "@/components/forms/field/textarea-field";
 import { cn } from "@/lib/utils";
 
 type PublicLeadFormProps = {
@@ -34,70 +34,10 @@ type PublicLeadField =
   | "desafios_principais"
   | "mensagem";
 
-type FieldProps = {
-  label: string;
-  name: string;
-  placeholder?: string;
-  description?: string;
-  autoComplete?: string;
-  required?: boolean;
-  type?: string;
-};
-
-type TextareaFieldProps = Omit<FieldProps, "type">;
-
 const initialState: PublicFormState = {
   error: null,
   success: null,
 };
-
-function Field({
-  label,
-  name,
-  placeholder,
-  description,
-  autoComplete,
-  required,
-  type = "text",
-}: FieldProps) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={name}>
-        {label}
-        {required ? <span className="text-destructive"> *</span> : null}
-      </Label>
-      <Input
-        autoComplete={autoComplete}
-        id={name}
-        min={type === "number" ? 1 : undefined}
-        name={name}
-        placeholder={placeholder}
-        required={required}
-        type={type}
-      />
-      {description ? <p className="text-sm leading-6 text-muted-foreground">{description}</p> : null}
-    </div>
-  );
-}
-
-function TextareaField({
-  label,
-  name,
-  placeholder,
-  description,
-  required,
-}: TextareaFieldProps) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={name}>
-        {label}
-        {required ? <span className="text-destructive"> *</span> : null}
-      </Label>
-      <Textarea id={name} name={name} placeholder={placeholder} required={required} />
-      {description ? <p className="text-sm leading-6 text-muted-foreground">{description}</p> : null}
-    </div>
-  );
-}
 
 function getSubmitVariant(submitColor: string): ButtonProps["variant"] {
   if (submitColor === "gold") return "gold";
@@ -146,7 +86,7 @@ export function PublicLeadForm({
         ) : null}
 
         {fields.includes("nome") ? (
-          <Field
+          <TextField
             autoComplete="name"
             label={labels.nome ?? "Nome"}
             name="nome"
@@ -157,7 +97,7 @@ export function PublicLeadForm({
 
         <div className="grid gap-5 md:grid-cols-2">
           {fields.includes("email") ? (
-            <Field
+            <TextField
               autoComplete="email"
               description={showDescriptions ? "Usaremos este e-mail para o retorno comercial." : undefined}
               label={labels.email ?? "E-mail"}
@@ -168,7 +108,7 @@ export function PublicLeadForm({
             />
           ) : null}
           {fields.includes("telefone") ? (
-            <Field
+            <TextField
               autoComplete="tel"
               description={showDescriptions ? "Inclua DDD para agilizar o contato." : undefined}
               label={labels.telefone ?? "Telefone"}
@@ -179,7 +119,7 @@ export function PublicLeadForm({
         </div>
 
         {fields.includes("orgao") ? (
-          <Field
+          <TextField
             autoComplete="organization"
             label={labels.orgao ?? "Órgão ou empresa"}
             name="orgao"
@@ -187,7 +127,7 @@ export function PublicLeadForm({
           />
         ) : null}
         {fields.includes("num_participantes") ? (
-          <Field
+          <TextField
             description={showDescriptions ? "Estimativa inicial para dimensionar a proposta." : undefined}
             label={labels.num_participantes ?? "Numero de participantes"}
             name="num_participantes"
@@ -195,14 +135,14 @@ export function PublicLeadForm({
           />
         ) : null}
         {fields.includes("tema_interesse") ? (
-          <Field
+          <TextField
             label={labels.tema_interesse ?? "Tema de interesse"}
             name="tema_interesse"
             placeholder={placeholders.tema_interesse ?? "Tema principal"}
           />
         ) : null}
         {fields.includes("tema_treinamento") ? (
-          <Field
+          <TextField
             label={labels.tema_treinamento ?? "Tema do treinamento"}
             name="tema_treinamento"
             placeholder={placeholders.tema_treinamento ?? "Tema desejado"}

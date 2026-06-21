@@ -16,10 +16,10 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { TextField } from "@/components/forms/field/text-field";
 import type { EnrollmentClassOption } from "@/lib/public-data";
 import { cn } from "@/lib/utils";
 
@@ -28,17 +28,6 @@ type PublicEnrollmentFormProps = {
   courseTitle: string;
   courseSlug: string;
   classOptions: EnrollmentClassOption[];
-};
-
-type FieldProps = {
-  label: string;
-  name?: string;
-  placeholder?: string;
-  autoComplete?: string;
-  required?: boolean;
-  type?: string;
-  className?: string;
-  rightIcon?: React.ReactNode;
 };
 
 const initialState: PublicFormState = {
@@ -62,44 +51,6 @@ function SectionTitle({ number, title }: { number: string; title: string }) {
       <h2 className="font-heading text-2xl font-bold text-brand-navy-700">
         {title}
       </h2>
-    </div>
-  );
-}
-
-function Field({
-  label,
-  name,
-  placeholder,
-  autoComplete,
-  required,
-  type = "text",
-  className,
-  rightIcon,
-}: FieldProps) {
-  const id = name ?? label.toLowerCase().replace(/\s+/g, "-");
-
-  return (
-    <div className={cn("grid gap-2", className)}>
-      <Label htmlFor={id}>
-        {label}
-        {required ? <span className="text-destructive"> *</span> : null}
-      </Label>
-      <div className="relative">
-        <Input
-          autoComplete={autoComplete}
-          className={rightIcon ? "pr-10" : undefined}
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          required={required}
-          type={type}
-        />
-        {rightIcon ? (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-            {rightIcon}
-          </span>
-        ) : null}
-      </div>
     </div>
   );
 }
@@ -141,7 +92,7 @@ export function PublicEnrollmentForm({
         <section className="grid gap-5">
           <SectionTitle number="1" title="Dados do Aluno" />
           <div className="grid gap-5 md:grid-cols-2">
-            <Field
+            <TextField
               autoComplete="name"
               className="md:col-span-2"
               label="Nome Completo"
@@ -149,7 +100,7 @@ export function PublicEnrollmentForm({
               placeholder="Seu nome como no certificado"
               required
             />
-            <Field
+            <TextField
               autoComplete="email"
               label="E-mail"
               name="email"
@@ -157,22 +108,22 @@ export function PublicEnrollmentForm({
               required
               type="email"
             />
-            <Field label="CPF" name="cpf" placeholder="000.000.000-00" required />
+            <TextField label="CPF" name="cpf" placeholder="000.000.000-00" required />
           </div>
         </section>
 
         <section className="grid gap-5">
           <SectionTitle number="2" title="Dados da Empresa" />
           <div className="grid gap-5 md:grid-cols-2">
-            <Field
+            <TextField
               autoComplete="organization"
               className="md:col-span-2"
               label="Razão Social"
               name="empresa_razao"
               placeholder="Nome da empresa"
             />
-            <Field label="CNPJ" name="empresa_cnpj" placeholder="00.000.000/0000-00" />
-            <Field
+            <TextField label="CNPJ" name="empresa_cnpj" placeholder="00.000.000/0000-00" />
+            <TextField
               autoComplete="tel"
               label="Telefone Corporativo"
               name="telefone"
@@ -223,14 +174,14 @@ export function PublicEnrollmentForm({
             <Card className="rounded-xl bg-muted/40">
               <CardContent className="grid gap-4 p-5">
                 <p className="font-extrabold text-brand-navy-700">Dados do cartão</p>
-                <Field
+                <TextField
                   label="Número do Cartão"
                   placeholder="0000 0000 0000 0000"
                   rightIcon={<CreditCard aria-hidden className="size-4" />}
                 />
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Validade" placeholder="MM/AA" />
-                  <Field label="CVV" placeholder="123" />
+                  <TextField label="Validade" placeholder="MM/AA" />
+                  <TextField label="CVV" placeholder="123" />
                 </div>
                 <div className="grid gap-2">
                   <Label>Parcelamento</Label>
@@ -284,7 +235,7 @@ export function PublicEnrollmentForm({
                     documentação, prazos e dados necessários para o órgão público.
                   </p>
                 </div>
-                <Field
+                <TextField
                   label="Observações para empenho"
                   name="observacoes"
                   placeholder="Ex.: dados do órgão, processo interno, prazo de emissão ou contato responsável"

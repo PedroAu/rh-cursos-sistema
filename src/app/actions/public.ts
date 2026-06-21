@@ -3,10 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export type PublicFormState = {
-  error: string | null;
-  success: string | null;
-};
+import type { FormState } from "@/lib/forms/form-state";
+
+export type PublicFormState = FormState;
 
 function normalizePaymentMethod(value: string) {
   const map: Record<string, string> = {
@@ -19,7 +18,7 @@ function normalizePaymentMethod(value: string) {
   return map[value.toLowerCase()] ?? value;
 }
 
-function normalizeLeadType(value: FormDataEntryValue | null) {
+function normalizeLeadType(value: string | null | undefined) {
   if (typeof value !== "string") {
     return "Contato";
   }
@@ -90,64 +89,38 @@ export async function submitLeadAction(
   _previousState: PublicFormState,
   formData: FormData,
 ): Promise<PublicFormState> {
-  const nome = formData.get("nome");
-  const email = formData.get("email");
-  const telefone = formData.get("telefone");
-  const tipo = formData.get("tipo");
-  const mensagem = formData.get("mensagem");
-  const temaInteresse = formData.get("tema_interesse");
-  const cursoId = formData.get("curso_id");
-  const modalidadePreferida = formData.get("modalidade_preferida");
-  const objetivoTreinamento = formData.get("objetivo_treinamento");
-  const temaTreinamento = formData.get("tema_treinamento");
-  const desafiosPrincipais = formData.get("desafios_principais");
-  const orgao = formData.get("orgao");
-  const numParticipantes = formData.get("num_participantes");
-  const origem = formData.get("origem");
-  const pathToRevalidate = formData.get("path_to_revalidate");
+  // Validação com zod
+  const { leadSchema } = await import("@/lib/forms/schemas/lead");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (typeof nome !== "string" || typeof email !== "string") {
+  const parsed = leadSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
     return {
       error: "Preencha pelo menos nome e email.",
       success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
     };
   }
 
+  const pathToRevalidate = formData.get("path_to_revalidate");
+
   const supabase = createAdminClient();
   const { error } = await supabase.from("lead").insert({
-    nome,
-    email,
-    telefone: typeof telefone === "string" ? telefone : null,
-    tipo: normalizeLeadType(tipo),
-    mensagem: typeof mensagem === "string" ? mensagem : null,
-    tema_interesse:
-      typeof temaInteresse === "string" && temaInteresse.length > 0
-        ? temaInteresse
-        : null,
-    curso_id:
-      typeof cursoId === "string" && cursoId.length > 0 ? cursoId : null,
-    modalidade_preferida:
-      typeof modalidadePreferida === "string" && modalidadePreferida.length > 0
-        ? modalidadePreferida
-        : null,
-    objetivo_treinamento:
-      typeof objetivoTreinamento === "string" && objetivoTreinamento.length > 0
-        ? objetivoTreinamento
-        : null,
-    tema_treinamento:
-      typeof temaTreinamento === "string" && temaTreinamento.length > 0
-        ? temaTreinamento
-        : null,
-    desafios_principais:
-      typeof desafiosPrincipais === "string" && desafiosPrincipais.length > 0
-        ? desafiosPrincipais
-        : null,
-    orgao: typeof orgao === "string" && orgao.length > 0 ? orgao : null,
-    num_participantes:
-      typeof numParticipantes === "string" && numParticipantes.length > 0
-        ? Number(numParticipantes)
-        : null,
-    origem: typeof origem === "string" ? origem : "Site RH Cursos",
+    nome: parsed.data.nome,
+    email: parsed.data.email,
+    telefone: parsed.data.telefone ?? null,
+    tipo: normalizeLeadType(parsed.data.tipo ?? null),
+    mensagem: parsed.data.mensagem ?? null,
+    tema_interesse: parsed.data.tema_interesse ?? null,
+    curso_id: parsed.data.curso_id ?? null,
+    modalidade_preferida: parsed.data.modalidade_preferida ?? null,
+    objetivo_treinamento: parsed.data.objetivo_treinamento ?? null,
+    tema_treinamento: parsed.data.tema_treinamento ?? null,
+    desafios_principais: parsed.data.desafios_principais ?? null,
+    orgao: parsed.data.orgao ?? null,
+    num_participantes: parsed.data.num_participantes ? Number(parsed.data.num_participantes) : null,
+    origem: parsed.data.origem ?? "Site RH Cursos",
     status_crm: "Novo",
   });
 
@@ -172,58 +145,39 @@ export async function submitEnrollmentAction(
   _previousState: PublicFormState,
   formData: FormData,
 ): Promise<PublicFormState> {
-  const nome = formData.get("nome");
-  const email = formData.get("email");
-  const telefone = formData.get("telefone");
-  const cpf = formData.get("cpf");
-  const cargo = formData.get("cargo");
-  const orgao = formData.get("orgao");
-  const empresaRazao = formData.get("empresa_razao");
-  const empresaCnpj = formData.get("empresa_cnpj");
-  const courseId = formData.get("course_id");
-  const turmaId = formData.get("turma_id");
-  const pagamentoMetodo = formData.get("pagamento_metodo");
-  const aceiteLgpd = formData.get("aceite_lgpd");
-  const observacoes = formData.get("observacoes");
-  const courseTitle = formData.get("course_title");
-  const pathToRevalidate = formData.get("path_to_revalidate");
+  // Validação com zod (determinística + mensagens por campo)
+  const { enrollmentSchema } = await import("@/lib/forms/schemas/enrollment");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (
-    typeof nome !== "string" ||
-    typeof email !== "string" ||
-    typeof cpf !== "string" ||
-    typeof telefone !== "string" ||
-    typeof cargo !== "string" ||
-    typeof orgao !== "string" ||
-    typeof courseId !== "string" ||
-    typeof turmaId !== "string" ||
-    typeof pagamentoMetodo !== "string" ||
-    nome.length === 0 ||
-    email.length === 0 ||
-    cpf.length === 0 ||
-    telefone.length === 0 ||
-    cargo.length === 0 ||
-    orgao.length === 0 ||
-    courseId.length === 0 ||
-    turmaId.length === 0 ||
-    pagamentoMetodo.length === 0 ||
-    aceiteLgpd !== "on"
-  ) {
+  const parsed = enrollmentSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
     return {
       error: "Preencha os campos obrigatórios e aceite o tratamento de dados.",
       success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
     };
   }
 
+  // Extrair dados do form (incluindo hidden fields que o schema não valida)
+  const empresaRazao = formData.get("empresa_razao");
+  const empresaCnpj = formData.get("empresa_cnpj");
+  const courseId = formData.get("course_id");
+  const courseTitle = formData.get("course_title");
+  const pathToRevalidate = formData.get("path_to_revalidate");
+  const cargo = formData.get("cargo");
+  const orgao = formData.get("orgao");
+  const observacoes = formData.get("observacoes");
+
   const rpcResult = await registerEnrollmentViaRpc({
-    nome,
-    email,
-    cpf,
-    telefone,
-    cargo,
-    orgao,
-    turmaId,
-    pagamentoMetodo,
+    nome: parsed.data.nome,
+    email: parsed.data.email,
+    cpf: parsed.data.cpf,
+    telefone: parsed.data.telefone,
+    cargo: typeof cargo === "string" ? cargo : "Participante",
+    orgao: typeof orgao === "string" ? orgao : "Não informado",
+    turmaId: parsed.data.turma_id,
+    pagamentoMetodo: parsed.data.pagamento_metodo,
     observacoes:
       typeof observacoes === "string" && observacoes.length > 0 ? observacoes : null,
   });
@@ -247,17 +201,17 @@ export async function submitEnrollmentAction(
     const { error } = await supabase.from("course_enrollments").insert({
       id: `enr-${Date.now()}`,
       course_id: courseId,
-      turma_id: turmaId,
-      aluno_nome: nome,
-      aluno_email: email,
-      aluno_telefone: telefone,
-      aluno_cpf: cpf,
+      turma_id: parsed.data.turma_id,
+      aluno_nome: parsed.data.nome,
+      aluno_email: parsed.data.email,
+      aluno_telefone: parsed.data.telefone,
+      aluno_cpf: parsed.data.cpf,
       empresa_razao:
         typeof empresaRazao === "string" && empresaRazao.length > 0 ? empresaRazao : null,
       empresa_cnpj:
         typeof empresaCnpj === "string" && empresaCnpj.length > 0 ? empresaCnpj : null,
-      orgao,
-      pagamento_metodo: pagamentoMetodo,
+      orgao: typeof orgao === "string" ? orgao : "Não informado",
+      pagamento_metodo: parsed.data.pagamento_metodo,
       aceite_lgpd: true,
       observacoes:
         typeof observacoes === "string" && observacoes.length > 0 ? observacoes : null,
@@ -284,9 +238,9 @@ export async function submitEnrollmentAction(
   logEnrollmentFallback("lead");
 
   const { error } = await supabase.from("lead").insert({
-    nome,
-    email,
-    telefone: typeof telefone === "string" ? telefone : null,
+    nome: parsed.data.nome,
+    email: parsed.data.email,
+    telefone: parsed.data.telefone,
     tipo: "Curso",
     mensagem:
       typeof observacoes === "string" && observacoes.length > 0

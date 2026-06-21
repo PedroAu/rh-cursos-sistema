@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyPaymentStatusToken } from "@/lib/payments/status-token";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type PaymentStatusRow = {
@@ -6,7 +7,7 @@ type PaymentStatusRow = {
 };
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ chargeId: string }> },
 ) {
   const { chargeId } = await params;
@@ -15,6 +16,16 @@ export async function GET(
     return NextResponse.json({ error: "chargeId is required" }, { status: 400 });
   }
 
+  const token =
+    new URL(request.url).searchParams.get("token") ??
+    request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
+
+  if (!token || !verifyPaymentStatusToken(token, chargeId).ok) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
+  // Service-role read stays server-only and is constrained to a token-validated
+  // charge id, returning only the payment status.
   const supabase = createAdminClient();
   const result = await supabase
     .from("payments")

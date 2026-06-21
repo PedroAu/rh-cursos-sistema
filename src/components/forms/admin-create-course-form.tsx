@@ -3,12 +3,10 @@
 import { useActionState } from "react";
 
 import { createCourseAction, type AdminFormState } from "@/app/actions/admin";
-import {
-  ShadcnCheckboxField,
-  ShadcnSelectField,
-  ShadcnTextareaField,
-  ShadcnTextField,
-} from "@/components/shadcn/admin/form-field";
+import { TextField } from "@/components/forms/field/text-field";
+import { SelectField } from "@/components/forms/field/select-field";
+import { TextareaField } from "@/components/forms/field/textarea-field";
+import { CheckboxField } from "@/components/forms/field/checkbox-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 
@@ -54,28 +52,28 @@ export function AdminCreateCourseForm() {
           </Alert>
         ) : null}
         <div className="grid gap-4 md:grid-cols-2">
-          <ShadcnTextField label="Título" name="titulo" placeholder="Nome do curso" required />
-          <ShadcnTextField label="Slug" name="slug" placeholder="nome-do-curso" required />
-          <ShadcnTextField label="Categoria" name="categoria" placeholder="Categoria" />
-          <ShadcnTextField label="Trilha ID" name="trilha_id" />
-          <ShadcnTextField label="Trilha nome" name="trilha_nome" />
-          <ShadcnTextField label="Tipo de público" name="tipo_publico" />
-          <ShadcnTextField label="Imagem de capa" name="imagem_capa" type="url" />
-          <ShadcnTextField defaultValue={8} label="Carga horária" min={1} name="carga_horaria" type="number" />
-          <ShadcnTextField defaultValue={0} label="Preço base" min={0} name="preco_base" type="number" />
-          <ShadcnTextField defaultValue={0} label="Rating" max={5} min={0} name="rating" step={0.1} type="number" />
-          <ShadcnTextField defaultValue={0} label="Total de alunos" min={0} name="total_alunos" type="number" />
-          <ShadcnSelectField defaultValue="Online" label="Modalidade" name="modalidade" options={modalityOptions} />
-          <ShadcnSelectField defaultValue="Basico" label="Nível" name="nivel" options={levelOptions} />
-          <ShadcnSelectField defaultValue="Rascunho" label="Status" name="status" options={statusOptions} />
+          <TextField label="Título" name="titulo" placeholder="Nome do curso" required />
+          <TextField label="Slug" name="slug" placeholder="nome-do-curso" required />
+          <TextField label="Categoria" name="categoria" placeholder="Categoria" />
+          <TextField label="Trilha ID" name="trilha_id" />
+          <TextField label="Trilha nome" name="trilha_nome" />
+          <TextField label="Tipo de público" name="tipo_publico" />
+          <TextField label="Imagem de capa" name="imagem_capa" type="url" />
+          <TextField defaultValue={8} label="Carga horária" min={1} name="carga_horaria" type="number" />
+          <TextField defaultValue={0} label="Preço base" min={0} name="preco_base" type="number" />
+          <TextField defaultValue={0} label="Rating" max={5} min={0} name="rating" step={0.1} type="number" />
+          <TextField defaultValue={0} label="Total de alunos" min={0} name="total_alunos" type="number" />
+          <SelectField defaultValue="Online" label="Modalidade" name="modalidade" options={modalityOptions} />
+          <SelectField defaultValue="Basico" label="Nível" name="nivel" options={levelOptions} />
+          <SelectField defaultValue="Rascunho" label="Status" name="status" options={statusOptions} />
         </div>
-        <ShadcnTextareaField label="Descrição curta" name="descricao_curta" />
-        <ShadcnTextareaField label="Descrição" name="descricao" />
-        <ShadcnTextareaField label="Ementa" name="ementa" placeholder="Um item por linha" required />
-        <ShadcnTextareaField label="Objetivos" name="objetivos" placeholder="Um item por linha" required />
-        <ShadcnTextareaField label="Benefícios" name="beneficios" placeholder="Um item por linha" required />
-        <ShadcnTextareaField label="Público-alvo" name="publico_alvo" placeholder="Um item por linha" required />
-        <ShadcnCheckboxField label="Destaque" name="destaque" />
+        <TextareaField label="Descrição curta" name="descricao_curta" />
+        <TextareaField label="Descrição" name="descricao" />
+        <TextareaField label="Ementa" name="ementa" placeholder="Um item por linha" required />
+        <TextareaField label="Objetivos" name="objetivos" placeholder="Um item por linha" required />
+        <TextareaField label="Benefícios" name="beneficios" placeholder="Um item por linha" required />
+        <TextareaField label="Público-alvo" name="publico_alvo" placeholder="Um item por linha" required />
+        <CheckboxField label="Destaque" name="destaque" />
         <Button disabled={pending} type="submit" variant="gold">
           {pending ? "Criando curso..." : "Criar curso"}
         </Button>

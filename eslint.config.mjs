@@ -23,6 +23,7 @@ const eslintConfig = defineConfig([
     ".cursor/**",
     ".gemini/**",
     ".kimi/**",
+    "squads/**",
     "next-env.d.ts",
   ]),
 ]);

@@ -7,6 +7,7 @@ import {
   normalizeStringList,
   normalizeValue,
 } from "@/lib/admin-data/filters";
+import { buildDashboardSnapshot } from "@/lib/admin-data/dashboard";
 
 export type AdminCourseRow = {
   id: string;
@@ -575,43 +576,46 @@ async function getCountWithFallback(
 }
 
 export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapshot> {
-  const [coursesCount, turmasCount, leadsCount, profilesCount, recentLeads, upcomingTurmas, recentCourses] =
+  // Memory-optimized for the Cloudflare Worker (128 MB isolate, Error 1102):
+  // a single client, column-light selects (no heavy curso/lead free-text), and
+  // curso/turma loaded exactly once each — instead of reusing getAdminCourses/
+  // getAdminAgenda/getAdminLeads which pulled full rows redundantly. See Story 1.11.
+  const supabase = createAdminClient();
+
+  const [coursesCount, turmasCount, leadsCount, profilesCount, leadsResult, turmasResult, coursesResult] =
     await Promise.all([
       getCountWithFallback("courses", "curso"),
       getCountWithFallback("turmas", "turma"),
       getCountWithFallback("leads", "lead"),
       getCountWithFallback("profiles"),
-      getAdminLeads(),
-      getAdminAgenda(),
-      getAdminCourses(),
+      supabase
+        .from("lead")
+        .select("id,nome,tema_interesse,status_crm,created_at")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false })
+        .limit(200),
+      supabase
+        .from("turma")
+        .select(
+          "id,curso_id,instrutor_id,data_inicio,data_fim,modalidade,horario,local,status,vagas_total,vagas_preenchidas,preco_turma,updated_at",
+        )
+        .is("deleted_at", null)
+        .order("data_inicio", { ascending: true }),
+      supabase
+        .from("curso")
+        .select("id,titulo,slug,categoria,status,preco_base,updated_at")
+        .is("deleted_at", null),
     ]);
-  const threshold = new Date();
-  threshold.setDate(threshold.getDate() + 30);
-  const today = new Date();
 
-  return {
+  return buildDashboardSnapshot({
     coursesCount,
     turmasCount,
     leadsCount,
     profilesCount,
-    newLeadsCount: recentLeads.filter((lead) => lead.crmStatus === "Novo").length,
-    nextThirtyDaysTurmasCount: upcomingTurmas.filter((turma) => {
-      const startDate = new Date(turma.startDate);
-      return startDate >= today && startDate <= threshold;
-    }).length,
-    coursesWithoutClassCount: recentCourses.filter(
-      (course) => course.seatsLabel === "Sem turmas vinculadas",
-    ).length,
-    draftCoursesCount: recentCourses.filter((course) => course.courseStatus === "Rascunho").length,
-    criticalOccupancyTurmasCount: upcomingTurmas.filter(
-      (turma) => turma.seatsTotal > 0 && turma.seatsFilled / turma.seatsTotal >= 0.9,
-    ).length,
-    recentLeads: recentLeads.slice(0, 5),
-    upcomingTurmas: upcomingTurmas.slice(0, 5),
-    recentCourses: recentCourses
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt))
-      .slice(0, 5),
-  };
+    leads: leadsResult.data ?? [],
+    turmas: turmasResult.data ?? [],
+    courses: coursesResult.data ?? [],
+  });
 }
 
 export async function getArchivedAdminEntities() {

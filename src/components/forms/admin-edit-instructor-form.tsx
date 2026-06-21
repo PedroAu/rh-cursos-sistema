@@ -6,11 +6,9 @@ import {
   updateInstructorAction,
   type AdminFormState,
 } from "@/app/actions/admin";
-import {
-  ShadcnSelectField,
-  ShadcnTextareaField,
-  ShadcnTextField,
-} from "@/components/shadcn/admin/form-field";
+import { TextField } from "@/components/forms/field/text-field";
+import { SelectField } from "@/components/forms/field/select-field";
+import { TextareaField } from "@/components/forms/field/textarea-field";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import type { AdminInstructorRow } from "@/lib/admin-data";
@@ -54,17 +52,17 @@ export function AdminEditInstructorForm({
         ) : null}
         <input name="id" type="hidden" value={instructor.id} />
         <div className="grid gap-4 md:grid-cols-2">
-          <ShadcnTextField defaultValue={instructor.name} disabled={readOnly} label="Nome" name="nome" required />
-          <ShadcnTextField defaultValue={instructor.email === "-" ? "" : instructor.email} disabled={readOnly} label="E-mail" name="email" type="email" />
-          <ShadcnTextField defaultValue={instructor.phone} disabled={readOnly} label="Telefone" name="telefone" />
-          <ShadcnTextField defaultValue={instructor.specialty} disabled={readOnly} label="Especialidade" name="especialidade" required />
-          <ShadcnTextField defaultValue={instructor.photoUrl} disabled={readOnly} label="URL da foto" name="foto_url" type="url" />
-          <ShadcnTextField defaultValue={instructor.rating} disabled={readOnly} label="Rating" max={5} min={0} name="rating" step={0.1} type="number" />
-          <ShadcnSelectField defaultValue={instructor.status} disabled={readOnly} label="Status" name="status" options={statusOptions} />
+          <TextField defaultValue={instructor.name} disabled={readOnly} label="Nome" name="nome" required />
+          <TextField defaultValue={instructor.email === "-" ? "" : instructor.email} disabled={readOnly} label="E-mail" name="email" type="email" />
+          <TextField defaultValue={instructor.phone} disabled={readOnly} label="Telefone" name="telefone" />
+          <TextField defaultValue={instructor.specialty} disabled={readOnly} label="Especialidade" name="especialidade" required />
+          <TextField defaultValue={instructor.photoUrl} disabled={readOnly} label="URL da foto" name="foto_url" type="url" />
+          <TextField defaultValue={instructor.rating} disabled={readOnly} label="Rating" max={5} min={0} name="rating" step={0.1} type="number" />
+          <SelectField defaultValue={instructor.status} disabled={readOnly} label="Status" name="status" options={statusOptions} />
         </div>
-        <ShadcnTextareaField defaultValue={instructor.areas.join("\n")} disabled={readOnly} label="Áreas de atuação" name="areas_atuacao" required />
-        <ShadcnTextareaField defaultValue={instructor.bio} disabled={readOnly} label="Bio" name="bio" />
-        <ShadcnTextareaField defaultValue={instructor.education} disabled={readOnly} label="Formação" name="formacao" />
+        <TextareaField defaultValue={instructor.areas.join("\n")} disabled={readOnly} label="Áreas de atuação" name="areas_atuacao" required />
+        <TextareaField defaultValue={instructor.bio} disabled={readOnly} label="Bio" name="bio" />
+        <TextareaField defaultValue={instructor.education} disabled={readOnly} label="Formação" name="formacao" />
         {readOnly ? null : (
           <Button disabled={pending} type="submit">
             {pending ? "Salvando instrutor..." : "Salvar instrutor"}

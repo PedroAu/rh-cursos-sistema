@@ -26,6 +26,14 @@ describe("payment webhook RPC migration", () => {
     expect(timestampSql).not.toContain("payment_status_rank(p_new_status)");
   });
 
+  it("keeps a legacy RPC wrapper for non-atomic database and app rollouts", () => {
+    expect(timestampSql).toContain(
+      "drop function if exists public.apply_payment_webhook_event(text, text, text, payment_status, jsonb)",
+    );
+    expect(timestampSql).toContain("p_raw_event       jsonb");
+    expect(timestampSql).toContain("null::timestamptz");
+  });
+
   it("allows unknown statuses to be audited without updating the enum column", () => {
     expect(timestampSql).toContain("p_new_status       payment_status");
     expect(timestampSql).toContain("p_new_status is not null");

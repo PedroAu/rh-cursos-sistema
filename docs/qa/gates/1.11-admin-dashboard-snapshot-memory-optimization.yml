@@ -1,0 +1,55 @@
+schema: 1
+story: '1.11'
+gate: PASS
+status_reason: 'All 6 ACs verified against real code; lightweight deduplicated snapshot confirmed, output shape preserved, all quality gates pass (typecheck 0 errors, 120 tests, lint clean on story files).'
+reviewer: 'Quinn'
+updated: '2026-06-21T13:55:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'curso select in getAdminDashboardSnapshot = "id,titulo,slug,categoria,status,preco_base,updated_at" (admin-data.ts:606). No descricao/ementa/objetivos/beneficios/publico_alvo.'
+  - id: AC2
+    status: PASS
+    evidence: 'curso loaded once (admin-data.ts:604-607), turma loaded once (admin-data.ts:597-603). No redundant loads via getAdminCourses/getAdminAgenda.'
+  - id: AC3
+    status: PASS
+    evidence: 'AdminDashboardSnapshot shape unchanged (admin-data.ts:139-152). Every field consumed by admin/page.tsx is produced by buildDashboardSnapshot.'
+  - id: AC4
+    status: PASS
+    evidence: 'lead select = "id,nome,tema_interesse,status_crm,created_at" (admin-data.ts:593). No mensagem/objetivo_treinamento/desafios_principais.'
+  - id: AC5
+    status: PASS
+    evidence: 'git diff confirms only import block + getAdminDashboardSnapshot region changed. getAdminCourses/getAdminLeads/getAdminAgenda etc. untouched.'
+  - id: AC6
+    status: PASS
+    evidence: 'typecheck PASS (0 errors); npm test PASS (35 files/120 tests); lint clean on the 3 story files; build:cloudflare PASS per @devops. Re-verified physically by @qa.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: PASS
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'PERF-001'
+    severity: low
+    finding: 'The 1102 memory fix cannot be confirmed in production from the gate alone — it requires deploy + wrangler tail observation. The code change is sound and reduces buffered data, but the production effect is unverified at gate time.'
+    suggested_action: 'After @devops deploy, observe wrangler tail on /admin to confirm Error 1102 no longer fires. Non-blocking; the optimization is correct regardless.'
+  - id: 'TEST-001'
+    severity: low
+    finding: 'Unit coverage is on the pure builder (buildDashboardSnapshot) only; the column-light DB select strings in getAdminDashboardSnapshot are not asserted by a test (they are validated by review and typecheck).'
+    suggested_action: 'Optional: add a lightweight assertion or comment-lock on the select column lists to prevent regression of the memory optimization. Non-blocking.'
+
+waiver: { active: false }
+
+notes: |
+  Strengths:
+  - Clean separation: I/O in getAdminDashboardSnapshot, pure computation in buildDashboardSnapshot (unit-testable, no I/O).
+  - Memory optimization is real and surgical: single Supabase client, single load of curso/turma, column-light selects on lead/curso/turma.
+  - Field-level behavior preserved — buildDashboardSnapshot mirrors prior getAdminCourses/getAdminAgenda/getAdminLeads output for the fields the dashboard consumes; the test "does not leak heavy text fields" locks the intent.
+  - Scope discipline: Opção A (list-page pagination) correctly deferred; no runtime/deploy config touched; no remote git ops.
+  Security: No new attack surface. Same createAdminClient (service-role) already used by all admin-data helpers; this change reduces data fetched, never broadens it. requireAdmin() gate on the page is unchanged.

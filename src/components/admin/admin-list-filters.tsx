@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Search, X } from "lucide-react";
 
-import { ShadcnSelectField } from "@/components/shadcn/admin/form-field";
+import { SelectField } from "@/components/forms/field/select-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -137,7 +137,7 @@ export function AdminListFilters({
             </div>
 
             {allSelectFilters.map((filter) => (
-              <ShadcnSelectField
+              <SelectField
                 className="xl:col-span-2"
                 defaultValue={normalizedValues[filter.name] ?? filter.value ?? "todos"}
                 id={`${formId}-${filter.name}`}

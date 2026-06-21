@@ -10,6 +10,10 @@ import {
 import { toAmountCents, toAsaasValue } from "@/lib/asaas/money";
 import type { AsaasBillingType } from "@/lib/asaas/types";
 import { resolveCourseForPayment, type CourseForPayment } from "@/lib/payments/course-identity";
+import {
+  assertPaymentStatusTokenConfigured,
+  createPaymentStatusToken,
+} from "@/lib/payments/status-token";
 
 export type CreatePixOrBoletoChargeInput = {
   // FLAG-A: the live checkout flow only carries a course slug / legacy text
@@ -32,8 +36,9 @@ export type CreatePixOrBoletoChargeResult =
   | {
       error: null;
       success: true;
-      chargeId: string;
-      status: string;
+	      chargeId: string;
+	      statusToken: string;
+	      status: string;
       billingType: "PIX" | "BOLETO";
       pix?: { qrImage: string; payload: string };
       boleto?: { url: string | null; linhaDigitavel: string };
@@ -61,6 +66,12 @@ export async function createPixOrBoletoCharge(
 ): Promise<CreatePixOrBoletoChargeResult> {
   if (input.billingType !== "PIX" && input.billingType !== "BOLETO") {
     return { error: "Método de pagamento inválido.", success: false };
+  }
+
+  try {
+    assertPaymentStatusTokenConfigured();
+  } catch {
+    return { error: "Configuração de pagamento indisponível.", success: false };
   }
 
   const supabase = createAdminClient();
@@ -153,11 +164,12 @@ export async function createPixOrBoletoCharge(
     };
   }
 
-  return {
-    error: null,
-    success: true,
-    chargeId: charge.id,
-    status: charge.status,
+	  return {
+	    error: null,
+	    success: true,
+	    chargeId: charge.id,
+	    statusToken: createPaymentStatusToken(charge.id),
+	    status: charge.status,
     billingType,
     pix,
     boleto,

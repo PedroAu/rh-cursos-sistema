@@ -118,10 +118,12 @@ describe("public actions", () => {
       }),
     );
 
-    expect(result).toEqual({
+    // Agora a ação retorna fieldErrors por campo (zod) — ver spec §5.1
+    expect(result).toMatchObject({
       error: "Preencha os campos obrigatórios e aceite o tratamento de dados.",
       success: null,
     });
+    expect(result.fieldErrors).toBeDefined();
     expect(createAdminClient).not.toHaveBeenCalled();
   });
 

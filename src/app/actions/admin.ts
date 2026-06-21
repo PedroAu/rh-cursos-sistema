@@ -2,18 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 import { readAdminSettings, writeAdminSettings } from "@/lib/admin-settings";
+import { assertAdminAction } from "@/lib/admin-action-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-export type AdminFormState = {
-  error: string | null;
-  success: string | null;
-};
+import type { FormState } from "@/lib/forms/form-state";
+
+export type AdminFormState = FormState;
 
 const userRoles = new Set(["admin", "professor", "aluno"]);
 const ADMIN_ASSETS_BUCKET = "admin-assets";
 const MAX_BRAND_ASSET_BYTES = 250 * 1024;
 const userStatuses = new Set(["ativo", "pendente", "inativo"]);
 const studentTypes = new Set(["PF", "PJ"]);
+
+function unauthorizedAdminFormState(): AdminFormState {
+  return {
+    error: "Acesso não autorizado.",
+    success: null,
+  };
+}
 
 function slugify(value: string) {
   return value
@@ -148,6 +155,10 @@ export async function createSystemUserAction(
     };
   }
 
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
+  }
+
   const supabase = createAdminClient();
   const createResult = await supabase.auth.admin.createUser({
     email,
@@ -204,6 +215,10 @@ export async function updateSystemUserAction(
     return { error: "Dados insuficientes para atualizar o usuario.", success: null };
   }
 
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
+  }
+
   const supabase = createAdminClient();
   const existingMetadata = await getExistingUserMetadata(id);
   const updateResult = await supabase.auth.admin.updateUserById(id, {
@@ -249,6 +264,10 @@ export async function deactivateSystemUserAction(
     return { error: "Usuário inválido.", success: null };
   }
 
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
+  }
+
   const supabase = createAdminClient();
   const existingMetadata = await getExistingUserMetadata(id);
   const { error } = await supabase.auth.admin.updateUserById(id, {
@@ -280,6 +299,10 @@ export async function reactivateSystemUserAction(
     return { error: "Usuário inválido.", success: null };
   }
 
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
+  }
+
   const supabase = createAdminClient();
   const existingMetadata = await getExistingUserMetadata(id);
   const { error } = await supabase.auth.admin.updateUserById(id, {
@@ -306,32 +329,35 @@ export async function createInstructorAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const nome = formData.get("nome");
-  const especialidade = formData.get("especialidade");
-  const areasAtuacao = listFromText(formData, "areas_atuacao", []);
+  const { instrutorSchema } = await import("@/lib/forms/schemas/instrutor");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (
-    typeof nome !== "string" ||
-    typeof especialidade !== "string" ||
-    nome.length === 0 ||
-    especialidade.length === 0 ||
-    areasAtuacao.length === 0
-  ) {
-    return { error: "Informe nome, especialidade e áreas de atuação.", success: null };
+  const parsed = instrutorSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Informe nome, especialidade e áreas de atuação.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const id = `inst-${Date.now()}`;
   const { error } = await supabase.from("instrutor").insert({
     id,
-    nome,
+    nome: parsed.data.nome,
     email: optionalString(formData, "email"),
     telefone: optionalString(formData, "telefone"),
     bio: optionalString(formData, "bio"),
     foto_url: optionalString(formData, "foto_url"),
     formacao: optionalString(formData, "formacao"),
-    especialidade,
-    areas_atuacao: areasAtuacao,
+    especialidade: parsed.data.especialidade,
+    areas_atuacao: listFromText(formData, "areas_atuacao", []),
     rating: numberFromForm(formData, "rating", 0),
     status: readRequiredString(formData, "status") || "Ativo",
     created_at: new Date().toISOString(),
@@ -352,54 +378,44 @@ export async function createCourseAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const titulo = formData.get("titulo");
-  const slug = formData.get("slug");
-  const modalidade = formData.get("modalidade");
-  const nivel = formData.get("nivel");
-  const status = formData.get("status");
-  const ementa = listFromText(formData, "ementa", []);
-  const objetivos = listFromText(formData, "objetivos", []);
-  const beneficios = listFromText(formData, "beneficios", []);
-  const publicoAlvo = listFromText(formData, "publico_alvo", []);
+  const { cursoSchema } = await import("@/lib/forms/schemas/curso");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (
-    typeof titulo !== "string" ||
-    typeof slug !== "string" ||
-    typeof modalidade !== "string" ||
-    typeof nivel !== "string" ||
-    typeof status !== "string" ||
-    titulo.length === 0 ||
-    slug.length === 0 ||
-    modalidade.length === 0 ||
-    ementa.length === 0 ||
-    objetivos.length === 0 ||
-    beneficios.length === 0 ||
-    publicoAlvo.length === 0
-  ) {
-    return { error: "Preencha titulo, slug, modalidade e listas obrigatorias.", success: null };
+  const parsed = cursoSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Preencha titulo, slug, modalidade e listas obrigatórias.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const id = `course-${Date.now()}`;
   const { error } = await supabase.from("curso").insert({
     id,
-    titulo,
-    slug: slugify(slug),
+    titulo: parsed.data.titulo,
+    slug: slugify(parsed.data.slug),
     descricao_curta: optionalString(formData, "descricao_curta"),
     descricao: optionalString(formData, "descricao"),
-    ementa,
-    objetivos,
-    beneficios,
-    publico_alvo: publicoAlvo,
+    ementa: listFromText(formData, "ementa", []),
+    objetivos: listFromText(formData, "objetivos", []),
+    beneficios: listFromText(formData, "beneficios", []),
+    publico_alvo: listFromText(formData, "publico_alvo", []),
     categoria: optionalString(formData, "categoria"),
-    modalidade,
-    nivel,
+    modalidade: parsed.data.modalidade,
+    nivel: parsed.data.nivel,
     trilha_id: optionalString(formData, "trilha_id"),
     trilha_nome: optionalString(formData, "trilha_nome"),
     tipo_publico: optionalString(formData, "tipo_publico"),
     carga_horaria: numberFromForm(formData, "carga_horaria", 0),
     preco_base: numberFromForm(formData, "preco_base", 0),
-    status,
+    status: parsed.data.status,
     destaque: formData.get("destaque") === "on",
     imagem_capa: optionalString(formData, "imagem_capa"),
     rating: numberFromForm(formData, "rating", 0),
@@ -422,39 +438,30 @@ export async function createTurmaAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const cursoId = formData.get("curso_id");
-  const instrutorId = formData.get("instrutor_id");
-  const dataInicio = formData.get("data_inicio");
-  const dataFim = formData.get("data_fim");
-  const horario = formData.get("horario");
-  const local = formData.get("local");
-  const modalidade = formData.get("modalidade");
-  const status = formData.get("status");
+  const { turmaSchema } = await import("@/lib/forms/schemas/turma");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (
-    typeof cursoId !== "string" ||
-    typeof instrutorId !== "string" ||
-    typeof dataInicio !== "string" ||
-    typeof horario !== "string" ||
-    typeof local !== "string" ||
-    typeof modalidade !== "string" ||
-    typeof status !== "string" ||
-    cursoId.length === 0 ||
-    instrutorId.length === 0 ||
-    dataInicio.length === 0 ||
-    horario.length === 0 ||
-    local.length === 0
-  ) {
-    return { error: "Preencha os campos obrigatórios da turma.", success: null };
+  const parsed = turmaSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Preencha os campos obrigatórios da turma.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const [courseResult, instructorResult] = await Promise.all([
-    supabase.from("curso").select("id").eq("id", cursoId).is("deleted_at", null).maybeSingle(),
+    supabase.from("curso").select("id").eq("id", parsed.data.curso_id).is("deleted_at", null).maybeSingle(),
     supabase
       .from("instrutor")
       .select("id")
-      .eq("id", instrutorId)
+      .eq("id", parsed.data.instrutor_id)
       .is("deleted_at", null)
       .maybeSingle(),
   ]);
@@ -469,18 +476,20 @@ export async function createTurmaAction(
 
   const { error } = await supabase.from("turma").insert({
     id: `class-${Date.now()}`,
-    curso_id: cursoId,
-    instrutor_id: instrutorId,
-    data_inicio: dataInicio,
+    curso_id: parsed.data.curso_id,
+    instrutor_id: parsed.data.instrutor_id,
+    data_inicio: parsed.data.data_inicio,
     data_fim:
-      typeof dataFim === "string" && dataFim.length > 0 ? dataFim : null,
-    horario,
-    local,
+      typeof formData.get("data_fim") === "string" && (formData.get("data_fim") as string).length > 0
+        ? formData.get("data_fim")
+        : null,
+    horario: parsed.data.horario,
+    local: parsed.data.local,
     vagas_total: numberFromForm(formData, "vagas_total", 0),
     vagas_preenchidas: numberFromForm(formData, "vagas_preenchidas", 0),
     preco_turma: numberFromForm(formData, "preco_turma", 0),
-    modalidade,
-    status,
+    modalidade: parsed.data.modalidade,
+    status: parsed.data.status,
     observacoes: optionalString(formData, "observacoes"),
   });
 
@@ -500,39 +509,35 @@ export async function updateTurmaAction(
   formData: FormData,
 ): Promise<AdminFormState> {
   const id = formData.get("id");
-  const cursoId = formData.get("curso_id");
-  const instrutorId = formData.get("instrutor_id");
-  const dataInicio = formData.get("data_inicio");
-  const dataFim = formData.get("data_fim");
-  const horario = formData.get("horario");
-  const local = formData.get("local");
-  const modalidade = formData.get("modalidade");
-  const status = formData.get("status");
 
-  if (
-    typeof id !== "string" ||
-    typeof cursoId !== "string" ||
-    typeof instrutorId !== "string" ||
-    typeof dataInicio !== "string" ||
-    typeof horario !== "string" ||
-    typeof local !== "string" ||
-    typeof modalidade !== "string" ||
-    typeof status !== "string" ||
-    id.length === 0 ||
-    cursoId.length === 0 ||
-    instrutorId.length === 0 ||
-    dataInicio.length === 0
-  ) {
-    return { error: "Dados insuficientes para atualizar a turma.", success: null };
+  if (typeof id !== "string" || id.length === 0) {
+    return { error: "ID da turma inválido.", success: null };
+  }
+
+  const { turmaSchema } = await import("@/lib/forms/schemas/turma");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
+
+  const parsed = turmaSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Dados insuficientes para atualizar a turma.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const [courseResult, instructorResult] = await Promise.all([
-    supabase.from("curso").select("id").eq("id", cursoId).is("deleted_at", null).maybeSingle(),
+    supabase.from("curso").select("id").eq("id", parsed.data.curso_id).is("deleted_at", null).maybeSingle(),
     supabase
       .from("instrutor")
       .select("id")
-      .eq("id", instrutorId)
+      .eq("id", parsed.data.instrutor_id)
       .is("deleted_at", null)
       .maybeSingle(),
   ]);
@@ -548,18 +553,20 @@ export async function updateTurmaAction(
   const { error } = await supabase
     .from("turma")
     .update({
-      curso_id: cursoId,
-      instrutor_id: instrutorId,
-      data_inicio: dataInicio,
+      curso_id: parsed.data.curso_id,
+      instrutor_id: parsed.data.instrutor_id,
+      data_inicio: parsed.data.data_inicio,
       data_fim:
-        typeof dataFim === "string" && dataFim.length > 0 ? dataFim : null,
-      horario,
-      local,
+        typeof formData.get("data_fim") === "string" && (formData.get("data_fim") as string).length > 0
+          ? formData.get("data_fim")
+          : null,
+      horario: parsed.data.horario,
+      local: parsed.data.local,
       vagas_total: numberFromForm(formData, "vagas_total", 0),
       vagas_preenchidas: numberFromForm(formData, "vagas_preenchidas", 0),
       preco_turma: numberFromForm(formData, "preco_turma", 0),
-      modalidade,
-      status,
+      modalidade: parsed.data.modalidade,
+      status: parsed.data.status,
       observacoes: optionalString(formData, "observacoes"),
       updated_at: new Date().toISOString(),
     })
@@ -581,57 +588,50 @@ export async function updateCourseAction(
   formData: FormData,
 ): Promise<AdminFormState> {
   const id = formData.get("id");
-  const titulo = formData.get("titulo");
-  const slug = formData.get("slug");
-  const modalidade = formData.get("modalidade");
-  const nivel = formData.get("nivel");
-  const status = formData.get("status");
-  const destaque = formData.get("destaque");
-  const ementa = listFromText(formData, "ementa", []);
-  const objetivos = listFromText(formData, "objetivos", []);
-  const beneficios = listFromText(formData, "beneficios", []);
-  const publicoAlvo = listFromText(formData, "publico_alvo", []);
 
-  if (
-    typeof id !== "string" ||
-    typeof titulo !== "string" ||
-    typeof slug !== "string" ||
-    typeof modalidade !== "string" ||
-    typeof nivel !== "string" ||
-    typeof status !== "string" ||
-    id.length === 0 ||
-    titulo.length === 0 ||
-    slug.length === 0 ||
-    ementa.length === 0 ||
-    objetivos.length === 0 ||
-    beneficios.length === 0 ||
-    publicoAlvo.length === 0
-  ) {
-    return { error: "Dados insuficientes para atualizar o curso.", success: null };
+  if (typeof id !== "string" || id.length === 0) {
+    return { error: "ID do curso inválido.", success: null };
+  }
+
+  const { cursoSchema } = await import("@/lib/forms/schemas/curso");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
+
+  const parsed = cursoSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Dados insuficientes para atualizar o curso.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("curso")
     .update({
-      titulo,
-      slug: slugify(slug),
+      titulo: parsed.data.titulo,
+      slug: slugify(parsed.data.slug),
       descricao_curta: optionalString(formData, "descricao_curta"),
       descricao: optionalString(formData, "descricao"),
-      ementa,
-      objetivos,
-      beneficios,
-      publico_alvo: publicoAlvo,
+      ementa: listFromText(formData, "ementa", []),
+      objetivos: listFromText(formData, "objetivos", []),
+      beneficios: listFromText(formData, "beneficios", []),
+      publico_alvo: listFromText(formData, "publico_alvo", []),
       categoria: optionalString(formData, "categoria"),
-      modalidade,
-      nivel,
+      modalidade: parsed.data.modalidade,
+      nivel: parsed.data.nivel,
       trilha_id: optionalString(formData, "trilha_id"),
       trilha_nome: optionalString(formData, "trilha_nome"),
       tipo_publico: optionalString(formData, "tipo_publico"),
       carga_horaria: numberFromForm(formData, "carga_horaria", 0),
       preco_base: numberFromForm(formData, "preco_base", 0),
-      status,
-      destaque: destaque === "on",
+      status: parsed.data.status,
+      destaque: formData.get("destaque") === "on",
       imagem_capa: optionalString(formData, "imagem_capa"),
       rating: numberFromForm(formData, "rating", 0),
       total_alunos: numberFromForm(formData, "total_alunos", 0),
@@ -654,41 +654,42 @@ export async function updateInstructorAction(
   formData: FormData,
 ): Promise<AdminFormState> {
   const id = formData.get("id");
-  const nome = formData.get("nome");
-  const especialidade = formData.get("especialidade");
-  const status = formData.get("status");
-  const areasAtuacao = listFromText(formData, "areas_atuacao", []);
 
-  if (
-    typeof id !== "string" ||
-    typeof nome !== "string" ||
-    typeof especialidade !== "string" ||
-    typeof status !== "string" ||
-    id.length === 0 ||
-    nome.length === 0 ||
-    especialidade.length === 0 ||
-    areasAtuacao.length === 0
-  ) {
+  if (typeof id !== "string" || id.length === 0) {
+    return { error: "ID do instrutor inválido.", success: null };
+  }
+
+  const { instrutorSchema } = await import("@/lib/forms/schemas/instrutor");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
+
+  const parsed = instrutorSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
     return {
       error: "Dados insuficientes para atualizar o instrutor.",
       success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
     };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("instrutor")
     .update({
-      nome,
+      nome: parsed.data.nome,
       email: optionalString(formData, "email"),
       telefone: optionalString(formData, "telefone"),
       bio: optionalString(formData, "bio"),
       foto_url: optionalString(formData, "foto_url"),
       formacao: optionalString(formData, "formacao"),
-      especialidade,
-      areas_atuacao: areasAtuacao,
+      especialidade: parsed.data.especialidade,
+      areas_atuacao: listFromText(formData, "areas_atuacao", []),
       rating: numberFromForm(formData, "rating", 0),
-      status,
+      status: parsed.data.status || "Ativo",
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -716,6 +717,10 @@ export async function updateLeadStatusAction(formData: FormData) {
     return;
   }
 
+  if (!(await assertAdminAction())) {
+    return;
+  }
+
   const supabase = createAdminClient();
   await supabase
     .from("lead")
@@ -733,19 +738,29 @@ export async function createLeadAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const nome = readRequiredString(formData, "nome");
-  const tipo = readRequiredString(formData, "tipo") || "Contato";
+  const { leadAdminSchema } = await import("@/lib/forms/schemas/lead-admin");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (!nome || !tipo) {
-    return { error: "Informe nome e tipo do lead.", success: null };
+  const parsed = leadAdminSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Informe nome e tipo do lead.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("lead").insert({
-    nome,
+    nome: parsed.data.nome,
     email: optionalString(formData, "email"),
     telefone: optionalString(formData, "telefone"),
-    tipo,
+    tipo: parsed.data.tipo,
     orgao: optionalString(formData, "orgao"),
     num_participantes: numberFromForm(formData, "num_participantes", 0) || null,
     tema_interesse: optionalString(formData, "tema_interesse"),
@@ -778,39 +793,37 @@ export async function createAlunoAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const nomeCompleto = readRequiredString(formData, "nome_completo");
-  const email = readRequiredString(formData, "email").toLowerCase();
-  const tipoAluno = normalizeStudentType(readRequiredString(formData, "tipo_aluno"));
-  const cpf = normalizeDigits(formData, "cpf");
-  const telefone = normalizeDigits(formData, "telefone");
-  const userId = optionalString(formData, "user_id");
+  const { alunoSchema } = await import("@/lib/forms/schemas/aluno");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (!nomeCompleto || !email || !tipoAluno || !isValidEmail(email)) {
-    return { error: "Informe nome completo, e-mail válido e tipo do aluno.", success: null };
+  const parsed = alunoSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Informe nome completo, e-mail válido e tipo do aluno.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
   }
 
-  if (!isValidOptionalCpf(cpf)) {
-    return { error: "Informe um CPF com 11 digitos ou deixe em branco.", success: null };
-  }
-
-  if (!isValidOptionalPhone(telefone)) {
-    return { error: "Informe um telefone com DDD ou deixe em branco.", success: null };
-  }
-
-  if (!isValidOptionalUuid(userId)) {
-    return { error: "Informe um User ID UUID válido ou deixe em branco.", success: null };
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
+  const cpfNormalized = parsed.data.cpf ? parsed.data.cpf.replace(/\D/g, "") : null;
+  const telefoneNormalized = parsed.data.telefone ? parsed.data.telefone.replace(/\D/g, "") : null;
+  const userIdNormalized = parsed.data.user_id && parsed.data.user_id.trim().length > 0 ? parsed.data.user_id : null;
+
   const { error } = await supabase.from("aluno").insert({
-    nome_completo: nomeCompleto,
-    email,
-    cpf,
-    telefone,
+    nome_completo: parsed.data.nome_completo,
+    email: parsed.data.email.toLowerCase(),
+    cpf: cpfNormalized,
+    telefone: telefoneNormalized,
     cargo: optionalString(formData, "cargo"),
     orgao: optionalString(formData, "orgao"),
-    tipo_aluno: tipoAluno,
-    user_id: userId,
+    tipo_aluno: parsed.data.tipo_aluno,
+    user_id: userIdNormalized,
   });
 
   if (error) {
@@ -828,41 +841,44 @@ export async function updateAlunoAction(
   formData: FormData,
 ): Promise<AdminFormState> {
   const id = readRequiredString(formData, "id");
-  const nomeCompleto = readRequiredString(formData, "nome_completo");
-  const email = readRequiredString(formData, "email").toLowerCase();
-  const tipoAluno = normalizeStudentType(readRequiredString(formData, "tipo_aluno"));
-  const cpf = normalizeDigits(formData, "cpf");
-  const telefone = normalizeDigits(formData, "telefone");
-  const userId = optionalString(formData, "user_id");
 
-  if (!id || !nomeCompleto || !email || !tipoAluno || !isValidEmail(email)) {
-    return { error: "Dados insuficientes para atualizar o aluno.", success: null };
+  if (!id) {
+    return { error: "ID do aluno inválido.", success: null };
   }
 
-  if (!isValidOptionalCpf(cpf)) {
-    return { error: "Informe um CPF com 11 digitos ou deixe em branco.", success: null };
+  const { alunoSchema } = await import("@/lib/forms/schemas/aluno");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
+
+  const parsed = alunoSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Dados insuficientes para atualizar o aluno.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
   }
 
-  if (!isValidOptionalPhone(telefone)) {
-    return { error: "Informe um telefone com DDD ou deixe em branco.", success: null };
-  }
-
-  if (!isValidOptionalUuid(userId)) {
-    return { error: "Informe um User ID UUID válido ou deixe em branco.", success: null };
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
+  const cpfNormalized = parsed.data.cpf ? parsed.data.cpf.replace(/\D/g, "") : null;
+  const telefoneNormalized = parsed.data.telefone ? parsed.data.telefone.replace(/\D/g, "") : null;
+  const userIdNormalized = parsed.data.user_id && parsed.data.user_id.trim().length > 0 ? parsed.data.user_id : null;
+
   const { error } = await supabase
     .from("aluno")
     .update({
-      nome_completo: nomeCompleto,
-      email,
-      cpf,
-      telefone,
+      nome_completo: parsed.data.nome_completo,
+      email: parsed.data.email.toLowerCase(),
+      cpf: cpfNormalized,
+      telefone: telefoneNormalized,
       cargo: optionalString(formData, "cargo"),
       orgao: optionalString(formData, "orgao"),
-      tipo_aluno: tipoAluno,
-      user_id: userId,
+      tipo_aluno: parsed.data.tipo_aluno,
+      user_id: userIdNormalized,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
@@ -882,21 +898,36 @@ export async function updateLeadAction(
   formData: FormData,
 ): Promise<AdminFormState> {
   const id = readRequiredString(formData, "id");
-  const nome = readRequiredString(formData, "nome");
-  const tipo = readRequiredString(formData, "tipo") || "Contato";
 
-  if (!id || !nome || !tipo) {
-    return { error: "Dados insuficientes para atualizar o lead.", success: null };
+  if (!id) {
+    return { error: "ID do lead inválido.", success: null };
+  }
+
+  const { leadAdminSchema } = await import("@/lib/forms/schemas/lead-admin");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
+
+  const parsed = leadAdminSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
+    return {
+      error: "Dados insuficientes para atualizar o lead.",
+      success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
+    };
+  }
+
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
   }
 
   const supabase = createAdminClient();
   const { error } = await supabase
     .from("lead")
     .update({
-      nome,
+      nome: parsed.data.nome,
       email: optionalString(formData, "email"),
       telefone: optionalString(formData, "telefone"),
-      tipo,
+      tipo: parsed.data.tipo,
       orgao: optionalString(formData, "orgao"),
       num_participantes: numberFromForm(formData, "num_participantes", 0) || null,
       tema_interesse: optionalString(formData, "tema_interesse"),
@@ -941,6 +972,10 @@ export async function archiveEntityAction(formData: FormData) {
     return;
   }
 
+  if (!(await assertAdminAction())) {
+    return;
+  }
+
   const supabase = createAdminClient();
   await supabase
     .from(table)
@@ -972,6 +1007,10 @@ export async function restoreEntityAction(formData: FormData) {
     return;
   }
 
+  if (!(await assertAdminAction())) {
+    return;
+  }
+
   const supabase = createAdminClient();
   await supabase
     .from(table)
@@ -993,33 +1032,23 @@ export async function saveAdminSettingsAction(
   _previousState: AdminFormState,
   formData: FormData,
 ): Promise<AdminFormState> {
-  const operationName = formData.get("operationName");
-  const commercialEmail = formData.get("commercialEmail");
-  const mainLogoUrl = formData.get("mainLogoUrl");
-  const faviconUrl = formData.get("faviconUrl");
-  const mainLogoFile = getOptionalFile(formData.get("mainLogoFile"));
-  const faviconFile = getOptionalFile(formData.get("faviconFile"));
-  const dataSource = formData.get("dataSource");
-  const priorityChannel = formData.get("priorityChannel");
+  const { settingsSchema } = await import("@/lib/forms/schemas/settings");
+  const { flattenZodErrors } = await import("@/lib/forms/flatten-zod-errors");
 
-  if (
-    typeof operationName !== "string" ||
-    typeof commercialEmail !== "string" ||
-    typeof mainLogoUrl !== "string" ||
-    typeof faviconUrl !== "string" ||
-    typeof dataSource !== "string" ||
-    typeof priorityChannel !== "string" ||
-    operationName.length === 0 ||
-    commercialEmail.length === 0
-  ) {
+  const parsed = settingsSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!parsed.success) {
     return {
       error: "Preencha os campos obrigatórios das configurações.",
       success: null,
+      fieldErrors: flattenZodErrors(parsed.error),
     };
   }
 
-  const normalizedMainLogoUrl = normalizeAssetUrl(mainLogoUrl);
-  const normalizedFaviconUrl = normalizeAssetUrl(faviconUrl);
+  const mainLogoFile = getOptionalFile(formData.get("mainLogoFile"));
+  const faviconFile = getOptionalFile(formData.get("faviconFile"));
+  const normalizedMainLogoUrl = normalizeAssetUrl(parsed.data.mainLogoUrl ?? "");
+  const normalizedFaviconUrl = normalizeAssetUrl(parsed.data.faviconUrl ?? "");
 
   if (!isValidAssetUrl(normalizedMainLogoUrl, ["svg", "png", "jpg", "jpeg", "webp"])) {
     return {
@@ -1061,6 +1090,10 @@ export async function saveAdminSettingsAction(
     };
   }
 
+  if (!(await assertAdminAction())) {
+    return unauthorizedAdminFormState();
+  }
+
   try {
     const current = await readAdminSettings();
     const supabase = mainLogoFile || faviconFile ? createAdminClient() : null;
@@ -1073,14 +1106,14 @@ export async function saveAdminSettingsAction(
 
     await writeAdminSettings({
       ...current,
-      operationName,
-      commercialEmail,
+      operationName: parsed.data.operationName,
+      commercialEmail: parsed.data.commercialEmail,
       mainLogoUrl: uploadedMainLogoUrl,
       faviconUrl: uploadedFaviconUrl,
       notifyEnrollments: formData.get("notifyEnrollments") === "on",
       notifyLeads: formData.get("notifyLeads") === "on",
-      dataSource,
-      priorityChannel,
+      dataSource: parsed.data.dataSource,
+      priorityChannel: parsed.data.priorityChannel,
     });
   } catch (error) {
     return {

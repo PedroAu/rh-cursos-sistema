@@ -8,10 +8,8 @@ import {
 } from "@/app/actions/admin";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  ShadcnSelectField,
-  ShadcnTextField,
-} from "@/components/shadcn/admin/form-field";
+import { TextField } from "@/components/forms/field/text-field";
+import { SelectField } from "@/components/forms/field/select-field";
 import type { AdminUserRow } from "@/lib/admin-data";
 
 const initialState: AdminFormState = {
@@ -57,10 +55,10 @@ export function AdminUserForm({ user, readOnly = false }: AdminUserFormProps) {
         ) : null}
         {user ? <input name="id" type="hidden" value={user.id} /> : null}
         <div className="grid gap-4 md:grid-cols-2">
-          <ShadcnTextField disabled={readOnly} label="Nome" name="nome" defaultValue={user?.name ?? ""} required />
-          <ShadcnTextField disabled={readOnly} label="E-mail" name="email" defaultValue={user?.email ?? ""} required type="email" />
+          <TextField disabled={readOnly} label="Nome" name="nome" defaultValue={user?.name ?? ""} required />
+          <TextField disabled={readOnly} label="E-mail" name="email" defaultValue={user?.email ?? ""} required type="email" />
           {user ? null : (
-            <ShadcnTextField
+            <TextField
               disabled={readOnly}
               label="Senha provisória"
               minLength={8}
@@ -69,14 +67,14 @@ export function AdminUserForm({ user, readOnly = false }: AdminUserFormProps) {
               type="password"
             />
           )}
-          <ShadcnSelectField
+          <SelectField
             options={roleOptions}
             defaultValue={user?.role ?? "professor"}
             disabled={readOnly}
             label="Perfil"
             name="role"
           />
-          <ShadcnSelectField
+          <SelectField
             options={statusOptions}
             defaultValue={user?.status ?? "ativo"}
             disabled={readOnly}

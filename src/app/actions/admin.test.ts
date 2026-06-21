@@ -12,11 +12,12 @@ import {
   updateSystemUserAction,
 } from "@/app/actions/admin";
 
-const { revalidatePath, readAdminSettings, writeAdminSettings, createAdminClient } =
+const { revalidatePath, readAdminSettings, writeAdminSettings, assertAdminAction, createAdminClient } =
   vi.hoisted(() => ({
     revalidatePath: vi.fn(),
     readAdminSettings: vi.fn(),
     writeAdminSettings: vi.fn(),
+    assertAdminAction: vi.fn(),
     createAdminClient: vi.fn(),
   }));
 
@@ -27,6 +28,10 @@ vi.mock("next/cache", () => ({
 vi.mock("@/lib/admin-settings", () => ({
   readAdminSettings,
   writeAdminSettings,
+}));
+
+vi.mock("@/lib/admin-action-auth", () => ({
+  assertAdminAction,
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
@@ -89,6 +94,65 @@ function buildSystemUserAdminClient(options: {
 describe("admin actions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    assertAdminAction.mockResolvedValue(true);
+  });
+
+  it("rejects unauthorized create, update, archive, and settings mutations before privileged writes", async () => {
+    assertAdminAction.mockResolvedValue(false);
+
+    const createResult = await createCourseAction(
+      { error: null, success: null },
+      buildFormData({
+        titulo: "Gestao Publica Avancada",
+        slug: "gestao-publica-avancada",
+        categoria: "Gestao",
+        modalidade: "Online",
+        nivel: "Basico",
+        status: "Rascunho",
+        ementa: "Modulo 1",
+        objetivos: "Objetivo 1",
+        beneficios: "Beneficio 1",
+        publico_alvo: "Gestores",
+      }),
+    );
+
+    const updateResult = await updateAlunoAction(
+      { error: null, success: null },
+      buildFormData({
+        id: "aluno-1",
+        nome_completo: "Maria Silva",
+        email: "maria@example.com",
+        cpf: "",
+        telefone: "",
+        tipo_aluno: "PF",
+      }),
+    );
+
+    await archiveEntityAction(
+      buildFormData({
+        table: "aluno",
+        id: "aluno-1",
+      }),
+    );
+
+    const settingsResult = await saveAdminSettingsAction(
+      { error: null, success: null },
+      buildFormData({
+        operationName: "RH Cursos",
+        commercialEmail: "comercial@rhcursos.com",
+        mainLogoUrl: "/uploads/logo-rh.svg",
+        faviconUrl: "/uploads/favicon.png",
+        dataSource: "supabase",
+        priorityChannel: "whatsapp",
+      }),
+    );
+
+    expect(createResult).toEqual({ error: "Acesso não autorizado.", success: null });
+    expect(updateResult).toEqual({ error: "Acesso não autorizado.", success: null });
+    expect(settingsResult).toEqual({ error: "Acesso não autorizado.", success: null });
+    expect(createAdminClient).not.toHaveBeenCalled();
+    expect(writeAdminSettings).not.toHaveBeenCalled();
+    expect(revalidatePath).not.toHaveBeenCalled();
   });
 
   it("returns validation error when createCourseAction receives incomplete data", async () => {
@@ -97,10 +161,11 @@ describe("admin actions", () => {
       buildFormData({ titulo: "", categoria: "Lideranca", modalidade: "Online" }),
     );
 
-    expect(result).toEqual({
-      error: "Preencha titulo, slug, modalidade e listas obrigatorias.",
+    expect(result).toMatchObject({
+      error: "Preencha titulo, slug, modalidade e listas obrigatórias.",
       success: null,
     });
+    expect(result.fieldErrors).toBeDefined();
     expect(createAdminClient).not.toHaveBeenCalled();
   });
 
@@ -234,10 +299,11 @@ describe("admin actions", () => {
       }),
     );
 
-    expect(result).toEqual({
-      error: "Informe um CPF com 11 digitos ou deixe em branco.",
+    expect(result).toMatchObject({
+      error: "Informe nome completo, e-mail válido e tipo do aluno.",
       success: null,
     });
+    expect(result.fieldErrors).toBeDefined();
     expect(createAdminClient).not.toHaveBeenCalled();
   });
 

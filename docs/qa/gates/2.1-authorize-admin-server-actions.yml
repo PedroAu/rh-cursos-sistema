@@ -1,0 +1,54 @@
+schema: 1
+story: '2.1'
+gate: CONCERNS
+status_reason: 'Security implementation and story-scoped tests pass; repo-wide lint is blocked by pre-existing/unrelated untracked squad lint errors outside this story.'
+reviewer: 'Quinn'
+updated: '2026-06-21T14:36:00Z'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    evidence: 'src/lib/admin-action-auth.ts adds server-only assertAdminAction() using current Supabase user plus profiles.role admin verification.'
+  - id: AC2
+    status: PASS
+    evidence: 'src/app/actions/admin.ts has assertAdminAction() checks before exported mutation service-role operations.'
+  - id: AC3
+    status: PASS
+    evidence: 'Unauthorized tests verify create/update/archive/settings paths do not call createAdminClient/writeAdminSettings/revalidatePath.'
+  - id: AC4
+    status: PASS
+    evidence: 'src/app/actions/admin.test.ts covers unauthorized createCourseAction, updateAlunoAction, archiveEntityAction, and saveAdminSettingsAction.'
+  - id: AC5
+    status: PASS
+    evidence: 'src/lib/admin-action-auth.test.ts covers no user, non-admin user, and admin user.'
+  - id: AC6
+    status: PASS
+    evidence: 'Focused admin tests pass and existing admin action tests remain green.'
+
+quality_checks:
+  code_review: PASS
+  unit_tests: PASS
+  acceptance_criteria: PASS
+  no_regressions: PASS
+  performance: PASS
+  security: PASS
+  documentation: PASS
+
+top_issues:
+  - id: 'LINT-001'
+    severity: medium
+    finding: 'Repo-wide npm run lint fails in squads/claude-code-mastery/scripts/validate-setup.js due no-require-imports. This file is unrelated and untracked in the current story scope.'
+    suggested_action: 'Handle in a separate hygiene story or exclude untracked squad artifacts from app lint scope. Story-scoped lint passed.'
+  - id: 'CR-001'
+    severity: low
+    finding: 'CodeRabbit CLI is unavailable at ~/.local/bin/coderabbit.'
+    suggested_action: 'Install/authenticate CodeRabbit before PR review if required by team process.'
+
+waiver: { active: false }
+
+notes: |
+  Story-scoped evidence:
+  - npm test -- src/lib/admin-action-auth.test.ts src/app/actions/admin.test.ts: PASS (2 files, 26 tests)
+  - npx eslint src/app/actions/admin.ts src/app/actions/admin.test.ts src/lib/admin-action-auth.ts src/lib/admin-action-auth.test.ts: PASS
+  - npm run typecheck: PASS
+  - npm test: PASS (36 files, 124 tests)

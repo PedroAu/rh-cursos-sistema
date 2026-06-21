@@ -70,4 +70,25 @@ Interprete os atalhos abaixo carregando o arquivo correspondente em `.aiox-core/
 - `@ux-design-expert`, `/ux-design-expert`, `/ux-design-expert.md` -> `.aiox-core/development/agents/ux-design-expert.md`
 - `@squad-creator`, `/squad-creator`, `/squad-creator.md` -> `.aiox-core/development/agents/squad-creator.md`
 - `@aiox-master`, `/aiox-master`, `/aiox-master.md` -> `.aiox-core/development/agents/aiox-master.md`
+
+## Squad Shortcuts
+
+Preferencia de ativacao no Codex CLI:
+1. Use `/skills` e selecione `aiox-<squad-chief>` vindo de `.codex/skills` (ex.: `aiox-cyber-chief`)
+2. Se preferir, use os atalhos abaixo (`/cybersecurity`, `/copy-squad`, etc.)
+
+Interprete os atalhos abaixo carregando o arquivo correspondente em `squads/{squad}/agents/`, assuma a persona do chief/orchestrator e resolva dependencias relativas ao diretorio do squad ate `*exit`:
+
+- `@advisory-board`, `/advisory-board`, `/advisory-board.md` -> `squads/advisory-board/agents/board-chair.md`
+- `@brand-squad`, `/brand-squad`, `/brand-squad.md` -> `squads/brand-squad/agents/brand-chief.md`
+- `@c-level-squad`, `/c-level-squad`, `/c-level-squad.md` -> `squads/c-level-squad/agents/vision-chief.md`
+- `@claude-code-mastery`, `/claude-code-mastery`, `/claude-code-mastery.md` -> `squads/claude-code-mastery/agents/claude-mastery-chief.md`
+- `@copy-squad`, `/copy-squad`, `/copy-squad.md` -> `squads/copy-squad/agents/copy-chief.md`
+- `@cybersecurity`, `/cybersecurity`, `/cybersecurity.md` -> `squads/cybersecurity/agents/cyber-chief.md`
+- `@data-squad`, `/data-squad`, `/data-squad.md` -> `squads/data-squad/agents/data-chief.md`
+- `@design-squad`, `/design-squad`, `/design-squad.md` -> `squads/design-squad/agents/design-chief.md`
+- `@hormozi-squad`, `/hormozi-squad`, `/hormozi-squad.md` -> `squads/hormozi-squad/agents/hormozi-chief.md`
+- `@movement`, `/movement`, `/movement.md` -> `squads/movement/agents/movement-chief.md`
+- `@storytelling`, `/storytelling`, `/storytelling.md` -> `squads/storytelling/agents/story-chief.md`
+- `@traffic-masters`, `/traffic-masters`, `/traffic-masters.md` -> `squads/traffic-masters/agents/traffic-chief.md`
 <!-- AIOX-MANAGED-END: shortcuts -->

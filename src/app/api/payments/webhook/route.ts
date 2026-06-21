@@ -14,6 +14,15 @@ type ApplyWebhookEventResult = {
   applied_status: string | null;
 };
 
+type WebhookRpcParams = {
+  p_asaas_event_id: string;
+  p_asaas_charge_id: string;
+  p_event_type: string;
+  p_new_status: string | null;
+  p_event_created_at: string | null;
+  p_raw_event: unknown;
+};
+
 const knownPaymentStatuses = new Set([
   "PENDING",
   "CONFIRMED",
@@ -70,6 +79,48 @@ function getEventCreatedAt(payload: unknown) {
   }
 
   return Number.isNaN(Date.parse(candidate.dateCreated)) ? null : candidate.dateCreated;
+}
+
+function isMissingTimestampRpc(error: unknown) {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const candidate = error as { code?: unknown; message?: unknown };
+  const code = typeof candidate.code === "string" ? candidate.code : "";
+  const message = typeof candidate.message === "string" ? candidate.message : "";
+
+  return (
+    code === "PGRST202" ||
+    code === "42883" ||
+    (message.includes("apply_payment_webhook_event") &&
+      message.includes("p_event_created_at"))
+  );
+}
+
+async function applyWebhookEvent(
+  supabase: ReturnType<typeof createAdminClient>,
+  params: WebhookRpcParams,
+) {
+  const result = await supabase
+    .rpc("apply_payment_webhook_event", params)
+    .maybeSingle<ApplyWebhookEventResult>();
+
+  if (!result.error || !isMissingTimestampRpc(result.error)) {
+    return result;
+  }
+
+  const legacyParams = {
+    p_asaas_event_id: params.p_asaas_event_id,
+    p_asaas_charge_id: params.p_asaas_charge_id,
+    p_event_type: params.p_event_type,
+    p_new_status: params.p_new_status,
+    p_raw_event: params.p_raw_event,
+  };
+
+  return supabase
+    .rpc("apply_payment_webhook_event", legacyParams)
+    .maybeSingle<ApplyWebhookEventResult>();
 }
 
 function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
@@ -131,16 +182,17 @@ export async function POST(request: Request) {
   const knownStatus = knownPaymentStatuses.has(payload.payment.status)
     ? payload.payment.status
     : null;
-  const result = await supabase
-    .rpc("apply_payment_webhook_event", {
+  const result = await applyWebhookEvent(
+    supabase,
+    {
       p_asaas_event_id: payload.id,
       p_asaas_charge_id: payload.payment.id,
       p_event_type: payload.event,
       p_new_status: knownStatus,
       p_event_created_at: getEventCreatedAt(rawPayload),
       p_raw_event: rawPayload,
-    })
-    .maybeSingle<ApplyWebhookEventResult>();
+    },
+  );
 
   if (result.error) {
     return jsonError({ error: "payment webhook processing failed" }, 500);

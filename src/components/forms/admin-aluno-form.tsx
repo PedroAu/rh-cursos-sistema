@@ -4,10 +4,8 @@ import { useActionState } from "react";
 import { createAlunoAction, updateAlunoAction, type AdminFormState } from "@/app/actions/admin";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import {
-  ShadcnSelectField,
-  ShadcnTextField,
-} from "@/components/shadcn/admin/form-field";
+import { TextField } from "@/components/forms/field/text-field";
+import { SelectField } from "@/components/forms/field/select-field";
 import type { AdminAlunoRow } from "@/lib/admin-data";
 
 const initialState: AdminFormState = {
@@ -46,7 +44,7 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
         ) : null}
         {aluno ? <input name="id" type="hidden" value={aluno.id} /> : null}
         <div className="grid gap-4 md:grid-cols-2">
-          <ShadcnTextField
+          <TextField
             autoComplete="name"
             defaultValue={aluno?.fullName ?? ""}
             disabled={readOnly}
@@ -54,7 +52,7 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
             name="nome_completo"
             required
           />
-          <ShadcnTextField
+          <TextField
             autoComplete="email"
             defaultValue={aluno?.email ?? ""}
             disabled={readOnly}
@@ -63,7 +61,7 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
             required
             type="email"
           />
-          <ShadcnTextField
+          <TextField
             autoComplete="off"
             defaultValue={aluno?.cpf ?? ""}
             disabled={readOnly}
@@ -71,7 +69,7 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
             name="cpf"
             placeholder="Somente números ou formatado"
           />
-          <ShadcnTextField
+          <TextField
             autoComplete="tel"
             defaultValue={aluno?.phone ?? ""}
             disabled={readOnly}
@@ -79,20 +77,20 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
             name="telefone"
             placeholder="DDD + número"
           />
-          <ShadcnTextField
+          <TextField
             defaultValue={aluno?.role ?? ""}
             disabled={readOnly}
             label="Cargo"
             name="cargo"
           />
-          <ShadcnTextField
+          <TextField
             autoComplete="organization"
             defaultValue={aluno?.organization ?? ""}
             disabled={readOnly}
             label="Órgão/empresa"
             name="orgao"
           />
-          <ShadcnSelectField
+          <SelectField
             options={studentTypeOptions}
             defaultValue={aluno?.studentType ?? "PF"}
             disabled={readOnly}
@@ -100,7 +98,7 @@ export function AdminAlunoForm({ aluno, readOnly = false }: AdminAlunoFormProps)
             name="tipo_aluno"
             required
           />
-          <ShadcnTextField
+          <TextField
             defaultValue={aluno?.userId ?? ""}
             disabled={readOnly}
             label="User ID"

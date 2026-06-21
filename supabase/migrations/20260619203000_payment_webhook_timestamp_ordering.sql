@@ -73,4 +73,27 @@ begin
 end;
 $$;
 
+create or replace function public.apply_payment_webhook_event(
+  p_asaas_event_id  text,
+  p_asaas_charge_id text,
+  p_event_type      text,
+  p_new_status      payment_status,
+  p_raw_event       jsonb
+)
+returns table (payment_id uuid, duplicate boolean, applied_status payment_status)
+language sql
+security definer
+set search_path = public
+as $$
+  select *
+  from public.apply_payment_webhook_event(
+    p_asaas_event_id,
+    p_asaas_charge_id,
+    p_event_type,
+    p_new_status,
+    null::timestamptz,
+    p_raw_event
+  )
+$$;
+
 drop function if exists public.payment_status_rank(payment_status);
