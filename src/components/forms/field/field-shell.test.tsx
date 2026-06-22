@@ -70,7 +70,7 @@ describe('FieldShell', () => {
   });
 
   it('renders children without modification', () => {
-    const { container } = render(
+    render(
       <FieldShell id="test-input" label="Test Label">
         <input type="text" id="custom-id" data-testid="custom-input" />
       </FieldShell>

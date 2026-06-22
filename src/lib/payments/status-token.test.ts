@@ -4,9 +4,10 @@ import {
 } from "@/lib/payments/status-token";
 
 describe("payment status token", () => {
-  const originalSecret = process.env.PAYMENT_STATUS_TOKEN_SECRET;
+  let originalSecret: string | undefined;
 
   beforeEach(() => {
+    originalSecret = process.env.PAYMENT_STATUS_TOKEN_SECRET;
     process.env.PAYMENT_STATUS_TOKEN_SECRET = "test-payment-status-secret";
   });
 
