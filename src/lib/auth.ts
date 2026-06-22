@@ -41,7 +41,7 @@ function getDemoUsers(): Array<DemoSession & { password: string }> {
 
   const demoPassword = process.env.DEMO_ADMIN_PASSWORD;
   if (!demoPassword) {
-    if (process.env.DEMO_AUTH_ENABLED !== "true") {
+    if (process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTH !== "true") {
       return [];
     }
     console.warn(

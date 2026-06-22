@@ -3,8 +3,6 @@
  * Ensures all required security variables are configured correctly
  */
 
-import { validateDemoAuthConfig } from "./demo-auth";
-
 function validateEnvironment(): void {
   // O app agora roda em modelo híbrido (SSG para páginas públicas e SSR para
   // rotas protegidas do admin). Variáveis NEXT_PUBLIC_* continuam sendo
@@ -46,15 +44,6 @@ function validateEnvironment(): void {
 
   if (isProduction && !process.env.AUTH_SESSION_SECRET) {
     errors.push("🔴 CRITICAL: AUTH_SESSION_SECRET must be set in production");
-  }
-
-  // ============================================
-  // DEMO AUTH VALIDATION (feature flag: NEXT_PUBLIC_ENABLE_DEMO_AUTH)
-  // ============================================
-
-  const demoAuthValidation = validateDemoAuthConfig();
-  if (demoAuthValidation.warnings.length > 0) {
-    warnings.push(...demoAuthValidation.warnings);
   }
 
   // ============================================

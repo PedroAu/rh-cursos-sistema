@@ -116,6 +116,7 @@ export function CalendarView({
               <input
                 id="agenda-date"
                 type="date"
+                aria-label="Selecionar data"
                 value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
                 onChange={(event) => goToDate(event.target.value)}
                 className="h-11 w-full rounded-lg border border-input bg-white px-3 text-sm shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-ring/30"

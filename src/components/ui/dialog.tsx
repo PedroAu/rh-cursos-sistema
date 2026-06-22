@@ -57,11 +57,12 @@ export function DialogContent({
           }
         }}
         onCloseAutoFocus={(event) => {
-          event.preventDefault();
-          // Restore focus to trigger element when dialog closes
+          // Only prevent default if we have a trigger to restore focus to
           if (triggerRef?.current) {
+            event.preventDefault();
             triggerRef.current.focus();
           }
+          // Otherwise let Radix handle default focus restoration
         }}
         {...props}
       >

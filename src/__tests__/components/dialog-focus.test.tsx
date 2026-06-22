@@ -12,7 +12,7 @@ import { describe, it, expect } from "vitest";
 describe("Dialog Focus Management (AC9 - D-2.4)", () => {
   function DialogTestComponent() {
     const [open, setOpen] = useState(false);
-    const triggerRef = useRef<HTMLElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
 
     return (
       <Dialog open={open} onOpenChange={setOpen}>
@@ -34,16 +34,13 @@ describe("Dialog Focus Management (AC9 - D-2.4)", () => {
     render(<DialogTestComponent />);
 
     const triggerButton = screen.getByRole("button", { name: /open dialog/i });
-    const dialogContent = screen.getByTestId("dialog-content");
-
     // Open dialog
     fireEvent.click(triggerButton);
-    await waitFor(() => {
-      expect(dialogContent).toBeVisible();
-    });
+
+    // Dialog should open (verified by close button becoming available)
+    const closeButton = screen.getByRole("button", { name: /close/i });
 
     // Close dialog
-    const closeButton = screen.getByRole("button", { name: /close/i });
     fireEvent.click(closeButton);
 
     // Focus should be restored to trigger button
@@ -56,16 +53,14 @@ describe("Dialog Focus Management (AC9 - D-2.4)", () => {
     render(<DialogTestComponent />);
 
     const triggerButton = screen.getByRole("button", { name: /open dialog/i });
-    const dialogContent = screen.getByTestId("dialog-content");
-
     // Open dialog
     fireEvent.click(triggerButton);
-    await waitFor(() => {
-      expect(dialogContent).toBeVisible();
-    });
 
-    // Close dialog with Escape key
-    fireEvent.keyDown(dialogContent, { key: "Escape", code: "Escape" });
+    // Dialog should open (verified by close button becoming available)
+    const closeButton = screen.getByRole("button", { name: /close/i });
+
+    // Close dialog with Escape key (fire on document since dialog is in portal)
+    fireEvent.keyDown(document, { key: "Escape", code: "Escape" });
 
     // Focus should be restored to trigger button
     await waitFor(() => {
@@ -76,7 +71,7 @@ describe("Dialog Focus Management (AC9 - D-2.4)", () => {
   it("should support custom initialFocusRef", async () => {
     function DialogWithInitialFocus() {
       const [open, setOpen] = useState(false);
-      const triggerRef = useRef<HTMLElement>(null);
+      const triggerRef = useRef<HTMLButtonElement>(null);
       const initialFocusRef = useRef<HTMLInputElement>(null);
 
       return (
@@ -98,10 +93,12 @@ describe("Dialog Focus Management (AC9 - D-2.4)", () => {
     render(<DialogWithInitialFocus />);
 
     const triggerButton = screen.getByRole("button", { name: /open dialog/i });
-    const input = screen.getByTestId("input");
 
-    // Open dialog
+    // Open dialog first
     fireEvent.click(triggerButton);
+
+    // Now the input inside the dialog portal is rendered
+    const input = screen.getByTestId("input");
 
     // Input should receive focus
     await waitFor(() => {

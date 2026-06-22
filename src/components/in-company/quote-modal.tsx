@@ -73,7 +73,10 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
   const closeQuote = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      // Capture active element as trigger for focus restoration on close
+      triggerRef.current = document.activeElement as HTMLElement;
+    } else {
       setForm(initialForm);
       setErrors({});
       setSubmitError(null);

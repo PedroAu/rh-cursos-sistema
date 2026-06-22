@@ -23,10 +23,12 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
+    ignores: ["coverage/**"]
+  },
+  {
     rules: {
       "react-hooks/preserve-manual-memoization": "off",
       "react-hooks/set-state-in-effect": "off",
-      // A11y: Enforce aria-labels on icon-only buttons
       "@next/next/no-img-element": "off"
     }
   },

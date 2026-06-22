@@ -142,7 +142,10 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
   const requiresOrganizationContext = form.enrollmentType !== "Pessoa física";
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      // Capture active element as trigger for focus restoration on close
+      triggerRef.current = document.activeElement as HTMLElement;
+    } else {
       setStep(1);
       setForm(initialForm);
       setFieldErrors({});

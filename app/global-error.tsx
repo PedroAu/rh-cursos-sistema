@@ -60,7 +60,15 @@ export default function GlobalError({
               borderRadius: 10,
               background: "#1d4ed8",
               color: "#ffffff",
-              cursor: "pointer"
+              cursor: "pointer",
+              outline: "none"
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.outline = "2px solid #ffffff";
+              e.currentTarget.style.outlineOffset = "2px";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.outline = "none";
             }}
           >
             Tentar novamente
