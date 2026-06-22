@@ -1,54 +1,56 @@
-name: CI
-
-# Gate de qualidade. O deploy do site é feito em Cloudflare Workers com
-# OpenNext; este workflow valida a aplicação e também o empacotamento para o
-# runtime da Cloudflare antes do merge.
+name: CI Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, develop, 'feature/**']
   pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+    branches: [main, develop]
 
 jobs:
-  quality:
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
-    name: Typecheck, Lint & Build
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Install dependencies
-        run: npm ci
+  typecheck:
+    name: TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
 
-      - name: Run type check
-        run: npm run typecheck
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test
 
-      - name: Run linting
-        run: npm run lint
-
-      - name: Build Next.js app
-        run: npm run build
-        env:
-          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
-
-      - name: Package Cloudflare Worker
-        run: npm run build:workers
-        env:
-          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build

@@ -1,0 +1,48 @@
+# CodeRabbit Configuration
+# Review profile: balanced
+
+rules:
+  - type: pattern
+    pattern: "console.log"
+    replacement: "logger.debug or remove in production"
+    severity: medium
+  
+  - type: pattern
+    pattern: "TODO|FIXME|HACK"
+    severity: low
+
+review:
+  auto_review: true
+  request_changes_on_critical: true
+
+path_instructions:
+  - path: "src/**"
+    instructions: |
+      Focus on code quality, performance, and security:
+      - Check for proper error handling
+      - Verify input validation
+      - Look for security vulnerabilities (SQL injection, XSS, etc.)
+      - Ensure TypeScript types are correct
+  
+  - path: "**/*.test.ts"
+    instructions: |
+      Ensure comprehensive test coverage:
+      - Verify edge cases are tested
+      - Check mock implementations
+      - Ensure assertions are meaningful
+  
+  - path: "docs/**"
+    instructions: |
+      Check documentation quality:
+      - Verify clarity and completeness
+      - Check for broken links
+      - Ensure examples are correct
+
+  - path: ".github/workflows/**"
+    instructions: |
+      Verify GitHub Actions workflows:
+      - Check YAML syntax
+      - Verify action versions
+      - Check for security issues
+
+profile: balanced
