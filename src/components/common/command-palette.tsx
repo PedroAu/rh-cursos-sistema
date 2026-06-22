@@ -1,7 +1,7 @@
 "use client";
 
 import { BookOpen, CalendarDays, Home, LockKeyhole, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "@/lib/router-compat";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,11 +22,14 @@ export function CommandPalette() {
   const { courses } = useAppStore();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const triggerRef = useRef<HTMLElement>(null);
 
   useHotkey(
     (event) => (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k",
     (event) => {
       event.preventDefault();
+      // Store the currently focused element as the trigger for focus restoration
+      triggerRef.current = document.activeElement as HTMLElement;
       setOpen((current) => !current);
     }
   );
@@ -46,7 +49,7 @@ export function CommandPalette() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-2xl p-0">
+      <DialogContent className="max-w-2xl p-0" triggerRef={triggerRef}>
         <div className="flex max-h-[calc(100vh-2rem)] flex-col">
           <DialogHeader className="border-b border-border px-6 py-5">
             <DialogTitle>Busca rápida</DialogTitle>

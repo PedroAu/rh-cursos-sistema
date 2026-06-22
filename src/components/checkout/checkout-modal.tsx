@@ -134,6 +134,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const triggerRef = useRef<HTMLElement>(null);
 
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course.id), [classes, course.id]);
   const selectedClass = courseClasses.find((item) => item.id === form.classId);
@@ -243,7 +244,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl p-0">
+      <DialogContent className="max-w-5xl p-0" triggerRef={triggerRef}>
         <div className="grid max-h-[calc(100vh-2rem)] md:grid-cols-[minmax(0,0.9fr)_minmax(320px,0.55fr)]">
           <div className="flex min-h-0 flex-col">
             <DialogHeader className="border-b border-border px-6 py-5">
@@ -429,6 +430,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                       <button
                         key={trainingClass.id}
                         type="button"
+                        aria-label={`Selecionar turma de ${new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(trainingClass.startDate))} às ${trainingClass.time}`}
                         onClick={() => {
                           setFieldErrors((current) => ({ ...current, classId: "" }));
                           setForm((current) => ({ ...current, classId: trainingClass.id }));
