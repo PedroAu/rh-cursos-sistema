@@ -232,7 +232,6 @@ CREATE TABLE public.instrutor (
   foto_url        VARCHAR(500),
   formacao        TEXT,
   especialidade   VARCHAR(160),
-  areas_atuacao   JSONB NOT NULL DEFAULT '[]'::jsonb,
   rating          NUMERIC(3,2) NOT NULL DEFAULT 0,
   status          public.status_instrutor NOT NULL DEFAULT 'Ativo',
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -245,7 +244,6 @@ CREATE TABLE public.instrutor (
 
 **Notes:**
 - `rating` is calculated from `avaliacao` table (see trigger `avaliacao_sync_curso_rating`)
-- `areas_atuacao` is JSONB array of expertise areas
 - Soft delete via `deleted_at`
 - Public catalog shows only active instructors
 
@@ -270,7 +268,6 @@ CREATE TABLE public.curso (
   categoria       VARCHAR(120),
   trilha_id       VARCHAR(80),
   trilha_nome     VARCHAR(180),
-  tipo_publico    VARCHAR(80),
   preco_base      NUMERIC(10,2) NOT NULL DEFAULT 0,
   status          public.status_curso NOT NULL DEFAULT 'Ativo',
   destaque        BOOLEAN NOT NULL DEFAULT false,
