@@ -1,49 +1,79 @@
-import type { ComponentProps } from "react";
+'use client';
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
-import { fieldDescriptionId } from "./field-shell";
-
-type CheckboxFieldProps = ComponentProps<typeof Checkbox> & {
+export interface CheckboxFieldProps
+  extends React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root> {
+  id?: string;
   label: string;
   description?: string;
-};
+  error?: string;
+  name?: string;
+}
 
-/**
- * Checkbox Radix: renderiza um input hidden com value `"on"` quando marcado e
- * o omite do FormData quando desmarcado. O schema zod deve modelar o campo como
- * `z.literal("on").optional()` — nunca `z.boolean()`. Ver spec §5.2.
- */
-export function CheckboxField({
-  id,
-  name,
-  label,
-  description,
-  className,
-  ...props
-}: CheckboxFieldProps) {
-  const inputId = id ?? name ?? label;
+export const CheckboxField = React.forwardRef<
+  React.ElementRef<typeof CheckboxPrimitive.Root>,
+  CheckboxFieldProps
+>(
+  (
+    {
+      id: providedId,
+      label,
+      description,
+      error,
+      className,
+      name,
+      ...checkboxProps
+    },
+    ref,
+  ) => {
+    const id = providedId || name || `field-${Math.random().toString(36).slice(2, 9)}`;
+    const descriptionId = `${id}-description`;
+    const errorId = `${id}-error`;
 
-  return (
-    <div className={cn("flex items-start gap-3 rounded-sm border border-border bg-background p-3", className)}>
-      <Checkbox
-        aria-describedby={description ? fieldDescriptionId(inputId) : undefined}
-        id={inputId}
-        name={name}
-        {...props}
-      />
-      <div className="grid gap-1.5 leading-none">
-        <Label className="cursor-pointer" htmlFor={inputId}>
-          {label}
-        </Label>
-        {description ? (
-          <p className="text-xs text-muted-foreground" id={fieldDescriptionId(inputId)}>
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <Checkbox
+            ref={ref}
+            id={id}
+            name={name}
+            aria-describedby={[
+              description ? descriptionId : null,
+              error ? errorId : null,
+            ]
+              .filter(Boolean)
+              .join(' ') || undefined}
+            {...(error && { 'aria-invalid': true })}
+            className={className}
+            {...checkboxProps}
+          />
+          <Label htmlFor={id} className="font-normal cursor-pointer">
+            {label}
+          </Label>
+        </div>
+
+        {description && !error && (
+          <p id={descriptionId} className="text-xs text-muted-foreground ml-6">
             {description}
           </p>
-        ) : null}
+        )}
+
+        {error && (
+          <p
+            id={errorId}
+            role="alert"
+            className="text-xs font-semibold text-destructive ml-6"
+          >
+            {error}
+          </p>
+        )}
       </div>
-    </div>
-  );
-}
+    );
+  },
+);
+
+CheckboxField.displayName = 'CheckboxField';

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { FieldShell } from './field-shell';
 
 interface FieldMeta {
@@ -11,16 +11,16 @@ interface FieldMeta {
   required?: boolean;
 }
 
-export interface TextareaFieldProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'id'>,
+export interface NumberFieldProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'id' | 'type'>,
     FieldMeta {
   id?: string;
+  min?: number;
+  max?: number;
+  step?: number;
 }
 
-export const TextareaField = React.forwardRef<
-  HTMLTextAreaElement,
-  TextareaFieldProps
->(
+export const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(
   (
     {
       id: providedId,
@@ -30,7 +30,10 @@ export const TextareaField = React.forwardRef<
       required,
       className,
       name,
-      ...textareaProps
+      min = 0,
+      max,
+      step = 1,
+      ...inputProps
     },
     ref,
   ) => {
@@ -46,10 +49,14 @@ export const TextareaField = React.forwardRef<
         error={error}
         required={required}
       >
-        <Textarea
+        <Input
           ref={ref}
           id={id}
           name={name}
+          type="number"
+          min={min}
+          max={max}
+          step={step}
           aria-describedby={[
             description ? descriptionId : null,
             error ? errorId : null,
@@ -59,11 +66,11 @@ export const TextareaField = React.forwardRef<
           {...(error && { 'aria-invalid': true })}
           aria-required={required || undefined}
           className={className}
-          {...textareaProps}
+          {...inputProps}
         />
       </FieldShell>
     );
   },
 );
 
-TextareaField.displayName = 'TextareaField';
+NumberField.displayName = 'NumberField';
