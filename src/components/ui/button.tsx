@@ -6,21 +6,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--ea-button-radius)] text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ea-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--mantine-radius-md)] text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--ea-button-primary-bg)] text-[var(--ea-button-primary-fg)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--ea-button-primary-hover)]",
+          "bg-[var(--color-primary)] text-[var(--mantine-color-white)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--color-primary-hover)]",
         secondary:
-          "border border-[var(--ea-button-secondary-border)] bg-[var(--ea-button-secondary-bg)] text-[var(--ea-button-secondary-fg)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--ea-button-secondary-hover)]",
+          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--form-input-color)] shadow-soft hover:-translate-y-0.5 hover:bg-tertiary-0",
         outline:
-          "border border-[var(--ea-button-ghost-border)] bg-[var(--ea-button-ghost-bg)] text-[var(--ea-button-ghost-fg)] hover:-translate-y-0.5 hover:bg-[var(--ea-button-ghost-hover-bg)]",
-        ghost: "text-[var(--ea-button-ghost-fg)] hover:bg-[var(--ea-button-ghost-hover-bg)]",
+          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--color-primary)] hover:-translate-y-0.5 hover:bg-primary-0",
+        ghost: "text-[var(--color-primary)] hover:bg-primary-0",
         tertiary:
-          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--ea-button-ghost-fg)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
-        success: "bg-success text-white hover:-translate-y-0.5 hover:bg-success/90",
-        danger: "bg-danger text-white hover:bg-danger/90"
+          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--color-primary)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
+        success: "bg-[var(--color-status-success)] text-white hover:-translate-y-0.5 hover:opacity-90",
+        danger: "bg-[var(--color-status-error)] text-white hover:opacity-90"
       },
       size: {
         default: "h-12 px-6",

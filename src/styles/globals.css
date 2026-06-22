@@ -1,5 +1,6 @@
 /* Design System Tokens (Phase 1 — Foundation) */
 @import '../design-tokens/tokens.css';
+@import '../design-tokens/mantine-tokens.css';
 
 @tailwind base;
 @tailwind components;
