@@ -1,3 +1,6 @@
+/* Design System Tokens (Phase 1 — Foundation) */
+@import '../design-tokens/tokens.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

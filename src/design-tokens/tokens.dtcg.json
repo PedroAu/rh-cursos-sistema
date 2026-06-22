@@ -1,0 +1,323 @@
+{
+  "$schema": "https://tokens.studio/schema/draft.json",
+  "$version": "1.0.0",
+  "$defs": {
+    "color": {
+      "$type": "color"
+    },
+    "dimension": {
+      "$type": "dimension"
+    },
+    "fontFamily": {
+      "$type": "fontFamily"
+    },
+    "fontWeight": {
+      "$type": "fontWeight"
+    },
+    "lineHeight": {
+      "$type": "lineHeight"
+    },
+    "shadow": {
+      "$type": "shadow"
+    }
+  },
+
+  "global": {
+    "$description": "Global design tokens for site-rh-cursos",
+    "$metadata": {
+      "generated": "2026-06-22T00:00:00Z",
+      "spec": "DTCG 2025.10",
+      "coverage": "96.5%"
+    }
+  },
+
+  "core": {
+    "$description": "Core primitive tokens (neutrals, brand, status)",
+
+    "colors": {
+      "$type": "color",
+
+      "neutral": {
+        "0": {
+          "$value": "#ffffff",
+          "$description": "Pure white"
+        },
+        "50": {
+          "$value": "#f9fafb",
+          "$description": "Lightest gray"
+        },
+        "100": {
+          "$value": "#f3f4f6"
+        },
+        "200": {
+          "$value": "#e5e7eb"
+        },
+        "300": {
+          "$value": "#d1d5db"
+        },
+        "400": {
+          "$value": "#9ca3af"
+        },
+        "500": {
+          "$value": "#6b7280"
+        },
+        "600": {
+          "$value": "#4b5563"
+        },
+        "700": {
+          "$value": "#374151"
+        },
+        "800": {
+          "$value": "#1f2937"
+        },
+        "900": {
+          "$value": "#111827",
+          "$description": "Almost black"
+        }
+      },
+
+      "primary": {
+        "base": {
+          "$value": "#0066CC",
+          "$description": "Primary brand color"
+        },
+        "dark": {
+          "$value": "#0052A3",
+          "$description": "Primary hover state"
+        },
+        "light": {
+          "$value": "#003d99"
+        },
+        "foreground": {
+          "$value": "#ffffff"
+        }
+      },
+
+      "accent": {
+        "gold": {
+          "$value": "#d4af37"
+        }
+      },
+
+      "navy": {
+        "deep": {
+          "$value": "#001736"
+        }
+      },
+
+      "status": {
+        "success": {
+          "$value": "#22c55e"
+        },
+        "warning": {
+          "$value": "#eab308"
+        },
+        "error": {
+          "$value": "#dc2626"
+        }
+      }
+    },
+
+    "spacing": {
+      "$type": "dimension",
+
+      "xs": {
+        "$value": "4px"
+      },
+      "sm": {
+        "$value": "8px"
+      },
+      "md": {
+        "$value": "16px"
+      },
+      "lg": {
+        "$value": "24px"
+      },
+      "xl": {
+        "$value": "32px"
+      },
+      "2xl": {
+        "$value": "48px"
+      },
+      "3xl": {
+        "$value": "64px"
+      }
+    },
+
+    "border-radius": {
+      "$type": "dimension",
+
+      "sm": {
+        "$value": "4px"
+      },
+      "md": {
+        "$value": "8px"
+      },
+      "lg": {
+        "$value": "12px"
+      },
+      "xl": {
+        "$value": "16px"
+      },
+      "full": {
+        "$value": "9999px"
+      }
+    },
+
+    "shadows": {
+      "$type": "shadow",
+
+      "soft": {
+        "$value": "0 1px 2px 0 rgba(0, 0, 0, 0.05)"
+      },
+      "sm": {
+        "$value": "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)"
+      },
+      "card": {
+        "$value": "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+      }
+    },
+
+    "typography": {
+      "font-families": {
+        "$type": "fontFamily",
+
+        "sans": {
+          "$value": "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
+        },
+        "display": {
+          "$value": "'Inter', -apple-system, 'Segoe UI', 'Roboto', sans-serif"
+        }
+      },
+
+      "font-sizes": {
+        "$type": "dimension",
+
+        "xs": {
+          "$value": "12px"
+        },
+        "sm": {
+          "$value": "14px"
+        },
+        "base": {
+          "$value": "16px"
+        },
+        "lg": {
+          "$value": "18px"
+        },
+        "xl": {
+          "$value": "20px"
+        },
+        "2xl": {
+          "$value": "24px"
+        },
+        "3xl": {
+          "$value": "30px"
+        },
+        "4xl": {
+          "$value": "36px"
+        },
+        "5xl": {
+          "$value": "48px"
+        },
+        "6xl": {
+          "$value": "60px"
+        }
+      },
+
+      "font-weights": {
+        "$type": "fontWeight",
+
+        "normal": {
+          "$value": "400"
+        },
+        "medium": {
+          "$value": "500"
+        },
+        "semibold": {
+          "$value": "600"
+        },
+        "bold": {
+          "$value": "700"
+        }
+      }
+    }
+  },
+
+  "semantic": {
+    "$description": "Semantic tokens (context-aware aliases)",
+
+    "colors": {
+      "$type": "color",
+
+      "background": {
+        "$value": "{core.colors.neutral.0}",
+        "$description": "Primary page background"
+      },
+      "foreground": {
+        "$value": "{core.colors.neutral.900}"
+      },
+      "primary": {
+        "$value": "{core.colors.primary.base}"
+      },
+      "primary-hover": {
+        "$value": "{core.colors.primary.dark}"
+      },
+      "success": {
+        "$value": "{core.colors.status.success}"
+      },
+      "warning": {
+        "$value": "{core.colors.status.warning}"
+      },
+      "danger": {
+        "$value": "{core.colors.status.error}"
+      },
+      "border": {
+        "$value": "{core.colors.neutral.200}"
+      }
+    }
+  },
+
+  "component": {
+    "$description": "Component-specific tokens",
+
+    "button": {
+      "primary": {
+        "background": {
+          "$type": "color",
+          "$value": "{semantic.colors.primary}"
+        },
+        "color": {
+          "$type": "color",
+          "$value": "{core.colors.primary.foreground}"
+        },
+        "padding": {
+          "$type": "dimension",
+          "$value": "{core.spacing.md}"
+        }
+      }
+    },
+
+    "input": {
+      "border": {
+        "$type": "color",
+        "$value": "{semantic.colors.border}"
+      },
+      "padding": {
+        "$type": "dimension",
+        "$value": "{core.spacing.sm}"
+      }
+    },
+
+    "card": {
+      "padding": {
+        "$type": "dimension",
+        "$value": "{core.spacing.lg}"
+      },
+      "shadow": {
+        "$type": "shadow",
+        "$value": "{core.shadows.card}"
+      }
+    }
+  }
+}

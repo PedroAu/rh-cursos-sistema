@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { tokens } from './src/design-tokens/tokens.tailwind.js'
 
 const config: Config = {
   darkMode: ["class"],
@@ -17,6 +18,7 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Existing EA tokens (keep as-is)
         background: "var(--ea-color-background)",
         foreground: "var(--ea-color-on-surface)",
         primary: {
@@ -53,28 +55,32 @@ const config: Config = {
         "text-main": "var(--ea-color-text-main)",
         "text-muted": "var(--ea-color-text-muted)",
         "outline-variant": "var(--ea-color-outline-variant)",
-        // Camada semântica (Story 1.2). `label` vira `label-primary`/`label-secondary`
-        // porque `text-label` já é um utilitário de fontSize (colisão de classe).
         "label-primary": "var(--ea-color-label)",
         "label-secondary": "var(--ea-color-secondary-label)",
         separator: "var(--ea-color-separator)",
         "surface-raised": "var(--ea-color-surface-raised)",
-        control: "var(--ea-color-control)"
+        control: "var(--ea-color-control)",
+        // New design system tokens (Phase 1 — Foundation)
+        ...tokens.colors,
       },
+      spacing: tokens.spacing,
       borderRadius: {
         DEFAULT: "var(--ea-radius-default)",
         lg: "var(--ea-radius-lg)",
         xl: "var(--ea-radius-xl)",
         "2xl": "var(--ea-radius-2xl)",
-        "3xl": "var(--ea-radius-2xl)"
+        "3xl": "var(--ea-radius-2xl)",
+        ...tokens.borderRadius,
       },
       boxShadow: {
         soft: "var(--ea-shadow-soft)",
-        card: "var(--ea-shadow-card)"
+        card: "var(--ea-shadow-card)",
+        ...tokens.boxShadow,
       },
       fontFamily: {
         sans: ["var(--ea-font-sans)"],
-        display: ["var(--ea-font-display)"]
+        display: ["var(--ea-font-display)"],
+        ...tokens.fontFamily,
       },
       fontSize: {
         micro: ["var(--ea-font-size-micro)", { lineHeight: "1.4" }],
@@ -102,8 +108,11 @@ const config: Config = {
         section: ["var(--ea-font-size-section)", { lineHeight: "1.2" }],
         "h1-alt": ["var(--ea-font-size-h1-alt)", { lineHeight: "1.08" }],
         display: ["var(--ea-font-size-display)", { lineHeight: "1.12" }],
-        hero: ["var(--ea-font-size-hero)", { lineHeight: "1.08" }]
+        hero: ["var(--ea-font-size-hero)", { lineHeight: "1.08" }],
+        ...tokens.fontSize,
       },
+      fontWeight: tokens.fontWeight,
+      lineHeight: tokens.lineHeight,
       backgroundImage: {
         "hero-radial":
           "linear-gradient(90deg, rgba(0,23,54,0.96), rgba(0,23,54,0.86) 48%, rgba(0,23,54,0.24))",
