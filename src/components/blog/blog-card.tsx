@@ -9,9 +9,10 @@ import type { BlogPost } from "@/types";
 export function BlogCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
   return (
     <Card
-      className={`h-full overflow-hidden ${
-        featured ? "border-primary/10 bg-primary text-white" : "border-primary/10"
-      }`}
+      variant={featured ? "filled" : "base"}
+      interactive={false}
+      size="md"
+      className={`h-full overflow-hidden ${featured ? "bg-primary text-white" : ""}`}
     >
       <div className={`min-h-40 border-b ${featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30"} p-6`}>
         <div className={`inline-flex rounded px-4 py-2 text-label font-semibold uppercase tracking-[0.16em] ${

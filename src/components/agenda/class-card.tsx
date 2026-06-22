@@ -31,7 +31,7 @@ export function ClassCard({
         : trainingClass.status;
 
   return (
-    <Card className="overflow-hidden border-[#d7dee5] bg-white shadow-[0_8px_24px_rgba(0,67,100,0.08)]">
+    <Card variant="elevated" interactive={false} size="md" className="overflow-hidden">
       <div className="grid lg:grid-cols-[172px_minmax(0,1fr)]">
         <div className="flex min-h-[172px] flex-col items-center justify-center bg-[#0b4668] px-6 py-8 text-center text-white">
           <span className="text-5xl font-extrabold leading-none">{day}</span>

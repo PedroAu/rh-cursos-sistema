@@ -12,7 +12,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
     .join("");
 
   return (
-    <Card className="h-full border-primary/10">
+    <Card variant="outlined" interactive={false} size="md" className="h-full">
       <CardContent className="space-y-6 p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14">
