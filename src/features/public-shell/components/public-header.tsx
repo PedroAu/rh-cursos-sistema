@@ -1,7 +1,9 @@
 "use client";
 
 import NextLink from "next/link";
+import NextImage from "next/image";
 import { Anchor, Box, Button, Container, Group, Text } from "@mantine/core";
+import { useWindowScroll } from "@mantine/hooks";
 import { Mail, MapPin, MessageCircle, Phone, UserRound } from "lucide-react";
 
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
@@ -17,18 +19,31 @@ function isItemActive(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
+/** Altura da top bar de utilidades, recolhida no scroll. */
+const TOP_BAR_HEIGHT = 40;
+
 export function PublicHeader() {
   const location = useLocation();
+  const [scroll] = useWindowScroll();
+  const isScrolled = scroll.y > 8;
 
   return (
     <Box component="header" className="sticky top-0 z-30">
-      {/* Camada 1 — top bar de utilidades */}
+      {/* Camada 1 — top bar de utilidades (recolhe no scroll) */}
       <Box
         visibleFrom="md"
-        style={{ background: "var(--mantine-color-rhBlue-9)", color: "#ffffff" }}
+        aria-hidden={isScrolled}
+        style={{
+          background: "var(--mantine-color-rhBlue-9)",
+          color: "#ffffff",
+          maxHeight: isScrolled ? 0 : TOP_BAR_HEIGHT,
+          opacity: isScrolled ? 0 : 1,
+          overflow: "hidden",
+          transition: "max-height 0.3s ease, opacity 0.2s ease"
+        }}
       >
         <Container size={1200} px="md">
-          <Group h={40} justify="space-between" wrap="nowrap">
+          <Group h={TOP_BAR_HEIGHT} justify="space-between" wrap="nowrap">
             <Group gap="lg" wrap="nowrap">
               <Anchor
                 href={`tel:+55${company.phones.primary.replace(/\D/g, "")}`}
@@ -107,83 +122,92 @@ export function PublicHeader() {
         </Container>
       </Box>
 
-      {/* Camada 2 — barra principal com logo + navegação */}
+      {/* Camada 2 — barra principal: logo + navegação */}
       <Box
         className="border-b border-[var(--mantine-color-gray-3)]"
         style={{ background: "rgba(255,255,255,0.95)", backdropFilter: "blur(12px)" }}
       >
         <Container size={1200} px="md">
-          <Group h={72} justify="space-between" wrap="nowrap">
-            <Group gap={40} wrap="nowrap">
-              <Text
-                component={NextLink}
-                href="/"
-                fw={800}
-                fz="2rem"
-                c="rhBlue.9"
-                td="none"
-                lh={1}
-                style={{ letterSpacing: "-0.04em", whiteSpace: "nowrap" }}
-              >
-                RH Cursos
-              </Text>
+          <Group
+            h={isScrolled ? 64 : 76}
+            justify="space-between"
+            wrap="nowrap"
+            style={{ position: "relative", transition: "height 0.3s ease" }}
+          >
+            <Box
+              component={NextLink}
+              href="/"
+              aria-label={company.logo.alt}
+              style={{ display: "inline-flex", alignItems: "center", lineHeight: 0 }}
+            >
+              <NextImage
+                src={company.logo.src}
+                alt={company.logo.alt}
+                width={453}
+                height={285}
+                priority
+                style={{
+                  height: isScrolled ? 40 : 52,
+                  width: "auto",
+                  transition: "height 0.3s ease"
+                }}
+              />
+            </Box>
 
-              <Group gap={8} visibleFrom="md" component="nav" aria-label="Navegação principal">
-                {publicNavItems.map((item) => (
+            <Group
+              gap={4}
+              visibleFrom="md"
+              wrap="nowrap"
+              component="nav"
+              aria-label="Navegação principal"
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translateX(-50%)"
+              }}
+            >
+              {publicNavItems.map((item) => {
+                const active = isItemActive(location.pathname, item.to);
+                const barHeight = isScrolled ? 64 : 76;
+
+                return (
                   <Button
                     key={item.to}
                     component={NextLink}
                     href={item.to}
                     variant="subtle"
-                    color={isItemActive(location.pathname, item.to) ? "rhBlue" : "gray"}
+                    color="gray"
                     radius={0}
-                    px={8}
+                    px={14}
                     styles={{
                       root: {
-                        height: 72,
-                        borderBottom: isItemActive(location.pathname, item.to)
+                        height: barHeight,
+                        color: active
+                          ? "var(--mantine-color-rhBlue-9)"
+                          : "var(--mantine-color-gray-7)",
+                        background: "transparent",
+                        borderBottom: active
                           ? "3px solid var(--mantine-color-rhGold-6)"
                           : "3px solid transparent",
-                        borderRadius: 0
+                        borderRadius: 0,
+                        transition: "height 0.3s ease"
                       },
                       label: {
-                        fontSize: "0.95rem",
-                        fontWeight: 600
+                        fontSize: "var(--mantine-font-size-sm)",
+                        fontWeight: 600,
+                        letterSpacing: "0.01em"
                       }
                     }}
                   >
                     {item.label}
                   </Button>
-                ))}
-              </Group>
+                );
+              })}
             </Group>
 
-            <Group gap="sm" wrap="nowrap">
-              <Button
-                component={NextLink}
-                href="/cursos"
-                visibleFrom="md"
-                color="rhBlue"
-                size="md"
-                radius="sm"
-                styles={{
-                  root: {
-                    minWidth: 160,
-                    background: "var(--mantine-color-rhBlue-9)"
-                  },
-                  label: {
-                    fontSize: "0.95rem",
-                    fontWeight: 700
-                  }
-                }}
-              >
-                Ver cursos
-              </Button>
-
-              <Box hiddenFrom="md">
-                <PublicMobileNavigation />
-              </Box>
-            </Group>
+            <Box hiddenFrom="md">
+              <PublicMobileNavigation />
+            </Box>
           </Group>
         </Container>
       </Box>
