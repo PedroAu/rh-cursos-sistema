@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TextField } from "@/components/forms/field";
 import type { AdminSettings } from "@/lib/admin-settings";
 
 const initialState: AdminFormState = {
@@ -31,14 +32,6 @@ const initialState: AdminFormState = {
 
 type AdminSettingsFormProps = {
   settings: AdminSettings;
-};
-
-type FieldProps = {
-  label: string;
-  name: string;
-  defaultValue: string;
-  type?: string;
-  helper?: string;
 };
 
 type SwitchFieldProps = {
@@ -58,16 +51,6 @@ type AssetFieldProps = {
   previewLabel: string;
   previewSize: "logo" | "favicon";
 };
-
-function Field({ label, name, defaultValue, type = "text", helper }: FieldProps) {
-  return (
-    <div className="grid gap-2">
-      <Label htmlFor={name}>{label}</Label>
-      <Input defaultValue={defaultValue} id={name} name={name} type={type} />
-      {helper ? <p className="text-sm leading-6 text-muted-foreground">{helper}</p> : null}
-    </div>
-  );
-}
 
 function AssetField({
   label,
@@ -187,18 +170,18 @@ export function AdminSettingsForm({ settings }: AdminSettingsFormProps) {
                     </div>
                   </CardHeader>
                   <CardContent className="grid gap-5">
-                    <Field
+                    <TextField
                       defaultValue={settings.operationName}
                       label="Nome da operação"
                       name="operationName"
                     />
-                    <Field
+                    <TextField
                       defaultValue="Capacitação estratégica para gestão de pessoas e setor público."
-                      helper="Campo visual desta tela. A persistência atual mantém apenas os dados operacionais existentes."
+                      description="Campo visual desta tela. A persistência atual mantém apenas os dados operacionais existentes."
                       label="Slogan institucional"
                       name="institutionalSlogan"
                     />
-                    <Field
+                    <TextField
                       defaultValue={settings.commercialEmail}
                       label="E-mail de contato oficial"
                       name="commercialEmail"
@@ -318,7 +301,7 @@ export function AdminSettingsForm({ settings }: AdminSettingsFormProps) {
                   <Badge className="w-fit bg-green-100 text-green-800 hover:bg-green-100">
                     Conectado
                   </Badge>
-                  <Field
+                  <TextField
                     defaultValue={settings.priorityChannel}
                     label="Canal prioritário"
                     name="priorityChannel"
@@ -342,7 +325,7 @@ export function AdminSettingsForm({ settings }: AdminSettingsFormProps) {
                   <p className="leading-7 text-muted-foreground">
                     Mantenha registrada a fonte principal usada pelo painel administrativo.
                   </p>
-                  <Field
+                  <TextField
                     defaultValue={settings.dataSource}
                     label="Origem principal de dados"
                     name="dataSource"
