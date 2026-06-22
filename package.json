@@ -19,6 +19,9 @@
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "npm run typecheck && npm run build && node scripts/run-playwright.mjs",
+    "test:unit": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
     "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"
   },
   "dependencies": {
@@ -57,15 +60,24 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
     "@playwright/test": "^1.60.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.15.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/ui": "^4.1.9",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.39.4",
     "eslint-config-next": "^16.2.6",
+    "happy-dom": "^20.10.6",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3",
+    "vitest": "^4.1.9",
     "wrangler": "^4.99.0"
   }
 }
