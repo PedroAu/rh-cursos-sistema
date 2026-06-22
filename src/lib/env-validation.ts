@@ -3,6 +3,8 @@
  * Ensures all required security variables are configured correctly
  */
 
+import { validateDemoAuthConfig } from "./demo-auth";
+
 function validateEnvironment(): void {
   // O app agora roda em modelo híbrido (SSG para páginas públicas e SSR para
   // rotas protegidas do admin). Variáveis NEXT_PUBLIC_* continuam sendo
@@ -47,21 +49,12 @@ function validateEnvironment(): void {
   }
 
   // ============================================
-  // AVISOS DE SEGURANÇA (não bloqueiam o build estático)
+  // DEMO AUTH VALIDATION (feature flag: NEXT_PUBLIC_ENABLE_DEMO_AUTH)
   // ============================================
 
-  if (isProduction) {
-    if (process.env.DEMO_AUTH_ENABLED === "true") {
-      warnings.push(
-        "⚠️ WARNING: DEMO_AUTH_ENABLED is true in production - this should be false"
-      );
-    }
-
-    if (process.env.DEMO_ADMIN_PASSWORD) {
-      warnings.push(
-        "⚠️ WARNING: DEMO_ADMIN_PASSWORD is set in production - should be empty"
-      );
-    }
+  const demoAuthValidation = validateDemoAuthConfig();
+  if (demoAuthValidation.warnings.length > 0) {
+    warnings.push(...demoAuthValidation.warnings);
   }
 
   // ============================================
@@ -75,9 +68,9 @@ function validateEnvironment(): void {
       );
     }
 
-    if (process.env.DEMO_AUTH_ENABLED === "true" && !process.env.DEMO_ADMIN_PASSWORD) {
+    if (process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTH !== "true") {
       warnings.push(
-        "ℹ️ INFO: DEMO_AUTH_ENABLED is true but DEMO_ADMIN_PASSWORD not set - demo login disabled"
+        "ℹ️ INFO: Demo auth is disabled. Set NEXT_PUBLIC_ENABLE_DEMO_AUTH=true to enable it."
       );
     }
   }
