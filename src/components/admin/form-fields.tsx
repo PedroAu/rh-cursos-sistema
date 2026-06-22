@@ -3,7 +3,11 @@
 import * as React from "react";
 import { X, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { FormField } from "@/components/ui/form-field";
+import { FormField, MantineFormFieldSelect, MantineFormFieldText, MantineFormFieldMultiSelect } from "@/components/ui/form-field";
+import { TextInput, ActionIcon, Group } from "@mantine/core";
+
+// Re-export Mantine form components for backward compatibility
+export { MantineFormFieldSelect as SelectField, MantineFormFieldText as TextField };
 
 export function ArrayInput({
   label,
@@ -26,9 +30,8 @@ export function ArrayInput({
         <div className="space-y-2">
           {value.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
-              <input
+              <TextInput
                 id={i === 0 ? fieldId : undefined}
-                type="text"
                 value={item}
                 aria-describedby={i === 0 ? ariaDescribedBy : undefined}
                 aria-invalid={i === 0 ? ariaInvalid : undefined}
@@ -37,23 +40,23 @@ export function ArrayInput({
                   copy[i] = e.target.value;
                   onChange(copy);
                 }}
-                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                className="flex-1"
               />
-              <button
-                type="button"
+              <ActionIcon
+                variant="subtle"
+                color="red"
                 onClick={() => onChange(value.filter((_, j) => j !== i))}
-                className="rounded p-1 text-destructive hover:bg-destructive/10"
                 aria-label={`Remover item ${i + 1}`}
                 title="Remover"
               >
                 <X className="h-4 w-4" />
-              </button>
+              </ActionIcon>
             </div>
           ))}
-          <div className="flex gap-2">
-            <input
+          <Group gap="sm">
+            <TextInput
               id={value.length === 0 ? fieldId : undefined}
-              type="text"
+              placeholder={placeholder}
               value={inputValue}
               aria-describedby={value.length === 0 ? ariaDescribedBy : undefined}
               aria-invalid={value.length === 0 ? ariaInvalid : undefined}
@@ -67,8 +70,7 @@ export function ArrayInput({
                   e.preventDefault();
                 }
               }}
-              placeholder={placeholder}
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="flex-1"
             />
             <Button
               type="button"
@@ -83,46 +85,8 @@ export function ArrayInput({
             >
               <Plus className="h-4 w-4" />
             </Button>
-          </div>
+          </Group>
         </div>
-      )}
-    </FormField>
-  );
-}
-
-export function SelectField({
-  label,
-  value,
-  options,
-  onChange,
-  error,
-  required = false,
-}: {
-  label: string;
-  value: string;
-  options: Array<{ value: string; label: string }>;
-  onChange: (v: string) => void;
-  error?: string;
-  required?: boolean;
-}) {
-  return (
-    <FormField error={error} label={label} required={required}>
-      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-        <select
-          id={fieldId}
-          value={value}
-          aria-describedby={ariaDescribedBy}
-          aria-invalid={ariaInvalid}
-          onChange={(e) => onChange(e.target.value)}
-          className="rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        >
-          <option value="">Selecione uma opção...</option>
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
       )}
     </FormField>
   );
@@ -162,19 +126,18 @@ export function ModulesBuilder({
             >
               <div className="flex items-start justify-between">
                 <h4 className="text-sm font-medium">Módulo {i + 1}</h4>
-                <button
-                  type="button"
+                <ActionIcon
+                  variant="subtle"
+                  color="red"
                   onClick={() => onChange(value.filter((_, j) => j !== i))}
-                  className="rounded p-1 text-destructive hover:bg-destructive/10"
                   aria-label={`Remover módulo ${i + 1}`}
                 >
                   <X className="h-4 w-4" />
-                </button>
+                </ActionIcon>
               </div>
 
-              <input
+              <TextInput
                 id={i === 0 ? fieldId : undefined}
-                type="text"
                 placeholder="Ex.: Introdução à legislação"
                 value={module.title}
                 aria-describedby={i === 0 ? ariaDescribedBy : undefined}
@@ -184,7 +147,6 @@ export function ModulesBuilder({
                   copy[i].title = e.target.value;
                   onChange(copy);
                 }}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
 
               <textarea
@@ -198,8 +160,7 @@ export function ModulesBuilder({
                 className="w-full min-h-20 rounded-md border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
 
-              <input
-                type="text"
+              <TextInput
                 placeholder="Ex.: 8 horas"
                 value={module.duration}
                 onChange={(e) => {
@@ -207,7 +168,6 @@ export function ModulesBuilder({
                   copy[i].duration = e.target.value;
                   onChange(copy);
                 }}
-                className="w-full rounded-md border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
 
               <div className="border-t pt-2">
@@ -216,19 +176,19 @@ export function ModulesBuilder({
                 </p>
                 <div className="space-y-1">
                   {module.topics.map((topic, j) => (
-                    <div key={j} className="flex items-center gap-2">
-                      <input
-                        type="text"
+                    <Group key={j} gap="sm">
+                      <TextInput
                         value={topic}
                         onChange={(e) => {
                           const copy = [...value];
                           copy[i].topics[j] = e.target.value;
                           onChange(copy);
                         }}
-                        className="flex-1 rounded-md border border-input px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        className="flex-1"
                       />
-                      <button
-                        type="button"
+                      <ActionIcon
+                        variant="subtle"
+                        color="red"
                         onClick={() => {
                           const copy = [...value];
                           copy[i].topics = module.topics.filter(
@@ -236,12 +196,11 @@ export function ModulesBuilder({
                           );
                           onChange(copy);
                         }}
-                        className="rounded p-1 text-destructive hover:bg-destructive/10"
                         aria-label={`Remover tópico ${j + 1} do módulo ${i + 1}`}
                       >
                         <X className="h-3 w-3" />
-                      </button>
-                    </div>
+                      </ActionIcon>
+                    </Group>
                   ))}
                 </div>
                 <Button
@@ -296,30 +255,13 @@ export function MultiSelectField({
   error?: string;
 }) {
   return (
-    <FormField error={error} label={label}>
-      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-        <div className="space-y-2" id={fieldId}>
-          {options.map((opt, index) => (
-            <label key={opt.value} className="flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                checked={value.includes(opt.value)}
-                aria-describedby={index === 0 ? ariaDescribedBy : undefined}
-                aria-invalid={index === 0 ? ariaInvalid : undefined}
-                onChange={(e) => {
-                  if (e.target.checked) {
-                    onChange([...value, opt.value]);
-                  } else {
-                    onChange(value.filter((v) => v !== opt.value));
-                  }
-                }}
-                className="rounded border border-input"
-              />
-              <span className="text-sm">{opt.label}</span>
-            </label>
-          ))}
-        </div>
-      )}
-    </FormField>
+    <MantineFormFieldMultiSelect
+      label={label}
+      value={value}
+      onChange={onChange}
+      options={options}
+      error={error}
+      placeholder="Selecione as opções..."
+    />
   );
 }
