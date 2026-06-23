@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useMemo } from "react";
 import {
   ActionIcon,
   Badge,
@@ -12,10 +13,11 @@ import {
   Stack,
   Table,
   Text,
+  TextInput,
   ThemeIcon,
   Title
 } from "@mantine/core";
-import { ArrowRight, BookOpen, CircleDollarSign, Pencil, TrendingUp, Trash2, UserPlus, Users } from "lucide-react";
+import { ArrowRight, BookOpen, CircleDollarSign, Download, Pencil, TrendingUp, Trash2, UserPlus, Users } from "lucide-react";
 
 import {
   buildPerformanceStats,
@@ -25,6 +27,9 @@ import {
 } from "@/features/admin/dashboard/model/dashboard-activity";
 import { buildDashboardMetrics } from "@/features/admin/dashboard/model/dashboard-metrics";
 import { useAppStore } from "@/lib/app-store";
+import { useAdminSearch } from "@/lib/hooks/useAdminSearch";
+import { useRealTimeMetrics } from "@/lib/hooks/useRealTimeMetrics";
+import { exportToCSV } from "@/lib/utils/csv-export";
 import { Link } from "@/lib/router-compat";
 
 function pickMetric(
@@ -49,65 +54,112 @@ function getActivityTone(kind: DashboardActivity["kind"]) {
 }
 
 export function AdminDashboardPage() {
-  const { courses, classes, students, leads, enrollments } = useAppStore();
-  const metrics = buildDashboardMetrics({ courses, classes, students, leads, enrollments });
-  const activities = buildRecentActivities({ enrollments, leads, courses });
-  const performanceStats = buildPerformanceStats({ enrollments, leads });
+  const appStore = useAppStore();
+  const { courses, classes, students, leads, enrollments } = appStore;
 
-  const kpis = [
-    {
-      label: "TOTAL DE ALUNOS",
-      value: pickMetric(metrics, "Total de alunos").value,
-      helper: pickMetric(metrics, "Total de alunos").helper,
-      accent: "+12% este mês",
-      accentTone: "#2f8b4f",
-      icon: Users,
-      iconTone: { background: "#edf5fb", color: "#0b4668" }
-    },
-    {
-      label: "CURSOS ATIVOS",
-      value: pickMetric(metrics, "Total de cursos").value,
-      helper: "Catálogo publicado",
-      accent: `${courses.filter((course) => course.status === "Ativo" || course.status === "Destaque").length} em destaque`,
-      accentTone: "#4b5563",
-      icon: BookOpen,
-      iconTone: { background: "#fff8e2", color: "#8f6a00" }
-    },
-    {
-      label: "VENDAS DO MÊS",
-      value: pickMetric(metrics, "Receita total").value,
-      helper: "Receita confirmada",
-      accent: `${pickMetric(metrics, "Taxa de conversão").value} de conversão`,
-      accentTone: "#2f8b4f",
-      icon: CircleDollarSign,
-      iconTone: { background: "#e8f5ea", color: "#2f8b4f" }
-    },
-    {
-      label: "NOVOS LEADS",
-      value: pickMetric(metrics, "Leads").value,
-      helper: "Funil comercial",
-      accent: `${leads.filter((lead) => lead.status === "Novo").length} aguardando retorno`,
-      accentTone: "#cc4f4f",
-      icon: TrendingUp,
-      iconTone: { background: "#fff1f1", color: "#d17a00" }
-    }
-  ];
+  // Real-time metrics subscription
+  const rtData = useRealTimeMetrics({ courses, classes, students, leads, enrollments });
 
-  const highlightedCourses = courses.slice(0, 4).map((course) => {
-    const courseEnrollments = enrollments.filter((item) => item.courseId === course.id);
-    const category = course.pathName ?? course.category ?? "Geral";
-    const isDraft = course.status === "Em breve" || course.status === "Inativo";
+  // Memoized metrics calculations
+  const metrics = useMemo(
+    () => buildDashboardMetrics({ courses: rtData.courses, classes: rtData.classes, students: rtData.students, leads: rtData.leads, enrollments: rtData.enrollments }),
+    [rtData.courses, rtData.classes, rtData.students, rtData.leads, rtData.enrollments]
+  );
 
-    return {
+  const activities = useMemo(
+    () => buildRecentActivities({ enrollments: rtData.enrollments, leads: rtData.leads, courses: rtData.courses }),
+    [rtData.enrollments, rtData.leads, rtData.courses]
+  );
+
+  const performanceStats = useMemo(
+    () => buildPerformanceStats({ enrollments: rtData.enrollments, leads: rtData.leads }),
+    [rtData.enrollments, rtData.leads]
+  );
+
+  // Search functionality
+  const { results: searchedCourses, handleSearch, query: searchQuery } = useAdminSearch(
+    rtData.courses.slice(0, 100),
+    (course, q) => {
+      const lowerQ = q.toLowerCase();
+      return course.title.toLowerCase().includes(lowerQ) || (course.category?.toLowerCase() ?? "").includes(lowerQ);
+    },
+    { debounceMs: 300, minChars: 1 }
+  );
+
+  // CSV export handler
+  const handleExportCourses = useCallback(() => {
+    const exportData = rtData.courses.map((course) => ({
       id: course.id,
       title: course.title,
-      category,
-      status: isDraft ? "Rascunho" : "Ativo",
-      tone: isDraft ? "#d17a00" : "#2f8b4f",
-      detail: `ID: #${course.id.replace(/\D/g, "").slice(-4) || course.id.slice(-4)}`,
-      students: `${courseEnrollments.length} inscriç${courseEnrollments.length === 1 ? "ão" : "ões"}`
-    };
-  });
+      category: course.category,
+      status: course.status,
+      price: course.price,
+      enrollments: rtData.enrollments.filter((e) => e.courseId === course.id).length
+    }));
+    exportToCSV(exportData, { filename: `courses-export-${new Date().toISOString().split("T")[0]}.csv` });
+  }, [rtData.courses, rtData.enrollments]);
+
+  const kpis = useMemo(
+    () => [
+      {
+        label: "TOTAL DE ALUNOS",
+        value: pickMetric(metrics, "Total de alunos").value,
+        helper: pickMetric(metrics, "Total de alunos").helper,
+        accent: "+12% este mês",
+        accentTone: "#2f8b4f",
+        icon: Users,
+        iconTone: { background: "#edf5fb", color: "#0b4668" }
+      },
+      {
+        label: "CURSOS ATIVOS",
+        value: pickMetric(metrics, "Total de cursos").value,
+        helper: "Catálogo publicado",
+        accent: `${rtData.courses.filter((course) => course.status === "Ativo" || course.status === "Destaque").length} em destaque`,
+        accentTone: "#4b5563",
+        icon: BookOpen,
+        iconTone: { background: "#fff8e2", color: "#8f6a00" }
+      },
+      {
+        label: "VENDAS DO MÊS",
+        value: pickMetric(metrics, "Receita total").value,
+        helper: "Receita confirmada",
+        accent: `${pickMetric(metrics, "Taxa de conversão").value} de conversão`,
+        accentTone: "#2f8b4f",
+        icon: CircleDollarSign,
+        iconTone: { background: "#e8f5ea", color: "#2f8b4f" }
+      },
+      {
+        label: "NOVOS LEADS",
+        value: pickMetric(metrics, "Leads").value,
+        helper: "Funil comercial",
+        accent: `${rtData.leads.filter((lead) => lead.status === "Novo").length} aguardando retorno`,
+        accentTone: "#cc4f4f",
+        icon: TrendingUp,
+        iconTone: { background: "#fff1f1", color: "#d17a00" }
+      }
+    ],
+    [metrics, rtData.courses, rtData.leads]
+  );
+
+  const highlightedCourses = useMemo(
+    () =>
+      (searchQuery ? searchedCourses : rtData.courses).slice(0, 4).map((course) => {
+        const courseEnrollments = rtData.enrollments.filter((item) => item.courseId === course.id);
+        const category = course.pathName ?? course.category ?? "Geral";
+        const isDraft = course.status === "Em breve" || course.status === "Inativo";
+
+        return {
+          id: course.id,
+          title: course.title,
+          category,
+          status: isDraft ? "Rascunho" : "Ativo",
+          tone: isDraft ? "#d17a00" : "#2f8b4f",
+          detail: `ID: #${course.id.replace(/\D/g, "").slice(-4) || course.id.slice(-4)}`,
+          students: `${courseEnrollments.length} inscriç${courseEnrollments.length === 1 ? "ão" : "ões"}`
+        };
+      }),
+    [searchQuery, searchedCourses, rtData.courses, rtData.enrollments]
+  );
 
   return (
     <Stack gap="xl">
@@ -156,10 +208,23 @@ export function AdminDashboardPage() {
             <Title order={2} c="#0b4668">
               Gerenciar Cursos
             </Title>
-            <Button color="rhGold" c="white" radius="xl" leftSection={<Users size={16} />}>
-              Novo Cadastro
-            </Button>
+            <Group gap="sm">
+              <Button color="rhGold" c="white" radius="xl" leftSection={<Download size={16} />} onClick={handleExportCourses} size="sm">
+                Exportar CSV
+              </Button>
+              <Button color="rhGold" c="white" radius="xl" leftSection={<Users size={16} />}>
+                Novo Cadastro
+              </Button>
+            </Group>
           </Group>
+
+          <TextInput
+            placeholder="Buscar por título ou categoria..."
+            value={searchQuery}
+            onChange={(e) => handleSearch(e.currentTarget.value)}
+            radius="lg"
+            size="sm"
+          />
 
           <Paper radius="xl" withBorder shadow="xs" style={{ overflow: "hidden" }}>
             <Table.ScrollContainer minWidth={720}>
