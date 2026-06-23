@@ -47,24 +47,6 @@ function validateEnvironment(): void {
   }
 
   // ============================================
-  // AVISOS DE SEGURANÇA (não bloqueiam o build estático)
-  // ============================================
-
-  if (isProduction) {
-    if (process.env.DEMO_AUTH_ENABLED === "true") {
-      warnings.push(
-        "⚠️ WARNING: DEMO_AUTH_ENABLED is true in production - this should be false"
-      );
-    }
-
-    if (process.env.DEMO_ADMIN_PASSWORD) {
-      warnings.push(
-        "⚠️ WARNING: DEMO_ADMIN_PASSWORD is set in production - should be empty"
-      );
-    }
-  }
-
-  // ============================================
   // DEVELOPMENT RECOMMENDATIONS
   // ============================================
 
@@ -75,9 +57,9 @@ function validateEnvironment(): void {
       );
     }
 
-    if (process.env.DEMO_AUTH_ENABLED === "true" && !process.env.DEMO_ADMIN_PASSWORD) {
+    if (process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTH !== "true") {
       warnings.push(
-        "ℹ️ INFO: DEMO_AUTH_ENABLED is true but DEMO_ADMIN_PASSWORD not set - demo login disabled"
+        "ℹ️ INFO: Demo auth is disabled. Set NEXT_PUBLIC_ENABLE_DEMO_AUTH=true to enable it."
       );
     }
   }

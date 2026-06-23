@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { BookOpen } from "lucide-react";
 import { toast } from "sonner";
@@ -63,6 +63,7 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
   const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const triggerRef = useRef<HTMLElement>(null);
 
   const openQuote = useCallback((nextCourse?: Course) => {
     setCourse(nextCourse);
@@ -72,7 +73,10 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
   const closeQuote = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      // Capture active element as trigger for focus restoration on close
+      triggerRef.current = document.activeElement as HTMLElement;
+    } else {
       setForm(initialForm);
       setErrors({});
       setSubmitError(null);
@@ -155,7 +159,7 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
     <QuoteModalContext.Provider value={value}>
       {children}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-3xl p-0">
+        <DialogContent className="max-w-3xl p-0" triggerRef={triggerRef}>
           <div className="flex max-h-[calc(100vh-2rem)] flex-col">
             <DialogHeader className="border-b border-border px-6 py-5">
               <DialogTitle>Orçamento personalizado In Company</DialogTitle>

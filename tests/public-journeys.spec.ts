@@ -1,11 +1,24 @@
 import { expect, test } from "@playwright/test";
 
-const coursePath =
-  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico";
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
+
+async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) {
+  await page.goto("/agenda");
+  const href = await page
+    .getByRole("link", { name: "Ver curso" })
+    .first()
+    .getAttribute("href");
+
+  if (!href) {
+    throw new Error("Nenhum curso com turma pública disponível foi encontrado na agenda.");
+  }
+
+  return href;
+}
 
 test.describe("epica 4 — jornadas publicas", () => {
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(coursePath);
 
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();

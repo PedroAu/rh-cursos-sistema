@@ -15,17 +15,9 @@ import { toast } from "sonner";
 import {
   courseCoverByPath,
   defaultCourseCover,
-  demoAccessList,
-  mockBlogPosts,
-  mockClasses,
-  mockCourses,
-  mockEnrollments,
-  mockInstructors,
-  mockLeads,
-  mockStudents,
-  mockTestimonials,
   trainingPaths
 } from "@/data";
+import { demoAccessList } from "@/lib/demo-access";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -36,7 +28,11 @@ import {
   decodeSessionToken,
   getSupabaseSession,
 } from "@/lib/supabase/session-token";
-import { fetchPublicCatalogFromSupabase, fetchLeadsFromSupabase } from "@/lib/supabase/rh-cursos-api";
+import {
+  fetchLeadsFromSupabase,
+  fetchPublicBlogPostsFromSupabase,
+  fetchPublicCatalogFromSupabase
+} from "@/lib/supabase/rh-cursos-api";
 import type {
   BlogPost,
   Course,
@@ -47,6 +43,7 @@ import type {
   Instructor,
   Lead,
   Student,
+  Testimonial,
   TrainingClass
 } from "@/types";
 
@@ -58,9 +55,11 @@ type AppState = {
   leads: Lead[];
   enrollments: Enrollment[];
   blogPosts: BlogPost[];
-  testimonials: typeof mockTestimonials;
+  testimonials: Testimonial[];
   currentSession: CurrentSession | null;
 };
+
+export type AppStoreInitialData = Partial<Omit<AppState, "currentSession">>;
 
 type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
 type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
@@ -97,41 +96,33 @@ type AdminMutation =
   | { resource: "leads" | "enrollments"; action: "update-status"; id: string; status: string };
 
 const initialState: AppState = {
-  courses: mockCourses,
-  classes: mockClasses,
-  students: mockStudents,
-  instructors: mockInstructors,
-  leads: mockLeads,
-  enrollments: mockEnrollments,
-  blogPosts: mockBlogPosts,
-  testimonials: mockTestimonials,
+  courses: [],
+  classes: [],
+  students: [],
+  instructors: [],
+  leads: [],
+  enrollments: [],
+  blogPosts: [],
+  testimonials: [],
   currentSession: null
 };
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
-function readInitialState(initialSession?: CurrentSession | null) {
-  return initialSession
-    ? { ...initialState, currentSession: initialSession }
-    : initialState;
+function readInitialState(initialSession?: CurrentSession | null, initialData?: AppStoreInitialData) {
+  return {
+    ...initialState,
+    ...initialData,
+    currentSession: initialSession ?? null
+  };
 }
 
-function readStoredState(initialSession?: CurrentSession | null) {
+function clearLegacyStoredState() {
   if (typeof window === "undefined") {
-    return null;
+    return;
   }
 
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(stored) as AppState;
-    return initialSession ? { ...parsed, currentSession: initialSession } : parsed;
-  } catch {
-    return null;
-  }
+  window.localStorage.removeItem(STORAGE_KEY);
 }
 
 function countConfirmedEnrollments(enrollments: Enrollment[], classId: string) {
@@ -165,10 +156,10 @@ function persistAdminMutation(mutation: AdminMutation): Promise<void> {
     sessionToken: getSessionToken() ?? undefined
   }).then((response) => {
     if (!response.ok) {
-      toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
+      toast.error("Alteração aplicada na sessão atual, mas não foi sincronizada com o Supabase.");
     }
   }).catch(() => {
-    toast.error("Alteração salva localmente, mas não foi enviada ao Supabase.");
+    toast.error("Alteração aplicada na sessão atual, mas não foi sincronizada com o Supabase.");
   });
 }
 
@@ -185,10 +176,10 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
 
 export function AppStoreProvider({
   children,
-  initialSession = null
-}: PropsWithChildren<{ initialSession?: CurrentSession | null }>) {
-  const [state, setState] = useState<AppState>(() => readInitialState(initialSession));
-  const [isStoreHydrated, setIsStoreHydrated] = useState(false);
+  initialSession = null,
+  initialData
+}: PropsWithChildren<{ initialSession?: CurrentSession | null; initialData?: AppStoreInitialData }>) {
+  const [state, setState] = useState<AppState>(() => readInitialState(initialSession, initialData));
 
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
   // recriar sua identidade a cada mudança (evita re-renders em cascata).
@@ -196,18 +187,11 @@ export function AppStoreProvider({
 
   useEffect(() => {
     stateRef.current = state;
-    if (isStoreHydrated) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-  }, [isStoreHydrated, state]);
+  }, [state]);
 
   useEffect(() => {
-    const storedState = readStoredState(initialSession);
-    if (storedState) {
-      setState(storedState);
-    }
-    setIsStoreHydrated(true);
-  }, [initialSession]);
+    clearLegacyStoredState();
+  }, []);
 
   // Reconciliação de sessão na inicialização: a sessão server-side do admin
   // entra por prop; como fallback, reidratamos o payload do token HMAC salvo no
@@ -257,19 +241,23 @@ export function AppStoreProvider({
 
     let active = true;
 
-    fetchPublicCatalogFromSupabase()
-      .then((catalog) => {
-        if (!active || !catalog) return;
+    Promise.all([
+      fetchPublicCatalogFromSupabase(),
+      fetchPublicBlogPostsFromSupabase()
+    ])
+      .then(([catalog, blogPosts]) => {
+        if (!active) return;
 
         setState((current) => ({
           ...current,
-          courses: catalog.courses.length ? catalog.courses : current.courses,
-          classes: catalog.classes.length ? catalog.classes : current.classes,
-          instructors: catalog.instructors.length ? catalog.instructors : current.instructors
+          courses: catalog?.courses.length ? catalog.courses : current.courses,
+          classes: catalog?.classes.length ? catalog.classes : current.classes,
+          instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
+          blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
         }));
       })
       .catch(() => {
-        toast.error("Não foi possível carregar o catálogo do Supabase. Usando dados locais.");
+        toast.error("Não foi possível carregar os dados públicos do Supabase.");
       });
 
     // Reidrata a sessão do Supabase Auth (JWT em localStorage) e, com o cliente
@@ -349,7 +337,8 @@ export function AppStoreProvider({
         }
       } catch (error) {
         if (error instanceof Error && /fetch/i.test(error.message)) {
-          toast.error("Serviço indisponível no momento. Inscrição registrada localmente para validação.");
+          toast.error("Serviço indisponível no momento. A inscrição não foi sincronizada.");
+          return;
         } else {
           throw error;
         }
@@ -406,7 +395,7 @@ export function AppStoreProvider({
     toast.success(
       isFunctionsConfigured
         ? "Inscrição realizada com sucesso."
-        : "Inscrição registrada localmente no modo de desenvolvimento."
+        : "Inscrição registrada apenas nesta sessão de desenvolvimento."
     );
   }, []);
 
@@ -420,7 +409,8 @@ export function AppStoreProvider({
         }
       } catch (error) {
         if (error instanceof Error && /fetch/i.test(error.message)) {
-          toast.error("Serviço indisponível no momento. Solicitação registrada localmente para validação.");
+          toast.error("Serviço indisponível no momento. A solicitação não foi sincronizada.");
+          return;
         } else {
           throw error;
         }
@@ -442,7 +432,7 @@ export function AppStoreProvider({
     toast.success(
       isFunctionsConfigured
         ? "Lead cadastrado."
-        : "Lead registrado localmente no modo de desenvolvimento."
+        : "Lead registrado apenas nesta sessão de desenvolvimento."
     );
   }, []);
 
@@ -702,9 +692,9 @@ export function AppStoreProvider({
   }, []);
 
   const resetStore = useCallback<AppStoreValue["resetStore"]>(() => {
-    setState(initialState);
+    setState((current) => ({ ...initialState, currentSession: current.currentSession }));
     window.localStorage.removeItem(STORAGE_KEY);
-    toast.success("Base simulada restaurada.");
+    toast.success("Estado da aplicação limpo.");
   }, []);
 
   const value = useMemo<AppStoreValue>(

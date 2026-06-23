@@ -155,16 +155,13 @@ export function PublicHeader() {
             </Box>
 
             <Group
+              className="absolute left-1/2 -translate-x-1/2"
               gap={4}
               visibleFrom="md"
               wrap="nowrap"
               component="nav"
               aria-label="Navegação principal"
-              style={{
-                position: "absolute",
-                left: "50%",
-                transform: "translateX(-50%)"
-              }}
+              style={{ position: "absolute" }}
             >
               {publicNavItems.map((item) => {
                 const active = isItemActive(location.pathname, item.to);

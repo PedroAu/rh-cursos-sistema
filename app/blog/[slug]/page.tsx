@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
 
 import { BlogPostClient } from "@/components/page-clients/blog-post-client";
-import { mockBlogPosts } from "@/data";
-import type { BlogPost } from "@/types";
+import {
+  fetchPublicBlogPostsFromSupabaseServer,
+  fetchPublicCatalogFromSupabaseServer
+} from "@/lib/supabase/rh-cursos-api";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 async function getBlogPosts() {
-  return mockBlogPosts;
+  try {
+    return await fetchPublicBlogPostsFromSupabaseServer() ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function generateStaticParams() {
-  return (await getBlogPosts()).map((post: BlogPost) => ({ slug: post.slug }));
+  return (await getBlogPosts()).map((post) => ({ slug: post.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = (await getBlogPosts()).find((item: BlogPost) => item.slug === slug);
+  const post = (await getBlogPosts()).find((item) => item.slug === slug);
 
   if (!post) {
     return {
@@ -32,6 +38,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function Page() {
-  return <BlogPostClient />;
+export default async function Page() {
+  const [blogPosts, catalog] = await Promise.all([
+    fetchPublicBlogPostsFromSupabaseServer().catch(() => null),
+    fetchPublicCatalogFromSupabaseServer().catch(() => null)
+  ]);
+
+  return (
+    <BlogPostClient
+      initialData={{
+        blogPosts: blogPosts ?? [],
+        courses: catalog?.courses ?? []
+      }}
+    />
+  );
 }

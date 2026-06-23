@@ -152,6 +152,7 @@ on conflict (id) do update set
   tempo_leitura = excluded.tempo_leitura,
   status = excluded.status,
   imagem_url = excluded.imagem_url,
-  curso_id = excluded.curso_id;
+  curso_id = excluded.curso_id,
+  deleted_at = null;
 
 commit;

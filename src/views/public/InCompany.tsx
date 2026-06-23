@@ -184,7 +184,7 @@ export function InCompanyPage() {
                   w="fit-content"
                   px="md"
                   py={8}
-                  style={{ background: "#f6be39", borderRadius: 999, color: "#715300", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}
+                  style={{ background: "#f3cf74", borderRadius: 999, color: "#4f3500", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}
                 >
                   Consultoria Exclusiva
                 </Box>
@@ -196,7 +196,7 @@ export function InCompanyPage() {
                 </Text>
 
                 <Group gap="md">
-                  <Button onClick={() => openQuote()} color="rhGold" c="#715300" fw={700}>
+                  <Button onClick={() => openQuote()} color="rhGold" c="#08324d" fw={700}>
                     Solicitar orçamento
                   </Button>
                   <Button
@@ -384,7 +384,7 @@ export function InCompanyPage() {
                     fw={700}
                     tt="uppercase"
                     rightSection={<Send size={18} />}
-                    styles={{ root: { background: "#d9a300" } }}
+                    styles={{ root: { background: "#8f6800" } }}
                   >
                     {isSubmitting ? "Enviando..." : "Enviar solicitação de proposta"}
                   </Button>
@@ -448,9 +448,9 @@ export function InCompanyPage() {
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, lg: 4 }}>
-            <Card radius="lg" padding="xl" style={{ background: "#f6be39" }} c="#715300" h="100%">
+            <Card radius="lg" padding="xl" style={{ background: "#f3cf74" }} c="#4f3500" h="100%">
               <Stack gap="md">
-                <Title order={2} c="#715300">
+                <Title order={2} c="#4f3500">
                   Precisa de algo ainda mais específico?
                 </Title>
                 <Text fz="lg">Fale diretamente com nosso consultor técnico pelo WhatsApp.</Text>

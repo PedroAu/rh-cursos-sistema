@@ -1,4 +1,4 @@
-import type * as React from "react";
+import React from "react";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -9,14 +9,36 @@ export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
+/**
+ * Hook to manage focus restoration when a dialog closes.
+ * Stores a reference to the trigger element and restores focus on dialog close.
+ *
+ * Usage:
+ * ```tsx
+ * const triggerRef = useDialogFocus();
+ * <Dialog open={open} onOpenChange={setOpen}>
+ *   <DialogTrigger ref={triggerRef} asChild>
+ *     <button>Open Dialog</button>
+ *   </DialogTrigger>
+ *   <DialogContent triggerRef={triggerRef} />
+ * </Dialog>
+ * ```
+ */
+export function useDialogFocus() {
+  const triggerRef = React.useRef<HTMLElement>(null);
+  return triggerRef;
+}
+
 export function DialogContent({
   className,
   children,
   initialFocusRef,
   onOpenAutoFocus,
+  triggerRef,
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
   initialFocusRef?: React.RefObject<HTMLElement | null>;
+  triggerRef?: React.RefObject<HTMLElement | null>;
 }) {
   return (
     <DialogPrimitive.Portal>
@@ -33,6 +55,14 @@ export function DialogContent({
             event.preventDefault();
             initialFocusRef.current.focus();
           }
+        }}
+        onCloseAutoFocus={(event) => {
+          // Only prevent default if we have a trigger to restore focus to
+          if (triggerRef?.current) {
+            event.preventDefault();
+            triggerRef.current.focus();
+          }
+          // Otherwise let Radix handle default focus restoration
         }}
         {...props}
       >

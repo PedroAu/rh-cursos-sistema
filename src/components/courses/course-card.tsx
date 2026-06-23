@@ -55,7 +55,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
             <span>{course.durationLabel}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-[#795900]" />
+            <Star className="h-4 w-4 text-[#6b4f00]" />
             <span>{course.rating.toFixed(1)} de avaliação média</span>
           </div>
           <div className="flex items-center gap-2">
@@ -82,7 +82,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           <button
             type="button"
             onClick={() => openQuote(course)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.04em] text-[#795900] transition hover:text-[#5c4300]"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.04em] text-[#6b4f00] transition hover:text-[#4e3900]"
           >
             <Building2 className="h-4 w-4" />
             Orçamento In Company

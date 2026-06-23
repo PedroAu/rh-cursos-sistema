@@ -150,6 +150,7 @@ export function ModulesBuilder({
               />
 
               <textarea
+                aria-label={`Descrição do módulo ${i + 1}`}
                 placeholder="Resumo do conteúdo e objetivo do módulo"
                 value={module.description}
                 onChange={(e) => {

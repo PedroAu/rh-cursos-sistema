@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
-import { mockCourses } from "@/data";
-import { fetchPublicCatalogFromSupabase } from "@/lib/supabase/rh-cursos-api";
+import { fetchPublicCatalogFromSupabaseServer } from "@/lib/supabase/rh-cursos-api";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -10,10 +9,10 @@ type PageProps = {
 
 async function getCourses() {
   try {
-    const catalog = await fetchPublicCatalogFromSupabase();
-    return catalog?.courses.length ? catalog.courses : mockCourses;
+    const catalog = await fetchPublicCatalogFromSupabaseServer();
+    return catalog?.courses ?? [];
   } catch {
-    return mockCourses;
+    return [];
   }
 }
 
@@ -37,6 +36,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function Page() {
-  return <CourseDetailClient />;
+export default async function Page() {
+  const catalog = await fetchPublicCatalogFromSupabaseServer().catch(() => null);
+
+  return (
+    <CourseDetailClient
+      initialData={{
+        courses: catalog?.courses ?? [],
+        classes: catalog?.classes ?? [],
+        instructors: catalog?.instructors ?? []
+      }}
+    />
+  );
 }
