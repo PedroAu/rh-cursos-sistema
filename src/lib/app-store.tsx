@@ -174,6 +174,30 @@ function deriveClassCapacity(trainingClass: TrainingClass, enrollments: Enrollme
   };
 }
 
+function createRealtimeSubscription(
+  client: NonNullable<typeof supabase>,
+  channelName: string,
+  table: string,
+  isActive: () => boolean,
+  onChange: () => void
+) {
+  return client
+    .channel(channelName)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table },
+      () => {
+        if (!isActive()) return;
+        onChange();
+      }
+    )
+    .subscribe((status) => {
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error(`Real-time subscription failed for channel '${channelName}': ${status}`);
+      }
+    });
+}
+
 function persistAdminMutation(mutation: AdminMutation): Promise<void> {
   if (!isFunctionsConfigured) return Promise.resolve();
 
@@ -329,56 +353,32 @@ export function AppStoreProvider({
 
         // Real-time subscriptions para cursos após dados iniciais carregarem
         if (active && supabase) {
-          const courseSub = supabase
-            .channel("curso_changes")
-            .on(
-              "postgres_changes",
-              { event: "*", schema: "public", table: "curso" },
-              () => {
-                if (!active) return;
-                scheduleCatalogRefetch();
-              }
-            )
-            .subscribe((status) => {
-              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                console.error(`Real-time subscription failed for channel 'curso_changes': ${status}`);
-              }
-            });
+          const courseSub = createRealtimeSubscription(
+            supabase,
+            "curso_changes",
+            "curso",
+            () => active,
+            scheduleCatalogRefetch
+          );
 
           // Real-time subscriptions para blog posts
-          const blogSub = supabase
-            .channel("blog_changes")
-            .on(
-              "postgres_changes",
-              { event: "*", schema: "public", table: "post_blog" },
-              () => {
-                if (!active) return;
-                scheduleBlogRefetch();
-              }
-            )
-            .subscribe((status) => {
-              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                console.error(`Real-time subscription failed for channel 'blog_changes': ${status}`);
-              }
-            });
+          const blogSub = createRealtimeSubscription(
+            supabase,
+            "blog_changes",
+            "post_blog",
+            () => active,
+            scheduleBlogRefetch
+          );
 
           // Real-time para instrutores (dado público do catálogo). Refetch do
           // catálogo completo mantém cursos/turmas/instrutores consistentes.
-          const instructorSub = supabase
-            .channel("instrutor_changes")
-            .on(
-              "postgres_changes",
-              { event: "*", schema: "public", table: "instrutor" },
-              () => {
-                if (!active) return;
-                scheduleCatalogRefetch();
-              }
-            )
-            .subscribe((status) => {
-              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                console.error(`Real-time subscription failed for channel 'instrutor_changes': ${status}`);
-              }
-            });
+          const instructorSub = createRealtimeSubscription(
+            supabase,
+            "instrutor_changes",
+            "instrutor",
+            () => active,
+            scheduleCatalogRefetch
+          );
 
           subscriptions.push(courseSub, blogSub, instructorSub);
         }
@@ -403,58 +403,34 @@ export function AppStoreProvider({
 
             // Real-time subscriptions para leads (admin only)
             if (supabase) {
-              const leadSub = supabase
-                .channel("lead_changes")
-                .on(
-                  "postgres_changes",
-                  { event: "*", schema: "public", table: "lead" },
-                  () => {
-                    if (!active) return;
-                    scheduleLeadRefetch();
-                  }
-                )
-                .subscribe((status) => {
-                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                    console.error(`Real-time subscription failed for channel 'lead_changes': ${status}`);
-                  }
-                });
+              const leadSub = createRealtimeSubscription(
+                supabase,
+                "lead_changes",
+                "lead",
+                () => active,
+                scheduleLeadRefetch
+              );
 
               // Real-time para inscrições (admin only). Mudanças em inscrição
               // afetam a capacidade das turmas (vagas), por isso refetch do
               // catálogo para reconciliar as contagens de vagas.
-              const enrollmentSub = supabase
-                .channel("inscricao_changes")
-                .on(
-                  "postgres_changes",
-                  { event: "*", schema: "public", table: "inscricao" },
-                  () => {
-                    if (!active) return;
-                    scheduleCatalogRefetch();
-                  }
-                )
-                .subscribe((status) => {
-                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                    console.error(`Real-time subscription failed for channel 'inscricao_changes': ${status}`);
-                  }
-                });
+              const enrollmentSub = createRealtimeSubscription(
+                supabase,
+                "inscricao_changes",
+                "inscricao",
+                () => active,
+                scheduleCatalogRefetch
+              );
 
               // Real-time para alunos (admin only). Alterações em aluno podem
               // refletir nas estatísticas do catálogo (total de alunos por curso).
-              const studentSub = supabase
-                .channel("aluno_changes")
-                .on(
-                  "postgres_changes",
-                  { event: "*", schema: "public", table: "aluno" },
-                  () => {
-                    if (!active) return;
-                    scheduleCatalogRefetch();
-                  }
-                )
-                .subscribe((status) => {
-                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-                    console.error(`Real-time subscription failed for channel 'aluno_changes': ${status}`);
-                  }
-                });
+              const studentSub = createRealtimeSubscription(
+                supabase,
+                "aluno_changes",
+                "aluno",
+                () => active,
+                scheduleCatalogRefetch
+              );
 
               subscriptions.push(leadSub, enrollmentSub, studentSub);
             }
