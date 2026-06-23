@@ -152,11 +152,11 @@ function toDbEnrollmentStatus(value: EnrollmentStatus): EnrollmentRow["status_in
   return map[value];
 }
 
-function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentRow["forma_pagamento"] {
+export function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentRow["forma_pagamento"] {
   return value === "Cartão" ? "Cartao" : value;
 }
 
-function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_aluno"] {
+export function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_aluno"] {
   if (value === "Empresa") return "PJ";
   if (value === "Órgão público") return "Servidor";
   return "PF";
