@@ -199,6 +199,16 @@ function createRealtimeSubscription(
     });
 }
 
+function upsertCollection<T extends { id: string }>(
+  collection: T[],
+  exists: boolean,
+  nextItem: T
+): T[] {
+  return exists
+    ? collection.map((item) => (item.id === nextItem.id ? nextItem : item))
+    : [nextItem, ...collection];
+}
+
 function persistAdminMutation(mutation: AdminMutation): Promise<void> {
   if (!isFunctionsConfigured) return Promise.resolve();
 
@@ -657,9 +667,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      courses: exists
-        ? current.courses.map((item) => (item.id === nextCourse.id ? nextCourse : item))
-        : [nextCourse, ...current.courses]
+      courses: upsertCollection(current.courses, Boolean(exists), nextCourse)
     }));
     toast.success(course.id ? "Curso editado." : "Curso criado no admin.");
     return persistAdminMutation({ resource: "courses", action: "upsert", payload: nextCourse });
@@ -722,9 +730,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      classes: exists
-        ? current.classes.map((item) => (item.id === nextClass.id ? nextClass : item))
-        : [nextClass, ...current.classes]
+      classes: upsertCollection(current.classes, Boolean(exists), nextClass)
     }));
     toast.success(trainingClass.id ? "Turma editada." : "Turma criada.");
     return persistAdminMutation({ resource: "classes", action: "upsert", payload: nextClass });
@@ -772,9 +778,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      instructors: exists
-        ? current.instructors.map((item) => (item.id === nextInstructor.id ? nextInstructor : item))
-        : [nextInstructor, ...current.instructors]
+      instructors: upsertCollection(current.instructors, Boolean(exists), nextInstructor)
     }));
     toast.success(instructor.id ? "Instrutor editado." : "Instrutor criado.");
     return persistAdminMutation({ resource: "instructors", action: "upsert", payload: nextInstructor });
@@ -838,9 +842,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      blogPosts: exists
-        ? current.blogPosts.map((item) => (item.id === nextPost.id ? nextPost : item))
-        : [nextPost, ...current.blogPosts]
+      blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
     }));
     toast.success(post.id ? "Post atualizado." : "Post publicado.");
     return persistAdminMutation({ resource: "blog", action: "upsert", payload: nextPost });
