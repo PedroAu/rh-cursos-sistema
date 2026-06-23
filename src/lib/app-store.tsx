@@ -110,10 +110,35 @@ const initialState: AppState = {
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
+const ARRAY_STATE_KEYS = [
+  "courses",
+  "classes",
+  "students",
+  "instructors",
+  "leads",
+  "enrollments",
+  "blogPosts",
+  "testimonials"
+] as const satisfies readonly (keyof AppStoreInitialData)[];
+
+function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitialData | undefined {
+  if (!initialData) return initialData;
+
+  const sanitized: AppStoreInitialData = { ...initialData };
+
+  for (const key of ARRAY_STATE_KEYS) {
+    if (key in sanitized && !Array.isArray(sanitized[key])) {
+      delete sanitized[key];
+    }
+  }
+
+  return sanitized;
+}
+
 function readInitialState(initialSession?: CurrentSession | null, initialData?: AppStoreInitialData) {
   return {
     ...initialState,
-    ...initialData,
+    ...sanitizeInitialData(initialData),
     currentSession: initialSession ?? null
   };
 }
