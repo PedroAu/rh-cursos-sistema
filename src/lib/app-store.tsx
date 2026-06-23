@@ -296,7 +296,7 @@ export function AppStoreProvider({
 
         setState((current) => ({
           ...current,
-          courses: catalog?.courses.length ? catalog.courses : current.courses,
+          courses: catalog?.courses !== undefined ? catalog.courses : current.courses,
           classes: catalog?.classes.length ? catalog.classes : current.classes,
           instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
           blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
