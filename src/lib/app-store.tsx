@@ -18,6 +18,7 @@ import {
   trainingPaths
 } from "@/data";
 import { demoAccessList } from "@/lib/demo-access";
+import { debounce } from "@/lib/debounce";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -189,6 +190,8 @@ export function AppStoreProvider({
     stateRef.current = state;
   }, [state]);
 
+  const catalogFetchVersionRef = useRef(0);
+
   useEffect(() => {
     clearLegacyStoredState();
   }, []);
@@ -246,6 +249,44 @@ export function AppStoreProvider({
     const subscriptions: ReturnType<typeof supabase.channel>[] = [];
     const client = supabase;
 
+    const scheduleCatalogRefetch = debounce(() => {
+      if (!active) return;
+      catalogFetchVersionRef.current += 1;
+      const fetchVersion = catalogFetchVersionRef.current;
+
+      fetchPublicCatalogFromSupabase()
+        .then((updated) => {
+          if (!active || !updated || fetchVersion !== catalogFetchVersionRef.current) return;
+          setState((current) => ({
+            ...current,
+            courses: updated.courses,
+            classes: updated.classes,
+            instructors: updated.instructors
+          }));
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    const scheduleBlogRefetch = debounce(() => {
+      if (!active) return;
+      fetchPublicBlogPostsFromSupabase()
+        .then((updated) => {
+          if (!active || !updated) return;
+          setState((current) => ({ ...current, blogPosts: updated }));
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    const scheduleLeadRefetch = debounce(() => {
+      if (!active) return;
+      fetchLeadsFromSupabase()
+        .then((updated) => {
+          if (!active || !updated) return;
+          setState((current) => ({ ...current, leads: updated }));
+        })
+        .catch(() => undefined);
+    }, 300);
+
     Promise.all([
       fetchPublicCatalogFromSupabase(),
       fetchPublicBlogPostsFromSupabase()
@@ -262,29 +303,22 @@ export function AppStoreProvider({
         }));
 
         // Real-time subscriptions para cursos após dados iniciais carregarem
-        if (active && supabase && catalog?.courses?.length) {
+        if (active && supabase) {
           const courseSub = supabase
             .channel("curso_changes")
             .on(
               "postgres_changes",
               { event: "*", schema: "public", table: "curso" },
               () => {
-                // Refetch do catálogo completo quando curso é modificado
                 if (!active) return;
-                fetchPublicCatalogFromSupabase()
-                  .then(updated => {
-                    if (!active || !updated) return;
-                    setState(current => ({
-                      ...current,
-                      courses: updated.courses,
-                      classes: updated.classes,
-                      instructors: updated.instructors
-                    }));
-                  })
-                  .catch(() => undefined);
+                scheduleCatalogRefetch();
               }
             )
-            .subscribe();
+            .subscribe((status) => {
+              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.error(`Real-time subscription failed for channel 'curso_changes': ${status}`);
+              }
+            });
 
           // Real-time subscriptions para blog posts
           const blogSub = supabase
@@ -294,17 +328,34 @@ export function AppStoreProvider({
               { event: "*", schema: "public", table: "post_blog" },
               () => {
                 if (!active) return;
-                fetchPublicBlogPostsFromSupabase()
-                  .then(updated => {
-                    if (!active || !updated) return;
-                    setState(current => ({ ...current, blogPosts: updated }));
-                  })
-                  .catch(() => undefined);
+                scheduleBlogRefetch();
               }
             )
-            .subscribe();
+            .subscribe((status) => {
+              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.error(`Real-time subscription failed for channel 'blog_changes': ${status}`);
+              }
+            });
 
-          subscriptions.push(courseSub, blogSub);
+          // Real-time para instrutores (dado público do catálogo). Refetch do
+          // catálogo completo mantém cursos/turmas/instrutores consistentes.
+          const instructorSub = supabase
+            .channel("instrutor_changes")
+            .on(
+              "postgres_changes",
+              { event: "*", schema: "public", table: "instrutor" },
+              () => {
+                if (!active) return;
+                scheduleCatalogRefetch();
+              }
+            )
+            .subscribe((status) => {
+              if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                console.error(`Real-time subscription failed for channel 'instrutor_changes': ${status}`);
+              }
+            });
+
+          subscriptions.push(courseSub, blogSub, instructorSub);
         }
       })
       .catch(() => {
@@ -334,15 +385,14 @@ export function AppStoreProvider({
                   { event: "*", schema: "public", table: "lead" },
                   () => {
                     if (!active) return;
-                    fetchLeadsFromSupabase()
-                      .then(updated => {
-                        if (!active || !updated) return;
-                        setState(current => ({ ...current, leads: updated }));
-                      })
-                      .catch(() => undefined);
+                    scheduleLeadRefetch();
                   }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                    console.error(`Real-time subscription failed for channel 'lead_changes': ${status}`);
+                  }
+                });
 
               // Real-time para inscrições (admin only). Mudanças em inscrição
               // afetam a capacidade das turmas (vagas), por isso refetch do
@@ -354,20 +404,14 @@ export function AppStoreProvider({
                   { event: "*", schema: "public", table: "inscricao" },
                   () => {
                     if (!active) return;
-                    fetchPublicCatalogFromSupabase()
-                      .then(updated => {
-                        if (!active || !updated) return;
-                        setState(current => ({
-                          ...current,
-                          courses: updated.courses,
-                          classes: updated.classes,
-                          instructors: updated.instructors
-                        }));
-                      })
-                      .catch(() => undefined);
+                    scheduleCatalogRefetch();
                   }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                    console.error(`Real-time subscription failed for channel 'inscricao_changes': ${status}`);
+                  }
+                });
 
               // Real-time para alunos (admin only). Alterações em aluno podem
               // refletir nas estatísticas do catálogo (total de alunos por curso).
@@ -378,20 +422,14 @@ export function AppStoreProvider({
                   { event: "*", schema: "public", table: "aluno" },
                   () => {
                     if (!active) return;
-                    fetchPublicCatalogFromSupabase()
-                      .then(updated => {
-                        if (!active || !updated) return;
-                        setState(current => ({
-                          ...current,
-                          courses: updated.courses,
-                          classes: updated.classes,
-                          instructors: updated.instructors
-                        }));
-                      })
-                      .catch(() => undefined);
+                    scheduleCatalogRefetch();
                   }
                 )
-                .subscribe();
+                .subscribe((status) => {
+                  if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+                    console.error(`Real-time subscription failed for channel 'aluno_changes': ${status}`);
+                  }
+                });
 
               subscriptions.push(leadSub, enrollmentSub, studentSub);
             }
