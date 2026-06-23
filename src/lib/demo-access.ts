@@ -6,6 +6,6 @@ export const demoAccessList: DemoAccess[] = [
     email: "admin@rhcursos.demo",
     password: "admin123",
     name: "Admin RH Cursos",
-    description: "Acesso total para testar dashboard, CRUD local, leads, inscrições, cursos e blog."
+    description: "Acesso de desenvolvimento para testar o dashboard administrativo."
   }
 ];

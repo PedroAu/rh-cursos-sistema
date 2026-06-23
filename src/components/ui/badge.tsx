@@ -10,9 +10,9 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "border-[var(--ea-chip-border)] bg-[var(--ea-chip-bg)] text-[var(--ea-chip-fg)]",
-        success: "border-transparent bg-success/12 text-success",
-        warning: "border-transparent bg-warning/12 text-warning",
-        danger: "border-transparent bg-danger/12 text-danger",
+        success: "border-[#bbf7d0] bg-[#f0fdf4] text-[#166534]",
+        warning: "border-[#fde68a] bg-[#fffbeb] text-[#92400e]",
+        danger: "border-[#fecaca] bg-[#fef2f2] text-[#991b1b]",
         muted: "border-outline-variant bg-muted text-muted-foreground"
       }
     },

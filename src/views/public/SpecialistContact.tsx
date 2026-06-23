@@ -270,7 +270,12 @@ export function SpecialistContactPage() {
                   />
                 )}
               </FormField>
-              <Button size="lg" loading={isSubmitting} onClick={submit} className="justify-center">
+              <Button
+                size="lg"
+                loading={isSubmitting}
+                onClick={submit}
+                className="justify-center bg-[var(--color-primary-hover)] hover:bg-[var(--color-primary-light)]"
+              >
                 <Send className="h-4 w-4" />
                 Solicitar contato
               </Button>

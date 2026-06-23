@@ -9,8 +9,19 @@ import { expect, test } from "@playwright/test";
  * turma obrigatória, deeplink `?checkout=1` e seleção de pagamento.
  */
 
-const coursePath =
-  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico";
+async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) {
+  await page.goto("/agenda");
+  const href = await page
+    .getByRole("link", { name: "Ver curso" })
+    .first()
+    .getAttribute("href");
+
+  if (!href) {
+    throw new Error("Nenhum curso com turma pública disponível foi encontrado na agenda.");
+  }
+
+  return href;
+}
 
 async function fillPersonalStep(page: import("@playwright/test").Page) {
   await page.getByLabel("Nome completo").fill("Carlos Pereira");
@@ -21,6 +32,7 @@ async function fillPersonalStep(page: import("@playwright/test").Page) {
 
 test.describe("checkout — baseline de receita", () => {
   test("bloqueia avanço da etapa de turma sem seleção e conclui após escolher", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(coursePath);
 
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
@@ -48,6 +60,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
@@ -61,6 +74,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("inscrição corporativa exige empresa e cargo", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
@@ -77,12 +91,14 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(`${coursePath}?checkout=1`);
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Inscrição guiada")).toBeVisible();
   });
 
   test("fechar o modal com Cancelar mantém o usuário na página do curso", async ({ page }) => {
+    const coursePath = await resolveCheckoutCoursePath(page);
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();

@@ -1,16 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import {
-  mockBlogPosts,
-  mockClasses,
-  mockCourses,
-  mockEnrollments,
-  mockInstructors,
-  mockLeads,
-  mockStudents,
-  mockTestimonials,
-  trainingPaths,
-} from "@/data";
+import { createAdminStoreFixture } from "./fixtures/admin-store";
 import {
   buildChartSummaryItems,
   buildRevenueSummaryItems,
@@ -27,18 +17,7 @@ import {
 } from "@/features/admin/settings/model/admin-settings";
 
 function createStoreSnapshot() {
-  return {
-    courses: mockCourses,
-    classes: mockClasses,
-    students: mockStudents,
-    instructors: mockInstructors,
-    leads: mockLeads,
-    enrollments: mockEnrollments,
-    blogPosts: mockBlogPosts,
-    testimonials: mockTestimonials,
-    trainingPaths,
-    currentSession: null,
-  };
+  return createAdminStoreFixture();
 }
 
 test.describe("epica 3 — admin polish", () => {

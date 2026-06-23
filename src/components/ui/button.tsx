@@ -15,10 +15,10 @@ const buttonVariants = cva(
         secondary:
           "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--form-input-color)] shadow-soft hover:-translate-y-0.5 hover:bg-tertiary-0",
         outline:
-          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--color-primary)] hover:-translate-y-0.5 hover:bg-primary-0",
-        ghost: "text-[var(--color-primary)] hover:bg-primary-0",
+          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--color-primary-light)] hover:-translate-y-0.5 hover:bg-primary-0",
+        ghost: "text-[var(--color-primary-light)] hover:bg-primary-0",
         tertiary:
-          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--color-primary)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
+          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--color-primary-light)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
         success: "bg-[var(--color-status-success)] text-white hover:-translate-y-0.5 hover:opacity-90",
         danger: "bg-[var(--color-status-error)] text-white hover:opacity-90"
       },

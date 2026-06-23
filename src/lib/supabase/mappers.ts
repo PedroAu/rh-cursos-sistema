@@ -1,6 +1,6 @@
-import { courseCoverByPath, defaultCourseCover, trainingPaths } from "@/data";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type {
+  BlogPost,
   ClassStatus,
   Course,
   CourseModule,
@@ -9,6 +9,7 @@ import type {
   EnrollmentStatus,
   Instructor,
   Lead,
+  Testimonial,
   TrainingClass
 } from "@/types";
 
@@ -18,11 +19,43 @@ export type InstructorRow = Tables["instrutor"]["Row"];
 export type CourseInstructorRow = Tables["curso_instrutor"]["Row"];
 export type ClassRow = Tables["turma"]["Row"];
 export type LeadRow = Tables["lead"]["Row"];
+export type BlogPostRow = Tables["post_blog"]["Row"];
+export type AssessmentRow = Tables["avaliacao"]["Row"];
 export type StudentRow = Tables["aluno"]["Row"];
 export type EnrollmentRow = Tables["inscricao"]["Row"];
 export type StudentInsert = Tables["aluno"]["Insert"];
 export type EnrollmentInsert = Tables["inscricao"]["Insert"];
 export type LeadInsert = Tables["lead"]["Insert"];
+
+export type AssessmentWithCourseRow = AssessmentRow & {
+  turma?: {
+    curso?: {
+      titulo?: string | null;
+    } | null;
+  } | null;
+};
+
+const defaultCourseCover = "/images/courses/default-course.jpg";
+
+const courseCoverByPath: Record<string, string> = {
+  "path-dp": "/images/courses/departamento-pessoal.jpg",
+  "path-gestao": "/images/courses/gestao-publica.jpg",
+  "path-licitacoes": "/images/courses/licitacoes.jpg",
+  "path-pessoas": "/images/courses/gestao-pessoas.jpg",
+  "path-tech": "/images/courses/tecnologia.jpg",
+  "path-comunicacao": "/images/courses/comunicacao.jpg",
+  "path-auditoria": "/images/courses/auditoria.jpg"
+};
+
+const trainingPathNames: Record<string, string> = {
+  "path-dp": "Departamento Pessoal",
+  "path-gestao": "Gestão Pública",
+  "path-licitacoes": "Licitações e Contratos",
+  "path-pessoas": "Gestão de Pessoas",
+  "path-tech": "Tecnologia e Dados",
+  "path-comunicacao": "Comunicação Institucional",
+  "path-auditoria": "Auditoria e Controle"
+};
 
 function asStringArray(value: Json): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
@@ -141,8 +174,22 @@ function fromDbLeadStatus(value: LeadRow["status_crm"]): Lead["status"] {
   return map[value];
 }
 
+function fromDbBlogCategory(value: string): BlogPost["category"] {
+  const validCategories: BlogPost["category"][] = [
+    "Departamento Pessoal",
+    "eSocial",
+    "Gestão Pública",
+    "Liderança",
+    "Tecnologia",
+    "Assédio e Compliance"
+  ];
+
+  return validCategories.includes(value as BlogPost["category"])
+    ? (value as BlogPost["category"])
+    : "Tecnologia";
+}
+
 export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes: ClassRow[]): Course {
-  const path = trainingPaths.find((item) => item.id === row.trilha_id);
   const primaryInstructor = joins.find((item) => item.curso_id === row.id && item.principal) ??
     joins.find((item) => item.curso_id === row.id);
   const nextClass = classes
@@ -153,8 +200,8 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     id: row.id,
     slug: row.slug,
     title: row.titulo,
-    pathId: row.trilha_id ?? path?.id ?? "path-dp",
-    pathName: row.trilha_nome ?? path?.name ?? "Cursos",
+    pathId: row.trilha_id ?? "path-dp",
+    pathName: row.trilha_nome ?? trainingPathNames[row.trilha_id ?? ""] ?? "Cursos",
     category: row.categoria ?? undefined,
     modality: fromDbModality(row.modalidade),
     modalities: [fromDbModality(row.modalidade)],
@@ -170,7 +217,7 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     benefits: asStringArray(row.beneficios),
     modules: asModules(row.ementa),
     instructorId: primaryInstructor?.instrutor_id ?? "",
-    image: row.imagem_capa ?? courseCoverByPath[row.trilha_id ?? path?.id ?? ""] ?? defaultCourseCover,
+    image: row.imagem_capa ?? courseCoverByPath[row.trilha_id ?? ""] ?? defaultCourseCover,
     rating: Number(row.rating),
     studentsCount: row.total_alunos,
     status: fromDbCourseStatus(row.status),
@@ -228,6 +275,36 @@ export function mapLead(row: LeadRow): Lead {
     status: fromDbLeadStatus(row.status_crm),
     message: row.mensagem ?? "",
     createdAt: row.created_at
+  };
+}
+
+export function mapBlogPost(row: BlogPostRow): BlogPost {
+  return {
+    id: row.id,
+    title: row.titulo,
+    slug: row.slug,
+    summary: row.resumo,
+    content: row.conteudo,
+    category: fromDbBlogCategory(row.categoria),
+    tags: asStringArray(row.tags),
+    author: row.autor,
+    date: row.publicado_em ?? row.created_at,
+    readingTime: row.tempo_leitura ?? "5 min",
+    status: row.status,
+    image: row.imagem_url ?? "",
+    relatedCourseId: row.curso_id ?? ""
+  };
+}
+
+export function mapAssessmentToTestimonial(row: AssessmentWithCourseRow): Testimonial {
+  return {
+    id: row.id,
+    name: "Aluno RH Cursos",
+    role: "Participante",
+    organization: "Turma pública",
+    course: row.turma?.curso?.titulo ?? "",
+    text: row.comentario ?? "",
+    rating: Math.min(Math.max(row.nota, 1), 5)
   };
 }
 
