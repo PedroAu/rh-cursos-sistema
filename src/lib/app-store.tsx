@@ -237,9 +237,14 @@ export function AppStoreProvider({
   }, [initialSession]);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    // Guard explícito de ambiente: subscriptions real-time dependem de WebSocket
+    // do browser. Evita side effects de rede em SSR ou em ambientes sem window.
+    if (typeof window === "undefined") return;
+    if (!isSupabaseConfigured || !supabase) return;
 
     let active = true;
+    const subscriptions: ReturnType<typeof supabase.channel>[] = [];
+    const client = supabase;
 
     Promise.all([
       fetchPublicCatalogFromSupabase(),
@@ -255,14 +260,58 @@ export function AppStoreProvider({
           instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
           blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
         }));
+
+        // Real-time subscriptions para cursos após dados iniciais carregarem
+        if (active && supabase && catalog?.courses?.length) {
+          const courseSub = supabase
+            .channel("curso_changes")
+            .on(
+              "postgres_changes",
+              { event: "*", schema: "public", table: "curso" },
+              () => {
+                // Refetch do catálogo completo quando curso é modificado
+                if (!active) return;
+                fetchPublicCatalogFromSupabase()
+                  .then(updated => {
+                    if (!active || !updated) return;
+                    setState(current => ({
+                      ...current,
+                      courses: updated.courses,
+                      classes: updated.classes,
+                      instructors: updated.instructors
+                    }));
+                  })
+                  .catch(() => undefined);
+              }
+            )
+            .subscribe();
+
+          // Real-time subscriptions para blog posts
+          const blogSub = supabase
+            .channel("blog_changes")
+            .on(
+              "postgres_changes",
+              { event: "*", schema: "public", table: "post_blog" },
+              () => {
+                if (!active) return;
+                fetchPublicBlogPostsFromSupabase()
+                  .then(updated => {
+                    if (!active || !updated) return;
+                    setState(current => ({ ...current, blogPosts: updated }));
+                  })
+                  .catch(() => undefined);
+              }
+            )
+            .subscribe();
+
+          subscriptions.push(courseSub, blogSub);
+        }
       })
       .catch(() => {
         toast.error("Não foi possível carregar os dados públicos do Supabase.");
       });
 
-    // Reidrata a sessão do Supabase Auth (JWT em localStorage) e, com o cliente
-    // já autenticado como `authenticated`, busca os leads diretamente via RLS
-    // (policy lead_admin_select / is_admin). Sem JWT, nenhuma leitura admin ocorre.
+    // Lazy load admin data apenas quando há sessão ativa
     const stored = getSupabaseSession();
     if (stored && supabase) {
       supabase.auth
@@ -275,6 +324,27 @@ export function AppStoreProvider({
           return fetchLeadsFromSupabase().then((leads) => {
             if (!active || !leads?.length) return;
             setState((current) => ({ ...current, leads }));
+
+            // Real-time subscriptions para leads (admin only)
+            if (supabase) {
+              const leadSub = supabase
+                .channel("lead_changes")
+                .on(
+                  "postgres_changes",
+                  { event: "*", schema: "public", table: "lead" },
+                  () => {
+                    if (!active) return;
+                    fetchLeadsFromSupabase()
+                      .then(updated => {
+                        if (!active || !updated) return;
+                        setState(current => ({ ...current, leads: updated }));
+                      })
+                      .catch(() => undefined);
+                  }
+                )
+                .subscribe();
+              subscriptions.push(leadSub);
+            }
           });
         })
         .catch(() => undefined);
@@ -282,6 +352,10 @@ export function AppStoreProvider({
 
     return () => {
       active = false;
+      // Cleanup todas as subscriptions
+      subscriptions.forEach(channel => {
+        client.removeChannel(channel);
+      });
     };
   }, []);
 
