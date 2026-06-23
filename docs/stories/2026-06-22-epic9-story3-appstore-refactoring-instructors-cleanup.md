@@ -70,3 +70,9 @@ Esta story é o **gateway para Phase B completa** — após completion, o site e
 
 - 2026-06-22 — Story criada (Draft) — Orion/aiox-master
 - 2026-06-23 — Real-time subscription Supabase para `instrutor` em `src/lib/app-store.tsx`; auditoria final de mock-data com ZERO matches; lint/typecheck/build verdes; Status → Done — Executor (EP-9.3)
+- 2026-06-23 — Code review (high effort, 8 angles): 5 correctness findings (1 CONFIRMED, 4 PLAUSIBLE) + 5 cleanup/efficiency issues identified
+  - Fixed CONFIRMED: empty leads array prevented state update (data loss)
+  - Fixed PLAUSIBLE: empty catalog treated as falsy (stale data), unvalidated initialData, missing trilha mapping warning
+  - Cleaned up: subscription boilerplate (−24 lines), initials generation (centralized), type mappers reuse (toDbStudentType, toDbPaymentMethod), upsert pattern dedup
+  - PR #3 created → redesign/ep-0-fundacao; all 111 tests passing ✅
+  - Code Review Agent (executor mode) + 8 commits total
