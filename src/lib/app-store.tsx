@@ -18,6 +18,8 @@ import {
   trainingPaths
 } from "@/data";
 import { demoAccessList } from "@/lib/demo-access";
+import { debounce } from "@/lib/debounce";
+import { getInitials } from "@/lib/get-initials";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -109,10 +111,35 @@ const initialState: AppState = {
 
 const AppStoreContext = createContext<AppStoreValue | null>(null);
 
+const ARRAY_STATE_KEYS = [
+  "courses",
+  "classes",
+  "students",
+  "instructors",
+  "leads",
+  "enrollments",
+  "blogPosts",
+  "testimonials"
+] as const satisfies readonly (keyof AppStoreInitialData)[];
+
+function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitialData | undefined {
+  if (!initialData) return initialData;
+
+  const sanitized: AppStoreInitialData = { ...initialData };
+
+  for (const key of ARRAY_STATE_KEYS) {
+    if (key in sanitized && !Array.isArray(sanitized[key])) {
+      delete sanitized[key];
+    }
+  }
+
+  return sanitized;
+}
+
 function readInitialState(initialSession?: CurrentSession | null, initialData?: AppStoreInitialData) {
   return {
     ...initialState,
-    ...initialData,
+    ...sanitizeInitialData(initialData),
     currentSession: initialSession ?? null
   };
 }
@@ -146,6 +173,40 @@ function deriveClassCapacity(trainingClass: TrainingClass, enrollments: Enrollme
     filledSeats,
     availableSeats: Math.max(0, trainingClass.totalSeats - filledSeats),
   };
+}
+
+function createRealtimeSubscription(
+  client: NonNullable<typeof supabase>,
+  channelName: string,
+  table: string,
+  isActive: () => boolean,
+  onChange: () => void
+) {
+  return client
+    .channel(channelName)
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table },
+      () => {
+        if (!isActive()) return;
+        onChange();
+      }
+    )
+    .subscribe((status) => {
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error(`Real-time subscription failed for channel '${channelName}': ${status}`);
+      }
+    });
+}
+
+function upsertCollection<T extends { id: string }>(
+  collection: T[],
+  exists: boolean,
+  nextItem: T
+): T[] {
+  return exists
+    ? collection.map((item) => (item.id === nextItem.id ? nextItem : item))
+    : [nextItem, ...collection];
 }
 
 function persistAdminMutation(mutation: AdminMutation): Promise<void> {
@@ -188,6 +249,8 @@ export function AppStoreProvider({
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  const catalogFetchVersionRef = useRef(0);
 
   useEffect(() => {
     clearLegacyStoredState();
@@ -237,9 +300,52 @@ export function AppStoreProvider({
   }, [initialSession]);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    // Guard explícito de ambiente: subscriptions real-time dependem de WebSocket
+    // do browser. Evita side effects de rede em SSR ou em ambientes sem window.
+    if (typeof window === "undefined") return;
+    if (!isSupabaseConfigured || !supabase) return;
 
     let active = true;
+    const subscriptions: ReturnType<typeof supabase.channel>[] = [];
+    const client = supabase;
+
+    const scheduleCatalogRefetch = debounce(() => {
+      if (!active) return;
+      catalogFetchVersionRef.current += 1;
+      const fetchVersion = catalogFetchVersionRef.current;
+
+      fetchPublicCatalogFromSupabase()
+        .then((updated) => {
+          if (!active || !updated || fetchVersion !== catalogFetchVersionRef.current) return;
+          setState((current) => ({
+            ...current,
+            courses: updated.courses,
+            classes: updated.classes,
+            instructors: updated.instructors
+          }));
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    const scheduleBlogRefetch = debounce(() => {
+      if (!active) return;
+      fetchPublicBlogPostsFromSupabase()
+        .then((updated) => {
+          if (!active || !updated) return;
+          setState((current) => ({ ...current, blogPosts: updated }));
+        })
+        .catch(() => undefined);
+    }, 300);
+
+    const scheduleLeadRefetch = debounce(() => {
+      if (!active) return;
+      fetchLeadsFromSupabase()
+        .then((updated) => {
+          if (!active || !updated) return;
+          setState((current) => ({ ...current, leads: updated }));
+        })
+        .catch(() => undefined);
+    }, 300);
 
     Promise.all([
       fetchPublicCatalogFromSupabase(),
@@ -250,19 +356,49 @@ export function AppStoreProvider({
 
         setState((current) => ({
           ...current,
-          courses: catalog?.courses.length ? catalog.courses : current.courses,
+          courses: catalog?.courses !== undefined ? catalog.courses : current.courses,
           classes: catalog?.classes.length ? catalog.classes : current.classes,
           instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
           blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
         }));
+
+        // Real-time subscriptions para cursos após dados iniciais carregarem
+        if (active && supabase) {
+          const courseSub = createRealtimeSubscription(
+            supabase,
+            "curso_changes",
+            "curso",
+            () => active,
+            scheduleCatalogRefetch
+          );
+
+          // Real-time subscriptions para blog posts
+          const blogSub = createRealtimeSubscription(
+            supabase,
+            "blog_changes",
+            "post_blog",
+            () => active,
+            scheduleBlogRefetch
+          );
+
+          // Real-time para instrutores (dado público do catálogo). Refetch do
+          // catálogo completo mantém cursos/turmas/instrutores consistentes.
+          const instructorSub = createRealtimeSubscription(
+            supabase,
+            "instrutor_changes",
+            "instrutor",
+            () => active,
+            scheduleCatalogRefetch
+          );
+
+          subscriptions.push(courseSub, blogSub, instructorSub);
+        }
       })
       .catch(() => {
         toast.error("Não foi possível carregar os dados públicos do Supabase.");
       });
 
-    // Reidrata a sessão do Supabase Auth (JWT em localStorage) e, com o cliente
-    // já autenticado como `authenticated`, busca os leads diretamente via RLS
-    // (policy lead_admin_select / is_admin). Sem JWT, nenhuma leitura admin ocorre.
+    // Lazy load admin data apenas quando há sessão ativa
     const stored = getSupabaseSession();
     if (stored && supabase) {
       supabase.auth
@@ -273,8 +409,42 @@ export function AppStoreProvider({
         .then(({ error }) => {
           if (!active || error) return;
           return fetchLeadsFromSupabase().then((leads) => {
-            if (!active || !leads?.length) return;
+            if (!active || !leads) return;
             setState((current) => ({ ...current, leads }));
+
+            // Real-time subscriptions para leads (admin only)
+            if (supabase) {
+              const leadSub = createRealtimeSubscription(
+                supabase,
+                "lead_changes",
+                "lead",
+                () => active,
+                scheduleLeadRefetch
+              );
+
+              // Real-time para inscrições (admin only). Mudanças em inscrição
+              // afetam a capacidade das turmas (vagas), por isso refetch do
+              // catálogo para reconciliar as contagens de vagas.
+              const enrollmentSub = createRealtimeSubscription(
+                supabase,
+                "inscricao_changes",
+                "inscricao",
+                () => active,
+                scheduleCatalogRefetch
+              );
+
+              // Real-time para alunos (admin only). Alterações em aluno podem
+              // refletir nas estatísticas do catálogo (total de alunos por curso).
+              const studentSub = createRealtimeSubscription(
+                supabase,
+                "aluno_changes",
+                "aluno",
+                () => active,
+                scheduleCatalogRefetch
+              );
+
+              subscriptions.push(leadSub, enrollmentSub, studentSub);
+            }
           });
         })
         .catch(() => undefined);
@@ -282,6 +452,10 @@ export function AppStoreProvider({
 
     return () => {
       active = false;
+      // Cleanup todas as subscriptions
+      subscriptions.forEach(channel => {
+        client.removeChannel(channel);
+      });
     };
   }, []);
 
@@ -493,9 +667,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      courses: exists
-        ? current.courses.map((item) => (item.id === nextCourse.id ? nextCourse : item))
-        : [nextCourse, ...current.courses]
+      courses: upsertCollection(current.courses, Boolean(exists), nextCourse)
     }));
     toast.success(course.id ? "Curso editado." : "Curso criado no admin.");
     return persistAdminMutation({ resource: "courses", action: "upsert", payload: nextCourse });
@@ -558,9 +730,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      classes: exists
-        ? current.classes.map((item) => (item.id === nextClass.id ? nextClass : item))
-        : [nextClass, ...current.classes]
+      classes: upsertCollection(current.classes, Boolean(exists), nextClass)
     }));
     toast.success(trainingClass.id ? "Turma editada." : "Turma criada.");
     return persistAdminMutation({ resource: "classes", action: "upsert", payload: nextClass });
@@ -601,16 +771,14 @@ export function AppStoreProvider({
           avatar:
             instructor.photoUrl ??
             instructor.avatar ??
-            instructor.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() ??
+            (instructor.name ? getInitials(instructor.name) : undefined) ??
             "NI",
           status: instructor.status ?? "Ativo"
         } as Instructor);
 
     setState((current) => ({
       ...current,
-      instructors: exists
-        ? current.instructors.map((item) => (item.id === nextInstructor.id ? nextInstructor : item))
-        : [nextInstructor, ...current.instructors]
+      instructors: upsertCollection(current.instructors, Boolean(exists), nextInstructor)
     }));
     toast.success(instructor.id ? "Instrutor editado." : "Instrutor criado.");
     return persistAdminMutation({ resource: "instructors", action: "upsert", payload: nextInstructor });
@@ -674,9 +842,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      blogPosts: exists
-        ? current.blogPosts.map((item) => (item.id === nextPost.id ? nextPost : item))
-        : [nextPost, ...current.blogPosts]
+      blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
     }));
     toast.success(post.id ? "Post atualizado." : "Post publicado.");
     return persistAdminMutation({ resource: "blog", action: "upsert", payload: nextPost });

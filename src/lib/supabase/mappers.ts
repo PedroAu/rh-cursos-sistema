@@ -1,3 +1,4 @@
+import { getInitials } from "@/lib/get-initials";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type {
   BlogPost,
@@ -151,11 +152,11 @@ function toDbEnrollmentStatus(value: EnrollmentStatus): EnrollmentRow["status_in
   return map[value];
 }
 
-function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentRow["forma_pagamento"] {
+export function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentRow["forma_pagamento"] {
   return value === "Cartão" ? "Cartao" : value;
 }
 
-function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_aluno"] {
+export function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_aluno"] {
   if (value === "Empresa") return "PJ";
   if (value === "Órgão público") return "Servidor";
   return "PF";
@@ -195,6 +196,10 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
   const nextClass = classes
     .filter((item) => item.curso_id === row.id)
     .sort((a, b) => a.data_inicio.localeCompare(b.data_inicio))[0];
+
+  if (!row.trilha_nome && row.trilha_id && !(row.trilha_id in trainingPathNames)) {
+    console.warn(`mapCourse: trilha_id "${row.trilha_id}" not found in trainingPathNames map (course ${row.id}).`);
+  }
 
   return {
     id: row.id,
@@ -259,7 +264,7 @@ export function mapInstructor(row: InstructorRow, joins: CourseInstructorRow[]):
     photoUrl: row.foto_url ?? "",
     courseIds: joins.filter((item) => item.instrutor_id === row.id).map((item) => item.curso_id),
     rating: Number(row.rating),
-    avatar: row.foto_url ?? row.nome.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(),
+    avatar: row.foto_url ?? getInitials(row.nome),
     status: row.status === "Ativo" ? "Ativo" : "Inativo"
   };
 }

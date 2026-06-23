@@ -38,3 +38,10 @@ Thumbs.db
 .claude/settings.local.json
 .aiox/install-log.txt
 .aiox/handoffs/
+
+# Test Coverage (AIOX)
+coverage/
+.nyc_output/
+
+# OMC Tooling State (AIOX)
+.omc/state/

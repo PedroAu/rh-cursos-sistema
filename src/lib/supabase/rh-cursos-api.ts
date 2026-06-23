@@ -11,6 +11,8 @@ import {
   mapCourse,
   mapInstructor,
   mapLead,
+  toDbPaymentMethod,
+  toDbStudentType,
   type AssessmentWithCourseRow,
   type BlogPostRow,
   type ClassRow,
@@ -135,15 +137,10 @@ export async function createEnrollmentInSupabase(payload: Omit<Enrollment, "id" 
     p_telefone: payload.phone,
     p_cargo: payload.jobTitle,
     p_orgao: payload.organization,
-    p_tipo_aluno:
-      payload.enrollmentType === "Empresa"
-        ? "PJ"
-        : payload.enrollmentType === "Órgão público"
-          ? "Servidor"
-          : "PF",
+    p_tipo_aluno: toDbStudentType(payload.enrollmentType),
     p_turma_id: payload.classId,
     p_tipo_inscricao: payload.enrollmentType,
-    p_forma_pagamento: payload.paymentMethod === "Cartão" ? "Cartao" : payload.paymentMethod,
+    p_forma_pagamento: toDbPaymentMethod(payload.paymentMethod),
     p_observacoes: payload.notes
   });
 
