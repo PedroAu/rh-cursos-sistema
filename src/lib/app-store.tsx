@@ -343,7 +343,57 @@ export function AppStoreProvider({
                   }
                 )
                 .subscribe();
-              subscriptions.push(leadSub);
+
+              // Real-time para inscrições (admin only). Mudanças em inscrição
+              // afetam a capacidade das turmas (vagas), por isso refetch do
+              // catálogo para reconciliar as contagens de vagas.
+              const enrollmentSub = supabase
+                .channel("inscricao_changes")
+                .on(
+                  "postgres_changes",
+                  { event: "*", schema: "public", table: "inscricao" },
+                  () => {
+                    if (!active) return;
+                    fetchPublicCatalogFromSupabase()
+                      .then(updated => {
+                        if (!active || !updated) return;
+                        setState(current => ({
+                          ...current,
+                          courses: updated.courses,
+                          classes: updated.classes,
+                          instructors: updated.instructors
+                        }));
+                      })
+                      .catch(() => undefined);
+                  }
+                )
+                .subscribe();
+
+              // Real-time para alunos (admin only). Alterações em aluno podem
+              // refletir nas estatísticas do catálogo (total de alunos por curso).
+              const studentSub = supabase
+                .channel("aluno_changes")
+                .on(
+                  "postgres_changes",
+                  { event: "*", schema: "public", table: "aluno" },
+                  () => {
+                    if (!active) return;
+                    fetchPublicCatalogFromSupabase()
+                      .then(updated => {
+                        if (!active || !updated) return;
+                        setState(current => ({
+                          ...current,
+                          courses: updated.courses,
+                          classes: updated.classes,
+                          instructors: updated.instructors
+                        }));
+                      })
+                      .catch(() => undefined);
+                  }
+                )
+                .subscribe();
+
+              subscriptions.push(leadSub, enrollmentSub, studentSub);
             }
           });
         })
