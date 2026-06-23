@@ -373,7 +373,7 @@ export function AppStoreProvider({
         .then(({ error }) => {
           if (!active || error) return;
           return fetchLeadsFromSupabase().then((leads) => {
-            if (!active || !leads?.length) return;
+            if (!active || !leads) return;
             setState((current) => ({ ...current, leads }));
 
             // Real-time subscriptions para leads (admin only)
