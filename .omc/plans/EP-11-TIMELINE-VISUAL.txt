@@ -1,0 +1,221 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                           EP-11 EXECUTION TIMELINE — 5-AGENT PARALLEL                                 ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+DAY 1 — MONDAY
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ 9:00 AM  │  @pm KICKOFF MEETING (15 min)
+          │  │ Review plan + ACs
+          │  │ Assign responsibilities
+          │  │ Confirm blockers/risks
+          │  └─ Output: Team alignment ✅
+          │
+ 10:00 AM │  @architect START                    @dev START                 @qa PLANNING
+          │  ┌─ Design phase ─────────────────┐  ┌─ Implementation ────────┐  ┌─ Test planning
+          │  │                                 │  │                         │  │
+          │  │ • Session rotation design      │  │ • Session rotation code │  │ • Test cases
+          │  │ • RBAC model + hierarchy       │  │ • RBAC middleware       │  │ • Coverage plan
+          │  │ • Rate limiting algorithm      │  │ • Unit tests            │  │ • Test template
+          │  │ • Demo auth RLS policies       │  │                         │  │
+          │  │ • ASCII diagrams               │  │ (6 hours)               │  │ (2 hours)
+          │  │                                 │  │                         │  │
+          │  │ (6 hours)                       │  │                         │  │
+          │  └─ Output: ────────────────────┘  └─ Output: ──────────────┘  └─
+          │     AUTH-ARCHITECTURE.md              Code compiling ✅
+          │                                        Typecheck ✅
+          │
+ 3:00 PM  │  @security THREAT MODELING (2 hours)    @qa TEST PLANNING START (2 hours)
+          │  ┌─ Review architecture                  ┌─ Implement test suite
+          │  │ • JWT validation strategy             │ • auth-flows.spec.ts
+          │  │ • RBAC bypass vectors                 │ • rbac-enforcement.spec.ts
+          │  │ • Rate limit evasion                  │ • rate-limiting.spec.ts
+          │  │ • Demo isolation risks                │
+          │  │                                        │
+          │  └─ Output: Threat model documented     └─ Output: Test structure ready
+          │
+ 5:00 PM  │  @architect HANDOFF → @dev ✅           @qa IMPLEMENTS (continues)
+          │  • AUTH-ARCHITECTURE.md ready
+          │  • Design approved, proceed!
+          │
+
+
+DAY 2 — TUESDAY
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ 9:00 AM  │  @security AUDIT START (6-8 hours)
+          │  ┌─ Code review phase ────────────────────────────────────┐
+          │  │                                                         │
+          │  │ • Review @dev session rotation code                   │
+          │  │ • Review @dev RBAC middleware                         │
+          │  │ • Review @dev rate limiting                           │
+          │  │ • Static analysis (npm audit)                         │
+          │  │ • OWASP A01/A02/A07 checklist                        │
+          │  │ • Threat modeling validation                          │
+          │  │                                                         │
+          │  │ (4 hours)                                              │
+          │  │                                                         │
+          │  └─────────────────────────────────────────────────────┘
+          │
+ 10:00 AM │  @dev CONTINUES (8 hours)              @qa TESTING (6 hours)
+          │  ┌─ Implement remaining ────────────┐  ┌─ Run test suite
+          │  │                                   │  │ • All tests implement
+          │  │ • Rate limiting (4 hours)         │  │ • Coverage tracking
+          │  │ • Session cleanup (2 hours)       │  │ • Regression tests
+          │  │ • Demo auth isolation (2 hours)   │  │
+          │  │ • Integration into auth.ts        │  │ (4 hours)
+          │  │ • Final checks                    │  │
+          │  │   - typecheck ✅                  │  │
+          │  │   - lint ✅                       │  │
+          │  │   - build ✅                      │  │
+          │  │                                   │  │
+          │  └─ Output: All code ready ─────────┘  └─ Output: Tests ready
+          │      (compiling, no errors)
+          │
+ 3:00 PM  │  @dev HANDOFF → @security ✅           @qa REGRESSION TESTS
+          │  • All implementations done                  (continues)
+          │  • Code ready for audit
+          │  └─ @security resumes review (4 hours)
+          │
+ 5:00 PM  │  @security FINDINGS PHASE ─────────────────────────┐
+          │  ┌─ Document results                               │
+          │  │ • SECURITY-AUDIT.md                             │
+          │  │ • OWASP-CHECKLIST.md                            │
+          │  │ • Issue prioritization                          │
+          │  │                                                  │
+          │  │ ⚠️  CRITICAL findings? → Brief @dev + @pm       │
+          │  │ ✅ All findings documented                      │
+          │  │                                                  │
+          │  └─ If CRITICAL: @dev paused, await fixes ─────────┘
+          │
+
+
+DAY 3 — WEDNESDAY
+─────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+ 9:00 AM  │  @dev REMEDIATION (if needed) ───────────────────────┐  @qa FINAL VALIDATION (4 hours)
+          │  ├─ If CRITICAL findings:                           │  ┌─ Run full test suite
+          │  │  • Fix identified issues (2-4 hours)             │  │ • All 7 ACs tested
+          │  │  • Re-test locally                               │  │ • Coverage ≥70%
+          │  │  • Ping @security when ready                     │  │ • Security tests
+          │  │                                                   │  │ • Regression validation
+          │  │ └─ Output: Fixes committed                       │  │
+          │  │                                                   │  │ (4 hours)
+          │  └────────────────────────────────────────────────┘  └─
+          │
+          │  @security FINAL REVIEW (if remediation)
+          │  ├─ If fixes submitted:
+          │  │  • Quick review of changes
+          │  │  • Approve or request changes
+          │  │  └─ If approved: AUDIT COMPLETE ✅
+          │  │
+          │  └─ Output: Final security approval
+          │
+ 2:00 PM  │  @qa HANDOFF → @pm ✅
+          │  ├─ Test results + coverage report
+          │  ├─ ALL ACs PASSING ✅
+          │  └─ Output: Ready for acceptance
+          │
+ 3:00 PM  │  @pm FINAL ACCEPTANCE ─────────────────────────────────┐
+          │  ├─ Review @qa test results                           │
+          │  ├─ Verify @security audit passed                     │
+          │  ├─ Check all 7 ACs implemented                       │
+          │  ├─ Confirm story file marked Done                    │
+          │  ├─ Create ACCEPTANCE-SIGN-OFF.md                     │
+          │  │                                                     │
+          │  │ ✅ ALL ACs PASSING                                │
+          │  │ ✅ SECURITY AUDIT PASSED                          │
+          │  │ ✅ TESTS GREEN (109+ passing)                     │
+          │  │ ✅ ZERO LINT/TYPECHECK ERRORS                    │
+          │  │ ✅ TEAM SIGN-OFF                                  │
+          │  │                                                     │
+          │  │ → EP-11 READY FOR STAGING ✅                     │
+          │  │                                                     │
+          │  └─ Output: Ready for @devops push ─────────────────┘
+          │
+ 5:00 PM  │  DELIVERY COMPLETE ─────────────────────────────────────
+          │  └─ Story EP-11.1 → Done ✅
+          │     Commits ready for staging review
+          │     Team feedback incorporated
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                              HANDOFF FLOW & DEPENDENCIES                                             ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+                          @pm (Kickoff)
+                            │
+                    ┌───────┼───────┐
+                    │               │
+                @architect      @dev  ← Dependencies: AUTH-ARCHITECTURE.md
+                    │               │
+                    │               ├─→ @qa (test cases)
+                    │               │
+                    └───────┬───────┘
+                            │
+                        (Day 1, 5PM)
+                        CODE READY ✅
+                            │
+                        @security (audit)
+                            │
+                      (Day 2, 5PM)
+          ┌─ If findings → @dev (fix) → @security (re-review)
+          │                  │
+          └──────────────────┼──────────────────┐
+                             │                  │
+                        (Day 3, 9AM)      @qa (testing)
+                     Fixes if needed           │
+                             │                 │
+                             └─────────┬───────┘
+                                       │
+                                 (Day 3, 2PM)
+                            ALL ACS PASSING ✅
+                                       │
+                                     @pm
+                            (acceptance sign-off)
+                                       │
+                                 (Day 3, 3PM)
+                           EP-11 READY ✅
+                                       │
+                                  DEPLOY
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                           PARALLEL WORK DISTRIBUTION                                                 ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Agent              Total Hours    Day 1      Day 2      Day 3     Role
+─────────────────────────────────────────────────────────────────────────────────────────────────────
+@pm                 4-5 hours    2 hours    1 hour     1.5 hours  Coordination
+@architect          6-8 hours    6 hours    —          —          Design authority
+@dev               12-14 hours    6 hours    8 hours    0-2 hours  Implementation
+@security           8-10 hours    2 hours    6-8 hours  0-2 hours  Security audit
+@qa                10-12 hours    2 hours    6 hours    4 hours    Testing & validation
+─────────────────────────────────────────────────────────────────────────────────────────────────────
+TOTAL              42-48 hours   18 hours   21-24 hours 5-7.5 hours
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                              KEY MILESTONES & GATES                                                  ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+Day 1, 5 PM    → @architect design complete + approved
+Day 2, 5 PM    → @dev implementation complete + @security audit started
+Day 3, 9 AM    → @dev remediations complete (if needed)
+Day 3, 2 PM    → @qa all tests passing + security tests green
+Day 3, 3 PM    → @pm final acceptance + story marked Done ✅
+
+CRITICAL PATH: @architect design → @dev implementation → @security audit → @qa validation → @pm acceptance
+
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                           DAILY SYNC POINTS (async/15min)                                            ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+ 9:00 AM  Daily standup (if needed)
+10:00 AM  Team sync (status updates)
+ 3:00 PM  Afternoon checkin (blockers + progress)
+ 5:00 PM  EOD handoff confirmation
+
+
+READY TO KICK OFF? → Start with @pm at 9:00 AM Day 1
