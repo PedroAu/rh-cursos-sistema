@@ -1,3 +1,4 @@
+import { getInitials } from "@/lib/get-initials";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type {
   BlogPost,
@@ -263,7 +264,7 @@ export function mapInstructor(row: InstructorRow, joins: CourseInstructorRow[]):
     photoUrl: row.foto_url ?? "",
     courseIds: joins.filter((item) => item.instrutor_id === row.id).map((item) => item.curso_id),
     rating: Number(row.rating),
-    avatar: row.foto_url ?? row.nome.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase(),
+    avatar: row.foto_url ?? getInitials(row.nome),
     status: row.status === "Ativo" ? "Ativo" : "Inativo"
   };
 }

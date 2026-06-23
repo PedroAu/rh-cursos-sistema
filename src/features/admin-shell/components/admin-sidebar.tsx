@@ -17,17 +17,13 @@ import { BookOpen, LogOut, Settings, Sparkles } from "lucide-react";
 
 import { adminNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { useAppStore } from "@/lib/app-store";
+import { getInitials } from "@/lib/get-initials";
 import { Link, useLocation } from "@/lib/router-compat";
 
 export function AdminSidebar({ role }: { role: "admin" }) {
   const { currentSession, logout } = useAppStore();
   const location = useLocation();
-  const initials = (currentSession?.name ?? "Admin")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((chunk) => chunk[0]?.toUpperCase())
-    .join("");
+  const initials = getInitials(currentSession?.name ?? "Admin");
 
   return (
     <AppShell.Navbar

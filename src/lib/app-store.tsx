@@ -19,6 +19,7 @@ import {
 } from "@/data";
 import { demoAccessList } from "@/lib/demo-access";
 import { debounce } from "@/lib/debounce";
+import { getInitials } from "@/lib/get-initials";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
@@ -764,7 +765,7 @@ export function AppStoreProvider({
           avatar:
             instructor.photoUrl ??
             instructor.avatar ??
-            instructor.name?.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase() ??
+            (instructor.name ? getInitials(instructor.name) : undefined) ??
             "NI",
           status: instructor.status ?? "Ativo"
         } as Instructor);
