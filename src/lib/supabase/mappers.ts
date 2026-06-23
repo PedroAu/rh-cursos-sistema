@@ -196,6 +196,10 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     .filter((item) => item.curso_id === row.id)
     .sort((a, b) => a.data_inicio.localeCompare(b.data_inicio))[0];
 
+  if (!row.trilha_nome && row.trilha_id && !(row.trilha_id in trainingPathNames)) {
+    console.warn(`mapCourse: trilha_id "${row.trilha_id}" not found in trainingPathNames map (course ${row.id}).`);
+  }
+
   return {
     id: row.id,
     slug: row.slug,
