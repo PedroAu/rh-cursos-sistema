@@ -1,7 +1,7 @@
 # Story 1.2: Tokens Semânticos de Cor e Superfície
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 1 — Fundação Visual & Baseline A11y (`docs/epics/epic-1-fundacao-visual-baseline-a11y.md`)
@@ -133,4 +133,4 @@ Claude (dev/Dex)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

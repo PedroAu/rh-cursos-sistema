@@ -1,7 +1,7 @@
 # Story: Migrar aplicação ativa para Next.js e corrigir achados técnicos
 
 ## Status
-Ready for Review
+Done
 
 ## Contexto
 O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, enquanto existia uma árvore Next paralela em `app/`. O usuário solicitou migrar para Next.js e executar as correções dos achados principais: duplicidade de arquitetura, proteção de rotas, bundle grande, higiene de repositório, autenticação demo e integração Supabase.
@@ -69,7 +69,7 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `tailwind.config.ts`
 - `postcss.config.js`
 - `next.config.mjs`
-- `proxy.ts`
+- `middleware.ts`
 - `app/layout.tsx`
 - `app/page.tsx`
 - `app/cursos/page.tsx`
@@ -90,12 +90,7 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `app/admin/inscricoes/page.tsx`
 - `app/admin/instrutores/page.tsx`
 - `app/admin/blog/page.tsx`
-- `app/aluno/page.tsx`
-- `app/instrutor/page.tsx`
-- `app/api/demo-session/route.ts`
 - `app/api/auth/session/route.ts`
-- `app/api/leads/route.ts`
-- `app/api/enrollments/route.ts`
 - `scripts/check-schema.js`
 - `scripts/load-seed-data.js`
 - `src/`
@@ -110,11 +105,9 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `public/images/courses/tecnologia-inovacao.jpg`
 - `src/data/courseCovers.ts`
 - `src/data/index.ts`
-- `src/data/mockCourses.ts`
 - `src/components/page-clients/blog-post-client.tsx`
 - `src/components/page-clients/course-detail-client.tsx`
 - `src/components/next-page-shell.tsx`
-- `src/components/courses/training-path-card.tsx`
 - `src/lib/auth.ts`
 - `src/lib/admin-form-validation.ts`
 - `src/lib/router-compat.tsx`
@@ -131,3 +124,7 @@ O diagnóstico técnico identificou que o app ativo era Vite/React em `src/`, en
 - `next.config.mjs`
 - `tests/route-auth.spec.ts`
 - `docs/stories/2026-05-13-next-migration-hardening.md`
+
+## QA Results
+
+Pass — encerramento documental em 2026-06-24. Gates atuais do repositório (`npm run lint`, `npm run typecheck`, `npm test`) passaram e a story permanece refletida no runtime ativo, apesar de parte da file list histórica ter sido superada por refactors posteriores.

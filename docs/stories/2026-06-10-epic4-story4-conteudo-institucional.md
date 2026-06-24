@@ -1,7 +1,7 @@
 # Story 4.4: Conteúdo Institucional
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 4 — Jornadas Públicas (`docs/epics/epic-4-jornadas-publicas.md`)
@@ -29,10 +29,10 @@ As páginas institucionais precisavam sair do formato apenas informativo e ganha
 - `src/views/public/BlogPost.tsx` — tags, leitura guiada e taxonomia lateral
 - `tests/public-journeys.spec.ts` — regressão do conteúdo institucional
 - `tests/visual.baseline.spec.ts` — rotas dinâmicas e institucionais no baseline visual
-- `tests/baseline/blog-artigo-desktop.png`
-- `tests/baseline/blog-artigo-mobile.png`
-- `tests/baseline/sobre-desktop.png`
-- `tests/baseline/sobre-mobile.png`
+- `tests/baseline/blog-artigo-baseline-desktop.png`
+- `tests/baseline/blog-artigo-baseline-mobile.png`
+- `tests/baseline/sobre-baseline-desktop.png`
+- `tests/baseline/sobre-baseline-mobile.png`
 
 ## Change Log
 
@@ -49,4 +49,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

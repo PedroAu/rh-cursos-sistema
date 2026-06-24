@@ -1,7 +1,7 @@
 # Story 5.1: Busca Global do Header Conectada
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 5 — Busca, Loading, Motion & Imagens (`docs/epics/epic-5-busca-loading-motion-imagens.md`)
@@ -46,4 +46,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

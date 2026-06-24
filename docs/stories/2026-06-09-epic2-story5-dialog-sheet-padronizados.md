@@ -1,7 +1,7 @@
 # Story 2.5: Dialog e Sheet Padronizados
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 2 — Form System & Acessibilidade Compartilhada (`docs/epics/epic-2-form-system-a11y.md`)
@@ -26,11 +26,11 @@ PRD: `docs/prd/modernizacao-ui-2026.md`
 
 ### Modificados
 - `src/components/ui/dialog.tsx` — suporte compartilhado a `DialogFooter` e `initialFocusRef`
-- `src/components/ui/sheet.tsx` — `SheetHeader`, `SheetTitle`, `SheetDescription` e `initialFocusRef`
 - `src/components/common/command-palette.tsx` — descrição explícita do diálogo
 - `src/features/public-shell/components/public-mobile-navigation.tsx` — sheet com título/descrição semânticos
 - `src/features/public-shell/components/whatsapp-support.tsx` — diálogo com descrição explícita
 - `src/components/checkout/checkout-modal.tsx` — descrição e footer padronizados
+- `src/components/in-company/quote-modal.tsx` — footer e descrição alinhados à base compartilhada
 - `src/views/admin/AdminResourcePage.tsx` — footer do dialog alinhado à base compartilhada
 
 ## Change Log
@@ -48,4 +48,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

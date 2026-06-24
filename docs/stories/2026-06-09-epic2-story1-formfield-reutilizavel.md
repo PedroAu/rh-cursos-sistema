@@ -1,7 +1,7 @@
 # Story 2.1: Componente `FormField` Reutilizável
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 2 — Form System & Acessibilidade Compartilhada (`docs/epics/epic-2-form-system-a11y.md`)
@@ -46,4 +46,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

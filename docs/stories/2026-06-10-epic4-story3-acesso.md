@@ -1,7 +1,7 @@
 # Story 4.3: Jornada de Acesso
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 4 — Jornadas Públicas (`docs/epics/epic-4-jornadas-publicas.md`)
@@ -28,8 +28,8 @@ O login já tinha labels persistentes e erro inline, mas faltava deixar explíci
 ### Modificados
 - `src/views/public/Login.tsx` — papéis apresentados de forma previsível e mensagem do guard
 - `tests/public-journeys.spec.ts` — cobertura do fluxo de acesso público
-- `tests/baseline/login-desktop.png`
-- `tests/baseline/login-mobile.png`
+- `tests/baseline/login-baseline-desktop.png`
+- `tests/baseline/login-baseline-mobile.png`
 
 ## Change Log
 
@@ -46,4 +46,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

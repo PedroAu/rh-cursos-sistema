@@ -1,7 +1,7 @@
 # Story 2.4: Icon Buttons Acessíveis no Admin
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 2 — Form System & Acessibilidade Compartilhada (`docs/epics/epic-2-form-system-a11y.md`)
@@ -24,7 +24,7 @@ Os botões só-ícone do admin ainda dependem de contexto visual para editar/exc
 - `docs/stories/2026-06-09-epic2-story4-icon-buttons-acessiveis.md`
 
 ### Modificados
-- `src/components/admin/data-table.tsx` — botões de editar/excluir com `aria-label` e `title` explícitos
+- `src/views/admin/AdminResourcePage.tsx` — botões de editar/excluir com `aria-label` e `title` explícitos
 
 ## Change Log
 
@@ -41,4 +41,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

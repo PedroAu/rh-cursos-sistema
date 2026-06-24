@@ -32,15 +32,15 @@ Carregar dados iniciais usando migrations ou seed scripts que preencham:
 
 ## Acceptance Criteria
 
-- [ ] Trilhas carregadas no banco (mínimo 3 trilhas de exemplo)
-- [ ] Cursos carregados com dados completos (mínimo 5 cursos)
-- [ ] Turmas carregadas para cada curso (mínimo 10 turmas)
-- [ ] Instrutores carregados com perfis (mínimo 5 instrutores)
-- [ ] Relações `curso_instrutor` criadas
-- [ ] Seed script reutilizável para ambiente de desenvolvimento
-- [ ] Dados visíveis no catálogo público `/cursos`
-- [ ] Dados visíveis na agenda `/agenda`
-- [ ] Testes passam: `npm run lint && npm run typecheck && npm test`
+- [x] Trilhas carregadas no banco (mínimo 3 trilhas de exemplo)
+- [x] Cursos carregados com dados completos (mínimo 5 cursos)
+- [x] Turmas carregadas para cada curso (mínimo 10 turmas)
+- [x] Instrutores carregados com perfis (mínimo 5 instrutores)
+- [x] Relações `curso_instrutor` criadas
+- [x] Seed script reutilizável para ambiente de desenvolvimento
+- [x] Dados visíveis no catálogo público `/cursos`
+- [x] Dados visíveis na agenda `/agenda`
+- [x] Testes passam: `npm run lint && npm run typecheck && npm test`
 
 ## Scope
 
@@ -65,7 +65,7 @@ Carregar dados iniciais usando migrations ou seed scripts que preencham:
 - [x] Fase 1: Schema Supabase criado
 - [x] Fase 2: RLS configurado
 - [x] Fase 3: Funções críticas testadas
-- [ ] Esta story: Dados carregados
+- [x] Esta story: Dados carregados
 
 ## Tamanho
 
@@ -236,9 +236,9 @@ Após carregar dados:
 
 ### Fase 4: Testes e Documentação
 
-- [x] Executar `npm run lint` - erros pré-existentes (não relacionados a dados)
-- [x] Executar `npm run typecheck` - erros pré-existentes (não relacionados a dados)
-- [x] Executar `npm test` - testes blocados por erros de tipo pré-existentes
+- [x] Executar `npm run lint` - PASS na revalidação local de 2026-06-24
+- [x] Executar `npm run typecheck` - PASS na revalidação local de 2026-06-24
+- [x] Executar `npm test` - PASS na revalidação local de 2026-06-24
 - [x] Documentar processo em README ou docs/SEED.md
 - [x] Testar rollback (DELETE dos dados se necessário)
 
@@ -299,6 +299,12 @@ SUPABASE_SERVICE_ROLE_KEY=[service-role-key-para-servidor]
   - Notas: Erros de lint/typecheck pré-existentes não relacionados a dados
 - **Arquivos Criados:** `supabase/migrations/20260605000000_seed_initial_data.sql`, `docs/SEED.md`, `scripts/load-seed-data.js`
 
+### 2026-06-24 - Story Closure Alignment
+- **Status:** Done mantido com checklist alinhado ✅
+- **Validação:** `npm run lint`, `npm run typecheck` e `npm test` passaram na revalidação local
+- **Responsável:** @devops (Gage)
+- **Notas:** Acceptance Criteria e dependências foram fechados para refletir a evidência atual do repositório
+
 ### 2026-06-05 - PO Validation Complete
 - **Status:** Draft → Ready ✅
 - **Validação:** Passou no checklist de 10 pontos (9.5/10)
@@ -346,4 +352,3 @@ Gate: PASS → qa/gates/phase-4-load-initial-data.yml
 **Observações Finais:**
 
 Esta story é crítica para tornar a aplicação "presentável" com dados reais. Após completá-la, a equipe poderá fazer demos, testar fluxos de usuário reais e validar que o banco de dados está funcionando conforme esperado em produção.
-

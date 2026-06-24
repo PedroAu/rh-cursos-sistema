@@ -1,7 +1,7 @@
 # Story: Aplicar marca e dados reais da RH Cursos
 
 ## Status
-Ready for Review
+Done
 
 ## Contexto
 O site em publicacao deve usar a logo real da RH Cursos, favicon da marca e dados institucionais reais nos pontos de contato e identidade visual.
@@ -31,3 +31,7 @@ O site em publicacao deve usar a logo real da RH Cursos, favicon da marca e dado
 - `src/components/layout/dashboard-shell.tsx`
 - `src/views/public/Contact.tsx`
 - `src/views/public/About.tsx`
+
+## QA Results
+
+Pass — encerramento documental em 2026-06-24. Artefatos presentes e sem inconsistência material encontrada na auditoria atual.

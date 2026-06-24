@@ -1,7 +1,7 @@
 # Story 6.3: Gates Automatizados de UI
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 6 — Governança de Design (`docs/epics/epic-6-governanca-design.md`)
@@ -23,7 +23,11 @@ O baseline capturado na Épica 1 precisava virar gate real nesta fase. Esta stor
 
 ### Criados
 - `tests/ui-governance.spec.ts`
-- `tests/ui-governance.spec.ts-snapshots/*.png`
+- `tests/ui-governance.spec.ts-snapshots/home-hero-governance-functional-darwin.png`
+- `tests/ui-governance.spec.ts-snapshots/courses-filters-governance-functional-darwin.png`
+- `tests/ui-governance.spec.ts-snapshots/agenda-filters-governance-functional-darwin.png`
+- `tests/ui-governance.spec.ts-snapshots/contact-form-governance-functional-darwin.png`
+- `tests/ui-governance.spec.ts-snapshots/login-card-governance-functional-darwin.png`
 - `docs/stories/2026-06-10-epic6-story3-gates-automatizados-ui.md`
 
 ### Modificados
@@ -50,4 +54,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

@@ -1,7 +1,7 @@
 # Story 6.2: Checklist Visual e A11y no Review
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 6 — Governança de Design (`docs/epics/epic-6-governanca-design.md`)
@@ -44,4 +44,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

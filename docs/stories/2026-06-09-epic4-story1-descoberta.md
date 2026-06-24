@@ -1,7 +1,7 @@
 # Story 4.1: Jornada de Descoberta
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 4 — Jornadas Públicas (`docs/epics/epic-4-jornadas-publicas.md`)
@@ -54,4 +54,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

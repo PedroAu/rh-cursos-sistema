@@ -15,14 +15,14 @@ A **4ª área permanece pendente**: a documentação pública do projeto. O `REA
 
 ## Acceptance Criteria
 
-- [ ] `README.md` completo com: visão geral do projeto, stack (Next.js 16, React 19, TypeScript), pré-requisitos, quick start (instalação + variáveis de ambiente), scripts npm, estrutura de pastas e instruções de deploy (Cloudflare Workers).
-- [ ] Seção de troubleshooting no README cobrindo os problemas conhecidos mais comuns (build, typecheck, lint).
-- [ ] Documentação de API para os endpoints existentes (mínimo: `app/api/auth/session/route.ts`) — método, payload, respostas e códigos de status.
-- [ ] Referência cruzada do README para os documentos internos relevantes (`docs/architecture/`, `docs/database/SCHEMA.md`, `docs/DEMO-AUTH.md`).
-- [ ] Atualizar `docs/PHASE-A-FINAL-STATUS.md` marcando D-4.1 (AC15) como concluído.
-- [ ] Validar com `npm run lint`.
-- [ ] Validar com `npm run typecheck`.
-- [ ] Atualizar checklist e File List ao concluir.
+- [x] `README.md` completo com: visão geral do projeto, stack (Next.js 16, React 19, TypeScript), pré-requisitos, quick start (instalação + variáveis de ambiente), scripts npm, estrutura de pastas e instruções de deploy (Cloudflare Workers).
+- [x] Seção de troubleshooting no README cobrindo os problemas conhecidos mais comuns (build, typecheck, lint).
+- [x] Documentação de API para os endpoints existentes (mínimo: `app/api/auth/session/route.ts`) — método, payload, respostas e códigos de status.
+- [x] Referência cruzada do README para os documentos internos relevantes (`docs/architecture/`, `docs/database/SCHEMA.md`, `docs/DEMO-AUTH.md`).
+- [x] Atualizar `docs/PHASE-A-FINAL-STATUS.md` marcando D-4.1 (AC15) como concluído.
+- [x] Validar com `npm run lint`.
+- [x] Validar com `npm run typecheck`.
+- [x] Atualizar checklist e File List ao concluir.
 
 ## Scope
 
@@ -42,14 +42,14 @@ A **4ª área permanece pendente**: a documentação pública do projeto. O `REA
 
 ## Tarefas / Subtarefas
 
-- [ ] Levantar scripts npm, variáveis de ambiente (`.env.example`) e fluxo de deploy atual.
-- [ ] Escrever `README.md` (visão geral, stack, quick start, scripts, estrutura, deploy, troubleshooting).
-- [ ] Mapear endpoints de API existentes em `app/api/`.
-- [ ] Escrever documentação de API em `docs/api/`.
-- [ ] Adicionar referências cruzadas para docs internos.
-- [ ] Atualizar `docs/PHASE-A-FINAL-STATUS.md` (D-4.1 / AC15 → concluído).
-- [ ] Rodar gates de qualidade (`lint`, `typecheck`).
-- [ ] Atualizar File List e status final da story.
+- [x] Levantar scripts npm, variáveis de ambiente (`.env.example`) e fluxo de deploy atual.
+- [x] Escrever `README.md` (visão geral, stack, quick start, scripts, estrutura, deploy, troubleshooting).
+- [x] Mapear endpoints de API existentes em `app/api/`.
+- [x] Escrever documentação de API em `docs/api/`.
+- [x] Adicionar referências cruzadas para docs internos.
+- [x] Atualizar `docs/PHASE-A-FINAL-STATUS.md` (D-4.1 / AC15 → concluído).
+- [x] Rodar gates de qualidade (`lint`, `typecheck`).
+- [x] Atualizar File List e status final da story.
 
 ## Dependencies
 
@@ -79,6 +79,7 @@ A **4ª área permanece pendente**: a documentação pública do projeto. O `REA
 
 - `docs/stories/2026-06-24-phase-a-documentation-readme-api-docs.md`
 - `README.md` — expandido com stack, quick start, cross-references (8,850 bytes)
+- `docs/api/README.md` — índice dos endpoints documentados
 - `docs/api/edge-functions.md` — criado (586 linhas, 17KB)
 - `docs/api/auth-session.md` — criado (10KB)
 - `docs/PHASE-A-FINAL-STATUS.md` — AC15 marcado como concluído
@@ -87,3 +88,4 @@ A **4ª área permanece pendente**: a documentação pública do projeto. O `REA
 
 - 2026-06-24 — @aiox-master (Orion) — Story criada (Draft) para fechar a 4ª área de melhoria do Brownfield Discovery (documentação pública). As outras 3 áreas — acessibilidade, tratamento de erros e testes unitários — já foram verificadas como implementadas.
 - 2026-06-24 — @dev (Dex) — Story D-4.1 finalizada: README, edge-functions.md, auth-session.md entregues. Gates passando (lint ✅, typecheck ✅). Commit atômico e401c40 pronto para push.
+- 2026-06-24 — @devops (Gage) — Checklist e File List alinhados ao estado atual do repositório. Revalidação local confirmada com `npm run lint` e `npm run typecheck` em PASS.

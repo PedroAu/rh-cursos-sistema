@@ -1,7 +1,7 @@
 # Story 1.3: Escala Tipográfica Responsiva
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 1 — Fundação Visual & Baseline A11y (`docs/epics/epic-1-fundacao-visual-baseline-a11y.md`)
@@ -90,7 +90,6 @@ Sem a migração tipográfica, a modernização visual continua inconsistente: a
 - `src/components/ui/card.tsx` — descrição padrão alinhada ao token semântico secundário
 - `src/components/common/section-title.tsx` — descrição responsiva (`text-sm` → `md:text-base`) sem competir com o heading
 - `src/components/courses/course-card.tsx` — path/nível e título do card migrados para variantes legíveis
-- `src/components/courses/training-path-card.tsx` — badge de contagem migrada para `text-label`
 - `src/components/blog/blog-card.tsx` — categoria migrada para `text-label`
 - `src/components/agenda/class-card.tsx` — badge da trilha migrada para `text-label`
 - `src/components/agenda/calendar-view.tsx` — cabeçalhos do calendário, aviso e chip de seleção migrados para o mínimo funcional
@@ -120,4 +119,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

@@ -1,7 +1,7 @@
 # Story 2.2: Aplicar `FormField` nos Formulários Públicos
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 2 — Form System & Acessibilidade Compartilhada (`docs/epics/epic-2-form-system-a11y.md`)
@@ -31,7 +31,12 @@ PRD: `docs/prd/modernizacao-ui-2026.md`
 - `src/views/public/Login.tsx` — login com labels persistentes e erros por campo + resumo
 - `src/components/checkout/checkout-modal.tsx` — etapas do checkout com `FormField`, validação inline e resumo de erro recuperável
 - `tests/login-errors.spec.ts` — alinhado à nova semântica de labels/erros inline
-- `tests/baseline/login-baseline-*.png`, `tests/baseline/contato-baseline-*.png`, `tests/baseline/in-company-baseline-*.png` — baseline visual regenerado
+- `tests/baseline/login-baseline-desktop.png` — baseline visual regenerado
+- `tests/baseline/login-baseline-mobile.png` — baseline visual regenerado
+- `tests/baseline/contato-baseline-desktop.png` — baseline visual regenerado
+- `tests/baseline/contato-baseline-mobile.png` — baseline visual regenerado
+- `tests/baseline/in-company-baseline-desktop.png` — baseline visual regenerado
+- `tests/baseline/in-company-baseline-mobile.png` — baseline visual regenerado
 
 ## Change Log
 
@@ -49,4 +54,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

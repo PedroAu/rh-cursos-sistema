@@ -1,7 +1,7 @@
 # Story 4.2: Jornada de Conversão
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 4 — Jornadas Públicas (`docs/epics/epic-4-jornadas-publicas.md`)
@@ -35,10 +35,10 @@ Depois da descoberta, a próxima trava do PRD é reduzir atrito na decisão e na
 - `src/views/public/InCompany.tsx` — briefing mais denso, confirmação inline e superfície ajustada
 - `tests/route-auth.spec.ts` — rota pública de confirmação incluída
 - `tests/visual.baseline.spec.ts` — captura visual das páginas dinâmicas e de confirmação
-- `tests/baseline/curso-detalhe-desktop.png`
-- `tests/baseline/curso-detalhe-mobile.png`
-- `tests/baseline/inscricao-confirmada-desktop.png`
-- `tests/baseline/inscricao-confirmada-mobile.png`
+- `tests/baseline/curso-detalhe-baseline-desktop.png`
+- `tests/baseline/curso-detalhe-baseline-mobile.png`
+- `tests/baseline/inscricao-confirmada-baseline-desktop.png`
+- `tests/baseline/inscricao-confirmada-baseline-mobile.png`
 
 ## Change Log
 
@@ -56,4 +56,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

@@ -1,7 +1,7 @@
 # Story 3.4: Guard de Regressão dos Componentes de Formulário
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 3 — Admin Polish (`docs/epics/epic-3-admin-polish.md`)
@@ -43,4 +43,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Acceptance Criteria fechados, artefatos presentes e sem gap funcional identificado na auditoria atual.

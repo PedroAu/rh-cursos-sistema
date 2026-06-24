@@ -1,7 +1,7 @@
 # Story 2.3: Estados Padronizados de `Button`
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 2 — Form System & Acessibilidade Compartilhada (`docs/epics/epic-2-form-system-a11y.md`)
@@ -26,7 +26,11 @@ PRD: `docs/prd/modernizacao-ui-2026.md`
 
 ### Modificados
 - `src/components/ui/button.tsx` — estado `loading`, `aria-busy` e proteção contra acionamento duplo
-- `src/views/public/Contact.tsx`, `src/views/public/InCompany.tsx`, `src/views/public/Login.tsx`, `src/components/checkout/checkout-modal.tsx`, `src/views/admin/AdminResourcePage.tsx` — ações críticas migradas para o estado compartilhado
+- `src/views/public/Contact.tsx` — ações críticas migradas para o estado compartilhado
+- `src/views/public/InCompany.tsx` — ações críticas migradas para o estado compartilhado
+- `src/views/public/Login.tsx` — ações críticas migradas para o estado compartilhado
+- `src/components/checkout/checkout-modal.tsx` — ações críticas migradas para o estado compartilhado
+- `src/views/admin/AdminResourcePage.tsx` — ações críticas migradas para o estado compartilhado
 
 ## Change Log
 
@@ -43,4 +47,4 @@ Codex (dev)
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Story permanece coerente com o runtime atual após ajuste documental da file list.

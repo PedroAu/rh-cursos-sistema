@@ -1,7 +1,7 @@
 # Story 1.1: Baseline Visual & Gates de Acessibilidade
 
 ## Status
-Ready for Review
+Done
 
 ## Épica
 Épica 1 — Fundação Visual & Baseline A11y (`docs/epics/epic-1-fundacao-visual-baseline-a11y.md`)
@@ -94,11 +94,12 @@ Sem baseline, não há prova de que a modernização melhora a11y/legibilidade �
 - `tests/visual.baseline.spec.ts` — captura de baseline visual (D6: só captura, não compara)
 - `tests/contrast-report.baseline.spec.ts` — gerador do relatório de contraste WCAG AA
 - `docs/diagnosis/contrast-baseline-2026-06-09.md` — relatório com 70 violações reais (gerado)
-- `tests/baseline/*.png` — 14 screenshots de referência (7 rotas × desktop/mobile)
+- `tests/baseline/` — 14 screenshots de referência (7 rotas × desktop/mobile)
 
 ### Modificados
 - `playwright.config.ts` — projetos `functional`, `baseline-desktop`, `baseline-mobile`
-- `package.json` / `package-lock.json` — devDependency `@axe-core/playwright@^4.11.3`
+- `package.json` — devDependency `@axe-core/playwright@^4.11.3`
+- `package-lock.json` — lockfile atualizado com `@axe-core/playwright`
 
 ## Dev Agent Record
 
@@ -128,4 +129,4 @@ Claude (dev/Dex) — modo Pre-Flight
 
 ## QA Results
 
-_(a preencher pelo @qa)_
+Pass — encerramento formal em 2026-06-24. Baseline, artefatos e gates seguem coerentes com o repositório atual; a pendência do `/admin` autenticado permaneceu corretamente fora do escopo desta story.

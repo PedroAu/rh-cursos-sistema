@@ -1,7 +1,7 @@
 # Story: Revisar prontidao de publicacao e remover portal aluno/instrutor
 
 ## Status
-Ready for Review
+Done
 
 ## Contexto
 O site deve ser publicado hoje com foco em apresentar cursos, consultoria e servicos da RH Cursos, facilitar a geracao de leads e manter um painel admin para administrar cursos, turmas, datas, leads e informacoes do site. O portal do aluno e do instrutor fica fora do escopo desta publicacao e sera implementado depois.
@@ -32,46 +32,27 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 
 ## File List
 - `.claude/settings.json`
-- `.env`
-- `.env.backup-20260608`
 - `.env.example`
-- `.env.security`
-- `.github/DEPLOY.md`
 - `.github/workflows/deploy-frontend.yml`
 - `.github/workflows/deploy-functions.yml`
-- `DEPLOY-HYBRID.md`
-- `DEPLOY-STATIC.md`
-- `DEPLOYMENT.md`
-- `SETUP-PROD.md`
-- `app/aluno/page.tsx`
-- `app/instrutor/page.tsx`
 - `app/api/auth/session/route.ts`
 - `package.json`
 - `playwright.config.ts`
-- `proxy.ts`
-- `src/components/admin/admin-guard.tsx`
+- `middleware.ts`
 - `src/lib/auth.ts`
 - `src/lib/app-store.tsx`
 - `src/lib/admin-resource-configs.tsx`
 - `src/components/ui/dialog.tsx`
-- `src/components/ui/sheet.tsx`
 - `src/lib/supabase/functions-client.ts`
 - `src/types/index.ts`
 - `src/lib/validation.ts`
-- `src/data/mockAccess.ts`
-- `src/data/mockCourses.ts`
-- `src/data/mockClasses.ts`
 - `src/components/checkout/checkout-modal.tsx`
 - `src/views/public/Login.tsx`
 - `src/views/public/Contact.tsx`
 - `src/views/public/InCompany.tsx`
 - `src/views/public/Blog.tsx`
-- `src/views/student/StudentDashboard.tsx`
-- `src/views/instructor/InstructorDashboard.tsx`
 - `src/components/layout/public-layout.tsx`
 - `src/components/common/command-palette.tsx`
-- `src/components/admin/data-table.tsx`
-- `src/components/admin/chart-card.tsx`
 - `src/components/layout/dashboard-shell.tsx`
 - `src/components/next-page-shell.tsx`
 - `src/views/admin/AdminResourcePage.tsx`
@@ -80,19 +61,15 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `src/views/public/Home.tsx`
 - `src/views/public/CourseDetail.tsx`
 - `src/views/public/EnrollmentSuccess.tsx`
-- `src/components/common/faq-accordion.tsx`
 - `scripts/promote-admin.js`
 - `scripts/seed-admin.js`
-- `scripts/setup-prod.sh`
 - `supabase/config.toml`
 - `supabase/functions/_shared/auth.ts`
 - `supabase/functions/_shared/validation.ts`
 - `supabase/functions/leads/index.ts`
 - `tests/route-auth.spec.ts`
-- `app/curso/page.tsx`
 - `src/components/agenda/class-card.tsx`
 - `src/lib/admin-form-validation.ts`
-- `src/lib/supabase/admin-resources.ts`
 - `src/lib/supabase/database.types.ts`
 - `src/lib/supabase/mappers.ts`
 - `src/lib/supabase/rh-cursos-api.ts`
@@ -103,3 +80,7 @@ O site deve ser publicado hoje com foco em apresentar cursos, consultoria e serv
 - `supabase/migrations/20260609120000_remove_legacy_course_instructor_fields.sql`
 - `supabase/sql/create_all_rh_cursos_schema.sql`
 - `supabase/sql/seed_rh_cursos_demo.sql`
+
+## QA Results
+
+Pass — encerramento documental em 2026-06-24. Story mantida como concluída; itens legados da file list foram superados por limpeza posterior de runtime/deploy, sem evidência de gap funcional aberto.
