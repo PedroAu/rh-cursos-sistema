@@ -1,4 +1,6 @@
-export type UserRole = "lead" | "admin";
+import type { DashboardRole } from "@/lib/auth";
+
+export type UserRole = "lead" | DashboardRole;
 
 export type CourseStatus = "Ativo" | "Inativo" | "Destaque" | "Em breve";
 export type ClassStatus = "Inscrições abertas" | "Poucas vagas" | "Encerrada" | "Em breve";
@@ -175,17 +177,9 @@ export type Enrollment = {
 };
 
 export type CurrentSession = {
-  role: "admin";
+  role: DashboardRole;
   email: string;
   name: string;
-};
-
-export type DemoAccess = {
-  role: Exclude<UserRole, "lead">;
-  email: string;
-  password: string;
-  name: string;
-  description: string;
 };
 
 export type DashboardMetric = {

@@ -39,6 +39,8 @@ Deno.serve(async (request) => {
   if (request.method === "DELETE") {
     const body = (await request.json().catch(() => null)) as { accessToken?: string } | null;
     const accessToken = body?.accessToken;
+    let mode: "global" | "local-only" = "local-only";
+    let revoked = false;
 
     if (accessToken && isAdminConfigured) {
       try {
@@ -46,6 +48,9 @@ Deno.serve(async (request) => {
         const { error } = await admin.auth.admin.signOut(accessToken, "global");
         if (error) {
           console.error("Falha ao revogar sessões globais:", error.message);
+        } else {
+          mode = "global";
+          revoked = true;
         }
       } catch (error) {
         console.error(
@@ -56,7 +61,7 @@ Deno.serve(async (request) => {
       }
     }
 
-    return jsonResponse({ ok: true }, 200, request);
+    return jsonResponse({ ok: true, mode, revoked }, 200, request);
   }
 
   if (request.method !== "POST") {

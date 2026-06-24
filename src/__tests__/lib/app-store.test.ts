@@ -125,21 +125,13 @@ const mocks = vi.hoisted(() => {
     toastError: vi.fn(),
     fetchMock: vi.fn(),
     clearSessionToken: vi.fn(),
+    setSessionToken: vi.fn<(token: string) => void>(),
     getSessionToken: vi.fn<() => string | null>(() => null),
     decodeSessionToken: vi.fn<(token: string | null) => CurrentSession | null>(() => null),
     getSupabaseSession: vi.fn<() => { access_token: string; refresh_token: string } | null>(() => null),
     data: {
       courseCoverByPath: { "path-1": "/course.png" },
       defaultCourseCover: "/default-course.png",
-      demoAccessList: [
-        {
-          role: "admin",
-          email: "admin@rhcursos.demo",
-          password: "admin-password",
-          name: "Admin RH Cursos",
-          description: "Admin demo",
-        },
-      ],
       mockBlogPosts: [
         {
           id: "post-1",
@@ -171,10 +163,6 @@ const mocks = vi.hoisted(() => {
 
 vi.mock("@/data", () => mocks.data);
 vi.mock("@/data/index.ts", () => mocks.data);
-vi.mock("@/lib/demo-access", () => ({
-  demoAccessList: mocks.data.demoAccessList,
-}));
-
 vi.mock("sonner", () => ({
   toast: {
     success: mocks.toastSuccess,
@@ -201,8 +189,10 @@ vi.mock("@/lib/supabase/rh-cursos-api", () => ({
 vi.mock("@/lib/supabase/session-token", () => ({
   getSessionToken: mocks.getSessionToken,
   clearSessionToken: mocks.clearSessionToken,
+  setSessionToken: mocks.setSessionToken,
   decodeSessionToken: mocks.decodeSessionToken,
   getSupabaseSession: mocks.getSupabaseSession,
+  SESSION_ACTIVITY_SYNC_MS: 5 * 60 * 1000,
 }));
 
 type Store = ReturnType<AppStoreModule["useAppStore"]>;
@@ -212,7 +202,6 @@ let AppStoreProvider: AppStoreModule["AppStoreProvider"];
 let useAppStore: AppStoreModule["useAppStore"];
 let useCourseBySlug: AppStoreModule["useCourseBySlug"];
 let useDashboardCharts: AppStoreModule["useDashboardCharts"];
-let demoAccessList: Array<(typeof mocks.data.demoAccessList)[number]>;
 let mockClasses: Array<(typeof mocks.data.mockClasses)[number]>;
 let mockCourses: Array<(typeof mocks.data.mockCourses)[number]>;
 let mockLeads: Array<(typeof mocks.data.mockLeads)[number]>;
@@ -344,7 +333,6 @@ describe("AppStoreProvider and hooks", () => {
     useAppStore = appStore.useAppStore;
     useCourseBySlug = appStore.useCourseBySlug;
     useDashboardCharts = appStore.useDashboardCharts;
-    demoAccessList = (data as typeof mocks.data).demoAccessList;
     mockClasses = (data as typeof mocks.data).mockClasses;
     mockCourses = (data as typeof mocks.data).mockCourses;
     mockLeads = (data as typeof mocks.data).mockLeads;
@@ -359,6 +347,7 @@ describe("AppStoreProvider and hooks", () => {
     mocks.toastSuccess.mockClear();
     mocks.toastError.mockClear();
     mocks.clearSessionToken.mockClear();
+    mocks.setSessionToken.mockClear();
     mocks.getSessionToken.mockClear();
     mocks.decodeSessionToken.mockClear();
     mocks.getSupabaseSession.mockClear();
@@ -379,6 +368,12 @@ describe("AppStoreProvider and hooks", () => {
       email: "admin@rhcursos.demo",
       name: "Admin RH Cursos",
     };
+    mocks.fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ session, token: "renewed.token" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
 
     const harness = renderStore(session);
 
@@ -386,16 +381,7 @@ describe("AppStoreProvider and hooks", () => {
 
     await waitFor(() => expect(harness.onStore).toHaveBeenCalled());
     expect(harness.store.currentSession).toEqual(session);
-  });
-
-  it("reports invalid demo credentials through the public store API", async () => {
-    const harness = renderStore();
-
-    await act(async () => {
-      expect(harness.store.login("admin", "admin@rhcursos.demo", "senha-invalida")).toBe(false);
-    });
-
-    expect(mocks.toastError).toHaveBeenCalledWith("Credenciais de teste inválidas para este perfil.");
+    await waitFor(() => expect(mocks.setSessionToken).toHaveBeenCalledWith("renewed.token"));
   });
 
   it("sets and clears the current session via provider actions", async () => {
@@ -417,13 +403,57 @@ describe("AppStoreProvider and hooks", () => {
       harness.store.logout();
     });
 
-    expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken: undefined }),
-    });
+    await waitFor(() =>
+      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: undefined }),
+      })
+    );
     expect(mocks.clearSessionToken).toHaveBeenCalled();
     expect(screen.getByTestId("session-email")).toHaveTextContent("none");
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
+  });
+
+  it("warns when the logout falls back to local-only despite having an access token", async () => {
+    const harness = renderStore();
+    const session: CurrentSession = {
+      role: "admin",
+      email: "session@example.com",
+      name: "Session User",
+    };
+    mocks.getSupabaseSession.mockReturnValue({
+      access_token: "supabase-access-token",
+      refresh_token: "supabase-refresh-token",
+    });
+    mocks.fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, mode: "local-only", revoked: false }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      harness.store.setSession(session);
+    });
+
+    await act(async () => {
+      harness.store.logout();
+    });
+
+    await waitFor(() =>
+      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: "supabase-access-token" }),
+      })
+    );
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
+    await waitFor(() =>
+      expect(mocks.toastError).toHaveBeenCalledWith(
+        "Não foi possível confirmar a revogação global da sessão."
+      )
+    );
   });
 
   it("creates leads through the provider and prepends them to state", async () => {
@@ -556,11 +586,32 @@ describe("AppStoreProvider and hooks", () => {
     };
     mocks.getSessionToken.mockReturnValue("payload.signature");
     mocks.decodeSessionToken.mockReturnValue(decodedSession);
+    mocks.fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ session: decodedSession, token: "payload.signature" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
 
     const harness = renderStore();
 
     await waitFor(() => expect(harness.store.currentSession).toEqual(decodedSession));
     expect(screen.getByTestId("session-email")).toHaveTextContent(decodedSession.email);
+  });
+
+  it("clears the optimistic session when the server reports expiration", async () => {
+    const session: CurrentSession = {
+      role: "admin",
+      email: "expired@example.com",
+      name: "Expired User",
+    };
+    mocks.fetchMock.mockResolvedValue(new Response(null, { status: 401 }));
+
+    const harness = renderStore(session);
+
+    await waitFor(() => expect(mocks.clearSessionToken).toHaveBeenCalled());
+    await waitFor(() => expect(harness.store.currentSession).toBeNull());
+    expect(screen.getByTestId("session-email")).toHaveTextContent("none");
   });
 
   it("keeps an explicit initial session when stored state has another session", async () => {

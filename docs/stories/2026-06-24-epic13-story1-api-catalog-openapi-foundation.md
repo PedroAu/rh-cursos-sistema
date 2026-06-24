@@ -68,14 +68,17 @@ Já existem `docs/api/README.md`, `auth-session.md` e `edge-functions.md`, mas a
 - `docs/api/README.md`
 - `docs/api/auth-session.md`
 - `docs/api/edge-functions.md`
+- `docs/api/openapi.yaml`
 - `docs/stories/2026-06-24-epic13-story1-api-catalog-openapi-foundation.md`
 
 ## Change Log
 
 - 2026-06-24 — @po (Pax) — Story refinada para criar a fundação documental antes da geração da spec.
 - 2026-06-24 — @devops (Gage) — Catálogo `docs/api/README.md` reconciliado com o código real, incluindo `DELETE /functions/v1/auth-session` e definição explícita das fontes canônicas para a futura spec OpenAPI.
+- 2026-06-24 — @dev (Dex) — Catálogo atualizado com `GET /api/auth/session`, alinhamento do Route Handler e criação de `docs/api/openapi.yaml` como fundação versionada da spec 3.x.
 
 ## QA Results
 
 - 2026-06-24 — Evidência verificada localmente em `app/api/auth/session/route.ts`, `supabase/functions/auth-session/index.ts`, `docs/api/auth-session.md` e `docs/api/edge-functions.md`.
 - 2026-06-24 — ACs encerrados porque o inventário, o runtime de cada endpoint, os mecanismos de auth e a fundação documental da spec já existem e foram reconciliados no catálogo canônico.
+- 2026-06-24 — `docs/api/openapi.yaml` criado e reconciliado com os handlers atuais do Next (`GET/POST/DELETE /api/auth/session`) e das Edge Functions (`enrollments`, `leads`, `admin-resources`, `auth-session`).

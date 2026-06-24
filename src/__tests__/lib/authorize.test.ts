@@ -16,25 +16,19 @@ describe('authorize', () => {
   it('returns false when the session role does not match the single allowed role string', () => {
     const session: DemoSession = { role: 'admin', email: 'test@test.com', name: 'Test' };
 
-    // "instructor" is not part of DashboardRole today (only "admin" exists); the cast
-    // verifies the runtime comparison still fails closed for roles outside the allowed set.
-    expect(authorize(session, 'instructor' as unknown as DemoSession['role'])).toBe(false);
+    expect(authorize(session, 'instructor')).toBe(false);
   });
 
   it('returns true when the session role is included in an array of allowed roles', () => {
-    const session: DemoSession = { role: 'admin', email: 'test@test.com', name: 'Test' };
+    const session: DemoSession = { role: 'instructor', email: 'test@test.com', name: 'Test' };
 
-    expect(authorize(session, ['admin'])).toBe(true);
+    expect(authorize(session, ['student', 'instructor'])).toBe(true);
   });
 
   it('returns false when the session role is not included in an array of allowed roles', () => {
-    const session: DemoSession = { role: 'admin', email: 'test@test.com', name: 'Test' };
+    const session: DemoSession = { role: 'student', email: 'test@test.com', name: 'Test' };
 
-    // Exercising roles outside the current DashboardRole union (only "admin" exists today)
-    // to verify authorize() fails closed rather than throwing.
-    expect(
-      authorize(session, ['student', 'instructor'] as unknown as DemoSession['role'][])
-    ).toBe(false);
+    expect(authorize(session, ['admin', 'instructor'])).toBe(false);
   });
 
   it('accepts allowedRoles as either a single role or an array of roles (type-level)', () => {
@@ -45,5 +39,11 @@ describe('authorize', () => {
 
     expect(resultWithString).toBe(true);
     expect(resultWithArray).toBe(true);
+  });
+
+  it('fails closed when an allowed role array is empty', () => {
+    const session: DemoSession = { role: 'admin', email: 'test@test.com', name: 'Test' };
+
+    expect(authorize(session, [])).toBe(false);
   });
 });

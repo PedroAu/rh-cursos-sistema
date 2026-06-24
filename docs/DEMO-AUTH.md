@@ -1,263 +1,55 @@
-# Demo Authentication — Security Implications & Usage Guide
+# Demo Auth — Estado Atual
 
-## Overview
+## Resumo
 
-Demo authentication is a **LOCAL DEVELOPMENT ONLY** feature that provides hardcoded demo credentials for testing the admin dashboard without setting up full Supabase authentication.
+O fluxo de autenticação publicado pela aplicação é **Supabase-only**.
 
-**CRITICAL**: Demo auth is **DISABLED BY DEFAULT** via the feature flag `NEXT_PUBLIC_ENABLE_DEMO_AUTH=false`.
+- `POST /api/auth/session` autentica exclusivamente contra o Supabase Auth
+- `GET /api/auth/session` sincroniza/renova a sessão HMAC do admin
+- `DELETE /api/auth/session` encerra a sessão local e tenta revogação global quando possível
 
----
+Não existe mais nenhum login simulado ativo no cliente.
 
-## Security Architecture
+## Onde ainda existem artefatos de demo
 
-### Feature Flag: `NEXT_PUBLIC_ENABLE_DEMO_AUTH`
+Os artefatos abaixo permanecem apenas como referência histórica e configuração defensiva:
 
-| Setting | Environment | Behavior | Risk |
-|---------|-------------|----------|------|
-| `false` (default) | Development | Demo auth disabled | ✅ SAFE |
-| `false` | Production | Demo auth disabled | ✅ SAFE |
-| `true` | Development | Demo auth enabled | ✅ ACCEPTABLE (local dev only) |
-| `true` | Production | Demo auth enabled | 🔴 **CRITICAL SECURITY BREACH** |
+| Arquivo | Papel atual | Participa do fluxo publicado? |
+|---|---|---|
+| `src/lib/auth.ts` | Apenas helpers de sessão HMAC do admin | Sim |
+| `src/lib/env-validation.ts` | Validação geral de ambiente | Sim |
 
-### Why Feature Flag is Critical
+O `AppStore` não importa mais artefatos demo e não expõe login simulado.
 
-1. **Code is visible in source**: Demo credentials/logic live in `/src/lib/auth.ts`
-2. **Public builds include NEXT_PUBLIC_* variables**: Any `NEXT_PUBLIC_` variable is embedded in the client-side bundle
-3. **Visible to users**: If enabled, credentials appear in browser devtools, Network tab, etc.
-4. **Default disabled**: Mitigates risk by requiring explicit opt-in during development
+## Feature flag
 
-### Validation & Warnings
+As variáveis `NEXT_PUBLIC_ENABLE_DEMO_AUTH` e `DEMO_ADMIN_PASSWORD` podem ainda aparecer em documentação histórica ou `.env.example`, mas não ativam mais nenhum caminho real de autenticação publicado.
 
-When the app starts, environment validation checks:
+## Fluxo real de login/logout
 
-```
-✅ SAFE:   NODE_ENV=production   + NEXT_PUBLIC_ENABLE_DEMO_AUTH=false
-✅ SAFE:   NODE_ENV=development  + NEXT_PUBLIC_ENABLE_DEMO_AUTH=false
-✅ OK:     NODE_ENV=development  + NEXT_PUBLIC_ENABLE_DEMO_AUTH=true
-🔴 BREACH: NODE_ENV=production   + NEXT_PUBLIC_ENABLE_DEMO_AUTH=true
-```
+### Login
 
-If a breach is detected, the app logs a **CRITICAL** security warning.
+1. Usuário envia credenciais para `POST /api/auth/session`
+2. O handler autentica com Supabase Auth
+3. Apenas `app_metadata.role = "admin"` é aceito na publicação atual
+4. O servidor emite cookie HttpOnly + token HMAC para o cliente admin
 
----
+### Logout
 
-## How to Enable Demo Auth (Development Only)
+1. O cliente limpa a sessão local imediatamente
+2. `DELETE /api/auth/session` tenta `global signout` apenas quando há `accessToken` e `SUPABASE_SERVICE_ROLE_KEY`
+3. Se a revogação global falhar ou não estiver configurada, o comportamento cai explicitamente para `local-only`
 
-### Step 1: Copy `.env.example` to `.env.local`
+## Contrato de segurança
 
-```bash
-cp .env.example .env.local
-```
+- Nunca considerar demo auth como caminho suportado de produção
+- Nunca ativar `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true` em produção
+- Nunca depender de variáveis demo para autenticação operacional
+- Qualquer uso de demo auth deve ser tratado como exceção local de desenvolvimento
 
-### Step 2: Set the Feature Flag
+## Referências reais
 
-```bash
-NEXT_PUBLIC_ENABLE_DEMO_AUTH=true
-```
-
-### Step 3: (Optional) Override Demo Password
-
-The default demo password is `admin123`. You can override it:
-
-```bash
-DEMO_ADMIN_PASSWORD=my-custom-password
-```
-
-### Step 4: Run the App
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000/admin/login and login with:
-
-| Field | Value |
-|-------|-------|
-| Email | `admin@rhcursos.demo` |
-| Password | `admin123` (or your custom password) |
-
----
-
-## Demo Credentials
-
-### Default Admin Account
-
-```
-Email:    admin@rhcursos.demo
-Password: admin123
-Role:     admin
-Name:     Admin RH Cursos
-```
-
-**Location**: `/src/lib/auth.ts`
-
----
-
-## How Demo Auth Works
-
-### Module: `src/lib/auth.ts`
-
-This module centralizes all demo auth logic:
-
-```typescript
-isDemoAuthEnabled()      // Check if feature flag is true AND development
-getDemoUsers()          // Get list of demo users (empty if disabled)
-findDemoUser()          // Find a user by email/password
-listDemoCredentials()   // List all demo credentials (for reference)
-validateDemoAuthConfig()// Validate production safety
-```
-
-### Diagram: Demo Auth Flow
-
-```
-User navigates to /admin/login
-           ↓
-   Submits login form
-           ↓
-   POST /api/auth/session (email, password)
-           ↓
-   Currently: Supabase auth only
-   (Demo auth code not integrated into session handler)
-           ↓
-   Success: Set session cookie
-```
-
-**Note**: The current API endpoint (`app/api/auth/session/route.ts`) uses Supabase auth only. Demo credentials in `/src/lib/auth.ts` and demo-access artifacts are legacy from development and are not actively used in the current auth flow.
-
----
-
-## Legacy Demo Code (Deprecated)
-
-The following files contain legacy demo auth code that is **NOT** currently integrated:
-
-| File | Purpose | Status |
-|------|---------|--------|
-| `src/lib/auth.ts` | Session helpers + demo credential fallback | Active (legacy/demo-only) |
-| `src/lib/demo-access.ts` | Demo access artifacts | Deprecated |
-| `src/lib/app-store.tsx` | Legacy references for demo access | Deprecated |
-
-**These are kept for reference and may be removed in a future refactor.**
-
----
-
-## Security Best Practices
-
-### In Development ✅
-
-1. **Enable only when needed**: Leave `NEXT_PUBLIC_ENABLE_DEMO_AUTH=false` by default
-2. **Use custom passwords**: Override `admin123` with a unique password
-3. **Disable before committing**: Never commit `.env.local` with `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true`
-4. **Test Supabase auth**: Use real Supabase users when possible
-
-### In Production 🔴
-
-**NEVER** set `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true` in production:
-
-- The app validates this during startup
-- Will trigger a **CRITICAL** security warning
-- Exposes hardcoded credentials in client-side bundle
-- Violates security best practices
-
-### Deployment Checklist
-
-Before deploying to production:
-
-- [ ] `NEXT_PUBLIC_ENABLE_DEMO_AUTH` is `false`
-- [ ] `DEMO_ADMIN_PASSWORD` is empty or unset
-- [ ] All sensitive credentials are stored in secrets manager
-- [ ] Environment validation shows ✅ in logs
-
----
-
-## Validation Messages
-
-### During Development
-
-```
-✅ Environment validation passed (development)
-ℹ️ INFO: Demo auth is disabled. Set NEXT_PUBLIC_ENABLE_DEMO_AUTH=true to enable it.
-```
-
-### When Demo Auth is Enabled
-
-```
-✅ Environment validation passed (development)
-```
-
-### If Mistakenly Enabled in Production
-
-```
-❌ ENVIRONMENT VALIDATION FAILED:
-🔴 CRITICAL: NEXT_PUBLIC_ENABLE_DEMO_AUTH is true in production - this is a SECURITY BREACH
-```
-
----
-
-## Troubleshooting
-
-### "Demo auth is disabled"
-
-**Cause**: `NEXT_PUBLIC_ENABLE_DEMO_AUTH` is not `true`
-
-**Solution**:
-```bash
-# Edit .env.local
-NEXT_PUBLIC_ENABLE_DEMO_AUTH=true
-
-# Then restart:
-npm run dev
-```
-
-### "Incorrect credentials"
-
-**Cause**: Wrong password or email
-
-**Solution**:
-- Default email: `admin@rhcursos.demo` (exact match required)
-- Default password: `admin123` (or your custom `DEMO_ADMIN_PASSWORD`)
-- Check `.env.local` for `DEMO_ADMIN_PASSWORD` override
-
-### "CRITICAL: NEXT_PUBLIC_ENABLE_DEMO_AUTH is true in production"
-
-**Cause**: Feature flag was enabled in production build
-
-**Solution**:
-1. Immediately disable in your deployment platform
-2. Redeploy with `NEXT_PUBLIC_ENABLE_DEMO_AUTH=false`
-3. Review git history to ensure no `.env` files with `true` were committed
-4. Rotate any credentials that may have been exposed
-
----
-
-## References
-
-| File | Purpose |
-|------|---------|
-| `src/lib/demo-auth.ts` | Demo auth module & implementation |
-| `src/lib/env-validation.ts` | Environment validation & warnings |
-| `.env.example` | Environment variable documentation |
-| `app/api/auth/session/route.ts` | Login endpoint (Supabase-only) |
-
----
-
-## Related Stories & Issues
-
-- **Story 8.1 (D-1.2)**: Extract demo auth to feature flag, disable by default
-- **AC12**: Demo auth extracted, feature flag disabled by default ✅
-
----
-
-## Acceptance Criteria
-
-- [x] Demo auth extracted to `src/lib/demo-auth.ts` module
-- [x] Feature flag `NEXT_PUBLIC_ENABLE_DEMO_AUTH` implemented
-- [x] Default: disabled (`false`)
-- [x] Security validation in `env-validation.ts`
-- [x] Documentation in `docs/DEMO-AUTH.md`
-- [x] `.env.example` updated with flag & instructions
-- [x] Production safety warnings in place
-
----
-
-**Last Updated**: 2026-06-22
-**Status**: ✅ SECURITY ENHANCEMENT COMPLETE
+- `app/api/auth/session/route.ts`
+- `supabase/functions/auth-session/index.ts`
+- `src/lib/auth.ts`
+- `src/lib/env-validation.ts`

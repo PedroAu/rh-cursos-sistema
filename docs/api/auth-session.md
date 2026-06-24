@@ -5,10 +5,11 @@ Endpoints executados no Next.js (Node.js em dev, Cloudflare Workers em prod).
 ## Overview
 
 Atualmente, um único Route Handler:
+- **GET /api/auth/session** — sincroniza a sessão autenticada e renova o token quando necessário
 - **POST /api/auth/session** — login administrativo
 - **DELETE /api/auth/session** — logout (revoga sessões)
 
-Ambos implementados em `app/api/auth/session/route.ts`.
+Todos implementados em `app/api/auth/session/route.ts`.
 
 ## Convenções
 
@@ -22,6 +23,7 @@ Ambos implementados em `app/api/auth/session/route.ts`.
 - Sessão: cookie HttpOnly `SESSION_COOKIE` (assinado com `AUTH_SESSION_SECRET`)
 - Segurança: `Secure` apenas em produção (`NODE_ENV === "production"`), `SameSite=Lax`, `path=/`
 - TTL: `SESSION_TTL_MS` — **30 minutos** (padrão)
+- Rotação deslizante: atividade autenticada renova o cookie/token quando restam **5 minutos ou menos** para expiração
 
 ### Response Format
 - Sucesso: `{ "ok": true, ... }`
@@ -30,6 +32,64 @@ Ambos implementados em `app/api/auth/session/route.ts`.
 ---
 
 ## Endpoints
+
+### GET /api/auth/session
+
+**Descrição:** Sincroniza a sessão administrativa atual e reaproveita ou rotaciona o token HMAC sem quebrar o SSR de `/admin`
+
+**Método:** `GET`
+
+**Autenticação:** Cookie `SESSION_COOKIE`
+
+**Comportamento:**
+- valida o cookie assinado e o campo `exp`
+- retorna `401` se a sessão estiver ausente, inválida ou expirada
+- devolve o token atual quando a sessão ainda está saudável
+- emite um novo token/cookie quando a sessão entra na janela de renovação
+
+**Response (200 — sessão válida):**
+```json
+{
+  "ok": true,
+  "session": {
+    "role": "admin",
+    "email": "admin@rhcursos.com.br",
+    "name": "Admin"
+  },
+  "token": "eyJ...",
+  "rotated": false,
+  "supabaseSession": null
+}
+```
+
+**Response (200 — sessão renovada):**
+```json
+{
+  "ok": true,
+  "session": {
+    "role": "admin",
+    "email": "admin@rhcursos.com.br",
+    "name": "Admin"
+  },
+  "token": "eyJ...novo",
+  "rotated": true,
+  "supabaseSession": null
+}
+```
+
+**Cookie set quando `rotated = true`:**
+- Nome: `SESSION_COOKIE` — `"rh_cursos_demo_session"`
+- Valor: novo `token`
+- Flags: `HttpOnly`, `SameSite=Lax`, `path=/`
+- `Max-Age`: `1800` segundos
+
+**Response (401 — sessão inválida/expirada):**
+```json
+{
+  "ok": false,
+  "error": "Sessao invalida ou expirada."
+}
+```
 
 ### POST /api/auth/session
 
@@ -63,6 +123,7 @@ Ambos implementados em `app/api/auth/session/route.ts`.
     "name": "Admin"
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQHJoY3Vyc29zLmNvbS5iciIsIm5hbWUiOiJBZG1pbiIsImlhdCI6MTcxODk0MzYwMCwiZXhwIjoxNzE5MDMwMDAwfQ.SIGNATURE",
+  "rotated": false,
   "supabaseSession": {
     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "refresh_token": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -176,20 +237,32 @@ Retry-After: 900
   - Se fornecido e `SUPABASE_SERVICE_ROLE_KEY` configurado: revoga TODAS as sessões do usuário (global signout via `supabaseAdmin.auth.admin.signOut(token, "global")`)
   - Se omitido ou `supabaseAdmin` não disponível: apenas limpa o cookie local
 
-**Response (200 — sempre sucesso):**
+**Response (200 — logout global confirmado):**
 ```json
 {
-  "ok": true
+  "ok": true,
+  "mode": "global",
+  "revoked": true
+}
+```
+
+**Response (200 — fallback local-only):**
+```json
+{
+  "ok": true,
+  "mode": "local-only",
+  "revoked": false
 }
 ```
 
 **Comportamento:**
 1. Se `accessToken` fornecido e `supabaseAdmin` disponível:
    - Chama `supabaseAdmin.auth.admin.signOut(accessToken, "global")`
-   - Se falhar: loga erro, segue para limpar cookie (fallback silencioso)
+   - Se funcionar: responde `mode: "global"` e `revoked: true`
+   - Se falhar: loga erro, segue para limpar cookie e responde `mode: "local-only"`
 2. Limpa cookie `SESSION_COOKIE`:
    - `Set-Cookie: rh_cursos_demo_session=; Max-Age=0; path=/; ...`
-3. Retorna `{ "ok": true }`
+3. Retorna `mode: "global"` ou `mode: "local-only"` para o cliente distinguir o resultado
 
 **Cookie cleared:**
 - Nome: `SESSION_COOKIE` — `"rh_cursos_demo_session"`
@@ -199,21 +272,10 @@ Retry-After: 900
 
 **Fallback & Resiliência:**
 - Logout NUNCA falha — retorna `200 + ok: true` mesmo se revogação Supabase falhar
+- `mode: "global"` significa que a revogação via service role foi confirmada
+- `mode: "local-only"` significa que só a limpeza local pôde ser garantida
 - Cookie é SEMPRE limpo, independente de erros de revogação
 - Erros de revogação são logados via `console.error` para observabilidade
-
-**Response (500 — raro):**
-```json
-{
-  "ok": false,
-  "error": "Logout failed"
-}
-```
-
-**Trigger:**
-- Erro inesperado ao limpar cookie (improvável; o try/catch do handler captura isso)
-
----
 
 ## Fluxo de Autenticação
 
@@ -230,13 +292,15 @@ Retry-After: 900
    ↓
 6. Browser: Armazena cookie (HttpOnly, automático)
    ↓
-7. Admin: Faz ações administrativas com cookie na sessão
+7. Admin autenticado: sincroniza sessão via GET /api/auth/session em foco/visibilidade/atividade
    ↓
-8. Frontend: DELETE /api/auth/session (com accessToken opcional)
+8. Server: reutiliza ou renova o token/cookie quando a expiração entra na janela de 5 minutos
    ↓
-9. Server: Revoga Supabase (se accessToken) + limpa cookie
+9. Frontend: DELETE /api/auth/session (com accessToken opcional)
    ↓
-10. Browser: Cookie removido, logout completo
+10. Server: Revoga Supabase (se accessToken) + limpa cookie
+   ↓
+11. Browser: Cookie removido, logout completo
 ```
 
 ---
@@ -312,6 +376,46 @@ Set-Cookie: rh_cursos_demo_session=eyJ...; HttpOnly; SameSite=Lax; path=/; Max-A
 
 ---
 
+### Sync / Rotation (GET)
+
+**Requisição:**
+```bash
+curl http://localhost:3000/api/auth/session \
+  --cookie "rh_cursos_demo_session=eyJ..."
+```
+
+**Resposta (200, sem rotação):**
+```json
+{
+  "ok": true,
+  "session": {
+    "role": "admin",
+    "email": "admin@rhcursos.com.br",
+    "name": "Admin"
+  },
+  "token": "eyJ...",
+  "rotated": false,
+  "supabaseSession": null
+}
+```
+
+**Resposta (200, com rotação):**
+```json
+{
+  "ok": true,
+  "session": {
+    "role": "admin",
+    "email": "admin@rhcursos.com.br",
+    "name": "Admin"
+  },
+  "token": "eyJ...novo",
+  "rotated": true,
+  "supabaseSession": null
+}
+```
+
+---
+
 ### Logout (DELETE)
 
 **Requisição:**
@@ -327,7 +431,9 @@ curl -X DELETE http://localhost:3000/api/auth/session \
 **Resposta (200):**
 ```json
 {
-  "ok": true
+  "ok": true,
+  "mode": "global",
+  "revoked": true
 }
 ```
 

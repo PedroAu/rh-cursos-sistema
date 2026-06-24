@@ -6,6 +6,7 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 |--------|-----------|--------------|
 | **Route Handlers** | Next.js (Cloudflare Workers) | [`auth-session.md`](auth-session.md) |
 | **Edge Functions** | Supabase (Deno) | [`edge-functions.md`](edge-functions.md) |
+| **Contrato OpenAPI** | Artefato versionado | [`openapi.yaml`](openapi.yaml) |
 
 ---
 
@@ -26,6 +27,7 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 
 | Método | Endpoint | Descrição | Doc |
 |--------|----------|-----------|-----|
+| `GET` | `/api/auth/session` | Sincronizar sessão admin e rotacionar token quando necessário | [auth-session](auth-session.md) |
 | `POST` | `/api/auth/session` | Login administrativo | [auth-session](auth-session.md) |
 | `DELETE` | `/api/auth/session` | Logout (revoga sessões) | [auth-session](auth-session.md) |
 | `POST` | `/functions/v1/enrollments` | Criar inscrição em curso | [edge-functions](edge-functions.md) |
@@ -40,5 +42,7 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 
 - **Route Handler canônico:** `app/api/auth/session/route.ts`
 - **Edge Functions canônicas:** `supabase/functions/*/index.ts`
+- **Spec OpenAPI versionada:** `docs/api/openapi.yaml`
 - **Documentação manual:** `docs/api/auth-session.md` e `docs/api/edge-functions.md`
 - **Drift conhecido reconciliado neste catálogo:** `DELETE /functions/v1/auth-session` existe no código e deve aparecer no inventário
+- **Estratégia de manutenção:** atualizar o código primeiro, depois reconciliar `docs/api/*.md` e `docs/api/openapi.yaml` na mesma mudança

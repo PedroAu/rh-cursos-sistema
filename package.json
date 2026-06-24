@@ -21,6 +21,8 @@
     "test": "npm run typecheck && npm run build && node scripts/run-playwright.mjs",
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:e2e:smoke": "node scripts/run-playwright.mjs --project=functional",
+    "test:harness:audit": "npm run test:coverage && npm run test:e2e:smoke",
     "test:watch": "vitest",
     "devops:all": "node scripts/devops-run-all.mjs",
     "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"

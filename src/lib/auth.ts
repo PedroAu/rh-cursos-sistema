@@ -1,4 +1,7 @@
-export type DashboardRole = "admin";
+import { isSessionExpired, SESSION_TTL_MS } from "@/lib/auth-session";
+import type { Database } from "@/lib/supabase/database.types";
+
+export type DashboardRole = Database["public"]["Tables"]["profiles"]["Row"]["role"];
 
 export type DemoSession = {
   role: DashboardRole;
@@ -10,15 +13,13 @@ export type DemoSession = {
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
 
-/** TTL padrão (ms) usado para emitir sessões assinadas com expiração. */
-export const SESSION_TTL_MS = 30 * 60 * 1000;
-
-export function getCookieOptions() {
+export function getCookieOptions(ttlMs = SESSION_TTL_MS) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
     secure: process.env.NODE_ENV === "production",
-    path: "/"
+    path: "/",
+    maxAge: Math.floor(ttlMs / 1000)
   };
 }
 
@@ -47,34 +48,6 @@ export function getSessionSecret(): string {
 }
 
 export const SESSION_SECRET = getSessionSecret();
-
-function getDemoUsers(): Array<DemoSession & { password: string }> {
-  if (process.env.NODE_ENV === "production") {
-    return [];
-  }
-
-  const demoPassword = process.env.DEMO_ADMIN_PASSWORD;
-  if (!demoPassword) {
-    if (process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTH !== "true") {
-      return [];
-    }
-    console.warn(
-      "⚠️ DEMO_ADMIN_PASSWORD not set. Demo authentication disabled."
-    );
-    return [];
-  }
-
-  return [
-    {
-      role: "admin",
-      email: "admin@rhcursos.demo",
-      password: demoPassword,
-      name: "Admin RH Cursos"
-    }
-  ];
-}
-
-export const demoUsers = getDemoUsers();
 
 function toBase64Url(value: ArrayBuffer | string) {
   const binary =
@@ -112,8 +85,12 @@ function timingSafeEqual(a: string, b: string): boolean {
   return mismatch === 0;
 }
 
-function isDashboardRole(value: unknown): value is DashboardRole {
-  return value === "admin";
+export function isDashboardRole(value: unknown): value is DashboardRole {
+  return value === "admin" || value === "instructor" || value === "student";
+}
+
+export function normalizeDashboardRole(value: unknown): DashboardRole | null {
+  return isDashboardRole(value) ? value : null;
 }
 
 export async function encodeSession(session: DemoSession, ttlMs?: number) {
@@ -135,7 +112,7 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
 
   const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
   if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
-  if (typeof parsed.exp === "number" && parsed.exp < Date.now()) return null;
+  if (isSessionExpired(parsed)) return null;
 
   return {
     role: parsed.role,
@@ -143,13 +120,4 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
     name: parsed.name,
     ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {})
   };
-}
-
-export function findDemoUser(role: string, email: string, password: string) {
-  return demoUsers.find(
-    (user) =>
-      user.role === role &&
-      user.email.toLowerCase() === email.trim().toLowerCase() &&
-      user.password === password
-  );
 }

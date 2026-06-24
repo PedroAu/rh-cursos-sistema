@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { encodeSession } from "@/lib/auth";
 
 // Mensagens de erro da página de login (/login).
 // Campos vazios são validados no cliente; credenciais inválidas e falhas de rede
@@ -14,6 +15,46 @@ const clickEntrar = (page: import("@playwright/test").Page) =>
   page.getByRole("button", { name: "Entrar", exact: true }).click();
 
 test.describe("mensagens de erro do login", () => {
+  test("login bem-sucedido persiste o token local e respeita o next informado", async ({
+    page
+  }) => {
+    const token = await encodeSession({
+      role: "admin",
+      email: "admin@rhcursos.com.br",
+      name: "Admin RH Cursos"
+    });
+
+    await page.route("**/api/auth/session", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          ok: true,
+          session: {
+            role: "admin",
+            email: "admin@rhcursos.com.br",
+            name: "Admin RH Cursos"
+          },
+          token,
+          rotated: false,
+          supabaseSession: null
+        })
+      })
+    );
+
+    await page.goto("/login?next=/cursos");
+    await page.getByLabel("E-mail").fill("admin@rhcursos.com.br");
+    await page.getByLabel("Senha").fill("senha-correta");
+    await clickEntrar(page);
+
+    await expect(page).toHaveURL(/\/cursos$/);
+    await expect
+      .poll(() =>
+        page.evaluate(() => window.localStorage.getItem("rh_cursos_admin_token"))
+      )
+      .toBe(token);
+  });
+
   test("campos vazios exibem alerta de validacao", async ({ page }) => {
     await page.goto("/login");
     await clickEntrar(page);

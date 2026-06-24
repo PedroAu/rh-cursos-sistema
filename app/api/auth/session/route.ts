@@ -1,12 +1,72 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
-import { encodeSession, getCookieOptions, SESSION_COOKIE, SESSION_TTL_MS } from "@/lib/auth";
+import {
+  type DashboardRole,
+  encodeSession,
+  getCookieOptions,
+  normalizeDashboardRole,
+  SESSION_COOKIE
+} from "@/lib/auth";
+import { SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
+import { getServerSession } from "@/lib/server-session";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
-function normalizeRole(value: unknown) {
-  return value === "admin" ? "admin" : null;
+function toSessionPayload(session: {
+  role: DashboardRole;
+  email: string;
+  name: string;
+  exp?: number;
+}) {
+  return {
+    role: session.role,
+    email: session.email,
+    name: session.name
+  } as const;
+}
+
+async function buildSessionResponse(
+  session: { role: DashboardRole; email: string; name: string },
+  options?: {
+    supabaseSession?: { access_token: string; refresh_token: string } | null;
+    rotated?: boolean;
+  }
+) {
+  const token = await encodeSession(session, SESSION_TTL_MS);
+  const response = NextResponse.json({
+    ok: true,
+    session,
+    token,
+    rotated: options?.rotated ?? false,
+    supabaseSession: options?.supabaseSession ?? null
+  });
+
+  response.cookies.set(SESSION_COOKIE, token, getCookieOptions());
+  return response;
+}
+
+export async function GET() {
+  const cookieStore = await cookies();
+  const currentToken = cookieStore.get(SESSION_COOKIE)?.value ?? null;
+  const session = await getServerSession();
+
+  if (!session || session.role !== "admin") {
+    return NextResponse.json({ ok: false, error: "Sessao invalida ou expirada." }, { status: 401 });
+  }
+
+  if (shouldRotateSession(session)) {
+    return buildSessionResponse(toSessionPayload(session), { rotated: true });
+  }
+
+  return NextResponse.json({
+    ok: true,
+    session: toSessionPayload(session),
+    token: currentToken,
+    rotated: false,
+    supabaseSession: null
+  });
 }
 
 export async function POST(request: Request) {
@@ -31,11 +91,11 @@ export async function POST(request: Request) {
     | { role?: string; email?: string; password?: string }
     | null;
 
-  const role = normalizeRole(body?.role);
+  const role = normalizeDashboardRole(body?.role);
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
 
-  if (!role || !email || !password) {
+  if (role !== "admin" || !email || !password) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
   }
 
@@ -50,8 +110,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Credenciais invalidas." }, { status: 401 });
   }
 
-  const metadataRole = normalizeRole(result.data.user.app_metadata?.role);
-  if (!metadataRole) {
+  const metadataRole = normalizeDashboardRole(result.data.user.app_metadata?.role);
+  if (metadataRole !== "admin" || metadataRole !== role) {
     return NextResponse.json({ ok: false, error: "Acesso nao autorizado." }, { status: 403 });
   }
 
@@ -64,12 +124,7 @@ export async function POST(request: Request) {
         : email.split("@")[0]
   } as const;
 
-  const token = await encodeSession(session, SESSION_TTL_MS);
-
-  const response = NextResponse.json({
-    ok: true,
-    session,
-    token,
+  return buildSessionResponse(session, {
     supabaseSession: result.data.session
       ? {
           access_token: result.data.session.access_token,
@@ -77,15 +132,13 @@ export async function POST(request: Request) {
         }
       : null
   });
-
-  response.cookies.set(SESSION_COOKIE, token, getCookieOptions());
-
-  return response;
 }
 
 export async function DELETE(request: Request) {
   const body = (await request.json().catch(() => null)) as { accessToken?: string } | null;
   const accessToken = body?.accessToken;
+  let mode: "global" | "local-only" = "local-only";
+  let revoked = false;
 
   if (accessToken && supabaseAdmin) {
     try {
@@ -93,6 +146,9 @@ export async function DELETE(request: Request) {
       if (error) {
         console.error("Falha ao revogar sessoes globais:", error.message);
         // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
+      } else {
+        mode = "global";
+        revoked = true;
       }
     } catch (error) {
       console.error(
@@ -103,7 +159,7 @@ export async function DELETE(request: Request) {
     }
   }
 
-  const response = NextResponse.json({ ok: true });
+  const response = NextResponse.json({ ok: true, mode, revoked });
   response.cookies.set(SESSION_COOKIE, "", {
     ...getCookieOptions(),
     maxAge: 0

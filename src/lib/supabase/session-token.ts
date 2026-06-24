@@ -1,3 +1,6 @@
+import { isSessionExpired, SESSION_REFRESH_THRESHOLD_MS } from "@/lib/auth-session";
+import type { DashboardRole } from "@/lib/auth";
+
 /**
  * Gestão do token de sessão admin no frontend.
  *
@@ -54,9 +57,10 @@ export function setSupabaseSession(tokens: SupabaseSessionTokens): void {
 }
 
 type DecodedSession = {
-  role: "admin";
+  role: DashboardRole;
   email: string;
   name: string;
+  exp?: number;
 };
 
 function fromBase64Url(value: string): string {
@@ -82,10 +86,24 @@ export function decodeSessionToken(token?: string | null): DecodedSession | null
 
   try {
     const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DecodedSession>;
-    if (parsed.role !== "admin" || !parsed.email || !parsed.name) return null;
+    if (
+      (parsed.role !== "admin" && parsed.role !== "instructor" && parsed.role !== "student") ||
+      !parsed.email ||
+      !parsed.name
+    ) {
+      return null;
+    }
+    if (isSessionExpired(parsed)) return null;
 
-    return { role: parsed.role, email: parsed.email, name: parsed.name };
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {})
+    };
   } catch {
     return null;
   }
 }
+
+export const SESSION_ACTIVITY_SYNC_MS = SESSION_REFRESH_THRESHOLD_MS;

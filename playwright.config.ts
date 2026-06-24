@@ -3,6 +3,12 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "./tests",
   reporter: "list",
+  metadata: {
+    harnessMode: "production-build + local webServer",
+    smokeProject: "functional",
+    baselineProjects: ["baseline-desktop", "baseline-mobile"],
+    adminFixture: "tests/fixtures/admin-store.ts",
+  },
   use: {
     baseURL: "http://127.0.0.1:3100"
   },

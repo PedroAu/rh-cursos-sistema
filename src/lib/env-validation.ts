@@ -56,12 +56,6 @@ function validateEnvironment(): void {
         "ℹ️ INFO: AUTH_SESSION_SECRET not set - using insecure development default"
       );
     }
-
-    if (process.env.NEXT_PUBLIC_ENABLE_DEMO_AUTH !== "true") {
-      warnings.push(
-        "ℹ️ INFO: Demo auth is disabled. Set NEXT_PUBLIC_ENABLE_DEMO_AUTH=true to enable it."
-      );
-    }
   }
 
   // ============================================

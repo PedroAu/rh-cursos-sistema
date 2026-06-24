@@ -23,6 +23,12 @@ export type AdminStoreFixture = {
   currentSession: null;
 };
 
+export const ADMIN_STORE_HARNESS_DESCRIPTOR = Object.freeze({
+  mode: "mocked-admin-store",
+  resetStrategy: "createAdminStoreFixture returns a fresh object graph per invocation",
+  authStrategy: "no persisted session; callers must authenticate explicitly in route-level flows",
+});
+
 const trainingPaths = [
   {
     id: "path-dp",

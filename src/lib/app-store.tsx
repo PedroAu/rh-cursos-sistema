@@ -17,7 +17,6 @@ import {
   defaultCourseCover,
   trainingPaths
 } from "@/data";
-import { demoAccessList } from "@/lib/demo-access";
 import { debounce } from "@/lib/debounce";
 import { getInitials } from "@/lib/get-initials";
 import { slugify } from "@/lib/utils";
@@ -29,6 +28,8 @@ import {
   clearSessionToken,
   decodeSessionToken,
   getSupabaseSession,
+  setSessionToken,
+  SESSION_ACTIVITY_SYNC_MS,
 } from "@/lib/supabase/session-token";
 import {
   fetchLeadsFromSupabase,
@@ -39,7 +40,6 @@ import type {
   BlogPost,
   Course,
   CurrentSession,
-  DemoAccess,
   Enrollment,
   EnrollmentStatus,
   Instructor,
@@ -68,8 +68,6 @@ type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
 
 type AppStoreValue = AppState & {
   trainingPaths: typeof trainingPaths;
-  demoAccessList: DemoAccess[];
-  login: (role: CurrentSession["role"], email: string, password: string, name?: string) => boolean;
   setSession: (session: CurrentSession) => void;
   logout: () => void;
   createEnrollment: (payload: EnrollmentPayload) => Promise<void>;
@@ -300,6 +298,86 @@ export function AppStoreProvider({
   }, [initialSession]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!state.currentSession || state.currentSession.role !== "admin") return;
+
+    let cancelled = false;
+
+    const syncSession = async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          method: "GET",
+          headers: { Accept: "application/json" },
+          cache: "no-store",
+        });
+
+        if (cancelled) return;
+
+        if (response.status === 401) {
+          clearSessionToken();
+          setState((current) =>
+            current.currentSession ? { ...current, currentSession: null } : current
+          );
+          return;
+        }
+
+        if (!response.ok) return;
+
+        const payload = (await response.json().catch(() => null)) as
+          | {
+              session?: CurrentSession;
+              token?: string | null;
+            }
+          | null;
+
+        const nextSession = payload?.session ?? null;
+        if (!nextSession) return;
+
+        if (payload?.token) {
+          setSessionToken(payload.token);
+        }
+
+        setState((current) => {
+          if (
+            current.currentSession?.role === nextSession.role &&
+            current.currentSession?.email === nextSession.email &&
+            current.currentSession?.name === nextSession.name
+          ) {
+            return current;
+          }
+
+          return { ...current, currentSession: nextSession };
+        });
+      } catch {
+        // Mantém a sessão atual e tenta novamente na próxima interação visível.
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        void syncSession();
+      }
+    };
+
+    void syncSession();
+    window.addEventListener("focus", syncSession);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void syncSession();
+      }
+    }, SESSION_ACTIVITY_SYNC_MS);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", syncSession);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.clearInterval(intervalId);
+    };
+  }, [state.currentSession]);
+
+  useEffect(() => {
     // Guard explícito de ambiente: subscriptions real-time dependem de WebSocket
     // do browser. Evita side effects de rede em SSR ou em ambientes sem window.
     if (typeof window === "undefined") return;
@@ -459,33 +537,6 @@ export function AppStoreProvider({
     };
   }, []);
 
-  const login = useCallback<AppStoreValue["login"]>((role, email, password, name) => {
-    const matchedAccess = demoAccessList.find(
-      (access) =>
-        access.role === role &&
-        access.email.toLowerCase() === email.toLowerCase() &&
-        access.password === password
-    );
-
-    if (!matchedAccess) {
-      toast.error("Credenciais de teste inválidas para este perfil.");
-      return false;
-    }
-
-    const fallbackName = matchedAccess.name ?? name ?? email.split("@")[0];
-
-    setState((current) => ({
-      ...current,
-      currentSession: {
-        role,
-        email,
-        name: fallbackName
-      }
-    }));
-    toast.success("Login simulado realizado.");
-    return true;
-  }, []);
-
   const setSession = useCallback<AppStoreValue["setSession"]>((session) => {
     setState((current) => ({ ...current, currentSession: session }));
     toast.success("Login realizado.");
@@ -493,17 +544,46 @@ export function AppStoreProvider({
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
     const accessToken = getSupabaseSession()?.access_token;
-    void fetch("/api/auth/session", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accessToken })
-    }).catch(() => undefined);
+    const notifyLocalOnlyFallback = () => {
+      toast.success("Sessão local encerrada.");
+      if (accessToken) {
+        toast.error("Não foi possível confirmar a revogação global da sessão.");
+      }
+    };
+
+    void (async () => {
+      try {
+        const response = await fetch("/api/auth/session", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ accessToken })
+        });
+
+        if (!response.ok) {
+          notifyLocalOnlyFallback();
+          return;
+        }
+
+        const payload = (await response.json().catch(() => null)) as
+          | { mode?: "global" | "local-only"; revoked?: boolean }
+          | null;
+
+        if (payload?.mode === "global" && payload.revoked) {
+          toast.success("Sessão global encerrada.");
+          return;
+        }
+
+        notifyLocalOnlyFallback();
+      } catch {
+        notifyLocalOnlyFallback();
+      }
+    })();
+
     if (supabase) {
       void supabase.auth.signOut().catch(() => undefined);
     }
     clearSessionToken();
     setState((current) => ({ ...current, currentSession: null }));
-    toast.success("Sessão encerrada.");
   }, []);
 
   const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
@@ -872,8 +952,6 @@ export function AppStoreProvider({
     () => ({
       ...state,
       trainingPaths,
-      demoAccessList,
-      login,
       setSession,
       logout,
       createEnrollment,
@@ -895,7 +973,6 @@ export function AppStoreProvider({
     }),
     [
       state,
-      login,
       setSession,
       logout,
       createEnrollment,

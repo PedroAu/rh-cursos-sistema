@@ -521,9 +521,9 @@ Header: `Retry-After: 900` (15 minutos)
 ```
 
 **Comportamento:**
-- Com `accessToken` + `SUPABASE_SERVICE_ROLE_KEY` configurada: chama `admin.auth.admin.signOut(accessToken, "global")` revogando TODAS as sessões do usuário
-- Com `accessToken` mas sem `SUPABASE_SERVICE_ROLE_KEY`: apenas retorna `ok: true` (frontend limpa o token local)
-- Sem `accessToken`: apenas retorna `ok: true`
+- Com `accessToken` + `SUPABASE_SERVICE_ROLE_KEY` configurada: chama `admin.auth.admin.signOut(accessToken, "global")` revogando TODAS as sessões do usuário e responde `mode: "global", revoked: true`
+- Com `accessToken` mas sem `SUPABASE_SERVICE_ROLE_KEY`: responde `mode: "local-only", revoked: false`
+- Sem `accessToken`: responde `mode: "local-only", revoked: false`
 - Se a revogação Supabase falhar: erro é logado mas response ainda é `{ ok: true }` (fallback gracioso)
 
 **Nota:** Rate limit NÃO aplicado no DELETE — logout sempre deve ser permitido.

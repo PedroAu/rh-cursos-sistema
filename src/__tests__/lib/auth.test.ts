@@ -4,10 +4,9 @@ import {
   SESSION_COOKIE,
   encodeSession,
   decodeSession,
-  findDemoUser,
-  demoUsers,
   type DemoSession,
 } from '@/lib/auth';
+import { shouldRotateSession } from '@/lib/auth-session';
 
 describe('Auth Utilities', () => {
   let originalEnv: NodeJS.ProcessEnv;
@@ -18,6 +17,7 @@ describe('Auth Utilities', () => {
 
   afterEach(() => {
     process.env = originalEnv;
+    vi.useRealTimers();
   });
 
   describe('SESSION_COOKIE', () => {
@@ -116,113 +116,40 @@ describe('Auth Utilities', () => {
       expect(decoded?.email).toBe('test@example.com');
       expect(decoded?.name).toBe('Test User');
     });
-  });
 
-  describe('findDemoUser', () => {
-    it('should find demo user with correct credentials', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.stubEnv('DEMO_AUTH_ENABLED', 'true');
-      vi.stubEnv('DEMO_ADMIN_PASSWORD', 'test-password');
+    it('should support explicit instructor and student roles in signed sessions', async () => {
+      const instructorSession: DemoSession = {
+        role: 'instructor',
+        email: 'instrutor@example.com',
+        name: 'Instrutor',
+      };
+      const studentSession: DemoSession = {
+        role: 'student',
+        email: 'aluno@example.com',
+        name: 'Aluno',
+      };
 
-      // Note: demoUsers is loaded at module level, so we test with the environment
-      // This test validates the function logic
-      const mockUsers = [
-        {
-          role: 'admin' as const,
-          email: 'admin@rhcursos.demo',
-          password: 'test-password',
-          name: 'Admin RH Cursos',
-        },
-      ];
-
-      const found = mockUsers.find(
-        (user) =>
-          user.role === 'admin' &&
-          user.email.toLowerCase() === 'admin@rhcursos.demo'.toLowerCase() &&
-          user.password === 'test-password'
-      );
-
-      expect(found).toBeDefined();
-      expect(found?.email).toBe('admin@rhcursos.demo');
+      await expect(decodeSession(await encodeSession(instructorSession))).resolves.toEqual(instructorSession);
+      await expect(decodeSession(await encodeSession(studentSession))).resolves.toEqual(studentSession);
     });
 
-    it('should return undefined with wrong password', () => {
-      const mockUsers = [
-        {
-          role: 'admin' as const,
-          email: 'admin@rhcursos.demo',
-          password: 'correct-password',
-          name: 'Admin RH Cursos',
-        },
-      ];
+    it('should reject expired sessions issued with ttl', async () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-06-24T12:00:00.000Z'));
 
-      const found = mockUsers.find(
-        (user) =>
-          user.role === 'admin' &&
-          user.email.toLowerCase() === 'admin@rhcursos.demo' &&
-          user.password === 'wrong-password'
-      );
+      const encoded = await encodeSession(testSession, 1_000);
+      vi.advanceTimersByTime(1_001);
 
-      expect(found).toBeUndefined();
+      await expect(decodeSession(encoded)).resolves.toBeNull();
     });
 
-    it('should handle case-insensitive email comparison', () => {
-      const mockUsers = [
-        {
-          role: 'admin' as const,
-          email: 'admin@rhcursos.demo',
-          password: 'password',
-          name: 'Admin RH Cursos',
-        },
-      ];
+    it('should mark sessions near expiration for rotation', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date('2026-06-24T12:00:00.000Z'));
 
-      const found = mockUsers.find(
-        (user) =>
-          user.role === 'admin' &&
-          user.email.toLowerCase() === 'ADMIN@RHCURSOS.DEMO'.toLowerCase() &&
-          user.password === 'password'
-      );
-
-      expect(found).toBeDefined();
-    });
-
-    it('should trim email whitespace', () => {
-      const mockUsers = [
-        {
-          role: 'admin' as const,
-          email: 'admin@rhcursos.demo',
-          password: 'password',
-          name: 'Admin RH Cursos',
-        },
-      ];
-
-      const email = '  admin@rhcursos.demo  '.trim();
-      const found = mockUsers.find(
-        (user) =>
-          user.role === 'admin' &&
-          user.email.toLowerCase() === email.toLowerCase() &&
-          user.password === 'password'
-      );
-
-      expect(found).toBeDefined();
+      expect(shouldRotateSession({ exp: Date.now() + 4 * 60 * 1000 })).toBe(true);
+      expect(shouldRotateSession({ exp: Date.now() + 10 * 60 * 1000 })).toBe(false);
     });
   });
 
-  describe('demoUsers', () => {
-    it('should be empty in production', () => {
-      vi.stubEnv('NODE_ENV', 'production');
-      // demoUsers is set at module load time, but this validates the logic
-      const shouldBeEmpty = process.env.NODE_ENV === 'production';
-      expect(shouldBeEmpty).toBe(true);
-    });
-
-    it('should be empty if DEMO_AUTH_ENABLED is not true', () => {
-      vi.stubEnv('NODE_ENV', 'development');
-      vi.unstubAllEnvs();
-      vi.stubEnv('NODE_ENV', 'development');
-      // Logic: return [] if DEMO_AUTH_ENABLED !== 'true'
-      const shouldBeEmpty = process.env.DEMO_AUTH_ENABLED !== 'true';
-      expect(shouldBeEmpty).toBe(true);
-    });
-  });
 });
