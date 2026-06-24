@@ -61,4 +61,28 @@ test.describe("mensagens de erro do login", () => {
     await expect(loginAlert(page)).toHaveCount(0);
     await expect(page.getByText("Preencha a senha para continuar.")).toBeVisible();
   });
+
+  test("mostra mensagem de erro apos rate limit (429)", async ({ page }) => {
+    // Simula a rota interna retornando 429 (limite de tentativas excedido),
+    // sem bater na RPC real do Postgres — evita contaminar contadores de rate
+    // limit do banco em execuções de CI.
+    await page.route("**/api/auth/session", (route) =>
+      route.fulfill({
+        status: 429,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: false, error: "Muitas tentativas. Tente novamente mais tarde." })
+      })
+    );
+
+    await page.goto("/login");
+    await page.getByLabel("E-mail").fill("admin@rhcursos.com.br");
+    await page.getByLabel("Senha").fill("qualquer-senha");
+    await clickEntrar(page);
+
+    // O cliente trata qualquer `!response.ok` com a mesma mensagem genérica de
+    // credenciais — não há tratamento diferenciado para 429 hoje. Este teste
+    // documenta o comportamento atual: o alerta aparece e a navegação é bloqueada.
+    await expect(loginAlert(page)).toBeVisible();
+    await expect(page).toHaveURL(/\/login/);
+  });
 });

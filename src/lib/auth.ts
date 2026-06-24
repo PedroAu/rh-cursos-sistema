@@ -4,9 +4,23 @@ export type DemoSession = {
   role: DashboardRole;
   email: string;
   name: string;
+  /** Epoch ms de expiração. Presente apenas quando a sessão foi emitida com TTL. */
+  exp?: number;
 };
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
+
+/** TTL padrão (ms) usado para emitir sessões assinadas com expiração. */
+export const SESSION_TTL_MS = 30 * 60 * 1000;
+
+export function getCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/"
+  };
+}
 
 export function getSessionSecret(): string {
   const secret = process.env.AUTH_SESSION_SECRET;
@@ -102,8 +116,10 @@ function isDashboardRole(value: unknown): value is DashboardRole {
   return value === "admin";
 }
 
-export async function encodeSession(session: DemoSession) {
-  const payload = toBase64Url(JSON.stringify(session));
+export async function encodeSession(session: DemoSession, ttlMs?: number) {
+  const payload = toBase64Url(
+    JSON.stringify(ttlMs ? { ...session, exp: Date.now() + ttlMs } : session)
+  );
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -119,11 +135,13 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
 
   const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
   if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+  if (typeof parsed.exp === "number" && parsed.exp < Date.now()) return null;
 
   return {
     role: parsed.role,
     email: parsed.email,
-    name: parsed.name
+    name: parsed.name,
+    ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {})
   };
 }
 

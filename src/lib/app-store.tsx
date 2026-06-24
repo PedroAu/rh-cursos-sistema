@@ -492,7 +492,12 @@ export function AppStoreProvider({
   }, []);
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
-    void fetch("/api/auth/session", { method: "DELETE" }).catch(() => undefined);
+    const accessToken = getSupabaseSession()?.access_token;
+    void fetch("/api/auth/session", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken })
+    }).catch(() => undefined);
     if (supabase) {
       void supabase.auth.signOut().catch(() => undefined);
     }

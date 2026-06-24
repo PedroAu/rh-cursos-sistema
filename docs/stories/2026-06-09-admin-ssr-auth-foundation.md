@@ -58,6 +58,7 @@ O projeto já está em Next.js 16 com App Router, porém o admin ainda dependia 
 - `src/lib/env-validation.ts`
 - `src/lib/supabase/session-token.ts`
 - `src/lib/app-store.tsx`
+- `src/lib/auth.ts`
 - `src/lib/server-session.ts`
 - `src/components/next-page-shell.tsx`
 - `src/components/admin/data-table.tsx`
@@ -75,6 +76,8 @@ O projeto já está em Next.js 16 com App Router, porém o admin ainda dependia 
 - `app/admin/leads/page.tsx`
 - `app/admin/turmas/page.tsx`
 - `src/views/public/Login.tsx`
+- `supabase/functions/_shared/auth.ts`
+- `supabase/functions/_shared/supabase.ts`
 - `supabase/functions/auth-session/index.ts`
 - `scripts/seed-admin.js`
 - `supabase/migrations/20260608000000_seed_admin_user.sql`

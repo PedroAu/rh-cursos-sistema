@@ -417,7 +417,11 @@ describe("AppStoreProvider and hooks", () => {
       harness.store.logout();
     });
 
-    expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", { method: "DELETE" });
+    expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ accessToken: undefined }),
+    });
     expect(mocks.clearSessionToken).toHaveBeenCalled();
     expect(screen.getByTestId("session-email")).toHaveTextContent("none");
   });

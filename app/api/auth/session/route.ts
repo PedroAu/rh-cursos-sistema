@@ -1,24 +1,30 @@
 import { NextResponse } from "next/server";
 
-import { encodeSession, SESSION_COOKIE } from "@/lib/auth";
+import { encodeSession, getCookieOptions, SESSION_COOKIE, SESSION_TTL_MS } from "@/lib/auth";
+import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 function normalizeRole(value: unknown) {
   return value === "admin" ? "admin" : null;
 }
 
-function getCookieOptions() {
-  return {
-    httpOnly: true,
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-    path: "/"
-  };
-}
-
 export async function POST(request: Request) {
   if (!isSupabaseServerConfigured) {
     return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
+  }
+
+  const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rate.retryAfter)
+        }
+      }
+    );
   }
 
   const body = (await request.json().catch(() => null)) as
@@ -58,7 +64,7 @@ export async function POST(request: Request) {
         : email.split("@")[0]
   } as const;
 
-  const token = await encodeSession(session);
+  const token = await encodeSession(session, SESSION_TTL_MS);
 
   const response = NextResponse.json({
     ok: true,
@@ -77,7 +83,26 @@ export async function POST(request: Request) {
   return response;
 }
 
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  const body = (await request.json().catch(() => null)) as { accessToken?: string } | null;
+  const accessToken = body?.accessToken;
+
+  if (accessToken && supabaseAdmin) {
+    try {
+      const { error } = await supabaseAdmin.auth.admin.signOut(accessToken, "global");
+      if (error) {
+        console.error("Falha ao revogar sessoes globais:", error.message);
+        // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
+      }
+    } catch (error) {
+      console.error(
+        "Erro ao revogar sessoes globais:",
+        error instanceof Error ? error.message : error
+      );
+      // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
+    }
+  }
+
   const response = NextResponse.json({ ok: true });
   response.cookies.set(SESSION_COOKIE, "", {
     ...getCookieOptions(),

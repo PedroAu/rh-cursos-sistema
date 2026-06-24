@@ -9,7 +9,11 @@ export type AdminSession = {
   role: DashboardRole;
   email: string;
   name: string;
+  /** Epoch ms de expiração. Presente quando a sessão foi emitida com TTL. */
+  exp?: number;
 };
+
+export const SESSION_TTL_MS = 30 * 60 * 1000;
 
 export function getSessionSecret(): string {
   const secret = Deno.env.get("AUTH_SESSION_SECRET");
@@ -61,8 +65,10 @@ function isDashboardRole(value: unknown): value is DashboardRole {
   return value === "admin";
 }
 
-export async function encodeSession(session: AdminSession): Promise<string> {
-  const payload = toBase64Url(JSON.stringify(session));
+export async function encodeSession(session: AdminSession, ttlMs?: number): Promise<string> {
+  const payload = toBase64Url(
+    JSON.stringify(ttlMs ? { ...session, exp: Date.now() + ttlMs } : session)
+  );
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -80,8 +86,14 @@ export async function decodeSession(value?: string | null): Promise<AdminSession
   try {
     const parsed = JSON.parse(fromBase64Url(payload)) as Partial<AdminSession>;
     if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+    if (typeof parsed.exp === "number" && parsed.exp < Date.now()) return null;
 
-    return { role: parsed.role, email: parsed.email, name: parsed.name };
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {}),
+    };
   } catch {
     return null;
   }
