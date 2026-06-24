@@ -49,6 +49,7 @@ O usuário solicitou análise do site atual contra as tabelas e relacionamentos 
 - `supabase/migrations/20260513300000_sprint3_performance.sql`
 - `supabase/migrations/20260513400000_sprint4_evolution.sql`
 - `supabase/migrations/20260604164120_content_access_alignment.sql`
+- `supabase/migrations/20260623144035_rbac_authorization_helpers.sql`
 - `supabase/sql/create_all_rh_cursos_schema.sql`
 - `supabase/sql/seed_rh_cursos_demo.sql`
 - `app/api/admin/resources/route.ts`

@@ -419,6 +419,14 @@ export type Database = {
         Args: Record<string, never>;
         Returns: boolean;
       };
+      is_instructor: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
+      is_student: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
     };
   };
 };
