@@ -67,3 +67,4 @@ Story de otimização do admin dashboard. Melhora performance, ativa real-time s
 
 - 2026-06-23 — Story criada (Ready) — Setup inicial com épica definida, AC claros, escopo bem delimitado
 - 2026-06-23 — Implementação concluída em YOLO mode — Real-time subscriptions (useRealTimeMetrics), search otimizada (useAdminSearch), CSV export (exportToCSV), dashboard refatorado com memoization; todos os ACs implementados; tests 109/111 passing; build 0 warnings; Status → Done — Dev (EP-10.1)
+- 2026-06-24 — Evidência de QA reconciliada — gate completo `npm test` verde (118/118), ressalva anterior encerrada; story permanece Done.

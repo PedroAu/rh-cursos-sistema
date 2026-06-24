@@ -14,6 +14,8 @@ import { getServerSession } from "@/lib/server-session";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
+const GLOBAL_SIGNOUT_TIMEOUT_MS = 1_500;
+
 function toSessionPayload(session: {
   role: DashboardRole;
   email: string;
@@ -141,21 +143,42 @@ export async function DELETE(request: Request) {
   let revoked = false;
 
   if (accessToken && supabaseAdmin) {
-    try {
-      const { error } = await supabaseAdmin.auth.admin.signOut(accessToken, "global");
-      if (error) {
-        console.error("Falha ao revogar sessoes globais:", error.message);
+    const rate = await checkRateLimit(
+      `auth-logout-global:${clientIp(request)}`,
+      rateLimitConfigs.authGlobalLogout
+    );
+
+    if (!rate.allowed) {
+      console.warn("Revogacao global ignorada por rate limit; seguindo com logout local-only.");
+    } else {
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+      try {
+        const { error } = await Promise.race([
+          supabaseAdmin.auth.admin.signOut(accessToken, "global"),
+          new Promise<never>((_, reject) => {
+            timeoutId = setTimeout(() => {
+              reject(new Error(`Timeout na revogacao global apos ${GLOBAL_SIGNOUT_TIMEOUT_MS}ms.`));
+            }, GLOBAL_SIGNOUT_TIMEOUT_MS);
+          })
+        ]);
+
+        if (error) {
+          console.error("Falha ao revogar sessoes globais:", error.message);
+          // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
+        } else {
+          mode = "global";
+          revoked = true;
+        }
+      } catch (error) {
+        console.error(
+          "Erro ao revogar sessoes globais:",
+          error instanceof Error ? error.message : error
+        );
         // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
-      } else {
-        mode = "global";
-        revoked = true;
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
       }
-    } catch (error) {
-      console.error(
-        "Erro ao revogar sessoes globais:",
-        error instanceof Error ? error.message : error
-      );
-      // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
     }
   }
 

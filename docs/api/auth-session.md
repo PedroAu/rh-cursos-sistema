@@ -219,7 +219,7 @@ Retry-After: 900
 
 ### DELETE /api/auth/session
 
-**Descrição:** Logout administrativo — revoga sessões Supabase globalmente e limpa cookie local
+**Descrição:** Logout administrativo — tenta revogar sessões Supabase globalmente e sempre limpa o cookie local
 
 **Método:** `DELETE`
 
@@ -237,7 +237,7 @@ Retry-After: 900
   - Se fornecido e `SUPABASE_SERVICE_ROLE_KEY` configurado: revoga TODAS as sessões do usuário (global signout via `supabaseAdmin.auth.admin.signOut(token, "global")`)
   - Se omitido ou `supabaseAdmin` não disponível: apenas limpa o cookie local
 
-**Response (200 — logout global confirmado):**
+**Response (200 — sucesso com revogação global confirmada):**
 ```json
 {
   "ok": true,
@@ -246,7 +246,7 @@ Retry-After: 900
 }
 ```
 
-**Response (200 — fallback local-only):**
+**Response (200 — sucesso com fallback local-only):**
 ```json
 {
   "ok": true,
@@ -257,9 +257,11 @@ Retry-After: 900
 
 **Comportamento:**
 1. Se `accessToken` fornecido e `supabaseAdmin` disponível:
+   - Aplica rate limit específico no ramo de revogação global (`authGlobalLogout`: 5 tentativas / 1 minuto por IP)
+   - Limita a espera da chamada externa de revogação a uma janela curta
    - Chama `supabaseAdmin.auth.admin.signOut(accessToken, "global")`
    - Se funcionar: responde `mode: "global"` e `revoked: true`
-   - Se falhar: loga erro, segue para limpar cookie e responde `mode: "local-only"`
+   - Se falhar, exceder rate limit ou expirar no timeout: loga erro, segue para limpar cookie e responde `mode: "local-only"`
 2. Limpa cookie `SESSION_COOKIE`:
    - `Set-Cookie: rh_cursos_demo_session=; Max-Age=0; path=/; ...`
 3. Retorna `mode: "global"` ou `mode: "local-only"` para o cliente distinguir o resultado
@@ -332,6 +334,12 @@ auth: { windowMs: 15 * 60 * 1000, maxRequests: 5 }
 3. Chama `checkRateLimit(\`auth:${ip}\`, rateLimitConfigs.auth)`
 4. Se limite excedido: retorna `429` com `Retry-After` em segundos até o reset da janela
 5. Cliente aguarda o tempo indicado antes de tentar novamente
+
+**Logout global (ramo opcional do DELETE):**
+```typescript
+authGlobalLogout: { windowMs: 60 * 1000, maxRequests: 5 }
+// 5 tentativas de revogação global por 1 minuto por IP
+```
 
 ---
 

@@ -46,6 +46,19 @@ function capture(command, commandArgs) {
   return result.stdout.trim();
 }
 
+function maskRemoteUrl(remoteUrl) {
+  if (!remoteUrl) return "unknown";
+
+  try {
+    const url = new URL(remoteUrl);
+    url.username = "";
+    url.password = "";
+    return url.toString();
+  } catch {
+    return remoteUrl.replace(/\/\/[^/@\s]+@/, "//***@");
+  }
+}
+
 function detectStoryFromProjectStatus() {
   const statusPath = resolve(root, ".aiox/project-status.yaml");
   if (!existsSync(statusPath)) return null;
@@ -103,7 +116,9 @@ const storyPath = explicitStoryPath ?? detectStoryFromProjectStatus();
 const skipCodeRabbit = hasArg("--skip-coderabbit") || hasArg("--no-coderabbit");
 
 console.log("AIOX DevOps local execution");
-console.log(`Repository: ${capture("git", ["config", "--get", "remote.origin.url"]) ?? "unknown"}`);
+console.log(
+  `Repository: ${maskRemoteUrl(capture("git", ["config", "--get", "remote.origin.url"]))}`
+);
 console.log(`Branch: ${capture("git", ["branch", "--show-current"]) ?? "unknown"}`);
 console.log(`Package: ${JSON.parse(readFileSync(resolve(root, "package.json"), "utf8")).name}`);
 

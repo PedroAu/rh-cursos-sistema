@@ -36,6 +36,7 @@ export const rateLimitConfigs = {
   enrollment: { windowMs: 60 * 1000, maxRequests: 20 },
   lead: { windowMs: 60 * 1000, maxRequests: 10 },
   auth: { windowMs: 15 * 60 * 1000, maxRequests: 5 },
+  authGlobalLogout: { windowMs: 60 * 1000, maxRequests: 5 },
   admin: { windowMs: 60 * 1000, maxRequests: 30 }
 } as const;
 
@@ -77,20 +78,27 @@ async function checkPostgres(
   if (!supabaseAdmin) return null;
 
   const timeoutMs = 300;
-  const rpc = supabaseAdmin.rpc("rate_limit_increment", {
-    p_identifier: identifier,
-    p_window_ms: config.windowMs,
-    p_max_requests: config.maxRequests
-  });
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), timeoutMs);
+  const rpc = supabaseAdmin
+    .rpc("rate_limit_increment", {
+      p_identifier: identifier,
+      p_window_ms: config.windowMs,
+      p_max_requests: config.maxRequests
+    })
+    .abortSignal(abortController.signal);
 
-  // Race entre a RPC e um timeout de 300ms
   type RpcResult = { data: number | null; error: { message: string } | null };
-  const result = await Promise.race([
-    rpc as unknown as Promise<RpcResult>,
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))
-  ]);
+  let result: RpcResult;
+  try {
+    result = (await rpc) as RpcResult;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 
-  if (result === null || result.error || result.data === null) return null;
+  if (result.error || result.data === null) return null;
 
   const count = result.data;
   const windowMs = config.windowMs;

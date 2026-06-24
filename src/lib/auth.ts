@@ -7,7 +7,7 @@ export type DemoSession = {
   role: DashboardRole;
   email: string;
   name: string;
-  /** Epoch ms de expiração. Presente apenas quando a sessão foi emitida com TTL. */
+  /** Epoch ms de expiração da sessão assinada. */
   exp?: number;
 };
 
@@ -93,10 +93,8 @@ export function normalizeDashboardRole(value: unknown): DashboardRole | null {
   return isDashboardRole(value) ? value : null;
 }
 
-export async function encodeSession(session: DemoSession, ttlMs?: number) {
-  const payload = toBase64Url(
-    JSON.stringify(ttlMs ? { ...session, exp: Date.now() + ttlMs } : session)
-  );
+export async function encodeSession(session: DemoSession, ttlMs = SESSION_TTL_MS) {
+  const payload = toBase64Url(JSON.stringify({ ...session, exp: Date.now() + ttlMs }));
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -110,14 +108,18 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
   const expectedSignature = await signPayload(payload);
   if (!timingSafeEqual(signature, expectedSignature)) return null;
 
-  const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
-  if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
-  if (isSessionExpired(parsed)) return null;
+  try {
+    const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
+    if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+    if (typeof parsed.exp !== "number" || isSessionExpired(parsed)) return null;
 
-  return {
-    role: parsed.role,
-    email: parsed.email,
-    name: parsed.name,
-    ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {})
-  };
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      exp: parsed.exp
+    };
+  } catch {
+    return null;
+  }
 }

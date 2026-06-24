@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   rpc: vi.fn(),
@@ -13,6 +13,12 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 import { checkRateLimit, rateLimitConfigs, clientIp } from '@/lib/rate-limit';
 
+function rpcBuilder(resultFactory: (signal: AbortSignal) => Promise<unknown>) {
+  return {
+    abortSignal: vi.fn().mockImplementation(resultFactory),
+  };
+}
+
 describe('rate-limit', () => {
   beforeEach(() => {
     mocks.rpc.mockReset();
@@ -20,8 +26,9 @@ describe('rate-limit', () => {
 
   describe('checkRateLimit — Postgres RPC success', () => {
     it('returns allowed=true when RPC count is within the configured limit', async () => {
-      // count=1 with maxRequests=20 => allowed
-      mocks.rpc.mockReturnValue(Promise.resolve({ data: 1, error: null }));
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.resolve({ data: 1, error: null })),
+      );
 
       const result = await checkRateLimit('user-a', rateLimitConfigs.enrollment);
 
@@ -29,8 +36,9 @@ describe('rate-limit', () => {
     });
 
     it('returns allowed=false with a retryAfter when RPC count exceeds maxRequests', async () => {
-      // count=21 with maxRequests=20 => blocked
-      mocks.rpc.mockReturnValue(Promise.resolve({ data: 21, error: null }));
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.resolve({ data: 21, error: null })),
+      );
 
       const result = await checkRateLimit('user-b', rateLimitConfigs.enrollment);
 
@@ -39,7 +47,10 @@ describe('rate-limit', () => {
     });
 
     it('calls supabaseAdmin.rpc with the expected RPC name and params', async () => {
-      mocks.rpc.mockReturnValue(Promise.resolve({ data: 1, error: null }));
+      const abortSignal = vi
+        .fn()
+        .mockImplementation(() => Promise.resolve({ data: 1, error: null }));
+      mocks.rpc.mockReturnValue({ abortSignal });
 
       await checkRateLimit('user-c', rateLimitConfigs.lead);
 
@@ -48,25 +59,33 @@ describe('rate-limit', () => {
         p_window_ms: rateLimitConfigs.lead.windowMs,
         p_max_requests: rateLimitConfigs.lead.maxRequests,
       });
+      expect(abortSignal).toHaveBeenCalledTimes(1);
+      expect(abortSignal.mock.calls[0]?.[0]).toBeInstanceOf(AbortSignal);
     });
   });
 
   describe('checkRateLimit — fallback in-memory behavior', () => {
-    it('falls back to in-memory limiter when the RPC takes longer than 300ms (timeout race)', async () => {
-      // Never resolves within the 300ms race window — checkPostgres should
-      // resolve to null and the function should fall back to in-memory.
-      mocks.rpc.mockReturnValue(new Promise(() => {}));
+    it('falls back to in-memory limiter when the RPC exceeds the timeout and is aborted', async () => {
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(
+          (signal: AbortSignal) =>
+            new Promise((_, reject) => {
+              signal.addEventListener('abort', () => reject(new Error('aborted')));
+            }),
+        ),
+      );
 
       const config = { windowMs: 60_000, maxRequests: 5 };
       const result = await checkRateLimit('timeout-identifier', config);
 
-      // First call on a fresh identifier is always allowed by the fallback store.
       expect(result.allowed).toBe(true);
       expect(result.remaining).toBe(config.maxRequests - 1);
     }, 1000);
 
     it('falls back to in-memory limiter when the RPC rejects', async () => {
-      mocks.rpc.mockReturnValue(Promise.reject(new Error('connection refused')));
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.reject(new Error('connection refused'))),
+      );
 
       const config = { windowMs: 60_000, maxRequests: 5 };
       const result = await checkRateLimit('rejected-identifier', config);
@@ -76,7 +95,7 @@ describe('rate-limit', () => {
 
     it('falls back to in-memory limiter when the RPC resolves with an error', async () => {
       mocks.rpc.mockReturnValue(
-        Promise.resolve({ data: null, error: { message: 'rpc failed' } })
+        rpcBuilder(() => Promise.resolve({ data: null, error: { message: 'rpc failed' } })),
       );
 
       const config = { windowMs: 60_000, maxRequests: 5 };
@@ -86,7 +105,9 @@ describe('rate-limit', () => {
     });
 
     it('blocks subsequent in-memory requests once maxRequests is exceeded for the same identifier', async () => {
-      mocks.rpc.mockReturnValue(Promise.reject(new Error('always fails')));
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.reject(new Error('always fails'))),
+      );
 
       const config = { windowMs: 60_000, maxRequests: 2 };
       const identifier = 'exhaust-identifier';
@@ -104,7 +125,9 @@ describe('rate-limit', () => {
 
   describe('checkRateLimit — bucket isolation across identifiers', () => {
     it('does not block a different identifier when one identifier has hit its limit', async () => {
-      mocks.rpc.mockReturnValue(Promise.reject(new Error('always fails')));
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.reject(new Error('always fails'))),
+      );
 
       const config = { windowMs: 60_000, maxRequests: 1 };
 
@@ -125,6 +148,13 @@ describe('rate-limit', () => {
     it('defines the auth config with a 15-minute window and a max of 5 requests', () => {
       expect(rateLimitConfigs.auth).toEqual({
         windowMs: 15 * 60 * 1000,
+        maxRequests: 5,
+      });
+    });
+
+    it('defines the global logout auth config with a 1-minute window and a max of 5 requests', () => {
+      expect(rateLimitConfigs.authGlobalLogout).toEqual({
+        windowMs: 60 * 1000,
         maxRequests: 5,
       });
     });

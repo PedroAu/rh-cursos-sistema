@@ -65,7 +65,8 @@ describe('Auth Utilities', () => {
       expect(encoded.includes('.')).toBe(true);
 
       const decoded = await decodeSession(encoded);
-      expect(decoded).toEqual(testSession);
+      expect(decoded).toMatchObject(testSession);
+      expect(decoded?.exp).toEqual(expect.any(Number));
     });
 
     it('should return null for undefined session', async () => {
@@ -111,7 +112,8 @@ describe('Auth Utilities', () => {
       const encoded = await encodeSession(session);
       const decoded = await decodeSession(encoded);
 
-      expect(decoded).toEqual(session);
+      expect(decoded).toMatchObject(session);
+      expect(decoded?.exp).toEqual(expect.any(Number));
       expect(decoded?.role).toBe('admin');
       expect(decoded?.email).toBe('test@example.com');
       expect(decoded?.name).toBe('Test User');
@@ -129,8 +131,8 @@ describe('Auth Utilities', () => {
         name: 'Aluno',
       };
 
-      await expect(decodeSession(await encodeSession(instructorSession))).resolves.toEqual(instructorSession);
-      await expect(decodeSession(await encodeSession(studentSession))).resolves.toEqual(studentSession);
+      await expect(decodeSession(await encodeSession(instructorSession))).resolves.toMatchObject(instructorSession);
+      await expect(decodeSession(await encodeSession(studentSession))).resolves.toMatchObject(studentSession);
     });
 
     it('should reject expired sessions issued with ttl', async () => {
@@ -141,6 +143,27 @@ describe('Auth Utilities', () => {
       vi.advanceTimersByTime(1_001);
 
       await expect(decodeSession(encoded)).resolves.toBeNull();
+    });
+
+    it('should reject a signed payload that is missing exp', async () => {
+      const payload = Buffer.from(
+        JSON.stringify({
+          role: 'admin',
+          email: 'admin@rhcursos.demo',
+          name: 'Test Admin',
+        }),
+      ).toString('base64url');
+      const key = await crypto.subtle.importKey(
+        'raw',
+        new TextEncoder().encode(getSessionSecret()),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign'],
+      );
+      const signature = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(payload));
+      const token = `${payload}.${Buffer.from(signature).toString('base64url')}`;
+
+      await expect(decodeSession(token)).resolves.toBeNull();
     });
 
     it('should mark sessions near expiration for rotation', () => {
