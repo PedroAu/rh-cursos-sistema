@@ -121,7 +121,7 @@ export function BlogPage() {
                 type="button"
                 onClick={() => setCategory(item)}
                 className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                  category === item ? "bg-primary text-white" : "bg-muted text-muted-foreground hover:bg-secondary hover:text-primary"
+                  category === item ? "bg-deep-navy text-white" : "bg-muted text-muted-foreground hover:bg-secondary hover:text-deep-navy"
                 }`}
               >
                 {item}
@@ -180,7 +180,7 @@ export function BlogPage() {
                   onChange={(event) => setNewsletterEmail(event.target.value)}
                 />
                 <Button
-                  className="w-full"
+                  className="w-full bg-deep-navy text-white hover:bg-deep-navy/92"
                   loading={isSubmittingNewsletter}
                   onClick={submitNewsletter}
                 >
