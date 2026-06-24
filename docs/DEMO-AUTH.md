@@ -21,7 +21,7 @@ Demo authentication is a **LOCAL DEVELOPMENT ONLY** feature that provides hardco
 
 ### Why Feature Flag is Critical
 
-1. **Code is visible in source**: Demo credentials are hardcoded in `/src/lib/demo-auth.ts`
+1. **Code is visible in source**: Demo credentials/logic live in `/src/lib/auth.ts`
 2. **Public builds include NEXT_PUBLIC_* variables**: Any `NEXT_PUBLIC_` variable is embedded in the client-side bundle
 3. **Visible to users**: If enabled, credentials appear in browser devtools, Network tab, etc.
 4. **Default disabled**: Mitigates risk by requiring explicit opt-in during development
@@ -89,13 +89,13 @@ Role:     admin
 Name:     Admin RH Cursos
 ```
 
-**Location**: `/src/lib/demo-auth.ts` (lines 47-55)
+**Location**: `/src/lib/auth.ts`
 
 ---
 
 ## How Demo Auth Works
 
-### Module: `src/lib/demo-auth.ts`
+### Module: `src/lib/auth.ts`
 
 This module centralizes all demo auth logic:
 
@@ -122,7 +122,7 @@ User navigates to /admin/login
    Success: Set session cookie
 ```
 
-**Note**: The current API endpoint (`app/api/auth/session/route.ts`) uses Supabase auth only. Demo credentials in `/src/lib/demo-auth.ts` and `/src/data/mockAccess.ts` are legacy from development and not actively used in the current auth flow.
+**Note**: The current API endpoint (`app/api/auth/session/route.ts`) uses Supabase auth only. Demo credentials in `/src/lib/auth.ts` and demo-access artifacts are legacy from development and are not actively used in the current auth flow.
 
 ---
 
@@ -132,9 +132,9 @@ The following files contain legacy demo auth code that is **NOT** currently inte
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `src/lib/auth.ts` | Session encoding/decoding | Active (legacy) |
-| `src/data/mockAccess.ts` | Mock demo access list | Deprecated |
-| `src/lib/app-store.tsx` | Provides demoAccessList to UI | Deprecated |
+| `src/lib/auth.ts` | Session helpers + demo credential fallback | Active (legacy/demo-only) |
+| `src/lib/demo-access.ts` | Demo access artifacts | Deprecated |
+| `src/lib/app-store.tsx` | Legacy references for demo access | Deprecated |
 
 **These are kept for reference and may be removed in a future refactor.**
 
