@@ -22,6 +22,7 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
+    "devops:all": "node scripts/devops-run-all.mjs",
     "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"
   },
   "dependencies": {
