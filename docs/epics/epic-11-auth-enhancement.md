@@ -1,6 +1,6 @@
 # Épica 11 — Auth Enhancement
 
-**Status:** PROPOSED (ready for refinement)  
+**Status:** IN REVIEW — 4/4 stories `Ready for Review`; security audit `WAIVED`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-1.4)  
 **Prioridade:** P1  
 **Duração:** 2-3 dias  
@@ -22,6 +22,9 @@ Endurecer a autenticação da plataforma para o próximo ciclo, unificando sess�
 ---
 
 ## Acceptance Criteria da Épica
+
+> Os checkboxes permanecem abertos enquanto as quatro stories estiverem em
+> `Ready for Review`. Implementação concluída não equivale a aceite de QA.
 
 ### Fase 0: Contrato e superfície atual
 - [ ] **AC-0.1** — Superfície de auth inventariada: `app/api/auth/session`, `supabase/functions/auth-session`, `src/lib/auth.ts`, `src/lib/server-session.ts`, `src/lib/authorize.ts`, `src/lib/app-store.tsx`
@@ -71,18 +74,22 @@ Endurecer a autenticação da plataforma para o próximo ciclo, unificando sess�
 ### Story EP-11.1: Sessão admin com rotação deslizante e expiração consistente
 **Objetivo:** introduzir sliding session rotation sem quebrar SSR, cookie e token HMAC  
 **Esforço:** 1 dia
+**Status:** Ready for Review
 
 ### Story EP-11.2: RBAC unificado no app e no Supabase
 **Objetivo:** alinhar tipos, guards e contrato de papéis entre app e banco  
 **Esforço:** 0.5-1 dia
+**Status:** Ready for Review
 
 ### Story EP-11.3: Isolamento definitivo de demo auth e logout global
 **Objetivo:** remover risco residual de credenciais demo no cliente e fechar semântica de sign-out  
 **Esforço:** 0.5 dia
+**Status:** Ready for Review
 
 ### Story EP-11.4: Testes de auth e security audit
 **Objetivo:** provar os fluxos críticos e fechar a épica com evidência de segurança  
 **Esforço:** 0.5-1 dia
+**Status:** Ready for Review — audit `WAIVED`
 
 ---
 
@@ -97,10 +104,10 @@ Endurecer a autenticação da plataforma para o próximo ciclo, unificando sess�
 
 ## Riscos Conhecidos
 
-- Conflito entre o escopo publicado hoje e o RBAC triplo pedido pelo plano
-- Rotação de sessão pode quebrar o contrato atual entre SSR cookie e `x-rh-session`
-- Logout global depende de `SUPABASE_SERVICE_ROLE_KEY`
-- Demo auth legado ainda aparece em artefatos do cliente
+- Revogação global não invalida imediatamente access JWTs já emitidos
+- Prova HTTP positiva da rotação ainda é indireta
+- Paridade automatizada da Edge Function `auth-session` permanece pendente
+- Tratamento diferenciado de `429/503` depende de decisão de produto
 
 ---
 

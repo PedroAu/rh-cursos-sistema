@@ -1,5 +1,8 @@
 # Phase A Quick Action Plan — Blocker Resolution
 
+> **Historical execution plan.** O estado final está em
+> `docs/PHASE-A-FINAL-STATUS.md`; itens e datas abaixo não representam backlog atual.
+
 **Generated:** 2026-06-22  
 **Status:** CRITICAL PATH TO PHASE B  
 **Estimated Duration:** 2-3 days

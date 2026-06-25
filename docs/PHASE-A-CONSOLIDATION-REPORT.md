@@ -1,5 +1,8 @@
 # Phase A Consolidation Report — Story 8.1 (Brownfield Remediation)
 
+> **Historical snapshot.** Este relatório foi superseded por
+> `docs/PHASE-A-FINAL-STATUS.md`.
+
 **Report Date:** 2026-06-22  
 **Status:** IN PROGRESS ⏳  
 **Completion:** ~5% (1 of 20 AC completed)  

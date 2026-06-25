@@ -1,5 +1,8 @@
 # Phase A Executive Summary — Brownfield Remediation Kickoff
 
+> **Historical snapshot.** Projeções e blockers deste documento foram
+> superseded por `docs/PHASE-A-FINAL-STATUS.md`.
+
 **Date:** 2026-06-22  
 **Epic:** Epic 8 — Brownfield Remediation  
 **Phase:** A — Critical UX & Accessibility Fixes  
@@ -212,4 +215,3 @@ PHASE B START: 2026-06-25 or 2026-06-26
 **Prepared By:** Master Agent (Orchestration Layer)  
 **Status:** READY FOR TEAM EXECUTION  
 **Version:** 1.0
-

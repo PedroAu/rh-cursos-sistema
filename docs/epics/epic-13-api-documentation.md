@@ -1,6 +1,6 @@
 # Épica 13 — API Documentation
 
-**Status:** PROPOSED (ready for refinement)  
+**Status:** IN PROGRESS — EP-13.1/13.2 `Done`; EP-13.3 `Approved`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-4.2)  
 **Prioridade:** P2  
 **Duração:** 1-2 dias  
@@ -23,22 +23,22 @@ Transformar a documentação manual já existente em um contrato canônico OpenA
 ## Acceptance Criteria da Épica
 
 ### Fase 0: Inventário e contrato
-- [ ] **AC-0.1** — Superfície híbrida inventariada: Route Handlers do Next + Edge Functions do Supabase
-- [ ] **AC-0.2** — Fonte de verdade definida para exemplos, erros, auth e rate limits
+- [x] **AC-0.1** — Superfície híbrida inventariada: Route Handlers do Next + Edge Functions do Supabase
+- [x] **AC-0.2** — Fonte de verdade definida para exemplos, erros, auth e rate limits
 
 ### Fase 1: Spec OpenAPI
-- [ ] **AC-1.1** — Spec OpenAPI 3.x gerada e versionada no repositório
-- [ ] **AC-1.2** — Todos os endpoints atuais documentados
-- [ ] **AC-1.3** — Exemplos de request/response e códigos de erro presentes
+- [x] **AC-1.1** — Spec OpenAPI 3.x gerada e versionada no repositório
+- [x] **AC-1.2** — Todos os endpoints atuais documentados
+- [x] **AC-1.3** — Exemplos de request/response e códigos de erro presentes
 
 ### Fase 2: Publicação
-- [ ] **AC-2.1** — Métodos de autenticação documentados
-- [ ] **AC-2.2** — Rate limits documentados
+- [x] **AC-2.1** — Métodos de autenticação documentados
+- [x] **AC-2.2** — Rate limits documentados
 - [ ] **AC-2.3** — Swagger UI ou ReDoc rodando e referenciado no README/docs
 
 ### Fase 3: Governança
 - [ ] **AC-3.1** — Processo mínimo para evitar drift entre código e spec definido
-- [ ] **AC-3.2** — Endpoint `DELETE /functions/v1/auth-session` e demais gaps do catálogo atual reconciliados
+- [x] **AC-3.2** — Endpoint `DELETE /functions/v1/auth-session` e demais gaps do catálogo atual reconciliados
 
 ---
 
@@ -63,14 +63,17 @@ Transformar a documentação manual já existente em um contrato canônico OpenA
 ### Story EP-13.1: Catálogo canônico da API híbrida e fundação OpenAPI
 **Objetivo:** consolidar a superfície real e decidir o modelo do contrato  
 **Esforço:** 0.5 dia
+**Status:** Done
 
 ### Story EP-13.2: Spec OpenAPI completa com exemplos, auth e rate limits
 **Objetivo:** gerar a spec versionada cobrindo todos os endpoints atuais  
 **Esforço:** 0.5-1 dia
+**Status:** Done
 
 ### Story EP-13.3: Swagger UI/ReDoc e gate anti-drift
 **Objetivo:** publicar a documentação navegável e impedir divergência óbvia  
 **Esforço:** 0.5 dia
+**Status:** Approved — implementação pendente
 
 ---
 

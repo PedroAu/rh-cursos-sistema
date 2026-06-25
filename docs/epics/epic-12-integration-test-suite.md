@@ -1,6 +1,6 @@
 # Épica 12 — Integration Test Suite
 
-**Status:** PROPOSED (ready for refinement)  
+**Status:** IN PROGRESS — EP-12.1 `Ready for Review`; EP-12.2 a EP-12.4 `Approved`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-3.2)  
 **Prioridade:** P1  
 **Duração:** 2-3 dias  
@@ -21,6 +21,9 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 ---
 
 ## Acceptance Criteria da Épica
+
+> Apenas stories `Done` podem encerrar AC da épica. EP-12.1 aguarda revisão;
+> EP-12.2 a EP-12.4 ainda aguardam implementação.
 
 ### Fase 0: Harness e evidência
 - [ ] **AC-0.1** — Ambiente de integração reproduzível definido (seed, auth helper, reset)
@@ -64,18 +67,22 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 ### Story EP-12.1: Harness de integração com seed, auth helper e coverage gate
 **Objetivo:** estabilizar a base para testes reais e produzir cobertura auditável  
 **Esforço:** 0.5-1 dia
+**Status:** Ready for Review
 
 ### Story EP-12.2: Fluxos críticos E2E reais — login, logout e checkout
 **Objetivo:** provar os journeys principais contra o backend real  
 **Esforço:** 0.5-1 dia
+**Status:** Approved — implementação pendente
 
 ### Story EP-12.3: Contract tests dos endpoints híbridos
 **Objetivo:** validar formatos, códigos e auth dos endpoints Next + Supabase  
 **Esforço:** 0.5-1 dia
+**Status:** Approved — cobertura Next parcial; Edge Functions pendentes
 
 ### Story EP-12.4: Testes transacionais de banco e RLS
 **Objetivo:** fechar o risco de concorrência, duplicidade e autorização em dados  
 **Esforço:** 0.5-1 dia
+**Status:** Approved — implementação pendente
 
 ---
 
