@@ -2,8 +2,11 @@
 
 **Report Date:** 2026-06-24  
 **Reviewed By:** Quinn (QA Agent)  
-**Review Scope:** 5 most recent stories  
+**Review Scope:** fechamento da tranche EP-9/EP-10 + DevOps local
 **Overall Status:** ✅ **ALL PASS**
+
+> Este relatório não representa o fechamento integral da Fase B. O escopo
+> canônico da Fase B é EP-9 a EP-13, conforme `docs/PHASE-B-PLAN.md`.
 
 ---
 
@@ -28,7 +31,7 @@
 ### Story 1: DevOps Local Execution Command
 
 **File:** `docs/stories/2026-06-23-devops-local-execution-command.md`  
-**Status:** Ready for Review  
+**Status:** Done
 **Current Gate:** 🟢 **PASS**
 
 #### Quality Checklist (7/7)
@@ -62,9 +65,9 @@
 
 **VERDICT:** ✅ **PASS**  
 **Score:** 8/8  
-**Risk Level:** LOW  
+**Risk Level:** LOW
 
-**Action:** Ready for commit and push to redesign/ep-0-fundacao
+**Action:** Encerrada; nenhuma ação adicional neste relatório
 
 ---
 
@@ -147,7 +150,7 @@
 
 **VERDICT:** ✅ **PASSED (Done)**  
 **Score:** 9/9  
-**Risk Level:** LOW  
+**Risk Level:** LOW
 **Code Review Findings:** 5 fixed, 0 remaining
 
 ---
@@ -236,7 +239,7 @@
 
 | Story | Epic | Status | Tests | Verdict | Blocker | Next Step |
 |-------|------|--------|-------|---------|---------|-----------|
-| DevOps Local Exec | — | Ready for Review | 112/112 | ✅ PASS | No | Commit + Push |
+| DevOps Local Exec | — | Done | 112/112 | ✅ PASS | No | Encerrada |
 | EP-10.1 Admin | EP-10 | Done | 118/118 gate atual | ✅ PASS | No | Merged |
 | EP-9.3 Instructors | EP-9 | Done | 111/111 | ✅ PASS | No | Merged |
 | EP-9.2 Students | EP-9 | Done | ✅ | ✅ PASS | No | Merged |
@@ -258,7 +261,9 @@ EP-9.3 (Instructors) ✅
 EP-10.1 (Admin Dashboard) ✅
 ```
 
-All dependencies satisfied. Phase B is complete and ready for Phase C (EP-11 Auth, EP-12 Integration Tests).
+Todas as dependências da tranche EP-9/EP-10 foram satisfeitas. A Fase B
+permanece aberta: EP-11 está em revisão e EP-12/EP-13 ainda possuem stories
+aprovadas não concluídas.
 
 ---
 
@@ -281,21 +286,14 @@ All dependencies satisfied. Phase B is complete and ready for Phase C (EP-11 Aut
 
 ### Immediate Actions (This Sprint)
 
-1. **Story 1 (DevOps):** 
-   ```bash
-   git add docs/stories/2026-06-23-devops-local-execution-command.md \
-           package.json scripts/devops-run-all.mjs [other files]
-   git commit -m "feat(devops): add unified local gates command"
-   @devops *push  # delegate to DevOps for PR creation
-   ```
+1. **Stories deste relatório:** encerradas.
+2. **Fase B corrente:** seguir a ordem definida em `docs/PHASE-B-PLAN.md`.
 
-2. **Stories 2-5:** Already merged. No action needed.
+### Continuação da Fase B
 
-### Next Phase Planning
-
-- **EP-11 (Auth Enhancement):** Ready to start (all dependencies met)
-- **EP-12 (Integration Tests):** Ready to start (Phase B complete)
-- **EP-10.2+ (Dashboard Features):** Can proceed in parallel
+- **EP-11 (Auth Enhancement):** 4 stories `Ready for Review`; audit atual `WAIVED`
+- **EP-12 (Integration Tests):** EP-12.1 `Ready for Review`; EP-12.2 a EP-12.4 `Approved`
+- **EP-13 (API Documentation):** EP-13.1 e EP-13.2 `Done`; EP-13.3 `Approved`
 
 ### Quality Improvements (Optional)
 
@@ -305,7 +303,7 @@ All dependencies satisfied. Phase B is complete and ready for Phase C (EP-11 Aut
 
 ## Approval
 
-✅ **All 5 stories approved for merge**
+✅ **As 5 stories deste relatório foram aprovadas**
 
 **Reviewed By:** Quinn (QA Agent)  
 **Review Date:** 2026-06-24  

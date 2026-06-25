@@ -3,6 +3,8 @@
 ## Status
 Ready for Review
 
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+
 ## Executor Assignment
 
 executor: "@dev"  
@@ -29,11 +31,11 @@ O banco já possui helpers `is_instructor()` e `is_student()`, mas o app ainda t
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Tipos de sessão/autorização suportam `admin`, `instructor` e `student` de forma explícita
-- [ ] **AC2** — `authorize()` e equivalentes falham fechado para papéis não permitidos
-- [ ] **AC3** — O app não expõe `/aluno` ou `/instrutor`; apenas fica pronto para autorização futura
-- [ ] **AC4** — Contrato entre `app_metadata.role`, `profiles.role` e helpers SQL fica documentado
-- [ ] **AC5** — Casos positivos e negativos de RBAC têm testes
+- [x] **AC1** — Tipos de sessão/autorização suportam `admin`, `instructor` e `student` de forma explícita
+- [x] **AC2** — `authorize()` e equivalentes falham fechado para papéis não permitidos
+- [x] **AC3** — O app não expõe `/aluno` ou `/instrutor`; apenas fica pronto para autorização futura
+- [x] **AC4** — Contrato entre `app_metadata.role`, `profiles.role` e helpers SQL fica documentado
+- [x] **AC5** — Casos positivos e negativos de RBAC têm testes
 
 ## Scope
 
@@ -84,6 +86,7 @@ O banco já possui helpers `is_instructor()` e `is_student()`, mas o app ainda t
 
 - 2026-06-24 — @po (Pax) — Story refinada para separar RBAC do hardening de sessão e preservar o escopo publicado atual.
 - 2026-06-24 — @dev (Dex) — Contrato de roles alinhado ao `profiles.role`, `authorize()` reforçado como fail-closed e login HTTP mantido admin-only para preservar o escopo publicado.
+- 2026-06-24 — Codex — ACs reconciliados com `npm run lint`, `npm run typecheck` e `npm test` verdes.
 
 ## Dev Agent Record
 

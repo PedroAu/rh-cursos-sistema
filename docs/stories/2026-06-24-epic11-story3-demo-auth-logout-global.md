@@ -3,6 +3,8 @@
 ## Status
 Ready for Review
 
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+
 ## Executor Assignment
 
 executor: "@dev"  
@@ -29,11 +31,11 @@ O fluxo atual usa Supabase-only. O risco residual mapeado era a presença de art
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Demo auth legado deixa de participar do bundle/fluxo produtivo
-- [ ] **AC2** — A documentação de demo auth reflete o código real
-- [ ] **AC3** — Logout global e fallback local-only ficam explicitamente definidos em Next e Edge
-- [ ] **AC4** — A UI trata 429/rate limit e falhas de logout de forma distinguível onde fizer sentido
-- [ ] **AC5** — Testes cobrem logout global, fallback e isolamento do demo auth
+- [x] **AC1** — Demo auth legado deixa de participar do bundle/fluxo produtivo
+- [x] **AC2** — A documentação de demo auth reflete o código real
+- [x] **AC3** — Logout global e fallback local-only ficam explicitamente definidos em Next e Edge
+- [x] **AC4** — A UI trata 429/rate limit e falhas de logout de forma distinguível onde fizer sentido
+- [x] **AC5** — Testes cobrem logout global, fallback e isolamento do demo auth
 
 ## Scope
 
@@ -75,12 +77,14 @@ O fluxo atual usa Supabase-only. O risco residual mapeado era a presença de art
 - `src/types/index.ts`
 - `docs/DEMO-AUTH.md`
 - `app/api/auth/session/route.ts`
+- `src/lib/rate-limit.ts`
 - `supabase/functions/auth-session/index.ts`
 - `docs/api/auth-session.md`
 - `docs/api/edge-functions.md`
 - `src/__tests__/app/api/auth-session-route.test.ts`
 - `src/__tests__/lib/app-store.test.ts`
 - `src/__tests__/lib/auth.test.ts`
+- `src/__tests__/lib/rate-limit.test.ts`
 - `tests/login-errors.spec.ts`
 - `docs/stories/2026-06-24-epic11-story3-demo-auth-logout-global.md`
 
@@ -88,6 +92,7 @@ O fluxo atual usa Supabase-only. O risco residual mapeado era a presença de art
 
 - 2026-06-24 — @po (Pax) — Story refinada para atacar o maior risco residual identificado na auditoria de EP-11.
 - 2026-06-24 — @dev (Dex) — Removido login simulado do `AppStore`, documentação de demo auth corrigida e contrato de logout padronizado com `mode: global|local-only`.
+- 2026-06-24 — Codex — ACs reconciliados com `npm run lint`, `npm run typecheck` e `npm test` verdes; file list atualizada para incluir rate limiting e seus testes.
 
 ## Dev Agent Record
 

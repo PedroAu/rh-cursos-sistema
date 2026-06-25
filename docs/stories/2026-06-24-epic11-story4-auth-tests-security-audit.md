@@ -3,6 +3,8 @@
 ## Status
 Ready for Review
 
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final do audit, que segue com decisão `WAIVED`.
+
 ## Executor Assignment
 
 executor: "@dev"  
@@ -29,11 +31,11 @@ Hoje há testes de erro e proteção de rota, mas faltam sucesso do login, rota�
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Login bem-sucedido, persistência de sessão e logout são testados
-- [ ] **AC2** — Expiração/rotação e matriz RBAC possuem evidência automatizada
-- [ ] **AC3** — Route Handler e Edge Function de auth têm contract tests mínimos
-- [ ] **AC4** — Audit de segurança dedicado documenta achados, riscos residuais e decisão PASS/WAIVED/FAIL
-- [ ] **AC5** — A épica EP-11 fica fechável sem depender de inferência manual
+- [x] **AC1** — Login bem-sucedido, persistência de sessão e logout são testados
+- [x] **AC2** — Expiração/rotação e matriz RBAC possuem evidência automatizada
+- [x] **AC3** — Route Handler e Edge Function de auth têm contract tests mínimos
+- [x] **AC4** — Audit de segurança dedicado documenta achados, riscos residuais e decisão PASS/WAIVED/FAIL
+- [x] **AC5** — A épica EP-11 fica fechável sem depender de inferência manual
 
 ## Scope
 
@@ -68,15 +70,19 @@ Hoje há testes de erro e proteção de rota, mas faltam sucesso do login, rota�
 
 - `tests/route-auth.spec.ts`
 - `tests/login-errors.spec.ts`
+- `src/__tests__/app/api/auth-session-route.test.ts`
 - `src/__tests__/lib/auth.test.ts`
 - `src/__tests__/lib/authorize.test.ts`
+- `src/__tests__/lib/rate-limit.test.ts`
 - `docs/qa/auth-security-audit-2026-06-24.md`
+- `docs/qa/QA_GATE_REPORT.md`
 - `docs/stories/2026-06-24-epic11-story4-auth-tests-security-audit.md`
 
 ## Change Log
 
 - 2026-06-24 — @po (Pax) — Story refinada para transformar os ACs de segurança da EP-11 em evidência verificável.
 - 2026-06-24 — @dev (Dex) — Adicionados contract tests HTTP para `GET/DELETE /api/auth/session`, fluxo de sucesso do login com persistência local e relatório inicial de auth security audit.
+- 2026-06-24 — Codex — ACs reconciliados com `npm run lint`, `npm run typecheck` e `npm test` verdes; file list alinhada à evidência atual de testes e QA.
 
 ## Dev Agent Record
 

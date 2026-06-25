@@ -258,12 +258,8 @@ PASS
 
 ## Remaining Tasks (Priority Order)
 
-### CRITICAL TODAY (Blockers)
-
-1. **Fix ESLint Configuration** (15 min)
-   - Error: jsx-a11y/button-has-type not found
-   - Solution: Disable problematic rule in eslint.config.mjs
-No open Phase A tasks remain. Any carry-over now belongs to later epics, not to this closure report.
+No open Phase A tasks remain. Any carry-over belongs to later epics and is
+tracked in `docs/PHASE-B-PLAN.md`.
 
 ---
 
@@ -330,10 +326,9 @@ PHASE B START: 2026-06-24 ✅
 
 | Phase | Days | Status | Impact |
 |-------|------|--------|--------|
-| Phase A Completed | 4 days | ✅ 85% | 17/20 AC done |
-| Blockers (same-day) | 0.5 day | ⏳ TODAY | Unblocks everything |
-| Remaining tasks | 2-3 days | ⏳ | Final AC + quality gates |
-| **Phase A Total** | **6-7 days** | **✅ ON TRACK** | **Phase B starts 2026-06-25** |
+| Phase A execution | 2026-06-22 → 2026-06-24 | ✅ COMPLETE | 19 active AC complete |
+| Superseded scope | D-1.1 | ⚪ CLOSED | Absorbed by EP-9 |
+| Transition | 2026-06-24 | ✅ COMPLETE | Phase B authorized to proceed |
 
 ---
 

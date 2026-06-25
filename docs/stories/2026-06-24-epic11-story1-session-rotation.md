@@ -3,6 +3,8 @@
 ## Status
 Ready for Review
 
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+
 ## Executor Assignment
 
 executor: "@dev"  
@@ -29,11 +31,11 @@ Hoje a sessão é emitida no login e expira apenas por TTL fixo. Não há rotaç
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Sessão HMAC/cookie adota rotação deslizante baseada em atividade autenticada
-- [ ] **AC2** — TTL e payload de sessão ficam consistentes entre `src/lib/auth.ts` e `src/lib/supabase/session-token.ts`
-- [ ] **AC3** — `/admin` continua protegido server-side sem regressão de SSR
-- [ ] **AC4** — O contrato de renovação de sessão é documentado para Next Route Handler e Edge Function
-- [ ] **AC5** — Testes cobrem expiração, renovação e falha segura
+- [x] **AC1** — Sessão HMAC/cookie adota rotação deslizante baseada em atividade autenticada
+- [x] **AC2** — TTL e payload de sessão ficam consistentes entre `src/lib/auth.ts` e `src/lib/supabase/session-token.ts`
+- [x] **AC3** — `/admin` continua protegido server-side sem regressão de SSR
+- [x] **AC4** — O contrato de renovação de sessão é documentado para Next Route Handler e Edge Function
+- [x] **AC5** — Testes cobrem expiração, renovação e falha segura
 
 ## Scope
 
@@ -76,6 +78,7 @@ Hoje a sessão é emitida no login e expira apenas por TTL fixo. Não há rotaç
 - `src/lib/auth.ts`
 - `src/lib/server-session.ts`
 - `src/lib/supabase/session-token.ts`
+- `supabase/functions/_shared/auth.ts`
 - `src/__tests__/lib/auth.test.ts`
 - `src/__tests__/lib/session-token.test.ts`
 - `src/__tests__/lib/app-store.test.ts`
@@ -87,6 +90,7 @@ Hoje a sessão é emitida no login e expira apenas por TTL fixo. Não há rotaç
 
 - 2026-06-24 — @po (Pax) — Story refinada a partir de `D-1.4` com foco exclusivo em session rotation, TTL e SSR safety.
 - 2026-06-24 — @dev (Dex) — Implementada rotação deslizante via `GET /api/auth/session`, sincronização do token HMAC no cliente admin e cobertura de expiração/renovação.
+- 2026-06-24 — Codex — ACs reconciliados com `npm run lint`, `npm run typecheck` e `npm test` verdes; file list atualizada com o shared auth da Edge Function.
 
 ## Dev Agent Record
 

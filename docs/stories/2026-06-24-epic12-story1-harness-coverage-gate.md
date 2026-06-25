@@ -3,6 +3,8 @@
 ## Status
 Ready for Review
 
+> ACs reconciliados com a evidência de implementação e com os gates `npm run test:coverage` e `npm run test:e2e:smoke` verdes em 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+
 ## Executor Assignment
 
 executor: "@dev"  
@@ -29,10 +31,10 @@ A base atual já tem boa quantidade de testes, mas a cobertura reportada hoje me
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Ambiente de integração define seed/reset e credenciais de teste de forma repetível
-- [ ] **AC2** — Helper(s) de autenticação de teste permitem login/logout controlados sem duplicação
-- [ ] **AC3** — Coverage gate tem escopo explícito e limiar >= 70% para a suíte relevante
-- [ ] **AC4** — Documentação explica o que é teste real, mockado e de contrato
+- [x] **AC1** — Ambiente de integração define seed/reset e credenciais de teste de forma repetível
+- [x] **AC2** — Helper(s) de autenticação de teste permitem login/logout controlados sem duplicação
+- [x] **AC3** — Coverage gate tem escopo explícito e limiar >= 70% para a suíte relevante
+- [x] **AC4** — Documentação explica o que é teste real, mockado e de contrato
 
 ## Scope
 
@@ -73,12 +75,15 @@ A base atual já tem boa quantidade de testes, mas a cobertura reportada hoje me
 - `playwright.config.ts`
 - `scripts/run-playwright.mjs`
 - `tests/fixtures/admin-store.ts`
+- `docs/epics/epic-12-integration-test-suite.md`
+- `docs/qa/QA_GATE_REPORT.md`
 - `docs/stories/2026-06-24-epic12-story1-harness-coverage-gate.md`
 
 ## Change Log
 
 - 2026-06-24 — @po (Pax) — Story refinada para tornar a evidência de integração e cobertura auditável antes de expandir a suíte.
 - 2026-06-24 — @dev (Subagente 2 / Dex) — Harness tornado auditável sem ampliar escopo: limiar explícito de coverage >= 70% sobre a superfície unitária já medida, script de smoke Playwright separado do baseline visual e descriptor do fixture mockado do admin store.
+- 2026-06-24 — Codex — ACs reconciliados com `npm run test:coverage` verde (95.23% statements / 89.47% branches / 96.42% functions / 96.05% lines) e `npm run test:e2e:smoke` verde (66/66).
 
 ## Dev Agent Record
 
