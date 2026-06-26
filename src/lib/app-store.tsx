@@ -233,6 +233,15 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
+function shouldUseLocalEnrollmentProxy() {
+  if (typeof window === "undefined") return false;
+
+  return (
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname === "localhost"
+  );
+}
+
 export function AppStoreProvider({
   children,
   initialSession = null,
@@ -587,20 +596,21 @@ export function AppStoreProvider({
   }, []);
 
   const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
-    if (isFunctionsConfigured) {
-      try {
-        const response = await invokeFunction("enrollments", { body: payload });
+    if (shouldUseLocalEnrollmentProxy()) {
+      const response = await fetch("/api/enrollments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-        if (!response.ok) {
-          throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
-        }
-      } catch (error) {
-        if (error instanceof Error && /fetch/i.test(error.message)) {
-          toast.error("Serviço indisponível no momento. A inscrição não foi sincronizada.");
-          return;
-        } else {
-          throw error;
-        }
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
+      }
+    } else if (isFunctionsConfigured) {
+      const response = await invokeFunction("enrollments", { body: payload });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
       }
     }
 

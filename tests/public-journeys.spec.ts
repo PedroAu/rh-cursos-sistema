@@ -1,4 +1,8 @@
 import { expect, test } from "@playwright/test";
+import {
+  cleanupEnrollmentArtifacts,
+  createUniqueEmail,
+} from "./helpers/integration-env";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
 
@@ -16,34 +20,47 @@ async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) 
   return href;
 }
 
+function createUniqueCpf() {
+  return Date.now().toString().slice(-11).padStart(11, "0");
+}
+
 test.describe("epica 4 — jornadas publicas", () => {
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
+    const enrollmentEmail = createUniqueEmail("public-journey");
+    const enrollmentCpf = createUniqueCpf();
     const coursePath = await resolveCheckoutCoursePath(page);
-    await page.goto(coursePath);
 
-    await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
-    await page.getByRole("button", { name: "Avançar" }).click();
+    await cleanupEnrollmentArtifacts(enrollmentEmail);
 
-    await expect(page.getByText("Nome deve ter no mínimo 3 caracteres.")).toBeVisible();
-    await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
+    try {
+      await page.goto(coursePath);
 
-    await page.getByLabel("Nome completo").fill("Maria Oliveira");
-    await page.getByLabel("E-mail").fill("maria@empresa.com.br");
-    await page.getByLabel("Telefone / WhatsApp").fill("61999998888");
-    await page.getByLabel("CPF").fill("12345678901");
-    await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+      await page.getByRole("button", { name: "Avançar" }).click();
 
-    await page.getByRole("button", { name: "Avançar" }).click();
+      await expect(page.getByText("Nome deve ter no mínimo 3 caracteres.")).toBeVisible();
+      await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
 
-    await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
-    await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByLabel("Nome completo").fill("Maria Oliveira");
+      await page.getByLabel("E-mail").fill(enrollmentEmail);
+      await page.getByLabel("Telefone / WhatsApp").fill("61999998888");
+      await page.getByLabel("CPF").fill(enrollmentCpf);
+      await page.getByRole("button", { name: "Avançar" }).click();
 
-    await expect(page.getByText("Resumo do pedido")).toBeVisible();
-    await page.getByRole("button", { name: "Confirmar inscrição" }).click();
+      await page.getByRole("button", { name: "Avançar" }).click();
 
-    await expect(page).toHaveURL(/\/inscricao-confirmada/);
-    await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
-    await expect(page.getByText("Aluno")).toBeVisible();
+      await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
+      await page.getByRole("button", { name: "Avançar" }).click();
+
+      await expect(page.getByText("Resumo do pedido")).toBeVisible();
+      await page.getByRole("button", { name: "Confirmar inscrição" }).click();
+
+      await expect(page).toHaveURL(/\/inscricao-confirmada/);
+      await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
+      await expect(page.getByText("Aluno")).toBeVisible();
+    } finally {
+      await cleanupEnrollmentArtifacts(enrollmentEmail);
+    }
   });
 
   test("contato e in-company exibem confirmação inline após envio", async ({ page }) => {

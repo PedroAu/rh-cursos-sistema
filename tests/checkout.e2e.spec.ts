@@ -1,4 +1,11 @@
 import { expect, test } from "@playwright/test";
+import {
+  annotateCanonicalDoc,
+  cleanupEnrollmentArtifacts,
+  createServiceRoleClient,
+  createUniqueEmail,
+  getCanonicalDocs,
+} from "./helpers/integration-env";
 
 /**
  * Baseline E2E do fluxo de receita (checkout/inscrição) — criado ANTES do reskin
@@ -23,40 +30,82 @@ async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) 
   return href;
 }
 
-async function fillPersonalStep(page: import("@playwright/test").Page) {
+function createUniqueCpf() {
+  return Date.now().toString().slice(-11).padStart(11, "0");
+}
+
+async function fillPersonalStep(
+  page: import("@playwright/test").Page,
+  email = "carlos@empresa.com.br",
+  cpf = "98765432100"
+) {
   await page.getByLabel("Nome completo").fill("Carlos Pereira");
-  await page.getByLabel("E-mail").fill("carlos@empresa.com.br");
+  await page.getByLabel("E-mail").fill(email);
   await page.getByLabel("Telefone / WhatsApp").fill("61999990000");
-  await page.getByLabel("CPF").fill("98765432100");
+  await page.getByLabel("CPF").fill(cpf);
 }
 
 test.describe("checkout — baseline de receita", () => {
-  test("bloqueia avanço da etapa de turma sem seleção e conclui após escolher", async ({ page }) => {
-    const coursePath = await resolveCheckoutCoursePath(page);
-    await page.goto(coursePath);
+  test("bloqueia avanço da etapa de turma sem seleção e conclui com o backend real", async ({ page }, testInfo) => {
+    test.setTimeout(60_000);
+    annotateCanonicalDoc(testInfo, getCanonicalDocs().edgeFunctions);
+    const enrollmentEmail = createUniqueEmail("checkout-e2e");
+    const enrollmentCpf = createUniqueCpf();
+    const supabase = createServiceRoleClient();
 
-    await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await cleanupEnrollmentArtifacts(enrollmentEmail);
 
-    // Etapa 1 → 2
-    await fillPersonalStep(page);
-    await page.getByRole("button", { name: "Avançar" }).click();
+    try {
+      const coursePath = await resolveCheckoutCoursePath(page);
+      await page.goto(coursePath);
 
-    // Etapa 2 → 3 (pessoa física: empresa/cargo opcionais)
-    await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+      await expect(page.getByRole("dialog")).toBeVisible();
 
-    // Etapa 3: avançar sem turma deve bloquear com erro inline
-    await page.getByRole("button", { name: "Avançar" }).click();
-    await expect(page.getByText("Escolha uma turma antes de avançar.")).toBeVisible();
-    await expect(page.getByText("Resumo do pedido")).toBeHidden();
+      // Etapa 1 → 2
+      await fillPersonalStep(page, enrollmentEmail, enrollmentCpf);
+      await page.getByRole("button", { name: "Avançar" }).click();
 
-    // Seleciona turma e avança até confirmação
-    await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
-    await page.getByRole("button", { name: "Avançar" }).click();
-    await expect(page.getByText("Resumo do pedido")).toBeVisible();
+      // Etapa 2 → 3 (pessoa física: empresa/cargo opcionais)
+      await page.getByRole("button", { name: "Avançar" }).click();
 
-    await page.getByRole("button", { name: "Confirmar inscrição" }).click();
-    await expect(page).toHaveURL(/\/inscricao-confirmada/);
+      // Etapa 3: avançar sem turma deve bloquear com erro inline
+      await page.getByRole("button", { name: "Avançar" }).click();
+      await expect(page.getByText("Escolha uma turma antes de avançar.")).toBeVisible();
+      await expect(page.getByText("Resumo do pedido")).toBeHidden();
+
+      // Seleciona turma e avança até confirmação
+      await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
+      await page.getByRole("button", { name: "Avançar" }).click();
+      await expect(page.getByText("Resumo do pedido")).toBeVisible();
+
+      await page.getByRole("button", { name: "Confirmar inscrição" }).click();
+      await expect(page).toHaveURL(/\/inscricao-confirmada/);
+
+      let studentId: string | null = null;
+      await expect
+        .poll(async () => {
+          const { data, error } = await supabase
+            .from("aluno")
+            .select("id")
+            .ilike("email", enrollmentEmail);
+
+          if (error) throw error;
+          studentId = data?.[0]?.id ?? null;
+          return studentId ? 1 : 0;
+        })
+        .toBe(1);
+
+      const { data: enrollments, error: enrollmentLookupError } = await supabase
+        .from("inscricao")
+        .select("id")
+        .eq("aluno_id", studentId!);
+
+      if (enrollmentLookupError) throw enrollmentLookupError;
+      expect(enrollments?.length ?? 0).toBeGreaterThan(0);
+    } finally {
+      await cleanupEnrollmentArtifacts(enrollmentEmail);
+    }
   });
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {

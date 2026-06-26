@@ -1,9 +1,9 @@
 # Story EP-11.3: Isolamento definitivo de demo auth e logout global
 
 ## Status
-Ready for Review
+Done
 
-> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-25. Story encerrada como `Done`.
 
 ## Executor Assignment
 
@@ -111,3 +111,53 @@ O fluxo atual usa Supabase-only. O risco residual mapeado era a presença de art
 - O cliente admin não expõe mais `demoAccessList` nem `login()` simulado.
 - `DELETE /api/auth/session` e `DELETE /functions/v1/auth-session` agora retornam se o logout foi `global` ou `local-only`.
 - A UI do logout continua encerrando a sessão local sempre, mas avisa quando a revogação global não pôde ser confirmada.
+
+## QA Results
+
+### Review Date: 2026-06-25
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+O isolamento de demo auth e a semântica de logout ficaram consistentes com o comportamento validado em testes. A suíte atual confirma persistência de login, distinção de `local-only` no contrato e ausência de regressão no shell público/admin.
+
+### Refactoring Performed
+
+Nenhum. Revisão somente de evidência e gate.
+
+### Compliance Check
+
+- Coding Standards: ✓ Sem desvios detectados nesta revisão
+- Project Structure: ✓ Cleanup e documentação permanecem alinhados ao escopo da story
+- Testing Strategy: ✓ Evidência atual validada com `118 passed` em `npm test`
+- All ACs Met: ✓ AC1-AC5 reconciliados com testes e documentação
+
+### Improvements Checklist
+
+- [x] Validado gate completo do branch em 2026-06-25
+- [x] Confirmado o contrato determinístico de logout `global|local-only`
+- [ ] Reavaliar futuramente telemetria/operator messaging para `429` e `503`
+
+### Security Review
+
+Sem bloqueio para fechamento desta story. O logout continua fail-safe localmente mesmo quando a revogação global não é confirmada.
+
+### Performance Considerations
+
+Sem regressão identificada na execução atual.
+
+### Files Modified During Review
+
+- `docs/stories/2026-06-24-epic11-story3-demo-auth-logout-global.md`
+- `docs/qa/gates/epic11.3-demo-auth-logout-global.yml`
+
+### Gate Status
+
+Gate: PASS → `docs/qa/gates/epic11.3-demo-auth-logout-global.yml`
+
+### Recommended Status
+
+[✓ Ready for Done]
+
+- 2026-06-25 — @devops (Gage/Codex) — Revisão final consumida; status promovido de `Ready for Review` para `Done`.

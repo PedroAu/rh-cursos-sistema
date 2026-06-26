@@ -1,9 +1,9 @@
 # Story EP-11.4: Testes de auth e security audit de autenticação
 
 ## Status
-Ready for Review
+Done
 
-> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final do audit, que segue com decisão `WAIVED`.
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-25. Story encerrada como `Done`, mantendo o waiver explícito do audit.
 
 ## Executor Assignment
 
@@ -99,3 +99,55 @@ Hoje há testes de erro e proteção de rota, mas faltam sucesso do login, rota�
 - A suíte Playwright agora cobre rejeição fail-closed para sessão não-admin, rejeição explícita de cookie adulterado e contrato determinístico de logout `local-only`.
 - O login ganhou evidência de sucesso controlado por contrato da rota interna, incluindo persistência do token HMAC no cliente e respeito ao parâmetro `next`.
 - O relatório `docs/qa/auth-security-audit-2026-06-24.md` consolida os achados atuais e mantém a decisão `WAIVED` por risco residual de revogação imediata de JWT, ausência de paridade automatizada da Edge Function neste subescopo e prova positiva ainda indireta para a rotação HTTP.
+
+## QA Results
+
+### Review Date: 2026-06-25
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+Esta story entrega a evidência objetiva que faltava para a EP-11, mas o audit de auth continua corretamente classificado como `WAIVED`, não `PASS`. O gate de hoje confirma `npm run lint`, `npm run typecheck` e `npm test` verdes com `118 passed`, sem remover os riscos residuais já documentados no relatório de segurança.
+
+### Refactoring Performed
+
+Nenhum. Revisão somente de evidência e gate.
+
+### Compliance Check
+
+- Coding Standards: ✓ Sem desvios detectados nesta revisão
+- Project Structure: ✓ Evidência de QA centralizada em `docs/qa/`
+- Testing Strategy: ✓ Evidência atual validada com `118 passed` em `npm test`
+- All ACs Met: ✓ AC1-AC5 atendidos com fechamento formal condicionado ao waiver explícito
+
+### Improvements Checklist
+
+- [x] Validado gate completo do branch em 2026-06-25
+- [x] Confirmada a evidência automatizada mínima pedida pelos ACs
+- [x] Mantido o waiver explícito para riscos residuais conhecidos
+- [ ] Adicionar prova HTTP positiva do caminho de rotação aceito pelo servidor
+- [ ] Confirmar paridade automatizada da Edge Function `auth-session`
+
+### Security Review
+
+Waiver mantido por três pontos residuais sem bloqueio imediato de publicação: revogação não instantânea de JWT já emitido, colapso deliberado de mensagens operacionais em alguns erros de login e ausência de prova E2E positiva do branch de rotação HTTP.
+
+### Performance Considerations
+
+Sem regressão identificada na revisão atual.
+
+### Files Modified During Review
+
+- `docs/stories/2026-06-24-epic11-story4-auth-tests-security-audit.md`
+- `docs/qa/gates/epic11.4-auth-tests-security-audit.yml`
+
+### Gate Status
+
+Gate: WAIVED → `docs/qa/gates/epic11.4-auth-tests-security-audit.yml`
+
+### Recommended Status
+
+[✓ Ready for Done] com aceite explícito do waiver em EP-11.4
+
+- 2026-06-25 — @devops (Gage/Codex) — Revisão final consumida com aceite explícito do waiver; status promovido de `Ready for Review` para `Done`.

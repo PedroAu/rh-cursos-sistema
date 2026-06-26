@@ -2,18 +2,18 @@ status:
   branch: staging/phase-2
   modifiedFiles:
     - .aiox/project-status.yaml
-    - app/api/auth/session/route.ts
-    - docs/diagnosis/contrast-baseline-2026-06-09.md
-    - src/__tests__/lib/app-store.test.ts
-    - src/components/blog/blog-card.tsx
-  modifiedFilesTotalCount: 20
+    - docs/stories/2026-05-14-cronograma-construcao-ate-2026-05-20.md
+    - docs/stories/2026-06-24-epic11-story1-session-rotation.md
+    - docs/stories/2026-06-24-epic11-story2-rbac-unificado.md
+    - docs/stories/2026-06-24-epic11-story3-demo-auth-logout-global.md
+  modifiedFilesTotalCount: 27
   recentCommits:
-    - 'feat(devops): add local quality gate command'
-    - 'chore: exclude tooling state and generated files from git'
+    - 'docs(plan): normalize phase and epic execution status'
+    - 'docs(status): reconcile story checklists and QA evidence'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-24T00:43:17.899Z'
+  lastUpdate: '2026-06-26T01:23:21.819Z'
   isGitRepo: true
-timestamp: 1782261797901
+timestamp: 1782437001820
 ttl: 60
-gitFingerprint: 1782156289261.3447:1782261744575.0942
+gitFingerprint: 1782156289261.3447:1782436109476.5115

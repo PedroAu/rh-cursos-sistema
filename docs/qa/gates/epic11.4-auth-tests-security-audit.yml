@@ -1,0 +1,56 @@
+schema: 1
+story: 'EP-11.4'
+story_title: 'Testes de auth e security audit de autenticação'
+gate: WAIVED
+status_reason: 'A revisão de 2026-06-25 confirmou a evidência automatizada exigida pelos ACs e gates globais verdes, mas o audit continua com waiver válido por riscos residuais conhecidos e documentados.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-06-25T16:52:07Z'
+quality_score: 90
+expires: '2026-07-09T16:52:10Z'
+top_issues:
+  - id: 'WAIVED-01'
+    severity: medium
+    finding: 'Logout global não invalida JWTs já emitidos imediatamente; a mitigação depende do TTL curto e da semântica do Supabase Auth.'
+    suggested_owner: 'po'
+  - id: 'WAIVED-02'
+    severity: medium
+    finding: 'A UI de login ainda colapsa 401/403/429/503 em mensagens genéricas, reduzindo diagnósticos operacionais.'
+    suggested_owner: 'po'
+  - id: 'WAIVED-03'
+    severity: medium
+    finding: 'A prova HTTP positiva do caminho de rotação ainda é indireta neste subescopo.'
+    suggested_owner: 'dev'
+waiver:
+  active: true
+  reason: 'Riscos residuais conhecidos, documentados em docs/qa/auth-security-audit-2026-06-24.md, sem bloqueio imediato de publicação.'
+  approver: 'Team acceptance pending formal epic closure'
+evidence:
+  tests_reviewed: 5
+  risks_identified: 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: 'Waiver mantido por revogação não instantânea de JWT e prova positiva indireta da rotação HTTP.'
+  performance:
+    status: PASS
+    notes: 'Sem regressão observada na revisão atual.'
+  reliability:
+    status: PASS
+    notes: 'Suite atual confirma contratos mínimos de login, sessão e logout.'
+  maintainability:
+    status: PASS
+    notes: 'Artefatos de evidência estão centralizados e rastreáveis.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Adicionar teste automatizado com prova positiva do caminho de rotação HTTP aceito pelo servidor.'
+      refs:
+        - 'tests/route-auth.spec.ts'
+        - 'app/api/auth/session/route.ts'
+    - action: 'Confirmar paridade automatizada da Edge Function auth-session no escopo de segurança.'
+      refs:
+        - 'supabase/functions/auth-session/index.ts'
+        - 'docs/qa/auth-security-audit-2026-06-24.md'

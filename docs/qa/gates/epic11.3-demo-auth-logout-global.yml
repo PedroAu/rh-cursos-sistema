@@ -1,0 +1,38 @@
+schema: 1
+story: 'EP-11.3'
+story_title: 'Isolamento definitivo de demo auth e logout global'
+gate: PASS
+status_reason: 'Revisão de 2026-06-25 confirmou remoção efetiva do demo auth do fluxo produtivo, contrato determinístico de logout e gates obrigatórios verdes. Não há achado bloqueante para fechamento.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-06-25T16:52:07Z'
+quality_score: 100
+expires: '2026-07-09T16:52:10Z'
+top_issues: []
+waiver:
+  active: false
+evidence:
+  tests_reviewed: 5
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Logout segue fail-safe localmente e artefatos demo não participam do fluxo produtivo.'
+  performance:
+    status: PASS
+    notes: 'Nenhuma regressão observada na build ou na suíte atual.'
+  reliability:
+    status: PASS
+    notes: 'Contrato de logout `global|local-only` está estável em testes.'
+  maintainability:
+    status: PASS
+    notes: 'Documentação e comportamento estão alinhados ao código atual.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Avaliar se mensagens operacionais para 429/503 devem ser diferenciadas em produto.'
+      refs:
+        - 'src/views/public/Login.tsx'
+        - 'tests/login-errors.spec.ts'

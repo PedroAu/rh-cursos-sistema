@@ -1,9 +1,9 @@
 # Story EP-11.2: RBAC unificado no app e no Supabase
 
 ## Status
-Ready for Review
+Done
 
-> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-25. Story encerrada como `Done`.
 
 ## Executor Assignment
 
@@ -105,3 +105,53 @@ O banco já possui helpers `is_instructor()` e `is_student()`, mas o app ainda t
 - O app agora tipa explicitamente `admin`, `instructor` e `student` a partir de `profiles.role` do Supabase.
 - `authorize()` continua falhando fechado para sessão ausente, role não permitida ou lista vazia.
 - O login exposto em `/api/auth/session` permanece admin-only; isso preserva a publicação atual sem reativar `/aluno` ou `/instrutor`.
+
+## QA Results
+
+### Review Date: 2026-06-25
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+O RBAC explícito ficou consistente entre tipagem, autorização e escopo de publicação. A revisão atual confirma que a matriz de roles continua fail-closed e que o gate global do branch segue verde em 2026-06-25.
+
+### Refactoring Performed
+
+Nenhum. Revisão somente de evidência e gate.
+
+### Compliance Check
+
+- Coding Standards: ✓ Sem desvios detectados nesta revisão
+- Project Structure: ✓ Contrato app ↔ banco documentado e sem expansão indevida de escopo
+- Testing Strategy: ✓ Evidência atual validada com `118 passed` em `npm test`
+- All ACs Met: ✓ AC1-AC5 confirmados por código e testes
+
+### Improvements Checklist
+
+- [x] Validado gate completo do branch em 2026-06-25
+- [x] Confirmada semântica fail-closed para sessão ausente e role não permitida
+- [x] Confirmado que portais `/aluno` e `/instrutor` seguem fora da publicação
+
+### Security Review
+
+Sem achado bloqueante nesta story. O comportamento admin-only exposto publicamente continua coerente com o escopo vigente.
+
+### Performance Considerations
+
+Sem impacto material de performance identificado na revisão.
+
+### Files Modified During Review
+
+- `docs/stories/2026-06-24-epic11-story2-rbac-unificado.md`
+- `docs/qa/gates/epic11.2-rbac-unificado.yml`
+
+### Gate Status
+
+Gate: PASS → `docs/qa/gates/epic11.2-rbac-unificado.yml`
+
+### Recommended Status
+
+[✓ Ready for Done]
+
+- 2026-06-25 — @devops (Gage/Codex) — Revisão final consumida; status promovido de `Ready for Review` para `Done`.

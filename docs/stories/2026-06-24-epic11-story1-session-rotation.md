@@ -1,9 +1,9 @@
 # Story EP-11.1: Sessão admin com rotação deslizante e expiração consistente
 
 ## Status
-Ready for Review
+Done
 
-> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+> ACs reconciliados com a evidência de implementação e com o quality gate verde de 2026-06-25. Story encerrada como `Done`.
 
 ## Executor Assignment
 
@@ -109,3 +109,53 @@ Hoje a sessão é emitida no login e expira apenas por TTL fixo. Não há rotaç
 - Sessão HMAC agora expira e entra em janela de rotação com 5 minutos restantes.
 - `GET /api/auth/session` sincroniza o cookie SSR e devolve o token atual ou renovado para manter o header `x-rh-session` consistente no cliente.
 - `decodeSessionToken()` passou a rejeitar payloads expirados restaurados do `localStorage`, evitando sessão otimista inválida no admin.
+
+## QA Results
+
+### Review Date: 2026-06-25
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+Implementação coerente com os ACs da story e com o contrato SSR/admin atual. A evidência local de 2026-06-25 confirma `npm run lint`, `npm run typecheck` e `npm test` verdes, com cobertura automatizada suficiente para expiração, renovação e fail-closed.
+
+### Refactoring Performed
+
+Nenhum. Revisão somente de evidência e gate.
+
+### Compliance Check
+
+- Coding Standards: ✓ Sem desvios detectados nesta revisão
+- Project Structure: ✓ Artefatos e file list permanecem consistentes com o escopo
+- Testing Strategy: ✓ Evidência atual validada com `118 passed` em `npm test`
+- All ACs Met: ✓ AC1-AC5 reconciliados com código, docs e testes
+
+### Improvements Checklist
+
+- [x] Validado gate completo do branch em 2026-06-25
+- [x] Confirmada cobertura para expiração, renovação e SSR guard
+- [ ] Fortalecer futuramente a prova HTTP positiva do caminho de rotação fim a fim
+
+### Security Review
+
+Sem achado bloqueante nesta story. A renovação mantém direção segura ao rejeitar sessão expirada/tampered e preservar fail-closed.
+
+### Performance Considerations
+
+Sem regressão observável no gate atual. Build e suíte completa permaneceram estáveis.
+
+### Files Modified During Review
+
+- `docs/stories/2026-06-24-epic11-story1-session-rotation.md`
+- `docs/qa/gates/epic11.1-session-rotation.yml`
+
+### Gate Status
+
+Gate: PASS → `docs/qa/gates/epic11.1-session-rotation.yml`
+
+### Recommended Status
+
+[✓ Ready for Done]
+
+- 2026-06-25 — @devops (Gage/Codex) — Revisão final consumida; status promovido de `Ready for Review` para `Done`.

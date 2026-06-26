@@ -1,0 +1,38 @@
+schema: 1
+story: 'EP-11.2'
+story_title: 'RBAC unificado no app e no Supabase'
+gate: PASS
+status_reason: 'Revisão de 2026-06-25 confirmou fail-closed para autorização, alinhamento explícito de roles e ausência de regressão no escopo publicado. Gates globais do branch seguem verdes.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-06-25T16:52:07Z'
+quality_score: 100
+expires: '2026-07-09T16:52:10Z'
+top_issues: []
+waiver:
+  active: false
+evidence:
+  tests_reviewed: 4
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Autorização segue admin-only no endpoint exposto e falha fechado para roles não permitidas.'
+  performance:
+    status: PASS
+    notes: 'Mudança de tipagem e guardas sem impacto material detectado.'
+  reliability:
+    status: PASS
+    notes: 'Matriz de roles e guards permanece estável no gate atual.'
+  maintainability:
+    status: PASS
+    notes: 'Contrato app_metadata/profiles/SQL ficou explícito e verificável.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Quando os portais futuros forem reativados, expandir a matriz E2E para instructor/student.'
+      refs:
+        - 'src/lib/authorize.ts'
+        - 'tests/route-auth.spec.ts'
