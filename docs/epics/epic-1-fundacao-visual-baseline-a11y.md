@@ -1,5 +1,7 @@
 # Épica 1 — Fundação Visual & Baseline A11y
 
+**Status:** COMPLETE — stories 1.1 a 1.4 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P0 (pré-requisito de tudo — destrava certificados/portal)
 **Rollout:** Big Bang (entra junto com Épica 2 como fundação atômica)

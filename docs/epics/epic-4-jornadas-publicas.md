@@ -1,5 +1,7 @@
 # Épica 4 — Jornadas Públicas
 
+**Status:** COMPLETE — stories 4.1 a 4.4 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P2 (estanca conversão — driver de receita)
 **Depende de:** Épicas 1, 2 (tokens + FormField consolidados)

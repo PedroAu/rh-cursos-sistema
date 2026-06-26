@@ -1,9 +1,10 @@
 # Story EP-12.1: Harness de integração com seed, auth helper e coverage gate
 
 ## Status
-Ready for Review
+Done
 
-> ACs reconciliados com a evidência de implementação e com os gates `npm run test:coverage` e `npm run test:e2e:smoke` verdes em 2026-06-24. A story permanece em `Ready for Review` até revisão final.
+> ACs reconciliados com a evidência de implementação e com os gates `npm run test:coverage` e `npm run test:e2e:smoke` verdes em 2026-06-24.
+> Verificação final repetida em 2026-06-26: implementação presente, `npm run test:coverage` verde e `npm run test:e2e:smoke` verde. Status atualizado para `Done`.
 
 ## Executor Assignment
 
@@ -84,6 +85,7 @@ A base atual já tem boa quantidade de testes, mas a cobertura reportada hoje me
 - 2026-06-24 — @po (Pax) — Story refinada para tornar a evidência de integração e cobertura auditável antes de expandir a suíte.
 - 2026-06-24 — @dev (Subagente 2 / Dex) — Harness tornado auditável sem ampliar escopo: limiar explícito de coverage >= 70% sobre a superfície unitária já medida, script de smoke Playwright separado do baseline visual e descriptor do fixture mockado do admin store.
 - 2026-06-24 — Codex — ACs reconciliados com `npm run test:coverage` verde (95.23% statements / 89.47% branches / 96.42% functions / 96.05% lines) e `npm run test:e2e:smoke` verde (66/66).
+- 2026-06-26 — @dev (Dex) — Implantação de EP-12.1 verificada novamente; gates `test:coverage` e `test:e2e:smoke` verdes; status atualizado para `Done`.
 
 ## Dev Agent Record
 
@@ -95,6 +97,8 @@ A base atual já tem boa quantidade de testes, mas a cobertura reportada hoje me
 
 - `npm run test:coverage`
 - `npm run test:e2e:smoke`
+- 2026-06-26 — `npm run test:coverage` — 245 passed; statements 95.23%, branches 89.47%, functions 96.42%, lines 96.05%
+- 2026-06-26 — `npm run test:e2e:smoke` — 72 passed
 
 ### Completion Notes
 

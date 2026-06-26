@@ -1,6 +1,6 @@
 # Épica 11 — Auth Enhancement
 
-**Status:** IN REVIEW — 4/4 stories `Ready for Review`; security audit `WAIVED`
+**Status:** COMPLETE — EP-11.1 a EP-11.4 `Done`; security audit `WAIVED` com aceite explícito
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-1.4)  
 **Prioridade:** P1  
 **Duração:** 2-3 dias  
@@ -23,32 +23,32 @@ Endurecer a autenticação da plataforma para o próximo ciclo, unificando sess�
 
 ## Acceptance Criteria da Épica
 
-> Os checkboxes permanecem abertos enquanto as quatro stories estiverem em
-> `Ready for Review`. Implementação concluída não equivale a aceite de QA.
+> Os checkboxes abaixo foram reconciliados após o fechamento das stories
+> EP-11.1 a EP-11.4 como `Done` em 2026-06-25.
 
 ### Fase 0: Contrato e superfície atual
-- [ ] **AC-0.1** — Superfície de auth inventariada: `app/api/auth/session`, `supabase/functions/auth-session`, `src/lib/auth.ts`, `src/lib/server-session.ts`, `src/lib/authorize.ts`, `src/lib/app-store.tsx`
-- [ ] **AC-0.2** — Papel fonte-de-verdade definido e documentado entre `app_metadata.role`, `profiles.role` e sessão HMAC
-- [ ] **AC-0.3** — Escopo da publicação atual preservado: `/admin` continua protegido, `/aluno` e `/instrutor` não são habilitados por acidente
+- [x] **AC-0.1** — Superfície de auth inventariada: `app/api/auth/session`, `supabase/functions/auth-session`, `src/lib/auth.ts`, `src/lib/server-session.ts`, `src/lib/authorize.ts`, `src/lib/app-store.tsx`
+- [x] **AC-0.2** — Papel fonte-de-verdade definido e documentado entre `app_metadata.role`, `profiles.role` e sessão HMAC
+- [x] **AC-0.3** — Escopo da publicação atual preservado: `/admin` continua protegido, `/aluno` e `/instrutor` não são habilitados por acidente
 
 ### Fase 1: Hardening de sessão
-- [ ] **AC-1.1** — Sessões rotacionam por atividade com TTL deslizante e sem regressão no SSR
-- [ ] **AC-1.2** — Login e logout têm paridade entre Route Handler do Next e Edge Function equivalente
-- [ ] **AC-1.3** — Logout global revoga sessões Supabase quando houver `service_role`, com fallback explícito e documentado
+- [x] **AC-1.1** — Sessões rotacionam por atividade com TTL deslizante e sem regressão no SSR
+- [x] **AC-1.2** — Login e logout têm paridade entre Route Handler do Next e Edge Function equivalente
+- [x] **AC-1.3** — Logout global revoga sessões Supabase quando houver `service_role`, com fallback explícito e documentado
 
 ### Fase 2: RBAC
-- [ ] **AC-2.1** — Tipos e utilitários do app suportam `admin`, `instructor` e `student` de forma fail-closed
-- [ ] **AC-2.2** — Operações admin rejeitam acessos fora do papel permitido
-- [ ] **AC-2.3** — Contrato app ↔ Supabase fica alinhado com os helpers `is_admin`, `is_instructor`, `is_student`
+- [x] **AC-2.1** — Tipos e utilitários do app suportam `admin`, `instructor` e `student` de forma fail-closed
+- [x] **AC-2.2** — Operações admin rejeitam acessos fora do papel permitido
+- [x] **AC-2.3** — Contrato app ↔ Supabase fica alinhado com os helpers `is_admin`, `is_instructor`, `is_student`
 
 ### Fase 3: Segurança operacional
-- [ ] **AC-3.1** — Demo auth legado não participa do bundle/fluxo produtivo e não pode ser ativado silenciosamente
-- [ ] **AC-3.2** — Rate limiting do login (5 tentativas / 15 min) tem UX e testes explícitos
-- [ ] **AC-3.3** — Riscos de fallback in-memory e dependência de `SUPABASE_SERVICE_ROLE_KEY` ficam documentados
+- [x] **AC-3.1** — Demo auth legado não participa do bundle/fluxo produtivo e não pode ser ativado silenciosamente
+- [x] **AC-3.2** — Rate limiting do login (5 tentativas / 15 min) tem UX e testes explícitos
+- [x] **AC-3.3** — Riscos de fallback in-memory e dependência de `SUPABASE_SERVICE_ROLE_KEY` ficam documentados
 
 ### Fase 4: Verificação
-- [ ] **AC-4.1** — Fluxos de auth críticos têm testes automatizados
-- [ ] **AC-4.2** — Security audit dedicado de autenticação aprovado
+- [x] **AC-4.1** — Fluxos de auth críticos têm testes automatizados
+- [x] **AC-4.2** — Security audit dedicado de autenticação aprovado
 
 ---
 
@@ -74,22 +74,22 @@ Endurecer a autenticação da plataforma para o próximo ciclo, unificando sess�
 ### Story EP-11.1: Sessão admin com rotação deslizante e expiração consistente
 **Objetivo:** introduzir sliding session rotation sem quebrar SSR, cookie e token HMAC  
 **Esforço:** 1 dia
-**Status:** Ready for Review
+**Status:** Done
 
 ### Story EP-11.2: RBAC unificado no app e no Supabase
 **Objetivo:** alinhar tipos, guards e contrato de papéis entre app e banco  
 **Esforço:** 0.5-1 dia
-**Status:** Ready for Review
+**Status:** Done
 
 ### Story EP-11.3: Isolamento definitivo de demo auth e logout global
 **Objetivo:** remover risco residual de credenciais demo no cliente e fechar semântica de sign-out  
 **Esforço:** 0.5 dia
-**Status:** Ready for Review
+**Status:** Done
 
 ### Story EP-11.4: Testes de auth e security audit
 **Objetivo:** provar os fluxos críticos e fechar a épica com evidência de segurança  
 **Esforço:** 0.5-1 dia
-**Status:** Ready for Review — audit `WAIVED`
+**Status:** Done — audit `WAIVED`
 
 ---
 

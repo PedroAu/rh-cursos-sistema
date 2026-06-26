@@ -1,5 +1,7 @@
 # Épica 3 — Admin Polish
 
+**Status:** COMPLETE — stories 3.1 a 3.4 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P1 (a "primeira dor" do solicitante — mas barata, pois 80% já pronto)
 **Depende de:** Épicas 1 e 2 (tokens + FormField + a11y compartilhada)

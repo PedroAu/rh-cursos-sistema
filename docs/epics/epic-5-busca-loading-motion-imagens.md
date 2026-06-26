@@ -1,5 +1,7 @@
 # Épica 5 — Busca, Loading, Motion & Imagens
 
+**Status:** COMPLETE — stories 5.1 a 5.5 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P3
 **Depende de:** Épicas 1, 2 (tokens + componentes)

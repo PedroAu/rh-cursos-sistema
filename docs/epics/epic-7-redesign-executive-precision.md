@@ -3,7 +3,7 @@
 **Tipo:** Brownfield — reskin governado sobre app funcional
 **Autores:** @pm (Morgan) · @architect (Aria) · validado por @po (Pax)
 **Data:** 2026-06-10
-**Status:** **GO — pronto para `@sm *draft` da EP-0.1.** 9 decisões do stakeholder tomadas em 2026-06-10 (§8). Spec Pipeline enxuto concluído: `docs/specs/epic-7-executive-precision/spec.md` **APPROVED 4.6/5** pelo @qa (critique + re-critique em `critique.md`)
+**Status:** COMPLETE — fases/stories do redesign entregues (`Done`). 9 decisões do stakeholder tomadas em 2026-06-10 (§8). Spec Pipeline enxuto concluído: `docs/specs/epic-7-executive-precision/spec.md` **APPROVED 4.6/5** pelo @qa (critique + re-critique em `critique.md`)
 **Fontes (Article IV):** `docs/design/executive-precision/DESIGN.md` (canônico) + 15 telas HTML em `docs/design/executive-precision/screens/` · `docs/prd/modernizacao-ui-2026.md` · `docs/epics/epic-1..6` · verificação direta de código 2026-06-10
 
 ---

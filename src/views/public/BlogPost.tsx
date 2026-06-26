@@ -7,6 +7,7 @@ import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppStore } from "@/lib/app-store";
+import { sanitizeText } from "@/lib/security/sanitize";
 import { formatDate } from "@/lib/utils";
 
 export function BlogPostPage() {
@@ -14,9 +15,10 @@ export function BlogPostPage() {
   const { blogPosts, courses } = useAppStore();
 
   const post = blogPosts.find((item) => item.slug === slug);
+  const safeContent = sanitizeText(post?.content ?? "");
   const relatedPosts = blogPosts.filter((item) => item.slug !== slug && item.category === post?.category).slice(0, 3);
   const relatedCourse = courses.find((course) => course.id === post?.relatedCourseId);
-  const leadParagraphs = post?.content.split("\n\n").slice(0, 3) ?? [];
+  const leadParagraphs = safeContent.split("\n\n").slice(0, 3);
 
   if (!post) {
     return (
@@ -51,7 +53,7 @@ export function BlogPostPage() {
             </div>
             <Card className="border-outline-variant">
               <CardContent className="space-y-5 p-7 md:p-10">
-                {post.content.split("\n\n").map((paragraph) => (
+                {safeContent.split("\n\n").map((paragraph) => (
                   <p key={paragraph} className="mx-auto max-w-3xl text-base leading-8 text-muted-foreground">
                     {paragraph}
                   </p>

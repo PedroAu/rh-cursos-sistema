@@ -1,5 +1,7 @@
 # Épica 2 — Form System & Acessibilidade Compartilhada
 
+**Status:** COMPLETE — stories 2.1 a 2.5 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P0 (entra junto com Épica 1 — fundação Big Bang)
 **Fonte:** Apple HIG plan Fase 2; plano original Fase 2

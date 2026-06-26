@@ -5,6 +5,7 @@ import {
   createServiceRoleClient,
   createUniqueEmail,
   getCanonicalDocs,
+  resolveAvailableCheckoutCoursePath,
 } from "./helpers/integration-env";
 
 /**
@@ -15,20 +16,6 @@ import {
  * risco que o reskin não pode regredir: validação por etapa, navegação para trás,
  * turma obrigatória, deeplink `?checkout=1` e seleção de pagamento.
  */
-
-async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) {
-  await page.goto("/agenda");
-  const href = await page
-    .getByRole("link", { name: "Ver curso" })
-    .first()
-    .getAttribute("href");
-
-  if (!href) {
-    throw new Error("Nenhum curso com turma pública disponível foi encontrado na agenda.");
-  }
-
-  return href;
-}
 
 function createUniqueCpf() {
   return Date.now().toString().slice(-11).padStart(11, "0");
@@ -56,7 +43,7 @@ test.describe("checkout — baseline de receita", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      const coursePath = await resolveCheckoutCoursePath(page);
+      const coursePath = await resolveAvailableCheckoutCoursePath();
       await page.goto(coursePath);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
@@ -109,7 +96,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
-    const coursePath = await resolveCheckoutCoursePath(page);
+    const coursePath = await resolveAvailableCheckoutCoursePath();
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
@@ -123,7 +110,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("inscrição corporativa exige empresa e cargo", async ({ page }) => {
-    const coursePath = await resolveCheckoutCoursePath(page);
+    const coursePath = await resolveAvailableCheckoutCoursePath();
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
@@ -140,14 +127,14 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
-    const coursePath = await resolveCheckoutCoursePath(page);
+    const coursePath = await resolveAvailableCheckoutCoursePath();
     await page.goto(`${coursePath}?checkout=1`);
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Inscrição guiada")).toBeVisible();
   });
 
   test("fechar o modal com Cancelar mantém o usuário na página do curso", async ({ page }) => {
-    const coursePath = await resolveCheckoutCoursePath(page);
+    const coursePath = await resolveAvailableCheckoutCoursePath();
     await page.goto(coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();

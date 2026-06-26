@@ -182,6 +182,44 @@ export async function cleanupEnrollmentArtifacts(email: string) {
   if (studentDeleteError) throw studentDeleteError;
 }
 
+export async function resolveAvailableCheckoutCoursePath() {
+  const supabase = createServiceRoleClient();
+
+  const { data: classes, error: classesError } = await supabase
+    .from("turma")
+    .select("curso_id")
+    .in("status", ["Aberta", "PoucasVagas"])
+    .gt("vagas_restantes", 0)
+    .is("deleted_at", null)
+    .order("data_inicio", { ascending: true })
+    .limit(20);
+
+  if (classesError) throw classesError;
+  if (!classes || classes.length === 0) {
+    throw new Error("Nenhuma turma disponível para checkout foi encontrada no ambiente de integração.");
+  }
+
+  const courseIds = [...new Set(classes.map((item) => item.curso_id))];
+  const { data: courses, error: coursesError } = await supabase
+    .from("curso")
+    .select("id,slug")
+    .in("id", courseIds)
+    .in("status", ["Ativo", "Destaque"])
+    .is("deleted_at", null);
+
+  if (coursesError) throw coursesError;
+
+  const course = courseIds
+    .map((courseId) => courses?.find((item) => item.id === courseId))
+    .find((item): item is NonNullable<typeof courses>[number] => Boolean(item?.slug));
+
+  if (!course) {
+    throw new Error("Nenhum curso ativo com turma disponível foi encontrado no ambiente de integração.");
+  }
+
+  return `/cursos/${course.slug}`;
+}
+
 export function createUniqueEmail(prefix: string) {
   const slug = prefix.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase();
   return `${slug}-${Date.now()}@rhcursos.test`;

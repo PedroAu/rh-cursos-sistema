@@ -1,6 +1,6 @@
 # Épica 13 — API Documentation
 
-**Status:** IN PROGRESS — EP-13.1/13.2 `Done`; EP-13.3 `Approved`
+**Status:** IN PROGRESS — EP-13.1 e EP-13.2 `Done`; EP-13.3 `Approved`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-4.2)  
 **Prioridade:** P2  
 **Duração:** 1-2 dias  

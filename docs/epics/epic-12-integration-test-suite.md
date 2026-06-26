@@ -1,6 +1,6 @@
 # Épica 12 — Integration Test Suite
 
-**Status:** IN PROGRESS — EP-12.1 `Ready for Review`; EP-12.2 a EP-12.4 `Approved`
+**Status:** IN PROGRESS — EP-12.1 e EP-12.3 `Done`; EP-12.2 `Ready for Review`; EP-12.4 `Approved`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-3.2)  
 **Prioridade:** P1  
 **Duração:** 2-3 dias  
@@ -22,12 +22,12 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 
 ## Acceptance Criteria da Épica
 
-> Apenas stories `Done` podem encerrar AC da épica. EP-12.1 aguarda revisão;
-> EP-12.2 a EP-12.4 ainda aguardam implementação.
+> Apenas stories `Done` podem encerrar AC da épica. EP-12.1 e EP-12.3
+> concluídas; EP-12.2 aguarda revisão final e EP-12.4 ainda aguarda implementação.
 
 ### Fase 0: Harness e evidência
-- [ ] **AC-0.1** — Ambiente de integração reproduzível definido (seed, auth helper, reset)
-- [ ] **AC-0.2** — Cobertura reportada com escopo explícito, sem depender apenas do subset atual do Vitest
+- [x] **AC-0.1** — Ambiente de integração reproduzível definido (seed, auth helper, reset)
+- [x] **AC-0.2** — Cobertura reportada com escopo explícito, sem depender apenas do subset atual do Vitest
 
 ### Fase 1: Jornadas críticas
 - [ ] **AC-1.1** — Checkout flow testado fim a fim
@@ -35,9 +35,9 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 - [ ] **AC-1.3** — Matrícula em curso validada contra backend real
 
 ### Fase 2: Contratos
-- [ ] **AC-2.1** — `app/api/auth/session` coberto por contract/integration tests
-- [ ] **AC-2.2** — Edge Functions `enrollments`, `leads`, `admin-resources`, `auth-session` cobertas por contract tests
-- [ ] **AC-2.3** — Operações administrativas críticas testadas com autenticação válida e inválida
+- [x] **AC-2.1** — `app/api/auth/session` coberto por contract/integration tests
+- [x] **AC-2.2** — Edge Functions `enrollments`, `leads`, `admin-resources`, `auth-session` cobertas por contract tests
+- [x] **AC-2.3** — Operações administrativas críticas testadas com autenticação válida e inválida
 
 ### Fase 3: Banco e confiabilidade
 - [ ] **AC-3.1** — Casos transacionais críticos testados (duplicidade, concorrência, rollback)
@@ -67,17 +67,17 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 ### Story EP-12.1: Harness de integração com seed, auth helper e coverage gate
 **Objetivo:** estabilizar a base para testes reais e produzir cobertura auditável  
 **Esforço:** 0.5-1 dia
-**Status:** Ready for Review
+**Status:** Done
 
 ### Story EP-12.2: Fluxos críticos E2E reais — login, logout e checkout
 **Objetivo:** provar os journeys principais contra o backend real  
 **Esforço:** 0.5-1 dia
-**Status:** Approved — implementação pendente
+**Status:** Ready for Review
 
 ### Story EP-12.3: Contract tests dos endpoints híbridos
 **Objetivo:** validar formatos, códigos e auth dos endpoints Next + Supabase  
 **Esforço:** 0.5-1 dia
-**Status:** Approved — cobertura Next parcial; Edge Functions pendentes
+**Status:** Done
 
 ### Story EP-12.4: Testes transacionais de banco e RLS
 **Objetivo:** fechar o risco de concorrência, duplicidade e autorização em dados  

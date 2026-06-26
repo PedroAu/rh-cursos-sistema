@@ -1,19 +1,19 @@
 status:
-  branch: staging/phase-2
+  branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
-    - docs/stories/2026-05-14-cronograma-construcao-ate-2026-05-20.md
-    - docs/stories/2026-06-24-epic11-story1-session-rotation.md
-    - docs/stories/2026-06-24-epic11-story2-rbac-unificado.md
-    - docs/stories/2026-06-24-epic11-story3-demo-auth-logout-global.md
-  modifiedFilesTotalCount: 27
+    - docs/DEMO-AUTH.md
+    - docs/PHASE-A-ACTION-PLAN.md
+    - docs/PHASE-A-CONSOLIDATION-REPORT.md
+    - docs/PHASE-A-EXECUTION-STATUS.md
+  modifiedFilesTotalCount: 110
   recentCommits:
-    - 'docs(plan): normalize phase and epic execution status'
-    - 'docs(status): reconcile story checklists and QA evidence'
+    - 'merge: integrate story/1.1-baseline-a11y-clean into main'
+    - 'merge: integrate staging/phase-2 into main'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-26T01:23:21.819Z'
+  lastUpdate: '2026-06-26T13:01:40.894Z'
   isGitRepo: true
-timestamp: 1782437001820
+timestamp: 1782478900895
 ttl: 60
-gitFingerprint: 1782156289261.3447:1782436109476.5115
+gitFingerprint: 1782438372335.9148:1782478090011.8213

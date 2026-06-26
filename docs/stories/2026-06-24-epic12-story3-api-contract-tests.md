@@ -1,11 +1,14 @@
 # Story EP-12.3: Contract tests dos endpoints híbridos
 
 ## Status
-Ready for Review
+Done
 
 > Validação PO concluída em 2026-06-25: **GO (9/10)**. A story foi refinada
 > com matriz mínima de contratos, ambiente exigido, rastreabilidade Task→AC e
 > comandos reproduzíveis.
+> Verificação final repetida em 2026-06-26: implementação presente, `lint`,
+> `typecheck` e suíte direcionada de contratos verdes. Status atualizado para
+> `Done`.
 
 ## Executor Assignment
 
@@ -40,10 +43,10 @@ Os docs manuais já descrevem bem a superfície HTTP, mas faltam testes automati
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — `app/api/auth/session` possui contract tests de POST e DELETE
-- [ ] **AC2** — `enrollments`, `leads`, `admin-resources` e `auth-session` possuem contract tests mínimos
-- [ ] **AC3** — Casos de `401/403/405/429` relevantes ficam cobertos
-- [ ] **AC4** — Os testes referenciam a documentação canônica de API quando aplicável
+- [x] **AC1** — `app/api/auth/session` possui contract tests de POST e DELETE
+- [x] **AC2** — `enrollments`, `leads`, `admin-resources` e `auth-session` possuem contract tests mínimos
+- [x] **AC3** — Casos de `401/403/405/429` relevantes ficam cobertos
+- [x] **AC4** — Os testes referenciam a documentação canônica de API quando aplicável
 
 ## Scope
 
@@ -118,6 +121,8 @@ Os docs manuais já descrevem bem a superfície HTTP, mas faltam testes automati
 - `tests/api-contract.spec.ts`
 - `tests/route-auth.spec.ts`
 - `tests/helpers/integration-env.ts`
+- `tests/checkout.e2e.spec.ts`
+- `tests/public-journeys.spec.ts`
 - `docs/stories/2026-06-24-epic12-story3-api-contract-tests.md`
 
 ## Dev Agent Record
@@ -134,6 +139,11 @@ GPT-5 Codex
 - `node scripts/run-playwright.mjs tests/api-contract.spec.ts tests/checkout.e2e.spec.ts tests/login-errors.spec.ts --project=functional` — 17 passed
 - `node scripts/run-playwright.mjs tests/public-journeys.spec.ts tests/api-contract.spec.ts tests/checkout.e2e.spec.ts tests/login-errors.spec.ts --project=functional` — 21 passed
 - `npm test` — 124 passed
+- 2026-06-26 — `npm run lint` — passed
+- 2026-06-26 — `npm run typecheck` — passed
+- 2026-06-26 — `node scripts/run-playwright.mjs --project=functional tests/api-contract.spec.ts tests/route-auth.spec.ts` — 26 passed
+- 2026-06-26 — `node scripts/run-playwright.mjs --project=functional tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts tests/api-contract.spec.ts tests/route-auth.spec.ts` — 35 passed
+- 2026-06-26 — `npm test` — 124 passed
 
 ### Completion Notes List
 
@@ -141,6 +151,7 @@ GPT-5 Codex
 - Added direct HTTP contract coverage for Supabase Edge Functions `auth-session`, `enrollments`, `leads` and `admin-resources`.
 - Centralized integration environment, service-role client, test user provisioning, canonical API doc annotations and cleanup helpers in `tests/helpers/integration-env.ts`.
 - Kept remote Edge Function rate-limit assertions limited to deterministic local/Next coverage because upstream gateway headers do not reliably preserve synthetic client IP.
+- Hardened checkout E2E setup to resolve an active course with an available class via the integration database instead of using the first agenda card, which can point to an `Encerrada` class as real data changes.
 
 ## Validação PO
 
@@ -163,3 +174,4 @@ GPT-5 Codex
 - 2026-06-24 — @po (Pax) — Story refinada para tornar a superfície HTTP da plataforma verificável por contrato.
 - 2026-06-25 — @po (Pax) — Validação GO 9/10; definida matriz mínima de contratos, segurança do harness, Task→AC e comandos targeted.
 - 2026-06-25 — @dev (Dex) — Implementados contract tests HTTP dos endpoints híbridos; gates completos passaram.
+- 2026-06-26 — @dev (Dex) — EP-12.3 verificada novamente; ACs reconciliados, checkout E2E estabilizado contra dados reais, suíte completa verde e status atualizado para `Done`.

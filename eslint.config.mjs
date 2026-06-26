@@ -15,6 +15,7 @@ const eslintConfig = [
       "legacy/**",
       "node_modules/**",
       "playwright-report/**",
+      "storybook-static/**",
       "test-results/**",
       "supabase/functions/**",
       "next-env.d.ts"
@@ -23,7 +24,7 @@ const eslintConfig = [
   ...nextCoreWebVitals,
   ...nextTypescript,
   {
-    ignores: ["coverage/**"]
+    ignores: ["coverage/**", "dist/**"]
   },
   {
     rules: {

@@ -30,6 +30,7 @@ const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 test.describe("A11y — Axe-core CI Integration", () => {
   for (const route of publicRoutes) {
     test(`rota ${route} passa no Axe-core WCAG 2.1 A/AA`, async ({ page }) => {
+      await page.emulateMedia({ reducedMotion: "reduce" });
       await page.goto(route, { waitUntil: "domcontentloaded" });
       // Aguarda body visível e dá folga para conteúdo carregar
       // (networkidle é instável em rotas com imagens remotas/polling)
@@ -111,6 +112,7 @@ test.describe("A11y — Relatório consolidado", () => {
       }
 
       try {
+        await page.emulateMedia({ reducedMotion: "reduce" });
         await page.goto(route, { waitUntil: "domcontentloaded" });
         await page.locator("body").waitFor({ state: "visible" });
         await page.waitForTimeout(500);

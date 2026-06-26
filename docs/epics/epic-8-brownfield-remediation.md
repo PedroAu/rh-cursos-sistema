@@ -1,10 +1,39 @@
 # Épica 8 — Brownfield Remediation — Technical Debt Resolution
 
-**Status:** PROPOSED (ready for assignment)  
+**Status:** DONE — evidência local reconciliada; itens dependentes de serviço externo ficaram documentados como opt-in e não como concluídos sem validação  
 **PRD:** `docs/architecture/technical-debt-assessment.md`  
 **Prioridade:** P0 (critical for product quality & maintainability)  
 **Rollout:** Phased (4 stories, 6-8 weeks)  
 **Fonte:** Brownfield Discovery Phase 8 — Technical Debt Assessment + specialist reviews (Phases 1-7)
+
+---
+
+## Execução Atual
+
+> Auditoria e reconciliação @dev em 2026-06-26: a épica agregada tinha ACs
+> marcados como concluídos sem evidência local suficiente para parte de Phase
+> B-D. A lacuna foi tratada pela story `EP-8.final`, que adicionou
+> implementação, comandos reprodutíveis e documentação verificável para os
+> itens restantes.
+
+**Evidência presente:**
+- Phase A: error boundaries, axe/playwright, testes, coverage, README/API docs e fundamentos de acessibilidade existem no repositório atual.
+- Phase B: security headers, OpenAPI, env validation, CI workflows, rate-limit e Sentry opt-in existem.
+- Phase C: Storybook mínimo, bundle analyzer, Lighthouse CLI e sanitização com testes existem.
+- Phase D parcial: auditoria de dependências executada localmente; permaneceu um advisory alto transitivo em dependência do Storybook sem correção segura via upgrade automático.
+
+**Lacunas externas ou deliberadamente não prometidas como concluídas:**
+- Sentry não foi validado contra projeto remoto porque depende de DSN/credenciais e alerting externos.
+- O processo contínuo de security audit segue operacional, mas a remediação do advisory transitivo do ecossistema Storybook depende de atualização compatível de terceiros.
+
+**Fechamento aplicado nesta execução:**
+- `@sentry/nextjs` configurado em modo opt-in para client/server/edge.
+- `@next/bundle-analyzer` habilitado com `ANALYZE=true`.
+- `@lhci/cli` configurado com `lighthouserc.cjs` e script reproduzível.
+- Storybook configurado com `@storybook/nextjs` e addon de acessibilidade.
+- Sanitização de HTML/texto/URL implementada e coberta por testes unitários.
+- Conteúdo público do blog passou a consumir texto sanitizado.
+- Gates locais verificados: `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`, `npm run storybook:build`.
 
 ---
 

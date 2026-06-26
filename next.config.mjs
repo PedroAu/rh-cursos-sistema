@@ -1,6 +1,11 @@
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const rootDir = process.cwd();
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true"
+});
 
 initOpenNextCloudflareForDev();
 
@@ -30,4 +35,17 @@ const nextConfig = {
   }
 };
 
-export default nextConfig;
+const sentryOptions = {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true
+    }
+  }
+};
+
+export default withSentryConfig(withBundleAnalyzer(nextConfig), sentryOptions);

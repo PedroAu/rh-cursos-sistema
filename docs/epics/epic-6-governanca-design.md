@@ -1,5 +1,7 @@
 # Épica 6 — Governança de Design
 
+**Status:** COMPLETE — stories 6.1 a 6.3 `Done`
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P4
 **Depende de:** Épicas 1-5 (sistema consolidado)

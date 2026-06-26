@@ -2,23 +2,10 @@ import { expect, test } from "@playwright/test";
 import {
   cleanupEnrollmentArtifacts,
   createUniqueEmail,
+  resolveAvailableCheckoutCoursePath,
 } from "./helpers/integration-env";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
-
-async function resolveCheckoutCoursePath(page: import("@playwright/test").Page) {
-  await page.goto("/agenda");
-  const href = await page
-    .getByRole("link", { name: "Ver curso" })
-    .first()
-    .getAttribute("href");
-
-  if (!href) {
-    throw new Error("Nenhum curso com turma pública disponível foi encontrado na agenda.");
-  }
-
-  return href;
-}
 
 function createUniqueCpf() {
   return Date.now().toString().slice(-11).padStart(11, "0");
@@ -28,7 +15,7 @@ test.describe("epica 4 — jornadas publicas", () => {
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
-    const coursePath = await resolveCheckoutCoursePath(page);
+    const coursePath = await resolveAvailableCheckoutCoursePath();
 
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
