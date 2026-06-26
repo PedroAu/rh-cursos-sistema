@@ -1,1 +1,216 @@
+# RH Cursos — Plataforma de Cursos
 
+Plataforma SaaS de cursos corporativos da RH Cursos: catálogo público, fluxo de inscrição/checkout, área administrativa e captação de leads in-company. Aplicação fullstack com SSR, design system próprio e banco gerenciado no Supabase, publicada em Cloudflare Workers.
+
+---
+
+## Stack
+
+| Camada | Tecnologia |
+|--------|-----------|
+| **Framework** | Next.js 16 (App Router, SSR) |
+| **UI** | React 19, TypeScript 5.8 |
+| **Estilo** | Tailwind CSS + Mantine + Radix UI (design tokens unificados via CSS custom properties) |
+| **Estado** | AppStore (Supabase como fonte única de dados, real-time subscriptions) |
+| **Validação** | Zod |
+| **Backend** | Supabase (Postgres, Auth, Edge Functions, RLS) |
+| **Deploy** | Cloudflare Workers via `@opennextjs/cloudflare` |
+| **Testes** | Vitest + React Testing Library (unit) · Playwright + Axe-core (E2E/a11y) |
+| **Analytics** | Google Analytics 4 (opcional, no-op sem `NEXT_PUBLIC_GA_MEASUREMENT_ID`) |
+
+---
+
+## Pré-requisitos
+
+- **Node.js >= 24** (ver `engines` no `package.json`)
+- **npm**
+- Um projeto **Supabase** de teste (para desenvolvimento local — nunca use credenciais de produção no dev)
+
+---
+
+## Quick Start
+
+```bash
+# 1. Instalar dependências
+npm install
+
+# 2. Configurar variáveis de ambiente
+cp .env.example .env.local
+#    Edite .env.local e aponte para um projeto Supabase de TESTE.
+
+# 3. Rodar em modo desenvolvimento
+npm run dev
+#    App disponível em http://localhost:3000
+```
+
+### Variáveis de ambiente essenciais
+
+Consulte `.env.example` para a lista completa e comentada. As principais:
+
+| Variável | Obrigatória | Descrição |
+|----------|-------------|-----------|
+| `AUTH_SESSION_SECRET` | Sim (produção) | Segredo de assinatura do cookie de sessão (mín. 32 chars) |
+| `NEXT_PUBLIC_SUPABASE_URL` | Sim | URL pública do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Sim | Anon key (segura para o frontend) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Sim (scripts/migrations) | Service role key — **secreta**, nunca exposta no frontend |
+| `SUPABASE_DB_URL` | Scripts locais | Connection string Postgres |
+| `NEXT_PUBLIC_APP_URL` | Sim | URL pública do app (CORS, redirects) |
+| `NEXT_PUBLIC_ENABLE_DEMO_AUTH` | Não | Feature flag do demo auth (**`false` por padrão**) |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Não | ID do GA4 (sem ele, analytics fica inativo) |
+
+> **Segurança:** o demo auth é desabilitado por padrão e jamais deve ser ativado em produção. Detalhes em [`docs/DEMO-AUTH.md`](docs/DEMO-AUTH.md).
+
+---
+
+## Scripts npm
+
+| Script | Descrição |
+|--------|-----------|
+| `npm run dev` | Servidor de desenvolvimento (Next.js) |
+| `npm run build` | Build de produção |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `next typegen` + `tsc --noEmit` |
+| `npm test` | Gate completo: typecheck + build + Playwright (E2E/visual/a11y) |
+| `npm run test:unit` | Testes unitários (Vitest) |
+| `npm run test:coverage` | Testes unitários com cobertura |
+| `npm run test:watch` | Vitest em modo watch |
+| `npm run devops:all` | Fluxo local seguro pré-push (lint, typecheck, build, test, CodeRabbit) |
+| `npm run build:workers` | Build para Cloudflare Workers (OpenNext) |
+| `npm run preview:workers` | Build + preview local do bundle Workers |
+| `npm run deploy:workers` | Build + deploy para Cloudflare Workers |
+| `npm run verify:workers` | Verificação pós-deploy |
+| `npm run seed:admin` | Seed de usuário admin (usa `.env.local`) |
+
+---
+
+## Estrutura do projeto
+
+```
+app/                    # Next.js App Router (rotas, layouts, páginas)
+├── admin/              # Área administrativa (protegida)
+├── api/                # Route Handlers (ex.: auth/session)
+├── cursos/ curso/      # Catálogo e detalhe de curso
+├── agenda/ blog/       # Conteúdo público
+├── contato/ in-company/falar-com-especialista/  # Captação/leads
+├── error.tsx           # Error boundary de rota
+└── global-error.tsx    # Error boundary global
+
+src/
+├── components/         # Componentes de UI (design system)
+├── features/           # Módulos por feature (clean architecture feature-first)
+├── views/              # Composições de página
+├── hooks/              # Custom hooks
+├── lib/                # Utilitários, auth, rate-limit, Supabase clients
+├── data/               # Acesso a dados / AppStore
+├── design-tokens/      # Tokens de cor/superfície (Mantine ↔ Tailwind)
+├── theme/ styles/      # Tema e estilos globais
+├── types/              # Tipos TypeScript compartilhados
+└── __tests__/          # Testes unitários (Vitest)
+
+supabase/
+├── functions/          # Edge Functions (auth-session, enrollments, leads, admin-resources)
+└── migrations/         # 13 migrations versionadas
+
+docs/                   # Documentação (arquitetura, database, design, API, stories)
+tests/                  # Testes E2E/visual/a11y (Playwright)
+scripts/                # Automação (deploy, devops, seed, runners)
+```
+
+---
+
+## API
+
+A documentação dos endpoints está em [`docs/api/README.md`](docs/api/README.md). A API é dividida em duas camadas:
+
+- **Route Handlers (Next.js):** login/logout administrativo via `/api/auth/session`
+- **Edge Functions (Supabase):** `enrollments`, `leads`, `admin-resources`, `auth-session`
+
+### Convenções Gerais
+
+- **Formato:** todas as respostas são JSON com envelope `{ "ok": boolean, ... }`
+- **Erro:** `{ "ok": false, "error": "descrição" }`
+- **Autenticação:** cookie HttpOnly (`SESSION_COOKIE`) para rotas admin, JWT para Edge Functions
+- **Rate limiting:** endpoints sensíveis limitam por IP e retornam `429` com header `Retry-After`
+- **CORS:** Edge Functions validam header `Origin` contra allowlist
+
+---
+
+## Banco de dados
+
+Schema, auditoria e políticas RLS documentados em:
+
+- [`docs/database/SCHEMA.md`](docs/database/SCHEMA.md) — esquema completo
+- [`docs/database/DB-AUDIT.md`](docs/database/DB-AUDIT.md) — auditoria de segurança (rating A+)
+
+Migrations versionadas em `supabase/migrations/` (13 migrations estáveis, 100% de cobertura RLS).
+
+---
+
+## Deploy (Cloudflare Workers)
+
+O projeto é publicado em Cloudflare Workers via `@opennextjs/cloudflare`:
+
+```bash
+# Validar o bundle localmente antes de publicar
+npm run preview:workers
+
+# Build + deploy
+npm run deploy:workers
+
+# Verificação pós-deploy
+npm run verify:workers
+```
+
+Variáveis sensíveis em produção devem ser configuradas como **secrets** do Worker
+(`wrangler secret put <NOME>`) ou no painel do Cloudflare — nunca commitadas.
+
+---
+
+## Testes
+
+```bash
+npm run test:unit        # Unitários (Vitest + RTL) — ~91% de cobertura
+npm run test:coverage    # Com relatório de cobertura
+npm test                 # Gate completo (typecheck + build + Playwright E2E/visual/a11y)
+```
+
+A suíte E2E inclui gates de acessibilidade (Axe-core), regressão visual, navegação por
+teclado e contraste de cores (WCAG 2.1 AA).
+
+---
+
+## Troubleshooting
+
+| Sintoma | Causa provável | Solução |
+|---------|----------------|---------|
+| `npm run typecheck` falha com erro de tipo em `NODE_ENV` | Atribuição direta a `process.env` em testes | Use `vi.stubEnv()` no Vitest |
+| `npm run build` falha por variável Supabase ausente | `.env.local` não configurado | Copie `.env.example` → `.env.local` e preencha as chaves |
+| Login retorna `503 Auth indisponivel` | Supabase server não configurado | Verifique `NEXT_PUBLIC_SUPABASE_URL` e service role key |
+| Login retorna `429` | Rate limit (proteção brute-force) | Aguarde o `Retry-After`; o limite é por IP |
+| Demo auth não funciona | Flag desabilitada (padrão seguro) | Em dev, defina `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true` no `.env.local` |
+| Playwright instável sob concorrência | Specs visuais/axe paralelos | Os runners já forçam execução sequencial (`--workers=1`) |
+
+---
+
+## Documentação Adicional
+
+**API & Endpoints:**
+- [`docs/api/README.md`](docs/api/README.md) — overview de endpoints e convenções gerais
+
+**Arquitetura & Design:**
+- [`docs/architecture/system-architecture.md`](docs/architecture/system-architecture.md) — visão geral do sistema
+- [`docs/architecture/frontend-feature-first-architecture.md`](docs/architecture/frontend-feature-first-architecture.md) — feature-first
+
+**Banco de dados & Segurança:**
+- [`docs/database/SCHEMA.md`](docs/database/SCHEMA.md) — esquema completo
+- [`docs/database/DB-AUDIT.md`](docs/database/DB-AUDIT.md) — auditoria (rating A+)
+
+**Features & Configuração:**
+- [`docs/DEMO-AUTH.md`](docs/DEMO-AUTH.md) — feature flag de demo auth
+- [`docs/TECHNICAL-DEBT-REPORT.md`](docs/TECHNICAL-DEBT-REPORT.md) — avaliação de dívida técnica
+
+---
+
+## Licença
+
+Projeto proprietário — RH Cursos. Todos os direitos reservados.

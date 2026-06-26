@@ -7,7 +7,7 @@
  * 1ª camada, auth.users.user_metadata.role).
  *
  * Uso:
- *   ADMIN_EMAIL=admin@rhcursos.com.br node --env-file=.env scripts/promote-admin.js
+ *   ADMIN_EMAIL=admin@rhcursos.com.br node --env-file=.env.local scripts/promote-admin.js
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -22,7 +22,9 @@ function fail(message) {
 }
 
 if (!supabaseUrl || !serviceKey) {
-  fail("Defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no ambiente (.env).");
+  fail(
+    "Defina NEXT_PUBLIC_SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no ambiente (.env.local ou variaveis exportadas)."
+  );
 }
 
 const supabase = createClient(supabaseUrl, serviceKey, {

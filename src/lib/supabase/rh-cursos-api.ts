@@ -1,11 +1,20 @@
 import type { Enrollment, Lead } from "@/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
 import {
   leadToInsert,
+  mapAssessmentToTestimonial,
+  mapBlogPost,
   mapClass,
   mapCourse,
   mapInstructor,
   mapLead,
+  toDbPaymentMethod,
+  toDbStudentType,
+  type AssessmentWithCourseRow,
+  type BlogPostRow,
   type ClassRow,
   type CourseInstructorRow,
   type CourseRow,
@@ -13,23 +22,25 @@ import {
   type LeadRow
 } from "@/lib/supabase/mappers";
 
-export async function fetchPublicCatalogFromSupabase() {
-  if (!supabase) return null;
+type RhCursosClient = SupabaseClient<Database>;
+
+async function fetchPublicCatalog(client: RhCursosClient | null) {
+  if (!client) return null;
 
   const [coursesResult, classesResult, instructorsResult, courseInstructorsResult] = await Promise.all([
-    supabase
+    client
       .from("curso")
-      .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,trilha_id,trilha_nome,tipo_publico,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+      .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
       .order("titulo"),
-    supabase
+    client
       .from("turma")
       .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
       .order("data_inicio"),
-    supabase
+    client
       .from("instrutor")
-      .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,areas_atuacao,rating,status")
+      .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
       .order("nome"),
-    supabase
+    client
       .from("curso_instrutor")
       .select("id,curso_id,instrutor_id,principal")
   ]);
@@ -51,6 +62,53 @@ export async function fetchPublicCatalogFromSupabase() {
   };
 }
 
+async function fetchPublicBlogPosts(client: RhCursosClient | null) {
+  if (!client) return null;
+
+  const result = await client
+    .from("post_blog")
+    .select("id,titulo,slug,resumo,conteudo,categoria,tags,autor,publicado_em,tempo_leitura,status,imagem_url,curso_id,created_at")
+    .eq("status", "Publicado")
+    .order("publicado_em", { ascending: false });
+
+  if (result.error) throw result.error;
+
+  return (result.data as BlogPostRow[]).map(mapBlogPost);
+}
+
+export function fetchPublicCatalogFromSupabase() {
+  return fetchPublicCatalog(supabase);
+}
+
+export function fetchPublicCatalogFromSupabaseServer() {
+  return fetchPublicCatalog(createSupabaseServerClient());
+}
+
+export function fetchPublicBlogPostsFromSupabase() {
+  return fetchPublicBlogPosts(supabase);
+}
+
+export function fetchPublicBlogPostsFromSupabaseServer() {
+  return fetchPublicBlogPosts(createSupabaseServerClient());
+}
+
+export async function fetchPublicTestimonialsFromSupabase() {
+  if (!supabase) return null;
+
+  // `avaliacao` has public RLS for published rows, but current migrations do not
+  // grant explicit anon Data API access. Keep this isolated from catalog loading.
+  const result = await supabase
+    .from("avaliacao")
+    .select("id,inscricao_id,turma_id,nota,comentario,publicar,created_at,updated_at,deleted_at,turma(curso(titulo))")
+    .eq("publicar", true)
+    .not("comentario", "is", null)
+    .order("created_at", { ascending: false });
+
+  if (result.error) throw result.error;
+
+  return (result.data as AssessmentWithCourseRow[]).map(mapAssessmentToTestimonial);
+}
+
 export async function fetchLeadsFromSupabase() {
   if (!supabase) return null;
 
@@ -59,7 +117,6 @@ export async function fetchLeadsFromSupabase() {
 
   return (result.data as LeadRow[]).map(mapLead);
 }
-
 
 export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt" | "status">) {
   if (!supabase) return null;
@@ -80,15 +137,10 @@ export async function createEnrollmentInSupabase(payload: Omit<Enrollment, "id" 
     p_telefone: payload.phone,
     p_cargo: payload.jobTitle,
     p_orgao: payload.organization,
-    p_tipo_aluno:
-      payload.enrollmentType === "Empresa"
-        ? "PJ"
-        : payload.enrollmentType === "Órgão público"
-          ? "Servidor"
-          : "PF",
+    p_tipo_aluno: toDbStudentType(payload.enrollmentType),
     p_turma_id: payload.classId,
     p_tipo_inscricao: payload.enrollmentType,
-    p_forma_pagamento: payload.paymentMethod === "Cartão" ? "Cartao" : payload.paymentMethod,
+    p_forma_pagamento: toDbPaymentMethod(payload.paymentMethod),
     p_observacoes: payload.notes
   });
 

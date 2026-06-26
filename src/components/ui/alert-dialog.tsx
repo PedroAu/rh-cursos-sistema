@@ -1,5 +1,7 @@
+"use client";
+
 import type * as React from "react";
-import { useState, createContext, useContext } from "react";
+import { createContext, useContext } from "react";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -61,7 +63,6 @@ function AlertDialogDescription({ children }: { children: React.ReactNode }) {
 function AlertDialogAction({
   onClick,
   children,
-  className,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { onOpenChange } = useAlertDialog();

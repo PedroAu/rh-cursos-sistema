@@ -1,0 +1,423 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Configurações - RH Cursos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2f3133",
+                    "on-surface-variant": "#41484e",
+                    "surface-tint": "#1d648e",
+                    "on-tertiary-container": "#c9ccce",
+                    "primary": "#004364",
+                    "info": "#0D5B85",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#f6be39",
+                    "on-primary-fixed-variant": "#004b70",
+                    "tertiary-fixed": "#e0e3e5",
+                    "on-background": "#1a1c1e",
+                    "surface-bright": "#f9f9fc",
+                    "surface-container": "#eeeef0",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e2e2e5",
+                    "outline-variant": "#c0c7cf",
+                    "outline": "#71787f",
+                    "inverse-on-surface": "#f0f0f3",
+                    "primary-container": "#0d5b85",
+                    "surface-dark": "#083B56",
+                    "warning": "#E67E22",
+                    "success": "#2D8A39",
+                    "surface-container-low": "#f3f3f6",
+                    "inverse-primary": "#91cdfd",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e2e2e5",
+                    "tertiary": "#3b4041",
+                    "on-tertiary-fixed-variant": "#434749",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "on-secondary-container": "#715300",
+                    "primary-fixed": "#cae6ff",
+                    "surface-container-high": "#e8e8ea",
+                    "secondary-fixed": "#ffdfa0",
+                    "on-secondary-fixed-variant": "#5c4300",
+                    "on-surface": "#1a1c1e",
+                    "background": "#f9f9fc",
+                    "primary-fixed-dim": "#91cdfd",
+                    "on-primary-container": "#99d2ff",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#ffc641",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#dadadc",
+                    "tertiary-container": "#535759",
+                    "on-primary-fixed": "#001e30",
+                    "on-tertiary-fixed": "#181c1e",
+                    "secondary": "#795900",
+                    "on-secondary-fixed": "#261a00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1200px",
+                    "section-padding-sm": "48px",
+                    "gutter": "24px",
+                    "section-padding-lg": "80px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Montserrat"],
+                    "body-md": ["Inter"],
+                    "label-bold": ["Inter"],
+                    "headline-md": ["Montserrat"],
+                    "caption": ["Inter"],
+                    "headline-lg-mobile": ["Montserrat"],
+                    "display-lg": ["Montserrat"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .active-tab {
+            border-bottom: 2px solid #ffc641;
+            color: #004364 !important;
+            font-weight: 700;
+        }
+        .settings-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .settings-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant shadow-sm px-gutter py-4">
+<div class="max-w-container-max mx-auto flex justify-between items-center">
+<div class="flex items-center gap-8">
+<span class="text-headline-md font-headline-md font-bold text-primary">RH Cursos</span>
+<div class="hidden md:flex gap-6">
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Cursos</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">In Company</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Agenda</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Sobre</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Contato</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:block relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-primary focus:border-primary text-body-md outline-none" placeholder="Buscar configurações..." type="text">
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold hover:bg-primary-container transition-all">Admin</button>
+</div>
+</div>
+</nav>
+<main class="flex-grow pt-24 pb-section-padding-lg px-gutter max-w-container-max mx-auto w-full">
+<!-- Header Section -->
+<header class="mb-10">
+<h1 class="font-headline-lg text-headline-lg text-primary mb-2">Painel de Configurações</h1>
+<p class="text-on-surface-variant font-body-lg">Gerencie a identidade, comunicações e acessos da plataforma RH Cursos.</p>
+</header>
+<!-- Tabs Navigation -->
+<div class="flex border-b border-outline-variant mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide">
+<button class="px-6 py-3 font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-all active-tab" id="tab-geral" onclick="switchTab('geral')">Configurações Gerais</button>
+<button class="px-6 py-3 font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-all" id="tab-notificacoes" onclick="switchTab('notificacoes')">Notificações</button>
+<button class="px-6 py-3 font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-all" id="tab-integracoes" onclick="switchTab('integracoes')">Integrações</button>
+<button class="px-6 py-3 font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-all" id="tab-usuarios" onclick="switchTab('usuarios')">Gerenciamento de Usuários</button>
+</div>
+<!-- Content Area -->
+<div id="settings-content">
+<!-- SECTION: GERAL -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8" id="content-geral">
+<div class="lg:col-span-2 space-y-8">
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm settings-card">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-info text-2xl">language</span>
+<h2 class="font-headline-md text-headline-md">Identidade do Site</h2>
+</div>
+<div class="space-y-6">
+<div>
+<label class="block font-label-bold text-label-bold mb-2">Nome do Site</label>
+<input class="w-full p-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-primary focus:border-primary outline-none" type="text" value="RH Cursos &amp; Soluções">
+</div>
+<div>
+<label class="block font-label-bold text-label-bold mb-2">Slogan Institucional</label>
+<input class="w-full p-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-primary focus:border-primary outline-none" type="text" value="Capacitação estratégica para gestão de pessoas e setor público.">
+</div>
+<div>
+<label class="block font-label-bold text-label-bold mb-2">E-mail de Contato Oficial</label>
+<input class="w-full p-3 bg-surface-container-low border border-outline-variant rounded-lg focus:ring-primary focus:border-primary outline-none" type="email" value="contato@rhcursos.com.br">
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm settings-card">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-info text-2xl">palette</span>
+<h2 class="font-headline-md text-headline-md">Logotipo e Favicon</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="flex flex-col items-center p-6 border-2 border-dashed border-outline-variant rounded-xl">
+<img class="h-16 w-auto mb-4 object-contain" data-alt="A clean, professional minimalist logo design showing the initials RH in a sleek modern sans-serif font. The logo uses a palette of executive deep navy and golden yellow accents, presented on a crisp white background with soft ambient lighting for a high-end corporate brand feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDylObdqybpUB-OdyujpJK4jdWuvjTSmCX0c5Gt_3vrwWUCqGK_gkbIQ6fhqzzpNLAVlptnyDpC_aiWKcKktBioDT3M7cj7f8cePDZTmxLHTaOpfZj6YqOMmWrgH2mu5dLfIp03oV9iJsLvEQzOZlnlWD9StUAnegIxJwLVMrWYhkzxR2BM1H-dXF5ZDu5rvTsSFRE9LT0_ghQfvBdAcD9-N2hg1Pjfok1fn6-2B4X8ueFNJ4Ur5Ts7zCDboA6g3rHFl_n5dhZRwfrF">
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-2 hover:underline">
+<span class="material-symbols-outlined">upload</span> Alterar Logo Principal
+                                </button>
+</div>
+<div class="flex flex-col items-center p-6 border-2 border-dashed border-outline-variant rounded-xl">
+<div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl mb-4">RH</div>
+<button class="text-primary font-label-bold text-label-bold flex items-center gap-2 hover:underline">
+<span class="material-symbols-outlined">upload</span> Alterar Favicon
+                                </button>
+</div>
+</div>
+</section>
+</div>
+<aside class="space-y-6">
+<div class="bg-surface-dark p-6 rounded-xl text-white">
+<h3 class="font-headline-md text-headline-md mb-4 text-secondary-fixed">Resumo das Alterações</h3>
+<p class="text-body-md opacity-80 mb-6">Suas alterações de identidade afetam como os alunos visualizam a marca nos certificados e e-mails automáticos.</p>
+<button class="w-full bg-secondary-container text-on-secondary-container py-3 rounded-lg font-label-bold text-label-bold hover:opacity-90 transition-all">Salvar Alterações</button>
+</div>
+</aside>
+</div>
+<!-- SECTION: NOTIFICACOES (Hidden by default) -->
+<div class="hidden space-y-6" id="content-notificacoes">
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm max-w-3xl">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-info text-2xl">notifications</span>
+<h2 class="font-headline-md text-headline-md">Preferências de Notificação</h2>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between py-4 border-b border-outline-variant">
+<div>
+<p class="font-label-bold text-label-bold text-primary">Novas Inscrições</p>
+<p class="text-caption text-on-surface-variant">Alertar administrador quando um novo aluno se inscrever em um curso.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between py-4 border-b border-outline-variant">
+<div>
+<p class="font-label-bold text-label-bold text-primary">Pagamentos Confirmados</p>
+<p class="text-caption text-on-surface-variant">Receber confirmação imediata de vendas aprovadas.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="flex items-center justify-between py-4">
+<div>
+<p class="font-label-bold text-label-bold text-primary">Relatórios Mensais</p>
+<p class="text-caption text-on-surface-variant">Enviar resumo estatístico mensal para o e-mail cadastrado.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox">
+<div class="w-11 h-6 bg-outline-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</div>
+<!-- SECTION: INTEGRAÇÕES (Hidden by default) -->
+<div class="hidden grid grid-cols-1 md:grid-cols-2 gap-8" id="content-integracoes">
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm settings-card flex flex-col">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 bg-[#25D366] rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md">WhatsApp Business</h3>
+<p class="text-caption text-on-surface-variant">API de atendimento e envio automático.</p>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-8 flex-grow">Conecte sua conta do WhatsApp para enviar notificações de cursos e suporte em tempo real para seus alunos.</p>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-success font-label-bold">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">check_circle</span> Conectado</span>
+<span class="text-caption text-on-surface-variant">Último envio: Hoje, 10:45</span>
+</div>
+<button class="w-full border border-primary text-primary py-2 rounded-lg font-label-bold hover:bg-surface-container-low transition-all">Gerenciar Webhooks</button>
+</div>
+</section>
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant shadow-sm settings-card flex flex-col">
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md">E-mail Marketing</h3>
+<p class="text-caption text-on-surface-variant">RD Station / Mailchimp / ActiveCampaign</p>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-8 flex-grow">Sincronize sua base de alunos com sua plataforma de marketing favorita para campanhas de remarketing.</p>
+<div class="space-y-4">
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between">
+<span class="font-label-bold">RD Station CRM</span>
+<button class="text-primary font-label-bold">Conectar</button>
+</div>
+<div class="bg-surface-container-low p-4 rounded-lg flex items-center justify-between">
+<span class="font-label-bold">Mailchimp</span>
+<button class="text-primary font-label-bold">Conectar</button>
+</div>
+</div>
+</section>
+</div>
+<!-- SECTION: USUÁRIOS (Hidden by default) -->
+<div class="hidden space-y-6" id="content-usuarios">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h2 class="font-headline-md text-headline-md text-primary">Administradores do Sistema</h2>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-bold flex items-center gap-2 hover:bg-primary-container">
+<span class="material-symbols-outlined">person_add</span> Novo Admin
+                        </button>
+</div>
+<table class="w-full text-left">
+<thead>
+<tr class="bg-surface-container border-b border-outline-variant">
+<th class="p-4 font-label-bold text-label-bold">Nome</th>
+<th class="p-4 font-label-bold text-label-bold">E-mail</th>
+<th class="p-4 font-label-bold text-label-bold">Permissão</th>
+<th class="p-4 font-label-bold text-label-bold">Status</th>
+<th class="p-4 font-label-bold text-label-bold text-right">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr>
+<td class="p-4 font-label-bold">Ricardo Oliveira</td>
+<td class="p-4 text-on-surface-variant">ricardo.adm@rhcursos.com.br</td>
+<td class="p-4"><span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed rounded-full text-caption font-bold">Super Admin</span></td>
+<td class="p-4"><span class="flex items-center gap-2 text-success font-label-bold"><span class="w-2 h-2 bg-success rounded-full"></span> Ativo</span></td>
+<td class="p-4 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<tr>
+<td class="p-4 font-label-bold">Fernanda Souza</td>
+<td class="p-4 text-on-surface-variant">fernanda.vendas@rhcursos.com.br</td>
+<td class="p-4"><span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold">Vendas/Editor</span></td>
+<td class="p-4"><span class="flex items-center gap-2 text-success font-label-bold"><span class="w-2 h-2 bg-success rounded-full"></span> Ativo</span></td>
+<td class="p-4 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+<tr>
+<td class="p-4 font-label-bold">Lucas Mendes</td>
+<td class="p-4 text-on-surface-variant">lucas.suporte@rhcursos.com.br</td>
+<td class="p-4"><span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-full text-caption font-bold">Suporte</span></td>
+<td class="p-4"><span class="flex items-center gap-2 text-outline font-label-bold"><span class="w-2 h-2 bg-outline rounded-full"></span> Inativo</span></td>
+<td class="p-4 text-right">
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined">edit</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark text-secondary-fixed mt-auto py-section-padding-lg px-gutter">
+<div class="max-w-container-max mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+<div class="space-y-4">
+<span class="text-headline-md font-headline-md font-bold text-surface-container-lowest">RH Cursos</span>
+<p class="text-surface-variant opacity-80 font-body-md">Soluções em treinamento para o setor público e privado. Excelência em gestão há mais de 15 anos.</p>
+</div>
+<div>
+<h4 class="text-white font-label-bold text-label-bold mb-4">Navegação</h4>
+<ul class="space-y-2 text-surface-variant">
+<li><a class="hover:text-secondary-fixed transition-all" href="#">Home</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">Cursos</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">In Company</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">Agenda</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-label-bold text-label-bold mb-4">Suporte</h4>
+<ul class="space-y-2 text-surface-variant">
+<li><a class="hover:text-secondary-fixed transition-all" href="#">WhatsApp</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">E-mail</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">Administração</a></li>
+<li><a class="hover:text-secondary-fixed transition-all" href="#">Catálogo de cursos</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-label-bold text-label-bold mb-4">Informações</h4>
+<p class="text-surface-variant opacity-80 text-caption leading-relaxed">
+                    RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90<br>
+                    © 2024 Todos os direitos reservados.
+                </p>
+</div>
+</div>
+</footer>
+<script>
+        function switchTab(tabName) {
+            // Get all content divs
+            const contents = ['geral', 'notificacoes', 'integracoes', 'usuarios'];
+            
+            contents.forEach(name => {
+                const contentDiv = document.getElementById(`content-${name}`);
+                const tabButton = document.getElementById(`tab-${name}`);
+                
+                if (name === tabName) {
+                    contentDiv.classList.remove('hidden');
+                    tabButton.classList.add('active-tab');
+                } else {
+                    contentDiv.classList.add('hidden');
+                    tabButton.classList.remove('active-tab');
+                }
+            });
+
+            // Smooth scroll to top of content on mobile
+            if (window.innerWidth < 768) {
+                document.getElementById('settings-content').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Simple animation on hover for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.95)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body></html>

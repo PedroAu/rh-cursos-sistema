@@ -6,11 +6,15 @@ const supabasePublishableKey =
 
 export const isSupabaseServerConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 
-export const supabaseServer = isSupabaseServerConfigured
-  ? createClient(supabaseUrl!, supabasePublishableKey!, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false
-      }
-    })
-  : null;
+export function createSupabaseServerClient() {
+  if (!isSupabaseServerConfigured) {
+    return null;
+  }
+
+  return createClient(supabaseUrl!, supabasePublishableKey!, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+}

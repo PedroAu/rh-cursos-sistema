@@ -1,6 +1,6 @@
 // Sessão admin assinada via HMAC-SHA256 (WebCrypto).
 // Portado de src/lib/auth.ts para o runtime Deno das Edge Functions.
-// Em vez de cookie httpOnly (que não cruza o domínio Locaweb → supabase.co),
+// Em vez de cookie httpOnly (que não cruza o domínio do frontend → supabase.co),
 // o token é devolvido no corpo e reenviado pelo header `x-rh-session`.
 
 export type DashboardRole = "admin";
@@ -9,7 +9,11 @@ export type AdminSession = {
   role: DashboardRole;
   email: string;
   name: string;
+  /** Epoch ms de expiração da sessão assinada. */
+  exp?: number;
 };
+
+export const SESSION_TTL_MS = 30 * 60 * 1000;
 
 export function getSessionSecret(): string {
   const secret = Deno.env.get("AUTH_SESSION_SECRET");
@@ -61,8 +65,11 @@ function isDashboardRole(value: unknown): value is DashboardRole {
   return value === "admin";
 }
 
-export async function encodeSession(session: AdminSession): Promise<string> {
-  const payload = toBase64Url(JSON.stringify(session));
+export async function encodeSession(
+  session: AdminSession,
+  ttlMs = SESSION_TTL_MS
+): Promise<string> {
+  const payload = toBase64Url(JSON.stringify({ ...session, exp: Date.now() + ttlMs }));
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -80,8 +87,14 @@ export async function decodeSession(value?: string | null): Promise<AdminSession
   try {
     const parsed = JSON.parse(fromBase64Url(payload)) as Partial<AdminSession>;
     if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+    if (typeof parsed.exp !== "number" || parsed.exp < Date.now()) return null;
 
-    return { role: parsed.role, email: parsed.email, name: parsed.name };
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      exp: parsed.exp,
+    };
   } catch {
     return null;
   }

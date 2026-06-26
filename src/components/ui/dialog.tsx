@@ -1,4 +1,4 @@
-import type * as React from "react";
+import React from "react";
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
@@ -9,19 +9,61 @@ export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
+/**
+ * Hook to manage focus restoration when a dialog closes.
+ * Stores a reference to the trigger element and restores focus on dialog close.
+ *
+ * Usage:
+ * ```tsx
+ * const triggerRef = useDialogFocus();
+ * <Dialog open={open} onOpenChange={setOpen}>
+ *   <DialogTrigger ref={triggerRef} asChild>
+ *     <button>Open Dialog</button>
+ *   </DialogTrigger>
+ *   <DialogContent triggerRef={triggerRef} />
+ * </Dialog>
+ * ```
+ */
+export function useDialogFocus() {
+  const triggerRef = React.useRef<HTMLElement>(null);
+  return triggerRef;
+}
+
 export function DialogContent({
   className,
   children,
+  initialFocusRef,
+  onOpenAutoFocus,
+  triggerRef,
   ...props
-}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>) {
+}: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
+  initialFocusRef?: React.RefObject<HTMLElement | null>;
+  triggerRef?: React.RefObject<HTMLElement | null>;
+}) {
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-deep-navy/45 backdrop-blur-sm" />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[min(92vw,760px)] -translate-x-1/2 -translate-y-1/2 rounded-xl border bg-white p-6 shadow-card focus:outline-none",
+          "fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-2rem)] w-[min(92vw,760px)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border bg-white p-6 shadow-card focus:outline-none",
           className
         )}
+        onOpenAutoFocus={(event) => {
+          onOpenAutoFocus?.(event);
+          if (event.defaultPrevented) return;
+          if (initialFocusRef?.current) {
+            event.preventDefault();
+            initialFocusRef.current.focus();
+          }
+        }}
+        onCloseAutoFocus={(event) => {
+          // Only prevent default if we have a trigger to restore focus to
+          if (triggerRef?.current) {
+            event.preventDefault();
+            triggerRef.current.focus();
+          }
+          // Otherwise let Radix handle default focus restoration
+        }}
         {...props}
       >
         {children}
@@ -57,4 +99,11 @@ export function DialogDescription({
       {...props}
     />
   );
+}
+
+export function DialogFooter({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex flex-col gap-3 sm:flex-row sm:justify-end", className)} {...props} />;
 }

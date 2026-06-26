@@ -23,14 +23,19 @@ const courseLevelEnum = z.enum([
 export const courseSchema = z.object({
   title: z.string().min(1, "Nome do curso é obrigatório"),
   pathId: z.string().min(1, "Trilha é obrigatória"),
-  modality: modalityEnum,
+  modality: modalityEnum.optional(),
+  modalities: z.array(modalityEnum).min(1, "Selecione pelo menos uma modalidade"),
   level: courseLevelEnum,
   status: z.enum(["Ativo", "Inativo", "Destaque", "Em breve"]),
+  featured: z.boolean().optional(),
+  featuredCourseIds: z.array(z.string()).optional(),
   durationLabel: z.string().min(1, "Carga horária é obrigatória"),
   price: z.number({ invalid_type_error: "Preço deve ser um número" }).min(0, "Preço deve ser >= 0"),
   shortDescription: z.string().min(1, "Descrição curta é obrigatória"),
   fullDescription: z.string().min(1, "Descrição completa é obrigatória"),
   image: z.string().optional(),
+  targetAudience: z.array(z.string()).optional(),
+  categories: z.array(z.string()).optional(),
   objectives: z.array(z.string()).optional(),
   benefits: z.array(z.string()).optional(),
   modules: z
@@ -48,10 +53,16 @@ export const courseSchema = z.object({
 export const classSchema = z.object({
   courseId: z.string().min(1, "Curso é obrigatório"),
   startDate: z.string().min(1, "Data de início é obrigatória"),
+  endDate: z.string().min(1, "Data final é obrigatória"),
+  time: z.string().min(1, "Horário é obrigatório"),
   modality: modalityEnum,
   status: z.enum(["Inscrições abertas", "Poucas vagas", "Encerrada", "Em breve"]),
   instructorId: z.string().optional(),
   location: z.string().optional(),
+  totalSeats: z.number().int().min(0, "Quantidade de vagas deve ser >= 0"),
+  manualFilledSeats: z.number().int().min(0, "Vagas manuais deve ser >= 0").optional(),
+  filledSeats: z.number().int().min(0).optional(),
+  availableSeats: z.number().int().min(0).optional(),
 });
 
 export const studentSchema = z.object({
@@ -88,10 +99,12 @@ export const enrollmentStatusSchema = z.object({
 
 export const instructorSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
-  email: emailSchema,
+  email: z.union([z.literal(""), emailSchema]).optional(),
   phone: z.string().optional(),
-  specialty: z.string().min(1, "Especialidade é obrigatória"),
+  specialty: z.string().optional(),
   bio: z.string().optional(),
+  education: z.string().optional(),
+  photoUrl: z.string().optional(),
   status: z.enum(["Ativo", "Inativo"]),
   courseIds: z.array(z.string()).optional(),
 });
@@ -121,5 +134,5 @@ export const leadStatusUpdateSchema = z.object({
 });
 
 export const deleteIdSchema = z.object({
-  id: z.string().uuid("ID inválido"),
+  id: z.string().min(1, "ID inválido"),
 });

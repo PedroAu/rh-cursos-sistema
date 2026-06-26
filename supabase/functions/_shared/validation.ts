@@ -17,6 +17,13 @@ const phoneSchema = z
   )
   .transform((val) => val.replace(/\D/g, ""));
 
+const resourceIdSchema = z
+  .string()
+  .trim()
+  .min(1, "ID é obrigatório")
+  .max(80, "ID excede o tamanho permitido")
+  .regex(/^[A-Za-z0-9_-]+$/, "ID inválido");
+
 export const enrollmentSchema = z.object({
   studentName: z
     .string()
@@ -26,8 +33,8 @@ export const enrollmentSchema = z.object({
   email: emailSchema,
   cpf: cpfSchema,
   phone: phoneSchema,
-  courseId: z.string().uuid("ID do curso inválido"),
-  classId: z.string().uuid("ID da turma inválido"),
+  courseId: resourceIdSchema,
+  classId: resourceIdSchema,
   organization: z
     .string()
     .max(100, "Organização não pode ter mais de 100 caracteres")

@@ -1,11 +1,12 @@
 "use client";
 
 import { PublicPageShell } from "@/components/next-page-shell";
+import type { AppStoreInitialData } from "@/lib/app-store";
 import { BlogPostPage } from "@/views/public/BlogPost";
 
-export function BlogPostClient() {
+export function BlogPostClient({ initialData }: { initialData?: AppStoreInitialData }) {
   return (
-    <PublicPageShell>
+    <PublicPageShell initialData={initialData}>
       <BlogPostPage />
     </PublicPageShell>
   );

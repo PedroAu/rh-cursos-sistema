@@ -31,7 +31,7 @@ Deno.serve(async (request) => {
   }
 
   const ip = clientIp(request);
-  const rate = checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
+  const rate = await checkRateLimit(`lead:${ip}`, rateLimitConfigs.lead);
   if (!rate.allowed) {
     return jsonResponse(
       { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
@@ -49,7 +49,7 @@ Deno.serve(async (request) => {
 
   try {
     const supabase = anonClient();
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("lead")
       .insert({
         nome: payload.name,
@@ -61,16 +61,13 @@ Deno.serve(async (request) => {
         origem: payload.origin,
         mensagem: payload.message,
         status_crm: "Novo",
-      })
-      .select("*")
-      .single();
+      });
 
     if (error) throw error;
 
-    return jsonResponse({ ok: true, lead: data }, 201, request);
+    return jsonResponse({ ok: true }, 201, request);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro ao criar lead.";
-    console.error("leads.create error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    console.error("leads.create error:", error instanceof Error ? error.message : error);
+    return jsonResponse({ ok: false, error: "Erro ao criar lead." }, 500, request);
   }
 });

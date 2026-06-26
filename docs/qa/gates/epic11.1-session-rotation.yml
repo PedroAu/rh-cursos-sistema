@@ -1,0 +1,38 @@
+schema: 1
+story: 'EP-11.1'
+story_title: 'Sessão admin com rotação deslizante e expiração consistente'
+gate: PASS
+status_reason: 'Revisão de 2026-06-25 confirmou lint, typecheck e suíte completa verdes. ACs de rotação, expiração, SSR guard e documentação seguem cobertos sem achados bloqueantes.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-06-25T16:52:07Z'
+quality_score: 100
+expires: '2026-07-09T16:52:10Z'
+top_issues: []
+waiver:
+  active: false
+evidence:
+  tests_reviewed: 4
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Sessão expirada ou adulterada permanece fail-closed.'
+  performance:
+    status: PASS
+    notes: 'Nenhuma regressão observada no gate atual.'
+  reliability:
+    status: PASS
+    notes: 'SSR guard e sincronização de sessão mantêm comportamento consistente.'
+  maintainability:
+    status: PASS
+    notes: 'Contrato documentado e cobertura compatível com o escopo.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Adicionar no futuro prova HTTP positiva fim a fim do caminho de rotação aceito pelo servidor.'
+      refs:
+        - 'app/api/auth/session/route.ts'
+        - 'tests/route-auth.spec.ts'

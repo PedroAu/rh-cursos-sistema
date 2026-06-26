@@ -1,7 +1,7 @@
 # Story: Atualizar layout com base nos artefatos Stitch
 
 ## Status
-Ready for Review
+Done
 
 ## Contexto
 O site deve refletir os documentos e prototipos anexados em `/Users/pedroaugusto/Downloads/stitch_plataforma_de_cursos_e_gest_o`, principalmente `DESIGN.md`, `plano_do_projeto_site_de_cursos.md` e os HTMLs de Home, catalogo, pagina de vendas/checkout, area do aluno e in-company.
@@ -35,13 +35,15 @@ O site deve refletir os documentos e prototipos anexados em `/Users/pedroaugusto
 - `src/components/ui/textarea.tsx`
 - `src/components/common/section-title.tsx`
 - `src/components/courses/course-card.tsx`
-- `src/components/courses/training-path-card.tsx`
-- `src/App.tsx`
-- `src/pages/public/Home.tsx`
-- `src/pages/public/Courses.tsx`
-- `src/pages/public/CourseDetail.tsx`
-- `src/pages/public/InCompany.tsx`
-- `src/pages/public/Login.tsx`
-- `src/pages/student/StudentDashboard.tsx`
+- `src/views/public/Home.tsx`
+- `src/views/public/Courses.tsx`
+- `src/views/public/CourseDetail.tsx`
+- `src/views/public/InCompany.tsx`
+- `src/views/public/Login.tsx`
+- `src/components/next-page-shell.tsx`
 - `src/components/checkout/checkout-modal.tsx`
 - `docs/stories/2026-04-27-layout-template-audit.md`
+
+## QA Results
+
+Pass — encerramento documental em 2026-06-24. Story mantida como concluída com evidência histórica de build/smoke e sem gap funcional identificado na auditoria atual.

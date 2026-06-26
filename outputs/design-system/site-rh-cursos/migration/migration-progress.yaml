@@ -1,0 +1,549 @@
+# Migration Progress Tracker
+## site-rh-cursos Design System Migration
+
+---
+
+## Phase 1: Foundation (Token Deployment)
+
+**Status:** READY TO START
+**Timeline:** Week 1-2
+**Effort:** 2-3 hours
+**Lead:** [TO BE ASSIGNED]
+**Start Date:** [TBD]
+**Target Completion:** [TBD]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 1.1
+    name: "Organize token files"
+    status: NOT_STARTED  # [ NOT_STARTED | IN_PROGRESS | COMPLETED | BLOCKED ]
+    owner: ""
+    effort_hours: 0.25
+    completed_at: null
+
+  - id: 1.2
+    name: "Import CSS tokens in layout"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.25
+    completed_at: null
+    notes: ""
+
+  - id: 1.3
+    name: "Configure Tailwind with tokens"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.33
+    completed_at: null
+    notes: ""
+
+  - id: 1.4
+    name: "Verify CSS variables globally"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.17
+    completed_at: null
+    notes: ""
+
+  - id: 1.5
+    name: "Verify Tailwind tokens work"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.17
+    completed_at: null
+    notes: ""
+
+  - id: 1.6
+    name: "Run tests, type check, lint, build"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.25
+    completed_at: null
+    notes: ""
+
+  - id: 1.7
+    name: "Visual regression testing"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.33
+    completed_at: null
+    notes: ""
+
+  - id: 1.8
+    name: "Create token documentation"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.25
+    completed_at: null
+    notes: ""
+
+  - id: 1.9
+    name: "Commit & PR review"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.2
+    completed_at: null
+    notes: ""
+```
+
+### Success Criteria
+
+- [ ] CSS variables available globally
+- [ ] Tailwind config accepts token structure
+- [ ] Zero visual regressions
+- [ ] All tests pass
+- [ ] Build succeeds
+- [ ] Documentation complete
+- [ ] PR approved & merged
+
+### Metrics
+
+```yaml
+metrics:
+  css_variables_deployed: 0  # Target: 65+
+  build_success: false
+  test_pass_rate: 0%
+  visual_regression_count: 0  # Target: 0
+  team_readiness: 0%
+```
+
+---
+
+## Phase 2A: Form Consolidation
+
+**Status:** READY FOR PHASE 2
+**Timeline:** Week 3-4
+**Effort:** 2-2.5 hours
+**Lead:** [TO BE ASSIGNED]
+**Start Date:** [After Phase 1]
+**Target Completion:** [TBD]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 2a.1
+    name: "Extract admin form-fields variants"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+
+  - id: 2a.2
+    name: "Update imports in admin components"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.75
+    completed_at: null
+
+  - id: 2a.3
+    name: "Delete src/components/admin/form-fields.tsx"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.25
+    completed_at: null
+
+  - id: 2a.4
+    name: "Test admin forms (visual + functional)"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+
+  - id: 2a.5
+    name: "QA review & PR approval"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+```
+
+### Files Modified
+
+- `src/components/ui/form-field.tsx` — add variants
+- `src/components/admin/form-fields.tsx` — DELETE
+- `src/components/admin/user-admin.tsx` — update imports
+- `src/components/admin/settings-admin.tsx` — update imports
+
+### Success Criteria
+
+- [ ] Admin form fields use base FormField component
+- [ ] All 24 form instances migrated
+- [ ] Admin forms render identically
+- [ ] No import errors
+
+---
+
+## Phase 2B: Card Variant System
+
+**Status:** READY FOR PHASE 2
+**Timeline:** Week 4-5
+**Effort:** 2.5-3 hours
+**Lead:** [TO BE ASSIGNED]
+**Start Date:** [After Phase 2A]
+**Target Completion:** [TBD]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 2b.1
+    name: "Add CVA to Card component"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+
+  - id: 2b.2
+    name: "Extract domain card styles to variants"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.75
+    completed_at: null
+
+  - id: 2b.3
+    name: "Migrate ClassCard → Card variant"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+
+  - id: 2b.4
+    name: "Migrate BlogCard → Card variant"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+    completed_at: null
+
+  - id: 2b.5
+    name: "Migrate CourseCard → Card variant"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+    completed_at: null
+
+  - id: 2b.6
+    name: "Migrate TestimonialCard → Card variant"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.3
+    completed_at: null
+
+  - id: 2b.7
+    name: "Delete 4 domain card files"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.1
+    completed_at: null
+
+  - id: 2b.8
+    name: "Test all card variants (visual + functional)"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.75
+    completed_at: null
+
+  - id: 2b.9
+    name: "QA screenshot diff testing"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+
+  - id: 2b.10
+    name: "PR approval & merge"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+    completed_at: null
+```
+
+### Files Modified
+
+- `src/components/ui/card.tsx` — add CVA variants
+- `src/components/agenda/class-card.tsx` — DELETE
+- `src/components/blog/blog-card.tsx` — DELETE
+- `src/components/courses/course-card.tsx` — DELETE
+- `src/components/common/testimonial-card.tsx` — DELETE
+
+### Success Criteria
+
+- [ ] Card variants defined (5 types)
+- [ ] All 67 card instances migrated
+- [ ] No visual differences in any card variant
+- [ ] All card files removed
+- [ ] Tests passing
+
+### Metrics After Phase 2B
+
+```yaml
+metrics:
+  components_consolidated: 6 → 1
+  redundancy_factor: 1.79 → 1.68
+  maturity_score: 8.2 → 8.5
+  estimated_velocity_gain: 10-15%
+```
+
+---
+
+## Phase 3A: Badge Unification
+
+**Status:** READY FOR PHASE 3
+**Timeline:** Week 6
+**Effort:** 1-1.5 hours
+**Lead:** [TO BE ASSIGNED]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 3a.1
+    name: "Create status color tokens"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.25
+
+  - id: 3a.2
+    name: "Add status variants to Badge"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+
+  - id: 3a.3
+    name: "Migrate status-badge usages"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+
+  - id: 3a.4
+    name: "Delete status-badge.tsx (or convert to wrapper)"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.1
+
+  - id: 3a.5
+    name: "Test & QA"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+```
+
+---
+
+## Phase 3B: CVA Adoption
+
+**Status:** READY FOR PHASE 3
+**Timeline:** Week 6-7
+**Effort:** 2-3 hours
+**Lead:** [TO BE ASSIGNED]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 3b.1
+    name: "Refactor Input component to CVA"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+
+  - id: 3b.2
+    name: "Refactor Select to CVA"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+
+  - id: 3b.3
+    name: "Refactor Checkbox to CVA"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.3
+
+  - id: 3b.4
+    name: "Refactor Progress to CVA"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.3
+
+  - id: 3b.5
+    name: "Update molecule components"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+
+  - id: 3b.6
+    name: "Comprehensive testing"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+```
+
+### Metrics After Phase 3
+
+```yaml
+metrics:
+  cva_adoption_percent: 60%
+  maturity_score: 8.5 → 8.7
+  overall_redundancy: 1.68 → 1.45
+```
+
+---
+
+## Phase 4: Enforcement
+
+**Status:** READY FOR PHASE 4
+**Timeline:** Week 9-10
+**Effort:** 1-2 hours
+**Lead:** [TO BE ASSIGNED]
+
+### Tasks
+
+```yaml
+tasks:
+  - id: 4.1
+    name: "Setup ESLint no-hardcoded-colors rule"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+
+  - id: 4.2
+    name: "Add git hook for token validation"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.4
+
+  - id: 4.3
+    name: "Create deprecation notices (storybook)"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.3
+
+  - id: 4.4
+    name: "Setup metrics dashboard"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+
+  - id: 4.5
+    name: "Team training & documentation"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.5
+
+  - id: 4.6
+    name: "Final validation & metrics"
+    status: NOT_STARTED
+    owner: ""
+    effort_hours: 0.3
+```
+
+---
+
+## Overall Progress
+
+```yaml
+migration_overview:
+  start_date: null
+  target_completion: null
+  status: "READY_TO_START"
+
+  phases_completed: 0
+  phases_in_progress: 0
+  phases_remaining: 4
+
+  total_effort_hours: 15
+  hours_completed: 0
+  hours_remaining: 15
+
+  team_members: []
+  blockers: []
+
+  expected_completion:
+    optimistic: null  # 8 weeks
+    realistic: null   # 10 weeks
+    pessimistic: null # 12 weeks
+```
+
+---
+
+## Risk Log
+
+```yaml
+risks:
+  - id: R1
+    title: "Form field scope creep"
+    likelihood: MEDIUM
+    impact: HIGH
+    mitigation: "Use exact variant list from component-mapping.json"
+    status: OPEN
+
+  - id: R2
+    title: "Card variant testing complexity"
+    likelihood: MEDIUM
+    impact: MEDIUM
+    mitigation: "Screenshot diff testing for each variant"
+    status: OPEN
+
+  - id: R3
+    title: "Team adoption lag"
+    likelihood: MEDIUM
+    impact: MEDIUM
+    mitigation: "CI rules + training materials"
+    status: OPEN
+
+  - id: R4
+    title: "Concurrent feature development"
+    likelihood: HIGH
+    impact: HIGH
+    mitigation: "Dedicated migration work time (2h/week)"
+    status: OPEN
+```
+
+---
+
+## Weekly Status Template
+
+### Week [N] Status Report
+
+**Period:** [Date] - [Date]
+**Lead:** [Name]
+**Status:** [ON_TRACK | AT_RISK | BLOCKED]
+
+#### Completed This Week
+- [ ] Task 1
+- [ ] Task 2
+
+#### In Progress
+- [ ] Task 3 ([X]% complete)
+
+#### Blockers
+- Issue: [Description]
+  Resolution: [What's needed]
+
+#### Metrics This Week
+- Effort hours: [X] / [Y]
+- Test pass rate: [X]%
+- Visual regressions: [X]
+
+#### Notes for Next Week
+[Free-form notes]
+
+---
+
+## Lessons Learned (Post-Mortem)
+
+### Phase 1 Post-Mortem
+**Date:** [After Phase 1]
+
+- [ ] What went well?
+- [ ] What was harder than expected?
+- [ ] What surprised the team?
+- [ ] Adjustments for Phase 2?
+
+---
+
+**Progress Tracker Generated**
+Updated: 2026-06-22
+Next Review: When Phase 1 starts

@@ -1,0 +1,160 @@
+# Badge & Status Color Consolidation
+
+## Current State: Status Badge Redundancy (2.5x)
+
+### Base Component
+✓ GOOD - Exists
+- src/components/ui/badge.tsx (generic badge container)
+
+### Domain Variant
+⚠ CONSOLIDATE - Separate styling
+- src/components/common/status-badge.tsx (status-specific colors/styling)
+
+## Analysis: What Differs
+
+### Badge (Generic)
+```typescript
+// Simple container with optional variant styling
+<Badge>Label</Badge>
+<Badge variant="secondary">Secondary</Badge>
+```
+
+### StatusBadge (Domain)
+```typescript
+// Status-specific with color logic
+<StatusBadge status="active" />    // green
+<StatusBadge status="inactive" />  // gray
+<StatusBadge status="pending" />   // yellow
+<StatusBadge status="error" />     // red
+```
+
+## Consolidation Approach
+
+### Step 1: Define Status Color Tokens
+Create status colors in CSS variables or Tailwind tokens:
+
+```css
+/* CSS Variables */
+--ea-status-active: #22c55e;      /* green */
+--ea-status-pending: #eab308;     /* yellow */
+--ea-status-inactive: #6b7280;    /* gray */
+--ea-status-error: #ef4444;       /* red */
+--ea-status-warning: #f97316;     /* orange */
+--ea-status-info: #3b82f6;        /* blue */
+```
+
+### Step 2: Add Status Variants to Badge
+Update src/components/ui/badge.tsx:
+
+```typescript
+const badgeVariants = cva("badge-base", {
+  variants: {
+    variant: {
+      default: "default-styling",
+      secondary: "secondary-styling",
+      outline: "outline-styling",
+
+      // Status variants (NEW)
+      status_active: "status-active-styling",
+      status_pending: "status-pending-styling",
+      status_inactive: "status-inactive-styling",
+      status_error: "status-error-styling",
+      status_warning: "status-warning-styling",
+      status_info: "status-info-styling"
+    },
+    size: {
+      sm: "small-badge",
+      md: "medium-badge",
+      lg: "large-badge"
+    }
+  }
+});
+```
+
+### Step 3: Update StatusBadge Implementation
+Replace status logic with variant mapping:
+
+```typescript
+// BEFORE: Custom status color logic
+export const StatusBadge = ({ status }) => {
+  const colorMap = {
+    active: 'bg-green-500',
+    pending: 'bg-yellow-500',
+    // ...
+  };
+  return <div className={colorMap[status]}>...</div>;
+};
+
+// AFTER: Use Badge variants
+export const StatusBadge = ({ status }) => (
+  <Badge variant={`status_${status}`} />
+);
+```
+
+### Step 4: Update All StatusBadge Usage
+Find and migrate all StatusBadge calls:
+- In dashboard components
+- In course listing components
+- In admin views
+- In activity feeds
+
+```
+OLD: <StatusBadge status="active" />
+NEW: <Badge variant="status_active" />
+OR  <StatusBadge status="active" /> (if keeping wrapper)
+```
+
+## Implementation Options
+
+### Option A: Delete StatusBadge (Cleanest)
+Remove src/components/common/status-badge.tsx entirely.
+Update all usages to use Badge directly.
+
+**Pros:** Single source of truth, simpler codebase
+**Cons:** Direct Badge usage everywhere (not semantic)
+**Effort:** 1-1.5h
+
+### Option B: Keep StatusBadge as Thin Wrapper
+Keep src/components/common/status-badge.tsx but have it use Badge variants.
+
+```typescript
+// Thin wrapper for semantic naming
+export const StatusBadge = ({ status, ...props }) => (
+  <Badge variant={`status_${status}`} {...props} />
+);
+```
+
+**Pros:** Semantic naming preserved, easier to add domain logic later
+**Cons:** One extra component layer
+**Effort:** 1h
+
+### Option C: Keep Both (Status quo)
+Don't consolidate, keep separate implementations.
+
+**Pros:** No refactoring needed
+**Cons:** Continues duplication, harder to maintain
+**Not recommended**
+
+## Effort Estimate
+
+- Define status tokens: 15 min
+- Add Badge variants: 30 min
+- Update StatusBadge usage: 15 min
+- Testing: 15 min
+**Total: 1-1.5 hours**
+
+## Benefits
+
+✓ Single source of truth for status colors
+✓ Easier to change status colors globally
+✓ Consistent status indicators across app
+✓ Reduces component count by 1
+✓ Simplifies imports/usage
+
+## Testing Checklist
+
+- [ ] All status types render correct colors
+- [ ] Status badges display in all contexts (dashboard, courses, admin)
+- [ ] Hover/active states work
+- [ ] Accessibility labels correct
+- [ ] Color contrast meets WCAG AA

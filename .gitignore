@@ -16,10 +16,12 @@ node_modules
 dist/
 build/
 .next/
+.open-next/
 out/
 *.tsbuildinfo
 *.log
 logs/
+.wrangler/
 
 # Test artifacts
 test-results/
@@ -35,3 +37,11 @@ Thumbs.db
 .aiox-core/local/
 .claude/settings.local.json
 .aiox/install-log.txt
+.aiox/handoffs/
+
+# Test Coverage (AIOX)
+coverage/
+.nyc_output/
+
+# OMC Tooling State (AIOX)
+.omc/state/

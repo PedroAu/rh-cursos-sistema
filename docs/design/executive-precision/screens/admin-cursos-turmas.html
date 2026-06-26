@@ -1,0 +1,476 @@
+<!DOCTYPE html><html class="light" lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RH Cursos - Gestão de Cursos e Turmas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#2f3133",
+                      "on-surface-variant": "#41484e",
+                      "surface-tint": "#1d648e",
+                      "on-tertiary-container": "#c9ccce",
+                      "primary": "#004364",
+                      "info": "#0D5B85",
+                      "on-primary": "#ffffff",
+                      "error": "#ba1a1a",
+                      "secondary-fixed-dim": "#f6be39",
+                      "on-primary-fixed-variant": "#004b70",
+                      "tertiary-fixed": "#e0e3e5",
+                      "on-background": "#1a1c1e",
+                      "surface-bright": "#f9f9fc",
+                      "surface-container": "#eeeef0",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e2e2e5",
+                      "outline-variant": "#c0c7cf",
+                      "outline": "#71787f",
+                      "inverse-on-surface": "#f0f0f3",
+                      "primary-container": "#0d5b85",
+                      "surface-dark": "#083B56",
+                      "warning": "#E67E22",
+                      "success": "#2D8A39",
+                      "surface-container-low": "#f3f3f6",
+                      "inverse-primary": "#91cdfd",
+                      "error-container": "#ffdad6",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#e2e2e5",
+                      "tertiary": "#3b4041",
+                      "on-tertiary-fixed-variant": "#434749",
+                      "tertiary-fixed-dim": "#c4c7c9",
+                      "on-secondary-container": "#715300",
+                      "primary-fixed": "#cae6ff",
+                      "surface-container-high": "#e8e8ea",
+                      "secondary-fixed": "#ffdfa0",
+                      "on-secondary-fixed-variant": "#5c4300",
+                      "on-surface": "#1a1c1e",
+                      "background": "#f9f9fc",
+                      "primary-fixed-dim": "#91cdfd",
+                      "on-primary-container": "#99d2ff",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#ffc641",
+                      "on-tertiary": "#ffffff",
+                      "surface": "#f9f9fc",
+                      "on-error": "#ffffff",
+                      "surface-dim": "#dadadc",
+                      "tertiary-container": "#535759",
+                      "on-primary-fixed": "#001e30",
+                      "on-tertiary-fixed": "#181c1e",
+                      "secondary": "#795900",
+                      "on-secondary-fixed": "#261a00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "container-max": "1200px",
+                      "section-padding-sm": "48px",
+                      "gutter": "24px",
+                      "section-padding-lg": "80px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Montserrat"],
+                      "body-md": ["Inter"],
+                      "label-bold": ["Inter"],
+                      "headline-md": ["Montserrat"],
+                      "caption": ["Inter"],
+                      "headline-lg-mobile": ["Montserrat"],
+                      "display-lg": ["Montserrat"],
+                      "body-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter py-4 max-w-full bg-surface-container-lowest border-b border-outline-variant shadow-sm mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-headline-md font-headline-md font-bold text-primary">RH Cursos</span>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Cursos</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">In Company</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Agenda</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Sobre</a>
+<a class="text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-colors" href="#">Contato</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:block">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-body-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="Buscar no painel..." type="text">
+</div>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold text-label-bold hover:bg-primary-container transition-all flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">admin_panel_settings</span>
+                Admin
+            </button>
+</div>
+</header>
+<main class="pt-24 pb-section-padding-lg max-w-container-max mx-auto px-gutter">
+<!-- Header Actions -->
+<section class="mb-12 flex flex-col md:flex-row justify-between items-end md:items-center gap-6">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-2">Gestão de Cursos e Turmas</h1>
+<p class="text-body-md text-on-surface-variant max-w-2xl">Administre o catálogo educacional, monitore inscrições em tempo real e organize o cronograma das próximas turmas presenciais e online.</p>
+</div>
+<button class="px-6 py-3 rounded-full font-label-bold text-label-bold transition-all flex items-center gap-2 shadow-sm text-white" onclick="document.getElementById('new-course-modal').classList.remove('hidden')" style="background-color: #d4a017;"><span class="material-symbols-outlined">person_add</span> Novo Cadastro</button>
+</section>
+<!-- Bento Stats Grid -->
+<section class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="text-primary material-symbols-outlined text-3xl">school</span>
+<span class="text-success text-label-bold">+12%</span>
+</div>
+<div class="text-display-lg font-display-lg text-primary">24</div>
+<div class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wider">Cursos Ativos</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="text-primary material-symbols-outlined text-3xl">group</span>
+<span class="text-success text-label-bold">+5.4%</span>
+</div>
+<div class="text-display-lg font-display-lg text-primary">842</div>
+<div class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wider">Alunos Matriculados</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="text-primary material-symbols-outlined text-3xl">event_available</span>
+<span class="text-warning text-label-bold">Urgente</span>
+</div>
+<div class="text-display-lg font-display-lg text-primary">08</div>
+<div class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wider">Turmas Iniciando</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl shadow-sm">
+<div class="flex justify-between items-start mb-4">
+<span class="text-primary material-symbols-outlined text-3xl">trending_up</span>
+</div>
+<div class="text-display-lg font-display-lg text-primary">92%</div>
+<div class="text-label-bold font-label-bold text-on-surface-variant uppercase tracking-wider">Taxa de Conclusão</div>
+</div>
+</section>
+<!-- Course Table Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden mb-12">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h2 class="font-headline-md text-headline-md text-primary">Listagem de Turmas Ativas</h2>
+<div class="flex gap-2">
+<button class="p-2 hover:bg-surface-variant rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 hover:bg-surface-variant rounded transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container text-on-surface-variant font-label-bold text-label-bold">
+<th class="px-6 py-4">CURSO / TURMA</th>
+<th class="px-6 py-4">CATEGORIA</th>
+<th class="px-6 py-4">INSCRITOS</th>
+<th class="px-6 py-4">PERÍODO</th>
+<th class="px-6 py-4">STATUS</th>
+<th class="px-6 py-4 text-right">AÇÕES</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Course Row 1 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div>
+<div class="font-label-bold text-on-surface">Gestão Pública 4.0</div>
+<div class="text-caption text-on-surface-variant">Turma B - Noturno</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded-full text-caption">Administração</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 85%;"></div>
+</div>
+<span class="text-body-md font-label-bold">34/40</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-body-md text-on-surface">15 Out - 15 Dez</div>
+<div class="text-caption text-on-surface-variant">2024</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-success font-label-bold text-label-bold">
+<span class="w-2 h-2 rounded-full bg-success"></span> Em Andamento
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- Course Row 2 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">diversity_3</span>
+</div>
+<div>
+<div class="font-label-bold text-on-surface">Liderança em RH</div>
+<div class="text-caption text-on-surface-variant">Turma Alpha - Presencial</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded-full text-caption">Soft Skills</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-warning h-full" style="width: 100%;"></div>
+</div>
+<span class="text-body-md font-label-bold text-warning">LOTADO</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-body-md text-on-surface">20 Nov - 22 Nov</div>
+<div class="text-caption text-on-surface-variant">Imersão</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-info font-label-bold text-label-bold">
+<span class="w-2 h-2 rounded-full bg-info"></span> Matrículas Abertas
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+<!-- Course Row 3 -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div>
+<div class="font-label-bold text-on-surface">Licitações e Contratos</div>
+<div class="text-caption text-on-surface-variant">Turma Online Síncrona</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded-full text-caption">Jurídico</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-24 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full" style="width: 45%;"></div>
+</div>
+<span class="text-body-md font-label-bold">18/40</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-body-md text-on-surface">05 Jan - 20 Jan</div>
+<div class="text-caption text-on-surface-variant">2025</div>
+</td>
+<td class="px-6 py-4">
+<span class="flex items-center gap-1 text-on-surface-variant font-label-bold text-label-bold">
+<span class="w-2 h-2 rounded-full bg-outline"></span> Planejado
+                                </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+<button class="p-2 hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant flex justify-between items-center text-caption text-on-surface-variant">
+<span>Exibindo 3 de 24 cursos</span>
+<div class="flex gap-1">
+<button class="p-2 hover:bg-surface-variant rounded text-on-surface disabled:opacity-30" disabled=""><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="px-3 py-1 bg-primary text-on-primary rounded font-label-bold">1</button>
+<button class="px-3 py-1 hover:bg-surface-variant rounded">2</button>
+<button class="px-3 py-1 hover:bg-surface-variant rounded">3</button>
+<button class="p-2 hover:bg-surface-variant rounded text-on-surface"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</section>
+<!-- Form Section (Simulated "Create" UI) -->
+<div class="fixed inset-0 z-[60] flex items-center justify-center bg-surface-dark/60 backdrop-blur-sm hidden p-margin-mobile" id="new-course-modal">
+<div class="bg-surface-container-lowest w-full max-w-2xl rounded-xl shadow-2xl border border-outline-variant overflow-hidden flex flex-col animate-in fade-in zoom-in duration-300">
+<div class="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-headline-md text-headline-md text-primary">Cadastrar Novo Curso</h3>
+<button class="p-2 hover:bg-error-container hover:text-error rounded transition-all" onclick="document.getElementById('new-course-modal').classList.add('hidden')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-8 overflow-y-auto max-h-[716px]">
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="space-y-2 col-span-2">
+<label class="font-label-bold text-label-bold text-on-surface">Nome do Curso</label>
+<input class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" placeholder="Ex: Gestão Estratégica de Pessoas" type="text">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Categoria</label>
+<select class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none">
+<option>Administração</option>
+<option>Jurídico</option>
+<option>Soft Skills</option>
+<option>Finanças</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Modalidade</label>
+<select class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none">
+<option>Presencial</option>
+<option>Online Síncrono</option>
+<option>Online Gravado</option>
+<option>In Company</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Data de Início</label>
+<input class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none" type="date">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Data de Término</label>
+<input class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none" type="date">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Vagas Totais</label>
+<input class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="40" type="number">
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Investimento (R$)</label>
+<input class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="1.250,00" type="text">
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-bold text-label-bold text-on-surface">Descrição do Curso</label>
+<textarea class="w-full px-4 py-3 border border-outline rounded-lg focus:ring-2 focus:ring-primary outline-none" placeholder="Objetivos do curso, público-alvo e ementa resumida..." rows="4"></textarea>
+</div>
+<div class="pt-4 flex justify-end gap-4 border-t border-outline-variant">
+<button class="px-6 py-3 border border-primary text-primary rounded-lg font-label-bold hover:bg-surface-container-low transition-all" onclick="document.getElementById('new-course-modal').classList.add('hidden')" type="button">Cancelar</button>
+<button class="px-6 py-3 bg-primary text-on-primary rounded-lg font-label-bold hover:bg-primary-container shadow-md transition-all" type="submit">Salvar Curso</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-section-padding-lg px-gutter grid grid-cols-1 md:grid-cols-4 gap-8 max-w-container-max mx-auto bg-surface-dark text-secondary-fixed">
+<div class="md:col-span-1">
+<span class="text-headline-md font-headline-md font-bold text-surface-container-lowest block mb-4">RH Cursos</span>
+<p class="text-surface-variant opacity-80 text-body-md mb-6">Excelência em treinamento para o setor público e privado. Transformando organizações através do conhecimento.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full border border-surface-variant flex items-center justify-center hover:bg-surface-variant hover:text-surface-dark transition-all" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="w-10 h-10 rounded-full border border-surface-variant flex items-center justify-center hover:bg-surface-variant hover:text-surface-dark transition-all" href="#"><span class="material-symbols-outlined">mail</span></a>
+<a class="w-10 h-10 rounded-full border border-surface-variant flex items-center justify-center hover:bg-surface-variant hover:text-surface-dark transition-all" href="#"><span class="material-symbols-outlined">call</span></a>
+</div>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-surface-container-lowest uppercase mb-6">Plataforma</h4>
+<ul class="space-y-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Home</a></li>
+<li><a class="text-secondary-fixed font-bold text-body-md" href="#">Cursos</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Agenda de turmas</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Catálogo de cursos</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-surface-container-lowest uppercase mb-6">Institucional</h4>
+<ul class="space-y-3">
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Sobre</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">In Company</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Contato</a></li>
+<li><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all text-body-md" href="#">Administração</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-label-bold text-label-bold text-surface-container-lowest uppercase mb-6">Legal</h4>
+<p class="text-surface-variant opacity-80 text-caption mb-6 leading-relaxed">
+                RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90<br>
+                Todos os direitos reservados.
+            </p>
+<div class="space-y-3">
+<a class="flex items-center gap-2 text-surface-variant hover:text-secondary-fixed transition-all" href="#">
+<span class="material-symbols-outlined text-sm">security</span>
+<span class="text-caption">Políticas de Privacidade</span>
+</a>
+<a class="flex items-center gap-2 text-surface-variant hover:text-secondary-fixed transition-all" href="#">
+<span class="material-symbols-outlined text-sm">gavel</span>
+<span class="text-caption">Termos de Uso</span>
+</a>
+</div>
+</div>
+</footer>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Modal logic
+        window.onclick = function(event) {
+            const modal = document.getElementById('new-course-modal');
+            if (event.target == modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Active state logic for Nav
+        document.querySelectorAll('nav a').forEach(link => {
+            if (link.textContent === 'Cursos') {
+                link.classList.add('text-primary', 'font-bold', 'border-b-2', 'border-secondary-container');
+            }
+        });
+    </script>
+</body></html>

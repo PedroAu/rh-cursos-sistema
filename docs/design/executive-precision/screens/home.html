@@ -1,0 +1,484 @@
+<!DOCTYPE html><html lang="pt-BR" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>RH Cursos - Formando quem transforma</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1e",
+                        "outline": "#71787f",
+                        "surface-container-high": "#e8e8ea",
+                        "secondary-fixed": "#ffdfa0",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#1a1c1e",
+                        "surface-variant": "#e2e2e5",
+                        "surface-container": "#eeeef0",
+                        "outline-variant": "#c0c7cf",
+                        "secondary-fixed-dim": "#f6be39",
+                        "on-tertiary-fixed": "#181c1e",
+                        "background": "#f9f9fc",
+                        "surface-container-low": "#f3f3f6",
+                        "on-surface-variant": "#41484e",
+                        "surface-container-highest": "#e2e2e5",
+                        "surface-tint": "#1d648e",
+                        "inverse-surface": "#2f3133",
+                        "inverse-primary": "#91cdfd",
+                        "secondary-container": "#ffc641",
+                        "on-secondary-fixed": "#261a00",
+                        "surface-bright": "#f9f9fc",
+                        "primary": "#004364",
+                        "surface-dim": "#dadadc",
+                        "surface-container-lowest": "#ffffff",
+                        "info": "#0D5B85",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "tertiary-container": "#535759",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#91cdfd",
+                        "on-primary-fixed-variant": "#004b70",
+                        "on-secondary-container": "#715300",
+                        "primary-fixed": "#cae6ff",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#434749",
+                        "error": "#ba1a1a",
+                        "warning": "#E67E22",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "success": "#2D8A39",
+                        "secondary": "#795900",
+                        "surface": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "on-primary-container": "#99d2ff",
+                        "on-primary-fixed": "#001e30",
+                        "surface-dark": "#083B56",
+                        "primary-container": "#0d5b85",
+                        "on-secondary-fixed-variant": "#5c4300",
+                        "on-tertiary-container": "#c9ccce",
+                        "tertiary": "#3b4041"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "section-padding-sm": "48px",
+                        "gutter": "24px",
+                        "section-padding-lg": "80px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-bold": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "body-md": ["Inter"],
+                        "caption": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "34px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48; }
+        .hero-gradient { background: linear-gradient(rgba(0, 67, 100, 0.85), rgba(0, 67, 100, 0.7)), url('https://images.unsplash.com/photo-1524178232363-1fb28f74b671?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center; }
+        .card-shadow { box-shadow: 0px 4px 12px rgba(0,0,0,0.05); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-item.active .accordion-content { max-height: 200px; }
+        .accordion-item.active .chevron { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- Header / TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface-container-lowest border-b border-outline-variant shadow-sm">
+<nav class="max-w-container-max mx-auto px-gutter py-4 flex justify-between items-center">
+<div class="flex items-center gap-8">
+<img alt="RH Cursos Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLv-hrdVTaPCL0jtSf-M2mYU2haEbRZJ1ty3wEJPVjtoLz2K7Bka9Qu37AYsAOJYZdSu4P3QAb-1TINkxVLx36CrE_8Ycbc3fxzwRHUqRcRM_pMipZWH_KjP8dT3DN5I0_YUplieGThfPEFKXm2rqPeJ2D2mEoTFLOlwT7jVPwQm-ZSEFftzboTAE8Z6cmeXkY17ScpXNX7JFMu90BI73Cm_H24HCi29T3-ENR1-O_N-5e6XVKYh_o7DIdUc">
+<div class="hidden md:flex items-center gap-6">
+<a class="font-label-bold text-label-bold text-primary border-b-2 border-secondary-container" href="#">Cursos</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">In Company</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Agenda</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Sobre</a>
+<a class="font-label-bold text-label-bold text-on-surface-variant hover:text-primary transition-colors" href="#">Contato</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+
+
+</div>
+</nav>
+</header>
+<main class="mt-20">
+<!-- Hero Section -->
+<section class="relative h-[80vh] flex items-center overflow-hidden">
+<div class="absolute inset-0 hero-gradient" data-alt="A professional corporate training environment where a diverse group of focused adult learners is participating in a high-tech workshop led by an authoritative female instructor. The setting is a modern glass-walled office in a city skyline with soft warm interior lighting and deep professional blue atmospheric tones. The visual style is polished and high-end corporate photography." style="background: linear-gradient(rgba(0, 67, 100, 0.85), rgba(0, 67, 100, 0.7)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuA_ETVBn9O-TDjV5fQIL0qAZDeGPghF2CTK7SlvIBNTlJIzvwqpzVxQREnpywBJqNLKVTBtKtexeyPCeFuDSC7e-9zjzKCCWPms0v4N92pCZ-Fneor9ESRrXHEMA825zAyYU-k3gU7EpHo_cYCOzC31zxN77ZVEPO5XKjz6Ln5k8wTJUT9QHwlogkQm0cDCdbGM_Pk2WL28ukGp3FXU1nBVL0MnnYOXSLal_PYZhvDRRQmf27wd7PXIG9guGCMyEx-GBUvrm0YnvXoj'); background-size: cover; background-position: center;"></div>
+<div class="max-w-container-max mx-auto px-gutter relative z-10 text-white w-full">
+<div class="max-w-3xl">
+<span class="inline-block bg-secondary-container text-on-secondary-container px-3 py-1 rounded-sm text-xs font-bold tracking-wider mb-6">TREINAMENTO DE ALTA PERFORMANCE, DESDE 2007.</span>
+<h1 class="font-display-lg text-display-lg mb-4">Formando quem transforma, <span class="text-secondary-fixed-dim">há 19 anos.</span></h1>
+<p class="font-body-lg text-body-lg mb-8 opacity-90">Capacitação 100% prática para profissionais de RH, Gestão Pública e Auditoria que buscam segurança jurídica e excelência operacional.</p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-secondary-fixed-dim text-on-secondary-fixed px-8 py-4 rounded-lg font-label-bold shadow-lg hover:scale-105 transition-transform">Ver Trilhas de Conhecimento</button>
+<button class="border-2 border-white text-white px-8 py-4 rounded-lg font-label-bold flex items-center gap-2 hover:bg-white hover:text-primary transition-all">
+<span class="material-symbols-outlined">forum</span>
+                            Falar com Especialista
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Bar -->
+<section class="max-w-container-max mx-auto px-gutter -mt-16 relative z-20">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border-t-4 border-primary flex items-center gap-6">
+<div class="bg-primary-container/20 p-4 rounded-full">
+<span class="material-symbols-outlined text-primary text-[40px]">calendar_today</span>
+</div>
+<div>
+<div class="text-3xl font-bold text-primary">2.500+ Alunos</div>
+<div class="text-on-surface-variant font-label-bold">DE ENTREGA</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border-t-4 border-primary flex items-center gap-6">
+<div class="bg-primary-container/20 p-4 rounded-full">
+<span class="material-symbols-outlined text-primary text-[40px]">schema</span>
+</div>
+<div>
+<div class="text-3xl font-bold text-primary">180+ Cursos</div>
+<div class="text-on-surface-variant font-label-bold">ATIVAS</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border-t-4 border-primary flex items-center gap-6">
+<div class="bg-primary-container/20 p-4 rounded-full">
+<span class="material-symbols-outlined text-primary text-[40px]">stars</span>
+</div>
+<div>
+<div class="text-3xl font-bold text-primary">98% Satisfação</div>
+<div class="text-on-surface-variant font-label-bold">AVALIAÇÃO MÉDIA</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Problem/Solution Section -->
+<section class="py-section-padding-lg bg-surface-dark mt-16 text-white overflow-hidden relative">
+<div class="max-w-container-max mx-auto px-gutter relative z-10">
+<div class="max-w-2xl mb-16">
+<span class="text-secondary-fixed font-label-bold mb-4 block uppercase tracking-widest text-sm">O Problema Real</span>
+<h2 class="font-headline-lg text-headline-lg mb-6 leading-tight">A burocracia muda. Quem não se atualiza, erra.</h2>
+<p class="font-body-lg text-body-lg opacity-80">DP, eSocial, Lei 14.133 e IA aplicada ao serviço público avançam rápido. Enquanto o volume técnico aumenta, o tempo para aprender diminui. E cada erro pode virar multa, retrabalho ou risco para a equipe.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/20">
+<span class="material-symbols-outlined text-secondary-fixed text-[48px] mb-6">warning</span>
+<h3 class="font-headline-md text-headline-md mb-4">Risco de auditoria</h3>
+<p class="opacity-80">Erros técnicos detectados em fiscalizações geram multas, retrabalho e exposição para toda a equipe.</p>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/20">
+<span class="material-symbols-outlined text-secondary-fixed text-[48px] mb-6">menu_book</span>
+<h3 class="font-headline-md text-headline-md mb-4">Cursos teóricos demais</h3>
+<p class="opacity-80">Muito conteúdo promete capacitação, mas pouco prepara você para aplicar no dia seguinte.</p>
+</div>
+<div class="bg-white/10 backdrop-blur-md p-8 rounded-xl border border-white/20">
+<span class="material-symbols-outlined text-secondary-fixed text-[48px] mb-6">sync_problem</span>
+<h3 class="font-headline-md text-headline-md mb-4">Legislação em mudança</h3>
+<p class="opacity-80">eSocial, NR-1, licitações e outras normas não esperam. Quem não se atualiza fica para trás.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Course Tracks Section -->
+<section class="py-section-padding-lg bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-gutter text-center mb-16">
+<span class="text-primary font-label-bold block mb-2 uppercase">Nosso Currículo</span>
+<h2 class="font-headline-lg text-headline-lg mb-4 text-primary">Escolha sua trilha de capacitação</h2>
+<p class="text-on-surface-variant max-w-2xl mx-auto">+80 cursos em 6 trilhas, prontas para você começar sua transformação profissional agora.</p>
+</div>
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Track Card 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">group</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">14 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Departamento Pessoal, Folha &amp; eSocial</h3>
+<p class="text-on-surface-variant mb-8">Domínio técnico de DP público, legislação trabalhista e conformidade digital com eSocial, FGTS Digital e LGPD.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+<!-- Track Card 2 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">gavel</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">12 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Licitações, Compras e Contratos</h3>
+<p class="text-on-surface-variant mb-8">Da legislação básica à fiscalização avançada de contratos, com cobertura completa da Nova Lei 14.133/2021.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+<!-- Track Card 3 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">psychology</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">16 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Gestão de Pessoas &amp; Liderança</h3>
+<p class="text-on-surface-variant mb-8">Formação humanizada para líderes, com foco em inteligência emocional, cultura organizacional e gestão por resultados.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+<!-- Track Card 4 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">forum</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">10 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Comunicação e Atendimento</h3>
+<p class="text-on-surface-variant mb-8">Comunicação clara e eficiente para o atendimento ao cidadão e redação oficial moderna.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+<!-- Track Card 5 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">account_balance</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">18 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Auditoria e Contabilidade Pública</h3>
+<p class="text-on-surface-variant mb-8">Domínio técnico em contabilidade, obrigações acessórias, Tesouro, SIAFI e auditoria governamental.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+<!-- Track Card 6 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow border border-outline-variant hover:border-primary transition-all group">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-primary text-[40px]">bolt</span>
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded text-xs font-bold uppercase">11 Cursos</span>
+</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Tecnologia, Dados e Inovação</h3>
+<p class="text-on-surface-variant mb-8">Ferramentas digitais, análise de dados e governança para a transformação digital no setor público.</p>
+<a class="font-label-bold text-primary flex items-center gap-2 group-hover:gap-4 transition-all" href="#">Ver cursos da trilha <span class="material-symbols-outlined">arrow_forward</span></a>
+</div>
+</div>
+<div class="mt-16 text-center">
+<button class="bg-primary text-on-primary px-10 py-4 rounded-lg font-label-bold shadow-md hover:shadow-xl transition-all">Ver todos os cursos</button>
+</div>
+</section>
+<!-- Social Proof / Testimonials -->
+<section class="py-section-padding-lg bg-surface">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row gap-12 items-center">
+<div class="w-full md:w-1/3">
+<span class="text-primary font-label-bold uppercase mb-4 block">Testemunhos</span>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-6">Resultados percebidos por quem participou.</h2>
+<p class="text-on-surface-variant mb-8">Ouvimos centenas de profissionais que transformaram suas rotinas após nossos treinamentos práticos.</p>
+<div class="flex gap-4">
+<button class="p-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="p-3 rounded-full border border-primary text-primary hover:bg-primary hover:text-white transition-all"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+<div class="w-full md:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow relative">
+<span class="material-symbols-outlined text-primary/10 text-[80px] absolute top-4 right-4">format_quote</span>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">AR</div>
+<div>
+<div class="font-bold">Amanda Rocha</div>
+<div class="text-xs text-on-surface-variant">Coord. de DP • Grupo Horizonte</div>
+</div>
+</div>
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+</div>
+<p class="text-body-md italic text-on-surface-variant">"O curso trouxe clareza para revisar processos e organizar melhor a conferência da folha de pagamento."</p>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-xl card-shadow relative">
+<span class="material-symbols-outlined text-primary/10 text-[80px] absolute top-4 right-4">format_quote</span>
+<div class="flex items-center gap-4 mb-6">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold">SF</div>
+<div>
+<div class="font-bold">Silvia Ferreira</div>
+<div class="text-xs text-on-surface-variant">Gestora RH • Autarquia Federal</div>
+</div>
+</div>
+<div class="flex gap-1 mb-4">
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: &quot;FILL&quot; 1;">star</span>
+</div>
+<p class="text-body-md italic text-on-surface-variant">"Saímos com checklist, mais confiança e um caminho claro para ajustar a rotina legislativa do órgão."</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Process Section -->
+<section class="py-section-padding-lg bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto px-gutter text-center mb-16">
+<span class="text-primary font-label-bold block mb-2 uppercase">Como Funciona</span>
+<h2 class="font-headline-lg text-headline-lg text-primary">Três passos para transformar resultado</h2>
+</div>
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+<!-- Decorative line -->
+<div class="hidden md:block absolute top-12 left-1/4 right-1/4 h-0.5 border-t-2 border-dashed border-outline-variant -z-10"></div>
+<div class="text-center group">
+<div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 group-hover:scale-110 transition-transform shadow-lg">1</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Escolha sua trilha</h3>
+<p class="text-on-surface-variant">Identifique o desafio técnico do seu cargo ou da sua equipe e encontre a trilha ideal para suprir essa lacuna.</p>
+</div>
+<div class="text-center group">
+<div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 group-hover:scale-110 transition-transform shadow-lg">2</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Aprenda na prática</h3>
+<p class="text-on-surface-variant">Estude com casos reais, legislação atual e ferramentas que você já utiliza no seu cotidiano profissional.</p>
+</div>
+<div class="text-center group">
+<div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl font-bold mx-auto mb-8 group-hover:scale-110 transition-transform shadow-lg">3</div>
+<h3 class="font-headline-md text-headline-md mb-4 text-primary">Aplique e veja resultado</h3>
+<p class="text-on-surface-variant">Saia pronto para aplicar o conteúdo e acompanhar a evolução dos processos com mais segurança jurídica.</p>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="py-section-padding-lg bg-surface">
+<div class="max-w-3xl mx-auto px-gutter">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-12 text-center">Dúvidas Frequentes</h2>
+<div class="space-y-4">
+<div class="accordion-item bg-white border border-outline-variant rounded-lg">
+<button class="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none" onclick="this.parentElement.classList.toggle('active')">
+<span class="font-bold text-primary">Como faço minha inscrição?</span>
+<span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+</button>
+<div class="accordion-content px-6 pb-5">
+<p class="text-on-surface-variant">Você pode realizar a inscrição diretamente pelo nosso site em cada página de curso, ou falar com nossos consultores via WhatsApp para orçamentos por nota de empenho.</p>
+</div>
+</div>
+<div class="accordion-item bg-white border border-outline-variant rounded-lg">
+<button class="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none" onclick="this.parentElement.classList.toggle('active')">
+<span class="font-bold text-primary">Recebo certificado após o curso?</span>
+<span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+</button>
+<div class="accordion-content px-6 pb-5">
+<p class="text-on-surface-variant">Sim! Todos os nossos cursos conferem certificados válidos em todo o território nacional, especificando a carga horária e o conteúdo programático ministrado.</p>
+</div>
+</div>
+<div class="accordion-item bg-white border border-outline-variant rounded-lg">
+<button class="w-full px-6 py-5 flex justify-between items-center text-left focus:outline-none" onclick="this.parentElement.classList.toggle('active')">
+<span class="font-bold text-primary">Órgãos públicos podem contratar?</span>
+<span class="material-symbols-outlined chevron transition-transform">expand_more</span>
+</button>
+<div class="accordion-content px-6 pb-5">
+<p class="text-on-surface-variant">Sim. Somos especialistas no atendimento à administração pública direta e indireta, aceitando pagamentos via Nota de Empenho conforme a nova Lei de Licitações.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="py-section-padding-lg">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="bg-surface-dark rounded-2xl p-12 text-center relative overflow-hidden">
+<div class="relative z-10">
+<h2 class="font-display-lg text-display-lg text-white mb-6">Pronto para ser referência?</h2>
+<p class="text-white opacity-80 text-body-lg max-w-2xl mx-auto mb-10">Inicie agora sua jornada de atualização técnica e ganhe a segurança que seu cargo exige.</p>
+<div class="flex flex-wrap justify-center gap-6">
+<button class="bg-secondary-fixed-dim text-on-secondary-fixed px-10 py-4 rounded-lg font-bold shadow-lg hover:scale-105 transition-all">Ver trilhas agora</button>
+<a class="bg-success text-white px-10 py-4 rounded-lg font-bold flex items-center gap-3 hover:opacity-90 transition-all" href="https://wa.me/5500000000000">
+<svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.025 3.107l-.696 2.54 2.597-.681c.812.439 1.745.8 2.842.8 3.181 0 5.767-2.586 5.767-5.766 0-3.181-2.586-5.766-5.767-5.766zm3.39 8.201c-.148.414-.731.761-1.009.809-.277.048-.564.085-1.611-.328-1.047-.414-1.724-1.481-1.771-1.545-.048-.064-.388-.517-.388-1.003 0-.486.255-.724.346-.822.09-.098.202-.122.266-.122s.127.002.186.005c.058.003.138-.022.215.162.077.184.266.649.293.702.027.053.045.115.011.184-.034.069-.051.111-.101.168-.051.058-.106.129-.151.173-.051.05-.104.103-.045.205.059.102.261.429.561.696.387.346.713.453.815.505.102.051.162.043.222-.026.06-.069.255-.296.323-.396.069-.101.138-.085.234-.051s.606.286.712.339c.106.053.177.081.203.125.027.045.027.257-.121.671z"></path></svg>
+                                WhatsApp Consultoria
+                            </a>
+</div>
+</div>
+<!-- Abstract decoration -->
+<div class="absolute -bottom-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl"></div>
+<div class="absolute -top-20 -left-20 w-80 h-80 bg-primary-container/20 rounded-full blur-3xl"></div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-dark text-secondary-fixed py-section-padding-lg border-t border-white/10">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-4 gap-12">
+<div>
+<img alt="RH Cursos Footer" class="h-12 w-auto mb-6 brightness-0 invert" src="https://lh3.googleusercontent.com/aida/AP1WRLv-hrdVTaPCL0jtSf-M2mYU2haEbRZJ1ty3wEJPVjtoLz2K7Bka9Qu37AYsAOJYZdSu4P3QAb-1TINkxVLx36CrE_8Ycbc3fxzwRHUqRcRM_pMipZWH_KjP8dT3DN5I0_YUplieGThfPEFKXm2rqPeJ2D2mEoTFLOlwT7jVPwQm-ZSEFftzboTAE8Z6cmeXkY17ScpXNX7JFMu90BI73Cm_H24HCi29T3-ENR1-O_N-5e6XVKYh_o7DIdUc">
+<p class="text-surface-variant opacity-80 font-body-md mb-6">Desde 2007, cursos, consultoria e treinamento empresarial com foco em resultados práticos.</p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary-fixed hover:text-surface-dark transition-all" href="#"><span class="material-symbols-outlined text-[20px]">share</span></a>
+<a class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-secondary-fixed hover:text-surface-dark transition-all" href="#"><span class="material-symbols-outlined text-[20px]">mail</span></a>
+</div>
+</div>
+<div>
+<h4 class="text-white font-headline-md mb-6 text-body-lg uppercase tracking-wider font-bold">Navegação</h4>
+<ul class="space-y-4 font-label-bold">
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Home</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Cursos</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">In Company</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Agenda</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Sobre</a></li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-headline-md mb-6 text-body-lg uppercase tracking-wider font-bold">Atendimento</h4>
+<ul class="space-y-4 text-surface-variant opacity-80">
+<li class="flex items-center gap-3"><span class="material-symbols-outlined text-secondary-fixed text-[20px]">phone</span> (61) 3965-1929</li>
+<li class="flex items-center gap-3"><span class="material-symbols-outlined text-secondary-fixed text-[20px]">phone_iphone</span> (61) 99112-9682</li>
+<li class="flex items-center gap-3"><span class="material-symbols-outlined text-secondary-fixed text-[20px]">location_on</span> Águas Claras, Brasília - DF</li>
+</ul>
+</div>
+<div>
+<h4 class="text-white font-headline-md mb-6 text-body-lg uppercase tracking-wider font-bold">Acesso Rápido</h4>
+<ul class="space-y-4 font-label-bold">
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Administração</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Catálogo de cursos</a></li>
+<li class=""><a class="text-surface-variant opacity-80 hover:opacity-100 hover:text-secondary-fixed transition-all" href="#">Agenda de turmas</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter mt-16 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4 text-caption text-surface-variant opacity-60">
+<div class="">RH Cursos &amp; Soluções LTDA • CNPJ 08.703.044/0001-90</div>
+<div class="">Plataforma institucional para cursos, turmas e atendimento.</div>
+</div>
+</footer>
+<!-- FAB for WhatsApp -->
+<a class="fixed bottom-8 right-8 bg-success text-white w-16 h-16 rounded-full flex items-center justify-center shadow-2xl hover:scale-110 transition-transform z-[60]" href="https://wa.me/5500000000000">
+<svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.025 3.107l-.696 2.54 2.597-.681c.812.439 1.745.8 2.842.8 3.181 0 5.767-2.586 5.767-5.766 0-3.181-2.586-5.766-5.767-5.766zm3.39 8.201c-.148.414-.731.761-1.009.809-.277.048-.564.085-1.611-.328-1.047-.414-1.724-1.481-1.771-1.545-.048-.064-.388-.517-.388-1.003 0-.486.255-.724.346-.822.09-.098.202-.122.266-.122s.127.002.186.005c.058.003.138-.022.215.162.077.184.266.649.293.702.027.053.045.115.011.184-.034.069-.051.111-.101.168-.051.058-.106.129-.151.173-.051.05-.104.103-.045.205.059.102.261.429.561.696.387.346.713.453.815.505.102.051.162.043.222-.026.06-.069.255-.296.323-.396.069-.101.138-.085.234-.051s.606.286.712.339c.106.053.177.081.203.125.027.045.027.257-.121.671z"></path></svg>
+</a>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.card-shadow').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+
+
+
+
+</body></html>

@@ -16,6 +16,7 @@ export function BlogPostPage() {
   const post = blogPosts.find((item) => item.slug === slug);
   const relatedPosts = blogPosts.filter((item) => item.slug !== slug && item.category === post?.category).slice(0, 3);
   const relatedCourse = courses.find((course) => course.id === post?.relatedCourseId);
+  const leadParagraphs = post?.content.split("\n\n").slice(0, 3) ?? [];
 
   if (!post) {
     return (
@@ -40,11 +41,18 @@ export function BlogPostPage() {
                 <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(post.date)}</div>
                 <div className="flex items-center gap-2"><Clock3 className="h-4 w-4" />{post.readingTime}</div>
               </div>
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span key={tag} className="rounded-full border border-outline-variant bg-surface-muted px-3 py-1.5 text-label font-bold text-deep-navy">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
-            <Card>
-              <CardContent className="space-y-5 p-7">
+            <Card className="border-outline-variant">
+              <CardContent className="space-y-5 p-7 md:p-10">
                 {post.content.split("\n\n").map((paragraph) => (
-                  <p key={paragraph} className="text-base leading-8 text-muted-foreground">
+                  <p key={paragraph} className="mx-auto max-w-3xl text-base leading-8 text-muted-foreground">
                     {paragraph}
                   </p>
                 ))}
@@ -53,6 +61,19 @@ export function BlogPostPage() {
           </article>
 
           <div className="space-y-6">
+            <Card className="border-outline-variant bg-surface-muted">
+              <CardContent className="space-y-4 p-6">
+                <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Leitura guiada</div>
+                <ul className="space-y-3 text-sm leading-6 text-text-muted">
+                  {leadParagraphs.map((paragraph, index) => (
+                    <li key={paragraph} className="flex gap-3">
+                      <span className="mt-0.5 font-bold text-deep-navy">{index + 1}.</span>
+                      <span>{paragraph}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
             <Card className="bg-primary text-white">
               <CardContent className="space-y-4 p-6">
                 <div className="text-sm uppercase tracking-[0.18em] text-blue-100/80">CTA relacionado</div>
@@ -68,6 +89,17 @@ export function BlogPostPage() {
                     </Link>
                   </Button>
                 ) : null}
+              </CardContent>
+            </Card>
+
+            <Card className="border-outline-variant bg-white">
+              <CardContent className="space-y-4 p-6">
+                <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Taxonomia</div>
+                <div className="space-y-3 text-sm leading-6 text-text-muted">
+                  <p><strong className="text-deep-navy">Categoria:</strong> {post.category}</p>
+                  <p><strong className="text-deep-navy">Autor:</strong> {post.author}</p>
+                  <p><strong className="text-deep-navy">Leitura estimada:</strong> {post.readingTime}</p>
+                </div>
               </CardContent>
             </Card>
 

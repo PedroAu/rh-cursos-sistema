@@ -1,23 +1,26 @@
 import * as React from "react";
+import { Loader2 } from "lucide-react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--mantine-radius-md)] text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-soft hover:-translate-y-0.5 hover:bg-deep-navy",
+          "bg-[var(--color-primary)] text-[var(--mantine-color-white)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--color-primary-hover)]",
         secondary:
-          "bg-accent text-white shadow-soft hover:-translate-y-0.5 hover:bg-warning hover:text-white",
+          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--form-input-color)] shadow-soft hover:-translate-y-0.5 hover:bg-tertiary-0",
         outline:
-          "border border-primary/20 bg-white text-primary hover:-translate-y-0.5 hover:border-accent hover:bg-surface-muted",
-        ghost: "text-foreground hover:bg-primary/[0.05]",
-        success: "bg-success text-white hover:-translate-y-0.5 hover:bg-success/90",
-        danger: "bg-danger text-white hover:bg-danger/90"
+          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--color-primary-light)] hover:-translate-y-0.5 hover:bg-primary-0",
+        ghost: "text-[var(--color-primary-light)] hover:bg-primary-0",
+        tertiary:
+          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--color-primary-light)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
+        success: "bg-[var(--color-status-success)] text-white hover:-translate-y-0.5 hover:opacity-90",
+        danger: "bg-[var(--color-status-error)] text-white hover:opacity-90"
       },
       size: {
         default: "h-12 px-6",
@@ -37,18 +40,33 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  loading?: boolean;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ children, className, variant, size, asChild = false, disabled, loading = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+    const isDisabled = disabled || loading;
+    const content = asChild ? (
+      children
+    ) : (
+      <>
+        {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+        {children}
+      </>
+    );
 
     return (
       <Comp
         className={cn(buttonVariants({ variant, size }), className)}
         ref={ref}
+        aria-busy={loading || undefined}
+        disabled={isDisabled}
+        data-loading={loading ? "true" : undefined}
         {...props}
-      />
+      >
+        {content}
+      </Comp>
     );
   }
 );

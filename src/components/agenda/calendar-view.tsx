@@ -77,14 +77,13 @@ export function CalendarView({
   };
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)] xl:items-start">
-      <Card className="xl:sticky xl:top-28">
-        <CardContent className="p-5">
+    <div className="space-y-8">
+      <Card className="overflow-hidden border-[#d7dee5] bg-white shadow-[0_10px_24px_rgba(0,67,100,0.08)]">
+        <CardContent className="p-5 md:p-6">
           <div className="mb-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <span className="ea-label">Calendário</span>
-                <h3 className="mt-1 font-display text-2xl font-bold capitalize text-deep-navy">
+                <h3 className="mt-1 font-display text-[2rem] font-bold capitalize text-[#0b4668]">
                   {format(monthStart, "MMMM yyyy", { locale: ptBR })}
                 </h3>
               </div>
@@ -117,6 +116,7 @@ export function CalendarView({
               <input
                 id="agenda-date"
                 type="date"
+                aria-label="Selecionar data"
                 value={selectedDate ? format(selectedDate, "yyyy-MM-dd") : ""}
                 onChange={(event) => goToDate(event.target.value)}
                 className="h-11 w-full rounded-lg border border-input bg-white px-3 text-sm shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-ring/30"
@@ -127,7 +127,7 @@ export function CalendarView({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-micro font-bold uppercase tracking-[0.08em] text-muted-foreground">
+          <div className="grid grid-cols-7 gap-1 text-center text-[0.82rem] font-bold uppercase tracking-[0.08em] text-[#69737d]">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
               <div key={label} className="py-2">{label}</div>
             ))}
@@ -140,42 +140,49 @@ export function CalendarView({
                 selectedDate &&
                 format(day, "yyyy-MM-dd") === format(selectedDate, "yyyy-MM-dd");
 
+              const hasClasses = items.length > 0;
+              const inMonth = isSameMonth(day, monthStart);
+
               return (
                 <button
                   key={day.toISOString()}
                   type="button"
                   onClick={() => setSelectedDate(day)}
-                  className={`min-h-14 rounded-lg border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    isSameMonth(day, monthStart)
-                      ? "bg-white hover:border-primary/30 hover:bg-secondary/50"
-                      : "bg-background text-muted-foreground/70"
-                  } ${isToday(day) ? "border-primary shadow-soft" : "border-border"} ${
-                    isSelected ? "bg-deep-navy text-white hover:bg-deep-navy" : ""
+                  aria-label={`${format(day, "d 'de' MMMM", { locale: ptBR })}${hasClasses ? ` — ${items.length} turma${items.length === 1 ? "" : "s"}` : ""}`}
+                  aria-pressed={isSelected ? true : undefined}
+                  className={`flex min-h-[92px] flex-col justify-between border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                    inMonth
+                      ? hasClasses
+                        ? "bg-[#eaf5ff] hover:bg-[#dcebfa]"
+                        : "bg-white hover:border-[#9ebbd1] hover:bg-[#f8fbfe]"
+                      : "bg-[#f5f7fa] text-[#616971]"
+                  } ${isToday(day) ? "border-[#0d5b85] shadow-soft" : "border-[#d7dee5]"} ${
+                    isSelected ? "border-[#0b4668] bg-[#0b4668] text-white hover:bg-[#0b4668]" : ""
                   }`}
                 >
-                  <div className="text-xs font-bold">{format(day, "d")}</div>
-                  {items.length ? (
-                    <div className={`mt-1 h-1.5 w-1.5 rounded-full ${isSelected ? "bg-accent" : "bg-accent"}`} />
+                  <div className="self-end text-sm font-bold">{format(day, "d")}</div>
+                  {hasClasses ? (
+                    <div className={`mt-1 h-1 w-full rounded-full ${isSelected ? "bg-[#f6be39]" : "bg-[#004364]"}`} />
                   ) : null}
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-5 flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-xs font-semibold text-text-muted">
-            <CalendarDays className="h-4 w-4 text-primary" />
+          <div className="mt-5 flex items-center gap-2 rounded-md bg-[#f2f4f7] px-3 py-2 text-sm font-semibold text-[#58616b]">
+            <CalendarDays className="h-4 w-4 text-[#004364]" />
             Clique em uma data para filtrar os cards ao lado.
           </div>
         </CardContent>
       </Card>
 
       <div className="space-y-5">
-        <div className="apple-surface flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span className="inline-flex rounded bg-prestige-gold px-2 py-1 text-xs font-bold uppercase tracking-[0.08em] text-white">
+            <span className="inline-flex rounded-full bg-[#cae6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#004364]">
               {selectedLabel}
             </span>
-            <h2 className="mt-1 font-display text-2xl font-bold text-deep-navy">
+            <h2 className="mt-2 font-display text-[2rem] font-bold text-[#1a1c1e]">
               {visibleClasses.length} turma{visibleClasses.length === 1 ? "" : "s"} encontrada{visibleClasses.length === 1 ? "" : "s"}
             </h2>
           </div>
@@ -187,9 +194,9 @@ export function CalendarView({
         </div>
 
         {loading ? (
-          <LoadingBlocks count={6} />
+          <LoadingBlocks count={6} summary="Atualizando agenda filtrada..." />
         ) : visibleClasses.length ? (
-          <div className="grid gap-5 2xl:grid-cols-2">
+          <div className="grid gap-5">
             {visibleClasses.map((trainingClass) => {
               const course = courses.find((item) => item.id === trainingClass.courseId);
               const instructor = instructors.find((item) => item.id === trainingClass.instructorId);

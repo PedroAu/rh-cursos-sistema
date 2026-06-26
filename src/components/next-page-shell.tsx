@@ -2,14 +2,20 @@
 
 import { Suspense, type ReactNode } from "react";
 
-import { AdminGuard } from "@/components/admin/admin-guard";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
-import { AppStoreProvider } from "@/lib/app-store";
+import { AppStoreProvider, type AppStoreInitialData } from "@/lib/app-store";
+import type { CurrentSession } from "@/types";
 
-export function PublicPageShell({ children }: { children: ReactNode }) {
+export function PublicPageShell({
+  children,
+  initialData
+}: {
+  children: ReactNode;
+  initialData?: AppStoreInitialData;
+}) {
   return (
-    <AppStoreProvider>
+    <AppStoreProvider initialData={initialData}>
       <Suspense fallback={null}>
         <PublicLayout>{children}</PublicLayout>
       </Suspense>
@@ -19,17 +25,17 @@ export function PublicPageShell({ children }: { children: ReactNode }) {
 
 export function DashboardPageShell({
   role,
+  initialSession,
   children
 }: {
   role: "admin";
+  initialSession: CurrentSession;
   children: ReactNode;
 }) {
   return (
-    <AppStoreProvider>
+    <AppStoreProvider initialSession={initialSession}>
       <Suspense fallback={null}>
-        <AdminGuard>
-          <DashboardShell role={role}>{children}</DashboardShell>
-        </AdminGuard>
+        <DashboardShell role={role}>{children}</DashboardShell>
       </Suspense>
     </AppStoreProvider>
   );

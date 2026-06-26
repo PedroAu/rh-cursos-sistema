@@ -1,9 +1,12 @@
+import { isSessionExpired, SESSION_REFRESH_THRESHOLD_MS } from "@/lib/auth-session";
+import type { DashboardRole } from "@/lib/auth";
+
 /**
- * Gestão do token de sessão admin no frontend estático.
+ * Gestão do token de sessão admin no frontend.
  *
- * No modelo híbrido, a Edge Function `auth-session` devolve um token HMAC no
- * corpo (não em cookie httpOnly, que não cruzaria o domínio). Guardamos esse
- * token e o reenviamos via header `x-rh-session` nas chamadas administrativas.
+ * Mesmo com a sessão server-side do Next para proteger `/admin`, continuamos
+ * persistindo um token HMAC no cliente para reenviá-lo via header
+ * `x-rh-session` às Edge Functions administrativas já existentes.
  */
 
 const SESSION_TOKEN_KEY = "rh_cursos_admin_token";
@@ -54,9 +57,10 @@ export function setSupabaseSession(tokens: SupabaseSessionTokens): void {
 }
 
 type DecodedSession = {
-  role: "admin";
+  role: DashboardRole;
   email: string;
   name: string;
+  exp?: number;
 };
 
 function fromBase64Url(value: string): string {
@@ -68,10 +72,11 @@ function fromBase64Url(value: string): string {
 /**
  * Decodifica de forma otimista o payload do token HMAC no cliente.
  *
- * Formato do token: `base64url(payload).base64url(signature)`. Em export estático
- * não há como validar o HMAC (o secret é server-side), então apenas reidratamos a
- * sessão a partir do payload. A validação real continua na Edge Function
- * `admin-resources`. Retorna `null` se o token estiver ausente ou malformado.
+ * Formato do token: `base64url(payload).base64url(signature)`. No browser não
+ * há como validar o HMAC (o secret é server-side), então apenas reidratamos a
+ * sessão a partir do payload. A validação real continua no servidor Next e na
+ * Edge Function `admin-resources`. Retorna `null` se o token estiver ausente ou
+ * malformado.
  */
 export function decodeSessionToken(token?: string | null): DecodedSession | null {
   if (!token) return null;
@@ -81,10 +86,24 @@ export function decodeSessionToken(token?: string | null): DecodedSession | null
 
   try {
     const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DecodedSession>;
-    if (parsed.role !== "admin" || !parsed.email || !parsed.name) return null;
+    if (
+      (parsed.role !== "admin" && parsed.role !== "instructor" && parsed.role !== "student") ||
+      !parsed.email ||
+      !parsed.name
+    ) {
+      return null;
+    }
+    if (isSessionExpired(parsed)) return null;
 
-    return { role: parsed.role, email: parsed.email, name: parsed.name };
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      ...(typeof parsed.exp === "number" ? { exp: parsed.exp } : {})
+    };
   } catch {
     return null;
   }
 }
+
+export const SESSION_ACTIVITY_SYNC_MS = SESSION_REFRESH_THRESHOLD_MS;

@@ -1,414 +1,440 @@
+"use client";
+
 import {
   AlertTriangle,
-  BookOpenCheck,
-  CalendarCheck,
+  BookOpen,
+  BriefcaseBusiness,
+  Building2,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2,
-  FileWarning,
-  HeartHandshake,
-  Layers3,
-  MessageCircle,
-  Quote,
-  RefreshCw,
-  Star,
-  TrendingUp
+  ClipboardList,
+  Cpu,
+  MessageSquareText,
+  Scale,
+  ShieldCheck,
+  Sparkles,
+  Users
 } from "lucide-react";
-import { motion } from "framer-motion";
-import { useRef, useState } from "react";
+import { useState } from "react";
+import {
+  Accordion,
+  ActionIcon,
+  Anchor,
+  Badge,
+  Box,
+  Button,
+  Card,
+  Container,
+  Grid,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  ThemeIcon,
+  Title
+} from "@mantine/core";
+
+import { useAppStore } from "@/lib/app-store";
 import { Link } from "@/lib/router-compat";
 
-import { CTASection } from "@/components/common/cta-section";
-import { FAQAccordion } from "@/components/common/faq-accordion";
-import { SectionTitle } from "@/components/common/section-title";
-import { TestimonialCard } from "@/components/common/testimonial-card";
-import { TrainingPathCard } from "@/components/courses/training-path-card";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useAppStore } from "@/lib/app-store";
-
-const heroMetrics = [
-  { icon: CalendarCheck, label: "de entrega", value: "19 anos" },
-  { icon: Layers3, label: "ativas", value: "6 trilhas" },
-  { icon: Star, label: "avaliação de satisfação", value: "4,8/5", featured: true }
+const heroTrustMetrics = [
+  { icon: BriefcaseBusiness, value: "2.500+", label: "Alunos", helper: "DE ENTREGA" },
+  { icon: ClipboardList, value: "180+", label: "Cursos", helper: "ATIVAS" },
+  { icon: ShieldCheck, value: "98%", label: "Satisfação", helper: "AVALIAÇÃO MÉDIA" }
 ];
 
-const painPoints = [
+const problemCards = [
   {
-    icon: FileWarning,
+    icon: AlertTriangle,
     title: "Risco de auditoria",
-    description: "Erros técnicos detectados em fiscalizações geram multas, retrabalho e exposição para toda a equipe.",
-    accent: "border-l-red-500",
-    iconClass: "text-red-700"
+    description: "Erros técnicos detectados em fiscalizações geram multas, retrabalho e exposição para toda a equipe."
   },
   {
-    icon: BookOpenCheck,
+    icon: BookOpen,
     title: "Cursos teóricos demais",
-    description: "Muito conteúdo promete capacitação, mas pouco prepara você para aplicar no dia seguinte.",
-    accent: "border-l-prestige-gold",
-    iconClass: "bg-accent/12 text-accent"
+    description: "Muito conteúdo promete capacitação, mas pouco prepara você para aplicar no dia seguinte."
   },
   {
-    icon: RefreshCw,
+    icon: Sparkles,
     title: "Legislação em mudança",
-    description: "eSocial, NR-1, licitações e outras normas não esperam. Quem não se atualiza fica para trás.",
-    accent: "border-l-deep-navy",
-    iconClass: "bg-primary/10 text-primary"
+    description: "eSocial, NR-1, licitações e outras normas não esperam. Quem não se atualiza fica para trás."
   }
 ];
 
-const valuePillars = [
+const processSteps = [
   {
-    icon: CheckCircle2,
-    title: "100% prático",
-    description: "Casos reais, legislação atual e exercícios aplicáveis para o participante usar no dia seguinte.",
-    proof: "Aplicação imediata",
-    accent: "border-t-prestige-gold",
-    iconClass: "bg-accent/12 text-accent"
-  },
-  {
-    icon: TrendingUp,
-    title: "Resultado acompanhado",
-    description: "Avaliação de implementação e indicadores para medir evolução, aplicação e impacto.",
-    proof: "Evolução mensurável",
-    accent: "border-t-deep-navy",
-    iconClass: "bg-primary/10 text-primary"
-  },
-  {
-    icon: HeartHandshake,
-    title: "Propósito",
-    description: "Capacitação feita para desenvolver pessoas, fortalecer equipes e melhorar o serviço prestado.",
-    proof: "Transformação real",
-    accent: "border-t-success-green",
-    iconClass: "bg-success/10 text-success"
-  }
-];
-
-const journeySteps = [
-  {
+    number: "1",
     title: "Escolha sua trilha",
-    description: "Identifique o desafio técnico do cargo ou da equipe e encontre a trilha ideal."
+    description: "Identifique o desafio técnico do cargo ou da equipe e encontre a trilha ideal para suprir essa lacuna."
   },
   {
+    number: "2",
     title: "Aprenda na prática",
-    description: "Estude com casos reais, legislação atual e exemplos do cotidiano público."
+    description: "Estude com casos reais, legislação atual e ferramentas que você já utiliza no seu cotidiano profissional."
   },
   {
+    number: "3",
     title: "Aplique e veja resultado",
-    description: "Saia pronto para aplicar o conteúdo e acompanhar a evolução com mais clareza."
+    description: "Saia pronto para aplicar o conteúdo e acompanhar a evolução dos processos com mais segurança jurídica."
   }
 ];
+
+const faqItems = [
+  {
+    value: "faq-1",
+    question: "Como faço minha inscrição?",
+    answer: "Você pode realizar a inscrição diretamente pelo nosso site em cada página de curso, ou falar com a equipe para atendimento consultivo."
+  },
+  {
+    value: "faq-2",
+    question: "Recebo certificado após o curso?",
+    answer: "Sim. Todos os nossos cursos oferecem certificado válido em todo o território nacional conforme a carga horária da turma."
+  },
+  {
+    value: "faq-3",
+    question: "Órgãos públicos podem contratar?",
+    answer: "Sim. Somos especialistas no atendimento à administração pública direta e indireta, incluindo contratação por inexigibilidade e empenho."
+  }
+];
+
+const pathIconMap = {
+  "path-dp": Users,
+  "path-licitacoes": Scale,
+  "path-pessoas": Building2,
+  "path-comunicacao": MessageSquareText,
+  "path-auditoria": BriefcaseBusiness,
+  "path-tech": Cpu
+} as const;
 
 export function HomePage() {
   const { trainingPaths, testimonials } = useAppStore();
   const [testimonialPage, setTestimonialPage] = useState(0);
-  const testimonialsTrackRef = useRef<HTMLDivElement>(null);
 
-  const itemsPerPage = 3;
-  const totalPages = Math.ceil(testimonials.length / itemsPerPage);
-  const visibleTestimonials = testimonials.slice(testimonialPage * itemsPerPage, (testimonialPage + 1) * itemsPerPage);
-
-  const scrollTestimonials = (direction: "previous" | "next") => {
-    if (direction === "next" && testimonialPage < totalPages - 1) {
-      setTestimonialPage(testimonialPage + 1);
-    } else if (direction === "previous" && testimonialPage > 0) {
-      setTestimonialPage(testimonialPage - 1);
-    }
-  };
+  const highlightedTestimonials = testimonials.slice(0, 4);
+  const pages = Math.max(1, Math.ceil(highlightedTestimonials.length / 2));
+  const visibleTestimonials = highlightedTestimonials.slice(testimonialPage * 2, testimonialPage * 2 + 2);
 
   return (
     <>
-      <section className="executive-hero min-h-[calc(100svh-160px)] overflow-hidden py-14 text-white md:py-20">
-        <div className="ea-container flex min-h-[560px] items-center">
-          <div className="max-w-3xl space-y-8">
-            <div className="space-y-6">
-              <span className="inline-flex rounded-full border border-prestige-gold bg-prestige-gold px-4 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
-                Treinamento de alta performance, desde 2007.
-              </span>
-              <h1 className="max-w-3xl text-display text-white sm:text-hero">
-                Formando quem transforma, <span className="text-prestige-gold">há 19 anos</span>.
-              </h1>
-              <p className="max-w-xl text-lead text-white/82">
-                <strong className="text-white">A RH Cursos</strong> entrega capacitação 100% prática para quem precisa fazer, não apenas saber.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button asChild variant="secondary" size="lg">
-                <Link to="/cursos">Ver as trilhas</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
-                <a href="#atendimento">
-                  <MessageCircle className="h-4 w-4" />
-                  Falar com especialista
-                </a>
-              </Button>
-            </div>
-
-            <div className="grid items-stretch gap-4 border-t border-white/10 pt-8 sm:grid-cols-3">
-              {heroMetrics.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <div
-                    key={item.label}
-                    className="apple-material-dark flex min-h-[148px] flex-col justify-between rounded-lg border border-white/20 bg-white/5 backdrop-blur p-4 shadow-soft"
-                  >
-                    {item.featured ? (
-                      <div className="flex gap-1 text-prestige-gold">
-                        {Array.from({ length: 5 }).map((_, index) => (
-                          <Star
-                            key={index}
-                            className={`h-5 w-5 ${index < 4 ? "fill-current" : ""}`}
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-prestige-gold/15 text-prestige-gold">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xl font-bold text-white">{item.value}</p>
-                      <p className="mt-1 text-xs font-bold uppercase tracking-[0.05em] text-white/70">{item.label}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="page-section bg-primary text-white">
-        <div className="container space-y-10">
-          <div className="max-w-4xl">
-            <span className="inline-flex items-center gap-2 rounded border border-white/12 bg-white/10 px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
-              <AlertTriangle className="h-3.5 w-3.5" />
-              O problema real
-            </span>
-            <h2 className="mt-5 max-w-3xl font-display text-section font-bold text-white md:text-display">
-              A burocracia muda. Quem não se atualiza, erra.
-            </h2>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-white/76 md:text-lg">
-              DP, eSocial, Lei 14.133 e IA aplicada ao serviço público avançam rápido. Enquanto o volume técnico aumenta, o tempo para aprender diminui. E cada erro pode virar multa, retrabalho ou risco para a equipe.
-            </p>
-          </div>
-
-          <div className="grid items-stretch gap-5 md:grid-cols-3">
-            {painPoints.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <Card key={item.title} className={`h-full border-l-4 ${item.accent} bg-white shadow-card`}>
-                  <CardContent className="flex h-full flex-col gap-5 p-7">
-                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${item.iconClass}`}>
-                      <Icon className="h-8 w-8" />
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-feature font-bold text-deep-navy">{item.title}</h3>
-                      <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="page-section bg-white">
-        <div className="container space-y-10">
-          <div className="max-w-4xl">
-            <SectionTitle
-              eyebrow="Por que funciona"
-              title="Três razões que mudam o resultado"
-              description="A RH Cursos combina prática, acompanhamento e propósito para transformar conhecimento em execução real."
-            />
-          </div>
-
-          <div className="grid items-stretch gap-5 md:grid-cols-3">
-            {valuePillars.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <Card key={item.title} className={`h-full border-t-4 ${item.accent} bg-white shadow-card`}>
-                  <CardContent className="flex h-full flex-col gap-6 p-7">
-                    <div className={`flex h-[72px] w-[72px] items-center justify-center rounded-full ${item.iconClass}`}>
-                      <Icon className="h-8 w-8" />
-                    </div>
-                    <div className="space-y-3">
-                      <h3 className="text-feature font-bold text-deep-navy">{item.title}</h3>
-                      <p className="text-sm leading-7 text-muted-foreground">{item.description}</p>
-                    </div>
-                    <div className="mt-auto inline-flex w-fit rounded bg-accent px-3 py-2 text-xs font-bold uppercase tracking-[0.05em] text-white">
-                      {item.proof}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="page-section bg-surface-muted">
-        <div className="container space-y-12">
-          <div className="grid gap-8 xl:grid-cols-[0.95fr_1.05fr] xl:items-stretch">
-            <div className="section-panel flex h-full flex-col justify-center">
-              <span className="eyebrow w-fit">Quem está com você</span>
-              <h2 className="mt-5 max-w-3xl font-display text-section font-bold text-deep-navy md:text-display">
-                Entendemos a pressão de não poder errar.
-              </h2>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-text-muted md:text-lg">
-                Em 2007, a RH Cursos nasceu para apoiar profissionais que precisam aprender direito e transformar o serviço que prestam. Há 19 anos, unimos técnica, propósito e resultado real em capacitações práticas para profissionais, equipes e órgãos públicos.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-outline-variant pt-6 text-sm font-bold uppercase tracking-[0.05em] text-deep-navy">
-                <span>Desde 2007</span>
-                <span>19 anos de atuação</span>
-                <span>Capacitação prática</span>
-              </div>
-            </div>
-
-            <div className="tone-panel flex h-full flex-col justify-between p-8 md:p-10">
-              <Quote className="h-12 w-12 text-accent" />
-              <blockquote className="mt-8 font-display text-quote font-bold text-deep-navy md:text-h2">
-                “Você sai da nossa capacitação pronto para fazer, não apenas para saber.”
-              </blockquote>
-              <div className="mt-10 flex items-center gap-4 border-t border-primary/10 pt-6">
-                <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-accent text-white font-display text-lg font-bold">
-                  ER
-                </div>
-                <div>
-                  <p className="font-display text-xl font-bold text-deep-navy">Ester</p>
-                  <p className="text-sm text-muted-foreground">Fundadora da RH Cursos & Soluções</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-              <SectionTitle
-                eyebrow="Depoimentos"
-                title="Resultados percebidos por quem já participou."
-              />
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  aria-label="Ver depoimentos anteriores"
-                  onClick={() => scrollTestimonials("previous")}
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  aria-label="Ver próximos depoimentos"
-                  onClick={() => scrollTestimonials("next")}
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-            <div
-              ref={testimonialsTrackRef}
-              className="grid gap-5 md:grid-cols-3"
+      <Box
+        component="section"
+        data-testid="ui-hero-home"
+        py={{ base: 64, md: 112 }}
+        style={{
+          background: "linear-gradient(135deg, #08324d 0%, #0b4d74 100%)",
+          color: "#ffffff"
+        }}
+      >
+        <Container size={1200} px="md">
+          <Stack gap="lg" maw={760}>
+            <Badge
+              variant="light"
+              color="rhGold"
+              size="lg"
+              radius="sm"
+              styles={{ root: { background: "rgba(245,182,29,0.16)", color: "#f5b61d" } }}
             >
-              {visibleTestimonials.map((testimonial) => (
-                <div key={testimonial.id}>
-                  <TestimonialCard testimonial={testimonial} />
-                </div>
-              ))}
-            </div>
-            {totalPages > 1 && (
-              <div className="flex justify-center gap-2 pt-6">
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setTestimonialPage(index)}
-                    className={`h-2 w-2 rounded-full transition-all ${
-                      index === testimonialPage ? "w-8 bg-primary" : "bg-outline-variant"
-                    }`}
-                    aria-label={`Ir para página ${index + 1} de depoimentos`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </section>
+              TREINAMENTO DE ALTA PERFORMANCE, DESDE 2007.
+            </Badge>
+            <Title order={1} c="white">
+              Formando quem transforma,
+              <Text component="span" inherit c="rhGold.5">
+                {" "}há 19 anos.
+              </Text>
+            </Title>
+            <Text fz="lg" c="rgba(255,255,255,0.82)" maw={620}>
+              Capacitação 100% prática para profissionais de RH, Gestão Pública e Auditoria que buscam segurança jurídica e excelência operacional.
+            </Text>
 
-      <section className="page-section bg-surface-muted">
-        <div className="container space-y-10">
-          <div className="mx-auto max-w-4xl text-center">
-            <SectionTitle
-              eyebrow="Nosso currículo"
-              title="Escolha sua trilha de capacitação"
-              description="+80 cursos em 6 trilhas, prontas para você começar sua transformação."
-              align="center"
-            />
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {trainingPaths.map((path) => (
-              <TrainingPathCard key={path.id} path={path} />
-            ))}
-          </div>
-
-          <div className="mx-auto max-w-xl text-center">
-            <p className="mb-5 text-sm leading-7 text-text-muted">
-              Compare trilhas, modalidades e próximas turmas em um só lugar.
-            </p>
-            <Button asChild variant="secondary" size="lg">
-              <Link to="/cursos">Ver todos os cursos</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      <section className="page-section">
-        <div className="container space-y-8">
-          <SectionTitle
-            eyebrow="Como funciona"
-            title="Três passos para transformar resultado"
-            description="Um caminho simples para escolher a trilha certa, aprender com casos reais e aplicar com segurança."
-            align="center"
-          />
-          <div className="relative grid gap-5 md:grid-cols-3">
-            {journeySteps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+            <Group gap="md" mt="sm">
+              <Button component={Link} to="/cursos" color="rhGold" c="#08324d" size="lg" fw={700}>
+                Ver Trilhas de Conhecimento
+              </Button>
+              <Button
+                component={Link}
+                to="/falar-com-especialista"
+                variant="outline"
+                color="gray.0"
+                size="lg"
+                styles={{ root: { borderColor: "rgba(255,255,255,0.4)" }, label: { color: "#ffffff" } }}
               >
-                <Card className="h-full border-primary/10 bg-white shadow-soft hover:-translate-y-1 hover:shadow-card">
-                  <CardContent className="flex h-full flex-col items-center gap-5 p-7 text-center">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent text-white font-display text-xl font-bold shadow-soft">
-                      {index + 1}
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-article font-bold text-deep-navy">{step.title}</h3>
-                      <p className="text-sm leading-7 text-muted-foreground">{step.description}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+                Falar com Especialista
+              </Button>
+            </Group>
+          </Stack>
+        </Container>
+      </Box>
 
-      <section className="page-section bg-surface-muted">
-        <div className="container space-y-8">
-          <FAQAccordion />
-          <CTASection />
-        </div>
-      </section>
+      <Container size={1200} px="md" mt={{ base: -32, md: -48 }} style={{ position: "relative", zIndex: 1 }}>
+        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+          {heroTrustMetrics.map((metric) => {
+            const Icon = metric.icon;
+
+            return (
+              <Card key={metric.label} radius="lg" shadow="sm" withBorder padding="lg">
+                <Group gap="md" wrap="nowrap">
+                  <ThemeIcon size={48} radius="md" variant="light" color="rhBlue">
+                    <Icon size={20} />
+                  </ThemeIcon>
+                  <Box>
+                    <Text fw={800} fz="1.5rem" c="rhBlue.9" lh={1.1}>
+                      {metric.value}{" "}
+                      <Text component="span" fw={600} fz="sm" c="#4d5f70">
+                        {metric.label}
+                      </Text>
+                    </Text>
+                    <Text fz="xs" fw={600} c="#5f6b78">
+                      {metric.helper}
+                    </Text>
+                  </Box>
+                </Group>
+              </Card>
+            );
+          })}
+        </SimpleGrid>
+      </Container>
+
+      <Box component="section" py={{ base: 64, md: 96 }} mt={{ base: 48, md: 64 }} style={{ background: "#08324d", color: "#ffffff" }}>
+        <Container size={1200} px="md">
+          <Stack gap="sm" maw={720} mb="xl">
+            <Text fz="sm" fw={700} c="rhGold.5">
+              O PROBLEMA REAL
+            </Text>
+            <Title order={2} c="white">
+              A burocracia muda. Quem não se atualiza, erra.
+            </Title>
+            <Text c="rgba(255,255,255,0.78)">
+              DP, eSocial, Lei 14.133 e IA aplicada ao serviço público avançam rápido. Enquanto o volume técnico aumenta, o tempo para aprender diminui. E cada erro pode virar multa, retrabalho ou risco para a equipe.
+            </Text>
+          </Stack>
+
+          <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
+            {problemCards.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Card
+                  key={item.title}
+                  radius="lg"
+                  padding="xl"
+                  style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)" }}
+                >
+                  <ThemeIcon size={48} radius="md" color="rhGold" variant="light" mb="md">
+                    <Icon size={20} />
+                  </ThemeIcon>
+                  <Title order={3} fz="1.25rem" c="white" mb={8}>
+                    {item.title}
+                  </Title>
+                  <Text c="rgba(255,255,255,0.74)">{item.description}</Text>
+                </Card>
+              );
+            })}
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      <Box component="section" py={{ base: 64, md: 96 }} bg="#f4f6f9">
+        <Container size={1200} px="md">
+          <Stack gap="sm" align="center" ta="center" maw={680} mx="auto" mb="xl">
+            <Text fz="sm" fw={700} c="rhBlue.7">
+              NOSSO CURRÍCULO
+            </Text>
+            <Title order={2} c="rhBlue.9">
+              Escolha sua trilha de capacitação
+            </Title>
+            <Text c="#4d5f70">+80 cursos em 6 trilhas, prontas para você começar sua transformação profissional</Text>
+          </Stack>
+
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+            {trainingPaths.map((path) => {
+              const Icon = pathIconMap[path.id as keyof typeof pathIconMap] ?? BriefcaseBusiness;
+
+              return (
+                <Card key={path.id} radius="lg" shadow="sm" withBorder padding="xl">
+                  <Group justify="space-between" align="center" mb="md">
+                    <ThemeIcon size={40} radius="md" variant="light" color="rhBlue">
+                      <Icon size={16} />
+                    </ThemeIcon>
+                    <Badge variant="light" color="rhBlue" radius="sm">
+                      {path.courseCount} CURSOS
+                    </Badge>
+                  </Group>
+                  <Title order={3} fz="1.2rem" c="rhBlue.9" mb={8}>
+                    {path.name}
+                  </Title>
+                  <Text c="#4d5f70" mb="md">
+                    {path.description}
+                  </Text>
+                  <Anchor component={Link} to="/cursos" c="rhBlue.7" fw={600}>
+                    Ver cursos da trilha
+                  </Anchor>
+                </Card>
+              );
+            })}
+          </SimpleGrid>
+
+          <Group justify="center" mt="xl">
+            <Button component={Link} to="/cursos" color="rhBlue.9" size="lg">
+              Ver todos os cursos
+            </Button>
+          </Group>
+        </Container>
+      </Box>
+
+      <Box component="section" py={{ base: 64, md: 96 }}>
+        <Container size={1200} px="md">
+          <Grid gap={48} align="center">
+            <Grid.Col span={{ base: 12, md: 5 }}>
+              <Stack gap="sm">
+                <Text fz="sm" fw={700} c="rhBlue.7">
+                  TESTEMUNHOS
+                </Text>
+                <Title order={2} c="rhBlue.9">
+                  Resultados percebidos por quem participou.
+                </Title>
+                <Text c="#4d5f70">
+                  Ouvimos centenas de profissionais que já transformaram suas rotinas após nossos treinamentos práticos.
+                </Text>
+                <Group gap="sm" mt="sm">
+                  <ActionIcon
+                    size={44}
+                    radius="md"
+                    variant="default"
+                    aria-label="Depoimentos anteriores"
+                    disabled={testimonialPage === 0}
+                    onClick={() => setTestimonialPage((current) => Math.max(0, current - 1))}
+                  >
+                    <ChevronLeft size={16} />
+                  </ActionIcon>
+                  <ActionIcon
+                    size={44}
+                    radius="md"
+                    variant="default"
+                    aria-label="Próximos depoimentos"
+                    disabled={testimonialPage >= pages - 1}
+                    onClick={() => setTestimonialPage((current) => Math.min(pages - 1, current + 1))}
+                  >
+                    <ChevronRight size={16} />
+                  </ActionIcon>
+                </Group>
+              </Stack>
+            </Grid.Col>
+
+            <Grid.Col span={{ base: 12, md: 7 }}>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
+                {visibleTestimonials.map((testimonial) => (
+                  <Card key={testimonial.id} radius="lg" shadow="sm" withBorder padding="xl">
+                    <Group gap="md" mb="md" wrap="nowrap">
+                      <ThemeIcon size={44} radius="xl" variant="light" color="rhBlue">
+                        <Text fw={700} fz="sm">
+                          {testimonial.name.slice(0, 2).toUpperCase()}
+                        </Text>
+                      </ThemeIcon>
+                      <Box>
+                        <Title order={3} fz="1rem" c="rhBlue.9">
+                          {testimonial.name}
+                        </Title>
+                        <Text fz="sm" c="#4d5f70">
+                          {testimonial.organization}
+                        </Text>
+                      </Box>
+                    </Group>
+                    <Text c="rhGold.7" aria-label={`${testimonial.rating} de 5 estrelas`} mb={8}>
+                      {"★".repeat(testimonial.rating)}
+                    </Text>
+                    <Text c="#304255" fs="italic">
+                      “{testimonial.text}”
+                    </Text>
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </Box>
+
+      <Box component="section" py={{ base: 64, md: 96 }} bg="#f4f6f9">
+        <Container size={1200} px="md">
+          <Stack gap="sm" align="center" ta="center" maw={680} mx="auto" mb="xl">
+            <Text fz="sm" fw={700} c="rhBlue.7">
+              COMO FUNCIONA
+            </Text>
+            <Title order={2} c="rhBlue.9">
+              Três passos para transformar resultado
+            </Title>
+          </Stack>
+
+          <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
+            {processSteps.map((step) => (
+              <Card key={step.number} radius="lg" shadow="sm" withBorder padding="xl">
+                <ThemeIcon size={48} radius="xl" color="rhBlue" mb="md">
+                  <Text fw={800} fz="lg" c="white">
+                    {step.number}
+                  </Text>
+                </ThemeIcon>
+                <Title order={3} fz="1.2rem" c="rhBlue.9" mb={8}>
+                  {step.title}
+                </Title>
+                <Text c="#4d5f70">{step.description}</Text>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </Container>
+      </Box>
+
+      <Box component="section" py={{ base: 64, md: 96 }}>
+        <Container size={760} px="md">
+          <Title order={2} c="rhBlue.9" ta="center" mb="xl">
+            Dúvidas Frequentes
+          </Title>
+          <Accordion variant="separated" radius="md" chevronPosition="right" transitionDuration={0}>
+            {faqItems.map((item) => (
+              <Accordion.Item key={item.value} value={item.value}>
+                <Accordion.Control>
+                  <Text fw={600} c="rhBlue.9">
+                    {item.question}
+                  </Text>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  <Text c="#4d5f70">{item.answer}</Text>
+                </Accordion.Panel>
+              </Accordion.Item>
+            ))}
+          </Accordion>
+        </Container>
+      </Box>
+
+      <Box component="section" py={{ base: 56, md: 80 }} style={{ background: "#08324d", color: "#ffffff" }}>
+        <Container size={1200} px="md">
+          <Group justify="space-between" align="center" gap="xl" wrap="wrap">
+            <Box maw={560}>
+              <Title order={2} c="white" mb={8}>
+                Pronto para ser referência?
+              </Title>
+              <Text c="rgba(255,255,255,0.8)">
+                Inicie agora sua jornada de atualização técnica e ganhe a segurança que seu cargo exige.
+              </Text>
+            </Box>
+            <Group gap="md">
+              <Button component={Link} to="/cursos" color="rhGold" c="#08324d" size="lg" fw={700}>
+                Ver trilhas agora
+              </Button>
+              <Button
+                component="a"
+                href="https://wa.me/5561991129682"
+                rel="noreferrer"
+                target="_blank"
+                variant="outline"
+                color="gray.0"
+                size="lg"
+                styles={{ root: { borderColor: "rgba(255,255,255,0.4)" }, label: { color: "#ffffff" } }}
+              >
+                WhatsApp Consultoria
+              </Button>
+            </Group>
+          </Group>
+        </Container>
+      </Box>
     </>
   );
 }

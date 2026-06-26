@@ -1,0 +1,58 @@
+name: Deploy Frontend to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'public/**'
+      - 'src/**'
+      - 'next.config.mjs'
+      - 'open-next.config.ts'
+      - 'wrangler.jsonc'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend-production
+  cancel-in-progress: true
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    name: Build and Deploy Frontend
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy to Cloudflare Workers
+        run: npm run deploy:workers -- --keep-vars
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+
+      - name: Verify production Worker routes
+        run: npm run verify:workers
+        env:
+          DEPLOY_CANONICAL_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+          DEPLOY_APEX_URL: https://rhcursos.com.br
+          WORKERS_VERIFY_ATTEMPTS: '18'
+          WORKERS_VERIFY_DELAY_MS: '5000'

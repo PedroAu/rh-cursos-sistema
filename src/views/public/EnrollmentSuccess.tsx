@@ -1,4 +1,6 @@
-import { useLocation } from "@/lib/router-compat";
+"use client";
+
+import { useLocation, useSearchParams } from "@/lib/router-compat";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,12 +8,51 @@ import { useAppStore } from "@/lib/app-store";
 import { formatDate } from "@/lib/utils";
 import { Link } from "@/lib/router-compat";
 
+const ENROLLMENT_SUCCESS_STORAGE_KEY = "__latest_enrollment_success__";
+
 export function EnrollmentSuccessPage() {
   const location = useLocation();
-  const { courses, classes } = useAppStore();
-  const state = location.state as
+  const [params] = useSearchParams();
+  const { courses, classes, enrollments } = useAppStore();
+  const navigationState = location.state as
     | { courseId: string; classId: string; studentName: string; paymentMethod: string }
     | undefined;
+  const queryState =
+    params.get("courseId") && params.get("classId")
+      ? {
+          courseId: params.get("courseId") ?? "",
+          classId: params.get("classId") ?? "",
+          studentName: params.get("studentName") ?? "",
+          paymentMethod: params.get("paymentMethod") ?? ""
+        }
+      : undefined;
+  const persistedState =
+    typeof window !== "undefined"
+      ? (() => {
+          const stored = window.sessionStorage.getItem(ENROLLMENT_SUCCESS_STORAGE_KEY);
+          if (!stored) return undefined;
+
+          try {
+            return JSON.parse(stored) as {
+              courseId: string;
+              classId: string;
+              studentName: string;
+              paymentMethod: string;
+            };
+          } catch {
+            return undefined;
+          }
+        })()
+      : undefined;
+  const latestEnrollment = enrollments[0];
+  const state = queryState ?? navigationState ?? persistedState ?? (latestEnrollment
+    ? {
+        courseId: latestEnrollment.courseId,
+        classId: latestEnrollment.classId,
+        studentName: latestEnrollment.studentName,
+        paymentMethod: latestEnrollment.paymentMethod
+      }
+    : undefined);
 
   const course = courses.find((item) => item.id === state?.courseId);
   const trainingClass = classes.find((item) => item.id === state?.classId);
@@ -19,8 +60,8 @@ export function EnrollmentSuccessPage() {
   return (
     <section className="page-section">
       <div className="container flex justify-center">
-        <Card className="w-full max-w-3xl">
-          <CardContent className="space-y-6 p-8 text-center">
+        <Card className="w-full max-w-4xl border-outline-variant">
+          <CardContent className="space-y-8 p-8 text-center md:p-10">
             <span className="eyebrow">Inscrição recebida com sucesso</span>
             <h1 className="text-4xl font-extrabold text-primary">Tudo pronto para a próxima etapa.</h1>
             <p className="text-base leading-7 text-muted-foreground">
@@ -46,13 +87,31 @@ export function EnrollmentSuccessPage() {
               </div>
             </div>
 
-            <div className="space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>Próximos passos: confirmação da turma, envio de orientações, materiais e certificado pela equipe RH Cursos.</p>
+            <div className="grid gap-4 text-left md:grid-cols-3">
+              {[
+                {
+                  label: "1. Confirmação",
+                  description: "A equipe valida a turma e envia o resumo do pedido para o e-mail cadastrado."
+                },
+                {
+                  label: "2. Operação",
+                  description: "Você recebe orientações de acesso, agenda e material de apoio da capacitação."
+                },
+                {
+                  label: "3. Atendimento",
+                  description: "Se necessário, ajustamos faturamento, pagamento e dados da inscrição com você."
+                }
+              ].map((item) => (
+                <div key={item.label} className="surface-card p-5">
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                  <p className="mt-2 text-sm leading-6 text-text-muted">{item.description}</p>
+                </div>
+              ))}
             </div>
 
             <div className="flex flex-col justify-center gap-3 sm:flex-row">
               <Button asChild variant="outline"><Link to="/cursos">Ver outros cursos</Link></Button>
-              <Button asChild variant="ghost"><a href="#atendimento">Falar com atendimento</a></Button>
+              <Button asChild variant="ghost"><Link to="/falar-com-especialista">Falar com atendimento</Link></Button>
             </div>
           </CardContent>
         </Card>

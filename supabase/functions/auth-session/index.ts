@@ -6,8 +6,18 @@
 // devolvido no corpo e reenviado pelo frontend via header `x-rh-session`.
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
-import { anonClient } from "../_shared/supabase.ts";
-import { encodeSession, type AdminSession, type DashboardRole } from "../_shared/auth.ts";
+import {
+  anonClient,
+  adminClient,
+  isAdminConfigured,
+  isSupabaseConfigured,
+} from "../_shared/supabase.ts";
+import {
+  encodeSession,
+  SESSION_TTL_MS,
+  type AdminSession,
+  type DashboardRole,
+} from "../_shared/auth.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
 
 function normalizeRole(value: unknown): DashboardRole | null {
@@ -23,20 +33,50 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Origin not allowed" }, 403, request);
   }
 
-  // DELETE = logout (stateless: o frontend descarta o token).
+  // DELETE = logout. Se vier accessToken, tenta revogar TODAS as sessões do
+  // usuário (global signout) via admin API. Sem token ou sem service role
+  // configurada, cai no comportamento stateless de hoje (logout local-only).
   if (request.method === "DELETE") {
-    return jsonResponse({ ok: true }, 200, request);
+    const body = (await request.json().catch(() => null)) as { accessToken?: string } | null;
+    const accessToken = body?.accessToken;
+    let mode: "global" | "local-only" = "local-only";
+    let revoked = false;
+
+    if (accessToken && isAdminConfigured) {
+      try {
+        const admin = adminClient();
+        const { error } = await admin.auth.admin.signOut(accessToken, "global");
+        if (error) {
+          console.error("Falha ao revogar sessões globais:", error.message);
+        } else {
+          mode = "global";
+          revoked = true;
+        }
+      } catch (error) {
+        console.error(
+          "Erro ao revogar sessões globais:",
+          error instanceof Error ? error.message : error
+        );
+        // Fallback gracioso: logout local-only ainda funciona no frontend.
+      }
+    }
+
+    return jsonResponse({ ok: true, mode, revoked }, 200, request);
   }
 
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, error: "Method not allowed" }, 405, request);
   }
 
+  if (!isSupabaseConfigured) {
+    return jsonResponse({ ok: false, error: "Auth indisponivel." }, 503, request);
+  }
+
   const ip = clientIp(request);
-  const rate = checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
+  const rate = await checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
   if (!rate.allowed) {
     return jsonResponse(
-      { ok: false, error: "Muitas tentativas de login. Aguarde alguns minutos." },
+      { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
       429,
       request,
       { "Retry-After": rate.retryAfter.toString() }
@@ -52,7 +92,7 @@ Deno.serve(async (request) => {
   const password = body?.password ?? "";
 
   if (!role || !email || !password) {
-    return jsonResponse({ ok: false, error: "Dados de login inválidos." }, 400, request);
+    return jsonResponse({ ok: false, error: "Dados de login invalidos." }, 400, request);
   }
 
   try {
@@ -60,13 +100,13 @@ Deno.serve(async (request) => {
     const result = await supabase.auth.signInWithPassword({ email, password });
 
     if (result.error || !result.data.user) {
-      return jsonResponse({ ok: false, error: "Credenciais inválidas." }, 401, request);
+      return jsonResponse({ ok: false, error: "Credenciais invalidas." }, 401, request);
     }
 
-    const metadataRole = normalizeRole(result.data.user.user_metadata?.role);
+    const metadataRole = normalizeRole(result.data.user.app_metadata?.role);
     // Sem role admin nos metadados → acesso negado (não confiar no role pedido).
     if (!metadataRole) {
-      return jsonResponse({ ok: false, error: "Acesso não autorizado." }, 403, request);
+      return jsonResponse({ ok: false, error: "Acesso nao autorizado." }, 403, request);
     }
 
     const name =
@@ -80,7 +120,7 @@ Deno.serve(async (request) => {
       name,
     };
 
-    const token = await encodeSession(session);
+    const token = await encodeSession(session, SESSION_TTL_MS);
 
     // Além do token HMAC (usado pelo header x-rh-session nas Edge Functions),
     // devolvemos o par de tokens do Supabase Auth. O frontend reidrata a sessão
@@ -99,8 +139,7 @@ Deno.serve(async (request) => {
       request
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Erro na autenticação.";
-    console.error("auth-session error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    console.error("auth-session error:", error instanceof Error ? error.message : error);
+    return jsonResponse({ ok: false, error: "Erro na autenticacao." }, 500, request);
   }
 });

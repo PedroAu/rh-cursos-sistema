@@ -1,24 +1,48 @@
-import { useMemo, useRef, useState } from "react";
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  BarChart3,
   BookOpenCheck,
-  CheckCircle2,
-  GraduationCap,
-  Search,
-  SlidersHorizontal,
-  Target,
+  Calculator,
+  ClipboardCheck,
+  MessageSquareText,
+  Scale,
+  Users,
   X
 } from "lucide-react";
-import { useSearchParams } from "@/lib/router-compat";
+import {
+  Badge,
+  Box,
+  Button,
+  Card,
+  Container,
+  Grid,
+  Group,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  Title
+} from "@mantine/core";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { LoadingBlocks } from "@/components/common/loading-blocks";
 import { SearchInput } from "@/components/common/search-input";
 import { CourseCard } from "@/components/courses/course-card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
+import { useAppStore } from "@/lib/app-store";
+import { Link, useSearchParams } from "@/lib/router-compat";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+
+const pathIcons = {
+  Calculator,
+  Scale,
+  Users,
+  MessageSquareText,
+  ClipboardCheck,
+  BarChart3
+} as const;
 
 export function CoursesPage() {
   const { courses, classes, trainingPaths } = useAppStore();
@@ -54,10 +78,9 @@ export function CoursesPage() {
     setParams(next);
   };
 
-  const clearFilters = () => {
-    setQuery("");
-    setParams({});
-  };
+  useEffect(() => {
+    setQuery(params.get("q") ?? "");
+  }, [params]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -67,7 +90,7 @@ export function CoursesPage() {
     }
   );
 
-  const filtered = useMemo(() => {
+  const filteredCourses = useMemo(() => {
     const normalized = query.toLowerCase();
 
     return courses.filter((course) => {
@@ -92,216 +115,217 @@ export function CoursesPage() {
   const loading = useSimulatedLoading([query, filters.path, filters.modality, filters.duration, filters.level]);
   const activeFiltersCount = [query, filters.path, filters.modality, filters.duration, filters.level].filter(Boolean).length;
   const featuredCoursesCount = courses.filter((course) => course.featured).length;
+  const upcomingClassesCount = classes.filter((item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas").length;
   const activePathName = trainingPaths.find((path) => path.id === filters.path)?.shortName;
+  const activeFilterLabels = [
+    query ? `Busca: ${query}` : null,
+    activePathName ? `Trilha: ${activePathName}` : null,
+    filters.modality ? `Modalidade: ${filters.modality}` : null,
+    filters.duration ? `Carga: ${filters.duration}` : null,
+    filters.level ? `Nível: ${filters.level}` : null
+  ].filter(Boolean) as string[];
+
+  const visibleCourses = filteredCourses
+    .slice()
+    .sort((left, right) => Number(right.featured) - Number(left.featured) || left.title.localeCompare(right.title));
+
+  const clearFilters = () => {
+    setQuery("");
+    setParams({});
+  };
 
   return (
-    <>
-    <section className="bg-deep-navy px-4 py-12 text-white sm:px-6 sm:py-14">
-      <div className="ea-container overflow-hidden rounded-xl bg-deep-navy px-6 py-12 text-white shadow-card sm:px-10 sm:py-14">
-        <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-prestige-gold/45 bg-prestige-gold/15 px-4 py-2 text-xs font-bold uppercase tracking-[0.08em] text-secondary">
-            <span className="h-1.5 w-1.5 rounded-full bg-prestige-gold" />
-            Programas profissionais
-          </span>
-          <h1 className="mt-6 max-w-4xl font-display text-h1-alt font-extrabold text-white sm:text-hero">
-            Encontre a formação certa para sua equipe evoluir com segurança.
-          </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-white/75">
-            Filtre cursos por trilha, modalidade, carga horária e nível. O catálogo reúne
-            capacitações práticas para rotinas públicas, gestão, tecnologia e comunicação.
-          </p>
-          <div className="mt-8">
-            <Button
-              type="button"
-              variant="secondary"
+    <Box bg="#f6f7fb">
+      <Box component="section" py={{ base: 56, md: 64 }} style={{ background: "#0b4668", borderBottom: "1px solid #d7dee5" }}>
+        <Container size={1200} px="md">
+          <Stack gap="md" maw={760}>
+            <Badge
+              variant="light"
+              color="rhGold"
               size="lg"
-              className="gap-2 px-8"
-              onClick={() => {
-                searchRef.current?.focus();
-                searchRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-              }}
+              radius="sm"
+              styles={{ root: { background: "rgba(246,190,57,0.12)", color: "#f6be39" } }}
             >
-              <Search className="h-4 w-4" />
-              Explorar cursos
-            </Button>
-          </div>
-        </div>
+              Catálogo oficial
+            </Badge>
+            <Title order={1} c="white">
+              Catálogo de Cursos
+            </Title>
+            <Text fz="lg" c="rgba(255,255,255,0.8)" maw={620}>
+              Capacitação de excelência para profissionais de RH e Gestão Pública com foco em resultados práticos e conformidade legal.
+            </Text>
+          </Stack>
+        </Container>
+      </Box>
 
-        <div className="mx-auto mt-12 grid w-full max-w-4xl gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3">
-          {[
-            { label: "Trilhas especializadas", value: trainingPaths.length, icon: Target },
-            { label: "Cursos no catálogo", value: courses.length, icon: BookOpenCheck },
-            { label: "Programas em destaque", value: featuredCoursesCount, icon: GraduationCap }
-          ].map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <div
-                key={item.label}
-                className="flex items-center justify-center bg-white/10 px-5 py-5"
-              >
-                <div className="flex items-center gap-3 text-left">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-prestige-gold/15 text-prestige-gold">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <strong className="block font-display text-3xl leading-none text-white">{item.value}</strong>
-                    <span className="mt-1 block text-sm font-medium text-white/85">{item.label}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-
-    <section className="bg-surface-muted">
-      <div className="ea-container py-10">
-        <div className="grid gap-8 lg:grid-cols-[340px_1fr] lg:items-start">
-          <aside className="apple-surface p-6 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-            <div className="mb-6 flex items-center justify-between gap-4 border-b border-outline-variant pb-5">
-              <span className="eyebrow">Filtros</span>
-              <div className="flex items-center gap-2 rounded-lg bg-surface-muted px-3 py-2 text-xs font-bold text-deep-navy">
-                <CheckCircle2 className="h-4 w-4 text-accent" />
-                {filtered.length}/{courses.length}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <span className="ea-label mb-3 flex items-center gap-2">
-                  <Search className="h-3.5 w-3.5" />
-                  Busca
-                </span>
-                <SearchInput
-                  ref={searchRef}
-                  value={query}
-                  onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Buscar cursos"
-                />
-              </div>
-
-              <div>
-                <span className="ea-label mb-3 flex items-center gap-2">
-                  <SlidersHorizontal className="h-3.5 w-3.5" />
-                  Trilhas
-                </span>
-                <div className="grid gap-2">
-                  <button
-                    type="button"
+      <Box component="section" bg="white" style={{ borderBottom: "1px solid #d7dee5" }}>
+        <Container size={1200} px="md" py="lg">
+          <Grid gap="lg" data-testid="ui-courses-filters">
+            <Grid.Col span={{ base: 12, lg: 8 }}>
+              <Stack gap="md">
+                <Group gap="sm">
+                  <Button
+                    variant={!filters.path ? "filled" : "outline"}
+                    color="rhBlue.9"
+                    radius="xl"
+                    size="sm"
                     onClick={() => setFilter("path", "")}
-                    className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${!filters.path ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
+                    aria-pressed={!filters.path}
                   >
-                    <span className="flex items-center justify-between gap-3">
-                      <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Todas</span>
-                      <span className="rounded bg-surface-muted px-2 py-1 text-badge font-bold text-deep-navy">{courses.length}</span>
-                    </span>
-                    <span className="mt-1 block text-sm font-bold leading-tight">Todas as trilhas</span>
-                  </button>
-                  {trainingPaths.map((path) => (
-                    <button
-                      key={path.id}
-                      type="button"
-                      onClick={() => setFilter("path", path.id)}
-                      className={`w-full rounded-lg border px-3 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-prestige-gold hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${filters.path === path.id ? "border-deep-navy bg-deep-navy text-white" : "border-outline-variant bg-surface-muted text-text-main"}`}
-                    >
-                      <span className="flex items-center justify-between gap-3">
-                        <span className="text-badge font-bold uppercase tracking-[0.05em] opacity-70">Trilha</span>
-                        <span className={`rounded px-2 py-1 text-badge font-bold ${filters.path === path.id ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"}`}>
-                          {path.courseCount}
-                        </span>
-                      </span>
-                      <span className="mt-1 block text-sm font-bold leading-tight">{path.shortName}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+                    Todos
+                  </Button>
+                  {trainingPaths.map((path) => {
+                    const Icon = pathIcons[path.icon as keyof typeof pathIcons] ?? BookOpenCheck;
+                    const active = filters.path === path.id;
 
-              <div>
-                <span className="ea-label mb-3 block">Modalidade</span>
-                <Select value={filters.modality || "all-modalities"} onValueChange={(value) => setFilter("modality", value)}>
-                  <SelectTrigger><SelectValue placeholder="Modalidade" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-modalities">Todas</SelectItem>
-                    {["Ao vivo online", "Presencial", "In company", "Híbrido", "Gravado"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+                    return (
+                      <Button
+                        key={path.id}
+                        variant={active ? "filled" : "outline"}
+                        color="rhBlue.9"
+                        radius="xl"
+                        size="sm"
+                        leftSection={<Icon size={16} />}
+                        onClick={() => setFilter("path", path.id)}
+                        aria-pressed={active}
+                      >
+                        {path.shortName}
+                      </Button>
+                    );
+                  })}
+                </Group>
 
-              <div>
-                <span className="ea-label mb-3 block">Carga horária</span>
-                <Select value={filters.duration || "all-durations"} onValueChange={(value) => setFilter("duration", value)}>
-                  <SelectTrigger><SelectValue placeholder="Carga horária" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-durations">Qualquer carga</SelectItem>
-                    {["Até 8h", "De 9h a 16h", "De 17h a 24h", "Mais de 24h"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
+                <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="sm">
+                  <Select
+                    aria-label="Filtrar por modalidade"
+                    placeholder="Modalidade"
+                    value={filters.modality || null}
+                    onChange={(value) => setFilter("modality", value ?? "")}
+                    clearable
+                    data={["Ao vivo online", "Presencial", "In company", "Híbrido", "Gravado"]}
+                  />
+                  <Select
+                    aria-label="Filtrar por carga horária"
+                    placeholder="Carga horária"
+                    value={filters.duration || null}
+                    onChange={(value) => setFilter("duration", value ?? "")}
+                    clearable
+                    data={["Até 8h", "De 9h a 16h", "De 17h a 24h", "Mais de 24h"]}
+                  />
+                  <Select
+                    aria-label="Filtrar por nível"
+                    placeholder="Nível"
+                    value={filters.level || null}
+                    onChange={(value) => setFilter("level", value ?? "")}
+                    clearable
+                    data={["Básico", "Intermediário", "Avançado"]}
+                  />
+                  <Button
+                    variant="default"
+                    leftSection={<X size={16} />}
+                    disabled={!activeFiltersCount}
+                    onClick={clearFilters}
+                  >
+                    Limpar filtros
+                  </Button>
+                </SimpleGrid>
+              </Stack>
+            </Grid.Col>
 
-              <div>
-                <span className="ea-label mb-3 block">Nível</span>
-                <Select value={filters.level || "all-levels"} onValueChange={(value) => setFilter("level", value)}>
-                  <SelectTrigger><SelectValue placeholder="Nível" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-levels">Todos</SelectItem>
-                    {["Básico", "Intermediário", "Avançado"].map((item) => <SelectItem key={item} value={item}>{item}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full gap-2"
-                disabled={!activeFiltersCount}
-                onClick={clearFilters}
-              >
-                <X className="h-4 w-4" />
-                Limpar filtros
-              </Button>
-            </div>
-          </aside>
-
-          <div className="space-y-5">
-            <div className="apple-surface overflow-hidden">
-              <div className="flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <span className="ea-label">Cursos disponíveis</span>
-                  <h2 className="mt-2 flex items-baseline gap-2 font-display font-bold text-deep-navy">
-                    <span className="text-4xl leading-none">{filtered.length}</span>
-                    <span className="text-xl">
-                      resultado{filtered.length === 1 ? "" : "s"} encontrado{filtered.length === 1 ? "" : "s"}
-                    </span>
-                  </h2>
-                </div>
-                <div className="rounded-lg border border-outline-variant bg-surface-muted px-4 py-3 text-sm font-semibold text-deep-navy">
-                  {activePathName ? `Trilha: ${activePathName}` : "Todas as trilhas"}
-                </div>
-              </div>
-            </div>
-
-            {loading ? (
-              <LoadingBlocks count={6} />
-            ) : filtered.length ? (
-              <div className="grid items-stretch gap-6 lg:grid-cols-2">
-                {filtered.map((course) => (
-                  <CourseCard key={course.id} course={course} nextClass={classes.find((item) => item.id === course.nextClassId)} compact />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                title="Nenhum curso encontrado."
-                description="Tente ampliar sua busca, mudar a trilha ou falar com o atendimento para encontrar a capacitação ideal."
-                actionLabel="Limpar filtros"
-                onAction={clearFilters}
+            <Grid.Col span={{ base: 12, lg: 4 }}>
+              <SearchInput
+                ref={searchRef}
+                value={query}
+                onChange={(event) => setSearch(event.target.value)}
+                onClear={() => setSearch("")}
+                clearLabel="Limpar busca do catálogo"
+                placeholder="Buscar curso..."
+                resultsLabel={
+                  query
+                    ? `${filteredCourses.length} resultado${filteredCourses.length === 1 ? "" : "s"} para “${query}”.`
+                    : "Digite um termo para filtrar o catálogo."
+                }
+                loading={loading}
               />
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-    </>
+            </Grid.Col>
+          </Grid>
+        </Container>
+      </Box>
+
+      <Container size={1200} px="md" py="xl">
+        <Stack gap="xl">
+          <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
+            {[
+              { label: "Cursos no catálogo", value: courses.length },
+              { label: "Programas em destaque", value: featuredCoursesCount },
+              { label: "Turmas com vagas", value: upcomingClassesCount }
+            ].map((item) => (
+              <Card key={item.label} radius="lg" shadow="sm" withBorder padding="lg">
+                <Text fz="xs" fw={700} c="#5f6b78" tt="uppercase">
+                  {item.label}
+                </Text>
+                <Text mt={8} fz="2.25rem" fw={800} c="rhBlue.9">
+                  {item.value}
+                </Text>
+              </Card>
+            ))}
+          </SimpleGrid>
+
+          {activeFilterLabels.length ? (
+            <Group gap="xs">
+              {activeFilterLabels.map((label) => (
+                <Badge key={label} variant="light" color="rhBlue" radius="xl" size="lg">
+                  {label}
+                </Badge>
+              ))}
+            </Group>
+          ) : null}
+
+          {loading ? (
+            <LoadingBlocks count={6} summary="Atualizando catálogo..." />
+          ) : visibleCourses.length ? (
+            <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }} spacing="lg">
+              {visibleCourses.map((course) => {
+                const nextClass = classes.find((item) => item.id === course.nextClassId);
+                return <CourseCard key={course.id} course={course} nextClass={nextClass} />;
+              })}
+            </SimpleGrid>
+          ) : (
+            <EmptyState
+              title="Nenhum curso encontrado."
+              description="Ajuste os filtros de trilha, modalidade, carga ou termo pesquisado."
+            />
+          )}
+        </Stack>
+      </Container>
+
+      <Box component="section" pb="xl">
+        <Container size={1200} px="md">
+          <Card radius="lg" padding={48} style={{ background: "#0b4668" }} ta="center">
+            <Title order={2} c="white">
+              Precisa de um treinamento personalizado?
+            </Title>
+            <Text mx="auto" mt="md" maw={680} fz="lg" c="rgba(255,255,255,0.8)">
+              Nossas soluções In Company são adaptadas às necessidades específicas da sua organização ou órgão público.
+            </Text>
+            <Group justify="center" gap="md" mt="xl">
+              <Button component={Link} to="/in-company" color="rhGold" c="#083b56" size="md" fw={700}>
+                Solicitar Proposta
+              </Button>
+              <Button
+                component={Link}
+                to="/agenda"
+                variant="outline"
+                color="gray.0"
+                size="md"
+                styles={{ root: { borderColor: "rgba(255,255,255,0.7)" }, label: { color: "#ffffff" } }}
+              >
+                Ver Agenda de Turmas
+              </Button>
+            </Group>
+          </Card>
+        </Container>
+      </Box>
+    </Box>
   );
 }

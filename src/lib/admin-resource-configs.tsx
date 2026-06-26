@@ -1,5 +1,22 @@
+import {
+  BookOpen,
+  CalendarCheck,
+  Clock,
+  FileText,
+  type LucideIcon,
+  Newspaper,
+  Tag,
+  Target,
+  TrendingUp,
+  UserCheck,
+  Users,
+  UserX,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
+import { SeatProgress } from "@/components/admin/seat-progress";
+import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
 import {
   validateBlogPost,
@@ -34,21 +51,43 @@ export type ResourceKey =
 export type FieldConfig = {
   key: string;
   label: string;
-  type?: "text" | "textarea" | "select" | "array" | "modules" | "multiselect" | "number" | "date";
+  type?:
+    | "text"
+    | "textarea"
+    | "select"
+    | "array"
+    | "modules"
+    | "multiselect"
+    | "number"
+    | "date"
+    | "file"
+    | "readonly";
   options?: Array<{ value: string; label: string }>;
   required?: boolean;
+  section?: string;
 };
 
 export type ColumnConfig<T> = {
   key: string;
   label: string;
   render: (row: T) => React.ReactNode;
+  /** Valor textual usado no export CSV quando `render` produz markup composto. */
+  exportValue?: (row: T) => string;
+};
+
+export type ResourceStat = {
+  label: string;
+  value: string;
+  helper: string;
+  icon?: LucideIcon;
 };
 
 export type ResourceConfig = {
   title: string;
   description: string;
   rows: Array<{ id: string }>;
+  /** Stats bento opcionais — substituem os cards genéricos quando presentes. */
+  stats?: ResourceStat[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   columns: ColumnConfig<any>[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,6 +112,92 @@ type ConfigDeps = {
 
 import React from "react";
 
+function normalizeDateTimeForStorage(value?: string, fallbackHour = "09:00:00.000Z") {
+  if (!value) return new Date().toISOString();
+  return `${value}T${fallbackHour}`;
+}
+
+function formatAdminDate(value?: string) {
+  if (!value) return "—";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+function getBadgeVariant(value: string) {
+  if (
+    value === "Confirmada" ||
+    value === "Concluída" ||
+    value === "Ativo" ||
+    value === "Publicado" ||
+    value === "Convertido" ||
+    value === "Inscrições abertas"
+  ) {
+    return "success" as const;
+  }
+
+  if (
+    value === "Aguardando pagamento" ||
+    value === "Poucas vagas" ||
+    value === "Em atendimento" ||
+    value === "Em breve"
+  ) {
+    return "warning" as const;
+  }
+
+  if (
+    value === "Cancelada" ||
+    value === "Inativo" ||
+    value === "Arquivado" ||
+    value === "Perdido" ||
+    value === "Encerrada"
+  ) {
+    return "danger" as const;
+  }
+
+  return "muted" as const;
+}
+
+function renderStatusBadge(value: string) {
+  return <Badge variant={getBadgeVariant(value)}>{value}</Badge>;
+}
+
+function deriveEnrollmentOperationalStatus(
+  enrollment: Enrollment,
+  trainingClass?: TrainingClass
+) {
+  if (enrollment.status === "Cancelada") return "Cancelada pelo atendimento.";
+  if (enrollment.status === "Concluída") return "Concluída e pronta para pós-curso.";
+
+  if (!trainingClass) {
+    return `${enrollment.status} com turma não localizada.`;
+  }
+
+  const now = Date.now();
+  const startsAt = new Date(trainingClass.startDate).getTime();
+  const endsAt = new Date(trainingClass.endDate).getTime();
+
+  if (enrollment.status === "Confirmada") {
+    if (endsAt < now) return "Confirmada em turma encerrada. Revisar conclusão.";
+    if (startsAt <= now) return "Confirmada em turma em andamento.";
+    return "Confirmada para turma futura.";
+  }
+
+  if (enrollment.status === "Aguardando pagamento") {
+    if (startsAt <= now) return "Pagamento pendente com turma em andamento.";
+    return "Pagamento pendente antes do início da turma.";
+  }
+
+  if (enrollment.status === "Pendente") {
+    if (startsAt <= now) return "Aguardando confirmação com turma ativa.";
+    return "Aguardando confirmação comercial.";
+  }
+
+  return enrollment.status;
+}
+
 export function buildResourceConfig(
   resource: ResourceKey,
   store: ReturnType<typeof useAppStore>,
@@ -94,6 +219,7 @@ export function buildResourceConfig(
         { value: "Híbrido", label: "Híbrido" },
         { value: "Gravado", label: "Gravado" },
       ];
+      const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = [
         { value: "Ativo", label: "Ativo" },
         { value: "Inativo", label: "Inativo" },
@@ -101,22 +227,58 @@ export function buildResourceConfig(
         { value: "Em breve", label: "Em breve" },
       ];
 
+      const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
+      const enrolledStudents = store.students.length;
+      const upcomingClasses = store.classes.filter((item) => {
+        const startsAt = new Date(item.startDate).getTime();
+        return startsAt >= Date.now();
+      }).length;
+      const completedEnrollments = store.enrollments.filter((item) => item.status === "Concluída").length;
+      const totalEnrollments = store.enrollments.length;
+      const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
+
       return {
         title: "Gestão de cursos",
         description: "Criar, editar, duplicar, ativar e organizar cursos da plataforma.",
         rows,
+        stats: [
+          {
+            label: "Cursos ativos",
+            value: String(activeCourses),
+            helper: "Cursos com status Ativo ou Destaque.",
+            icon: BookOpen,
+          },
+          {
+            label: "Alunos matriculados",
+            value: String(enrolledStudents),
+            helper: "Alunos com ao menos uma inscrição.",
+            icon: Users,
+          },
+          {
+            label: "Turmas futuras",
+            value: String(upcomingClasses),
+            helper: "Turmas com início agendado.",
+            icon: CalendarCheck,
+          },
+          {
+            label: "Taxa de conclusão",
+            value: `${completionRate}%`,
+            helper: "Inscrições concluídas sobre o total.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
           { key: "title", label: "Curso", render: (row: Course) => row.title },
           { key: "pathName", label: "Trilha", render: (row: Course) => row.pathName },
-          { key: "modality", label: "Modalidade", render: (row: Course) => row.modality },
-          { key: "status", label: "Status", render: (row: Course) => row.status },
+          { key: "modality", label: "Modalidade", render: (row: Course) => <Badge variant="muted">{row.modality}</Badge> },
+          { key: "status", label: "Status", render: (row: Course) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Course) => {
           setEditingId(row.id);
           setForm({
             title: row.title,
             pathId: row.pathId,
-            modality: row.modality,
+            modalities: row.modalities?.length ? row.modalities : [row.modality],
             durationLabel: row.durationLabel,
             price: String(row.price),
             status: row.status,
@@ -124,6 +286,10 @@ export function buildResourceConfig(
             fullDescription: row.fullDescription,
             image: row.image,
             level: row.level,
+            targetAudience: row.targetAudience || [],
+            categories: row.categories?.length ? row.categories : row.category ? [row.category] : [],
+            featuredCourseIds: row.featuredCourseIds || [],
+            featured: row.featured ? "Sim" : "Não",
             objectives: row.objectives || [],
             benefits: row.benefits || [],
             modules: row.modules || [],
@@ -134,7 +300,15 @@ export function buildResourceConfig(
         onDelete: (row: Course) => store.deleteCourse(row.id),
         onSave: async () => {
           const validation = validateCourse(
-            { ...form, objectives: JSON.stringify(form.objectives), benefits: JSON.stringify(form.benefits) },
+            {
+              ...form,
+              modality: form.modalities?.[0] ?? "",
+              modalities: JSON.stringify(form.modalities || []),
+              categories: JSON.stringify(form.categories || []),
+              targetAudience: JSON.stringify(form.targetAudience || []),
+              objectives: JSON.stringify(form.objectives),
+              benefits: JSON.stringify(form.benefits),
+            },
             form.modules
           );
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
@@ -143,7 +317,8 @@ export function buildResourceConfig(
               id: editingId ?? undefined,
               title: form.title,
               pathId: form.pathId,
-              modality: form.modality as Course["modality"],
+              modality: (form.modalities?.[0] ?? "Ao vivo online") as Course["modality"],
+              modalities: (form.modalities || []) as Course["modality"][],
               durationLabel: form.durationLabel,
               durationHours: Number(form.durationLabel?.replace(/\D/g, "") || 8),
               price: Number(form.price || 0),
@@ -152,6 +327,11 @@ export function buildResourceConfig(
               fullDescription: form.fullDescription,
               image: form.image,
               level: form.level as Course["level"],
+              targetAudience: form.targetAudience || [],
+              category: form.categories?.[0],
+              categories: form.categories || [],
+              featured: form.featured === "Sim",
+              featuredCourseIds: form.featuredCourseIds || [],
               objectives: form.objectives || [],
               benefits: form.benefits || [],
               modules: form.modules || [],
@@ -165,7 +345,7 @@ export function buildResourceConfig(
         fields: [
           { key: "title", label: "Nome do curso", type: "text", required: true },
           { key: "pathId", label: "Trilha", type: "select", options: pathOptions, required: true },
-          { key: "modality", label: "Modalidade", type: "select", options: modalityOptions, required: true },
+          { key: "modalities", label: "Modalidades", type: "multiselect", options: modalityOptions, required: true },
           {
             key: "level", label: "Nível", type: "select", required: true,
             options: [
@@ -176,9 +356,22 @@ export function buildResourceConfig(
             ],
           },
           { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+          {
+            key: "featured",
+            label: "Curso destaque",
+            type: "select",
+            options: [
+              { value: "Não", label: "Não" },
+              { value: "Sim", label: "Sim" },
+            ],
+            required: true,
+          },
           { key: "durationLabel", label: "Carga horária", type: "text", required: true },
           { key: "price", label: "Preço (R$)", type: "number", required: true },
           { key: "image", label: "URL da imagem", type: "text" },
+          { key: "targetAudience", label: "Público-alvo", type: "array" },
+          { key: "categories", label: "Categorias", type: "array" },
+          { key: "featuredCourseIds", label: "Cursos destaque relacionados", type: "multiselect", options: featuredCourseOptions },
           { key: "shortDescription", label: "Descrição curta", type: "textarea", required: true },
           { key: "fullDescription", label: "Descrição completa", type: "textarea", required: true },
           { key: "objectives", label: "Objetivos", type: "array" },
@@ -194,13 +387,15 @@ export function buildResourceConfig(
         return courseName.toLowerCase().includes(search.toLowerCase());
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
-      const modalityOptions = [
-        { value: "Ao vivo online", label: "Ao vivo online" },
-        { value: "Presencial", label: "Presencial" },
-        { value: "In company", label: "In company" },
-        { value: "Híbrido", label: "Híbrido" },
-        { value: "Gravado", label: "Gravado" },
-      ];
+      const selectedCourse = store.courses.find((c) => c.id === form.courseId);
+      const modalityOptions = selectedCourse
+        ? [{ value: selectedCourse.modality, label: selectedCourse.modality }]
+        : courseOptions.length
+          ? store.courses
+              .map((course) => course.modality)
+              .filter((value, index, list) => list.indexOf(value) === index)
+              .map((value) => ({ value, label: value }))
+          : [];
       const classStatusOptions = [
         { value: "Inscrições abertas", label: "Inscrições abertas" },
         { value: "Poucas vagas", label: "Poucas vagas" },
@@ -208,13 +403,57 @@ export function buildResourceConfig(
         { value: "Em breve", label: "Em breve" },
       ];
       const instructorOptions = store.instructors.map((i) => ({ value: i.id, label: i.name }));
+      const confirmedEnrollments = editingId
+        ? store.enrollments.filter(
+            (item) =>
+              item.classId === editingId &&
+              (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
+          ).length
+        : 0;
+
+      const activeClasses = store.classes.filter(
+        (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
+      ).length;
+      const startingClasses = store.classes.filter((item) => {
+        const startsAt = new Date(item.startDate).getTime();
+        const now = Date.now();
+        return startsAt >= now && startsAt <= now + 30 * 86400_000;
+      }).length;
+      const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
+      const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
+      const occupancyRate = totalSeatsAll > 0 ? Math.round((filledSeatsAll / totalSeatsAll) * 100) : 0;
 
       return {
         title: "Gestão de turmas",
         description: "Editar calendário, status, instrutores e vagas das turmas.",
         rows,
+        stats: [
+          {
+            label: "Turmas ativas",
+            value: String(activeClasses),
+            helper: "Com inscrições abertas ou poucas vagas.",
+            icon: CalendarCheck,
+          },
+          {
+            label: "Cursos no catálogo",
+            value: String(store.courses.length),
+            helper: "Total de cursos cadastrados.",
+            icon: BookOpen,
+          },
+          {
+            label: "Iniciando em 30 dias",
+            value: String(startingClasses),
+            helper: "Turmas com início no próximo mês.",
+            icon: Users,
+          },
+          {
+            label: "Taxa de ocupação",
+            value: `${occupancyRate}%`,
+            helper: "Vagas preenchidas sobre o total ofertado.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
-          { key: "id", label: "ID", render: (row: TrainingClass) => row.id },
           {
             key: "course", label: "Curso",
             render: (row: TrainingClass) =>
@@ -225,17 +464,30 @@ export function buildResourceConfig(
             render: (row: TrainingClass) =>
               new Intl.DateTimeFormat("pt-BR").format(new Date(row.startDate)),
           },
-          { key: "status", label: "Status", render: (row: TrainingClass) => row.status },
+          {
+            key: "filledSeats", label: "Inscritos",
+            render: (row: TrainingClass) => <SeatProgress filled={row.filledSeats} total={row.totalSeats} />,
+          },
+          { key: "status", label: "Status", render: (row: TrainingClass) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: TrainingClass) => {
+          const rowConfirmedEnrollments = store.enrollments.filter(
+            (item) =>
+              item.classId === row.id &&
+              (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
+          ).length;
           setEditingId(row.id);
           setForm({
             courseId: row.courseId,
             startDate: row.startDate.slice(0, 10),
+            endDate: row.endDate.slice(0, 10),
+            time: row.time || "",
             modality: row.modality,
             status: row.status,
             location: row.location,
             instructorId: row.instructorId || "",
+            totalSeats: String(row.totalSeats),
+            manualFilledSeats: String(row.manualFilledSeats ?? Math.max(row.filledSeats - rowConfirmedEnrollments, 0)),
           });
           setValidationErrors([]);
           setOpen(true);
@@ -245,15 +497,22 @@ export function buildResourceConfig(
           const validation = validateClass(form);
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
+            const totalSeats = Number(form.totalSeats || 0);
+            const manualFilledSeats = Number(form.manualFilledSeats || 0);
             await store.upsertClass({
               id: editingId ?? undefined,
               courseId: form.courseId,
-              startDate: `${form.startDate}T09:00:00.000Z`,
-              endDate: `${form.startDate}T18:00:00.000Z`,
+              startDate: normalizeDateTimeForStorage(form.startDate),
+              endDate: normalizeDateTimeForStorage(form.endDate, "18:00:00.000Z"),
+              time: form.time,
               modality: form.modality as TrainingClass["modality"],
               status: form.status as TrainingClass["status"],
               location: form.location,
               instructorId: form.instructorId || undefined,
+              totalSeats,
+              manualFilledSeats,
+              filledSeats: Math.min(totalSeats, confirmedEnrollments + manualFilledSeats),
+              availableSeats: Math.max(0, totalSeats - (confirmedEnrollments + manualFilledSeats)),
             });
             setOpen(false);
             setValidationErrors([]);
@@ -264,7 +523,11 @@ export function buildResourceConfig(
         fields: [
           { key: "courseId", label: "Curso", type: "select", options: courseOptions, required: true },
           { key: "startDate", label: "Data de início", type: "date", required: true },
+          { key: "endDate", label: "Data final", type: "date", required: true },
+          { key: "time", label: "Horário(s)", type: "text", required: true },
           { key: "modality", label: "Modalidade", type: "select", options: modalityOptions, required: true },
+          { key: "totalSeats", label: "Quantidade de vagas", type: "number", required: true },
+          { key: "manualFilledSeats", label: "Vagas preenchidas manualmente", type: "number" },
           { key: "status", label: "Status", type: "select", options: classStatusOptions, required: true },
           { key: "instructorId", label: "Instrutor", type: "select", options: instructorOptions },
           { key: "location", label: "Local", type: "text" },
@@ -284,15 +547,52 @@ export function buildResourceConfig(
         { value: "Concluída", label: "Concluída" },
       ];
 
+      const activeStudents = store.students.filter(
+        (item) => item.enrollmentStatus === "Confirmada" || item.enrollmentStatus === "Concluída"
+      ).length;
+      const inactiveStudents = store.students.length - activeStudents;
+      const certifiedStudents = store.students.filter((item) => item.certificateIssued).length;
+
       return {
         title: "Gestão de alunos",
         description: "Visualizar dados, curso, turma e status de inscrição.",
         rows,
+        stats: [
+          {
+            label: "Total de alunos",
+            value: String(store.students.length),
+            helper: "Cadastros com ao menos uma inscrição.",
+            icon: Users,
+          },
+          {
+            label: "Ativos",
+            value: String(activeStudents),
+            helper: "Inscrições confirmadas ou concluídas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Inativos",
+            value: String(inactiveStudents),
+            helper: "Pendentes, aguardando pagamento ou cancelados.",
+            icon: UserX,
+          },
+          {
+            label: "Certificados emitidos",
+            value: String(certifiedStudents),
+            helper: "Alunos com certificado já liberado.",
+            icon: UserCheck,
+          },
+        ],
         columns: [
-          { key: "name", label: "Aluno", render: (row: Student) => row.name },
-          { key: "email", label: "E-mail", render: (row: Student) => row.email },
+          {
+            key: "name",
+            label: "Aluno",
+            render: (row: Student) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Student) => `${row.name} <${row.email}>`,
+          },
           { key: "organization", label: "Empresa/órgão", render: (row: Student) => row.organization },
-          { key: "status", label: "Status", render: (row: Student) => row.enrollmentStatus },
+          { key: "jobTitle", label: "Cargo", render: (row: Student) => row.jobTitle || "—" },
+          { key: "status", label: "Status", render: (row: Student) => renderStatusBadge(row.enrollmentStatus) },
         ],
         onEdit: (row: Student) => {
           setEditingId(row.id);
@@ -353,15 +653,53 @@ export function buildResourceConfig(
         { value: "Perdido", label: "Perdido" },
       ];
 
+      const newLeads = store.leads.filter((item) => item.status === "Novo").length;
+      const inProgressLeads = store.leads.filter(
+        (item) => item.status === "Em atendimento" || item.status === "Proposta enviada"
+      ).length;
+      const convertedLeads = store.leads.filter((item) => item.status === "Convertido").length;
+      const leadConversionRate = store.leads.length > 0 ? Math.round((convertedLeads / store.leads.length) * 100) : 0;
+
       return {
         title: "Gestão de leads",
         description: "Funil com origem, interesse e estágio comercial.",
         rows,
+        stats: [
+          {
+            label: "Total de leads",
+            value: String(store.leads.length),
+            helper: "Contatos registrados no funil.",
+            icon: Users,
+          },
+          {
+            label: "Novos",
+            value: String(newLeads),
+            helper: "Ainda sem primeiro atendimento.",
+            icon: UserCheck,
+          },
+          {
+            label: "Em atendimento",
+            value: String(inProgressLeads),
+            helper: "Em contato ou com proposta enviada.",
+            icon: Clock,
+          },
+          {
+            label: "Taxa de conversão",
+            value: `${leadConversionRate}%`,
+            helper: "Leads convertidos sobre o total.",
+            icon: Target,
+          },
+        ],
         columns: [
-          { key: "name", label: "Lead", render: (row: Lead) => row.name },
-          { key: "origin", label: "Origem", render: (row: Lead) => row.origin },
+          {
+            key: "name",
+            label: "Lead",
+            render: (row: Lead) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Lead) => `${row.name} <${row.email}>`,
+          },
+          { key: "origin", label: "Origem", render: (row: Lead) => <Badge variant="muted">{row.origin}</Badge> },
           { key: "courseInterest", label: "Interesse", render: (row: Lead) => row.courseInterest },
-          { key: "status", label: "Status", render: (row: Lead) => row.status },
+          { key: "status", label: "Status", render: (row: Lead) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Lead) => {
           setEditingId(row.id);
@@ -403,7 +741,7 @@ export function buildResourceConfig(
                 mainChallenges: form.mainChallenges || undefined,
               });
             } else {
-              store.createLead({
+              await store.createLead({
                 name: form.name,
                 email: form.email,
                 phone: form.phone || "(61) 90000-0000",
@@ -451,23 +789,81 @@ export function buildResourceConfig(
         { value: "Concluída", label: "Concluída" },
       ];
 
+      const confirmedEnrollmentsTotal = store.enrollments.filter(
+        (item) => item.status === "Confirmada" || item.status === "Concluída"
+      ).length;
+      const awaitingPaymentEnrollments = store.enrollments.filter(
+        (item) => item.status === "Aguardando pagamento"
+      ).length;
+      const completedEnrollmentsTotal = store.enrollments.filter((item) => item.status === "Concluída").length;
+
       return {
         title: "Gestão de inscrições",
         description: "Acompanhar inscrição, curso, turma e forma de pagamento simulada.",
         rows,
+        stats: [
+          {
+            label: "Total de inscrições",
+            value: String(store.enrollments.length),
+            helper: "Inscrições registradas na plataforma.",
+            icon: Users,
+          },
+          {
+            label: "Confirmadas",
+            value: String(confirmedEnrollmentsTotal),
+            helper: "Confirmadas ou já concluídas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Aguardando pagamento",
+            value: String(awaitingPaymentEnrollments),
+            helper: "Pendentes de confirmação financeira.",
+            icon: Clock,
+          },
+          {
+            label: "Concluídas",
+            value: String(completedEnrollmentsTotal),
+            helper: "Capacitações finalizadas.",
+            icon: TrendingUp,
+          },
+        ],
         columns: [
-          { key: "studentName", label: "Aluno", render: (row: Enrollment) => row.studentName },
+          {
+            key: "studentName",
+            label: "Aluno",
+            render: (row: Enrollment) => <UserCell name={row.studentName} email={row.email} />,
+            exportValue: (row: Enrollment) => `${row.studentName} <${row.email}>`,
+          },
           {
             key: "course", label: "Curso",
             render: (row: Enrollment) =>
               store.courses.find((course) => course.id === row.courseId)?.title ?? "--",
           },
-          { key: "paymentMethod", label: "Pagamento", render: (row: Enrollment) => row.paymentMethod },
-          { key: "status", label: "Status", render: (row: Enrollment) => row.status },
+          {
+            key: "paymentMethod",
+            label: "Pagamento",
+            render: (row: Enrollment) => <Badge variant="muted">{row.paymentMethod}</Badge>,
+          },
+          { key: "status", label: "Status", render: (row: Enrollment) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Enrollment) => {
+          const selectedCourse = store.courses.find((course) => course.id === row.courseId);
+          const selectedClass = store.classes.find((item) => item.id === row.classId);
+
           setEditingId(row.id);
-          setForm({ status: row.status });
+          setForm({
+            studentName: row.studentName,
+            studentEmail: row.email,
+            courseTitle: selectedCourse?.title ?? "Curso não localizado",
+            classLabel: selectedClass
+              ? `${formatAdminDate(selectedClass.startDate)} • ${selectedClass.modality}`
+              : "Turma não localizada",
+            createdAtLabel: formatAdminDate(row.createdAt),
+            paymentMethod: row.paymentMethod,
+            enrollmentType: row.enrollmentType,
+            derivedStatus: deriveEnrollmentOperationalStatus(row, selectedClass),
+            status: row.status,
+          });
           setValidationErrors([]);
           setOpen(true);
         },
@@ -485,7 +881,22 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "status", label: "Status", type: "select", options: enrollmentStatusOptions, required: true },
+          { key: "studentName", label: "Aluno", type: "readonly", section: "Contexto da inscrição" },
+          { key: "studentEmail", label: "E-mail", type: "readonly", section: "Contexto da inscrição" },
+          { key: "courseTitle", label: "Curso", type: "readonly", section: "Contexto da inscrição" },
+          { key: "classLabel", label: "Turma", type: "readonly", section: "Contexto da inscrição" },
+          { key: "createdAtLabel", label: "Data da inscrição", type: "readonly", section: "Contexto da inscrição" },
+          { key: "paymentMethod", label: "Pagamento", type: "readonly", section: "Contexto da inscrição" },
+          { key: "enrollmentType", label: "Tipo de inscrição", type: "readonly", section: "Contexto da inscrição" },
+          { key: "derivedStatus", label: "Status derivado", type: "readonly", section: "Contexto da inscrição" },
+          {
+            key: "status",
+            label: "Atualizar status",
+            type: "select",
+            options: enrollmentStatusOptions,
+            required: true,
+            section: "Ação operacional",
+          },
         ],
       };
     }
@@ -499,15 +910,51 @@ export function buildResourceConfig(
         { value: "Inativo", label: "Inativo" },
       ];
 
+      const activeInstructors = store.instructors.filter((item) => item.status === "Ativo").length;
+      const inactiveInstructors = store.instructors.length - activeInstructors;
+      const linkedCourseIds = new Set(
+        store.instructors.flatMap((item) => item.courseIds || [])
+      );
+
       return {
         title: "Gestão de instrutores",
         description: "Criar, editar, vincular cursos e acompanhar especialidades.",
         rows,
+        stats: [
+          {
+            label: "Total de instrutores",
+            value: String(store.instructors.length),
+            helper: "Especialistas cadastrados.",
+            icon: Users,
+          },
+          {
+            label: "Ativos",
+            value: String(activeInstructors),
+            helper: "Disponíveis para novas turmas.",
+            icon: UserCheck,
+          },
+          {
+            label: "Inativos",
+            value: String(inactiveInstructors),
+            helper: "Sem vínculo ativo no momento.",
+            icon: UserX,
+          },
+          {
+            label: "Cursos vinculados",
+            value: String(linkedCourseIds.size),
+            helper: "Cursos com instrutor designado.",
+            icon: BookOpen,
+          },
+        ],
         columns: [
-          { key: "name", label: "Instrutor", render: (row: Instructor) => row.name },
-          { key: "email", label: "E-mail", render: (row: Instructor) => row.email },
+          {
+            key: "name",
+            label: "Instrutor",
+            render: (row: Instructor) => <UserCell name={row.name} email={row.email} />,
+            exportValue: (row: Instructor) => `${row.name} <${row.email}>`,
+          },
           { key: "specialty", label: "Especialidade", render: (row: Instructor) => row.specialty },
-          { key: "status", label: "Status", render: (row: Instructor) => row.status },
+          { key: "status", label: "Status", render: (row: Instructor) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Instructor) => {
           setEditingId(row.id);
@@ -517,6 +964,8 @@ export function buildResourceConfig(
             phone: row.phone || "",
             specialty: row.specialty,
             bio: row.bio || "",
+            education: row.education || "",
+            photoUrl: row.photoUrl || (row.avatar.startsWith("/") || row.avatar.startsWith("http") ? row.avatar : ""),
             status: row.status,
             courseIds: row.courseIds || [],
           });
@@ -533,8 +982,10 @@ export function buildResourceConfig(
               name: form.name,
               email: form.email,
               phone: form.phone || undefined,
-              specialty: form.specialty,
+              specialty: form.specialty || undefined,
               bio: form.bio || undefined,
+              education: form.education || undefined,
+              photoUrl: form.photoUrl || undefined,
               status: form.status as Instructor["status"],
               courseIds: form.courseIds || [],
             });
@@ -546,9 +997,11 @@ export function buildResourceConfig(
         },
         fields: [
           { key: "name", label: "Nome", type: "text", required: true },
-          { key: "email", label: "E-mail", type: "text", required: true },
+          { key: "email", label: "E-mail", type: "text" },
           { key: "phone", label: "Telefone", type: "text" },
-          { key: "specialty", label: "Especialidade", type: "text", required: true },
+          { key: "specialty", label: "Especialidade", type: "text" },
+          { key: "education", label: "Formação", type: "textarea" },
+          { key: "photoUrl", label: "Foto do professor", type: "file" },
           { key: "bio", label: "Biografia", type: "textarea" },
           { key: "status", label: "Status", type: "select", options: instructorStatusOptions, required: true },
         ],
@@ -574,15 +1027,47 @@ export function buildResourceConfig(
       ];
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
 
+      const publishedPosts = store.blogPosts.filter((item) => item.status === "Publicado").length;
+      const draftPosts = store.blogPosts.filter((item) => item.status === "Rascunho").length;
+      const activeCategories = new Set(
+        store.blogPosts.filter((item) => item.status === "Publicado").map((item) => item.category)
+      );
+
       return {
         title: "Gestão do blog",
         description: "CRUD local para posts, categorias e status editoriais.",
         rows,
+        stats: [
+          {
+            label: "Total de posts",
+            value: String(store.blogPosts.length),
+            helper: "Conteúdos no acervo editorial.",
+            icon: Newspaper,
+          },
+          {
+            label: "Publicados",
+            value: String(publishedPosts),
+            helper: "Visíveis no blog público.",
+            icon: FileText,
+          },
+          {
+            label: "Rascunhos",
+            value: String(draftPosts),
+            helper: "Em produção, ainda não publicados.",
+            icon: Clock,
+          },
+          {
+            label: "Categorias ativas",
+            value: String(activeCategories.size),
+            helper: "Categorias com post publicado.",
+            icon: Tag,
+          },
+        ],
         columns: [
           { key: "title", label: "Post", render: (row: BlogPost) => row.title },
-          { key: "category", label: "Categoria", render: (row: BlogPost) => row.category },
+          { key: "category", label: "Categoria", render: (row: BlogPost) => <Badge variant="muted">{row.category}</Badge> },
           { key: "author", label: "Autor", render: (row: BlogPost) => row.author },
-          { key: "status", label: "Status", render: (row: BlogPost) => row.status },
+          { key: "status", label: "Status", render: (row: BlogPost) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: BlogPost) => {
           setEditingId(row.id);

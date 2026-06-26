@@ -1,7 +1,7 @@
 # Story: Aplicar diretrizes de design da Apple
 
 ## Status
-Ready for Review
+Done
 
 ## Contexto
 O usuário solicitou análise ampla da documentação oficial Apple Developer e aplicação no projeto. A pesquisa cobriu a documentação Apple Developer e Human Interface Guidelines em design fundamentals, layout, tipografia, cor, materiais, acessibilidade, botões e busca.
@@ -20,7 +20,7 @@ O usuário solicitou análise ampla da documentação oficial Apple Developer e 
 - `npm run lint` executa `tsc --noEmit` e passou.
 - `npm run build` passou com o aviso existente de chunk grande do Vite.
 - `npm test` e `npm run typecheck` não existem no `package.json`; ambos retornaram "Missing script".
-- Atualizacao de planejamento em 26/05/2026: depois desta implementacao, o runtime ativo foi migrado para Next.js pela story de hardening. A releitura da fonte oficial atual inclui a direcao Liquid Glass e foi consolidada em `docs/design/apple-hig-application-plan-2026-05-26.md`, sem alteracoes de interface nesta etapa.
+- Atualizacao de planejamento em 26/05/2026: depois desta implementacao, o runtime ativo foi migrado para Next.js pela story de hardening. A releitura da fonte oficial atual incluiu a direcao Liquid Glass e foi consolidada em nota de planejamento posterior, sem alteracoes de interface nesta etapa.
 - Validacao do plano no runtime Next em 26/05/2026: `npm run lint` passou com 7 warnings existentes de `<img>` registrados no plano; `npm run typecheck` passou; `npm test` passou com build e 18 testes Playwright.
 
 ## File List
@@ -34,14 +34,16 @@ O usuário solicitou análise ampla da documentação oficial Apple Developer e 
 - `src/components/common/section-title.tsx`
 - `src/components/common/search-input.tsx`
 - `src/components/courses/course-card.tsx`
-- `src/components/courses/training-path-card.tsx`
 - `src/components/agenda/calendar-view.tsx`
 - `src/components/agenda/class-card.tsx`
-- `src/pages/public/Home.tsx`
-- `src/pages/public/Courses.tsx`
-- `src/pages/public/Agenda.tsx`
-- `src/pages/public/CourseDetail.tsx`
-- `src/pages/public/InCompany.tsx`
-- `src/pages/public/Contact.tsx`
-- `docs/design/apple-hig-application-plan-2026-05-26.md`
+- `src/views/public/Home.tsx`
+- `src/views/public/Courses.tsx`
+- `src/views/public/Agenda.tsx`
+- `src/views/public/CourseDetail.tsx`
+- `src/views/public/InCompany.tsx`
+- `src/views/public/Contact.tsx`
 - `docs/stories/2026-05-12-apple-design-docs-refresh.md`
+
+## QA Results
+
+Pass — encerramento documental em 2026-06-24. Story mantida como concluída com evidência histórica de lint/build e validação posterior no runtime Next sem gap funcional aberto.

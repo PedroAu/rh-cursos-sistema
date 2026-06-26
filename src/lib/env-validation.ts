@@ -4,11 +4,10 @@
  */
 
 function validateEnvironment(): void {
-  // Este app é um SITE ESTÁTICO (`output: 'export'`): não há servidor Node em
-  // produção. Só as variáveis `NEXT_PUBLIC_*` são embutidas no bundle e chegam
-  // ao navegador. Segredos de servidor (SUPABASE_DB_URL, SERVICE_ROLE_KEY)
-  // vivem nas Edge Functions do Supabase, NÃO aqui — exigi-los no build do
-  // site estático estava errado e quebrava o build local e o CI.
+  // O app agora roda em modelo híbrido (SSG para páginas públicas e SSR para
+  // rotas protegidas do admin). Variáveis NEXT_PUBLIC_* continuam sendo
+  // necessárias no cliente; segredos de servidor ficam restritos ao runtime do
+  // Next e às Edge Functions do Supabase.
   const isProduction = process.env.NODE_ENV === "production";
   const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -43,22 +42,8 @@ function validateEnvironment(): void {
     }
   }
 
-  // ============================================
-  // AVISOS DE SEGURANÇA (não bloqueiam o build estático)
-  // ============================================
-
-  if (isProduction) {
-    if (process.env.DEMO_AUTH_ENABLED === "true") {
-      warnings.push(
-        "⚠️ WARNING: DEMO_AUTH_ENABLED is true in production - this should be false"
-      );
-    }
-
-    if (process.env.DEMO_ADMIN_PASSWORD) {
-      warnings.push(
-        "⚠️ WARNING: DEMO_ADMIN_PASSWORD is set in production - should be empty"
-      );
-    }
+  if (isProduction && !process.env.AUTH_SESSION_SECRET) {
+    errors.push("🔴 CRITICAL: AUTH_SESSION_SECRET must be set in production");
   }
 
   // ============================================
@@ -69,12 +54,6 @@ function validateEnvironment(): void {
     if (!process.env.AUTH_SESSION_SECRET) {
       warnings.push(
         "ℹ️ INFO: AUTH_SESSION_SECRET not set - using insecure development default"
-      );
-    }
-
-    if (process.env.DEMO_AUTH_ENABLED === "true" && !process.env.DEMO_ADMIN_PASSWORD) {
-      warnings.push(
-        "ℹ️ INFO: DEMO_AUTH_ENABLED is true but DEMO_ADMIN_PASSWORD not set - demo login disabled"
       );
     }
   }

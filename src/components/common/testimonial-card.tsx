@@ -12,7 +12,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
     .join("");
 
   return (
-    <Card className="h-full border-primary/10">
+    <Card variant="outlined" interactive={false} size="md" className="h-full">
       <CardContent className="space-y-6 p-6">
         <div className="flex items-center gap-4">
           <Avatar className="h-14 w-14">
@@ -20,7 +20,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           </Avatar>
           <div>
             <div className="text-base font-semibold text-foreground">{testimonial.name}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-label-secondary">
               {testimonial.role} • {testimonial.organization}
             </div>
           </div>
@@ -30,7 +30,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
             <Star key={index} className="h-4 w-4 fill-current" />
           ))}
         </div>
-        <p className="text-sm leading-7 text-muted-foreground">{testimonial.text}</p>
+        <p className="text-sm leading-7 text-label-secondary">{testimonial.text}</p>
         <div className="rounded-lg bg-secondary/60 px-4 py-3 text-sm font-medium text-foreground">
           {testimonial.course}
         </div>

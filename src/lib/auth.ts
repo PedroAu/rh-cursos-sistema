@@ -1,12 +1,27 @@
-export type DashboardRole = "admin";
+import { isSessionExpired, SESSION_TTL_MS } from "@/lib/auth-session";
+import type { Database } from "@/lib/supabase/database.types";
+
+export type DashboardRole = Database["public"]["Tables"]["profiles"]["Row"]["role"];
 
 export type DemoSession = {
   role: DashboardRole;
   email: string;
   name: string;
+  /** Epoch ms de expiração da sessão assinada. */
+  exp?: number;
 };
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
+
+export function getCookieOptions(ttlMs = SESSION_TTL_MS) {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: Math.floor(ttlMs / 1000)
+  };
+}
 
 export function getSessionSecret(): string {
   const secret = process.env.AUTH_SESSION_SECRET;
@@ -33,34 +48,6 @@ export function getSessionSecret(): string {
 }
 
 export const SESSION_SECRET = getSessionSecret();
-
-function getDemoUsers(): Array<DemoSession & { password: string }> {
-  if (process.env.NODE_ENV === "production") {
-    return [];
-  }
-
-  const demoPassword = process.env.DEMO_ADMIN_PASSWORD;
-  if (!demoPassword) {
-    if (process.env.DEMO_AUTH_ENABLED !== "true") {
-      return [];
-    }
-    console.warn(
-      "⚠️ DEMO_ADMIN_PASSWORD not set. Demo authentication disabled."
-    );
-    return [];
-  }
-
-  return [
-    {
-      role: "admin",
-      email: "admin@rhcursos.demo",
-      password: demoPassword,
-      name: "Admin RH Cursos"
-    }
-  ];
-}
-
-export const demoUsers = getDemoUsers();
 
 function toBase64Url(value: ArrayBuffer | string) {
   const binary =
@@ -89,12 +76,25 @@ async function signPayload(payload: string) {
   return toBase64Url(signature);
 }
 
-function isDashboardRole(value: unknown): value is DashboardRole {
-  return value === "admin";
+function timingSafeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
 
-export async function encodeSession(session: DemoSession) {
-  const payload = toBase64Url(JSON.stringify(session));
+export function isDashboardRole(value: unknown): value is DashboardRole {
+  return value === "admin" || value === "instructor" || value === "student";
+}
+
+export function normalizeDashboardRole(value: unknown): DashboardRole | null {
+  return isDashboardRole(value) ? value : null;
+}
+
+export async function encodeSession(session: DemoSession, ttlMs = SESSION_TTL_MS) {
+  const payload = toBase64Url(JSON.stringify({ ...session, exp: Date.now() + ttlMs }));
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
 }
@@ -106,23 +106,20 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
   if (!payload || !signature) return null;
 
   const expectedSignature = await signPayload(payload);
-  if (signature !== expectedSignature) return null;
+  if (!timingSafeEqual(signature, expectedSignature)) return null;
 
-  const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
-  if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+  try {
+    const parsed = JSON.parse(fromBase64Url(payload)) as Partial<DemoSession>;
+    if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
+    if (typeof parsed.exp !== "number" || isSessionExpired(parsed)) return null;
 
-  return {
-    role: parsed.role,
-    email: parsed.email,
-    name: parsed.name
-  };
-}
-
-export function findDemoUser(role: string, email: string, password: string) {
-  return demoUsers.find(
-    (user) =>
-      user.role === role &&
-      user.email.toLowerCase() === email.trim().toLowerCase() &&
-      user.password === password
-  );
+    return {
+      role: parsed.role,
+      email: parsed.email,
+      name: parsed.name,
+      exp: parsed.exp
+    };
+  } catch {
+    return null;
+  }
 }

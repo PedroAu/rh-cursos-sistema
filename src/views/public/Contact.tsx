@@ -1,35 +1,40 @@
-import { Mail, MapPin, MessageCircle, PhoneCall } from "lucide-react";
+"use client";
+
+import { Mail, MapPin, MessageCircle, PhoneCall, Send } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Container,
+  Grid,
+  Group,
+  SimpleGrid,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  ThemeIcon,
+  Title
+} from "@mantine/core";
 
-import { SectionTitle } from "@/components/common/section-title";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
 
 const contactItems = [
   {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: company.phones.whatsapp
-  },
-  {
     icon: PhoneCall,
-    label: "Telefone",
-    value: `${company.phones.primary} / ${company.phones.secondary}`
-  },
-  {
-    icon: Mail,
-    label: "E-mail",
-    value: company.email
+    title: "TELEFONES",
+    headline: company.phones.primary,
+    detail: `${company.phones.whatsapp} (WhatsApp)`
   },
   {
     icon: MapPin,
-    label: "Localização",
-    value: `${company.address.district}, ${company.address.cityState}`
+    title: "LOCALIZAÇÃO",
+    headline: `${company.address.district}, ${company.address.cityState}`,
+    detail: "Atendimento de Segunda a Sexta, das 08h às 18h."
   }
 ];
 
@@ -53,10 +58,19 @@ export function ContactPage() {
     name: "",
     email: "",
     phone: "",
+    organization: "",
+    courseInterest: "",
     message: ""
   });
+  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const update = (key: keyof typeof form, value: string) => {
+    setErrors((current) => ({ ...current, [key]: undefined }));
+    setSubmitError(null);
+    setSubmitSuccess(null);
     if (key === "phone") {
       setForm((current) => ({ ...current, [key]: formatPhone(value) }));
     } else {
@@ -64,144 +78,238 @@ export function ContactPage() {
     }
   };
 
-  const submit = () => {
+  const validate = () => {
+    const nextErrors: Partial<Record<keyof typeof form, string>> = {};
+
     if (!form.name.trim() || form.name.trim().length < 3) {
-      toast.error("Nome deve ter no mínimo 3 caracteres.");
-      return;
+      nextErrors.name = "Nome deve ter no mínimo 3 caracteres.";
     }
-
     if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      toast.error("Informe um e-mail válido.");
-      return;
+      nextErrors.email = "Informe um e-mail válido.";
     }
-
     if (form.phone && getPhoneDigits(form.phone).length < 10) {
-      toast.error("Informe um telefone válido (mínimo 10 dígitos).");
-      return;
+      nextErrors.phone = "Informe um telefone válido com pelo menos 10 dígitos.";
     }
-
     if (!form.message.trim() || form.message.trim().length < 10) {
-      toast.error("Mensagem deve ter no mínimo 10 caracteres.");
-      return;
+      nextErrors.message = "Mensagem deve ter no mínimo 10 caracteres.";
     }
 
-    createLead({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      courseInterest: "Contato pelo site",
-      origin: "Site",
-      message: form.message
-    });
-    toast.success("Mensagem registrada para atendimento.");
-    setForm({ name: "", email: "", phone: "", message: "" });
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const submit = async () => {
+    if (!validate()) return;
+
+    setIsSubmitting(true);
+    try {
+      await createLead({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        courseInterest: form.courseInterest.trim() || "Contato pelo site",
+        organization: form.organization.trim() || undefined,
+        origin: "Site",
+        message: form.message
+      });
+
+      const successMessage = "Mensagem registrada. Nossa equipe retorna com orientação inicial e próximos passos.";
+      toast.success("Mensagem registrada para atendimento.");
+      setForm({ name: "", email: "", phone: "", organization: "", courseInterest: "", message: "" });
+      setErrors({});
+      setSubmitError(null);
+      setSubmitSuccess(successMessage);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.";
+      setSubmitError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <>
-      <section className="bg-deep-navy py-20 text-white">
-        <div className="ea-container">
-          <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Contato</span>
-          <h1 className="mt-4 max-w-3xl text-white">
-            Fale com a RH Cursos e encontre a capacitação certa.
-          </h1>
-          <p className="mt-6 max-w-2xl text-lead text-white/78">
-            Tire dúvidas sobre cursos, trilhas, agenda, propostas in company e atendimento para órgãos públicos.
-          </p>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-white/62">
-            {company.legalName} • CNPJ {company.cnpj} • {company.address.full}
-          </p>
-        </div>
-      </section>
+    <Box bg="#f6f7fb">
+      <Box component="section" bg="white" style={{ borderBottom: "1px solid #d7dee5" }}>
+        <Container size={1200} px="md" py={{ base: 48, md: 56 }}>
+          <Stack gap="md" maw={840}>
+            <Title order={1} c="rhBlue.9">
+              Entre em Contato
+            </Title>
+            <Text fz="1.12rem" c="#414b56" maw={780}>
+              Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública. Fale conosco através do formulário ou nossos canais diretos.
+            </Text>
+          </Stack>
+        </Container>
+      </Box>
 
-      <section className="page-section">
-        <div className="ea-container grid gap-8 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
-          <div className="space-y-6">
-            <SectionTitle
-              eyebrow="Atendimento"
-              title="Canais diretos para falar com a nossa equipe."
-              description="Escolha o melhor canal ou envie uma mensagem pelo formulário. Um especialista poderá orientar o próximo passo."
-            />
-            <div className="grid gap-4">
+      <Container size={1200} px="md" py="xl">
+        <Grid gap={32}>
+          <Grid.Col span={{ base: 12, xl: 5 }}>
+            <Stack gap="lg">
               {contactItems.map((item) => {
                 const Icon = item.icon;
 
                 return (
-                  <Card key={item.label} className="border-outline-variant bg-white/95">
-                    <CardContent className="flex items-center gap-4 p-5">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-white">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold uppercase tracking-[0.05em] text-text-muted">
-                          {item.label}
-                        </p>
-                        <p className="mt-1 font-display text-xl font-bold text-deep-navy">
-                          {item.value}
-                        </p>
-                      </div>
-                    </CardContent>
+                  <Card key={item.title} radius="lg" shadow="sm" withBorder padding="xl">
+                    <Group align="flex-start" gap="lg" wrap="nowrap">
+                      <ThemeIcon size={48} radius="lg" variant="light" color="rhBlue">
+                        <Icon size={20} />
+                      </ThemeIcon>
+                      <Box>
+                        <Text fz="sm" fw={700} c="rhBlue.7" tt="uppercase">
+                          {item.title}
+                        </Text>
+                        <Text mt={8} fz="1.1rem" fw={700} c="#23292f">
+                          {item.headline}
+                        </Text>
+                        <Text mt={4} c="#55606a">
+                          {item.detail}
+                        </Text>
+                      </Box>
+                    </Group>
                   </Card>
                 );
               })}
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
-                  <MessageCircle className="h-4 w-4" />
-                  Chamar no WhatsApp
-                </a>
-              </Button>
-              <Button asChild variant="outline">
-                <a href={company.links.email}>
-                  <Mail className="h-4 w-4" />
-                  Enviar e-mail
-                </a>
-              </Button>
-            </div>
-          </div>
 
-          <Card className="border-outline-variant bg-white/95 shadow-card">
-            <CardContent className="grid gap-5 p-8 md:p-10">
-              <div>
-                <h2 className="font-display text-h2-compact font-bold text-deep-navy">
-                  Envie sua mensagem
-                </h2>
-                <p className="mt-3 text-sm leading-7 text-text-muted">
-                  Conte o que você procura e retornaremos com orientação objetiva.
-                </p>
-              </div>
-              <Input
-                placeholder="Nome completo"
-                value={form.name}
-                onChange={(event) => update("name", event.target.value)}
+              <Box
+                h={280}
+                style={{
+                  overflow: "hidden",
+                  borderRadius: "var(--mantine-radius-lg)",
+                  border: "1px solid #cfd7df",
+                  backgroundImage:
+                    "linear-gradient(rgba(60,63,69,0.48), rgba(60,63,69,0.48)), url('/images/home-hero-reference.jpg')",
+                  backgroundPosition: "center",
+                  backgroundSize: "cover",
+                  filter: "grayscale(1)"
+                }}
+                role="img"
+                aria-label="Mapa da região de Brasília"
               />
-              <Input
-                type="email"
-                placeholder="E-mail"
-                value={form.email}
-                onChange={(event) => update("email", event.target.value)}
-              />
-              <Input
-                type="tel"
-                inputMode="tel"
-                placeholder="Telefone"
-                value={form.phone}
-                onChange={(event) => update("phone", event.target.value)}
-              />
-              <Textarea
-                placeholder="Como podemos ajudar?"
-                value={form.message}
-                onChange={(event) => update("message", event.target.value)}
-              />
-              <Button size="lg" onClick={submit}>
-                <PhoneCall className="h-4 w-4" />
-                Enviar mensagem
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-    </>
+
+              <Group gap="sm">
+                <Button
+                  component="a"
+                  href={company.links.whatsapp}
+                  target="_blank"
+                  rel="noreferrer"
+                  color="rhBlue.9"
+                  leftSection={<MessageCircle size={16} />}
+                >
+                  WhatsApp
+                </Button>
+                <Button
+                  component="a"
+                  href={company.links.email}
+                  variant="default"
+                  c="rhBlue.7"
+                  leftSection={<Mail size={16} />}
+                >
+                  E-mail
+                </Button>
+              </Group>
+            </Stack>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, xl: 7 }}>
+            <Card radius="lg" shadow="sm" withBorder padding="xl" data-testid="ui-contact-form">
+              <Group align="center" gap="lg" mb="xl">
+                <Box w={4} h={48} bg="rhGold" aria-hidden />
+                <Title order={2} c="rhBlue.9">
+                  Envie uma mensagem
+                </Title>
+              </Group>
+
+              {submitError ? (
+                <Alert role="alert" color="red" mb="lg">
+                  {submitError}
+                </Alert>
+              ) : null}
+
+              {submitSuccess ? (
+                <Alert color="green" mb="lg" aria-live="polite">
+                  {submitSuccess}
+                </Alert>
+              ) : null}
+
+              <Stack gap="md">
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                  <TextInput
+                    label="Nome completo"
+                    withAsterisk
+                    value={form.name}
+                    onChange={(event) => update("name", event.target.value)}
+                    error={errors.name}
+                    placeholder="Seu nome"
+                    autoComplete="name"
+                  />
+                  <TextInput
+                    label="E-mail"
+                    withAsterisk
+                    type="email"
+                    value={form.email}
+                    onChange={(event) => update("email", event.target.value)}
+                    error={errors.email}
+                    placeholder="email@empresa.com.br"
+                    autoComplete="email"
+                  />
+                </SimpleGrid>
+
+                <TextInput
+                  label="Telefone / WhatsApp"
+                  value={form.phone}
+                  onChange={(event) => update("phone", event.target.value)}
+                  error={errors.phone}
+                  placeholder="(00) 00000-0000"
+                  autoComplete="tel"
+                />
+
+                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                  <TextInput
+                    label="Empresa / órgão"
+                    value={form.organization}
+                    onChange={(event) => update("organization", event.target.value)}
+                    placeholder="Prefeitura ou empresa"
+                    autoComplete="organization"
+                  />
+                  <TextInput
+                    label="Curso ou tema de interesse"
+                    value={form.courseInterest}
+                    onChange={(event) => update("courseInterest", event.target.value)}
+                    placeholder="Ex.: eSocial"
+                  />
+                </SimpleGrid>
+
+                <Textarea
+                  label="Mensagem"
+                  withAsterisk
+                  value={form.message}
+                  onChange={(event) => update("message", event.target.value)}
+                  error={errors.message}
+                  placeholder="Como podemos ajudar sua organização?"
+                  minRows={6}
+                  autosize
+                />
+
+                <Button
+                  onClick={() => void submit()}
+                  loading={isSubmitting}
+                  color="rhGold"
+                  c="#3d2c00"
+                  size="lg"
+                  fw={700}
+                  rightSection={<Send size={18} />}
+                  w="fit-content"
+                  mt="sm"
+                >
+                  {isSubmitting ? "Enviando..." : "Enviar mensagem"}
+                </Button>
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </Box>
   );
 }

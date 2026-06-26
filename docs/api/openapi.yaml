@@ -1,0 +1,820 @@
+openapi: 3.1.0
+info:
+  title: RH Cursos API
+  version: 0.1.0
+  summary: Contrato HTTP atual da plataforma RH Cursos
+  description: >-
+    Fundação OpenAPI 3.x baseada na superfície HTTP atualmente implementada no
+    Route Handler `app/api/auth/session/route.ts` e nas Edge Functions em
+    `supabase/functions/*/index.ts`.
+  license:
+    name: Proprietary
+servers:
+  - url: https://rhcursos.com.br
+    description: Aplicação pública
+  - url: https://{project-ref}.supabase.co
+    description: Base do projeto Supabase para Edge Functions
+    variables:
+      project-ref:
+        default: your-project-ref
+tags:
+  - name: Auth Session
+    description: Login, sincronização e logout administrativo
+  - name: Enrollments
+    description: Inscrição pública em cursos
+  - name: Leads
+    description: Captação de leads corporativos
+  - name: Admin Resources
+    description: Mutações administrativas autenticadas
+paths:
+  /api/auth/session:
+    get:
+      tags: [Auth Session]
+      summary: Sincroniza a sessão administrativa atual
+      description: >-
+        Lê o cookie `SESSION_COOKIE`, retorna a sessão atual e rotaciona o token
+        quando a expiração entra na janela de renovação.
+      operationId: getAdminSession
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Sessão válida, reutilizada ou renovada
+          headers:
+            Set-Cookie:
+              description: Retornado apenas quando `rotated=true`
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionSyncResponse'
+              examples:
+                current:
+                  summary: Sessão ainda saudável
+                  value:
+                    ok: true
+                    session:
+                      role: admin
+                      email: admin@rhcursos.com.br
+                      name: Admin
+                    token: eyJ...
+                    rotated: false
+                    supabaseSession: null
+                rotated:
+                  summary: Sessão renovada
+                  value:
+                    ok: true
+                    session:
+                      role: admin
+                      email: admin@rhcursos.com.br
+                      name: Admin
+                    token: eyJ...novo
+                    rotated: true
+                    supabaseSession: null
+        '401':
+          $ref: '#/components/responses/SessionInvalid'
+    post:
+      tags: [Auth Session]
+      summary: Login administrativo via Route Handler
+      operationId: loginAdminSession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              admin:
+                value:
+                  email: admin@rhcursos.com.br
+                  password: securepass123
+                  role: admin
+      responses:
+        '200':
+          description: Login concluído com cookie HttpOnly emitido
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          $ref: '#/components/responses/CredentialsInvalid'
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    delete:
+      tags: [Auth Session]
+      summary: Logout administrativo via Route Handler
+      operationId: logoutAdminSession
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Cookie limpo e revogação global tentada quando possível
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+              examples:
+                global:
+                  value:
+                    ok: true
+                    mode: global
+                    revoked: true
+                localOnly:
+                  value:
+                    ok: true
+                    mode: local-only
+                    revoked: false
+  /functions/v1/enrollments:
+    post:
+      tags: [Enrollments]
+      summary: Cria uma inscrição pública
+      operationId: createEnrollment
+      x-runtime: supabase-edge-function
+      security: []
+      x-rate-limit:
+        key: enrollment:{ip}
+        windowSeconds: 60
+        maxRequests: 20
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+      responses:
+        '201':
+          description: Inscrição registrada
+          headers:
+            X-RateLimit-Remaining:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentResponse'
+        '400':
+          description: Body inválido ou falha de validação
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '429':
+          $ref: '#/components/responses/GenericRateLimited'
+        '500':
+          description: Erro interno ao registrar inscrição
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error:
+                  value:
+                    ok: false
+                    error: Erro ao registrar inscrição.
+  /functions/v1/leads:
+    post:
+      tags: [Leads]
+      summary: Registra um lead corporativo
+      operationId: createLead
+      x-runtime: supabase-edge-function
+      security: []
+      x-rate-limit:
+        key: lead:{ip}
+        windowSeconds: 60
+        maxRequests: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LeadRequest'
+      responses:
+        '201':
+          description: Lead criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          description: Campos obrigatórios ausentes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                missingFields:
+                  value:
+                    ok: false
+                    error: Campos obrigatórios ausentes.
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '429':
+          $ref: '#/components/responses/GenericRateLimited'
+        '500':
+          description: Erro interno ao criar lead
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error:
+                  value:
+                    ok: false
+                    error: Erro ao criar lead.
+  /functions/v1/admin-resources:
+    post:
+      tags: [Admin Resources]
+      summary: Executa mutações administrativas
+      operationId: mutateAdminResources
+      x-runtime: supabase-edge-function
+      x-rate-limit:
+        key: admin:{email}:{ip}
+        windowSeconds: 60
+        maxRequests: 30
+      security:
+        - adminSessionHeader: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminMutation'
+      responses:
+        '200':
+          description: Mutação aceita
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminMutationResponse'
+        '400':
+          description: Recurso ou ação ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidMutation:
+                  value:
+                    ok: false
+                    error: Mutação inválida.
+        '401':
+          description: Token de sessão admin ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unauthorized:
+                  value:
+                    ok: false
+                    error: Não autorizado.
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        '422':
+          description: Falha de validação do payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Limite excedido para o admin/IP
+          headers:
+            Retry-After:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                limited:
+                  value:
+                    ok: false
+                    error: Muitas requisições. Aguarde um momento.
+        '500':
+          description: Erro ao persistir recurso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /functions/v1/auth-session:
+    post:
+      tags: [Auth Session]
+      summary: Login administrativo via Edge Function
+      operationId: loginAdminSessionEdge
+      x-runtime: supabase-edge-function
+      security: []
+      x-rate-limit:
+        key: auth:{ip}
+        windowSeconds: 900
+        maxRequests: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login administrativo concluído
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EdgeLoginResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          $ref: '#/components/responses/CredentialsInvalid'
+        '403':
+          $ref: '#/components/responses/OriginNotAllowedOrAccessDenied'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '500':
+          description: Erro interno na autenticação
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error:
+                  value:
+                    ok: false
+                    error: Erro na autenticacao.
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+    delete:
+      tags: [Auth Session]
+      summary: Logout administrativo via Edge Function
+      operationId: logoutAdminSessionEdge
+      x-runtime: supabase-edge-function
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Logout sempre retorna sucesso para o cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResponse'
+        '403':
+          $ref: '#/components/responses/OriginNotAllowed'
+        '405':
+          $ref: '#/components/responses/MethodNotAllowed'
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: rh_cursos_demo_session
+      description: Cookie HttpOnly emitido por `/api/auth/session`
+    adminSessionHeader:
+      type: apiKey
+      in: header
+      name: x-rh-session
+      description: Token HMAC retornado por `/functions/v1/auth-session`
+  responses:
+    SessionInvalid:
+      description: Sessão ausente, inválida ou expirada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid:
+              value:
+                ok: false
+                error: Sessao invalida ou expirada.
+    LoginInvalid:
+      description: Dados de login ausentes ou role inválida
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid:
+              value:
+                ok: false
+                error: Dados de login invalidos.
+    CredentialsInvalid:
+      description: Credenciais incorretas
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid:
+              value:
+                ok: false
+                error: Credenciais invalidas.
+    AccessDenied:
+      description: Usuário autenticado sem permissão de admin
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            denied:
+              value:
+                ok: false
+                error: Acesso nao autorizado.
+    OriginNotAllowed:
+      description: Origin não autorizada na allowlist
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            blocked:
+              value:
+                ok: false
+                error: Origin not allowed
+    OriginNotAllowedOrAccessDenied:
+      description: Origin não autorizada ou usuário sem role admin
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            blocked:
+              value:
+                ok: false
+                error: Origin not allowed
+            denied:
+              value:
+                ok: false
+                error: Acesso nao autorizado.
+    MethodNotAllowed:
+      description: Método HTTP não suportado pelo endpoint
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidMethod:
+              value:
+                ok: false
+                error: Method not allowed
+    AuthRateLimited:
+      description: Limite de tentativas de autenticação excedido
+      headers:
+        Retry-After:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            limited:
+              value:
+                ok: false
+                error: Muitas tentativas. Tente novamente mais tarde.
+    GenericRateLimited:
+      description: Limite de requisições excedido
+      headers:
+        Retry-After:
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            limited:
+              value:
+                ok: false
+                error: Muitas tentativas. Tente novamente mais tarde.
+    AuthUnavailable:
+      description: Ambiente sem credenciais Supabase configuradas
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unavailable:
+              value:
+                ok: false
+                error: Auth indisponivel.
+  schemas:
+    DashboardRole:
+      type: string
+      enum: [admin]
+    SessionPayload:
+      type: object
+      additionalProperties: false
+      properties:
+        role:
+          $ref: '#/components/schemas/DashboardRole'
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+      required: [role, email, name]
+    SupabaseSession:
+      type: object
+      additionalProperties: false
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+      required: [access_token, refresh_token]
+    OkResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok:
+          type: boolean
+          const: true
+      required: [ok]
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: string
+      required: [ok, error]
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            details:
+              type: object
+              additionalProperties: true
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        role:
+          $ref: '#/components/schemas/DashboardRole'
+      required: [email, password, role]
+    LogoutRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        accessToken:
+          type: string
+    SessionSyncResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        token:
+          oneOf:
+            - type: string
+            - type: 'null'
+        rotated:
+          type: boolean
+        supabaseSession:
+          type: 'null'
+      required: [ok, session, token, rotated, supabaseSession]
+    LoginResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        token:
+          type: string
+        rotated:
+          type: boolean
+        supabaseSession:
+          oneOf:
+            - $ref: '#/components/schemas/SupabaseSession'
+            - type: 'null'
+      required: [ok, session, token, rotated, supabaseSession]
+    EdgeLoginResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        token:
+          type: string
+        supabaseSession:
+          oneOf:
+            - $ref: '#/components/schemas/SupabaseSession'
+            - type: 'null'
+      required: [ok, session, token, supabaseSession]
+    LogoutResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        mode:
+          type: string
+          enum: [global, local-only]
+        revoked:
+          type: boolean
+      required: [ok, mode, revoked]
+    EnrollmentRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        studentName:
+          type: string
+          minLength: 3
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        cpf:
+          type: string
+        phone:
+          type: string
+        courseId:
+          type: string
+          minLength: 1
+          maxLength: 80
+        classId:
+          type: string
+          minLength: 1
+          maxLength: 80
+        jobTitle:
+          type: string
+          maxLength: 100
+          default: ''
+        organization:
+          type: string
+          maxLength: 100
+          default: ''
+        enrollmentType:
+          type: string
+          enum: ['Pessoa física', Empresa, 'Órgão público']
+          default: 'Pessoa física'
+        paymentMethod:
+          type: string
+          enum: [Pix, Cartão, Boleto, Empenho]
+          default: Pix
+        notes:
+          type: string
+          maxLength: 500
+          default: ''
+      required:
+        - studentName
+        - email
+        - cpf
+        - phone
+        - courseId
+        - classId
+    EnrollmentResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        enrollmentId:
+          type: string
+      required: [ok, enrollmentId]
+    LeadRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        organization:
+          type: string
+        teamSize:
+          type: integer
+        courseInterest:
+          type: string
+        origin:
+          type: string
+        message:
+          type: string
+      required: [name, email, courseInterest, origin]
+    AdminMutation:
+      oneOf:
+        - $ref: '#/components/schemas/AdminListMutation'
+        - $ref: '#/components/schemas/AdminUpsertMutation'
+        - $ref: '#/components/schemas/AdminDeleteMutation'
+        - $ref: '#/components/schemas/AdminUpdateStatusMutation'
+    AdminResourceKey:
+      type: string
+      enum: [courses, classes, students, leads, enrollments, instructors, blog]
+    AdminListMutation:
+      type: object
+      additionalProperties: false
+      properties:
+        resource:
+          $ref: '#/components/schemas/AdminResourceKey'
+        action:
+          type: string
+          const: list
+      required: [resource, action]
+    AdminUpsertMutation:
+      type: object
+      additionalProperties: false
+      properties:
+        resource:
+          $ref: '#/components/schemas/AdminResourceKey'
+        action:
+          type: string
+          const: upsert
+        payload:
+          type: object
+          additionalProperties: true
+      required: [resource, action, payload]
+    AdminDeleteMutation:
+      type: object
+      additionalProperties: false
+      properties:
+        resource:
+          $ref: '#/components/schemas/AdminResourceKey'
+        action:
+          type: string
+          const: delete
+        id:
+          type: string
+      required: [resource, action, id]
+    AdminUpdateStatusMutation:
+      type: object
+      additionalProperties: false
+      properties:
+        resource:
+          $ref: '#/components/schemas/AdminResourceKey'
+        action:
+          type: string
+          const: update-status
+        id:
+          type: string
+        status:
+          type: string
+      required: [resource, action, id, status]
+    AdminMutationResponse:
+      type: object
+      additionalProperties: true
+      properties:
+        ok:
+          type: boolean
+          const: true
+        skipped:
+          type: boolean
+        data:
+          type: object
+          additionalProperties: true
+      required: [ok, skipped]

@@ -1,36 +1,63 @@
-import { CheckCircle2, Clock3, GraduationCap, TrendingUp } from "lucide-react";
+"use client";
+
+import { CheckSquare, PiggyBank, Send, ShieldCheck, Users } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { toast } from "sonner";
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  Checkbox,
+  Container,
+  Grid,
+  Group,
+  Select,
+  SimpleGrid,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  ThemeIcon,
+  Title
+} from "@mantine/core";
 
-import { SectionTitle } from "@/components/common/section-title";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { useQuoteModal } from "@/components/in-company/quote-modal";
 import { useAppStore } from "@/lib/app-store";
 
 const benefits = [
   {
-    title: "Programa sob medida",
-    description: "Cada módulo é adaptado aos desafios, indicadores e maturidade da equipe.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCCxTUJIFi9FBUVhCytkWZGRIpKW8h9QpDo9nzq3jSJjoDxGuAg3jiYwazwjX3mNbWSxng_y0PI7TMD9eZYdf8HZY6CaPuR7J-2lI4qWIp4Jt0lMq8YiZPUCaNpg3zK8HUxyJXlWU6ofUKbw8tTx_mHbxVLyIN-yBrQ3e513eUCFlHB7jnu5bRvMJah61TRv17ZtpKuVheXMMdlxdSSBnk5WsrpeHLT93L643YFwCGO_4bdqqrORYYwZ3efmOLMxxMTeQR2jXKb-Ws"
+    icon: CheckSquare,
+    title: "Conteúdo 100% Customizado",
+    description:
+      "Nossos especialistas adaptam a ementa, os estudos de caso e a linguagem técnica para a realidade da sua empresa ou órgão público."
   },
   {
-    title: "Entrega Personalizada",
-    description: "Presencial, online ao vivo ou híbrido, com agenda alinhada à operação da empresa."
+    icon: ShieldCheck,
+    title: "Flexibilidade Total",
+    description:
+      "Escolha as datas, horários e formato presencial ou online ao vivo que melhor se adaptam à jornada de trabalho da sua equipe.",
+    dark: true
   },
   {
-    title: "Resultado mensurável",
-    description: "Acompanhamento de impacto, aprendizagem e evolução da equipe."
+    icon: PiggyBank,
+    title: "Redução de Custos",
+    description:
+      "Economize com deslocamentos e hospedagens. O treinamento coletivo reduz o investimento por colaborador significativamente."
+  }
+];
+
+const heroHighlights = [
+  {
+    icon: ShieldCheck,
+    title: "Diagnóstico Personalizado",
+    description: "Analisamos as dores específicas do seu departamento antes de propor qualquer solução."
   },
   {
-    title: "Instrutores especialistas",
-    description: "Os melhores profissionais do mercado com experiência prática, preparados para transformar sua equipe.",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAvPzGaDxombDDeqjt0KTF9QyG8Yq3Dbqo9UC8jbD7aFMx85PCEvD1rpHdtb2jjuZ4GEq2OXD4YFwUyVOAtBlBbG4teTlRiG4enWHB1D8ANNVbiItiTPMfVfjbHgJAQvAU03bXOqpuiOn8LAlxSIM3KG9gS4gIImbr-aLYd8n6KObW27WYm9nkhe-HeUTJiyPQUAevemRd91-5wQfXtlyVX8WplejipGC0hlSP09mNSR5WWdYCGD3zt5y2CdALAXQ-VYopioeSQBz0"
+    icon: Users,
+    title: "Expertise em Setor Público",
+    description: "Especialistas com anos de experiência em licitações e RH governamental."
   }
 ];
 
@@ -58,6 +85,7 @@ function getPhoneDigits(value: string) {
 
 export function InCompanyPage() {
   const { createLead } = useAppStore();
+  const { openQuote } = useQuoteModal();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -67,184 +95,380 @@ export function InCompanyPage() {
     modality: "",
     trainingObjective: "",
     trainingTheme: "",
-    mainChallenges: ""
+    mainChallenges: "",
+    consent: false
   });
+  const [errors, setErrors] = useState<Partial<Record<Exclude<keyof typeof form, "consent">, string>>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
-  const update = (key: keyof typeof form, value: string) => {
+  const update = (key: keyof typeof form, value: string | boolean) => {
+    if (key !== "consent") {
+      setErrors((current) => ({ ...current, [key]: undefined }));
+    }
+    setSubmitError(null);
+    setSubmitSuccess(null);
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const submit = () => {
-    if (!form.name.trim()) {
-      toast.error("Preencha o nome completo.");
-      return;
-    }
+  const validate = () => {
+    const nextErrors: Partial<Record<Exclude<keyof typeof form, "consent">, string>> = {};
 
-    if (!isValidEmail(form.email)) {
-      toast.error("Informe um e-mail corporativo válido.");
-      return;
-    }
+    if (!form.name.trim()) nextErrors.name = "Preencha o nome completo.";
+    if (!isValidEmail(form.email)) nextErrors.email = "Informe um e-mail corporativo válido.";
+    if (!form.company.trim()) nextErrors.company = "Preencha o nome da empresa.";
+    if (getPhoneDigits(form.phone).length < 10) nextErrors.phone = "Informe um telefone ou WhatsApp válido.";
+    if (!form.groupSize || Number(form.groupSize) <= 0) nextErrors.groupSize = "Informe o tamanho da equipe.";
+    if (!form.modality) nextErrors.modality = "Selecione a modalidade.";
+    if (!form.trainingObjective.trim()) nextErrors.trainingObjective = "Informe o objetivo do treinamento.";
+    if (!form.trainingTheme.trim()) nextErrors.trainingTheme = "Informe o tema a ser abordado.";
+    if (!form.mainChallenges.trim()) nextErrors.mainChallenges = "Informe os desafios principais.";
 
-    if (!form.company.trim()) {
-      toast.error("Preencha o nome da empresa.");
-      return;
-    }
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
 
-    if (getPhoneDigits(form.phone).length < 10) {
-      toast.error("Informe um telefone/WhatsApp válido.");
-      return;
-    }
+  const submit = async () => {
+    if (!validate()) return;
 
-    if (!form.groupSize || Number(form.groupSize) <= 0) {
-      toast.error("Informe o tamanho da equipe.");
-      return;
-    }
+    setIsSubmitting(true);
+    try {
+      await createLead({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        courseInterest: "Treinamento In-Company",
+        organization: form.company,
+        teamSize: Number(form.groupSize),
+        preferredModality: form.modality,
+        trainingObjective: form.trainingObjective,
+        mainChallenges: form.mainChallenges,
+        origin: "Site",
+        message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
+      });
 
-    if (!form.modality) {
-      toast.error("Selecione a modalidade.");
-      return;
+      setForm({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        groupSize: "",
+        modality: "",
+        trainingObjective: "",
+        trainingTheme: "",
+        mainChallenges: "",
+        consent: false
+      });
+      setErrors({});
+      toast.success("Proposta registrada para atendimento consultivo.");
+      setSubmitSuccess("Solicitação registrada. A equipe retorna com recomendação de formato, trilha e próximos passos.");
+      setSubmitError(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Não foi possível enviar a proposta.";
+      setSubmitError(message);
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (!form.trainingObjective.trim()) {
-      toast.error("Informe o objetivo do treinamento.");
-      return;
-    }
-
-    if (!form.trainingTheme.trim()) {
-      toast.error("Informe o tema a ser abordado.");
-      return;
-    }
-
-    if (!form.mainChallenges.trim()) {
-      toast.error("Informe os desafios principais.");
-      return;
-    }
-
-    createLead({
-      name: form.name,
-      email: form.email,
-      phone: form.phone,
-      courseInterest: "Treinamento In-Company",
-      organization: form.company,
-      teamSize: Number(form.groupSize),
-      preferredModality: form.modality,
-      trainingObjective: form.trainingObjective,
-      mainChallenges: form.mainChallenges,
-      origin: "Site",
-      message: `Empresa: ${form.company}. Telefone/WhatsApp: ${form.phone}. Tamanho da equipe: ${form.groupSize} pessoa(s). Modalidade: ${form.modality}. Objetivo: ${form.trainingObjective}. Tema: ${form.trainingTheme}. Desafios principais: ${form.mainChallenges}`
-    });
-    toast.success("Proposta registrada para atendimento consultivo.");
   };
 
   return (
-    <>
-      <section className="relative overflow-hidden bg-deep-navy py-24 text-white">
-        <div className="absolute inset-0 opacity-45">
-          <img
-            src="/images/in-company-hero-ai.png"
-            alt="Equipe corporativa em programa de capacitação in company"
-            className="h-full w-full object-cover"
-          />
-        </div>
-        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(0,23,54,0.98),rgba(0,23,54,0.88)_39%,rgba(0,23,54,0.28)_100%)]" />
-        <div className="ea-container relative grid gap-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(520px,1.12fr)] lg:items-center">
-          <div className="max-w-3xl">
-            <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Excelência Corporativa</span>
-            <h1 className="mt-4 text-white">Soluções de capacitação para quem precisa transformar equipes, processos e resultados.</h1>
-            <p className="mt-6 max-w-xl text-lead text-white/80">
-              Programas adaptados aos objetivos estratégicos da organização, com trilhas, turmas e relatórios de impacto mensurável.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild variant="secondary" size="lg">
-                <a href="#proposta">Solicitar Proposta</a>
-              </Button>
-              <div className="flex items-center gap-3 font-medium text-white/90">
-                <CheckCircle2 className="h-5 w-5 text-white" />
-                Atendimento consultivo para empresas
-              </div>
-            </div>
-          </div>
+    <Box bg="#f6f7fb">
+      <Box component="section" style={{ overflow: "hidden", borderBottom: "1px solid #d7dee5" }} bg="white">
+        <Grid gap={0} maw={1440} mx="auto">
+          <Grid.Col span={{ base: 12, lg: 6 }}>
+            <Box px={{ base: 24, lg: 56 }} py={{ base: 56, lg: 80 }} style={{ background: "#0a4568", color: "#ffffff", height: "100%" }}>
+              <Stack gap="lg">
+                <Box
+                  w="fit-content"
+                  px="md"
+                  py={8}
+                  style={{ background: "#f3cf74", borderRadius: 999, color: "#4f3500", fontSize: "0.85rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}
+                >
+                  Consultoria Exclusiva
+                </Box>
+                <Title order={1} c="white" maw={520}>
+                  Fale com um especialista em gestão.
+                </Title>
+                <Text fz="1.08rem" c="rgba(255,255,255,0.8)" maw={560}>
+                  Entenda como nossas soluções de treinamento e consultoria podem transformar a eficiência da sua equipe e otimizar seus processos públicos.
+                </Text>
 
-          <div className="relative hidden lg:block">
-            <div className="aspect-[5/4] overflow-hidden rounded-lg border border-white/10 shadow-card xl:-mr-10">
-              <img
-                src="/images/in-company-hero-ai.png"
-                alt="Equipe em treinamento corporativo in company"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="apple-material absolute -bottom-5 -left-5 max-w-[240px] rounded-lg border border-white p-4 shadow-card">
-              <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-              <p className="font-display text-stat font-extrabold leading-none text-deep-navy">98%</p>
-              <p className="mt-1 font-display text-base font-bold text-deep-navy">de satisfação</p>
-              <p className="mt-2 text-xs leading-5 text-text-muted">Avaliação de equipes após programas in company.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+                <Group gap="md">
+                  <Button onClick={() => openQuote()} color="rhGold" c="#08324d" fw={700}>
+                    Solicitar orçamento
+                  </Button>
+                  <Button
+                    component="a"
+                    href="#formulario-in-company"
+                    variant="outline"
+                    color="gray.0"
+                    styles={{ root: { borderColor: "rgba(255,255,255,0.55)" }, label: { color: "#ffffff" } }}
+                  >
+                    Saiba mais
+                  </Button>
+                </Group>
 
-      <section className="page-section">
-        <div className="ea-container">
-          <SectionTitle
-            eyebrow="Por que para sua equipe"
-            title="Treinamento sob medida, com execução simples e resultado mensurável"
-            description="O formato in-company combina diagnóstico, planejamento da turma, entrega e acompanhamento. Nossos especialistas trabalham junto com você para entender os desafios e entregar um programa de capacitação que realmente faça a diferença no desempenho."
-            align="center"
-          />
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {benefits.map((benefit, index) => (
-              <Card key={benefit.title} className={`${index === 0 || index === 3 ? "md:col-span-2" : ""} ${index === 1 || index === 2 ? "bg-deep-navy text-white" : ""}`}>
-                <CardContent className="grid gap-6 p-8 md:grid-cols-[1fr_auto] md:items-center">
-                  <div>
-                    {index === 1 ? <Clock3 className="mb-4 h-9 w-9 text-prestige-gold" /> : <GraduationCap className="mb-4 h-9 w-9 text-prestige-gold" />}
-                    <h3 className={index === 1 || index === 2 ? "text-white" : "text-deep-navy"}>{benefit.title}</h3>
-                    <p className={index === 1 || index === 2 ? "mt-3 text-sm leading-7 text-white/75" : "mt-3 text-sm leading-7 text-text-muted"}>{benefit.description}</p>
-                  </div>
-                  {benefit.image ? (
-                    <Image src={benefit.image} alt="" width={256} height={192} className="h-48 w-full rounded-lg object-cover md:w-64" />
-                  ) : null}
-                </CardContent>
+                <Stack gap="xl" mt="md">
+                  {heroHighlights.map((item) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <Group key={item.title} align="flex-start" gap="md" wrap="nowrap">
+                        <ThemeIcon size={48} radius="md" variant="light" color="rhBlue">
+                          <Icon size={20} />
+                        </ThemeIcon>
+                        <Box>
+                          <Title order={3} fz="1.25rem" c="white">
+                            {item.title}
+                          </Title>
+                          <Text mt={8} c="rgba(255,255,255,0.75)" maw={520}>
+                            {item.description}
+                          </Text>
+                        </Box>
+                      </Group>
+                    );
+                  })}
+                </Stack>
+
+                <Card radius="lg" padding="lg" maw={520} mt="md" c="#222a31">
+                  <Group align="center" gap="md">
+                    <Image
+                      src="/images/courses/pessoas-lideranca.jpg"
+                      alt="Mariana Silva"
+                      width={60}
+                      height={60}
+                      style={{ height: 60, width: 60, borderRadius: 12, objectFit: "cover" }}
+                    />
+                    <Box>
+                      <Text fz="1.5rem" fw={700} c="rhBlue.9">
+                        Mariana Silva
+                      </Text>
+                      <Text fz="sm" c="#4f5963">
+                        Coordenadora de Consultoria
+                      </Text>
+                    </Box>
+                  </Group>
+                  <Text mt="lg" fz="1.05rem" fs="italic" c="#4a535d">
+                    &ldquo;Nossa meta é simplificar a burocracia através da educação continuada de alta performance.&rdquo;
+                  </Text>
+                </Card>
+              </Stack>
+            </Box>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, lg: 6 }}>
+            <Box bg="white" px={{ base: 16, lg: 40 }} py={{ base: 40, lg: 64 }}>
+              <Card id="formulario-in-company" radius="lg" shadow="md" withBorder padding="xl" data-testid="ui-incompany-form">
+                {submitError ? (
+                  <Alert role="alert" color="red" mb="md">
+                    {submitError}
+                  </Alert>
+                ) : null}
+
+                {submitSuccess ? (
+                  <Alert color="green" mb="md" aria-live="polite">
+                    {submitSuccess}
+                  </Alert>
+                ) : null}
+
+                <Stack gap="md">
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    <TextInput
+                      label="Nome completo"
+                      withAsterisk
+                      value={form.name}
+                      onChange={(event) => update("name", event.target.value)}
+                      error={errors.name}
+                      placeholder="Ex: João da Silva"
+                      autoComplete="name"
+                    />
+                    <TextInput
+                      label="E-mail corporativo"
+                      withAsterisk
+                      type="email"
+                      value={form.email}
+                      onChange={(event) => update("email", event.target.value)}
+                      error={errors.email}
+                      placeholder="nome@empresa.com.br"
+                      autoComplete="email"
+                    />
+                  </SimpleGrid>
+
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    <TextInput
+                      label="Telefone ou WhatsApp"
+                      withAsterisk
+                      value={form.phone}
+                      onChange={(event) => update("phone", formatPhone(event.target.value))}
+                      error={errors.phone}
+                      placeholder="(00) 00000-0000"
+                      autoComplete="tel"
+                    />
+                    <TextInput
+                      label="Nome da empresa"
+                      withAsterisk
+                      value={form.company}
+                      onChange={(event) => update("company", event.target.value)}
+                      error={errors.company}
+                      placeholder="Prefeitura ou empresa"
+                      autoComplete="organization"
+                    />
+                  </SimpleGrid>
+
+                  <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+                    <TextInput
+                      label="Tamanho da equipe"
+                      withAsterisk
+                      value={form.groupSize}
+                      onChange={(event) => update("groupSize", formatTeamSize(event.target.value))}
+                      error={errors.groupSize}
+                      placeholder="Ex.: 35"
+                      inputMode="numeric"
+                    />
+                    <Select
+                      label="Área de Interesse"
+                      withAsterisk
+                      aria-label="Área de Interesse"
+                      placeholder="Selecione uma área"
+                      value={form.modality || null}
+                      onChange={(value) => update("modality", value ?? "")}
+                      error={errors.modality}
+                      data={["Online ao vivo", "Presencial", "Híbrido", "In company"]}
+                    />
+                  </SimpleGrid>
+
+                  <TextInput
+                    label="Objetivo do treinamento"
+                    withAsterisk
+                    value={form.trainingObjective}
+                    onChange={(event) => update("trainingObjective", event.target.value)}
+                    error={errors.trainingObjective}
+                    placeholder="Como podemos ajudar?"
+                  />
+
+                  <TextInput
+                    label="Tema a ser abordado"
+                    withAsterisk
+                    value={form.trainingTheme}
+                    onChange={(event) => update("trainingTheme", event.target.value)}
+                    error={errors.trainingTheme}
+                    placeholder="Ex.: Licitações e Contratos"
+                  />
+
+                  <Textarea
+                    label="Desafios principais"
+                    withAsterisk
+                    value={form.mainChallenges}
+                    onChange={(event) => update("mainChallenges", event.target.value)}
+                    error={errors.mainChallenges}
+                    placeholder="Descreva brevemente o seu desafio ou necessidade..."
+                    minRows={6}
+                    autosize
+                  />
+
+                  <Checkbox
+                    checked={form.consent}
+                    onChange={(event) => update("consent", event.currentTarget.checked)}
+                    label="Concordo em receber comunicações e aceito a Política de Privacidade da RH Cursos."
+                  />
+
+                  <Button
+                    onClick={() => void submit()}
+                    loading={isSubmitting}
+                    fullWidth
+                    color="rhGold"
+                    c="white"
+                    size="lg"
+                    fw={700}
+                    tt="uppercase"
+                    rightSection={<Send size={18} />}
+                    styles={{ root: { background: "#8f6800" } }}
+                  >
+                    {isSubmitting ? "Enviando..." : "Enviar solicitação de proposta"}
+                  </Button>
+                  <Text ta="center" fz="sm" c="#5c6672">
+                    Responderemos em até 24 horas úteis.
+                  </Text>
+                </Stack>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+            </Box>
+          </Grid.Col>
+        </Grid>
+      </Box>
 
-      <section id="proposta" className="page-section bg-white">
-        <div className="ea-container max-w-4xl">
-          <SectionTitle
-            eyebrow="Solicitar proposta"
-            title="Conte como podemos transformar a sua equipe."
-            description="Preparamos uma recomendação consultiva de trilha, modalidade e próximos passos."
-            align="center"
-          />
-          <div className="apple-surface mt-10 grid gap-6 p-8 md:grid-cols-2 md:p-12">
-            <Input placeholder="Nome completo" value={form.name} onChange={(event) => update("name", event.target.value)} />
-            <Input type="email" inputMode="email" placeholder="E-mail corporativo" value={form.email} onChange={(event) => update("email", event.target.value.trim().toLowerCase())} />
-            <Input placeholder="Nome da empresa" value={form.company} onChange={(event) => update("company", event.target.value)} />
-            <Input inputMode="tel" placeholder="Telefone/WhatsApp" value={form.phone} onChange={(event) => update("phone", formatPhone(event.target.value))} />
-            <Input inputMode="numeric" placeholder="Tamanho da equipe" value={form.groupSize} onChange={(event) => update("groupSize", formatTeamSize(event.target.value))} />
-            <Select value={form.modality} onValueChange={(value) => update("modality", value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Modalidade" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Presencial">Presencial</SelectItem>
-                <SelectItem value="Online ao vivo">Online ao vivo</SelectItem>
-                <SelectItem value="Híbrido">Híbrido</SelectItem>
-              </SelectContent>
-            </Select>
-            <Textarea placeholder="Objetivo do treinamento" value={form.trainingObjective} onChange={(event) => update("trainingObjective", event.target.value)} />
-            <Textarea placeholder="Tema que será abordado" value={form.trainingTheme} onChange={(event) => update("trainingTheme", event.target.value)} />
-            <Textarea className="md:col-span-2" placeholder="Desafios principais" value={form.mainChallenges} onChange={(event) => update("mainChallenges", event.target.value)} />
-            <Button className="md:col-span-2" size="lg" onClick={submit}>
-              Enviar solicitação de proposta
-            </Button>
-          </div>
-        </div>
-      </section>
-    </>
+      <Container size={1200} px="md" pb="xl" mt="xl">
+        <Grid gap="lg">
+          <Grid.Col span={{ base: 12, lg: 8 }}>
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
+              <Card radius="lg" shadow="sm" withBorder padding="xl" style={{ gridColumn: "1 / -1" }}>
+                <Group gap="lg" align="center" wrap="nowrap">
+                  <Image
+                    src="/images/courses/tecnologia-inovacao.jpg"
+                    alt="Logística simplificada"
+                    width={320}
+                    height={220}
+                    style={{ height: 160, width: 208, borderRadius: 8, objectFit: "cover" }}
+                  />
+                  <Box>
+                    <Title order={3} c="rhGold.8">
+                      Logística Simplificada
+                    </Title>
+                    <Text mt="sm" c="#56606a">
+                      Nós cuidamos de toda a infraestrutura educacional, material didático e certificados. Sua única preocupação é reunir o time.
+                    </Text>
+                  </Box>
+                </Group>
+              </Card>
+
+              {benefits.map((benefit) => {
+                const Icon = benefit.icon;
+
+                return (
+                  <Card
+                    key={benefit.title}
+                    radius="lg"
+                    shadow="sm"
+                    withBorder
+                    padding="xl"
+                    style={benefit.dark ? { background: "#0b4668", borderColor: "#0b4668", color: "#ffffff" } : undefined}
+                  >
+                    <Icon size={32} color={benefit.dark ? "#f6be39" : "#004364"} />
+                    <Title order={3} mt="lg" c={benefit.dark ? "white" : "rhBlue.9"}>
+                      {benefit.title}
+                    </Title>
+                    <Text mt="md" c={benefit.dark ? "rgba(255,255,255,0.75)" : "#56606a"}>
+                      {benefit.description}
+                    </Text>
+                  </Card>
+                );
+              })}
+            </SimpleGrid>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, lg: 4 }}>
+            <Card radius="lg" padding="xl" style={{ background: "#f3cf74" }} c="#4f3500" h="100%">
+              <Stack gap="md">
+                <Title order={2} c="#4f3500">
+                  Precisa de algo ainda mais específico?
+                </Title>
+                <Text fz="lg">Fale diretamente com nosso consultor técnico pelo WhatsApp.</Text>
+                <Button
+                  component="a"
+                  href="https://wa.me/5561991129682"
+                  target="_blank"
+                  rel="noreferrer"
+                  color="rhBlue.9"
+                  w="fit-content"
+                >
+                  Falar com Consultor
+                </Button>
+              </Stack>
+            </Card>
+          </Grid.Col>
+        </Grid>
+      </Container>
+    </Box>
   );
 }

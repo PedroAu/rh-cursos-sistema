@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 async function checkSchema() {
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('trilha')
       .select('count()', { count: 'exact', head: true });
 

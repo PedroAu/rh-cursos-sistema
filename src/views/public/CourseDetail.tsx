@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, MessageCircle, Play, ShieldCheck, Star, Users } from "lucide-react";
+import Image from "next/image";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
 
 import { EmptyState } from "@/components/common/empty-state";
@@ -8,6 +9,7 @@ import { SectionTitle } from "@/components/common/section-title";
 import { TestimonialCard } from "@/components/common/testimonial-card";
 import { ClassCard } from "@/components/agenda/class-card";
 import { CheckoutModal } from "@/components/checkout/checkout-modal";
+import { trackEvent } from "@/lib/analytics";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,17 +22,30 @@ export function CourseDetailPage() {
   const [params] = useSearchParams();
   const { courses, classes, instructors, testimonials } = useAppStore();
   const [openCheckout, setOpenCheckout] = useState(false);
+  const slugParam = Array.isArray(slug) ? slug[0] : slug;
+  const querySlug = params.get("slug") ?? "";
 
-  const course = courses.find((item) => item.slug === slug);
+  const course = courses.find((item) => item.slug === (slugParam || querySlug));
   const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course?.id), [classes, course?.id]);
   const relatedTestimonials = testimonials.filter((item) => item.course === course?.title).slice(0, 3);
   const instructor = instructors.find((item) => item.id === course?.instructorId);
+  const nextClass = courseClasses[0];
+  const openClassesCount = courseClasses.filter((item) => item.status !== "Encerrada").length;
+
+  const startCheckout = useCallback(
+    (origin: "hero_cta" | "sidebar_cta" | "deeplink") => {
+      trackEvent("inscricao_cta", { course: course?.slug ?? "", origin });
+      trackEvent("checkout_iniciado", { course: course?.slug ?? "", origin });
+      setOpenCheckout(true);
+    },
+    [course?.slug]
+  );
 
   useEffect(() => {
     if (params.get("checkout") === "1") {
-      setOpenCheckout(true);
+      startCheckout("deeplink");
     }
-  }, [params]);
+  }, [params, startCheckout]);
 
   if (!course) {
     return (
@@ -73,7 +88,7 @@ export function CourseDetailPage() {
               </div>
 
               <div className="flex flex-wrap gap-4 pt-2">
-                <Button size="lg" onClick={() => setOpenCheckout(true)}>
+                <Button size="lg" onClick={() => startCheckout("hero_cta")}>
                   Inscrever-se agora
                 </Button>
                 <Button variant="outline" size="lg">
@@ -100,12 +115,42 @@ export function CourseDetailPage() {
                   <p className="mt-1 font-bold text-primary">Profissional</p>
                 </div>
               </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {[
+                  {
+                    label: "Próxima janela",
+                    value: nextClass
+                      ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(nextClass.startDate))
+                      : "Em breve",
+                    helper: nextClass ? `${nextClass.modality} • ${nextClass.location}` : "Atendimento consultivo disponível."
+                  },
+                  {
+                    label: "Turmas abertas",
+                    value: openClassesCount,
+                    helper: "Escolha a agenda com melhor aderência ao seu calendário."
+                  },
+                  {
+                    label: "Benefícios-chave",
+                    value: course.benefits.slice(0, 2).length,
+                    helper: "Resumo direto do que está incluído antes da matrícula."
+                  }
+                ].map((item) => (
+                  <div key={item.label} className="surface-card p-5">
+                    <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
+                    <p className="mt-2 font-display text-3xl font-bold text-deep-navy">{item.value}</p>
+                    <p className="mt-2 text-sm leading-6 text-text-muted">{item.helper}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="group relative aspect-video overflow-hidden rounded-lg border border-outline-variant bg-surface-container shadow-card">
-                <img
+                <Image
                   src={course.image}
                   alt={course.title}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-primary/35">
@@ -137,9 +182,36 @@ export function CourseDetailPage() {
 
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="space-y-8">
+              <Card className="border-outline-variant bg-white">
+                <CardContent className="space-y-6 p-6">
+                  <SectionTitle accentBar eyebrow="Decisão rápida" title="O que avaliar antes de se inscrever" />
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {[
+                      {
+                        title: "Perfil ideal",
+                        description: "Compare o público-alvo com sua função atual para acelerar aplicação prática."
+                      },
+                      {
+                        title: "Agenda",
+                        description: "Revise turma, horário e formato antes de reservar a vaga."
+                      },
+                      {
+                        title: "Investimento",
+                        description: "Veja o valor total e alinhe forma de pagamento logo no checkout."
+                      }
+                    ].map((item) => (
+                      <div key={item.title} className="rounded-xl border border-outline-variant bg-surface-muted p-4">
+                        <h3 className="text-base font-bold text-deep-navy">{item.title}</h3>
+                        <p className="mt-2 text-sm leading-6 text-text-muted">{item.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card>
                 <CardContent className="space-y-6 p-6">
-                  <SectionTitle eyebrow="Público-alvo" title="Para quem é este curso" />
+                  <SectionTitle accentBar eyebrow="Público-alvo" title="Para quem é este curso" />
                   {course.targetAudience && course.targetAudience.length > 0 ? (
                     <div className="grid gap-3 sm:grid-cols-2">
                       {course.targetAudience.map((audience) => (
@@ -157,7 +229,7 @@ export function CourseDetailPage() {
 
               <Card>
                 <CardContent className="space-y-6 p-6">
-                  <SectionTitle title="Conteúdo programático" description="Módulos organizados em acordeon, com tópicos e duração." />
+                  <SectionTitle accentBar title="Conteúdo programático" description="Módulos organizados em acordeon, com tópicos e duração." />
                   <Accordion type="multiple" className="w-full">
                     {course.modules.map((module, index) => (
                       <AccordionItem key={module.title} value={`module-${index}`}>
@@ -186,11 +258,25 @@ export function CourseDetailPage() {
                   <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
                   <div className="text-4xl font-extrabold text-prestige-gold">{currency(course.price)}</div>
                 </div>
-                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => setOpenCheckout(true)}>
+                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => startCheckout("sidebar_cta")}>
                   Inscrever-se agora
                 </Button>
                 <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm font-medium text-white">
                   Próxima turma disponível: {courseClasses[0] ? new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(courseClasses[0].startDate)) : "Em breve"}
+                </div>
+                <div className="grid gap-3 rounded-lg border border-white/15 bg-white/8 p-4 text-sm text-white/80">
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Formato</span>
+                    <strong className="text-white">{course.modality}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Carga horária</span>
+                    <strong className="text-white">{course.durationLabel}</strong>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span>Vagas abertas</span>
+                    <strong className="text-white">{nextClass ? nextClass.availableSeats : "Sob consulta"}</strong>
+                  </div>
                 </div>
                 <ul className="space-y-3 text-sm text-white/80">
                   {course.benefits.slice(0, 4).map((benefit) => (
@@ -226,7 +312,7 @@ export function CourseDetailPage() {
         </div>
       </section>
 
-      <section className="page-section">
+      <section id="atendimento" className="page-section">
         <div className="container grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
             <SectionTitle eyebrow="Instrutor" title={instructor?.name ?? "Instrutor"} description={instructor?.bio} />
@@ -234,11 +320,21 @@ export function CourseDetailPage() {
               <CardContent className="space-y-6 p-6">
                 {instructor?.avatar && (
                   <div className="flex justify-center">
-                    <img
-                      src={instructor.avatar}
-                      alt={instructor.name}
-                      className="h-24 w-24 rounded-full object-cover border-2 border-outline-variant"
-                    />
+                    {instructor.avatar.startsWith("http") || instructor.avatar.startsWith("/") ? (
+                      <div className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-outline-variant">
+                        <Image
+                          src={instructor.avatar}
+                          alt={instructor.name}
+                          fill
+                          sizes="96px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-outline-variant bg-surface-container text-xl font-semibold text-primary">
+                        {instructor.avatar}
+                      </div>
+                    )}
                   </div>
                 )}
                 <div className="text-sm text-muted-foreground">Especialidade: {instructor?.specialty}</div>
@@ -250,6 +346,22 @@ export function CourseDetailPage() {
           <div className="space-y-6">
             <SectionTitle eyebrow="FAQ do curso" title="Dúvidas frequentes antes da inscrição" />
             <FAQAccordion />
+            <Card className="border-outline-variant bg-surface-muted">
+              <CardContent className="space-y-4 p-6">
+                <h3 className="font-display text-2xl font-bold text-deep-navy">Prefere validar com a equipe antes da matrícula?</h3>
+                <p className="text-sm leading-6 text-text-muted">
+                  Fale com atendimento para confirmar aderência do conteúdo, política comercial e formato ideal para sua turma.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button asChild>
+                    <Link to="/contato">Solicitar orientação</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/in-company">Ver solução in company</Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>

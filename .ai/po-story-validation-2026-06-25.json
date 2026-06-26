@@ -1,0 +1,89 @@
+{
+  "task": "validateNextStory",
+  "executed_at": "2026-06-25",
+  "agent": "@po",
+  "project_type": "brownfield",
+  "coderabbit_integration": "not_configured_treated_as_na",
+  "stories": [
+    {
+      "id": "EP-12.2",
+      "path": "docs/stories/2026-06-24-epic12-story2-e2e-auth-checkout.md",
+      "decision": "GO",
+      "readiness_score": 9,
+      "confidence": "high",
+      "critical_issues": [],
+      "corrections_applied": [
+        "Task-to-AC mapping",
+        "integration environment requirements",
+        "credential security boundaries",
+        "real-vs-controlled test boundary",
+        "targeted commands and planned file list"
+      ]
+    },
+    {
+      "id": "EP-12.3",
+      "path": "docs/stories/2026-06-24-epic12-story3-api-contract-tests.md",
+      "decision": "GO",
+      "readiness_score": 9,
+      "confidence": "high",
+      "critical_issues": [],
+      "corrections_applied": [
+        "endpoint contract matrix",
+        "Task-to-AC mapping",
+        "canonical documentation references",
+        "integration environment failure behavior",
+        "targeted commands and planned file list"
+      ]
+    },
+    {
+      "id": "EP-12.4",
+      "path": "docs/stories/2026-06-24-epic12-story4-db-transactions-rls.md",
+      "decision": "GO",
+      "readiness_score": 8.5,
+      "confidence": "medium-high",
+      "critical_issues": [],
+      "corrections_applied": [
+        "replaced unrelated migration references",
+        "defined pgTAP test location and command",
+        "defined JWT role emulation",
+        "separated rollback/RLS tests from multi-connection concurrency",
+        "added destructive-test safeguards"
+      ]
+    },
+    {
+      "id": "EP-13.3",
+      "path": "docs/stories/2026-06-24-epic13-story3-swagger-ui-drift-gate.md",
+      "decision": "GO",
+      "readiness_score": 9,
+      "confidence": "high",
+      "critical_issues": [],
+      "corrections_applied": [
+        "selected static ReDoc within approved scope",
+        "defined lint/build commands",
+        "defined minimum method/path drift gate",
+        "defined publication links and smoke",
+        "added planned file list"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "path": "docs/stories/2026-04-27-layout-template-audit.md",
+      "reason": "Audit artifact without Story/Status structure; not an active story draft."
+    },
+    {
+      "status": "Ready for Review",
+      "reason": "Requires QA/close-story workflow, not draft validation."
+    },
+    {
+      "status": "Done",
+      "reason": "Completed stories are outside draft validation."
+    }
+  ],
+  "overall_decision": "GO",
+  "post_conditions": {
+    "validation_executed": true,
+    "actionable_feedback_recorded": true,
+    "report_persisted": true
+  }
+}

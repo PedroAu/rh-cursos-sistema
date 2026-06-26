@@ -1,21 +1,19 @@
 status:
-  branch: main
+  branch: staging/phase-2
   modifiedFiles:
     - .aiox/project-status.yaml
-    - .mcp.json
-    - docs/database/rh-cursos-schema-analysis.md
-    - docs/stories/2026-05-12-supabase-database-implementation.md
-    - docs/stories/2026-05-13-next-migration-hardening.md
-  modifiedFilesTotalCount: 68
+    - docs/stories/2026-05-14-cronograma-construcao-ate-2026-05-20.md
+    - docs/stories/2026-06-24-epic11-story1-session-rotation.md
+    - docs/stories/2026-06-24-epic11-story2-rbac-unificado.md
+    - docs/stories/2026-06-24-epic11-story3-demo-auth-logout-global.md
+  modifiedFilesTotalCount: 27
   recentCommits:
-    - 'feat: implement form improvements - Phase 1 quick wins'
-    - >-
-      feat: expand course form with description, image, level, objectives,
-      benefits, and modules
+    - 'docs(plan): normalize phase and epic execution status'
+    - 'docs(status): reconcile story checklists and QA evidence'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-04T18:53:08.600Z'
+  lastUpdate: '2026-06-26T01:23:21.819Z'
   isGitRepo: true
-timestamp: 1780599188601
+timestamp: 1782437001820
 ttl: 60
-gitFingerprint: 1777055364708.749:1780591593152.7002
+gitFingerprint: 1782156289261.3447:1782436109476.5115

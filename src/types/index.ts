@@ -1,4 +1,6 @@
-export type UserRole = "lead" | "admin";
+import type { DashboardRole } from "@/lib/auth";
+
+export type UserRole = "lead" | DashboardRole;
 
 export type CourseStatus = "Ativo" | "Inativo" | "Destaque" | "Em breve";
 export type ClassStatus = "Inscrições abertas" | "Poucas vagas" | "Encerrada" | "Em breve";
@@ -35,11 +37,13 @@ export type Course = {
   title: string;
   pathId: string;
   pathName: string;
+  category?: string;
+  categories?: string[];
   modality: "Ao vivo online" | "Presencial" | "In company" | "Híbrido" | "Gravado";
+  modalities?: Array<"Ao vivo online" | "Presencial" | "In company" | "Híbrido" | "Gravado">;
   durationLabel: string;
   durationHours: number;
   level: "Básico" | "Intermediário" | "Avançado" | "Básico / Intermediário" | "Básico / Avançado" | "Intermediário / Avançado";
-  publicType: "Profissionais" | "Empresas" | "Órgãos públicos" | "Iniciantes" | "Avançado";
   price: number;
   shortDescription: string;
   fullDescription: string;
@@ -53,6 +57,7 @@ export type Course = {
   studentsCount: number;
   status: CourseStatus;
   featured: boolean;
+  featuredCourseIds?: string[];
   nextClassId: string;
 };
 
@@ -66,6 +71,7 @@ export type TrainingClass = {
   location: string;
   instructorId: string;
   totalSeats: number;
+  manualFilledSeats?: number;
   filledSeats: number;
   availableSeats: number;
   status: ClassStatus;
@@ -96,6 +102,8 @@ export type Instructor = {
   phone: string;
   specialty: string;
   bio: string;
+  education?: string;
+  photoUrl?: string;
   courseIds: string[];
   rating: number;
   avatar: string;
@@ -113,7 +121,7 @@ export type Lead = {
   preferredModality?: string;
   trainingObjective?: string;
   mainChallenges?: string;
-  origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn";
+  origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn" | "Especialista" | "Orçamento In Company";
   status: LeadStatus;
   message: string;
   createdAt: string;
@@ -169,17 +177,9 @@ export type Enrollment = {
 };
 
 export type CurrentSession = {
-  role: "admin";
+  role: DashboardRole;
   email: string;
   name: string;
-};
-
-export type DemoAccess = {
-  role: Exclude<UserRole, "lead">;
-  email: string;
-  password: string;
-  name: string;
-  description: string;
 };
 
 export type DashboardMetric = {

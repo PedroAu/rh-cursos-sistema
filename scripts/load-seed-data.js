@@ -21,7 +21,7 @@ async function loadSeedData() {
     });
 
     // First, let's just test connectivity
-    const { data: testData, error: testError } = await supabase
+    const { error: testError } = await supabase
       .rpc('ping');
 
     if (testError) {

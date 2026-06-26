@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { tokens } from './src/design-tokens/tokens.tailwind.js'
 
 const config: Config = {
   darkMode: ["class"],
@@ -17,18 +18,52 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Existing EA tokens (keep as-is)
         background: "var(--ea-color-background)",
         foreground: "var(--ea-color-on-surface)",
         primary: {
-          DEFAULT: "var(--ea-color-primary)",
+          DEFAULT: "var(--color-primary)",
+          0: "var(--mantine-color-primary-0)",
+          1: "var(--mantine-color-primary-1)",
+          2: "var(--mantine-color-primary-2)",
+          3: "var(--mantine-color-primary-3)",
+          4: "var(--mantine-color-primary-4)",
+          5: "var(--mantine-color-primary-5)",
+          6: "var(--mantine-color-primary-6)",
+          7: "var(--mantine-color-primary-7)",
+          8: "var(--mantine-color-primary-8)",
+          9: "var(--mantine-color-primary-9)",
           foreground: "var(--ea-color-on-primary)"
         },
         secondary: {
-          DEFAULT: "var(--ea-color-secondary-container)",
+          DEFAULT: "var(--color-secondary)",
+          0: "var(--mantine-color-secondary-0)",
+          1: "var(--mantine-color-secondary-1)",
+          2: "var(--mantine-color-secondary-2)",
+          3: "var(--mantine-color-secondary-3)",
+          4: "var(--mantine-color-secondary-4)",
+          5: "var(--mantine-color-secondary-5)",
+          6: "var(--mantine-color-secondary-6)",
+          7: "var(--mantine-color-secondary-7)",
+          8: "var(--mantine-color-secondary-8)",
+          9: "var(--mantine-color-secondary-9)",
           foreground: "var(--ea-color-on-secondary-container)"
         },
+        tertiary: {
+          DEFAULT: "var(--color-tertiary)",
+          0: "var(--mantine-color-tertiary-0)",
+          1: "var(--mantine-color-tertiary-1)",
+          2: "var(--mantine-color-tertiary-2)",
+          3: "var(--mantine-color-tertiary-3)",
+          4: "var(--mantine-color-tertiary-4)",
+          5: "var(--mantine-color-tertiary-5)",
+          6: "var(--mantine-color-tertiary-6)",
+          7: "var(--mantine-color-tertiary-7)",
+          8: "var(--mantine-color-tertiary-8)",
+          9: "var(--mantine-color-tertiary-9)",
+        },
         accent: {
-          DEFAULT: "var(--ea-color-prestige-gold)",
+          DEFAULT: "var(--ea-color-accent)",
           foreground: "var(--ea-color-primary)"
         },
         muted: {
@@ -42,9 +77,9 @@ const config: Config = {
         border: "var(--ea-color-outline-variant)",
         input: "var(--ea-color-outline-variant)",
         ring: "var(--ea-color-prestige-gold)",
-        warning: "var(--ea-color-secondary-fixed-dim)",
-        success: "var(--ea-color-success-green)",
-        danger: "var(--ea-color-error)",
+        warning: "var(--ea-color-warning)",
+        success: "var(--ea-color-success)",
+        danger: "var(--ea-color-danger)",
         "deep-navy": "var(--ea-color-deep-navy)",
         "prestige-gold": "var(--ea-color-prestige-gold)",
         surface: "var(--ea-color-surface)",
@@ -52,27 +87,49 @@ const config: Config = {
         "surface-container": "var(--ea-color-surface-container)",
         "text-main": "var(--ea-color-text-main)",
         "text-muted": "var(--ea-color-text-muted)",
-        "outline-variant": "var(--ea-color-outline-variant)"
+        "outline-variant": "var(--ea-color-outline-variant)",
+        "label-primary": "var(--ea-color-label)",
+        "label-secondary": "var(--ea-color-secondary-label)",
+        separator: "var(--ea-color-separator)",
+        "surface-raised": "var(--ea-color-surface-raised)",
+        control: "var(--ea-color-control)",
+        // New design system tokens (Phase 1 — Foundation)
+        ...tokens.colors,
       },
+      spacing: tokens.spacing,
       borderRadius: {
         DEFAULT: "var(--ea-radius-default)",
         lg: "var(--ea-radius-lg)",
         xl: "var(--ea-radius-xl)",
         "2xl": "var(--ea-radius-2xl)",
-        "3xl": "var(--ea-radius-2xl)"
+        "3xl": "var(--ea-radius-2xl)",
+        ...tokens.borderRadius,
       },
       boxShadow: {
         soft: "var(--ea-shadow-soft)",
-        card: "var(--ea-shadow-card)"
+        card: "var(--ea-shadow-card)",
+        ...tokens.boxShadow,
       },
       fontFamily: {
-        sans: ["-apple-system", "BlinkMacSystemFont", "Inter", "system-ui", "sans-serif"],
-        display: ["-apple-system", "BlinkMacSystemFont", "Manrope", "Inter", "system-ui", "sans-serif"]
+        sans: ["var(--ea-font-sans)"],
+        display: ["var(--ea-font-display)"],
+        ...tokens.fontFamily,
       },
       fontSize: {
         micro: ["var(--ea-font-size-micro)", { lineHeight: "1.4" }],
         badge: ["var(--ea-font-size-badge)", { lineHeight: "1.4" }],
         label: ["var(--ea-font-size-label)", { lineHeight: "1.4" }],
+        caption: ["var(--m3-type-caption-size)", { lineHeight: "var(--m3-type-caption-line-height)" }],
+        "label-bold": ["var(--m3-type-label-bold-size)", { lineHeight: "var(--m3-type-label-bold-line-height)" }],
+        "body-md": ["var(--m3-type-body-md-size)", { lineHeight: "var(--m3-type-body-md-line-height)" }],
+        "body-lg": ["var(--m3-type-body-lg-size)", { lineHeight: "var(--m3-type-body-lg-line-height)" }],
+        "headline-md": ["var(--m3-type-headline-md-size)", { lineHeight: "var(--m3-type-headline-md-line-height)" }],
+        "headline-lg-mobile": [
+          "var(--m3-type-headline-lg-mobile-size)",
+          { lineHeight: "var(--m3-type-headline-lg-mobile-line-height)" }
+        ],
+        "headline-lg": ["var(--m3-type-headline-lg-size)", { lineHeight: "var(--m3-type-headline-lg-line-height)" }],
+        "display-lg": ["var(--m3-type-display-lg-size)", { lineHeight: "var(--m3-type-display-lg-line-height)" }],
         lead: ["var(--ea-font-size-lead)", { lineHeight: "1.6" }],
         card: ["var(--ea-font-size-card)", { lineHeight: "1.2" }],
         feature: ["var(--ea-font-size-feature)", { lineHeight: "1.2" }],
@@ -84,8 +141,11 @@ const config: Config = {
         section: ["var(--ea-font-size-section)", { lineHeight: "1.2" }],
         "h1-alt": ["var(--ea-font-size-h1-alt)", { lineHeight: "1.08" }],
         display: ["var(--ea-font-size-display)", { lineHeight: "1.12" }],
-        hero: ["var(--ea-font-size-hero)", { lineHeight: "1.08" }]
+        hero: ["var(--ea-font-size-hero)", { lineHeight: "1.08" }],
+        ...tokens.fontSize,
       },
+      fontWeight: tokens.fontWeight,
+      lineHeight: tokens.lineHeight,
       backgroundImage: {
         "hero-radial":
           "linear-gradient(90deg, rgba(0,23,54,0.96), rgba(0,23,54,0.86) 48%, rgba(0,23,54,0.24))",

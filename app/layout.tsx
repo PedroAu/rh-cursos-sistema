@@ -1,9 +1,38 @@
 import type { Metadata } from "next";
+import { Inter, Manrope, Montserrat } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
+import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
+import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import "@/styles/globals.css";
+import { AppMantineProvider } from "@/components/providers/mantine-provider";
+import { MotionProvider } from "@/components/providers/motion-provider";
+import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
+
+const inter = Inter({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-inter",
+  weight: ["400", "500", "600", "700", "800"]
+});
+
+const montserrat = Montserrat({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+  weight: ["600", "700", "800"]
+});
+
+const legacyManrope = Manrope({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-legacy-manrope",
+  weight: ["600", "700", "800"]
+});
 
 export const metadata: Metadata = {
   title: "RH Cursos & Soluções",
@@ -27,8 +56,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
-      <body>{children}</body>
+    <html lang="pt-BR" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript defaultColorScheme="light" />
+      </head>
+      <body className={`${inter.variable} ${montserrat.variable} ${legacyManrope.variable}`}>
+        <AppMantineProvider>
+          <MotionProvider>{children}</MotionProvider>
+        </AppMantineProvider>
+      </body>
+      {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>
   );
 }
