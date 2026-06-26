@@ -30,14 +30,44 @@ const routes = [
   { path: "/inscricao-confirmada", name: "inscricao-confirmada" }
 ];
 
+async function prepareStableCapture(routeName: string, page: import("@playwright/test").Page) {
+  await page.addInitScript(() => {
+    window.localStorage.clear();
+    window.sessionStorage.clear();
+  });
+
+  await page.goto(routes.find((route) => route.name === routeName)?.path ?? "/", { waitUntil: "domcontentloaded" });
+  await page.locator("body").waitFor({ state: "visible" });
+
+  if (routeName === "cursos") {
+    await page
+      .getByText("Cursos no catálogo", { exact: true })
+      .waitFor({ state: "visible" });
+    await expect(page.getByText("Nenhum curso encontrado.", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Saiba mais" }).first()).toBeVisible();
+  }
+
+  if (routeName === "agenda") {
+    await page.getByText("Próximas turmas", { exact: true }).waitFor({ state: "visible" });
+  }
+
+  if (routeName === "blog") {
+    await page
+      .getByText("Artigos visíveis", { exact: true })
+      .waitFor({ state: "visible" });
+    await expect(page.getByText("Nenhum post encontrado.", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Ler artigo" }).first()).toBeVisible();
+  }
+
+  await page.waitForTimeout(800);
+}
+
 test.describe("baseline visual — rotas públicas", () => {
   for (const route of routes) {
     test(`captura referência de ${route.name}`, async ({ page }, testInfo) => {
-      await page.goto(route.path, { waitUntil: "domcontentloaded" });
-      // networkidle pode nunca resolver (imagens remotas/polling). Esperamos o
-      // body visível + folga para layout estabilizar antes do screenshot.
-      await page.locator("body").waitFor({ state: "visible" });
-      await page.waitForTimeout(800);
+      // Isola cada baseline de qualquer estado persistido e espera o conteúdo
+      // crítico da rota antes de capturar.
+      await prepareStableCapture(route.name, page);
 
       // Salva o screenshot como artefato de baseline versionado em
       // tests/baseline/. NÃO comparamos (D6) — apenas registramos o estado.
