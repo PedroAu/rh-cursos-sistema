@@ -437,7 +437,7 @@ SELECT * FROM lead;  -- Should return all leads
 ### Short Term (Next 1-2 Sprints)
 
 - [ ] **Add GIN index** on `curso.ementa` if full-text search features are planned
-- [ ] **Test RLS policies** with explicit user/role emulation tests
+- [x] **Test RLS policies** with explicit user/role emulation tests
 - [ ] **Validate rate_limit_store cleanup** is running (check `pg_cron` logs)
 
 ### Medium Term (Next Quarter)
@@ -459,7 +459,20 @@ SELECT * FROM lead;  -- Should return all leads
 - [x] Comments added to tables/functions
 - [ ] Query logging enabled (recommend before prod)
 - [ ] Backup restore procedure documented (recommend before prod)
-- [ ] RLS policies tested with role emulation (recommend before prod)
+- [x] RLS policies tested with role emulation (`supabase/tests/database/ep12-transactions-rls.test.sql`)
+
+## 10. Automated Evidence Added in EP-12.4
+
+- `supabase/tests/database/ep12-transactions-rls.test.sql`
+  cobre índice parcial, duplicidade, rollback da RPC e role emulation mínima
+  para `anon`, `authenticated` e `admin`.
+- `scripts/test-db-concurrency.mjs`
+  executa duas sessões reais concorrentes contra `registrar_inscricao_publica`
+  e valida que apenas uma inscrição ativa persiste com incremento único de
+  vagas.
+- `npm run test:db`
+  sobe o stack local do Supabase, reseta o banco, executa a suíte pgTAP e o
+  teste multi-conexão antes de liberar CI.
 
 ---
 

@@ -35,6 +35,7 @@ Done
 - `package-lock.json`
 - `eslint.config.mjs`
 - `next.config.mjs`
+- `proxy.ts`
 - `instrumentation.ts`
 - `instrumentation-client.ts`
 - `sentry.server.config.ts`
@@ -64,6 +65,7 @@ Done
 
 - Sentry ficou opt-in via variáveis de ambiente e não falha o build quando DSN não está definido.
 - Storybook buildou com sucesso; permaneceram apenas warnings não bloqueantes de asset size e `@opennextjs/cloudflare`.
+- A convenção de borda do Next 16 foi migrada de `middleware.ts` para `proxy.ts`, removendo o aviso de depreciação no build.
 - O lint precisou ignorar `storybook-static/` e `dist/` para não varrer artefatos gerados.
 - A sanitização foi implementada com testes unitários e aplicada ao conteúdo público do blog.
 - O fallback server-side da sanitização remove scripts, event handlers e URLs inseguras sem depender de runtime Node-only no bundle cliente.
@@ -75,6 +77,7 @@ Done
 
 - 2026-06-26 — @dev (Dex) — Story criada para tornar o fechamento da Épica 8 verificável.
 - 2026-06-26 — @dev (Dex) — Story concluída com Sentry opt-in, Storybook verificável, gates limpos e documentação reconciliada.
+- 2026-06-26 — @dev (Codex/Orion) — Convenção do Next 16 migrada de `middleware.ts` para `proxy.ts`; aviso de depreciação removido do build.
 
 ## QA Results
 

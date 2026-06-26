@@ -19,6 +19,20 @@ jobs:
       - run: npm ci
       - run: npm run lint
 
+  docs-api:
+    name: API Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run docs:api:lint
+      - run: npm run docs:api:build
+      - run: npm run docs:api:check-drift
+
   typecheck:
     name: TypeCheck
     runs-on: ubuntu-latest
@@ -43,6 +57,19 @@ jobs:
       - run: npm ci
       - run: npm run test:unit
       - run: npm run test
+
+  db-tests:
+    name: DB Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - uses: supabase/setup-cli@v1
+      - run: npm run test:db
 
   build:
     name: Build

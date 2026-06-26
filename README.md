@@ -73,6 +73,9 @@ Consulte `.env.example` para a lista completa e comentada. As principais:
 | `npm test` | Gate completo: typecheck + build + Playwright (E2E/visual/a11y) |
 | `npm run test:unit` | Testes unitários (Vitest) |
 | `npm run test:coverage` | Testes unitários com cobertura |
+| `npm run docs:api:lint` | Validação estrutural da spec OpenAPI |
+| `npm run docs:api:build` | Gera `public/api-docs.html` a partir da spec |
+| `npm run docs:api:check-drift` | Compara a superfície do código com a spec |
 | `npm run test:watch` | Vitest em modo watch |
 | `npm run devops:all` | Fluxo local seguro pré-push (lint, typecheck, build, test, CodeRabbit) |
 | `npm run build:workers` | Build para Cloudflare Workers (OpenNext) |
@@ -124,6 +127,7 @@ A documentação dos endpoints está em [`docs/api/README.md`](docs/api/README.m
 
 - **Route Handlers (Next.js):** login/logout administrativo via `/api/auth/session`
 - **Edge Functions (Supabase):** `enrollments`, `leads`, `admin-resources`, `auth-session`
+- **UI navegável:** [`/api-docs.html`](./public/api-docs.html)
 
 ### Convenções Gerais
 
@@ -185,6 +189,7 @@ teclado e contraste de cores (WCAG 2.1 AA).
 |---------|----------------|---------|
 | `npm run typecheck` falha com erro de tipo em `NODE_ENV` | Atribuição direta a `process.env` em testes | Use `vi.stubEnv()` no Vitest |
 | `npm run build` falha por variável Supabase ausente | `.env.local` não configurado | Copie `.env.example` → `.env.local` e preencha as chaves |
+| `npm run build` exibe aviso deprecatório sobre `middleware` | Projeto ainda usa a convenção antiga do Next 16 | Migrar `middleware.ts` para `proxy.ts` e exportar `proxy()` |
 | Login retorna `503 Auth indisponivel` | Supabase server não configurado | Verifique `NEXT_PUBLIC_SUPABASE_URL` e service role key |
 | Login retorna `429` | Rate limit (proteção brute-force) | Aguarde o `Retry-After`; o limite é por IP |
 | Demo auth não funciona | Flag desabilitada (padrão seguro) | Em dev, defina `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true` no `.env.local` |

@@ -1,7 +1,7 @@
 # Story EP-12.4: Testes transacionais de banco e RLS
 
 ## Status
-Approved
+Ready for Review
 
 > Validação PO concluída em 2026-06-25: **GO (8.5/10)** após refinamento.
 > Foram corrigidas as referências de banco, separadas as estratégias pgTAP e
@@ -40,10 +40,10 @@ Hoje não há evidência automatizada para concorrência de inscrição, rollbac
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Casos de inscrição duplicada/concorrente têm teste automatizado
-- [ ] **AC2** — Falhas transacionais relevantes demonstram rollback correto
-- [ ] **AC3** — Políticas RLS críticas têm role emulation mínima automatizada
-- [ ] **AC4** — Achados relevantes ficam ligados à documentação/auditoria de banco
+- [x] **AC1** — Casos de inscrição duplicada/concorrente têm teste automatizado
+- [x] **AC2** — Falhas transacionais relevantes demonstram rollback correto
+- [x] **AC3** — Políticas RLS críticas têm role emulation mínima automatizada
+- [x] **AC4** — Achados relevantes ficam ligados à documentação/auditoria de banco
 
 ## Scope
 
@@ -58,27 +58,27 @@ Hoje não há evidência automatizada para concorrência de inscrição, rollbac
 
 ## Tasks / Subtasks
 
-- [ ] Preparar a suíte de banco no Supabase local (AC: 1, 2, 3, 4)
-  - [ ] Criar specs SQL em `supabase/tests/database/`.
-  - [ ] Usar `begin`, `plan`, `finish` e `rollback` para isolamento pgTAP.
-  - [ ] Confirmar execução com `npx supabase test db --local`.
-- [ ] Validar duplicidade e concorrência de inscrição (AC: 1)
-  - [ ] Confirmar a proteção do índice parcial `inscricao_aluno_turma_active_idx`.
-  - [ ] Testar rejeição de segunda inscrição ativa para o mesmo aluno/turma.
-  - [ ] Executar o cenário concorrente com duas conexões/clientes independentes; chamadas sequenciais não satisfazem o requisito de concorrência.
-  - [ ] Confirmar uma única inscrição ativa e incremento consistente de vagas.
-- [ ] Validar rollback da RPC de inscrição (AC: 2)
-  - [ ] Forçar falha após alteração intermediária possível e confirmar que aluno, inscrição e vagas permanecem no estado anterior.
-  - [ ] Cobrir ao menos o erro de duplicidade da `registrar_inscricao_publica`, verificando que updates anteriores da mesma transação não persistem.
-- [ ] Validar RLS por role emulation (AC: 3)
-  - [ ] Usar `set local role authenticated` e claims JWT locais para representar usuários distintos.
-  - [ ] Confirmar que student lê somente os próprios registros.
-  - [ ] Confirmar que usuário comum não lê leads/inscrições alheias nem executa mutações administrativas.
-  - [ ] Confirmar que admin acessa os recursos previstos e que anon permanece bloqueado fora das operações públicas.
-- [ ] Reconciliar evidência com auditorias e CI (AC: 4)
-  - [ ] Atualizar `docs/database/DB-AUDIT.md` somente com resultados executados.
-  - [ ] Adicionar comando de banco ao fluxo de qualidade sem substituir lint/typecheck/test.
-  - [ ] Atualizar Dev Agent Record e File List.
+- [x] Preparar a suíte de banco no Supabase local (AC: 1, 2, 3, 4)
+  - [x] Criar specs SQL em `supabase/tests/database/`.
+  - [x] Usar `begin`, `plan`, `finish` e `rollback` para isolamento pgTAP.
+  - [x] Confirmar execução com `npx supabase test db --local`.
+- [x] Validar duplicidade e concorrência de inscrição (AC: 1)
+  - [x] Confirmar a proteção do índice parcial `inscricao_aluno_turma_active_idx`.
+  - [x] Testar rejeição de segunda inscrição ativa para o mesmo aluno/turma.
+  - [x] Executar o cenário concorrente com duas conexões/clientes independentes; chamadas sequenciais não satisfazem o requisito de concorrência.
+  - [x] Confirmar uma única inscrição ativa e incremento consistente de vagas.
+- [x] Validar rollback da RPC de inscrição (AC: 2)
+  - [x] Forçar falha após alteração intermediária possível e confirmar que aluno, inscrição e vagas permanecem no estado anterior.
+  - [x] Cobrir ao menos o erro de duplicidade da `registrar_inscricao_publica`, verificando que updates anteriores da mesma transação não persistem.
+- [x] Validar RLS por role emulation (AC: 3)
+  - [x] Usar `set local role authenticated` e claims JWT locais para representar usuários distintos.
+  - [x] Confirmar que student lê somente os próprios registros.
+  - [x] Confirmar que usuário comum não lê leads/inscrições alheias nem executa mutações administrativas.
+  - [x] Confirmar que admin acessa os recursos previstos e que anon permanece bloqueado fora das operações públicas.
+- [x] Reconciliar evidência com auditorias e CI (AC: 4)
+  - [x] Atualizar `docs/database/DB-AUDIT.md` somente com resultados executados.
+  - [x] Adicionar comando de banco ao fluxo de qualidade sem substituir lint/typecheck/test.
+  - [x] Atualizar Dev Agent Record e File List.
 
 ## Dependencies
 
@@ -129,12 +129,34 @@ Hoje não há evidência automatizada para concorrência de inscrição, rollbac
 
 ## File List
 
-- `supabase/tests/database/` (novas specs pgTAP)
-- spec multi-conexão em `tests/` ou script dedicado, conforme implementação
-- `package.json`, se for criado script `test:db`
-- `.github/workflows/ci.yml`, se o gate de banco for incorporado ao CI
+- `supabase/tests/database/ep12-transactions-rls.test.sql`
+- `scripts/test-db-concurrency.mjs`
+- `scripts/test-db.mjs`
+- `package.json`
+- `.github/workflows/ci.yml`
 - `docs/database/DB-AUDIT.md`
 - `docs/stories/2026-06-24-epic12-story4-db-transactions-rls.md`
+
+## Dev Agent Record
+
+### Agent Model Used
+
+GPT-5 Codex
+
+### Debug Log References
+
+- `npm run test:db` — passed
+- `npm run lint` — passed
+- `npm run typecheck` — passed
+- `npm run test:unit` — passed
+- `npm test` — passed
+
+### Completion Notes List
+
+- Added a pgTAP suite for duplicate enrollment rejection, transactional rollback evidence, and RLS role emulation.
+- Added a multi-connection race test that proves only one active enrollment survives under concurrent calls.
+- Added a reproducible `npm run test:db` wrapper and CI job that start only the local Postgres service required for database verification.
+- Reconciled `docs/database/DB-AUDIT.md` with the executed evidence produced in this story.
 
 ## Validação PO
 
@@ -159,3 +181,4 @@ Hoje não há evidência automatizada para concorrência de inscrição, rollbac
 
 - 2026-06-24 — @po (Pax) — Story refinada para fechar a lacuna mais fraca da evidência atual: transações e RLS reais.
 - 2026-06-25 — @po (Pax) — Validação GO 8.5/10; corrigidas dependências, definidos pgTAP, role emulation, rollback e concorrência multi-conexão.
+- 2026-06-26 — @dev (Codex/Orion) — Suite pgTAP e teste concorrente implementados; `test:db`, `lint`, `typecheck`, `test:unit` e `npm test` verdes; status promovido para `Ready for Review`.

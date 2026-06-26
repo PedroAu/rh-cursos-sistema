@@ -145,6 +145,69 @@ paths:
                     ok: true
                     mode: local-only
                     revoked: false
+  /api/enrollments:
+    post:
+      tags: [Enrollments]
+      summary: Cria uma inscrição pública via Route Handler
+      description: >-
+        Adaptador same-origin usado pelo app Next.js. Valida o payload,
+        aplica rate limit e delega a criação à RPC `registrar_inscricao_publica`.
+      operationId: createEnrollmentRouteHandler
+      security: []
+      x-runtime: next-route-handler
+      x-rate-limit:
+        key: enrollment:{ip}
+        windowSeconds: 60
+        maxRequests: 20
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentRequest'
+      responses:
+        '201':
+          description: Inscrição registrada
+          headers:
+            X-RateLimit-Remaining:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrollmentResponse'
+        '400':
+          description: Body inválido ou falha de validação
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - $ref: '#/components/schemas/ValidationErrorResponse'
+        '429':
+          $ref: '#/components/responses/GenericRateLimited'
+        '500':
+          description: Erro interno ao registrar inscrição
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                error:
+                  value:
+                    ok: false
+                    error: Erro ao registrar inscrição.
+        '503':
+          description: Backend de checkout indisponível
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unavailable:
+                  value:
+                    ok: false
+                    error: Checkout indisponivel.
   /functions/v1/enrollments:
     post:
       tags: [Enrollments]

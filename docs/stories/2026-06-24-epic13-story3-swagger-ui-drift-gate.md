@@ -1,7 +1,7 @@
 # Story EP-13.3: Swagger UI/ReDoc e gate anti-drift
 
 ## Status
-Approved
+Ready for Review
 
 > Validação PO concluída em 2026-06-25: **GO (9/10)**. A entrega foi
 > concretizada como ReDoc estático gerado pela Redocly CLI, alinhada ao
@@ -46,10 +46,10 @@ documentação ao app.
 
 ## Acceptance Criteria
 
-- [ ] **AC1** — Swagger UI ou ReDoc roda a partir da spec versionada
-- [ ] **AC2** — O README/docs apontam para a UI de documentação
-- [ ] **AC3** — Existe validação mínima para detectar drift óbvio entre código e spec
-- [ ] **AC4** — A estratégia de manutenção da doc fica registrada
+- [x] **AC1** — Swagger UI ou ReDoc roda a partir da spec versionada
+- [x] **AC2** — O README/docs apontam para a UI de documentação
+- [x] **AC3** — Existe validação mínima para detectar drift óbvio entre código e spec
+- [x] **AC4** — A estratégia de manutenção da doc fica registrada
 
 ## Scope
 
@@ -64,25 +64,25 @@ documentação ao app.
 
 ## Tasks / Subtasks
 
-- [ ] Criar comandos reproduzíveis para validar e gerar a documentação (AC: 1, 3)
-  - [ ] Adicionar `docs:api:lint` para executar Redocly lint sobre `docs/api/openapi.yaml`.
-  - [ ] Adicionar `docs:api:build` para gerar HTML estático em `public/api-docs.html`.
-  - [ ] Fixar a dependência/versão usada no projeto ou documentar explicitamente a estratégia de execução reproduzível.
-- [ ] Publicar a UI ReDoc estática (AC: 1)
-  - [ ] Gerar `public/api-docs.html` exclusivamente a partir da spec versionada.
-  - [ ] Confirmar carregamento local e compatibilidade com o deploy Cloudflare Workers.
-- [ ] Referenciar a UI navegável (AC: 2)
-  - [ ] Adicionar link em `README.md`.
-  - [ ] Adicionar link e comando de regeneração em `docs/api/README.md`.
-- [ ] Implementar gate mínimo anti-drift (AC: 3)
-  - [ ] Validar sintaxe/schema OpenAPI com Redocly.
-  - [ ] Comparar a superfície de `app/api/**/route.ts` e `supabase/functions/*/index.ts` com os paths da spec.
-  - [ ] Detectar ao menos método/path adicionado ou removido; equivalência semântica completa fica fora do escopo.
-  - [ ] Integrar o gate ao fluxo local e ao CI.
-- [ ] Registrar a estratégia de manutenção e executar smoke (AC: 4)
-  - [ ] Documentar: alterar código e spec na mesma mudança, regenerar UI e executar o gate.
-  - [ ] Validar resposta 200 e conteúdo básico da página gerada.
-  - [ ] Atualizar Dev Agent Record e File List.
+- [x] Criar comandos reproduzíveis para validar e gerar a documentação (AC: 1, 3)
+  - [x] Adicionar `docs:api:lint` para executar Redocly lint sobre `docs/api/openapi.yaml`.
+  - [x] Adicionar `docs:api:build` para gerar HTML estático em `public/api-docs.html`.
+  - [x] Fixar a dependência/versão usada no projeto ou documentar explicitamente a estratégia de execução reproduzível.
+- [x] Publicar a UI ReDoc estática (AC: 1)
+  - [x] Gerar `public/api-docs.html` exclusivamente a partir da spec versionada.
+  - [x] Confirmar carregamento local e compatibilidade com o deploy Cloudflare Workers.
+- [x] Referenciar a UI navegável (AC: 2)
+  - [x] Adicionar link em `README.md`.
+  - [x] Adicionar link e comando de regeneração em `docs/api/README.md`.
+- [x] Implementar gate mínimo anti-drift (AC: 3)
+  - [x] Validar sintaxe/schema OpenAPI com Redocly.
+  - [x] Comparar a superfície de `app/api/**/route.ts` e `supabase/functions/*/index.ts` com os paths da spec.
+  - [x] Detectar ao menos método/path adicionado ou removido; equivalência semântica completa fica fora do escopo.
+  - [x] Integrar o gate ao fluxo local e ao CI.
+- [x] Registrar a estratégia de manutenção e executar smoke (AC: 4)
+  - [x] Documentar: alterar código e spec na mesma mudança, regenerar UI e executar o gate.
+  - [x] Validar resposta 200 e conteúdo básico da página gerada.
+  - [x] Atualizar Dev Agent Record e File List.
 
 ## Dependencies
 
@@ -126,11 +126,36 @@ documentação ao app.
 - `docs/api/README.md`
 - `docs/api/openapi.yaml`
 - `public/api-docs.html`
+- `scripts/build-api-docs.mjs`
 - `scripts/check-openapi-drift.mjs`
+- `scripts/lint-openapi.mjs`
+- `tests/api-docs.spec.ts`
 - `package.json`
 - `.github/workflows/ci.yml`
-- spec de smoke em `tests/`, se necessária
 - `docs/stories/2026-06-24-epic13-story3-swagger-ui-drift-gate.md`
+
+## Dev Agent Record
+
+### Agent Model Used
+
+GPT-5 Codex
+
+### Debug Log References
+
+- `npm run docs:api:lint` — passed
+- `npm run docs:api:build` — passed
+- `npm run docs:api:check-drift` — passed
+- `npm run lint` — passed
+- `npm run typecheck` — passed
+- `npm run test:unit` — passed
+- `npm test` — passed
+
+### Completion Notes List
+
+- Added reproducible API docs commands for lint, build, and drift detection.
+- Published `public/api-docs.html` from the versioned OpenAPI spec and covered it with Playwright smoke.
+- Reconciled the drift gate with the real code surface, including `/api/enrollments` and the actual Edge Function method detection.
+- Linked the generated API docs and maintenance workflow from the main README and API docs catalog.
 
 ## Validação PO
 
@@ -155,3 +180,4 @@ documentação ao app.
 
 - 2026-06-24 — @po (Pax) — Story refinada para fechar o último AC de D-4.2: documentação navegável e governada.
 - 2026-06-25 — @po (Pax) — Validação GO 9/10; selecionado ReDoc estático, definidos comandos, gate anti-drift, smoke e File List.
+- 2026-06-26 — @dev (Codex/Orion) — Gate anti-drift corrigido, spec reconciliada com `/api/enrollments`, smoke Playwright ajustado e quality gates verdes; status promovido para `Ready for Review`.
