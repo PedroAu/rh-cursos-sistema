@@ -2,18 +2,18 @@ status:
   branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
-    - docs/DEMO-AUTH.md
-    - docs/PHASE-A-ACTION-PLAN.md
-    - docs/PHASE-A-CONSOLIDATION-REPORT.md
-    - docs/PHASE-A-EXECUTION-STATUS.md
-  modifiedFilesTotalCount: 110
+    - .github/workflows/ci.yml
+    - README.md
+    - docs/api/README.md
+    - next-env.d.ts
+  modifiedFilesTotalCount: 10
   recentCommits:
+    - 'feat(epic-8): finalize brownfield remediation governance'
     - 'merge: integrate story/1.1-baseline-a11y-clean into main'
-    - 'merge: integrate staging/phase-2 into main'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-06-26T13:01:40.894Z'
+  lastUpdate: '2026-06-26T14:50:31.736Z'
   isGitRepo: true
-timestamp: 1782478900895
+timestamp: 1782485431737
 ttl: 60
-gitFingerprint: 1782438372335.9148:1782478090011.8213
+gitFingerprint: 1782438372335.9148:1782482396636.6797

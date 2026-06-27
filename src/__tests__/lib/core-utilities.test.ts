@@ -100,11 +100,25 @@ describe('Core Utilities Coverage - Part 2', () => {
       expect(promise).toBeInstanceOf(Promise);
     });
 
-    it('resolves after specified time', async () => {
-      const start = Date.now();
-      await delay(10);
-      const elapsed = Date.now() - start;
-      expect(elapsed).toBeGreaterThanOrEqual(10);
+    it('resolves only after the specified time has elapsed', async () => {
+      // Fake timers make the timing deterministic. Asserting wall-clock
+      // elapsed time is flaky because setTimeout can fire a fraction early.
+      vi.useFakeTimers();
+      try {
+        let resolved = false;
+        const pending = delay(10).then(() => {
+          resolved = true;
+        });
+
+        await vi.advanceTimersByTimeAsync(9);
+        expect(resolved).toBe(false);
+
+        await vi.advanceTimersByTimeAsync(1);
+        await pending;
+        expect(resolved).toBe(true);
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 

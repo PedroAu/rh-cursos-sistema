@@ -2,6 +2,16 @@
 
 Plataforma SaaS de cursos corporativos da RH Cursos: catálogo público, fluxo de inscrição/checkout, área administrativa e captação de leads in-company. Aplicação fullstack com SSR, design system próprio e banco gerenciado no Supabase, publicada em Cloudflare Workers.
 
+### Tech Stack Badges
+
+[![Next.js 16](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-blue?logo=react)](https://react.dev/)
+[![TypeScript 5.8](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%2B%20Auth-green?logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-blue?logo=tailwindcss)](https://tailwindcss.com/)
+[![Mantine](https://img.shields.io/badge/Mantine-UI-7950f2)](https://mantine.dev/)
+[![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-orange?logo=cloudflare)](https://workers.cloudflare.com/)
+
 ---
 
 ## Stack
@@ -28,7 +38,9 @@ Plataforma SaaS de cursos corporativos da RH Cursos: catálogo público, fluxo d
 
 ---
 
-## Quick Start
+## Quick Start (30 minutos)
+
+Novo no projeto? Siga o **[Guia de Quick Start](docs/QUICK-START.md)** para fazer setup em 30 minutos:
 
 ```bash
 # 1. Instalar dependências
@@ -36,12 +48,14 @@ npm install
 
 # 2. Configurar variáveis de ambiente
 cp .env.example .env.local
-#    Edite .env.local e aponte para um projeto Supabase de TESTE.
+#    Edite .env.local com credenciais Supabase
 
 # 3. Rodar em modo desenvolvimento
 npm run dev
 #    App disponível em http://localhost:3000
 ```
+
+Veja [**docs/QUICK-START.md**](docs/QUICK-START.md) para instruções detalhadas de setup.
 
 ### Variáveis de ambiente essenciais
 
@@ -58,7 +72,7 @@ Consulte `.env.example` para a lista completa e comentada. As principais:
 | `NEXT_PUBLIC_ENABLE_DEMO_AUTH` | Não | Feature flag do demo auth (**`false` por padrão**) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Não | ID do GA4 (sem ele, analytics fica inativo) |
 
-> **Segurança:** o demo auth é desabilitado por padrão e jamais deve ser ativado em produção. Detalhes em [`docs/DEMO-AUTH.md`](docs/DEMO-AUTH.md).
+> **Segurança:** o demo auth é desabilitado por padrão e jamais deve ser ativado em produção.
 
 ---
 
@@ -152,7 +166,9 @@ Migrations versionadas em `supabase/migrations/` (13 migrations estáveis, 100% 
 
 ## Deploy (Cloudflare Workers)
 
-O projeto é publicado em Cloudflare Workers via `@opennextjs/cloudflare`:
+O projeto é publicado em Cloudflare Workers via `@opennextjs/cloudflare`.
+
+**Guia completo:** [**docs/DEPLOYMENT.md**](docs/DEPLOYMENT.md)
 
 ```bash
 # Validar o bundle localmente antes de publicar
@@ -167,6 +183,12 @@ npm run verify:workers
 
 Variáveis sensíveis em produção devem ser configuradas como **secrets** do Worker
 (`wrangler secret put <NOME>`) ou no painel do Cloudflare — nunca commitadas.
+
+Consulte [**docs/DEPLOYMENT.md**](docs/DEPLOYMENT.md) para:
+- Configuração de GitHub secrets
+- Setup de Cloudflare Workers
+- Rollback de emergência
+- Monitoramento pós-deploy
 
 ---
 
@@ -185,34 +207,65 @@ teclado e contraste de cores (WCAG 2.1 AA).
 
 ## Troubleshooting
 
+Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/TROUBLESHOOTING.md)** com soluções para:
+
+- Erros de instalação & setup
+- Problemas com desenvolvimento local
+- Falhas em testes
+- Problemas de build & deploy
+- Autenticação
+- Banco de dados
+- Performance
+
+**Problemas comuns:**
+
 | Sintoma | Causa provável | Solução |
 |---------|----------------|---------|
-| `npm run typecheck` falha com erro de tipo em `NODE_ENV` | Atribuição direta a `process.env` em testes | Use `vi.stubEnv()` no Vitest |
-| `npm run build` falha por variável Supabase ausente | `.env.local` não configurado | Copie `.env.example` → `.env.local` e preencha as chaves |
-| `npm run build` exibe aviso deprecatório sobre `middleware` | Projeto ainda usa a convenção antiga do Next 16 | Migrar `middleware.ts` para `proxy.ts` e exportar `proxy()` |
-| Login retorna `503 Auth indisponivel` | Supabase server não configurado | Verifique `NEXT_PUBLIC_SUPABASE_URL` e service role key |
-| Login retorna `429` | Rate limit (proteção brute-force) | Aguarde o `Retry-After`; o limite é por IP |
-| Demo auth não funciona | Flag desabilitada (padrão seguro) | Em dev, defina `NEXT_PUBLIC_ENABLE_DEMO_AUTH=true` no `.env.local` |
-| Playwright instável sob concorrência | Specs visuais/axe paralelos | Os runners já forçam execução sequencial (`--workers=1`) |
+| `npm run dev` não inicia | Porta 3000 em uso | `npm run dev -- -p 3001` |
+| `npm run build` falha | `.env.local` faltando | `cp .env.example .env.local` e preencha |
+| Login retorna `503 Auth indisponivel` | Supabase não acessível | Verifique `NEXT_PUBLIC_SUPABASE_URL` |
+| Login retorna `429` | Rate limit brute-force | Aguarde 60 segundos e tente novamente |
+| Playwright instável | Testes paralelos | Execução já é sequencial (`--workers=1`) |
+
+**Veja mais:** [**docs/TROUBLESHOOTING.md**](docs/TROUBLESHOOTING.md)
 
 ---
 
-## Documentação Adicional
+## Documentação
 
-**API & Endpoints:**
-- [`docs/api/README.md`](docs/api/README.md) — overview de endpoints e convenções gerais
+### Comece aqui
 
-**Arquitetura & Design:**
-- [`docs/architecture/system-architecture.md`](docs/architecture/system-architecture.md) — visão geral do sistema
-- [`docs/architecture/frontend-feature-first-architecture.md`](docs/architecture/frontend-feature-first-architecture.md) — feature-first
+- **[docs/QUICK-START.md](docs/QUICK-START.md)** — Setup em 30 minutos para novos devs
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Guia completo de deploy para Cloudflare Workers
+- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Soluções para problemas comuns
 
-**Banco de dados & Segurança:**
-- [`docs/database/SCHEMA.md`](docs/database/SCHEMA.md) — esquema completo
-- [`docs/database/DB-AUDIT.md`](docs/database/DB-AUDIT.md) — auditoria (rating A+)
+### Arquitetura & Design
 
-**Features & Configuração:**
-- [`docs/DEMO-AUTH.md`](docs/DEMO-AUTH.md) — feature flag de demo auth
-- [`docs/TECHNICAL-DEBT-REPORT.md`](docs/TECHNICAL-DEBT-REPORT.md) — avaliação de dívida técnica
+- [docs/architecture/system-architecture.md](docs/architecture/system-architecture.md) — Visão geral do sistema
+- [docs/architecture/frontend-feature-first-architecture.md](docs/architecture/frontend-feature-first-architecture.md) — Organização feature-first
+- [docs/design-system/](docs/design-system/) — Design tokens e componentes
+
+### API & Backend
+
+- [docs/api/README.md](docs/api/README.md) — Overview de endpoints
+- [docs/api/openapi.json](docs/api/openapi.json) — Especificação OpenAPI (navegue em `/api-docs.html`)
+
+### Banco de Dados
+
+- [docs/database/SCHEMA.md](docs/database/SCHEMA.md) — Esquema completo
+- [docs/database/DB-AUDIT.md](docs/database/DB-AUDIT.md) — Auditoria de segurança (rating A+)
+- [docs/database/MIGRATIONS.md](docs/database/MIGRATIONS.md) — Histórico de migrations
+
+### Epics & Stories
+
+- [docs/epics/](docs/epics/) — Planejamento de features (EPICs)
+- [docs/stories/](docs/stories/) — Histórias de desenvolvimento (Stories)
+
+### Acessibilidade & Qualidade
+
+- [docs/accessibility/](docs/accessibility/) — Checklist WCAG 2.1 AA
+- [docs/qa/](docs/qa/) — Planos de teste e checklists
+- [docs/TECHNICAL-DEBT-REPORT.md](docs/TECHNICAL-DEBT-REPORT.md) — Avaliação de dívida técnica
 
 ---
 
