@@ -1,6 +1,11 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 import nextTypescript from "eslint-config-next/typescript";
 
+// Reuse the exact jsx-a11y plugin instance registered by eslint-config-next so
+// our custom a11y rule (below) shares its namespace without redefining it.
+const jsxA11yPlugin = nextCoreWebVitals.find((c) => c.plugins?.["jsx-a11y"])
+  ?.plugins["jsx-a11y"];
+
 const eslintConfig = [
   {
     ignores: [
@@ -27,17 +32,23 @@ const eslintConfig = [
     ignores: ["coverage/**", "dist/**"]
   },
   {
+    plugins: { "jsx-a11y": jsxA11yPlugin },
     rules: {
       "react-hooks/preserve-manual-memoization": "off",
       "react-hooks/set-state-in-effect": "off",
-      "@next/next/no-img-element": "off"
+      "@next/next/no-img-element": "off",
+      // A11y regression guard (D-2.3): every interactive control must expose an
+      // accessible name (visible text, aria-label, or aria-labelledby).
+      "jsx-a11y/control-has-associated-label": "error"
     }
   },
   {
     files: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__/**/*"],
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
-      "@typescript-eslint/no-unused-vars": "off"
+      "@typescript-eslint/no-unused-vars": "off",
+      // Test fixtures may render bare controls without labels.
+      "jsx-a11y/control-has-associated-label": "off"
     }
   }
 ];
