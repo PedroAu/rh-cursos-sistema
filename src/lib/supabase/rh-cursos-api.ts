@@ -11,6 +11,7 @@ import {
   mapCourse,
   mapInstructor,
   mapLead,
+  mapTrainingPath,
   toDbPaymentMethod,
   toDbStudentType,
   type AssessmentWithCourseRow,
@@ -19,7 +20,8 @@ import {
   type CourseInstructorRow,
   type CourseRow,
   type InstructorRow,
-  type LeadRow
+  type LeadRow,
+  type TrilhaRow
 } from "@/lib/supabase/mappers";
 
 type RhCursosClient = SupabaseClient<Database>;
@@ -27,38 +29,56 @@ type RhCursosClient = SupabaseClient<Database>;
 async function fetchPublicCatalog(client: RhCursosClient | null) {
   if (!client) return null;
 
-  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult] = await Promise.all([
-    client
-      .from("curso")
-      .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
-      .order("titulo"),
-    client
-      .from("turma")
-      .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
-      .order("data_inicio"),
-    client
-      .from("instrutor")
-      .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
-      .order("nome"),
-    client
-      .from("curso_instrutor")
-      .select("id,curso_id,instrutor_id,principal")
-  ]);
+  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult, trainingPathsResult] =
+    await Promise.all([
+      client
+        .from("curso")
+        .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+        .order("titulo"),
+      client
+        .from("turma")
+        .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
+        .order("data_inicio"),
+      client
+        .from("instrutor")
+        .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
+        .order("nome"),
+      client
+        .from("curso_instrutor")
+        .select("id,curso_id,instrutor_id,principal"),
+      client
+        .from("trilha")
+        .select("id,codigo,nome,nome_curto,slug,descricao,icone,ordem,ativa")
+        .eq("ativa", true)
+        .order("ordem")
+    ]);
 
   if (coursesResult.error) throw coursesResult.error;
   if (classesResult.error) throw classesResult.error;
   if (instructorsResult.error) throw instructorsResult.error;
   if (courseInstructorsResult.error) throw courseInstructorsResult.error;
+  if (trainingPathsResult.error) throw trainingPathsResult.error;
 
   const courseRows = coursesResult.data as CourseRow[];
   const classRows = classesResult.data as ClassRow[];
   const instructorRows = instructorsResult.data as InstructorRow[];
   const courseInstructorRows = courseInstructorsResult.data as CourseInstructorRow[];
+  const trainingPathRows = trainingPathsResult.data as TrilhaRow[];
+
+  // Contagem de cursos por trilha derivada dos dados reais do catálogo, evitando
+  // o `courseCount` hardcoded (e propenso a drift) do antigo mock estático.
+  const courseCountByPath = courseRows.reduce<Record<string, number>>((acc, course) => {
+    if (course.trilha_id) {
+      acc[course.trilha_id] = (acc[course.trilha_id] ?? 0) + 1;
+    }
+    return acc;
+  }, {});
 
   return {
     courses: courseRows.map((course) => mapCourse(course, courseInstructorRows, classRows)),
     classes: classRows.map(mapClass),
-    instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows))
+    instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows)),
+    trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0))
   };
 }
 

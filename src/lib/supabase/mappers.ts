@@ -1,3 +1,4 @@
+import { courseCoverByPath, defaultCourseCover } from "@/lib/course-covers";
 import { getInitials } from "@/lib/get-initials";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type {
@@ -11,7 +12,8 @@ import type {
   Instructor,
   Lead,
   Testimonial,
-  TrainingClass
+  TrainingClass,
+  TrainingPath
 } from "@/types";
 
 type Tables = Database["public"]["Tables"];
@@ -27,6 +29,7 @@ export type EnrollmentRow = Tables["inscricao"]["Row"];
 export type StudentInsert = Tables["aluno"]["Insert"];
 export type EnrollmentInsert = Tables["inscricao"]["Insert"];
 export type LeadInsert = Tables["lead"]["Insert"];
+export type TrilhaRow = Tables["trilha"]["Row"];
 
 export type AssessmentWithCourseRow = AssessmentRow & {
   turma?: {
@@ -34,18 +37,6 @@ export type AssessmentWithCourseRow = AssessmentRow & {
       titulo?: string | null;
     } | null;
   } | null;
-};
-
-const defaultCourseCover = "/images/courses/default-course.jpg";
-
-const courseCoverByPath: Record<string, string> = {
-  "path-dp": "/images/courses/departamento-pessoal.jpg",
-  "path-gestao": "/images/courses/gestao-publica.jpg",
-  "path-licitacoes": "/images/courses/licitacoes.jpg",
-  "path-pessoas": "/images/courses/gestao-pessoas.jpg",
-  "path-tech": "/images/courses/tecnologia.jpg",
-  "path-comunicacao": "/images/courses/comunicacao.jpg",
-  "path-auditoria": "/images/courses/auditoria.jpg"
 };
 
 const trainingPathNames: Record<string, string> = {
@@ -57,6 +48,19 @@ const trainingPathNames: Record<string, string> = {
   "path-comunicacao": "Comunicação Institucional",
   "path-auditoria": "Auditoria e Controle"
 };
+
+export function mapTrainingPath(row: TrilhaRow, courseCount: number): TrainingPath {
+  return {
+    id: row.id,
+    code: row.codigo,
+    name: row.nome,
+    shortName: row.nome_curto,
+    slug: row.slug,
+    description: row.descricao,
+    icon: row.icone,
+    courseCount
+  };
+}
 
 function asStringArray(value: Json): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];

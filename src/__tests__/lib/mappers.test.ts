@@ -78,7 +78,7 @@ describe("Supabase mappers", () => {
     const course = mapCourse(courseRow, [courseInstructorRow], [classRow]);
 
     expect(course.pathName).toBe("Tecnologia e Dados");
-    expect(course.image).toBe("/images/courses/tecnologia.jpg");
+    expect(course.image).toBe("/images/courses/tecnologia-inovacao.jpg");
     expect(course.status).toBe("Destaque");
     expect(course.featured).toBe(true);
     expect(course.instructorId).toBe("inst-1");

@@ -12,11 +12,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import {
-  courseCoverByPath,
-  defaultCourseCover,
-  trainingPaths
-} from "@/data";
+import { courseCoverByPath, defaultCourseCover } from "@/lib/course-covers";
 import { debounce } from "@/lib/debounce";
 import { getInitials } from "@/lib/get-initials";
 import { slugify } from "@/lib/utils";
@@ -46,7 +42,8 @@ import type {
   Lead,
   Student,
   Testimonial,
-  TrainingClass
+  TrainingClass,
+  TrainingPath
 } from "@/types";
 
 type AppState = {
@@ -58,6 +55,7 @@ type AppState = {
   enrollments: Enrollment[];
   blogPosts: BlogPost[];
   testimonials: Testimonial[];
+  trainingPaths: TrainingPath[];
   currentSession: CurrentSession | null;
 };
 
@@ -67,7 +65,6 @@ type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
 type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
 
 type AppStoreValue = AppState & {
-  trainingPaths: typeof trainingPaths;
   setSession: (session: CurrentSession) => void;
   logout: () => void;
   createEnrollment: (payload: EnrollmentPayload) => Promise<void>;
@@ -104,6 +101,7 @@ const initialState: AppState = {
   enrollments: [],
   blogPosts: [],
   testimonials: [],
+  trainingPaths: [],
   currentSession: null
 };
 
@@ -117,7 +115,8 @@ const ARRAY_STATE_KEYS = [
   "leads",
   "enrollments",
   "blogPosts",
-  "testimonials"
+  "testimonials",
+  "trainingPaths"
 ] as const satisfies readonly (keyof AppStoreInitialData)[];
 
 function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitialData | undefined {
@@ -408,7 +407,8 @@ export function AppStoreProvider({
             ...current,
             courses: updated.courses,
             classes: updated.classes,
-            instructors: updated.instructors
+            instructors: updated.instructors,
+            trainingPaths: updated.trainingPaths
           }));
         })
         .catch(() => undefined);
@@ -446,6 +446,7 @@ export function AppStoreProvider({
           courses: catalog?.courses !== undefined ? catalog.courses : current.courses,
           classes: catalog?.classes.length ? catalog.classes : current.classes,
           instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
+          trainingPaths: catalog?.trainingPaths.length ? catalog.trainingPaths : current.trainingPaths,
           blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
         }));
 
@@ -725,6 +726,9 @@ export function AppStoreProvider({
 
   const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>((course) => {
     const snapshot = stateRef.current;
+    const trainingPaths = snapshot.trainingPaths;
+    const defaultPath = trainingPaths[0];
+    const resolvedPathId = course.pathId ?? defaultPath?.id ?? "";
     const exists = course.id && snapshot.courses.some((item) => item.id === course.id);
     const nextCourse: Course = exists
       ? ({ ...snapshot.courses.find((item) => item.id === course.id)!, ...course } as Course)
@@ -732,17 +736,24 @@ export function AppStoreProvider({
           id: `course-${Date.now()}`,
           slug: slugify(course.title ?? "novo-curso"),
           title: course.title ?? "Novo curso",
-          pathId: course.pathId ?? trainingPaths[0].id,
+          pathId: resolvedPathId,
           pathName:
-            trainingPaths.find((item) => item.id === (course.pathId ?? trainingPaths[0].id))?.name ??
-            trainingPaths[0].name,
+            trainingPaths.find((item) => item.id === resolvedPathId)?.name ??
+            defaultPath?.name ??
+            "",
           modality: course.modality ?? course.modalities?.[0] ?? "Ao vivo online",
           modalities: course.modalities ?? (course.modality ? [course.modality] : ["Ao vivo online"]),
           durationLabel: course.durationLabel ?? "8h",
           durationHours: course.durationHours ?? 8,
           level: course.level ?? "Básico",
-          category: course.category ?? course.categories?.[0] ?? trainingPaths[0].shortName,
-          categories: course.categories ?? (course.category ? [course.category] : [trainingPaths[0].shortName]),
+          category: course.category ?? course.categories?.[0] ?? defaultPath?.shortName ?? "",
+          categories:
+            course.categories ??
+            (course.category
+              ? [course.category]
+              : defaultPath?.shortName
+                ? [defaultPath.shortName]
+                : []),
           price: course.price ?? 0,
           shortDescription: course.shortDescription ?? "Descrição curta do curso.",
           fullDescription: course.fullDescription ?? "Descrição completa do curso.",
@@ -751,7 +762,7 @@ export function AppStoreProvider({
           benefits: course.benefits ?? ["Material de apoio"],
           modules: course.modules ?? [],
           instructorId: course.instructorId ?? snapshot.instructors[0]?.id ?? "inst-1",
-          image: course.image ?? courseCoverByPath[course.pathId ?? trainingPaths[0].id] ?? defaultCourseCover,
+          image: course.image ?? courseCoverByPath[resolvedPathId] ?? defaultCourseCover,
           rating: course.rating ?? 4.8,
           studentsCount: course.studentsCount ?? 0,
           status: course.status ?? "Ativo",
@@ -961,7 +972,6 @@ export function AppStoreProvider({
   const value = useMemo<AppStoreValue>(
     () => ({
       ...state,
-      trainingPaths,
       setSession,
       logout,
       createEnrollment,

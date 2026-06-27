@@ -161,8 +161,10 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock("@/data", () => mocks.data);
-vi.mock("@/data/index.ts", () => mocks.data);
+vi.mock("@/lib/course-covers", () => ({
+  courseCoverByPath: mocks.data.courseCoverByPath,
+  defaultCourseCover: mocks.data.defaultCourseCover,
+}));
 vi.mock("sonner", () => ({
   toast: {
     success: mocks.toastSuccess,
@@ -324,18 +326,15 @@ function installMemoryStorage() {
 describe("AppStoreProvider and hooks", () => {
   beforeAll(async () => {
     vi.resetModules();
-    vi.doMock("@/data", () => mocks.data);
-    vi.doMock("@/data/index.ts", () => mocks.data);
     const appStore = await import("@/lib/app-store");
-    const data = await import("@/data");
 
     AppStoreProvider = appStore.AppStoreProvider;
     useAppStore = appStore.useAppStore;
     useCourseBySlug = appStore.useCourseBySlug;
     useDashboardCharts = appStore.useDashboardCharts;
-    mockClasses = (data as typeof mocks.data).mockClasses;
-    mockCourses = (data as typeof mocks.data).mockCourses;
-    mockLeads = (data as typeof mocks.data).mockLeads;
+    mockClasses = mocks.data.mockClasses;
+    mockCourses = mocks.data.mockCourses;
+    mockLeads = mocks.data.mockLeads;
   });
 
   beforeEach(() => {
