@@ -32,6 +32,7 @@
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "analyze": "ANALYZE=true npm run build",
+    "bundle:check": "node scripts/check-bundle-size.mjs",
     "epic8:verify": "npm run lint && npm run typecheck && npm run test:coverage && npm run storybook:build",
     "test:watch": "vitest",
     "devops:all": "node scripts/devops-run-all.mjs",

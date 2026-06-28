@@ -73,7 +73,24 @@ jobs:
       - run: npm run docs:api:build
       - run: npm run docs:api:check-drift
 
-  # Lane 5 — Database contract tests.
+  # Lane 5 — Performance: bundle size budgets + Lighthouse CI per-route budgets.
+  performance:
+    name: Performance Budgets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - name: Bundle size budget
+        run: npm run bundle:check
+      - name: Lighthouse CI (per-route budgets)
+        run: npx lhci autorun --config=./lighthouserc.cjs
+
+  # Lane 6 — Database contract tests.
   db-tests:
     name: DB Tests
     runs-on: ubuntu-latest

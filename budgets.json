@@ -1,0 +1,41 @@
+[
+  {
+    "path": "/",
+    "resourceSizes": [
+      { "resourceType": "script", "budget": 1100 },
+      { "resourceType": "stylesheet", "budget": 120 },
+      { "resourceType": "image", "budget": 900 },
+      { "resourceType": "total", "budget": 2600 }
+    ],
+    "timings": [
+      { "metric": "interactive", "budget": 5000 },
+      { "metric": "first-contentful-paint", "budget": 2500 }
+    ]
+  },
+  {
+    "path": "/cursos",
+    "resourceSizes": [
+      { "resourceType": "script", "budget": 1100 },
+      { "resourceType": "stylesheet", "budget": 120 },
+      { "resourceType": "image", "budget": 900 },
+      { "resourceType": "total", "budget": 2600 }
+    ],
+    "timings": [
+      { "metric": "interactive", "budget": 5000 },
+      { "metric": "first-contentful-paint", "budget": 2500 }
+    ]
+  },
+  {
+    "path": "/login",
+    "resourceSizes": [
+      { "resourceType": "script", "budget": 900 },
+      { "resourceType": "stylesheet", "budget": 120 },
+      { "resourceType": "image", "budget": 300 },
+      { "resourceType": "total", "budget": 1800 }
+    ],
+    "timings": [
+      { "metric": "interactive", "budget": 4000 },
+      { "metric": "first-contentful-paint", "budget": 2000 }
+    ]
+  }
+]
