@@ -6,6 +6,7 @@ import { Link } from "@/lib/router-compat";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuoteModal } from "@/components/in-company/quote-modal";
+import { cn } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
 
 type CourseCardProps = {
@@ -20,7 +21,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
 
   const cardBody = (
     <Card variant="elevated" interactive={true} size={compact ? "sm" : "md"} className="group h-full overflow-hidden transition duration-300 hover:-translate-y-1">
-      <div className={`relative overflow-hidden ${compact ? "aspect-[16/10]" : "aspect-[1.32/1]"}`}>
+      <div className={cn("relative overflow-hidden", compact ? "aspect-[16/10]" : "aspect-[1.32/1]")}>
         <Image
           src={course.image}
           alt={course.title}

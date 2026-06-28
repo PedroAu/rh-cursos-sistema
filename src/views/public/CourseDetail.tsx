@@ -168,7 +168,7 @@ export function CourseDetailPage() {
                 {[...course.objectives, ...course.benefits].slice(0, 4).map((objective, index) => (
                   <Card key={objective} className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-deep-navy text-white" : ""}>
                     <CardContent className="space-y-3 p-8">
-                      <ShieldCheck className={`h-8 w-8 ${index === 1 ? "text-prestige-gold" : "text-prestige-gold"}`} />
+                      <ShieldCheck className="h-8 w-8 text-prestige-gold" />
                       <h3 className={index === 1 ? "text-white" : "text-primary"}>{objective}</h3>
                       <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-text-muted"}>
                         Aplicação prática com foco em decisão, rotina profissional e segurança na execução.

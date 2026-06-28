@@ -9,6 +9,7 @@ import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAppStore } from "@/lib/app-store";
+import { cn } from "@/lib/utils";
 import type { Course } from "@/types";
 
 function formatPhone(value: string) {
@@ -110,11 +111,12 @@ function PaymentSelector({
                 focusIndex(index - 1);
               }
             }}
-            className={`flex h-full flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+            className={cn(
+              "flex h-full flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               selected
                 ? "border-primary bg-secondary/60"
                 : "border-outline-variant bg-white hover:bg-surface-muted"
-            }`}
+            )}
           >
             <Icon className="h-6 w-6 text-primary" aria-hidden />
             <span className="text-sm font-bold text-deep-navy">{method.label}</span>
@@ -262,13 +264,14 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                 {checkoutSteps.map((item, index) => (
                   <div
                     key={item.title}
-                    className={`rounded-lg border px-3 py-3 text-left transition ${
+                    className={cn(
+                      "rounded-lg border px-3 py-3 text-left transition",
                       step === index + 1
                         ? "border-deep-navy bg-deep-navy text-white"
                         : step > index + 1
                           ? "border-success/30 bg-success/10 text-success"
                           : "border-outline-variant bg-white text-text-muted"
-                    }`}
+                    )}
                   >
                     <div className="text-label font-bold uppercase tracking-[0.08em]">{index + 1}. etapa</div>
                     <div className="mt-2 text-sm font-semibold">{item.title}</div>
@@ -438,9 +441,10 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                           setFieldErrors((current) => ({ ...current, classId: "" }));
                           setForm((current) => ({ ...current, classId: trainingClass.id }));
                         }}
-                        className={`rounded-xl border p-5 text-left transition ${
+                        className={cn(
+                          "rounded-xl border p-5 text-left transition",
                           form.classId === trainingClass.id ? "border-deep-navy bg-secondary/60" : "border-border bg-white hover:border-accent"
-                        }`}
+                        )}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-4">
                           <div>

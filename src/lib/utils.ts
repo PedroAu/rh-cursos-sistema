@@ -1,6 +1,18 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+/**
+ * Helper canônico de className do projeto. É o único padrão aprovado para
+ * compor classes Tailwind condicionais — evite template literals com `${...}`
+ * ou concatenação manual em `className`.
+ *
+ * - `clsx` resolve entradas condicionais (strings, objetos `{ classe: bool }`,
+ *   arrays, valores falsy ignorados).
+ * - `twMerge` deduplica classes Tailwind conflitantes, vencendo a última
+ *   declarada (ex.: `cn("px-2", "px-4")` → `"px-4"`).
+ *
+ * @example cn("rounded border", isActive && "border-primary", { "opacity-50": disabled })
+ */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

@@ -19,6 +19,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { LoadingBlocks } from "@/components/common/loading-blocks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { useAppStore } from "@/lib/app-store";
 import type { TrainingClass } from "@/types";
 
@@ -150,19 +151,20 @@ export function CalendarView({
                   onClick={() => setSelectedDate(day)}
                   aria-label={`${format(day, "d 'de' MMMM", { locale: ptBR })}${hasClasses ? ` — ${items.length} turma${items.length === 1 ? "" : "s"}` : ""}`}
                   aria-pressed={isSelected ? true : undefined}
-                  className={`flex min-h-[92px] flex-col justify-between border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  className={cn(
+                    "flex min-h-[92px] flex-col justify-between border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     inMonth
                       ? hasClasses
                         ? "bg-[#eaf5ff] hover:bg-[#dcebfa]"
                         : "bg-white hover:border-[#9ebbd1] hover:bg-[#f8fbfe]"
-                      : "bg-[#f5f7fa] text-[#616971]"
-                  } ${isToday(day) ? "border-[#0d5b85] shadow-soft" : "border-[#d7dee5]"} ${
-                    isSelected ? "border-[#0b4668] bg-[#0b4668] text-white hover:bg-[#0b4668]" : ""
-                  }`}
+                      : "bg-[#f5f7fa] text-[#616971]",
+                    isToday(day) ? "border-[#0d5b85] shadow-soft" : "border-[#d7dee5]",
+                    isSelected && "border-[#0b4668] bg-[#0b4668] text-white hover:bg-[#0b4668]"
+                  )}
                 >
                   <div className="self-end text-sm font-bold">{format(day, "d")}</div>
                   {hasClasses ? (
-                    <div className={`mt-1 h-1 w-full rounded-full ${isSelected ? "bg-[#f6be39]" : "bg-[#004364]"}`} />
+                    <div className={cn("mt-1 h-1 w-full rounded-full", isSelected ? "bg-[#f6be39]" : "bg-[#004364]")} />
                   ) : null}
                 </button>
               );

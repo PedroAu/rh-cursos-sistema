@@ -10,6 +10,7 @@ import { SearchInput } from "@/components/common/search-input";
 import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
@@ -120,9 +121,10 @@ export function BlogPage() {
                 key={item}
                 type="button"
                 onClick={() => setCategory(item)}
-                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                className={cn(
+                  "rounded-lg px-4 py-2 text-sm font-semibold transition",
                   category === item ? "bg-deep-navy text-white" : "bg-muted text-muted-foreground hover:bg-secondary hover:text-deep-navy"
-                }`}
+                )}
               >
                 {item}
               </button>

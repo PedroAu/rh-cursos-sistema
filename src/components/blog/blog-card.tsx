@@ -3,7 +3,7 @@ import { Link } from "@/lib/router-compat";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { BlogPost } from "@/types";
 
 export function BlogCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
@@ -12,25 +12,28 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
       variant={featured ? "filled" : "base"}
       interactive={false}
       size="md"
-      className={`h-full overflow-hidden ${featured ? "bg-deep-navy text-white" : ""}`}
+      className={cn("h-full overflow-hidden", featured && "bg-deep-navy text-white")}
     >
-      <div className={`min-h-40 border-b ${featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30"} p-6`}>
-        <div className={`inline-flex rounded px-4 py-2 text-label font-semibold uppercase tracking-[0.16em] ${
-          featured ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"
-        }`}>
+      <div className={cn("min-h-40 border-b p-6", featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30")}>
+        <div
+          className={cn(
+            "inline-flex rounded px-4 py-2 text-label font-semibold uppercase tracking-[0.16em]",
+            featured ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"
+          )}
+        >
           {post.category}
         </div>
       </div>
       <CardContent className="space-y-5 p-6">
         <div className="space-y-3">
-          <h3 className={`text-article font-bold ${featured ? "text-white" : ""}`}>
+          <h3 className={cn("text-article font-bold", featured && "text-white")}>
             {post.title}
           </h3>
-          <p className={`text-sm leading-7 ${featured ? "text-white/75" : "text-muted-foreground"}`}>
+          <p className={cn("text-sm leading-7", featured ? "text-white/75" : "text-muted-foreground")}>
             {post.summary}
           </p>
         </div>
-        <div className={`grid gap-2 text-sm ${featured ? "text-white/70" : "text-muted-foreground"}`}>
+        <div className={cn("grid gap-2 text-sm", featured ? "text-white/70" : "text-muted-foreground")}>
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
             {formatDate(post.date)}
