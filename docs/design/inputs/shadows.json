@@ -1,0 +1,66 @@
+[
+  {
+    "value": "inset 0 0 0 1px var(--light-grey-new)",
+    "count": 7
+  },
+  {
+    "value": "inset 0 0 0 1px #ebebeb",
+    "count": 4
+  },
+  {
+    "value": "inset 0 0 0 1px #00000008",
+    "count": 3
+  },
+  {
+    "value": "0 2px 16px #0003,0 16px 64px #00000080",
+    "count": 2
+  },
+  {
+    "value": "0 4px 16px #00000014",
+    "count": 2
+  },
+  {
+    "value": "0 0 0 4px var(--white)",
+    "count": 2
+  },
+  {
+    "value": "1px 1px 3px #0000",
+    "count": 2
+  },
+  {
+    "value": "unset",
+    "count": 1
+  },
+  {
+    "value": "0 0 0 1px #0000001a,0 1px 3px #0000001a",
+    "count": 1
+  },
+  {
+    "value": "0 0 3px #3336",
+    "count": 1
+  },
+  {
+    "value": "0 0 0 2px #fff",
+    "count": 1
+  },
+  {
+    "value": "0 0 3px 1px #3898ec",
+    "count": 1
+  },
+  {
+    "value": "0 12px 36px -8px #292b4e12",
+    "count": 1
+  },
+  {
+    "value": "0 4px 1rem 0 var(--black-8)",
+    "count": 1
+  },
+  {
+    "value": "0 0 0 1px var(--black-8)",
+    "count": 1
+  },
+  {
+    "value": "inset 0 0 0 1px var(--black-8)",
+    "count": 1
+  }
+]

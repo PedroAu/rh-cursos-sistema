@@ -1,0 +1,97 @@
+[
+  {
+    "name": "--light-grey-new",
+    "declarations": 1,
+    "references": 79
+  },
+  {
+    "name": "--white",
+    "declarations": 1,
+    "references": 37
+  },
+  {
+    "name": "--black-8",
+    "declarations": 1,
+    "references": 28
+  },
+  {
+    "name": "--lightest-grey-new",
+    "declarations": 1,
+    "references": 16
+  },
+  {
+    "name": "--black",
+    "declarations": 1,
+    "references": 15
+  },
+  {
+    "name": "--keith-blue",
+    "declarations": 1,
+    "references": 9
+  },
+  {
+    "name": "--bright-blue",
+    "declarations": 1,
+    "references": 8
+  },
+  {
+    "name": "--bright-blue-light",
+    "declarations": 1,
+    "references": 8
+  },
+  {
+    "name": "--gray",
+    "declarations": 1,
+    "references": 7
+  },
+  {
+    "name": "--dark-gray",
+    "declarations": 1,
+    "references": 6
+  },
+  {
+    "name": "--cream",
+    "declarations": 1,
+    "references": 5
+  },
+  {
+    "name": "--bright-blue-darkest",
+    "declarations": 1,
+    "references": 4
+  },
+  {
+    "name": "--light-cream",
+    "declarations": 1,
+    "references": 4
+  },
+  {
+    "name": "--light-blue-new",
+    "declarations": 1,
+    "references": 4
+  },
+  {
+    "name": "--keith-dark-blue",
+    "declarations": 1,
+    "references": 2
+  },
+  {
+    "name": "--white-75",
+    "declarations": 1,
+    "references": 2
+  },
+  {
+    "name": "--bright-blue-dark",
+    "declarations": 1,
+    "references": 2
+  },
+  {
+    "name": "--dark-cream",
+    "declarations": 1,
+    "references": 1
+  },
+  {
+    "name": "--light-grey",
+    "declarations": 1,
+    "references": 1
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "primary": "radial-gradient(circle,#f7f9fc 35%,#ebf3ff)",
+  "secondary": "linear-gradient(135deg,var(--bright-blue-darkest),var(--bright-blue))",
+  "total_unique": 9,
+  "top": [
+    {
+      "value": "radial-gradient(circle,#f7f9fc 35%,#ebf3ff)",
+      "count": 3
+    },
+    {
+      "value": "linear-gradient(135deg,var(--bright-blue-darkest),var(--bright-blue))",
+      "count": 2
+    },
+    {
+      "value": "radial-gradient(circle,#fff0,#ffffffbf)",
+      "count": 2
+    },
+    {
+      "value": "linear-gradient(90deg,var(--white),#fff0)",
+      "count": 1
+    },
+    {
+      "value": "linear-gradient(270deg,var(--white),#fff0)",
+      "count": 1
+    },
+    {
+      "value": "radial-gradient(circle,#f8fafe,#e7f0f9)",
+      "count": 1
+    },
+    {
+      "value": "linear-gradient(90deg,#fff,#fff0)",
+      "count": 1
+    },
+    {
+      "value": "linear-gradient(270deg,#fff,#fff0)",
+      "count": 1
+    },
+    {
+      "value": "radial-gradient(circle at center, rgba(0,0,0,0.16) 0, rgba(0,0,0,0.16) 1px, transparent 1px)",
+      "count": 1
+    }
+  ]
+}

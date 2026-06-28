@@ -1,0 +1,51 @@
+:root {
+  --tk-color-brand: #235875;
+  --tk-color-brand-hover: #194359;
+  --tk-color-accent: #4285f4;
+  --tk-color-accent-strong: #2459b3;
+  --tk-color-text: #222525;
+  --tk-color-text-muted: #4f5057;
+  --tk-color-surface: #ffffff;
+  --tk-color-surface-alt: #fafafa;
+  --tk-color-panel: #fffaf4;
+  --tk-color-border: #ebebeb;
+  --tk-color-success: #068466;
+  --tk-color-error: #ea384c;
+  --tk-color-cream-dark: #c3b6aa;
+  --tk-color-accent-soft: #e0eeff;
+
+  --tk-font-display: "Quincy CF", "Iowan Old Style", "Palatino Linotype", serif;
+  --tk-font-heading: "Merriweather", Georgia, serif;
+  --tk-font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+
+  --tk-text-display-hero-size: 3.75rem;
+  --tk-text-display-large-size: 2.75rem;
+  --tk-text-section-heading-size: 2rem;
+  --tk-text-subheading-large-size: 1.5rem;
+  --tk-text-subheading-size: 1.25rem;
+  --tk-text-body-large-size: 1.0625rem;
+  --tk-text-body-size: 1rem;
+  --tk-text-body-small-size: 0.875rem;
+  --tk-text-button-size: 0.875rem;
+  --tk-text-caption-size: 0.75rem;
+
+  --tk-radius-input: 4px;
+  --tk-radius-button: 6px;
+  --tk-radius-sm: 6px;
+  --tk-radius-md: 8px;
+  --tk-radius-lg: 16px;
+  --tk-radius-xl: 24px;
+  --tk-radius-pill: 999px;
+
+  --tk-space-xs: 0.25rem;
+  --tk-space-sm: 0.5rem;
+  --tk-space-md: 1rem;
+  --tk-space-lg: 1.5rem;
+  --tk-space-xl: 2rem;
+  --tk-space-2xl: 3rem;
+
+  --tk-shadow-glass: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --tk-shadow-card: 0 2px 16px rgba(0, 0, 0, 0.2), 0 16px 64px rgba(0, 0, 0, 0.5);
+  --tk-ease-standard: cubic-bezier(.25, .46, .45, .94);
+  --tk-duration-base: 1000ms;
+}

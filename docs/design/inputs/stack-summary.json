@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Cloudflare",
+    "kind": "cdn",
+    "confidence": "high"
+  },
+  {
+    "name": "Webflow",
+    "kind": "builder",
+    "confidence": "high"
+  },
+  {
+    "name": "Google Analytics / GTM",
+    "kind": "analytics",
+    "confidence": "high"
+  },
+  {
+    "name": "Webflow CDN",
+    "kind": "cdn",
+    "confidence": "high"
+  }
+]

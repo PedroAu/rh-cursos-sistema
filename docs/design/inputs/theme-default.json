@@ -1,0 +1,7 @@
+{
+  "default": "light",
+  "confidence": "low",
+  "signals": [
+    "no-signal-fallback"
+  ]
+}

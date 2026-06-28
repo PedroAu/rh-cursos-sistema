@@ -1,0 +1,135 @@
+[
+  {
+    "selector": ":root",
+    "name": "--white",
+    "value": "white",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--dark-gray",
+    "value": "#222525",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--gray",
+    "value": "#4f5057",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--black",
+    "value": "black",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--bright-blue-darkest",
+    "value": "#093173",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--bright-blue",
+    "value": "#4285f4",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--cream",
+    "value": "#ebddd0",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--black-8",
+    "value": "#00000014",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--keith-blue",
+    "value": "#235875",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--lightest-grey-new",
+    "value": "#fafafa",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--light-grey-new",
+    "value": "#ebebeb",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--bright-blue-light",
+    "value": "#e0eeff",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--keith-dark-blue",
+    "value": "#194359",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--light-cream",
+    "value": "#fffaf4",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--dark-cream",
+    "value": "#c3b6aa",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--white-75",
+    "value": "#fffc",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--light-blue-new",
+    "value": "#93c2ff",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--bright-blue-dark",
+    "value": "#2459b3",
+    "is_alias": false,
+    "line": 2
+  },
+  {
+    "selector": ":root",
+    "name": "--light-grey",
+    "value": "#f6f2ed",
+    "is_alias": false,
+    "line": 2
+  }
+]

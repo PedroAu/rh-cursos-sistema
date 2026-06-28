@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Cloudflare",
+    "kind": "cdn",
+    "evidence": "Cloudflare server header / cf-ray",
+    "confidence": "high"
+  },
+  {
+    "name": "Webflow",
+    "kind": "builder",
+    "evidence": "data-wf-page or w- classes",
+    "confidence": "high"
+  },
+  {
+    "name": "Google Analytics / GTM",
+    "kind": "analytics",
+    "evidence": "gtag or googletagmanager",
+    "confidence": "high"
+  },
+  {
+    "name": "Webflow CDN",
+    "kind": "cdn",
+    "evidence": "webflow CDN",
+    "confidence": "high"
+  }
+]

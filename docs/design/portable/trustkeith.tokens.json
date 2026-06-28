@@ -1,0 +1,138 @@
+{
+  "name": "Trust Keith",
+  "source": "https://www.trustkeith.co/",
+  "notes": [
+    "Normalized from outputs/design-md/trustkeith/tokens.json and render-contract.json.",
+    "Display typography uses Quincy CF; provide a licensed fallback before shipping to production."
+  ],
+  "color": {
+    "brand": "#235875",
+    "brandHover": "#194359",
+    "accent": "#4285f4",
+    "accentStrong": "#2459b3",
+    "text": "#222525",
+    "textMuted": "#4f5057",
+    "surface": "#ffffff",
+    "surfaceAlt": "#fafafa",
+    "panel": "#fffaf4",
+    "border": "#ebebeb",
+    "success": "#068466",
+    "error": "#ea384c",
+    "creamDark": "#c3b6aa",
+    "accentSoft": "#e0eeff"
+  },
+  "font": {
+    "display": "\"Quincy CF\", \"Iowan Old Style\", \"Palatino Linotype\", serif",
+    "heading": "\"Merriweather\", Georgia, serif",
+    "body": "\"Inter\", \"Helvetica Neue\", Arial, sans-serif"
+  },
+  "typeScale": {
+    "displayHero": {
+      "fontFamily": "display",
+      "fontSize": "3.75rem",
+      "fontWeight": 700,
+      "lineHeight": 1.1,
+      "letterSpacing": "-0.02em"
+    },
+    "displayLarge": {
+      "fontFamily": "display",
+      "fontSize": "2.75rem",
+      "fontWeight": 700,
+      "lineHeight": 1.2
+    },
+    "sectionHeading": {
+      "fontFamily": "display",
+      "fontSize": "2rem",
+      "fontWeight": 700,
+      "lineHeight": 1.25
+    },
+    "subheadingLarge": {
+      "fontFamily": "heading",
+      "fontSize": "1.5rem",
+      "fontWeight": 300,
+      "lineHeight": 1.35
+    },
+    "subheading": {
+      "fontFamily": "heading",
+      "fontSize": "1.25rem",
+      "fontWeight": 400,
+      "lineHeight": 1.4
+    },
+    "bodyLarge": {
+      "fontFamily": "body",
+      "fontSize": "1.0625rem",
+      "fontWeight": 400,
+      "lineHeight": 1.45
+    },
+    "body": {
+      "fontFamily": "body",
+      "fontSize": "1rem",
+      "fontWeight": 400,
+      "lineHeight": 1.5
+    },
+    "bodySmall": {
+      "fontFamily": "body",
+      "fontSize": "0.875rem",
+      "fontWeight": 400,
+      "lineHeight": 1.4
+    },
+    "button": {
+      "fontFamily": "body",
+      "fontSize": "0.875rem",
+      "fontWeight": 500,
+      "lineHeight": 1.2
+    },
+    "caption": {
+      "fontFamily": "body",
+      "fontSize": "0.75rem",
+      "fontWeight": 400,
+      "lineHeight": 1.2
+    }
+  },
+  "radius": {
+    "input": "4px",
+    "button": "6px",
+    "sm": "6px",
+    "md": "8px",
+    "lg": "16px",
+    "xl": "24px",
+    "pill": "999px"
+  },
+  "spacing": {
+    "xs": "0.25rem",
+    "sm": "0.5rem",
+    "md": "1rem",
+    "lg": "1.5rem",
+    "xl": "2rem",
+    "2xl": "3rem"
+  },
+  "shadow": {
+    "glass": "0 4px 16px rgba(0, 0, 0, 0.08)",
+    "card": "0 2px 16px rgba(0, 0, 0, 0.2), 0 16px 64px rgba(0, 0, 0, 0.5)"
+  },
+  "component": {
+    "buttonPrimary": {
+      "background": "{color.brand}",
+      "color": "#ffffff",
+      "borderColor": "{color.brand}",
+      "radius": "{radius.button}",
+      "paddingY": "1rem",
+      "paddingX": "1.25rem"
+    },
+    "buttonSecondary": {
+      "background": "rgba(0, 0, 0, 0.05)",
+      "color": "{color.text}",
+      "borderColor": "{color.border}",
+      "radius": "{radius.button}",
+      "paddingY": "1rem",
+      "paddingX": "1.25rem"
+    },
+    "cardGlass": {
+      "background": "rgba(255, 255, 255, 0.92)",
+      "borderColor": "{color.border}",
+      "radius": "{radius.xl}",
+      "shadow": "{shadow.glass}",
+      "padding": "{spacing.xl}"
+    }
+  }
+}

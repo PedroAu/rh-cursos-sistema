@@ -1,0 +1,41 @@
+{
+  "durations": [
+    {
+      "value": "2s",
+      "count": 16
+    },
+    {
+      "value": "25s",
+      "count": 7
+    },
+    {
+      "value": "15s",
+      "count": 4
+    },
+    {
+      "value": "3s",
+      "count": 3
+    },
+    {
+      "value": "1s",
+      "count": 2
+    },
+    {
+      "value": "5s",
+      "count": 2
+    },
+    {
+      "value": "4s",
+      "count": 2
+    }
+  ],
+  "easings": [
+    {
+      "value": "cubic-bezier(.25,.46,.45,.94)",
+      "count": 11
+    }
+  ],
+  "keyframes": [
+    "spin"
+  ]
+}
