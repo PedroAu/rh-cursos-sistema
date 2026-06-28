@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, Montserrat } from "next/font/google";
+import { Inter, Montserrat } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { ReactNode } from "react";
@@ -24,13 +24,6 @@ const montserrat = Montserrat({
   display: "swap",
   subsets: ["latin"],
   variable: "--font-montserrat",
-  weight: ["600", "700", "800"]
-});
-
-const legacyManrope = Manrope({
-  display: "swap",
-  subsets: ["latin"],
-  variable: "--font-legacy-manrope",
   weight: ["600", "700", "800"]
 });
 
@@ -60,7 +53,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
-      <body className={`${inter.variable} ${montserrat.variable} ${legacyManrope.variable}`}>
+      <body className={`${inter.variable} ${montserrat.variable}`}>
         <AppMantineProvider>
           <MotionProvider>{children}</MotionProvider>
         </AppMantineProvider>

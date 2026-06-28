@@ -44,7 +44,8 @@
     --ea-color-outline: #6e6e73;
     --ea-color-outline-variant: #d2d2d7;
     --ea-font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", system-ui, sans-serif;
-    --ea-font-display: -apple-system, BlinkMacSystemFont, var(--font-legacy-manrope), var(--ea-font-sans);
+    /* Base legada — sobrescrita pelo :root de Executive Precision (var(--m3-font-display)/Montserrat). */
+    --ea-font-display: -apple-system, BlinkMacSystemFont, var(--ea-font-sans);
     --ea-radius-default: var(--m3-radius-default);
     --ea-radius-lg: var(--m3-radius-lg);
     --ea-radius-xl: var(--m3-radius-lg);
