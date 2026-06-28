@@ -26,6 +26,7 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e:smoke": "node scripts/run-playwright.mjs --project=functional",
+    "test:a11y": "node scripts/run-playwright.mjs a11y.spec.ts --project=functional",
     "test:lighthouse": "npm run build && lhci autorun --config=./lighthouserc.cjs",
     "test:harness:audit": "npm run test:coverage && npm run test:e2e:smoke",
     "storybook": "storybook dev -p 6006",

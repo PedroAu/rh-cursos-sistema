@@ -6,9 +6,15 @@ on:
   pull_request:
     branches: [main, develop]
 
+# Cancel superseded runs on the same ref to keep the queue fast.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  lint:
-    name: Lint
+  # Lane 1 — Fast static checks. Type errors fail before the slower lint pass.
+  static:
+    name: Static Checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,8 +23,42 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
+      - run: npm run typecheck
       - run: npm run lint
 
+  # Lane 2 — Unit tests with coverage gate. Vitest parallelises internally.
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test:coverage
+
+  # Lane 3 — Production build + accessibility gate (Axe-core) + E2E smoke.
+  e2e:
+    name: Build & A11y & E2E
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Accessibility gate (Axe-core WCAG 2.1 A/AA)
+        run: npm run test:a11y
+      - name: E2E smoke
+        run: npm run test:e2e:smoke
+
+  # Lane 4 — API docs lint/build/drift gate.
   docs-api:
     name: API Docs
     runs-on: ubuntu-latest
@@ -33,31 +73,7 @@ jobs:
       - run: npm run docs:api:build
       - run: npm run docs:api:check-drift
 
-  typecheck:
-    name: TypeCheck
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run typecheck
-
-  test:
-    name: Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run test:coverage
-      - run: npm run test
-
+  # Lane 5 — Database contract tests.
   db-tests:
     name: DB Tests
     runs-on: ubuntu-latest
@@ -70,15 +86,3 @@ jobs:
       - run: npm ci
       - uses: supabase/setup-cli@v1
       - run: npm run test:db
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
