@@ -9,6 +9,7 @@ import {
   SESSION_COOKIE
 } from "@/lib/auth";
 import { SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
+import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { getServerSession } from "@/lib/server-session";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
@@ -149,7 +150,9 @@ export async function DELETE(request: Request) {
     );
 
     if (!rate.allowed) {
-      console.warn("Revogacao global ignorada por rate limit; seguindo com logout local-only.");
+      logger.warn("Revogacao global ignorada por rate limit; seguindo com logout local-only.", {
+        route: "api/auth/session"
+      });
     } else {
       let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -164,17 +167,20 @@ export async function DELETE(request: Request) {
         ]);
 
         if (error) {
-          console.error("Falha ao revogar sessoes globais:", error.message);
+          logger.error("Falha ao revogar sessoes globais", {
+            err: error,
+            route: "api/auth/session"
+          });
           // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
         } else {
           mode = "global";
           revoked = true;
         }
       } catch (error) {
-        console.error(
-          "Erro ao revogar sessoes globais:",
-          error instanceof Error ? error.message : error
-        );
+        logger.error("Erro ao revogar sessoes globais", {
+          err: error,
+          route: "api/auth/session"
+        });
         // Fallback: segue para limpar apenas o cookie local (logout nao deve falhar).
       } finally {
         if (timeoutId) clearTimeout(timeoutId);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { enrollmentSchema, type EnrollmentInput } from "@/lib/validation";
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
       }
     );
   } catch (error) {
-    console.error("api/enrollments.create error:", error instanceof Error ? error.message : error);
+    logger.error("api/enrollments.create error", { err: error, route: "api/enrollments" });
     return NextResponse.json({ ok: false, error: "Erro ao registrar inscrição." }, { status: 500 });
   }
 }
