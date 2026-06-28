@@ -6,21 +6,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-[var(--mantine-radius-md)] text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-[var(--color-primary)] text-[var(--mantine-color-white)] shadow-soft hover:-translate-y-0.5 hover:bg-[var(--color-primary-hover)]",
+          "bg-trust-keith-teal text-surface-white shadow-ambient hover:-translate-y-0.5 hover:bg-keith-dark-blue",
         secondary:
-          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--form-input-color)] shadow-soft hover:-translate-y-0.5 hover:bg-tertiary-0",
+          "border border-surface-neutral bg-surface-light text-text-primary shadow-ambient hover:-translate-y-0.5 hover:bg-surface-neutral",
         outline:
-          "border border-[var(--form-input-border)] bg-[var(--form-input-bg)] text-[var(--color-primary-light)] hover:-translate-y-0.5 hover:bg-primary-0",
-        ghost: "text-[var(--color-primary-light)] hover:bg-primary-0",
+          "border border-surface-neutral bg-surface-white text-bright-blue hover:-translate-y-0.5 hover:border-bright-blue",
+        ghost: "text-text-primary hover:bg-surface-light",
         tertiary:
-          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-[var(--color-primary-light)] underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
-        success: "bg-[var(--color-status-success)] text-white hover:-translate-y-0.5 hover:opacity-90",
-        danger: "bg-[var(--color-status-error)] text-white hover:opacity-90"
+          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-bright-blue underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
+        success: "bg-success text-surface-white hover:-translate-y-0.5 hover:opacity-90",
+        danger: "bg-danger text-surface-white hover:opacity-90"
       },
       size: {
         default: "h-12 px-6",

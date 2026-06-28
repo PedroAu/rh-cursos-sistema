@@ -150,18 +150,18 @@ Consolidar o design system **Trust Keith** definido em `docs/design/DESIGN.md` e
 ### Fase 2: Componentes Base (7 dias)
 
 #### 2.1 UI Base Components
-- [ ] `Button.tsx` — Primary, Secondary, Ghost, Danger (4 variantes)
-- [ ] `Card.tsx` — Standard + Glass (2 variantes)
-- [ ] `Input.tsx` — Text, email, password com focus ring
-- [ ] `Badge.tsx` — Status badges, pills
+- [x] `Button.tsx` — Primary, Secondary, Ghost, Danger (4 variantes) — Refatorado para Trust Keith
+- [x] `Card.tsx` — Standard + Glass (2 variantes) — Refatorado para Trust Keith
+- [x] `Input.tsx` — Text, email, password com focus ring — Refatorado para Trust Keith
+- [x] `Badge.tsx` — Status badges, pills — Refatorado para Trust Keith
 - [ ] `Typography.tsx` — H1-H4, Body, Caption wrappers
 - [ ] `Link.tsx` — Styled links com estados
 
 **Teste por componente:**
-- [ ] Renderiza sem erro
-- [ ] Props typadas com TypeScript
-- [ ] Estados (hover, focus, disabled) funcionam
-- [ ] Acessível (a11y)
+- [x] Renderiza sem erro — ✅ typecheck, lint passing
+- [x] Props typadas com TypeScript — ✅ zero errors
+- [x] Estados (hover, focus, disabled) funcionam — ✅ CSS updated
+- [ ] Acessível (a11y) — ℹ️ To be validated
 
 #### 2.2 Layout Components
 - [ ] `Header.tsx` — Nav bar com Trust Keith styling

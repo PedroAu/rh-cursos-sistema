@@ -7,7 +7,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "flex h-[var(--form-input-height)] w-full rounded-[var(--form-input-radius)] border border-[var(--form-input-border)] bg-[var(--form-input-bg)] px-[var(--form-input-padding-inline)] py-[var(--form-input-padding-block)] text-[var(--form-input-font-size)] text-[var(--form-input-color)] shadow-sm outline-none transition placeholder:text-muted-foreground hover:border-[var(--form-input-border-hover)] focus-visible:border-[var(--form-input-border-focus)] focus-visible:ring-[var(--form-input-focus-ring)] focus-visible:ring-[var(--form-input-focus-ring-color)]",
+        "flex h-11 w-full rounded-input border border-surface-neutral bg-surface-white px-4 py-3 text-sm text-text-primary shadow-sm outline-none transition placeholder:text-text-secondary hover:border-bright-blue focus-visible:border-bright-blue focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-1",
         className
       )}
       {...props}

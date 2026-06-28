@@ -2,16 +2,17 @@ import type * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
-const cardVariants = cva("surface-card rounded-md border border-border overflow-hidden transition-shadow", {
+const cardVariants = cva("bg-surface-white border border-surface-neutral overflow-hidden transition-shadow", {
   variants: {
     variant: {
-      base: "shadow-sm",
-      elevated: "shadow-md hover:shadow-lg",
-      outlined: "border-2 shadow-none",
-      filled: "bg-surface border-none shadow-sm"
+      base: "rounded-card shadow-standard",
+      elevated: "rounded-card shadow-standard hover:shadow-ambient",
+      outlined: "rounded-card border-2 shadow-none",
+      glass: "rounded-glass shadow-ambient",
+      filled: "rounded-card bg-surface-light border-none shadow-standard"
     },
     interactive: {
-      true: "cursor-pointer",
+      true: "cursor-pointer hover:-translate-y-1 transition-transform",
       false: ""
     },
     size: {
