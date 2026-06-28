@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -37,53 +36,24 @@ import type {
   Course,
   CurrentSession,
   Enrollment,
-  EnrollmentStatus,
   Instructor,
   Lead,
-  Student,
-  Testimonial,
-  TrainingClass,
-  TrainingPath
+  TrainingClass
 } from "@/types";
 
-type AppState = {
-  courses: Course[];
-  classes: TrainingClass[];
-  students: Student[];
-  instructors: Instructor[];
-  leads: Lead[];
-  enrollments: Enrollment[];
-  blogPosts: BlogPost[];
-  testimonials: Testimonial[];
-  trainingPaths: TrainingPath[];
-  currentSession: CurrentSession | null;
-};
+import { AdminStoreContext, type AdminStoreValue } from "@/lib/contexts/admin-context";
+import { CourseStoreContext, type CourseStoreValue } from "@/lib/contexts/course-context";
+import { SessionStoreContext, type SessionStoreValue } from "@/lib/contexts/session-context";
+import { StudentStoreContext, type StudentStoreValue } from "@/lib/contexts/student-context";
+import type { AppState, AppStoreInitialData } from "@/lib/contexts/store-types";
 
-export type AppStoreInitialData = Partial<Omit<AppState, "currentSession">>;
+export type { AppStoreInitialData } from "@/lib/contexts/store-types";
 
-type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
-type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
-
-type AppStoreValue = AppState & {
-  setSession: (session: CurrentSession) => void;
-  logout: () => void;
-  createEnrollment: (payload: EnrollmentPayload) => Promise<void>;
-  createLead: (payload: LeadPayload) => Promise<void>;
-  updateLeadStatus: (id: string, status: Lead["status"]) => Promise<void>;
-  updateLead: (payload: Partial<Lead> & { id: string }) => Promise<void>;
-  upsertCourse: (course: Partial<Course>) => Promise<void>;
-  deleteCourse: (id: string) => Promise<void>;
-  duplicateCourse: (id: string) => void;
-  upsertClass: (trainingClass: Partial<TrainingClass>) => Promise<void>;
-  deleteClass: (id: string) => Promise<void>;
-  upsertInstructor: (instructor: Partial<Instructor>) => Promise<void>;
-  deleteInstructor: (id: string) => Promise<void>;
-  updateStudent: (student: Partial<Student> & { id: string }) => Promise<void>;
-  updateEnrollmentStatus: (id: string, status: EnrollmentStatus) => Promise<void>;
-  upsertBlogPost: (post: Partial<BlogPost>) => Promise<void>;
-  deleteBlogPost: (id: string) => Promise<void>;
-  resetStore: () => void;
-};
+/**
+ * Interface pública agregada. Mantida por retrocompatibilidade: `useAppStore()`
+ * compõe os quatro contextos de domínio e expõe o mesmo shape plano de antes.
+ */
+export type AppStoreValue = SessionStoreValue & CourseStoreValue & StudentStoreValue & AdminStoreValue;
 
 const STORAGE_KEY = "rhcursos-demo-store-v4";
 
@@ -105,7 +75,6 @@ const initialState: AppState = {
   currentSession: null
 };
 
-const AppStoreContext = createContext<AppStoreValue | null>(null);
 
 const ARRAY_STATE_KEYS = [
   "courses",
@@ -969,68 +938,127 @@ export function AppStoreProvider({
     toast.success("Estado da aplicação limpo.");
   }, []);
 
-  const value = useMemo<AppStoreValue>(
+  // Fatias memoizadas por domínio. Cada slice só muda quando os dados ou as
+  // ações daquele domínio mudam — como o estado é atualizado por spread
+  // imutável, as referências das demais fatias permanecem estáveis e seus
+  // consumidores não re-renderizam. Esse é o ganho de performance do split.
+  const sessionValue = useMemo<SessionStoreValue>(
     () => ({
-      ...state,
+      currentSession: state.currentSession,
       setSession,
-      logout,
-      createEnrollment,
-      createLead,
-      updateLeadStatus,
-      updateLead,
+      logout
+    }),
+    [state.currentSession, setSession, logout]
+  );
+
+  const courseValue = useMemo<CourseStoreValue>(
+    () => ({
+      courses: state.courses,
+      classes: state.classes,
+      instructors: state.instructors,
+      trainingPaths: state.trainingPaths,
+      testimonials: state.testimonials,
       upsertCourse,
       deleteCourse,
       duplicateCourse,
       upsertClass,
       deleteClass,
       upsertInstructor,
-      deleteInstructor,
+      deleteInstructor
+    }),
+    [
+      state.courses,
+      state.classes,
+      state.instructors,
+      state.trainingPaths,
+      state.testimonials,
+      upsertCourse,
+      deleteCourse,
+      duplicateCourse,
+      upsertClass,
+      deleteClass,
+      upsertInstructor,
+      deleteInstructor
+    ]
+  );
+
+  const studentValue = useMemo<StudentStoreValue>(
+    () => ({
+      students: state.students,
+      enrollments: state.enrollments,
+      createEnrollment,
       updateStudent,
-      updateEnrollmentStatus,
+      updateEnrollmentStatus
+    }),
+    [
+      state.students,
+      state.enrollments,
+      createEnrollment,
+      updateStudent,
+      updateEnrollmentStatus
+    ]
+  );
+
+  const adminValue = useMemo<AdminStoreValue>(
+    () => ({
+      leads: state.leads,
+      blogPosts: state.blogPosts,
+      createLead,
+      updateLeadStatus,
+      updateLead,
       upsertBlogPost,
       deleteBlogPost,
       resetStore
     }),
     [
-      state,
-      setSession,
-      logout,
-      createEnrollment,
+      state.leads,
+      state.blogPosts,
       createLead,
       updateLeadStatus,
       updateLead,
-      upsertCourse,
-      deleteCourse,
-      duplicateCourse,
-      upsertClass,
-      deleteClass,
-      upsertInstructor,
-      deleteInstructor,
-      updateStudent,
-      updateEnrollmentStatus,
       upsertBlogPost,
       deleteBlogPost,
       resetStore
     ]
   );
 
-  return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
+  return (
+    <SessionStoreContext.Provider value={sessionValue}>
+      <CourseStoreContext.Provider value={courseValue}>
+        <StudentStoreContext.Provider value={studentValue}>
+          <AdminStoreContext.Provider value={adminValue}>{children}</AdminStoreContext.Provider>
+        </StudentStoreContext.Provider>
+      </CourseStoreContext.Provider>
+    </SessionStoreContext.Provider>
+  );
 }
 
-export function useAppStore() {
-  const context = useContext(AppStoreContext);
+/**
+ * Hook agregado de retrocompatibilidade. Compõe os quatro contextos de domínio
+ * no mesmo shape plano histórico. Componentes que precisam de um único domínio
+ * devem preferir os hooks específicos (`useCourseStore`, `useStudentStore`,
+ * `useAdminStore`, `useSessionStore`) para isolar re-renders.
+ */
+export function useAppStore(): AppStoreValue {
+  const session = useContext(SessionStoreContext);
+  const course = useContext(CourseStoreContext);
+  const student = useContext(StudentStoreContext);
+  const admin = useContext(AdminStoreContext);
 
-  if (!context) {
+  if (!session || !course || !student || !admin) {
     throw new Error("useAppStore must be used within AppStoreProvider");
   }
 
-  return context;
+  return useMemo(
+    () => ({ ...session, ...course, ...student, ...admin }),
+    [session, course, student, admin]
+  );
 }
 
-export function useCourseBySlug(slug?: string) {
-  const { courses } = useAppStore();
-  return courses.find((course) => course.slug === slug);
-}
+export { useSessionStore } from "@/lib/contexts/session-context";
+export { useCourseStore, useCourseBySlug } from "@/lib/contexts/course-context";
+export { useStudentStore } from "@/lib/contexts/student-context";
+export { useAdminStore } from "@/lib/contexts/admin-context";
 
 export function useDashboardCharts() {
   const { classes, courses, enrollments, leads } = useAppStore();
