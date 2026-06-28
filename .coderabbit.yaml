@@ -1,48 +1,57 @@
-# CodeRabbit Configuration
-# Review profile: balanced
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+# CodeRabbit Configuration — schema v2 (https://docs.coderabbit.ai/reference/yaml-template)
 
-rules:
-  - type: pattern
-    pattern: "console.log"
-    replacement: "logger.debug or remove in production"
-    severity: medium
-  
-  - type: pattern
-    pattern: "TODO|FIXME|HACK"
-    severity: low
+language: "pt-BR"
+tone_instructions: "Seja objetivo e técnico. Priorize segurança, validação de entrada, tratamento de erros e correção de tipos TypeScript."
 
-review:
-  auto_review: true
-  request_changes_on_critical: true
+reviews:
+  profile: assertive
+  request_changes_workflow: true
+  high_level_summary: true
+  review_status: true
+  poem: false
 
-path_instructions:
-  - path: "src/**"
-    instructions: |
-      Focus on code quality, performance, and security:
-      - Check for proper error handling
-      - Verify input validation
-      - Look for security vulnerabilities (SQL injection, XSS, etc.)
-      - Ensure TypeScript types are correct
-  
-  - path: "**/*.test.ts"
-    instructions: |
-      Ensure comprehensive test coverage:
-      - Verify edge cases are tested
-      - Check mock implementations
-      - Ensure assertions are meaningful
-  
-  - path: "docs/**"
-    instructions: |
-      Check documentation quality:
-      - Verify clarity and completeness
-      - Check for broken links
-      - Ensure examples are correct
+  auto_review:
+    enabled: true
+    drafts: false
+    base_branches:
+      - main
+      - "redesign/.*"
+      - "staging/.*"
 
-  - path: ".github/workflows/**"
-    instructions: |
-      Verify GitHub Actions workflows:
-      - Check YAML syntax
-      - Verify action versions
-      - Check for security issues
+  path_filters:
+    - "!storybook-static/**"
+    - "!**/*.min.js"
+    - "!tests/baseline/**"
 
-profile: balanced
+  path_instructions:
+    - path: "src/**"
+      instructions: |
+        Foco em qualidade, performance e segurança:
+        - Verifique tratamento de erros adequado
+        - Confirme validação de entrada (Zod) e ausência de casts `as` não checados
+        - Procure vulnerabilidades (SQL injection, XSS, exposição de segredos)
+        - Garanta tipos TypeScript corretos
+        - Sinalize `console.log`/`console.*` deixados em código de produção (use logger)
+        - Sinalize TODO/FIXME/HACK pendentes
+    - path: "**/*.test.ts"
+      instructions: |
+        Garanta cobertura de testes abrangente:
+        - Verifique casos de borda
+        - Cheque implementações de mocks
+        - Garanta que as asserções sejam significativas
+    - path: "docs/**"
+      instructions: |
+        Verifique qualidade da documentação:
+        - Clareza e completude
+        - Links quebrados
+        - Exemplos corretos
+    - path: ".github/workflows/**"
+      instructions: |
+        Verifique workflows do GitHub Actions:
+        - Sintaxe YAML
+        - Versões das actions fixadas
+        - Problemas de segurança (secrets expostos, permissões amplas)
+
+chat:
+  auto_reply: true
