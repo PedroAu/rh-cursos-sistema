@@ -45,3 +45,6 @@ coverage/
 
 # OMC Tooling State (AIOX)
 .omc/state/
+
+# CI/CD Reports (AIOX)
+.lighthouseci/

@@ -1,5 +1,0 @@
-{
-  "http://localhost:3000/": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1782480030173-5201.report.html",
-  "http://localhost:3000/cursos": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1782480031451-45702.report.html",
-  "http://localhost:3000/login": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1782480032431-11743.report.html"
-}
