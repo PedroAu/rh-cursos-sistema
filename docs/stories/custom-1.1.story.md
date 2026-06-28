@@ -73,6 +73,37 @@ frontmatter:
 
 ---
 
+---
+
+## 🔄 **CHECKPOINT — Phase 1 & 2 Complete (50% of story)**
+
+**Completed:**
+- ✅ Phase 1: Token Consolidation (100% — 3/3 tasks)
+- ✅ Phase 2: Base Components (100% — 6/6 components)
+
+**Tests Passing:**
+- ✅ npm run build (6.0s)
+- ✅ npm run typecheck (0 errors)
+- ✅ npm run lint (0 violations)
+
+**Commits Made:**
+1. refactor(design): consolidate Trust Keith tokens - Phase 1 complete
+2. refactor(components): update Button, Card, Input, Badge to Trust Keith tokens
+3. feat(components): add Typography and Link components with Trust Keith tokens
+4. docs: update decision log with Phase 2 refactoring details
+
+**Deferred to Next Story (custom-1.2):**
+- Phase 3: Page Refactoring (7 public + 3 admin pages) — 7 dias estimado
+- Phase 4: Quality Gates & Testing — 3 dias estimado
+
+**Why This Checkpoint:**
+- Foundation (tokens + base components) is solid and mergeable
+- Page refactoring is substantial work (10 pages to refactor)
+- Better to validate Phase 1-2 foundation before starting Phase 3
+- Allows for QA feedback on component design before mass page refactoring
+
+---
+
 ## 📋 Story Statement
 
 Como desenvolvedor/designer,  
@@ -163,13 +194,19 @@ Consolidar o design system **Trust Keith** definido em `docs/design/DESIGN.md` e
 - [x] Estados (hover, focus, disabled) funcionam — ✅ CSS updated
 - [ ] Acessível (a11y) — ℹ️ To be validated
 
-#### 2.2 Layout Components
+#### 2.2 Typography & Link Components
+- [x] `Typography.tsx` — H1-H4, P, Span, Caption with Trust Keith fonts ✅ Created
+- [x] `Link.tsx` — NextLink wrapper with Trust Keith colors ✅ Created
+
+**Status:** ✅ Phase 2 COMPLETE (6/6 components)
+
+#### 2.3 Layout Components (DEFERRED to Phase 3)
 - [ ] `Header.tsx` — Nav bar com Trust Keith styling
 - [ ] `Container.tsx` — Max-width wrapper
 - [ ] `Section.tsx` — Spacing logic
 - [ ] `Grid.tsx` — Responsive grid (3/2/1 col)
 
-#### 2.3 Form Components
+#### 2.4 Form Components (DEFERRED to Phase 3)
 - [ ] `FormField.tsx` — Label + hint + error + required indicator
 - [ ] `TextInput.tsx` (refatorado) — usa FormField
 - [ ] `Select.tsx` — Dropdown com keyboard nav
