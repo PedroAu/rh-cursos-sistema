@@ -1,10 +1,9 @@
 /**
- * Design Tokens - Tailwind CSS v4 Configuration
- * Source: tokens.yaml (DTCG 2025.10)
- * Generated: 2026-06-22
+ * Design Tokens - Trust Keith System
+ * Tailwind CSS v4 Configuration
  *
  * Usage:
- * import tokens from './tokens.tailwind.js'
+ * import { tokens } from './tokens.tailwind.js'
  *
  * In tailwind.config.ts:
  * theme: {
@@ -12,184 +11,119 @@
  *     colors: tokens.colors,
  *     spacing: tokens.spacing,
  *     borderRadius: tokens.borderRadius,
- *     boxShadow: tokens.shadows,
- *     ...
+ *     boxShadow: tokens.boxShadow,
+ *     fontFamily: tokens.fontFamily,
+ *     fontSize: tokens.fontSize,
+ *     fontWeight: tokens.fontWeight,
+ *     lineHeight: tokens.lineHeight,
  *   }
  * }
  */
 
 export const tokens = {
-  // Color System
+  // COLORS — Trust Keith Palette
   colors: {
-    // Neutral Scale
-    neutral: {
-      0: "#ffffff",
-      50: "#f9fafb",
-      100: "#f3f4f6",
-      200: "#e5e7eb",
-      300: "#d1d5db",
-      400: "#9ca3af",
-      500: "#6b7280",
-      600: "#4b5563",
-      700: "#374151",
-      800: "#1f2937",
-      900: "#111827",
-    },
-
     // Brand Colors
-    primary: {
-      DEFAULT: "#0066CC",
-      hover: "#0052A3",
-      light: "#003d99",
-      foreground: "#ffffff",
-    },
+    'trust-keith-teal': '#235875',
+    'keith-dark-blue': '#194359',
+    'bright-blue': '#4285f4',
+    'bright-blue-dark': '#2459b3',
+    'bright-blue-light': '#e0eeff',
 
-    accent: {
-      DEFAULT: "#d4af37",
-      gold: "#d4af37",
-    },
+    // Neutral Scale (7-step)
+    'text-primary': '#222525',
+    'text-secondary': '#4f5057',
+    'surface-light': '#fafafa',
+    'surface-neutral': '#ebebeb',
+    'surface-white': '#ffffff',
 
-    navy: {
-      deep: "#001736",
-    },
+    // Semantic
+    'success': '#068466',
+    'danger': '#ea384c',
+    'error': '#ea384c',
 
-    // Status Colors
-    success: "#22c55e",
-    warning: "#eab308",
-    error: "#dc2626",
-    danger: "#dc2626",
-
-    // Semantic Colors
-    background: "#ffffff",
-    surface: "#f9fafb",
-    "surface-raised": "#ffffff",
-    foreground: "#111827",
-    "foreground-muted": "#4b5563",
-    "foreground-subtle": "#6b7280",
-    border: "#e5e7eb",
-    "border-subtle": "#f3f4f6",
-    "border-strong": "#d1d5db",
-    ring: "#d4af37",
+    // Warm Accents
+    'cream-light': '#fffaf4',
+    'cream-dark': '#c3b6aa',
   },
 
-  // Spacing (Tailwind base 4px)
-  spacing: {
-    0: "0",
-    px: "1px",
-    xs: "4px",
-    sm: "8px",
-    md: "16px",
-    lg: "24px",
-    xl: "32px",
-    "2xl": "48px",
-    "3xl": "64px",
-  },
-
-  // Border Radius
-  borderRadius: {
-    none: "0",
-    sm: "4px",
-    md: "8px",
-    lg: "12px",
-    xl: "16px",
-    full: "9999px",
-  },
-
-  // Shadows
-  boxShadow: {
-    none: "0 0 0 0 rgba(0, 0, 0, 0)",
-    soft: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-    sm: "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-    md: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-    lg: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-    card: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
-  },
-
-  // Typography
-  fontFamily: {
-    sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-    display: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif",
-  },
-
+  // TYPOGRAPHY — Trust Keith Hierarchy
   fontSize: {
-    xs: ["12px", { lineHeight: "1.1" }],
-    sm: ["14px", { lineHeight: "1.2" }],
-    base: ["16px", { lineHeight: "1.5" }],
-    lg: ["18px", { lineHeight: "1.6" }],
-    xl: ["20px", { lineHeight: "1.6" }],
-    "2xl": ["24px", { lineHeight: "1.2" }],
-    "3xl": ["30px", { lineHeight: "1.2" }],
-    "4xl": ["36px", { lineHeight: "1.1" }],
-    "5xl": ["48px", { lineHeight: "1.1" }],
-    "6xl": ["60px", { lineHeight: "1.1" }],
+    // Display (Quincy CF 700)
+    'display-hero': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
+    'display-large': ['2.75rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+    'section-heading': ['2rem', { lineHeight: '1.25' }],
+
+    // Subheading (Merriweather 300/400)
+    'subheading-large': ['1.5rem', { lineHeight: '1.35' }],
+    'subheading': ['1.25rem', { lineHeight: '1.4' }],
+
+    // Body (Inter 400)
+    'body-large': ['1.0625rem', { lineHeight: '1.45' }],
+    'body': ['1rem', { lineHeight: '1.5' }],
+    'body-small': ['0.875rem', { lineHeight: '1.4' }],
+
+    // UI (Inter 500)
+    'button': ['0.875rem', { lineHeight: '1.2', fontWeight: '500' }],
+    'button-small': ['0.75rem', { lineHeight: '1.1', fontWeight: '500' }],
+    'link': ['0.875rem', { lineHeight: '1.2', fontWeight: '500' }],
+
+    // Captions (Inter 400)
+    'caption': ['0.75rem', { lineHeight: '1.2' }],
+    'caption-small': ['0.6875rem', { lineHeight: '1.1' }],
+  },
+
+  fontFamily: {
+    'sans': 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+    'serif': 'Merriweather, Georgia, serif',
+    'display': 'Quincy CF, serif',
   },
 
   fontWeight: {
-    thin: "100",
-    extralight: "200",
-    light: "300",
-    normal: "400",
-    medium: "500",
-    semibold: "600",
-    bold: "700",
-    extrabold: "800",
+    'light': '300',
+    'normal': '400',
+    'medium': '500',
+    'semibold': '600',
+    'bold': '700',
   },
 
+  // SPACING — 4px base unit
+  spacing: {
+    'xs': '0.25rem',   // 4px
+    'sm': '0.5rem',    // 8px
+    'md': '1rem',      // 16px
+    'lg': '1.5rem',    // 24px
+    'xl': '2rem',      // 32px
+    '2xl': '3rem',     // 48px
+    '3xl': '4rem',     // 64px
+  },
+
+  // BORDER RADIUS — Trust Keith Scale
+  borderRadius: {
+    'none': '0px',
+    'input': '0px',        // Utilitarian inputs
+    'button': '6px',       // Functional buttons
+    'glass': '16px',       // Glass card variant
+    'card': '24px',        // Primary cards
+    'pill': '100rem',      // Badges, fully rounded
+  },
+
+  // SHADOWS — Dual-layer glass effect
+  boxShadow: {
+    'none': 'none',
+    'ambient': '0 4px 16px rgba(0, 0, 0, 0.08)',  // Glass variant
+    'standard': '0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.5)',  // Primary cards
+    'focus': '0.125rem solid #4d65ff',  // Focus ring (bright blue)
+  },
+
+  // LINE HEIGHT
   lineHeight: {
-    tight: "1.1",
-    snug: "1.2",
-    normal: "1.5",
-    relaxed: "1.6",
-    loose: "1.75",
-  },
-
-  // Component-Specific Values
-  components: {
-    button: {
-      primary: {
-        backgroundColor: "#0066CC",
-        color: "#ffffff",
-        paddingInline: "16px",
-        paddingBlock: "8px",
-        borderRadius: "8px",
-        fontWeight: "600",
-      },
-      secondary: {
-        backgroundColor: "#f9fafb",
-        color: "#111827",
-        border: "1px solid #e5e7eb",
-        paddingInline: "16px",
-        paddingBlock: "8px",
-      },
-      danger: {
-        backgroundColor: "#dc2626",
-        color: "#ffffff",
-        paddingInline: "16px",
-        paddingBlock: "8px",
-      },
-    },
+    'tight': '1.1',
+    'snug': '1.2',
+    'normal': '1.4',
+    'relaxed': '1.5',
+    'loose': '1.6',
   },
 };
-
-/**
- * Tailwind v4 Usage Example:
- *
- * import { tokens } from './tokens.tailwind'
- *
- * export default {
- *   theme: {
- *     extend: {
- *       colors: tokens.colors,
- *       spacing: tokens.spacing,
- *       borderRadius: tokens.borderRadius,
- *       boxShadow: tokens.boxShadow,
- *       fontFamily: tokens.fontFamily,
- *       fontSize: tokens.fontSize,
- *       fontWeight: tokens.fontWeight,
- *       lineHeight: tokens.lineHeight,
- *     }
- *   }
- * }
- */
 
 export default tokens;

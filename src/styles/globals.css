@@ -211,6 +211,52 @@
     --ea-font-size-h1-alt: 2.5rem;     /* 40px — alternate page headings */
     --ea-font-size-display: 2.75rem;   /* 44px — display section / h1 mobile large */
     --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
+
+    /* Trust Keith Design System — New Tokens (Phase 1) */
+    --trust-keith-teal: #235875;
+    --keith-dark-blue: #194359;
+    --bright-blue: #4285f4;
+    --bright-blue-dark: #2459b3;
+    --bright-blue-light: #e0eeff;
+
+    --text-primary: #222525;
+    --text-secondary: #4f5057;
+    --surface-light: #fafafa;
+    --surface-neutral: #ebebeb;
+    --surface-white: #ffffff;
+
+    --success: #068466;
+    --danger: #ea384c;
+    --error: #ea384c;
+
+    --cream-light: #fffaf4;
+    --cream-dark: #c3b6aa;
+
+    /* Trust Keith Typography */
+    --font-sans-trust: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif-trust: 'Merriweather', Georgia, serif;
+    --font-display-trust: 'Quincy CF', serif;
+
+    /* Trust Keith Spacing (4px base) */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Trust Keith Border Radius */
+    --radius-input: 0px;
+    --radius-button: 6px;
+    --radius-glass: 16px;
+    --radius-card: 24px;
+    --radius-pill: 100rem;
+
+    /* Trust Keith Shadows */
+    --shadow-ambient: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-standard: 0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.5);
+    --shadow-focus: 0.125rem solid #4d65ff;
   }
 
   /*
