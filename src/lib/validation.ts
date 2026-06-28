@@ -1,20 +1,35 @@
 import { z } from "zod";
 
-// Email validation
+/**
+ * Schemas Zod de entrada do app (formulários e payloads de API).
+ *
+ * Intenção geral:
+ * - Validam dados vindos do usuário/cliente ANTES de chegarem ao banco —
+ *   complementam (não substituem) as RLS policies e as constraints do Postgres.
+ * - Campos mascarados (CPF, telefone) seguem o padrão "valida a máscara que o
+ *   usuário digita, mas persiste apenas dígitos": o `.regex` garante o formato
+ *   visual e o `.transform` normaliza para armazenamento canônico.
+ * - `.transform((val) => val.trim())` remove espaços de borda para evitar
+ *   duplicatas sutis e dados sujos.
+ */
+
+// E-mail normalizado para minúsculas — garante unicidade case-insensitive.
 const emailSchema = z.string().email("Email inválido").toLowerCase();
 
-// CPF validation (format: XXX.XXX.XXX-XX)
+// CPF: valida a máscara XXX.XXX.XXX-XX, mas persiste só os 11 dígitos.
 const cpfSchema = z
   .string()
   .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF deve estar no formato XXX.XXX.XXX-XX")
   .transform((val) => val.replace(/\D/g, ""));
 
-// Phone validation (format: (XX) XXXXX-XXXX or (XX) XXXX-XXXX)
+// Telefone: aceita celular (5 dígitos) ou fixo (4); persiste só os dígitos.
 const phoneSchema = z
   .string()
   .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, "Telefone deve estar no formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX")
   .transform((val) => val.replace(/\D/g, ""));
 
+// IDs de recurso (curso/turma): allowlist estrita de caracteres — defesa em
+// profundidade contra injeção em paths/queries antes de chegar ao Supabase.
 const resourceIdSchema = z
   .string()
   .trim()
@@ -22,7 +37,8 @@ const resourceIdSchema = z
   .max(80, "ID excede o tamanho permitido")
   .regex(/^[A-Za-z0-9_-]+$/, "ID inválido");
 
-// Course enrollment validation
+// Matrícula em curso — payload do checkout público. Campos opcionais usam
+// `.default("")` para que o registro nunca chegue ao banco com `undefined`.
 export const enrollmentSchema = z.object({
   studentName: z
     .string()
@@ -112,7 +128,13 @@ export const adminResourceSchema = z.object({
 
 export type AdminResource = z.infer<typeof adminResourceSchema>;
 
-// Validation helper function
+/**
+ * Valida `data` contra `schema` e devolve um resultado discriminado.
+ *
+ * Em caso de falha, achata `ZodError.issues` num mapa `campo → mensagem` com a
+ * chave no formato dot-path (ex.: `address.zip`), pronto para alimentar o estado
+ * de erros dos formulários. Erros não-Zod (inesperados) caem em `_global`.
+ */
 export function validateInput<T>(schema: z.ZodType<T>, data: unknown): { success: true; data: T } | { success: false; errors: Record<string, string> } {
   try {
     const validatedData = schema.parse(data);

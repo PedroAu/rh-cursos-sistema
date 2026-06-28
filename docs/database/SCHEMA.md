@@ -830,6 +830,65 @@ $$;
 
 ---
 
+### Worked Examples
+
+Concrete scenarios showing how the policies above resolve at query time. All
+policies **fail closed**: if no policy grants a row, the row is invisible.
+
+**1. Student reads their own enrollments (`inscricao_owner_or_admin_select`)**
+
+```sql
+-- Sessão: auth.uid() = 'student-uuid' (role = student)
+SELECT * FROM inscricao;
+-- Retorna SOMENTE as linhas onde:
+--   aluno_id IN (SELECT id FROM aluno WHERE user_id = 'student-uuid')
+-- Inscrições de outros alunos são filtradas (não geram erro, somam zero linhas).
+```
+
+**2. Anonymous visitor reads the public catalog (`catalogo_publico_curso_select`)**
+
+```sql
+-- Sessão: anon (sem auth.uid())
+SELECT id, titulo FROM curso;
+-- Retorna apenas cursos publicáveis:
+--   deleted_at IS NULL AND status IN ('Ativo', 'Destaque', 'EmBreve')
+-- Rascunhos/arquivados/soft-deleted ficam invisíveis para visitantes.
+```
+
+**3. Non-admin tries to read leads (`lead_admin_select`)**
+
+```sql
+-- Sessão: authenticated, role = student (is_admin() = false)
+SELECT * FROM lead;
+-- Retorna 0 linhas. A condição is_admin() falha, então nenhuma linha é exposta.
+-- Apenas anon/authenticated podem INSERIR leads (formulários públicos).
+```
+
+**4. User cannot self-promote to admin (`profiles_owner_update_role_locked`)**
+
+```sql
+-- Sessão: auth.uid() = 'user-uuid'
+UPDATE profiles SET role = 'admin' WHERE id = 'user-uuid';
+-- BLOQUEADO pelo WITH CHECK: role precisa permanecer igual ao valor atual.
+-- O usuário pode atualizar o próprio profile, mas não escalar privilégios.
+```
+
+**5. Review visibility (`avaliacao_public_or_owner_select`)**
+
+```sql
+-- Uma avaliação é visível se QUALQUER condição for verdadeira:
+--   publicar = true              → visível para todos (anon incluso)
+--   OR dono da inscrição          → autor sempre vê a própria avaliação
+--   OR is_admin()                 → moderação total
+```
+
+> Os helpers `is_admin()`, `is_instructor()` e `is_student()` são
+> `SECURITY DEFINER` com `SET search_path = public` (anti-hijacking) e leem
+> `profiles.role` via `auth.uid()`. Ver migrations `20260513100000_sprint1_security.sql`
+> e `20260623144035_rbac_authorization_helpers.sql`.
+
+---
+
 ## Access Patterns
 
 ### Public Catalog (anon, authenticated)
