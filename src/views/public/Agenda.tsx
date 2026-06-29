@@ -245,7 +245,7 @@ export function AgendaPage() {
                     <Button
                       fullWidth
                       variant="outline"
-                      color="rhBlue.9"
+                      color="rhBlue.10"
                       leftSection={<X size={16} />}
                       disabled={!activeFiltersCount}
                       onClick={clearFilters}
