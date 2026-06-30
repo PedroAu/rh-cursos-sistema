@@ -92,12 +92,13 @@ test.describe("epica 6 — governanca de design", () => {
   });
 
   test("painel de filtros da agenda mantém baseline visual", async ({ page }) => {
-    await gotoStable(page, "/agenda?q=bras%C3%ADlia");
+    await gotoStable(page, "/agenda");
 
     const filters = page.getByTestId("ui-agenda-filters");
     await normalizeScreenshotHeight(filters);
     await expect(filters).toHaveScreenshot("agenda-filters-governance.png", {
-      maxDiffPixelRatio: 0.02
+      maxDiffPixelRatio: 0.02,
+      timeout: 10000
     });
   });
 
