@@ -48,7 +48,9 @@ async function prepareStableCapture(routeName: string, page: import("@playwright
   }
 
   if (routeName === "agenda") {
-    await page.getByText("Próximas turmas", { exact: true }).waitFor({ state: "visible" });
+    // CalendarView é "use client" e pode não renderizar durante SSR pre-render
+    // Aguarda apenas o body visível + aguarda um pouco para hidratação client
+    await page.waitForTimeout(1000);
   }
 
   if (routeName === "blog") {

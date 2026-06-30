@@ -6,8 +6,8 @@ const rhBlue: MantineColorsTuple = [
   "#9ac9f1",
   "#61abE8",
   "#3491e1",
-  "#1b82dd",
-  "#0d78dc",
+  "#003d99",
+  "#003d99",
   "#0067c4",
   "#0059b0",
   "#004b9b"

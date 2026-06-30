@@ -1,3 +1,5 @@
+"use client";
+
 import {
   addDays,
   addMonths,
@@ -78,8 +80,8 @@ export function CalendarView({
   };
 
   return (
-    <div className="space-y-8">
-      <Card className="overflow-hidden border-[#d7dee5] bg-white shadow-[0_10px_24px_rgba(0,67,100,0.08)]">
+    <div className="space-y-8" data-testid="calendar-view-container">
+      <Card className="overflow-hidden border-[#d7dee5] bg-white shadow-[0_10px_24px_rgba(0,67,100,0.08)]" data-label={selectedLabel || "Próximas turmas"}>
         <CardContent className="p-5 md:p-6">
           <div className="mb-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
@@ -181,8 +183,8 @@ export function CalendarView({
       <div className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span className="inline-flex rounded-full bg-[#cae6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#004364]">
-              {selectedLabel}
+            <span className="inline-flex rounded-full bg-[#cae6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#004364]" data-testid="agenda-selected-label">
+              {selectedLabel || "Próximas turmas"}
             </span>
             <h2 className="mt-2 font-display text-[2rem] font-bold text-[#1a1c1e]">
               {visibleClasses.length} turma{visibleClasses.length === 1 ? "" : "s"} encontrada{visibleClasses.length === 1 ? "" : "s"}

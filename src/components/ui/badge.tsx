@@ -10,7 +10,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: "border-bright-blue bg-bright-blue-light text-trust-keith-teal",
-        success: "border-success bg-[#f0fdf4] text-success",
+        success: "border-success bg-[#f0fdf4] text-[#014D3A]",
         warning: "border-[#fde68a] bg-[#fffbeb] text-[#92400e]",
         danger: "border-danger bg-[#fef2f2] text-danger",
         muted: "border-surface-neutral bg-surface-light text-text-secondary"

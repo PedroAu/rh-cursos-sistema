@@ -26,8 +26,8 @@ export const tokens = {
     // Brand Colors
     'trust-keith-teal': '#235875',
     'keith-dark-blue': '#194359',
-    'bright-blue': '#4285f4',
-    'bright-blue-dark': '#2459b3',
+    'bright-blue': '#0d47a1',
+    'bright-blue-dark': '#0a2850',
     'bright-blue-light': '#e0eeff',
 
     // Neutral Scale (7-step)

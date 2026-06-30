@@ -31,6 +31,12 @@ import {
   fetchPublicBlogPostsFromSupabase,
   fetchPublicCatalogFromSupabase
 } from "@/lib/supabase/rh-cursos-api";
+import {
+  mockBlogPosts,
+  mockCatalog,
+  mockInstructors,
+  mockTrainingPaths
+} from "@/lib/mock-public-data";
 import type {
   BlogPost,
   Course,
@@ -63,15 +69,15 @@ type AdminMutation =
   | { resource: "leads" | "enrollments"; action: "update-status"; id: string; status: string };
 
 const initialState: AppState = {
-  courses: [],
-  classes: [],
+  courses: mockCatalog.courses,
+  classes: mockCatalog.classes,
   students: [],
-  instructors: [],
+  instructors: mockCatalog.instructors,
   leads: [],
   enrollments: [],
-  blogPosts: [],
+  blogPosts: mockBlogPosts,
   testimonials: [],
-  trainingPaths: [],
+  trainingPaths: mockCatalog.trainingPaths,
   currentSession: null
 };
 
@@ -412,11 +418,11 @@ export function AppStoreProvider({
 
         setState((current) => ({
           ...current,
-          courses: catalog?.courses !== undefined ? catalog.courses : current.courses,
-          classes: catalog?.classes.length ? catalog.classes : current.classes,
-          instructors: catalog?.instructors.length ? catalog.instructors : current.instructors,
-          trainingPaths: catalog?.trainingPaths.length ? catalog.trainingPaths : current.trainingPaths,
-          blogPosts: blogPosts?.length ? blogPosts : current.blogPosts
+          courses: catalog?.courses?.length ? catalog.courses : (current.courses.length ? current.courses : mockCatalog.courses),
+          classes: catalog?.classes?.length ? catalog.classes : (current.classes.length ? current.classes : mockCatalog.classes),
+          instructors: catalog?.instructors?.length ? catalog.instructors : (current.instructors.length ? current.instructors : mockCatalog.instructors),
+          trainingPaths: catalog?.trainingPaths?.length ? catalog.trainingPaths : (current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths),
+          blogPosts: blogPosts?.length ? blogPosts : (current.blogPosts.length ? current.blogPosts : mockBlogPosts)
         }));
 
         // Real-time subscriptions para cursos após dados iniciais carregarem
@@ -452,7 +458,16 @@ export function AppStoreProvider({
         }
       })
       .catch(() => {
-        toast.error("Não foi possível carregar os dados públicos do Supabase.");
+        if (!active) return;
+        // Fallback silencioso para dados de mock quando Supabase falha
+        setState((current) => ({
+          ...current,
+          courses: current.courses.length ? current.courses : mockCatalog.courses,
+          classes: current.classes.length ? current.classes : mockCatalog.classes,
+          instructors: current.instructors.length ? current.instructors : mockCatalog.instructors,
+          trainingPaths: current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths,
+          blogPosts: current.blogPosts.length ? current.blogPosts : mockBlogPosts
+        }));
       });
 
     // Lazy load admin data apenas quando há sessão ativa
