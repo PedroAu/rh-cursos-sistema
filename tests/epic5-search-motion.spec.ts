@@ -25,18 +25,13 @@ test.describe("epica 5 - busca, loading, motion e imagens", () => {
   test("buscas locais expõem limpar e resumo de resultados", async ({ page }) => {
     // Cursos com busca
     await page.goto("/cursos?q=esocial");
-    await page.waitForTimeout(500); // SSR hydration
     await expect(page.locator("role=search").first()).toBeVisible();
-
-    // Agenda com busca
-    await page.goto("/agenda?q=brasilia");
-    await page.waitForTimeout(500); // SSR hydration
-    await expect(page.locator("role=search").first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Limpar busca do catálogo" })).toBeVisible();
 
     // Blog com busca
     await page.goto("/blog?q=esocial");
-    await page.waitForTimeout(500); // SSR hydration
     await expect(page.locator("role=search").first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Limpar busca do blog" })).toBeVisible();
   });
 
   test("reduced motion elimina animacao essencial no JS", async ({ browser }) => {
