@@ -20,9 +20,21 @@ Sentry.init({
   // Debug mode for development
   debug: process.env.NODE_ENV === "development",
 
+  // Enable session replay for error context
+  replaysSessionSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 0.5,
+  replaysOnErrorSampleRate: 1.0,
+
   // Capture unhandled promise rejections
   attachStacktrace: true,
   maxValueLength: 1024,
+
+  // Enable client-side integrations
+  integrations: [
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true
+    })
+  ],
 
   // Configure breadcrumb tracking
   beforeBreadcrumb(breadcrumb) {
@@ -38,7 +50,7 @@ Sentry.init({
   // Configure error filtering
   beforeSend(event, hint) {
     // Ignore specific errors that are not actionable
-    if (hint.originalException instanceof Error) {
+    if (hint.originalException instanceof TypeError) {
       if (
         hint.originalException.message?.includes("NetworkError") ||
         hint.originalException.message?.includes("timeout")

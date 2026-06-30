@@ -50,6 +50,7 @@ export const WithError: Story = {
 
 // Story: Error boundary with custom fallback
 export const WithCustomFallback: Story = {
+  args: { children: null },
   render: () => (
     <ErrorBoundary
       fallback={
@@ -73,7 +74,7 @@ function WithResetStory() {
   return (
     <div className="space-y-4">
       <div className="flex gap-2">
-        <Button onClick={() => setShouldThrow(false)} variant="primary">
+        <Button onClick={() => setShouldThrow(false)} variant="default">
           Trigger Success
         </Button>
         <Button onClick={() => setShouldThrow(true)} variant="outline">
@@ -89,11 +90,13 @@ function WithResetStory() {
 }
 
 export const WithReset: Story = {
+  args: { children: null },
   render: () => <WithResetStory />,
 };
 
 // Story: Multiple error boundaries
 export const MultipleErrorBoundaries: Story = {
+  args: { children: null },
   render: () => (
     <div className="space-y-4">
       <ErrorBoundary>

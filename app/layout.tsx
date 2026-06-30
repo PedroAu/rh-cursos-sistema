@@ -9,6 +9,7 @@ import "@mantine/notifications/styles.css";
 import "@/styles/globals.css";
 import { AppMantineProvider } from "@/components/providers/mantine-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
@@ -54,9 +55,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
       <body className={`${inter.variable} ${montserrat.variable}`}>
-        <AppMantineProvider>
-          <MotionProvider>{children}</MotionProvider>
-        </AppMantineProvider>
+        <ErrorBoundary>
+          <AppMantineProvider>
+            <MotionProvider>{children}</MotionProvider>
+          </AppMantineProvider>
+        </ErrorBoundary>
       </body>
       {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>
