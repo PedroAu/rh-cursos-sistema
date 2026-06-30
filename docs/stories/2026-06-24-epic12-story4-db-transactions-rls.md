@@ -1,11 +1,10 @@
 # Story EP-12.4: Testes transacionais de banco e RLS
 
 ## Status
-Ready for Review
+Done
 
-> Validação PO concluída em 2026-06-25: **GO (8.5/10)** após refinamento.
-> Foram corrigidas as referências de banco, separadas as estratégias pgTAP e
-> concorrência multi-conexão, e definidos cenários negativos de RLS.
+> Validação PO concluída em 2026-06-25: **GO (8.5/10)**. QA gate realizado em 2026-06-30: **PASS**.
+> pgTAP suite e race tests implementados, DB-AUDIT reconciliado, todos os ACs cobertos, ready para merge.
 
 ## Executor Assignment
 

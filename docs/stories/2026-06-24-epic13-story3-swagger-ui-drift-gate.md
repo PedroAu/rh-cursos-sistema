@@ -1,11 +1,10 @@
 # Story EP-13.3: Swagger UI/ReDoc e gate anti-drift
 
 ## Status
-Ready for Review
+Done
 
-> Validação PO concluída em 2026-06-25: **GO (9/10)**. A entrega foi
-> concretizada como ReDoc estático gerado pela Redocly CLI, alinhada ao
-> tooling já usado na EP-13.2, com gate mínimo de inventário e lint.
+> Validação PO concluída em 2026-06-25: **GO (9/10)**. QA gate realizado em 2026-06-30: **PASS**.
+> ReDoc estático gerado, gates de docs passaram, anti-drift gate integrado ao CI, ready para merge.
 
 ## Executor Assignment
 

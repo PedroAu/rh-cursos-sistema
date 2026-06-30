@@ -1,0 +1,48 @@
+storyId: EP-12.2
+epicId: 12
+title: "E2E Login/Logout/Checkout"
+verdict: PASS
+qa_gate_date: 2026-06-30
+quality_gates:
+  - gate: lint
+    status: PASS
+    evidence: "npm run lint — 0 errors"
+  - gate: typecheck
+    status: PASS
+    evidence: "npm run typecheck — 0 errors"
+  - gate: build
+    status: PASS
+    evidence: "npm run build — success"
+  - gate: playwright-e2e
+    status: PASS
+    evidence: "tests/checkout.e2e.spec.ts, tests/login-errors.spec.ts, tests/public-journeys.spec.ts — 21 passed"
+  - gate: test:unit
+    status: PASS
+    evidence: "npm test — 124 passed"
+
+acceptance_criteria:
+  - AC1: "Login bem-sucedido cria sessão válida e libera /admin"
+    status: PASS
+    evidence: "tests/route-auth.spec.ts covers login flow with session persistence"
+  - AC2: "Logout encerra a sessão e volta a bloquear /admin"
+    status: PASS
+    evidence: "tests/login-errors.spec.ts covers logout flow"
+  - AC3: "Checkout executa contra backend real"
+    status: PASS
+    evidence: "tests/checkout.e2e.spec.ts validates enrollment persistence"
+  - AC4: "Falhas previsíveis geram mensagens consistentes"
+    status: PASS
+    evidence: "Controlled error scenarios tested, no interception of success path"
+
+issues: []
+blockers: []
+
+decision: PASS
+confidence: HIGH
+notes: |
+  - All ACs covered by E2E tests
+  - Backend persistence validated
+  - Security: no privileged credentials in logs
+  - Ready to merge
+
+reviewed_by: "@qa (Orion)"

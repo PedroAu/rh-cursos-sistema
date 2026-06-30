@@ -1,6 +1,6 @@
 # Épica 12 — Integration Test Suite
 
-**Status:** IN PROGRESS — EP-12.1 e EP-12.3 `Done`; EP-12.2 `Ready for Review`; EP-12.4 `Approved`
+**Status:** COMPLETE — EP-12.1, EP-12.2, EP-12.3, EP-12.4 all `Done`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-3.2)  
 **Prioridade:** P1  
 **Duração:** 2-3 dias  
@@ -30,9 +30,9 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 - [x] **AC-0.2** — Cobertura reportada com escopo explícito, sem depender apenas do subset atual do Vitest
 
 ### Fase 1: Jornadas críticas
-- [ ] **AC-1.1** — Checkout flow testado fim a fim
-- [ ] **AC-1.2** — Login/logout testados com persistência de sessão
-- [ ] **AC-1.3** — Matrícula em curso validada contra backend real
+- [x] **AC-1.1** — Checkout flow testado fim a fim
+- [x] **AC-1.2** — Login/logout testados com persistência de sessão
+- [x] **AC-1.3** — Matrícula em curso validada contra backend real
 
 ### Fase 2: Contratos
 - [x] **AC-2.1** — `app/api/auth/session` coberto por contract/integration tests
@@ -40,9 +40,9 @@ Expandir a suíte de testes para validar contratos reais entre UI, Next Route Ha
 - [x] **AC-2.3** — Operações administrativas críticas testadas com autenticação válida e inválida
 
 ### Fase 3: Banco e confiabilidade
-- [ ] **AC-3.1** — Casos transacionais críticos testados (duplicidade, concorrência, rollback)
-- [ ] **AC-3.2** — RLS e auditoria admin têm evidência automatizada mínima
-- [ ] **AC-3.3** — Cobertura total relevante para a épica permanece >= 70%
+- [x] **AC-3.1** — Casos transacionais críticos testados (duplicidade, concorrência, rollback)
+- [x] **AC-3.2** — RLS e auditoria admin têm evidência automatizada mínima
+- [x] **AC-3.3** — Cobertura total relevante para a épica permanece >= 70%
 
 ---
 

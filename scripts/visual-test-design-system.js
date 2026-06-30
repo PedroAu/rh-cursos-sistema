@@ -14,9 +14,13 @@
  *   npm run visual-test:update    (Update baselines)
  */
 
-const fs = require('fs');
-const path = require('path');
-const { chromium } = require('playwright');
+import fs from 'fs';
+import path from 'path';
+import { chromium } from 'playwright';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const REPORT_DIR = path.join(__dirname, '../.visual-tests');
 const BASELINES_DIR = path.join(REPORT_DIR, 'baselines');
@@ -233,11 +237,12 @@ async function runTests() {
 }
 
 // Run tests
-if (require.main === module) {
+const __main = import.meta.url === `file://${process.argv[1]}`;
+if (__main) {
   runTests().catch(err => {
     console.error('Fatal error:', err);
     process.exit(1);
   });
 }
 
-module.exports = { runTests, TEST_CASES, DESIGN_TOKENS };
+export { runTests, TEST_CASES, DESIGN_TOKENS };

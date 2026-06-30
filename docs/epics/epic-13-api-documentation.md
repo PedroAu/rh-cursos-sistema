@@ -1,6 +1,6 @@
 # Épica 13 — API Documentation
 
-**Status:** IN PROGRESS — EP-13.1 e EP-13.2 `Done`; EP-13.3 `Approved`
+**Status:** COMPLETE — EP-13.1, EP-13.2, EP-13.3 all `Done`
 **PRD Source:** `docs/PHASE-B-PLAN.md` (D-4.2)  
 **Prioridade:** P2  
 **Duração:** 1-2 dias  
@@ -34,10 +34,10 @@ Transformar a documentação manual já existente em um contrato canônico OpenA
 ### Fase 2: Publicação
 - [x] **AC-2.1** — Métodos de autenticação documentados
 - [x] **AC-2.2** — Rate limits documentados
-- [ ] **AC-2.3** — Swagger UI ou ReDoc rodando e referenciado no README/docs
+- [x] **AC-2.3** — Swagger UI ou ReDoc rodando e referenciado no README/docs
 
 ### Fase 3: Governança
-- [ ] **AC-3.1** — Processo mínimo para evitar drift entre código e spec definido
+- [x] **AC-3.1** — Processo mínimo para evitar drift entre código e spec definido
 - [x] **AC-3.2** — Endpoint `DELETE /functions/v1/auth-session` e demais gaps do catálogo atual reconciliados
 
 ---

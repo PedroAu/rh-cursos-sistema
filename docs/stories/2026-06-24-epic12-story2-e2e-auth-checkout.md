@@ -1,11 +1,10 @@
 # Story EP-12.2: Fluxos críticos E2E reais — login, logout e checkout
 
 ## Status
-Ready for Review
+Done
 
-> Validação PO concluída em 2026-06-25: **GO (9/10)**. A story foi refinada
-> para explicitar ambiente de integração, fronteira entre fluxo real e falhas
-> controladas, segurança de credenciais e rastreabilidade Task→AC.
+> Validação PO concluída em 2026-06-25: **GO (9/10)**. QA gate realizado em 2026-06-30: **PASS**.
+> Todos os ACs implementados e testados, gates de qualidade verdes, ready para merge.
 
 ## Executor Assignment
 

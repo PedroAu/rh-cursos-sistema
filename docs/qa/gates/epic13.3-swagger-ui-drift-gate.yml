@@ -1,0 +1,52 @@
+storyId: EP-13.3
+epicId: 13
+title: "ReDoc/Swagger UI and Anti-Drift Gate"
+verdict: PASS
+qa_gate_date: 2026-06-30
+quality_gates:
+  - gate: docs:api:lint
+    status: PASS
+    evidence: "npm run docs:api:lint — OpenAPI 3.1 spec valid"
+  - gate: docs:api:build
+    status: PASS
+    evidence: "npm run docs:api:build — public/api-docs.html generated"
+  - gate: docs:api:check-drift
+    status: PASS
+    evidence: "npm run docs:api:check-drift — 6 rotas reconciliadas, drift gate passed"
+  - gate: lint
+    status: PASS
+    evidence: "npm run lint — 0 errors"
+  - gate: typecheck
+    status: PASS
+    evidence: "npm run typecheck — 0 errors"
+  - gate: test:unit
+    status: PASS
+    evidence: "npm test — 392 passed"
+
+acceptance_criteria:
+  - AC1: "Swagger UI ou ReDoc roda a partir da spec versionada"
+    status: PASS
+    evidence: "public/api-docs.html generated via Redocly CLI from docs/api/openapi.yaml"
+  - AC2: "README/docs apontam para a UI de documentação"
+    status: PASS
+    evidence: "Links added to README.md and docs/api/README.md"
+  - AC3: "Existe validação mínima para detectar drift óbvio"
+    status: PASS
+    evidence: "check-openapi-drift.mjs validates method/path additions and removals"
+  - AC4: "Estratégia de manutenção da doc fica registrada"
+    status: PASS
+    evidence: "Maintenance workflow documented in docs/api/README.md"
+
+issues: []
+blockers: []
+
+decision: PASS
+confidence: HIGH
+notes: |
+  - All ACs covered by implementation
+  - ReDoc static generation chosen (no runtime overhead)
+  - Anti-drift gate integrated into CI
+  - Documentation maintenance strategy clear
+  - Ready to merge
+
+reviewed_by: "@qa (Orion)"

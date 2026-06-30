@@ -256,6 +256,7 @@ export const FocusRings: StoryObj = {
         <input
           type="text"
           placeholder="Focus me (Tab)"
+          aria-label="Input field demo"
           className="w-full px-4 py-3 rounded-input border border-surface-neutral bg-surface-white
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-1"
         />
