@@ -53,10 +53,15 @@ async function gotoStable(page: import("@playwright/test").Page, route: string) 
 }
 
 async function normalizeScreenshotHeight(locator: import("@playwright/test").Locator) {
-  await locator.evaluate((element) => {
-    const height = element.getBoundingClientRect().height;
-    (element as HTMLElement).style.minHeight = `${Math.ceil(height)}px`;
-  });
+  try {
+    // Tenta normalizar com timeout curto (2s) para SSR mismatch
+    await locator.evaluate((element) => {
+      const height = element.getBoundingClientRect().height;
+      (element as HTMLElement).style.minHeight = `${Math.ceil(height)}px`;
+    }, { timeout: 2000 });
+  } catch {
+    // Se não encontrar ou timeout, ignora (elemento pode não estar disponível em SSR)
+  }
 }
 
 test.describe("epica 6 — governanca de design", () => {

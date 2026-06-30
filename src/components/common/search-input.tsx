@@ -58,7 +58,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
           </div>
         </div>
         {resultsLabel ? (
-          <p id={helperId} aria-live="polite" className="text-sm leading-6 text-label-secondary">
+          <p id={helperId} aria-live="polite" data-testid="search-results-label" className="text-sm leading-6 text-label-secondary">
             {resultsLabel}
           </p>
         ) : null}

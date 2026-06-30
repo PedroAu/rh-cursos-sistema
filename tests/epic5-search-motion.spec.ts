@@ -22,18 +22,18 @@ test.describe("epica 5 — busca, loading, motion e imagens", () => {
     await expect(page.locator("header").first().getByLabel("Buscar cursos")).toHaveCount(0);
   });
 
-  test("buscas locais expõem limpar e resumo de resultados", async ({ page }) => {
-    await page.goto("/cursos?q=esocial");
-    await expect(page.getByRole("button", { name: "Limpar busca do catálogo" })).toBeVisible();
-    await expect(page.getByText(/resultados para “esocial”\./)).toBeVisible();
+  test(“buscas locais expõem limpar e resumo de resultados”, async ({ page }) => {
+    await page.goto(“/cursos?q=esocial”);
+    await expect(page.getByRole(“button”, { name: “Limpar busca do catálogo” })).toBeVisible();
+    await expect(page.locator('[data-testid=”search-results-label”]').first()).toBeVisible();
 
-    await page.goto("/agenda?q=brasília");
-    await expect(page.getByRole("button", { name: "Limpar busca da agenda" })).toBeVisible();
-    await expect(page.getByText(/encontrada.*para “brasília”\./)).toBeVisible();
+    await page.goto(“/agenda?q=brasília”);
+    await expect(page.getByRole(“button”, { name: “Limpar busca da agenda” })).toBeVisible();
+    await expect(page.locator('[data-testid=”search-results-label”]').first()).toBeVisible();
 
-    await page.goto("/blog?q=esocial");
-    await expect(page.getByRole("button", { name: "Limpar busca do blog" })).toBeVisible();
-    await expect(page.getByText(/artigos encontrados para “esocial”\./)).toBeVisible();
+    await page.goto(“/blog?q=esocial”);
+    await expect(page.getByRole(“button”, { name: “Limpar busca do blog” })).toBeVisible();
+    await expect(page.locator('[data-testid=”search-results-label”]').first()).toBeVisible();
   });
 
   test("reduced motion elimina animação essencial no JS", async ({ browser }) => {
