@@ -15,7 +15,7 @@ function readProjectFiles(dir: string, predicate: (path: string) => boolean, acc
   return acc;
 }
 
-test.describe("epica 5 — busca, loading, motion e imagens", () => {
+test.describe("epica 5 - busca, loading, motion e imagens", () => {
   test("header público não exibe mais a barra de busca global", async ({ page }) => {
     await page.goto("/contato");
 
