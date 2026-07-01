@@ -490,6 +490,37 @@ src/views/public/
 - [ ] Verificar contraste WCAG AA
 - [ ] Rodar `npm run lint` e `npm run typecheck`
 
+#### 3.1.1 Home 100/100
+
+**Fonte de referência:** `public/images/RH Cursos Home.html`
+
+**Objetivo:** a Home deve atingir paridade visual e funcional com o HTML de referência, cobrindo hero, blocos intermediários, CTA final e a relação entre conteúdo e shell público.
+
+**Escopo obrigatório da Home:**
+1. Hero com badge, headline, subtítulo, dois CTAs, chips de apoio e card lateral de próximas turmas.
+2. Bloco de diferenciais.
+3. Bloco de trilhas de conhecimento.
+4. Bloco de formatos de atendimento.
+5. Bloco de processo em 3 passos.
+6. Bloco de credibilidade/prova social.
+7. FAQ.
+8. CTA final.
+
+**Critério de 100/100 para a Home:**
+- A composição geral da página reproduz a hierarquia do mock, não apenas a primeira dobra.
+- A largura útil, espaçamentos, blocos, bordas e pesos visuais batem com o HTML de referência em desktop.
+- O mobile preserva a mesma ordem de narrativa sem overflow, sobreposição ou cards comprimidos.
+- A copy final da Home é de produto e conversão; nenhum bloco exibe texto de bastidor sobre a própria implementação.
+- Os dados dinâmicos continuam vindo de `useAppStore`, mas o layout não depende de placeholders visuais.
+- Header e footer entram no critério quando interferem diretamente na fidelidade da Home, já que o mock mostra a navegação completa.
+
+**Validação exigida:**
+- Screenshot desktop da Home completa.
+- Screenshot mobile da Home completa.
+- Snapshot do hero continua existindo, mas deixa de ser o único gate visual.
+- Comparação manual contra `public/images/RH Cursos Home.html` antes de aceitar o resultado como concluído.
+- `npm run lint`, `npm run typecheck`, `npm run build` e smoke test das rotas públicas continuam verdes.
+
 **Exemplo de refatoração:**
 
 **Antes:**
@@ -623,9 +654,10 @@ git push origin refactor/trust-keith-design
 3. ✅ 100% das páginas públicas e admin usam componentes base
 4. ✅ Contraste WCAG AA em todas as combinações de cores
 5. ✅ Keyboard navigation funcionando
-6. ✅ Sem visuais regridos vs. baseline
-7. ✅ Build time < 2.5s
-8. ✅ CSS file size < 30KB
+6. ✅ Home 100/100 em relação ao HTML de referência, validada além do hero
+7. ✅ Sem visuais regridos vs. baseline
+8. ✅ Build time < 2.5s
+9. ✅ CSS file size < 30KB
 
 ---
 
@@ -644,9 +676,9 @@ git push origin refactor/trust-keith-design
 ## 📝 Próximos Passos
 
 1. [ ] Review plano com @pm, @po, @qa
-2. [ ] Aprovar decisões de design (cores, tipografia)
-3. [ ] Criar stories para cada fase
-4. [ ] Começar Fase 1 (Tokens)
+2. [ ] Aprovar a definição de Home 100/100 antes de mexer em código
+3. [ ] Criar story específica da Home, se a entrega for isolada
+4. [ ] Atualizar baselines visuais da Home depois da aprovação visual
 5. [ ] Documentar mudanças em CHANGELOG.md
 
 ---

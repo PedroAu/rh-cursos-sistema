@@ -82,6 +82,25 @@ test.describe("epica 6 — governanca de design", () => {
     await expect(page.getByTestId("ui-hero-home")).toHaveScreenshot("home-hero-governance.png");
   });
 
+  test("home completa mantém baseline visual", async ({ page }) => {
+    await gotoStable(page, "/");
+
+    await expect(page).toHaveScreenshot("home-page-governance.png", {
+      fullPage: true,
+      maxDiffPixelRatio: 0.02
+    });
+  });
+
+  test("home mobile completa mantém baseline visual", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await gotoStable(page, "/");
+
+    await expect(page).toHaveScreenshot("home-page-mobile-governance.png", {
+      fullPage: true,
+      maxDiffPixelRatio: 0.02
+    });
+  });
+
   test("painel de filtros do catálogo mantém baseline visual", async ({ page }) => {
     await gotoStable(page, "/cursos?q=esocial");
 

@@ -6,7 +6,6 @@ import {
   BookOpen,
   BriefcaseBusiness,
   CalendarDays,
-  CheckCircle2,
   ClipboardCheck,
   GraduationCap,
   Landmark,
@@ -37,12 +36,6 @@ const themeVars = {
   "--rh-ink": "#1f2a33",
   "--rh-border": "rgba(12, 106, 131, 0.12)"
 } as CSSProperties;
-
-const heroBenefits = [
-  "Cursos abertos com aplicação imediata",
-  "Treinamentos in company sob medida",
-  "Consultoria para setor público e privado"
-];
 
 const promiseCards = [
   {
@@ -155,16 +148,21 @@ export function HomePage() {
   }));
 
   const heroStats = [
-    `${Math.max(courses.length, 80)} cursos`,
-    `${Math.max(trainingPaths.length, 6)} trilhas`,
+    `${Math.max(courses.length, 80)} cursos · ${Math.max(trainingPaths.length, 6)} trilhas`,
     "Presencial e online"
   ];
 
   const featuredTestimonials = testimonials.slice(0, 2);
+  const openClassesCount = classes.filter((item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas").length;
+  const socialProofItems = [
+    { value: `${Math.max(courses.length, 80)}`, label: "cursos ativos" },
+    { value: `${Math.max(openClassesCount, 3)}`, label: "turmas com matrícula" },
+    { value: `${Math.max(trainingPaths.length, 6)}`, label: "trilhas estruturadas" }
+  ];
 
   return (
-    <div className="bg-[#eef0f2] pb-16 pt-8 md:pb-24 md:pt-10" style={themeVars}>
-      <div className="mx-auto w-[min(1180px,calc(100%-24px))] overflow-hidden rounded-[24px] border border-[var(--rh-border)] bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] md:w-[min(1180px,calc(100%-40px))]">
+    <div className="bg-[#eef0f2] pb-16 pt-0 md:pb-24" style={themeVars}>
+      <div className="mx-auto w-[min(1180px,calc(100%-24px))] overflow-hidden rounded-b-[24px] border border-t-0 border-[var(--rh-border)] bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] md:w-[min(1180px,calc(100%-40px))]">
         <section
           data-testid="ui-hero-home"
           className="grid gap-10 bg-[var(--rh-paper)] px-6 py-12 md:grid-cols-[1.05fr_0.95fr] md:px-10 md:py-20"
@@ -216,17 +214,6 @@ export function HomePage() {
               ))}
             </div>
 
-            <div className="mt-8 grid gap-3 md:grid-cols-3">
-              {heroBenefits.map((item) => (
-                <div
-                  key={item}
-                  className="rounded-[18px] border border-[var(--rh-border)] bg-white/80 px-4 py-4 text-sm font-medium text-[var(--rh-ink)]"
-                >
-                  <CheckCircle2 className="mb-2 h-4 w-4 text-[var(--rh-teal)]" aria-hidden="true" />
-                  {item}
-                </div>
-              ))}
-            </div>
           </div>
 
           <div className="rounded-[24px] border border-[var(--rh-paper-border)] bg-[linear-gradient(158deg,#ffffff,#ebebeb)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.3)] md:p-8">
@@ -243,7 +230,9 @@ export function HomePage() {
             </div>
 
             <div className="mt-5">
-              <H3 className="text-xl text-[var(--rh-ink)]">Próximas turmas</H3>
+              <H3 className="font-display text-[0.95rem] uppercase tracking-[0.08em] text-[var(--rh-ink)]">
+                Próximas turmas
+              </H3>
               <div className="mt-4 grid gap-3">
                 {upcomingClasses.map((trainingClass) => {
                   const { day, month } = getClassDateParts(trainingClass.startDate);
@@ -282,15 +271,15 @@ export function HomePage() {
 
         <section className="px-6 py-12 md:px-10 md:py-16">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
               Diferenciais
             </p>
             <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
               Formação corporativa com foco em aplicação, clareza e decisão.
             </H2>
             <P className="mt-4 max-w-[60ch] text-[var(--rh-copy-soft)]">
-              A home de referência enfatiza uma proposta direta: menos conteúdo abstrato, mais repertório
-              operacional. Mantive essa lógica na estrutura da página e transformei em blocos de decisão.
+              Conteúdo técnico, mediação experiente e formatos desenhados para acelerar a decisão de quem
+              precisa capacitar equipes com critério e rapidez.
             </P>
           </div>
 
@@ -317,7 +306,7 @@ export function HomePage() {
         <section className="bg-[#f7f8f9] px-6 py-12 md:px-10 md:py-16">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
                 Trilhas de conhecimento
               </p>
               <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
@@ -360,15 +349,15 @@ export function HomePage() {
         <section className="px-6 py-12 md:px-10 md:py-16">
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
                 Formatos de atendimento
               </p>
               <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
                 A mesma profundidade técnica em jornadas diferentes.
               </H2>
               <P className="mt-4 max-w-[58ch] text-[var(--rh-copy-soft)]">
-                O site precisa vender clareza de escolha. Por isso a home agora separa os caminhos
-                de compra em cursos abertos, treinamentos internos e consultoria.
+                Escolha o formato conforme o momento da sua operação: atualizar profissionais, nivelar um
+                time inteiro ou revisar processos com apoio consultivo.
               </P>
             </div>
             <div className="grid gap-4">
@@ -399,7 +388,7 @@ export function HomePage() {
 
         <section className="bg-[var(--rh-teal-deep)] px-6 py-12 text-white md:px-10 md:py-16">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-light)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-white/80">
               Como funciona
             </p>
             <H2 className="mt-4 text-[2rem] text-white md:text-[3rem]">
@@ -413,7 +402,7 @@ export function HomePage() {
                 key={step.number}
                 className="rounded-[24px] border border-white/10 bg-white/5 p-6 backdrop-blur-[1px]"
               >
-                <div className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--rh-teal-light)]">
+                <div className="text-sm font-semibold uppercase tracking-[0.14em] text-white">
                   {step.number}
                 </div>
                 <H3 className="mt-4 text-[1.4rem] text-white">{step.title}</H3>
@@ -426,19 +415,31 @@ export function HomePage() {
         <section className="px-6 py-12 md:px-10 md:py-16">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
                 Credibilidade
               </p>
               <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
                 Segurança para quem contrata e para quem precisa aplicar.
               </H2>
               <P className="mt-4 text-[var(--rh-copy-soft)]">
-                Mantive uma faixa de prova social, mas sem depender de carrossel. Quando houver depoimentos
-                no store, a página os incorpora automaticamente.
+                Catálogo ativo, trilhas estruturadas e agenda recorrente formam uma base clara para comparar
+                opções e contratar com mais confiança.
               </P>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4">
+              <div className="grid gap-4 md:grid-cols-3">
+                {socialProofItems.map((item) => (
+                  <Card key={item.label} variant="glass" className="border-[var(--rh-border)] bg-[#f7f8f9]" size="lg">
+                    <CardContent className="p-0">
+                      <p className="font-display text-[2rem] leading-none text-[var(--rh-teal-deep)]">{item.value}</p>
+                      <p className="mt-2 text-sm font-medium text-[var(--rh-copy-soft)]">{item.label}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
               {(featuredTestimonials.length ? featuredTestimonials : promiseCards).map((item, index) => {
                 const isTestimonial = "text" in item;
 
@@ -469,6 +470,7 @@ export function HomePage() {
                   </Card>
                 );
               })}
+              </div>
             </div>
           </div>
         </section>
@@ -476,7 +478,7 @@ export function HomePage() {
         <section className="bg-[#f7f8f9] px-6 py-12 md:px-10 md:py-16">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
                 Dúvidas frequentes
               </p>
               <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
@@ -502,7 +504,7 @@ export function HomePage() {
         <section className="bg-[var(--rh-paper)] px-6 py-12 md:px-10 md:py-16">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
                 Próximo passo
               </p>
               <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">

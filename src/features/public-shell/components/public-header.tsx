@@ -25,10 +25,24 @@ function isItemActive(pathname: string, to: string) {
 
 export function PublicHeader() {
   const location = useLocation();
+  const isHome = location.pathname === "/";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[#ebebeb] bg-white/95 shadow-[0_10px_30px_-28px_rgba(0,0,0,0.35)] backdrop-blur-md">
-      <div className="mx-auto flex h-[72px] w-[min(1180px,calc(100%-24px))] items-center justify-between gap-5 md:w-[min(1180px,calc(100%-40px))]">
+    <header
+      className={cn(
+        "z-30",
+        isHome
+          ? "bg-[#eef0f2] pt-8 md:pt-10"
+          : "sticky top-0 border-b border-[#ebebeb] bg-white/95 shadow-[0_10px_30px_-28px_rgba(0,0,0,0.35)] backdrop-blur-md"
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex h-[72px] w-[min(1180px,calc(100%-24px))] items-center justify-between gap-5 md:w-[min(1180px,calc(100%-40px))]",
+          isHome &&
+            "rounded-t-[24px] border border-b-0 border-[rgba(12,106,131,0.12)] bg-[#ebebeb] px-4 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] md:px-10"
+        )}
+      >
         <NextLink
           href="/"
           aria-label={company.logo.alt}
