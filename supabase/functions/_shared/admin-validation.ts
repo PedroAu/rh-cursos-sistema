@@ -75,13 +75,16 @@ export const leadSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: emailSchema,
   phone: z.string().optional(),
-  courseInterest: z.string().min(1, "Curso de interesse é obrigatório"),
-  origin: z.enum(["Site", "WhatsApp", "Blog", "Indicação", "LinkedIn"]),
+  type: z.enum(["Curso", "InCompany", "Consultoria", "Newsletter", "Orçamento", "Contato"]),
+  courseInterest: z.string().min(1, "Interesse principal é obrigatório"),
+  courseId: z.string().optional(),
+  origin: z.enum(["Site", "WhatsApp", "Blog", "Indicação", "LinkedIn", "Especialista", "Orçamento In Company", "Contato", "Newsletter"]),
   status: z.enum(["Novo", "Em atendimento", "Proposta enviada", "Convertido", "Perdido"]),
   organization: z.string().optional(),
   teamSize: z.number().int().positive().optional(),
   preferredModality: z.string().optional(),
   trainingObjective: z.string().optional(),
+  trainingTheme: z.string().optional(),
   mainChallenges: z.string().optional(),
 });
 

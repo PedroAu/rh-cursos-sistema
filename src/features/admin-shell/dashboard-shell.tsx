@@ -4,13 +4,14 @@ import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import type { ReactNode } from "react";
 
+import type { DashboardRole } from "@/lib/auth";
 import { AppToaster } from "@/components/ui/toaster";
 import { AdminBottomNavigation } from "@/features/admin-shell/components/admin-bottom-navigation";
 import { AdminSidebar } from "@/features/admin-shell/components/admin-sidebar";
 import { AdminTopbar } from "@/features/admin-shell/components/admin-topbar";
 import { Outlet } from "@/lib/router-compat";
 
-export function DashboardShell({ role, children }: { role: "admin"; children?: ReactNode }) {
+export function DashboardShell({ role, children }: { role: DashboardRole; children?: ReactNode }) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure(false);
 
   return (
@@ -30,7 +31,7 @@ export function DashboardShell({ role, children }: { role: "admin"; children?: R
           }
         }}
       >
-        <AdminTopbar opened={mobileOpened} onToggle={toggleMobile} />
+        <AdminTopbar opened={mobileOpened} onToggle={toggleMobile} role={role} />
         <AdminSidebar role={role} />
 
         <AppShell.Main pb={{ base: 88, lg: 0 }}>
@@ -40,7 +41,7 @@ export function DashboardShell({ role, children }: { role: "admin"; children?: R
         </AppShell.Main>
       </AppShell>
 
-      <AdminBottomNavigation />
+      <AdminBottomNavigation role={role} />
       <AppToaster />
     </>
   );

@@ -10,10 +10,16 @@ type LeadPayload = {
   name?: string;
   email?: string;
   phone?: string;
+  type?: "Curso" | "InCompany" | "Consultoria" | "Newsletter" | "Orçamento" | "Contato";
   organization?: string;
   teamSize?: number;
   courseInterest?: string;
+  courseId?: string;
   origin?: string;
+  preferredModality?: string;
+  trainingObjective?: string;
+  trainingTheme?: string;
+  mainChallenges?: string;
   message?: string;
 };
 
@@ -55,10 +61,21 @@ Deno.serve(async (request) => {
         nome: payload.name,
         email: payload.email,
         telefone: payload.phone,
+        tipo:
+          payload.type === "Consultoria"
+            ? "Mentoria"
+            : payload.type === "Orçamento"
+              ? "Orcamento"
+              : payload.type ?? "Contato",
         orgao: payload.organization,
         num_participantes: payload.teamSize,
         tema_interesse: payload.courseInterest,
+        curso_id: payload.courseId,
         origem: payload.origin,
+        modalidade_preferida: payload.preferredModality,
+        objetivo_treinamento: payload.trainingObjective,
+        tema_treinamento: payload.trainingTheme,
+        desafios_principais: payload.mainChallenges,
         mensagem: payload.message,
         status_crm: "Novo",
       });

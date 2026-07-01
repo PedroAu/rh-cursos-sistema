@@ -8,7 +8,9 @@ import { company } from "@/lib/company";
 const quickLinks = [
   { label: "Administração", to: "/login" },
   { label: "Catálogo de cursos", to: "/cursos" },
-  { label: "Agenda de turmas", to: "/agenda" }
+  { label: "Consultoria", to: "/consultoria" },
+  { label: "Agenda de turmas", to: "/agenda" },
+  { label: "Falar com especialista", to: "/falar-com-especialista" }
 ];
 
 export function PublicFooter() {

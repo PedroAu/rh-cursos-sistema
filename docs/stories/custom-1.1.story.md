@@ -459,7 +459,7 @@ Must be available in project:
 
 ## 📎 Attachments
 
-- [`DESIGN_REFACTOR_PLAN.md`](../../DESIGN_REFACTOR_PLAN.md) — Plano detalhado em 4 fases
+- [`DESIGN_REFACTOR_PLAN.md`](../design/DESIGN_REFACTOR_PLAN.md) — Plano detalhado em 4 fases
 - [`docs/design/DESIGN.md`](../../docs/design/DESIGN.md) — Trust Keith Design System spec
 - [`src/design-tokens/tokens.tailwind.js`](../../src/design-tokens/tokens.tailwind.js) — Current tokens (to be refactored)
 

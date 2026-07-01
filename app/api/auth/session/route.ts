@@ -11,6 +11,7 @@ import {
 import { SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 import { getServerSession } from "@/lib/server-session";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -55,7 +56,7 @@ export async function GET() {
   const currentToken = cookieStore.get(SESSION_COOKIE)?.value ?? null;
   const session = await getServerSession();
 
-  if (!session || session.role !== "admin") {
+  if (!session) {
     return NextResponse.json({ ok: false, error: "Sessao invalida ou expirada." }, { status: 401 });
   }
 
@@ -98,7 +99,7 @@ export async function POST(request: Request) {
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
 
-  if (role !== "admin" || !email || !password) {
+  if (!role || !email || !password) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
   }
 
@@ -114,7 +115,7 @@ export async function POST(request: Request) {
   }
 
   const metadataRole = normalizeDashboardRole(result.data.user.app_metadata?.role);
-  if (metadataRole !== "admin" || metadataRole !== role) {
+  if (!metadataRole || metadataRole !== role) {
     return NextResponse.json({ ok: false, error: "Acesso nao autorizado." }, { status: 403 });
   }
 
@@ -127,7 +128,7 @@ export async function POST(request: Request) {
         : email.split("@")[0]
   } as const;
 
-  return buildSessionResponse(session, {
+  const response = await buildSessionResponse(session, {
     supabaseSession: result.data.session
       ? {
           access_token: result.data.session.access_token,
@@ -135,6 +136,9 @@ export async function POST(request: Request) {
         }
       : null
   });
+
+  response.headers.set("x-rh-dashboard-path", getDefaultDashboardPath(metadataRole));
+  return response;
 }
 
 export async function DELETE(request: Request) {

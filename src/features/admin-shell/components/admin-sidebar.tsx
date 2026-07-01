@@ -15,15 +15,25 @@ import {
 } from "@mantine/core";
 import { BookOpen, LogOut, Settings, Sparkles } from "lucide-react";
 
-import { adminNavItems } from "@/features/admin-shell/config/admin-navigation";
+import type { DashboardRole } from "@/lib/auth";
+import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { useAppStore } from "@/lib/app-store";
 import { getInitials } from "@/lib/get-initials";
 import { Link, useLocation } from "@/lib/router-compat";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 
-export function AdminSidebar({ role }: { role: "admin" }) {
+function getRoleLabel(role: DashboardRole) {
+  if (role === "student") return "portal do aluno";
+  if (role === "instructor") return "portal do instrutor";
+  return "admin";
+}
+
+export function AdminSidebar({ role }: { role: DashboardRole }) {
   const { currentSession, logout } = useAppStore();
   const location = useLocation();
   const initials = getInitials(currentSession?.name ?? "Admin");
+  const navItems = getDashboardNavItems(role);
+  const homePath = getDefaultDashboardPath(role);
 
   return (
     <AppShell.Navbar
@@ -41,7 +51,7 @@ export function AdminSidebar({ role }: { role: "admin" }) {
                 RH Cursos
               </Text>
               <Text c="rgba(255,255,255,0.64)" fz="0.72rem" tt="uppercase" fw={700} mt={6} lts="0.16em">
-                {role}
+                {getRoleLabel(role)}
               </Text>
             </Box>
             <ThemeIcon radius="xl" size={38} color="rhGold" variant="light">
@@ -53,10 +63,10 @@ export function AdminSidebar({ role }: { role: "admin" }) {
 
       <AppShell.Section grow component={ScrollArea} px="md" py="sm" scrollbarSize={6}>
         <Stack gap={8}>
-          {adminNavItems.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
-              item.to === "/admin"
+              item.to === homePath
                 ? location.pathname === item.to
                 : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 

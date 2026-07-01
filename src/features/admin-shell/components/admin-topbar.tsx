@@ -3,34 +3,45 @@
 import { ActionIcon, AppShell, Burger, Group, TextInput } from "@mantine/core";
 import { Bell, CircleHelp, Search } from "lucide-react";
 
-import { adminNavItems } from "@/features/admin-shell/config/admin-navigation";
+import type { DashboardRole } from "@/lib/auth";
+import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { useLocation } from "@/lib/router-compat";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 
-function resolvePlaceholder(pathname: string) {
-  const matched = [...adminNavItems]
+function resolvePlaceholder(pathname: string, role: DashboardRole) {
+  const navItems = getDashboardNavItems(role);
+  const homePath = getDefaultDashboardPath(role);
+  const matched = [...navItems]
     .sort((left, right) => right.to.length - left.to.length)
     .find((item) => pathname === item.to || pathname.startsWith(`${item.to}/`));
 
   if (!matched) {
-    return "Buscar no painel...";
+    return role === "admin" ? "Buscar no painel..." : "Buscar no portal...";
   }
 
   if (matched.to === "/admin/alunos") return "Buscar aluno ou curso...";
   if (matched.to === "/admin/cursos") return "Buscar curso...";
   if (matched.to === "/admin/turmas") return "Buscar turma...";
+  if (matched.to === "/aluno#inscricoes") return "Buscar inscrição...";
+  if (matched.to === "/instrutor#turmas") return "Buscar turma atribuída...";
+  if (matched.to === homePath) {
+    return role === "admin" ? "Buscar no painel..." : "Buscar no portal...";
+  }
 
-  return "Buscar no painel...";
+  return role === "admin" ? "Buscar no painel..." : "Buscar no portal...";
 }
 
 export function AdminTopbar({
   opened,
-  onToggle
+  onToggle,
+  role
 }: {
   opened: boolean;
   onToggle: () => void;
+  role: DashboardRole;
 }) {
   const location = useLocation();
-  const placeholder = resolvePlaceholder(location.pathname);
+  const placeholder = resolvePlaceholder(location.pathname, role);
 
   return (
     <AppShell.Header

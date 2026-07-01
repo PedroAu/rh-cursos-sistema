@@ -125,8 +125,11 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
         name: form.responsibleName,
         email: form.email,
         phone: form.phone,
+        type: "Orçamento",
         courseInterest: course ? course.title : "Orçamento In Company",
+        courseId: course?.id,
         organization: form.organization,
+        teamSize: Number(form.teamSize),
         preferredModality: form.modality,
         origin: "Orçamento In Company",
         message: [

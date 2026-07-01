@@ -179,6 +179,32 @@ function fromDbLeadStatus(value: LeadRow["status_crm"]): Lead["status"] {
   return map[value];
 }
 
+function fromDbLeadType(value: LeadRow["tipo"]): Lead["type"] {
+  const map: Record<LeadRow["tipo"], Lead["type"]> = {
+    Curso: "Curso",
+    InCompany: "InCompany",
+    Mentoria: "Consultoria",
+    Newsletter: "Newsletter",
+    Orcamento: "Orçamento",
+    Contato: "Contato"
+  };
+
+  return map[value];
+}
+
+function toDbLeadType(value: Lead["type"]): LeadRow["tipo"] {
+  const map: Record<Lead["type"], LeadRow["tipo"]> = {
+    Curso: "Curso",
+    InCompany: "InCompany",
+    Consultoria: "Mentoria",
+    Newsletter: "Newsletter",
+    Orçamento: "Orcamento",
+    Contato: "Contato"
+  };
+
+  return map[value];
+}
+
 function fromDbBlogCategory(value: string): BlogPost["category"] {
   const validCategories: BlogPost["category"][] = [
     "Departamento Pessoal",
@@ -279,7 +305,15 @@ export function mapLead(row: LeadRow): Lead {
     name: row.nome,
     email: row.email ?? "",
     phone: row.telefone ?? "",
+    type: fromDbLeadType(row.tipo),
     courseInterest: row.tema_interesse ?? "",
+    courseId: row.curso_id ?? undefined,
+    organization: row.orgao ?? undefined,
+    teamSize: row.num_participantes ?? undefined,
+    preferredModality: row.modalidade_preferida ?? undefined,
+    trainingObjective: row.objetivo_treinamento ?? undefined,
+    trainingTheme: row.tema_treinamento ?? undefined,
+    mainChallenges: row.desafios_principais ?? undefined,
     origin: (row.origem as Lead["origin"] | null) ?? "Site",
     status: fromDbLeadStatus(row.status_crm),
     message: row.mensagem ?? "",
@@ -350,10 +384,16 @@ export function leadToInsert(payload: Omit<Lead, "id" | "createdAt" | "status">)
     nome: payload.name,
     email: payload.email,
     telefone: payload.phone,
+    tipo: toDbLeadType(payload.type),
     orgao: payload.organization,
     num_participantes: payload.teamSize,
     tema_interesse: payload.courseInterest,
+    curso_id: payload.courseId,
     origem: payload.origin,
+    modalidade_preferida: payload.preferredModality,
+    objetivo_treinamento: payload.trainingObjective,
+    tema_treinamento: payload.trainingTheme,
+    desafios_principais: payload.mainChallenges,
     mensagem: payload.message,
     status_crm: "Novo"
   };

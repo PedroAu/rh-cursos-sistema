@@ -569,7 +569,7 @@ npm run seed:admin   # Create default admin user for testing
 - **Frontend Architecture Target:** `docs/architecture/frontend-feature-first-architecture.md`
 - **Database Migrations:** `supabase/migrations/`
 - **Feature Modules:** `src/features/`
-- **Seed Data:** `docs/SEED.md`
+- **Seed Data:** `docs/database/SEED.md`
 
 ---
 

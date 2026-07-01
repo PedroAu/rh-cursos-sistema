@@ -282,7 +282,7 @@ export function AppStoreProvider({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!state.currentSession || state.currentSession.role !== "admin") return;
+    if (!state.currentSession) return;
 
     let cancelled = false;
 

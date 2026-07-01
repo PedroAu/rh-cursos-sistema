@@ -6,7 +6,7 @@ Endpoints executados no Next.js (Node.js em dev, Cloudflare Workers em prod).
 
 Atualmente, um único Route Handler:
 - **GET /api/auth/session** — sincroniza a sessão autenticada e renova o token quando necessário
-- **POST /api/auth/session** — login administrativo
+- **POST /api/auth/session** — login por perfil (`admin`, `student`, `instructor`)
 - **DELETE /api/auth/session** — logout (revoga sessões)
 
 Todos implementados em `app/api/auth/session/route.ts`.
@@ -35,7 +35,7 @@ Todos implementados em `app/api/auth/session/route.ts`.
 
 ### GET /api/auth/session
 
-**Descrição:** Sincroniza a sessão administrativa atual e reaproveita ou rotaciona o token HMAC sem quebrar o SSR de `/admin`
+**Descrição:** Sincroniza a sessão autenticada atual e reaproveita ou rotaciona o token HMAC sem quebrar o SSR das áreas autenticadas (`/admin`, `/aluno`, `/instrutor`)
 
 **Método:** `GET`
 
@@ -52,9 +52,9 @@ Todos implementados em `app/api/auth/session/route.ts`.
 {
   "ok": true,
   "session": {
-    "role": "admin",
+    "role": "student",
     "email": "admin@rhcursos.com.br",
-    "name": "Admin"
+    "name": "Maria"
   },
   "token": "eyJ...",
   "rotated": false,
@@ -67,9 +67,9 @@ Todos implementados em `app/api/auth/session/route.ts`.
 {
   "ok": true,
   "session": {
-    "role": "admin",
+    "role": "instructor",
     "email": "admin@rhcursos.com.br",
-    "name": "Admin"
+    "name": "Carlos"
   },
   "token": "eyJ...novo",
   "rotated": true,
@@ -93,7 +93,7 @@ Todos implementados em `app/api/auth/session/route.ts`.
 
 ### POST /api/auth/session
 
-**Descrição:** Login administrativo — autentica contra Supabase e cria sessão
+**Descrição:** Login por perfil — autentica contra Supabase e cria sessão local compatível com os portais autenticados
 
 **Método:** `POST`
 
@@ -104,23 +104,23 @@ Todos implementados em `app/api/auth/session/route.ts`.
 {
   "email": "admin@rhcursos.com.br",
   "password": "securepass123",
-  "role": "admin"
+  "role": "student"
 }
 ```
 
 **Campos:**
 - `email` (string, obrigatório) — email da conta Supabase Auth
 - `password` (string, obrigatório) — senha da conta
-- `role` (string, obrigatório) — função desejada; único valor aceito: `"admin"`
+- `role` (string, obrigatório) — função desejada; valores aceitos: `"admin"`, `"student"`, `"instructor"`
 
 **Response (200 — sucesso):**
 ```json
 {
   "ok": true,
   "session": {
-    "role": "admin",
-    "email": "admin@rhcursos.com.br",
-    "name": "Admin"
+    "role": "student",
+    "email": "aluna@rhcursos.com.br",
+    "name": "Ana"
   },
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQHJoY3Vyc29zLmNvbS5iciIsIm5hbWUiOiJBZG1pbiIsImlhdCI6MTcxODk0MzYwMCwiZXhwIjoxNzE5MDMwMDAwfQ.SIGNATURE",
   "rotated": false,
@@ -130,6 +130,9 @@ Todos implementados em `app/api/auth/session/route.ts`.
   }
 }
 ```
+
+**Header adicional:**
+- `x-rh-dashboard-path` — rota padrão para redirecionamento pós-login (`/admin`, `/aluno` ou `/instrutor`)
 
 > **Nota:** `supabaseSession` pode ser `null` se o Supabase não retornar sessão (edge case).
 
@@ -154,7 +157,7 @@ Todos implementados em `app/api/auth/session/route.ts`.
 
 **Trigger:**
 - `email`, `password` ou `role` faltando no body
-- `role` tem valor diferente de `"admin"`
+- `role` não pertence ao conjunto permitido (`admin`, `student`, `instructor`)
 
 ---
 
@@ -181,7 +184,8 @@ Todos implementados em `app/api/auth/session/route.ts`.
 ```
 
 **Trigger:**
-- Usuário autenticado no Supabase, mas `app_metadata.role` é `null` ou diferente de `"admin"`
+- Usuário autenticado no Supabase, mas `app_metadata.role` é `null`
+- Usuário autenticado, porém o `app_metadata.role` não coincide com o `role` solicitado no login
 
 ---
 

@@ -88,6 +88,7 @@ export function WhatsAppSupport() {
                     name: "Lead do atendimento",
                     email: company.email,
                     phone: company.phones.whatsapp,
+                    type: "Contato",
                     courseInterest: "Atendimento geral",
                     origin: "WhatsApp",
                     message: message || "Solicitação enviada pelo atendimento rápido"

@@ -19,7 +19,7 @@ servers:
         default: your-project-ref
 tags:
   - name: Auth Session
-    description: Login, sincronização e logout administrativo
+    description: Login, sincronização e logout dos portais autenticados
   - name: Enrollments
     description: Inscrição pública em cursos
   - name: Leads
@@ -30,11 +30,11 @@ paths:
   /api/auth/session:
     get:
       tags: [Auth Session]
-      summary: Sincroniza a sessão administrativa atual
+      summary: Sincroniza a sessão autenticada atual
       description: >-
         Lê o cookie `SESSION_COOKIE`, retorna a sessão atual e rotaciona o token
         quando a expiração entra na janela de renovação.
-      operationId: getAdminSession
+      operationId: getDashboardSession
       security:
         - sessionCookie: []
       responses:
@@ -55,9 +55,9 @@ paths:
                   value:
                     ok: true
                     session:
-                      role: admin
-                      email: admin@rhcursos.com.br
-                      name: Admin
+                      role: student
+                      email: aluna@rhcursos.com.br
+                      name: Ana
                     token: eyJ...
                     rotated: false
                     supabaseSession: null
@@ -66,9 +66,9 @@ paths:
                   value:
                     ok: true
                     session:
-                      role: admin
-                      email: admin@rhcursos.com.br
-                      name: Admin
+                      role: instructor
+                      email: instrutor@rhcursos.com.br
+                      name: Carlos
                     token: eyJ...novo
                     rotated: true
                     supabaseSession: null
@@ -76,8 +76,8 @@ paths:
           $ref: '#/components/responses/SessionInvalid'
     post:
       tags: [Auth Session]
-      summary: Login administrativo via Route Handler
-      operationId: loginAdminSession
+      summary: Login por perfil via Route Handler
+      operationId: loginDashboardSession
       security: []
       requestBody:
         required: true
@@ -91,11 +91,19 @@ paths:
                   email: admin@rhcursos.com.br
                   password: securepass123
                   role: admin
+              student:
+                value:
+                  email: aluna@rhcursos.com.br
+                  password: securepass123
+                  role: student
       responses:
         '200':
           description: Login concluído com cookie HttpOnly emitido
           headers:
             Set-Cookie:
+              schema:
+                type: string
+            x-rh-dashboard-path:
               schema:
                 type: string
           content:
@@ -114,8 +122,8 @@ paths:
           $ref: '#/components/responses/AuthUnavailable'
     delete:
       tags: [Auth Session]
-      summary: Logout administrativo via Route Handler
-      operationId: logoutAdminSession
+      summary: Logout via Route Handler
+      operationId: logoutDashboardSession
       security: []
       requestBody:
         required: false
@@ -264,7 +272,7 @@ paths:
   /functions/v1/leads:
     post:
       tags: [Leads]
-      summary: Registra um lead corporativo
+      summary: Registra um lead comercial ou consultivo
       operationId: createLead
       x-runtime: supabase-edge-function
       security: []
@@ -392,8 +400,8 @@ paths:
   /functions/v1/auth-session:
     post:
       tags: [Auth Session]
-      summary: Login administrativo via Edge Function
-      operationId: loginAdminSessionEdge
+      summary: Login por perfil via Edge Function
+      operationId: loginDashboardSessionEdge
       x-runtime: supabase-edge-function
       security: []
       x-rate-limit:
@@ -408,7 +416,7 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Login administrativo concluído
+          description: Login concluído
           content:
             application/json:
               schema:
@@ -438,8 +446,8 @@ paths:
           $ref: '#/components/responses/AuthUnavailable'
     delete:
       tags: [Auth Session]
-      summary: Logout administrativo via Edge Function
-      operationId: logoutAdminSessionEdge
+      summary: Logout via Edge Function
+      operationId: logoutDashboardSessionEdge
       x-runtime: supabase-edge-function
       security: []
       requestBody:
@@ -597,7 +605,7 @@ components:
   schemas:
     DashboardRole:
       type: string
-      enum: [admin]
+      enum: [admin, student, instructor]
     SessionPayload:
       type: object
       additionalProperties: false
@@ -799,13 +807,26 @@ components:
           format: email
         phone:
           type: string
+        type:
+          type: string
+          enum: [Curso, InCompany, Consultoria, Newsletter, Orçamento, Contato]
         organization:
           type: string
         teamSize:
           type: integer
         courseInterest:
           type: string
+        courseId:
+          type: string
         origin:
+          type: string
+        preferredModality:
+          type: string
+        trainingObjective:
+          type: string
+        trainingTheme:
+          type: string
+        mainChallenges:
           type: string
         message:
           type: string

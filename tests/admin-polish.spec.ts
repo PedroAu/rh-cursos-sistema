@@ -46,7 +46,8 @@ test.describe("epica 3 — admin polish", () => {
 
     expect(classConfig.fields.find((field) => field.key === "courseId")?.type).toBe("select");
     expect(classConfig.fields.find((field) => field.key === "instructorId")?.type).toBe("select");
-    expect(leadConfig.fields.find((field) => field.key === "courseInterest")?.type).toBe("select");
+    expect(leadConfig.fields.find((field) => field.key === "type")?.type).toBe("select");
+    expect(leadConfig.fields.find((field) => field.key === "courseInterest")?.type).toBe("text");
   });
 
   test("inscrições derivam contexto read-only antes da atualização de status", async () => {

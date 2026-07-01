@@ -10,6 +10,7 @@ import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
 const publicPaths = [
   "/",
   "/cursos",
+  "/consultoria",
   "/agenda",
   "/blog",
   "/in-company",
@@ -70,7 +71,7 @@ test.describe("rotas publicas", () => {
   });
 });
 
-test.describe("protecao server-side do admin", () => {
+test.describe("protecao server-side das areas autenticadas", () => {
   test("/admin sem sessao redireciona para /login (server-side)", async ({ page, request }) => {
     const response = await request.get("/admin/", { maxRedirects: 0 });
     expect(response.status()).toBe(307);
@@ -80,9 +81,42 @@ test.describe("protecao server-side do admin", () => {
     await expect(page).toHaveURL(/\/login\?status=required&next=\/admin/);
   });
 
-  test("rotas de portal aluno e instrutor nao existem nesta publicacao", async ({ request }) => {
-    await expect.poll(async () => (await request.get("/aluno")).status()).toBe(404);
-    await expect.poll(async () => (await request.get("/instrutor")).status()).toBe(404);
+  test("portais aluno e instrutor redirecionam sem sessao", async ({ request }) => {
+    const studentResponse = await request.get("/aluno", { maxRedirects: 0 });
+    expect(studentResponse.status()).toBe(307);
+    expect(studentResponse.headers().location).toContain("/login?status=required&next=/aluno");
+
+    const instructorResponse = await request.get("/instrutor", { maxRedirects: 0 });
+    expect(instructorResponse.status()).toBe(307);
+    expect(instructorResponse.headers().location).toContain("/login?status=required&next=/instrutor");
+  });
+
+  test("cada portal aceita apenas a role correspondente", async ({ request }) => {
+    const studentToken = await issueSessionToken("student");
+    const instructorToken = await issueSessionToken("instructor");
+    const adminToken = await issueSessionToken("admin");
+
+    const studentPortal = await request.get("/aluno", {
+      headers: { cookie: cookieHeader(studentToken) }
+    });
+    expect(studentPortal.status()).toBe(200);
+
+    const instructorPortal = await request.get("/instrutor", {
+      headers: { cookie: cookieHeader(instructorToken) }
+    });
+    expect(instructorPortal.status()).toBe(200);
+
+    const blockedStudent = await request.get("/aluno", {
+      headers: { cookie: cookieHeader(instructorToken) },
+      maxRedirects: 0
+    });
+    expect(blockedStudent.status()).toBe(307);
+
+    const blockedInstructor = await request.get("/instrutor", {
+      headers: { cookie: cookieHeader(adminToken) },
+      maxRedirects: 0
+    });
+    expect(blockedInstructor.status()).toBe(307);
   });
 
   test("/admin com sessao nao-admin falha fechado e redireciona para /login", async ({
@@ -137,16 +171,20 @@ test.describe("contrato da rota /api/auth/session", () => {
     });
   });
 
-  test("GET com sessao nao-admin responde 401", async ({ request }) => {
+  test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ request }) => {
     const token = await issueSessionToken("student");
     const response = await request.get("/api/auth/session", {
       headers: { cookie: cookieHeader(token) }
     });
 
-    expect(response.status()).toBe(401);
-    await expect(response.json()).resolves.toEqual({
-      ok: false,
-      error: "Sessao invalida ou expirada."
+    expect(response.status()).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      session: {
+        role: "student",
+        email: "student@rhcursos.com.br",
+        name: "Perfil student"
+      }
     });
   });
 

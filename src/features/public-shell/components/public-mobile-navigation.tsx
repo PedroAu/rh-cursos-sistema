@@ -1,18 +1,21 @@
 "use client";
 
+import Image from "next/image";
 import NextLink from "next/link";
-import { Burger, Button, Divider, Drawer, Stack, Text } from "@mantine/core";
+import { Burger, Drawer } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { MessageCircle } from "lucide-react";
+import { ArrowRight, UserRound } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
+import { company } from "@/lib/company";
 
 export function PublicMobileNavigation() {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <>
-      <Burger opened={opened} onClick={open} aria-label="Abrir menu" color="var(--mantine-color-rhBlue-9)" />
+      <Burger opened={opened} onClick={open} aria-label="Abrir menu" color="#0c6a83" />
 
       <Drawer
         opened={opened}
@@ -20,68 +23,62 @@ export function PublicMobileNavigation() {
         keepMounted={false}
         position="right"
         title={
-          <Stack gap={2}>
-            <Text fw={800} fz="1.4rem" c="rhBlue.9" style={{ letterSpacing: "-0.04em" }}>
-              RH Cursos
-            </Text>
-            <Text c="dimmed" fz="sm">
-              Navegue pelas áreas principais da plataforma.
-            </Text>
-          </Stack>
+          <Image
+            src={company.logo.src}
+            alt={company.logo.alt}
+            width={260}
+            height={164}
+            className="h-12 w-auto"
+          />
         }
         styles={{
-          content: { background: "#f8fafc" },
-          header: { background: "#f8fafc" }
+          content: { background: "#f3f0e8" },
+          header: { background: "#f3f0e8", borderBottom: "1px solid #ddd7c7" },
+          title: { lineHeight: 0 }
         }}
       >
-        <Stack gap="sm">
+        <div className="grid gap-2">
           {publicNavItems.map((item) => (
-            <Button
+            <NextLink
               key={item.to}
-              component={NextLink}
               href={item.to}
-              justify="space-between"
-              variant="default"
-              color="gray"
               onClick={close}
-              styles={{
-                root: {
-                  height: 52,
-                  borderColor: "var(--mantine-color-gray-3)",
-                  background: "#ffffff"
-                },
-                label: {
-                  fontSize: "0.95rem",
-                  fontWeight: 700,
-                  color: "var(--mantine-color-rhBlue-9)"
-                }
-              }}
+              className="rounded-lg border border-[#ddd7c7] bg-white px-4 py-3 text-sm font-semibold text-[#1f2a33] transition hover:border-[#0c6a83] hover:text-[#0c6a83] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1791a9] focus-visible:ring-offset-2"
             >
               {item.label}
-            </Button>
+            </NextLink>
           ))}
+        </div>
 
-          <Divider my="xs" />
-
-          <Button component={NextLink} href="/cursos" color="rhGold" c="#0a2038" onClick={close}>
-            Ver cursos
-          </Button>
-
-          <Button component={NextLink} href="/login" aria-label="Área do Aluno" color="rhBlue" onClick={close}>
-            Área do Aluno
+        <div className="mt-5 grid gap-3 border-t border-[#ddd7c7] pt-5">
+          <Button asChild className="bg-[#0c6a83] text-white hover:bg-[#084f63]" onClick={close}>
+            <NextLink href="/falar-com-especialista">
+              Fale com um especialista
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </NextLink>
           </Button>
 
           <Button
-            component="a"
-            href="#atendimento"
-            variant="light"
-            color="rhBlue"
+            asChild
+            variant="secondary"
+            className="border-[#ddd7c7] bg-white text-[#0c6a83] hover:bg-[#ebe5d8]"
             onClick={close}
-            leftSection={<MessageCircle className="h-4 w-4" />}
           >
-            Falar com atendimento
+            <NextLink href="/agenda">Ver agenda de cursos</NextLink>
           </Button>
-        </Stack>
+
+          <Button
+            asChild
+            variant="ghost"
+            className="text-[#1f2a33] hover:bg-white/70"
+            onClick={close}
+          >
+            <NextLink href="/login">
+              <UserRound className="h-4 w-4" aria-hidden="true" />
+              Entrar
+            </NextLink>
+          </Button>
+        </div>
       </Drawer>
     </>
   );

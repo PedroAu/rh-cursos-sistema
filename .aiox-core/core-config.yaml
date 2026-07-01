@@ -63,7 +63,7 @@ git:
 decisionLogging:
   enabled: true
   async: true
-  location: .ai/
+  location: docs/history/decisions/
   indexFile: decision-logs-index.md
   format: adr
   performance:

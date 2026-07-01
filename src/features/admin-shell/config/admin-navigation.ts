@@ -1,7 +1,9 @@
+import type { DashboardRole } from "@/lib/auth";
 import type { LucideIcon } from "lucide-react";
 import {
   BookOpen,
   CalendarDays,
+  ContactRound,
   GraduationCap,
   LayoutDashboard,
   Newspaper,
@@ -11,14 +13,14 @@ import {
   Users
 } from "lucide-react";
 
-export type AdminNavItem = {
+export type DashboardNavItem = {
   to: string;
   label: string;
   mobileLabel: string;
   icon: LucideIcon;
 };
 
-export const adminNavItems: AdminNavItem[] = [
+const adminNavItems: DashboardNavItem[] = [
   { to: "/admin", label: "Visão geral", mobileLabel: "Início", icon: LayoutDashboard },
   { to: "/admin/cursos", label: "Cursos", mobileLabel: "Cursos", icon: BookOpen },
   { to: "/admin/turmas", label: "Turmas", mobileLabel: "Turmas", icon: CalendarDays },
@@ -29,3 +31,27 @@ export const adminNavItems: AdminNavItem[] = [
   { to: "/admin/blog", label: "Blog", mobileLabel: "Blog", icon: Newspaper },
   { to: "/admin/configuracoes", label: "Configurações", mobileLabel: "Config.", icon: Settings }
 ];
+
+const studentNavItems: DashboardNavItem[] = [
+  { to: "/aluno", label: "Minha visão geral", mobileLabel: "Início", icon: LayoutDashboard },
+  { to: "/aluno#inscricoes", label: "Inscrições", mobileLabel: "Inscr.", icon: ReceiptText },
+  { to: "/aluno#perfil", label: "Perfil", mobileLabel: "Perfil", icon: ContactRound }
+];
+
+const instructorNavItems: DashboardNavItem[] = [
+  { to: "/instrutor", label: "Minha visão geral", mobileLabel: "Início", icon: LayoutDashboard },
+  { to: "/instrutor#turmas", label: "Turmas", mobileLabel: "Turmas", icon: CalendarDays },
+  { to: "/instrutor#alunos", label: "Alunos", mobileLabel: "Alunos", icon: Users }
+];
+
+export function getDashboardNavItems(role: DashboardRole): DashboardNavItem[] {
+  switch (role) {
+    case "student":
+      return studentNavItems;
+    case "instructor":
+      return instructorNavItems;
+    case "admin":
+    default:
+      return adminNavItems;
+  }
+}

@@ -218,8 +218,12 @@ export function validateLead(form: Record<string, string>): ValidationResult {
     addError(errors, "email", "Email inválido");
   }
 
+  if (!form.type?.trim()) {
+    addError(errors, "type", "Selecione o tipo de lead");
+  }
+
   if (!form.courseInterest?.trim()) {
-    addError(errors, "courseInterest", "Selecione um curso de interesse");
+    addError(errors, "courseInterest", "Informe o interesse principal");
   }
 
   if (!form.origin?.trim()) {

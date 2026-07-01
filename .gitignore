@@ -48,3 +48,14 @@ coverage/
 
 # CI/CD Reports (AIOX)
 .lighthouseci/
+
+# Backups locais
+*.backup
+*.backup.*
+*.bak
+
+# Artefatos gerados por pipelines/agentes (AIOX)
+outputs/
+
+# Estado de execução AIOX (local)
+.aiox/config.yaml

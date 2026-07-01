@@ -23,10 +23,34 @@ import {
 import { isEmail, useForm } from "@mantine/form";
 import { toast } from "sonner";
 
+import type { DashboardRole } from "@/lib/auth";
 import { useNavigate } from "@/lib/router-compat";
 import { useAppStore } from "@/lib/app-store";
+import { getDefaultDashboardPath, isRolePathAllowed } from "@/lib/session-routing";
 import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
 import { supabase } from "@/lib/supabase/client";
+
+const roleOptions: Array<{
+  role: DashboardRole;
+  label: string;
+  description: string;
+}> = [
+  {
+    role: "admin",
+    label: "Administração",
+    description: "Acesso ao painel operacional e cadastro."
+  },
+  {
+    role: "student",
+    label: "Aluno",
+    description: "Acompanhe inscrições e contexto das suas turmas."
+  },
+  {
+    role: "instructor",
+    label: "Instrutor",
+    description: "Visualize turmas atribuídas e alunos vinculados."
+  }
+];
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -34,7 +58,7 @@ export function LoginPage() {
   const { setSession } = useAppStore();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRole] = useState<"admin">("admin");
+  const [selectedRole, setSelectedRole] = useState<DashboardRole>("admin");
   const status = searchParams.get("status");
   const nextPath = searchParams.get("next");
 
@@ -64,7 +88,7 @@ export function LoginPage() {
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ role: "admin", email: values.email, password: values.password })
+          body: JSON.stringify({ role: selectedRole, email: values.email, password: values.password })
         });
 
         if (!response.ok) {
@@ -73,7 +97,7 @@ export function LoginPage() {
         }
 
         const data = (await response.json()) as {
-          session: { role: "admin"; email: string; name: string };
+          session: { role: DashboardRole; email: string; name: string };
           token: string;
           supabaseSession: { access_token: string; refresh_token: string } | null;
         };
@@ -89,7 +113,10 @@ export function LoginPage() {
         }
 
         setSession(data.session);
-        navigate(searchParams.get("next") || "/admin");
+        const nextDestination = isRolePathAllowed(data.session.role, nextPath ?? undefined)
+          ? nextPath ?? getDefaultDashboardPath(data.session.role)
+          : getDefaultDashboardPath(data.session.role);
+        navigate(nextDestination);
       } catch {
         setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
       } finally {
@@ -158,37 +185,24 @@ export function LoginPage() {
 
               {status === "required" ? (
                 <Alert color="yellow" variant="light">
-                  Faça login para acessar {nextPath || "/admin"}. Nesta publicação, somente o papel administrativo está disponível.
+                  Faça login para acessar {nextPath || getDefaultDashboardPath(selectedRole)}.
                 </Alert>
               ) : null}
 
               <SimpleGrid cols={{ base: 1, md: 3 }} spacing="md">
-                {[
-                  {
-                    label: "Administração",
-                    description: "Acesso ao painel operacional e cadastro.",
-                    active: true
-                  },
-                  {
-                    label: "Aluno",
-                    description: "Portal fora do escopo desta publicação.",
-                    active: false
-                  },
-                  {
-                    label: "Instrutor",
-                    description: "Portal fora do escopo desta publicação.",
-                    active: false
-                  }
-                ].map((item) => (
+                {roleOptions.map((item) => (
                   <UnstyledButton
-                    key={item.label}
+                    key={item.role}
                     type="button"
-                    disabled={!item.active}
-                    aria-pressed={item.active}
+                    aria-pressed={selectedRole === item.role}
+                    onClick={() => {
+                      setSelectedRole(item.role);
+                      setError(null);
+                    }}
                     style={{
-                      border: item.active ? "1px solid #0a4b72" : "1px solid #d9e1e8",
-                      background: item.active ? "#0a4b72" : "#eef3f7",
-                      color: item.active ? "#ffffff" : "#5b6b7b",
+                      border: selectedRole === item.role ? "1px solid #0a4b72" : "1px solid #d9e1e8",
+                      background: selectedRole === item.role ? "#0a4b72" : "#eef3f7",
+                      color: selectedRole === item.role ? "#ffffff" : "#5b6b7b",
                       borderRadius: "12px",
                       padding: "16px",
                       textAlign: "left"
@@ -197,7 +211,7 @@ export function LoginPage() {
                     <Text fw={700} fz="sm">
                       {item.label}
                     </Text>
-                    <Text mt={8} fz="sm" c={item.active ? "rgba(255,255,255,0.82)" : "#4f5f6f"}>
+                    <Text mt={8} fz="sm" c={selectedRole === item.role ? "rgba(255,255,255,0.82)" : "#4f5f6f"}>
                       {item.description}
                     </Text>
                   </UnstyledButton>
@@ -215,7 +229,7 @@ export function LoginPage() {
                   <TextInput
                     key={form.key("email")}
                     label="E-mail"
-                    placeholder="admin@empresa.com.br"
+                    placeholder="voce@empresa.com.br"
                     description="Conta autorizada para o papel selecionado."
                     size="md"
                     {...form.getInputProps("email")}
@@ -226,7 +240,7 @@ export function LoginPage() {
                     key={form.key("password")}
                     label="Senha"
                     placeholder="Sua senha de acesso"
-                    description={`Perfil atual: ${selectedRole === "admin" ? "Administração" : selectedRole}.`}
+                    description={`Perfil atual: ${roleOptions.find((item) => item.role === selectedRole)?.label ?? selectedRole}.`}
                     size="md"
                     {...form.getInputProps("password")}
                     onFocus={() => setError(null)}

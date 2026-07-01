@@ -107,9 +107,10 @@ export function ContactPage() {
         name: form.name,
         email: form.email,
         phone: form.phone,
+        type: "Contato",
         courseInterest: form.courseInterest.trim() || "Contato pelo site",
         organization: form.organization.trim() || undefined,
-        origin: "Site",
+        origin: "Contato",
         message: form.message
       });
 

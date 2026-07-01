@@ -44,6 +44,7 @@ export function SpecialistContactPage() {
     name: "",
     email: "",
     phone: "",
+    organization: "",
     interestArea: "",
     message: ""
   });
@@ -75,6 +76,9 @@ export function SpecialistContactPage() {
     if (getPhoneDigits(form.phone).length < 10) {
       nextErrors.phone = "Informe um telefone ou WhatsApp válido.";
     }
+    if (!form.organization.trim()) {
+      nextErrors.organization = "Informe a empresa ou órgão.";
+    }
     if (!form.interestArea) {
       nextErrors.interestArea = "Selecione a área de interesse.";
     }
@@ -95,12 +99,15 @@ export function SpecialistContactPage() {
         name: form.name,
         email: form.email,
         phone: form.phone,
+        type: "Consultoria",
+        organization: form.organization,
         courseInterest: form.interestArea,
+        trainingTheme: form.interestArea,
         origin: "Especialista",
         message: form.message
       });
       toast.success("Solicitação registrada para atendimento especializado.");
-      setForm({ name: "", email: "", phone: "", interestArea: "", message: "" });
+      setForm({ name: "", email: "", phone: "", organization: "", interestArea: "", message: "" });
       setErrors({});
       setSubmitError(null);
       setSubmitSuccess(
@@ -239,6 +246,18 @@ export function SpecialistContactPage() {
                     aria-describedby={ariaDescribedBy}
                     aria-invalid={ariaInvalid}
                     onChange={(event) => update("phone", event.target.value)}
+                  />
+                )}
+              </FormField>
+              <FormField error={errors.organization} label="Empresa ou órgão" required>
+                {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                  <Input
+                    id={fieldId}
+                    placeholder="Ex.: Secretaria de Gestão"
+                    value={form.organization}
+                    aria-describedby={ariaDescribedBy}
+                    aria-invalid={ariaInvalid}
+                    onChange={(event) => update("organization", event.target.value)}
                   />
                 )}
               </FormField>

@@ -2,6 +2,7 @@
 
 import { Suspense, type ReactNode } from "react";
 
+import type { DashboardRole } from "@/lib/auth";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
 import { AppStoreProvider, type AppStoreInitialData } from "@/lib/app-store";
@@ -28,7 +29,7 @@ export function DashboardPageShell({
   initialSession,
   children
 }: {
-  role: "admin";
+  role: DashboardRole;
   initialSession: CurrentSession;
   children: ReactNode;
 }) {

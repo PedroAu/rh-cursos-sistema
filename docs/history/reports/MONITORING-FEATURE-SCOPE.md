@@ -139,7 +139,7 @@
 - `/src/lib/supabase/client.ts` — Supabase client with logging
 
 **Documentation**
-- `/docs/MONITORING.md` — Complete setup and troubleshooting guide
+- `/docs/guides/MONITORING.md` — Complete setup and troubleshooting guide
 - `/docs/MONITORING-FEATURE-SCOPE.md` — This file
 
 ## Sampling Rationale
@@ -206,7 +206,7 @@
 
 ## Related Documentation
 
-- **Setup Guide**: `docs/MONITORING.md`
+- **Setup Guide**: `docs/guides/MONITORING.md`
 - **Sentry Docs**: https://docs.sentry.io/
 - **Next.js Integration**: https://docs.sentry.io/platforms/javascript/guides/nextjs/
 - **Session Replay**: https://docs.sentry.io/product/session-replay/

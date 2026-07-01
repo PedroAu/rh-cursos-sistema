@@ -55,7 +55,7 @@ Origin não listada: `403 Origin not allowed`.
 |--------|-----------|
 | enrollments | Nenhuma (anônimo; RLS controla acesso no banco) |
 | leads | Nenhuma (anônimo; RLS permite insert) |
-| auth-session POST | Body `{email, password, role}` |
+| auth-session POST | Body `{email, password, role}` com `role` em `admin|student|instructor` |
 | auth-session DELETE | Body `{accessToken}` (opcional) |
 | admin-resources | Header `x-rh-session` (token HMAC-SHA256) |
 
@@ -180,7 +180,7 @@ Header: `Retry-After: 60` (segundos até reset da janela)
 
 ### POST /functions/v1/leads
 
-**Descrição:** Registrar lead in-company. Insert direto na tabela `lead` com `status_crm = "Novo"`.
+**Descrição:** Registrar lead comercial/consultivo. Insert direto na tabela `lead` com `status_crm = "Novo"`.
 
 **Autenticação:** Nenhuma
 
@@ -190,15 +190,21 @@ Header: `Retry-After: 60` (segundos até reset da janela)
   "name": "Maria Silva",
   "email": "maria@company.com",
   "phone": "(11) 98888-8888",
+  "type": "Consultoria",
   "organization": "Acme Inc",
   "teamSize": 100,
   "courseInterest": "Liderança",
-  "origin": "landing_page",
+  "courseId": "lideranca-estrategica",
+  "origin": "Especialista",
+  "preferredModality": "Online ao vivo",
+  "trainingObjective": "Desenvolver liderança média",
+  "trainingTheme": "Comunicação e feedback",
+  "mainChallenges": "Gestores recém-promovidos",
   "message": "Interessado em programa corporativo"
 }
 ```
 
-**Validação:** campos obrigatórios verificados diretamente no handler — `name`, `email`, `courseInterest`, `origin`. Os demais (`phone`, `organization`, `teamSize`, `message`) são opcionais e armazenados como-estão.
+**Validação:** campos obrigatórios verificados diretamente no handler — `name`, `email`, `courseInterest`, `origin`. Os demais (`phone`, `type`, `organization`, `teamSize`, `courseId`, `preferredModality`, `trainingObjective`, `trainingTheme`, `mainChallenges`, `message`) são opcionais e armazenados como-estão.
 
 Mapeamento para tabela `lead`:
 
@@ -207,12 +213,23 @@ Mapeamento para tabela `lead`:
 | `name` | `nome` |
 | `email` | `email` |
 | `phone` | `telefone` |
+| `type` | `tipo` |
 | `organization` | `orgao` |
 | `teamSize` | `num_participantes` |
 | `courseInterest` | `tema_interesse` |
+| `courseId` | `curso_id` |
 | `origin` | `origem` |
+| `preferredModality` | `modalidade_preferida` |
+| `trainingObjective` | `objetivo_treinamento` |
+| `trainingTheme` | `tema_treinamento` |
+| `mainChallenges` | `desafios_principais` |
 | `message` | `mensagem` |
 | (fixo) | `status_crm = "Novo"` |
+
+Normalização de `type` antes do insert:
+- `"Consultoria"` -> `"Mentoria"`
+- `"Orçamento"` -> `"Orcamento"`
+- Demais valores (`Curso`, `InCompany`, `Newsletter`, `Contato`) seguem como vieram
 
 **Response (201 — sucesso):**
 ```json

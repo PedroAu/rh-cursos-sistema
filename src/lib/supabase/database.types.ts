@@ -64,6 +64,7 @@ export type Database = {
           nome: string;
           email: string | null;
           telefone: string | null;
+          user_id: string | null;
           bio: string | null;
           foto_url: string | null;
           formacao: string | null;
@@ -79,6 +80,7 @@ export type Database = {
           nome: string;
           email?: string | null;
           telefone?: string | null;
+          user_id?: string | null;
           bio?: string | null;
           foto_url?: string | null;
           formacao?: string | null;

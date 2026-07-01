@@ -2,13 +2,15 @@
 
 import { Paper, SimpleGrid, Text, UnstyledButton } from "@mantine/core";
 
-import { adminNavItems } from "@/features/admin-shell/config/admin-navigation";
+import type { DashboardRole } from "@/lib/auth";
+import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { Link, useLocation } from "@/lib/router-compat";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 
-const mobileNavItems = adminNavItems.slice(0, 5);
-
-export function AdminBottomNavigation() {
+export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
   const location = useLocation();
+  const mobileNavItems = getDashboardNavItems(role).slice(0, 5);
+  const homePath = getDefaultDashboardPath(role);
 
   return (
     <Paper
@@ -33,7 +35,7 @@ export function AdminBottomNavigation() {
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.to === "/admin"
+            item.to === homePath
               ? location.pathname === item.to
               : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 

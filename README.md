@@ -40,7 +40,7 @@ Plataforma SaaS de cursos corporativos da RH Cursos: catálogo público, fluxo d
 
 ## Quick Start (30 minutos)
 
-Novo no projeto? Siga o **[Guia de Quick Start](docs/QUICK-START.md)** para fazer setup em 30 minutos:
+Novo no projeto? Siga o **[Guia de Quick Start](docs/guides/QUICK-START.md)** para fazer setup em 30 minutos:
 
 ```bash
 # 1. Instalar dependências
@@ -55,7 +55,7 @@ npm run dev
 #    App disponível em http://localhost:3000
 ```
 
-Veja [**docs/QUICK-START.md**](docs/QUICK-START.md) para instruções detalhadas de setup.
+Veja [**docs/guides/QUICK-START.md**](docs/guides/QUICK-START.md) para instruções detalhadas de setup.
 
 ### Variáveis de ambiente essenciais
 
@@ -207,7 +207,7 @@ teclado e contraste de cores (WCAG 2.1 AA).
 
 ## Troubleshooting
 
-Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/TROUBLESHOOTING.md)** com soluções para:
+Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/guides/TROUBLESHOOTING.md)** com soluções para:
 
 - Erros de instalação & setup
 - Problemas com desenvolvimento local
@@ -227,7 +227,7 @@ Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/TROUBLESHOOTI
 | Login retorna `429` | Rate limit brute-force | Aguarde 60 segundos e tente novamente |
 | Playwright instável | Testes paralelos | Execução já é sequencial (`--workers=1`) |
 
-**Veja mais:** [**docs/TROUBLESHOOTING.md**](docs/TROUBLESHOOTING.md)
+**Veja mais:** [**docs/guides/TROUBLESHOOTING.md**](docs/guides/TROUBLESHOOTING.md)
 
 ---
 
@@ -235,9 +235,9 @@ Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/TROUBLESHOOTI
 
 ### Comece aqui
 
-- **[docs/QUICK-START.md](docs/QUICK-START.md)** — Setup em 30 minutos para novos devs
+- **[docs/guides/QUICK-START.md](docs/guides/QUICK-START.md)** — Setup em 30 minutos para novos devs
 - **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — Guia completo de deploy para Cloudflare Workers
-- **[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)** — Soluções para problemas comuns
+- **[docs/guides/TROUBLESHOOTING.md](docs/guides/TROUBLESHOOTING.md)** — Soluções para problemas comuns
 
 ### Arquitetura & Design
 
@@ -265,7 +265,7 @@ Encontrou um problema? Consulte o **[Guia de Troubleshooting](docs/TROUBLESHOOTI
 
 - [docs/accessibility/](docs/accessibility/) — Checklist WCAG 2.1 AA
 - [docs/qa/](docs/qa/) — Planos de teste e checklists
-- [docs/TECHNICAL-DEBT-REPORT.md](docs/TECHNICAL-DEBT-REPORT.md) — Avaliação de dívida técnica
+- [docs/architecture/TECHNICAL-DEBT-REPORT.md](docs/architecture/TECHNICAL-DEBT-REPORT.md) — Avaliação de dívida técnica
 
 ---
 

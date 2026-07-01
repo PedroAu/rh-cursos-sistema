@@ -300,6 +300,48 @@ curl https://seu-projeto.supabase.co/auth/v1/verify
 - [ ] Apex https://rhcursos.com.br/ redireciona para www
 - [ ] `/admin/` requer login
 
+## Detalhes técnicos de infraestrutura
+
+### Workflow files
+
+- **Frontend:** [`.github/workflows/deploy-frontend.yml`](.github/workflows/deploy-frontend.yml)
+- **Edge Functions:** [`.github/workflows/deploy-functions.yml`](.github/workflows/deploy-functions.yml)
+
+### Sequência de deploy (CI/CD)
+
+Cada push em `main` dispara:
+1. `npm ci`
+2. `npm run deploy:workers -- --keep-vars` (frontend)
+3. `npm run verify:workers` (validação pós-deploy)
+4. `supabase functions deploy` (edge functions)
+
+### Configuração do Worker (wrangler.jsonc)
+
+- **Worker name:** definido em `wrangler.jsonc`
+- **Routes:** `www.rhcursos.com.br/*` e `rhcursos.com.br/*`
+- **Deploy command:** `npm run deploy:workers -- --keep-vars`
+- **Runtime:** Cloudflare Workers com `nodejs_compat`
+- **Node.js:** versão 24
+- `--keep-vars` preserva variáveis de runtime configuradas no painel da Cloudflare (não são apagadas pelo pipeline)
+
+### Configurações de produção
+
+- **Apex redirect:** `rhcursos.com.br` → `www.rhcursos.com.br` (aplicado pelo app, não por Redirect Rules)
+- **Workers.dev desabilitado:** reduz superfície pública
+- **Legado removido:** projeto antigo do Cloudflare Pages foi removido; tráfego agora entra só pelo Worker
+- **Headers de segurança:** `CSP`, `HSTS`, `X-Frame-Options` aplicados via `middleware.ts`
+- **Post-deploy validation:** automatizada via `scripts/verify-workers-deploy.js` (valida homepage, redirect, proteção do `/admin/`, headers)
+
+### Adapter e binding
+
+- **Empacotamento:** `@opennextjs/cloudflare` adapter
+- **Binding de assets:** gerado em `.open-next/` e referenciado em `wrangler.jsonc`
+
+### Fallbacks
+
+- `public/_headers` — apenas documental para assets estáticos
+- `public/_redirects` — não participa do deploy em Workers
+
 ## Dúvidas?
 
 - **Cloudflare Workers:** Leia a [documentação oficial](https://developers.cloudflare.com/workers/)

@@ -187,9 +187,10 @@ describe('validateLead', () => {
     const result = validateLead({
       name: 'Ana',
       email: 'ana@example.com',
+      type: 'Contato',
       courseInterest: 'DP',
-      origin: 'site',
-      status: 'new',
+      origin: 'Site',
+      status: 'Novo',
     });
     expect(result.valid).toBe(true);
   });

@@ -28,14 +28,14 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 
 | Método | Endpoint | Descrição | Doc |
 |--------|----------|-----------|-----|
-| `GET` | `/api/auth/session` | Sincronizar sessão admin e rotacionar token quando necessário | [auth-session](auth-session.md) |
-| `POST` | `/api/auth/session` | Login administrativo | [auth-session](auth-session.md) |
+| `GET` | `/api/auth/session` | Sincronizar sessão autenticada e rotacionar token quando necessário | [auth-session](auth-session.md) |
+| `POST` | `/api/auth/session` | Login por perfil (`admin`, `student`, `instructor`) | [auth-session](auth-session.md) |
 | `DELETE` | `/api/auth/session` | Logout (revoga sessões) | [auth-session](auth-session.md) |
 | `POST` | `/functions/v1/enrollments` | Criar inscrição em curso | [edge-functions](edge-functions.md) |
-| `POST` | `/functions/v1/leads` | Registrar lead in-company | [edge-functions](edge-functions.md) |
+| `POST` | `/functions/v1/leads` | Registrar lead comercial/consultivo | [edge-functions](edge-functions.md) |
 | `POST` | `/functions/v1/admin-resources` | Mutações administrativas (CRUD) | [edge-functions](edge-functions.md) |
-| `POST` | `/functions/v1/auth-session` | Login administrativo (Edge) | [edge-functions](edge-functions.md) |
-| `DELETE` | `/functions/v1/auth-session` | Logout administrativo (Edge) | [edge-functions](edge-functions.md) |
+| `POST` | `/functions/v1/auth-session` | Login por perfil no fluxo Edge | [edge-functions](edge-functions.md) |
+| `DELETE` | `/functions/v1/auth-session` | Logout no fluxo Edge | [edge-functions](edge-functions.md) |
 
 ---
 

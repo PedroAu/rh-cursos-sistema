@@ -12,6 +12,17 @@ export type EnrollmentStatus =
   | "Concluída";
 export type LeadStatus = "Novo" | "Em atendimento" | "Proposta enviada" | "Convertido" | "Perdido";
 export type BlogStatus = "Rascunho" | "Publicado" | "Arquivado";
+export type LeadType = "Curso" | "InCompany" | "Consultoria" | "Newsletter" | "Orçamento" | "Contato";
+export type LeadOrigin =
+  | "Site"
+  | "WhatsApp"
+  | "Blog"
+  | "Indicação"
+  | "LinkedIn"
+  | "Especialista"
+  | "Orçamento In Company"
+  | "Contato"
+  | "Newsletter";
 
 export type TrainingPath = {
   id: string;
@@ -115,13 +126,16 @@ export type Lead = {
   name: string;
   email: string;
   phone: string;
+  type: LeadType;
   courseInterest: string;
+  courseId?: string;
   organization?: string;
   teamSize?: number;
   preferredModality?: string;
   trainingObjective?: string;
+  trainingTheme?: string;
   mainChallenges?: string;
-  origin: "Site" | "WhatsApp" | "Blog" | "Indicação" | "LinkedIn" | "Especialista" | "Orçamento In Company";
+  origin: LeadOrigin;
   status: LeadStatus;
   message: string;
   createdAt: string;

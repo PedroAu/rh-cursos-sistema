@@ -291,6 +291,7 @@ function buildLeadPayload(store: Store): Omit<Lead, "id" | "createdAt" | "status
     name: "Lead Teste",
     email: "lead@example.com",
     phone: "(61) 99999-1111",
+    type: "Curso",
     courseInterest: store.courses[0]?.title ?? "Curso de teste",
     organization: "Empresa Lead",
     teamSize: 12,
@@ -476,11 +477,13 @@ describe("AppStoreProvider and hooks", () => {
 
   it("creates enrollments and updates the related class capacity from provider state", async () => {
     const harness = renderStore();
+    const initialCourseCount = harness.store.courses.length;
     await act(async () => {
       await harness.store.upsertCourse({ title: "Curso para Inscrição" });
     });
-    await waitFor(() => expect(harness.store.courses).toHaveLength(1));
+    await waitFor(() => expect(harness.store.courses).toHaveLength(initialCourseCount + 1));
 
+    const initialClassCount = harness.store.classes.length;
     await act(async () => {
       await harness.store.upsertClass({
         courseId: harness.store.courses[0].id,
@@ -489,7 +492,7 @@ describe("AppStoreProvider and hooks", () => {
         manualFilledSeats: 2,
       });
     });
-    await waitFor(() => expect(harness.store.classes).toHaveLength(1));
+    await waitFor(() => expect(harness.store.classes).toHaveLength(initialClassCount + 1));
 
     const initialEnrollmentCount = harness.store.enrollments.length;
     const payload = buildEnrollmentPayload(harness.store);

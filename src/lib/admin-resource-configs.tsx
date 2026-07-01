@@ -637,13 +637,24 @@ export function buildResourceConfig(
       const rows = store.leads.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
-      const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
+      const leadTypeOptions = [
+        { value: "Curso", label: "Curso" },
+        { value: "InCompany", label: "In Company" },
+        { value: "Consultoria", label: "Consultoria" },
+        { value: "Newsletter", label: "Newsletter" },
+        { value: "Orçamento", label: "Orçamento" },
+        { value: "Contato", label: "Contato" },
+      ];
       const originOptions = [
         { value: "Site", label: "Site" },
         { value: "WhatsApp", label: "WhatsApp" },
         { value: "Blog", label: "Blog" },
         { value: "Indicação", label: "Indicação" },
         { value: "LinkedIn", label: "LinkedIn" },
+        { value: "Especialista", label: "Especialista" },
+        { value: "Orçamento In Company", label: "Orçamento In Company" },
+        { value: "Contato", label: "Contato" },
+        { value: "Newsletter", label: "Newsletter" },
       ];
       const leadStatusOptions = [
         { value: "Novo", label: "Novo" },
@@ -697,6 +708,7 @@ export function buildResourceConfig(
             render: (row: Lead) => <UserCell name={row.name} email={row.email} />,
             exportValue: (row: Lead) => `${row.name} <${row.email}>`,
           },
+          { key: "type", label: "Jornada", render: (row: Lead) => <Badge variant="default">{row.type}</Badge> },
           { key: "origin", label: "Origem", render: (row: Lead) => <Badge variant="muted">{row.origin}</Badge> },
           { key: "courseInterest", label: "Interesse", render: (row: Lead) => row.courseInterest },
           { key: "status", label: "Status", render: (row: Lead) => renderStatusBadge(row.status) },
@@ -707,13 +719,16 @@ export function buildResourceConfig(
             name: row.name,
             email: row.email,
             phone: row.phone || "",
+            type: row.type,
             courseInterest: row.courseInterest,
+            courseId: row.courseId || "",
             origin: row.origin,
             status: row.status,
             organization: row.organization || "",
             teamSize: row.teamSize?.toString() || "",
             preferredModality: row.preferredModality || "",
             trainingObjective: row.trainingObjective || "",
+            trainingTheme: row.trainingTheme || "",
             mainChallenges: row.mainChallenges || "",
             message: row.message || "",
           });
@@ -731,13 +746,16 @@ export function buildResourceConfig(
                 name: form.name,
                 email: form.email,
                 phone: form.phone || "(61) 90000-0000",
+                type: form.type as Lead["type"],
                 courseInterest: form.courseInterest,
+                courseId: form.courseId || undefined,
                 origin: form.origin as Lead["origin"],
                 status: form.status as Lead["status"],
                 organization: form.organization || undefined,
                 teamSize: form.teamSize ? parseInt(form.teamSize) : undefined,
                 preferredModality: form.preferredModality || undefined,
                 trainingObjective: form.trainingObjective || undefined,
+                trainingTheme: form.trainingTheme || undefined,
                 mainChallenges: form.mainChallenges || undefined,
               });
             } else {
@@ -745,12 +763,15 @@ export function buildResourceConfig(
                 name: form.name,
                 email: form.email,
                 phone: form.phone || "(61) 90000-0000",
+                type: form.type as Lead["type"],
                 courseInterest: form.courseInterest,
+                courseId: form.courseId || undefined,
                 origin: form.origin as Lead["origin"],
                 organization: form.organization || undefined,
                 teamSize: form.teamSize ? parseInt(form.teamSize) : undefined,
                 preferredModality: form.preferredModality || undefined,
                 trainingObjective: form.trainingObjective || undefined,
+                trainingTheme: form.trainingTheme || undefined,
                 mainChallenges: form.mainChallenges || undefined,
                 message: form.message || "Lead criado manualmente no admin.",
               });
@@ -765,13 +786,15 @@ export function buildResourceConfig(
           { key: "name", label: "Nome", type: "text", required: true },
           { key: "email", label: "E-mail", type: "text", required: true },
           { key: "phone", label: "Telefone", type: "text" },
-          { key: "courseInterest", label: "Curso de interesse", type: "select", options: courseOptions, required: true },
+          { key: "type", label: "Jornada comercial", type: "select", options: leadTypeOptions, required: true },
+          { key: "courseInterest", label: "Interesse principal", type: "text", required: true },
           { key: "origin", label: "Origem", type: "select", options: originOptions, required: true },
           { key: "status", label: "Status", type: "select", options: leadStatusOptions, required: true },
           { key: "organization", label: "Empresa/Órgão", type: "text" },
           { key: "teamSize", label: "Tamanho da equipe", type: "number" },
           { key: "preferredModality", label: "Modalidade preferida", type: "text" },
           { key: "trainingObjective", label: "Objetivo do treinamento", type: "textarea" },
+          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea" },
           { key: "mainChallenges", label: "Desafios principais", type: "textarea" },
         ],
       };

@@ -79,6 +79,7 @@ export function BlogPage() {
         name: newsletterEmail.split("@")[0],
         email: newsletterEmail,
         phone: "",
+        type: "Newsletter",
         courseInterest: "Newsletter",
         origin: "Blog",
         message: "Cadastro de newsletter pelo blog."

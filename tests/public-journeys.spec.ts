@@ -80,10 +80,11 @@ test.describe("epica 4 — jornadas publicas", () => {
   test("login deixa a escolha de papel previsível", async ({ page }) => {
     await page.goto("/login?status=required&next=/admin");
 
-    await expect(page.getByText("somente o papel administrativo está disponível", { exact: false })).toBeVisible();
-    await expect(page.getByRole("button", { name: /Aluno/ })).toBeDisabled();
-    await expect(page.getByRole("button", { name: /Instrutor/ })).toBeDisabled();
     await expect(page.getByRole("button", { name: /Administração/ })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: /Aluno/ }).click();
+    await expect(page.getByRole("button", { name: /Aluno/ })).toHaveAttribute("aria-pressed", "true");
+    await page.getByRole("button", { name: /Instrutor/ }).click();
+    await expect(page.getByRole("button", { name: /Instrutor/ })).toHaveAttribute("aria-pressed", "true");
   });
 
   test("sobre e artigo reforçam leitura institucional e taxonomia", async ({ page }) => {

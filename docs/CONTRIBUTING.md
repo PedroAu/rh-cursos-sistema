@@ -15,7 +15,7 @@ Welcome to the RH Cursos development community! This guide covers coding standar
 
 ### Initial Setup
 
-1. **Clone and install** (see [`docs/QUICK-START.md`](QUICK-START.md))
+1. **Clone and install** (see [`docs/guides/QUICK-START.md`](guides/QUICK-START.md))
    ```bash
    git clone https://github.com/rhcursos/site-rh-cursos.git
    cd site-rh-cursos
@@ -511,7 +511,7 @@ const userId = req.query.id;
 **Tests are flaky**
 - Run serially (already configured): tests use `--workers=1`
 - Check for race conditions in test cleanup
-- See [`docs/TROUBLESHOOTING.md`](TROUBLESHOOTING.md) for detailed help
+- See [`docs/guides/TROUBLESHOOTING.md`](guides/TROUBLESHOOTING.md) for detailed help
 
 ---
 
@@ -532,8 +532,8 @@ A PR is ready to merge when:
 
 ### Resources
 
-- **Setup issues?** → [`docs/QUICK-START.md`](QUICK-START.md)
-- **Troubleshooting?** → [`docs/TROUBLESHOOTING.md`](TROUBLESHOOTING.md)
+- **Setup issues?** → [`docs/guides/QUICK-START.md`](guides/QUICK-START.md)
+- **Troubleshooting?** → [`docs/guides/TROUBLESHOOTING.md`](guides/TROUBLESHOOTING.md)
 - **Architecture questions?** → [`docs/ARCHITECTURE.md`](ARCHITECTURE.md)
 - **API documentation?** → [`docs/api/README.md`](api/README.md)
 - **Design system?** → [`docs/design-system/`](design-system/)
