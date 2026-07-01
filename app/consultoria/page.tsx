@@ -6,7 +6,7 @@ import { SpecialistContactPage } from "@/features/public/specialist/specialist-p
 export default function Page() {
   return (
     <PublicPageShell>
-      <SpecialistContactPage />
+      <SpecialistContactPage leadOrigin="Consultoria" />
     </PublicPageShell>
   );
 }

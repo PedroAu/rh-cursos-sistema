@@ -19,6 +19,7 @@ export type LeadOrigin =
   | "Blog"
   | "Indicação"
   | "LinkedIn"
+  | "Consultoria"
   | "Especialista"
   | "Orçamento In Company"
   | "Contato"

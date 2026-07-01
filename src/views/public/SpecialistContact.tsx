@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
+import type { LeadOrigin } from "@/types";
 
 function formatPhone(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 11);
@@ -38,7 +39,11 @@ const guarantees = [
   }
 ];
 
-export function SpecialistContactPage() {
+type SpecialistContactPageProps = {
+  leadOrigin?: Extract<LeadOrigin, "Consultoria" | "Especialista">;
+};
+
+export function SpecialistContactPage({ leadOrigin = "Especialista" }: SpecialistContactPageProps) {
   const { createLead } = useAppStore();
   const [form, setForm] = useState({
     name: "",
@@ -103,7 +108,7 @@ export function SpecialistContactPage() {
         organization: form.organization,
         courseInterest: form.interestArea,
         trainingTheme: form.interestArea,
-        origin: "Especialista",
+        origin: leadOrigin,
         message: form.message
       });
       toast.success("Solicitação registrada para atendimento especializado.");

@@ -55,6 +55,17 @@ const initialForm = {
   phone: ""
 };
 
+const teamSizeOptions = [
+  { value: "10", label: "Até 10 participantes" },
+  { value: "30", label: "De 11 a 30 participantes" },
+  { value: "50", label: "De 31 a 50 participantes" },
+  { value: "51", label: "Acima de 50 participantes" }
+];
+
+function getTeamSizeLabel(value: string) {
+  return teamSizeOptions.find((option) => option.value === value)?.label ?? value;
+}
+
 export function QuoteModalProvider({ children }: { children: ReactNode }) {
   const { createLead } = useAppStore();
   const [open, setOpen] = useState(false);
@@ -135,7 +146,7 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
         message: [
           course ? `Curso de interesse: ${course.title}.` : "Orçamento In Company (sem curso específico).",
           `CNPJ/ID fiscal: ${form.taxId}.`,
-          `Nº de colaboradores: ${form.teamSize}.`,
+          `Nº de colaboradores: ${getTeamSizeLabel(form.teamSize)}.`,
           `Localidade: ${form.location}.`,
           `Previsão de início: ${form.startForecast}.`,
           `Modalidade: ${form.modality}.`,
@@ -214,10 +225,11 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
                             <SelectValue placeholder="Selecione uma faixa" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Até 10 participantes">Até 10 participantes</SelectItem>
-                            <SelectItem value="De 11 a 30 participantes">De 11 a 30 participantes</SelectItem>
-                            <SelectItem value="De 31 a 50 participantes">De 31 a 50 participantes</SelectItem>
-                            <SelectItem value="Acima de 50 participantes">Acima de 50 participantes</SelectItem>
+                            {teamSizeOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                       )}

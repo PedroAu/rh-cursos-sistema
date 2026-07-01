@@ -651,6 +651,7 @@ export function buildResourceConfig(
         { value: "Blog", label: "Blog" },
         { value: "Indicação", label: "Indicação" },
         { value: "LinkedIn", label: "LinkedIn" },
+        { value: "Consultoria", label: "Consultoria" },
         { value: "Especialista", label: "Especialista" },
         { value: "Orçamento In Company", label: "Orçamento In Company" },
         { value: "Contato", label: "Contato" },
