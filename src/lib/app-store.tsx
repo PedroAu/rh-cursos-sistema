@@ -33,9 +33,7 @@ import {
 } from "@/lib/supabase/rh-cursos-api";
 import {
   mockBlogPosts,
-  mockCatalog,
-  mockInstructors,
-  mockTrainingPaths
+  mockCatalog
 } from "@/lib/mock-public-data";
 import type {
   BlogPost,
