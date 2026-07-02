@@ -1,0 +1,27 @@
+/* Trust Keith — Effects: shadows, focus, motion
+ * Shadows are ALWAYS dark-tinted, never colored. Signature card shadow is dual-layer
+ * (2px crisp edge + soft diffusion) creating a glass-pane elevation — NOT glassmorphism
+ * (no backdrop-filter blur anywhere in the system).
+ */
+
+:root {
+  /* ---- Shadows ---- */
+  --tk-shadow-hairline: inset 0 0 0 1px var(--tk-line);          /* flat bordered surface */
+  --tk-shadow-glass: 0 4px 16px rgba(0,0,0,0.08);                /* ambient — glass card variant */
+  --tk-shadow-card: 0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.12); /* signature card elevation */
+  --tk-shadow-pop: 0 12px 36px -8px rgba(41,43,78,0.18);         /* dropdowns, popovers */
+
+  /* ---- Focus ring ---- */
+  --tk-focus-ring: 0.125rem solid var(--tk-focus);
+  --tk-focus-offset: 0.125rem;
+
+  /* ---- Motion ---- */
+  --tk-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);  /* @kind other */ /* the brand's single easing curve */
+  --tk-duration-fast: 200ms;  /* @kind other */
+  --tk-duration-base: 300ms;  /* @kind other */
+  --tk-duration-slow: 500ms;  /* @kind other */
+
+  /* ---- Surface gradients (subtle, light) ---- */
+  --tk-gradient-soft: radial-gradient(circle, #f7f9fc 35%, #ebf3ff);  /* @kind color */
+  --tk-gradient-hero: linear-gradient(135deg, #ffffff 0%, var(--tk-cream) 52%, var(--tk-accent-soft) 100%);
+}

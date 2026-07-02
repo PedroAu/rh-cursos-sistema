@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#eef0f2}
+    .rh-page{width:1180px;margin:0 auto;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--tk-line);border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-nav a.link[data-cur="1"]{opacity:1;color:var(--tk-brand);font-weight:600}
+    .rh-wm{font-family:var(--tk-font-display);font-weight:700;color:var(--tk-brand);font-size:22px;letter-spacing:-0.02em;display:inline-flex;align-items:center;gap:.5rem}
+    .rh-wm span{width:27px;height:27px;border-radius:30%;background:var(--tk-brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    /* ---- RH brand merge: real logo palette over Trust Keith tokens ---- */
+    .rh-page.rh2{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--rh-paper-line:#ded8c9;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .rh-page.rh2 .rh-nav{background:#ffffff}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+    .rh-card{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);padding:28px 30px}
+    .rh-eyebrow{font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-accent)}
+    .rh-h2{font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:8px 0 0;text-wrap:balance}
+    .rh-body{font-family:var(--tk-font-body);font-size:var(--tk-text-body);line-height:1.65;color:var(--tk-ink-muted);margin:0 0 16px;text-wrap:pretty}
+    .rh-body:last-child{margin-bottom:0}
+    .rh-vlist{display:flex;flex-direction:column;gap:12px;margin:0;padding:0;list-style:none}
+    .rh-vitem{display:flex;gap:12px;align-items:flex-start;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);line-height:1.5;color:var(--tk-ink)}
+    .rh-check{flex:none;width:22px;height:22px;border-radius:50%;background:var(--tk-accent-soft);color:var(--tk-accent-strong);display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px}
+  </style>
+</helmet>
+
+<div class="rh-page rh2">
+  <nav class="rh-nav">
+    <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="link" href="#">Cursos</a><a class="link" href="#">Agenda</a><a class="link" href="#">In-company</a><a class="link" href="#">Consultoria</a><a class="link" data-cur="1" href="#">Quem Somos</a><a class="link" href="#">Blog</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a class="link" href="#">Entrar</a>
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="180px,32px">Fale com um especialista →</x-import>
+    </div>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <header style="background:radial-gradient(circle at 50% -10%, #f7f9fc 30%, #ebf3ff 130%);border-bottom:1px solid var(--tk-border);padding:64px 0 56px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="accent" dot="true" hint-size="auto,26px">Documento institucional · Desde 2007</x-import>
+      <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-large);line-height:1.08;letter-spacing:-0.02em;color:var(--tk-ink);margin:18px 0 16px;max-width:20ch;text-wrap:balance">Transformando vidas por meio do <span style="font-style:italic">conhecimento</span></h1>
+      <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0;max-width:62ch;text-wrap:pretty">A RH Cursos &amp; Soluções é uma empresa brasileira de educação corporativa, consultoria e treinamento empresarial, sediada em Brasília – DF, especializada na capacitação de servidores públicos e profissionais do setor privado.</p>
+    </div>
+  </header>
+
+  <!-- ===== Stats ===== -->
+  <section style="padding:0;font-family:var(--tk-font-body);background:var(--tk-surface)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--tk-border)">
+      <div style="padding:36px 0;border-right:1px solid var(--tk-line)">
+        <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);color:var(--tk-brand);letter-spacing:-0.02em">2007</div>
+        <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-top:4px">Ano de fundação</div>
+      </div>
+      <div style="padding:36px 0 36px 28px;border-right:1px solid var(--tk-line)">
+        <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);color:var(--tk-brand);letter-spacing:-0.02em">~80</div>
+        <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-top:4px">Cursos no portfólio</div>
+      </div>
+      <div style="padding:36px 0 36px 28px;border-right:1px solid var(--tk-line)">
+        <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);color:var(--tk-brand);letter-spacing:-0.02em">6</div>
+        <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-top:4px">Trilhas de conhecimento</div>
+      </div>
+      <div style="padding:36px 0 36px 28px">
+        <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);color:var(--tk-brand);letter-spacing:-0.02em">Nacional</div>
+        <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-top:4px">Alcance de atuação</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Nossa História ===== -->
+  <section style="padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:0.85fr 1.15fr;gap:52px;align-items:start">
+      <div>
+        <div class="rh-eyebrow">Nossa história</div>
+        <h2 class="rh-h2" style="max-width:14ch">Nascida do sonho de compartilhar conhecimento</h2>
+      </div>
+      <div>
+        <p class="rh-body">Fundada em 2007, a RH Cursos &amp; Soluções nasceu da união do casal <strong style="color:var(--tk-ink);font-weight:600">Ester e Nilson</strong>, que combinaram suas experiências em advocacia, consultoria e ensino para construir uma instituição voltada a transformar vidas por meio do conhecimento.</p>
+        <p class="rh-body">Originalmente constituída no Distrito Federal e sediada em Taguatinga, a empresa estruturou-se para oferecer cursos abertos e treinamentos in company em todo o território nacional — consolidando um histórico robusto em temas técnicos de alta relevância para o setor público, como GFIP/SEFIP, SIAFI/CPR, escrituração fiscal digital, cálculos trabalhistas, fiscalização de contratos e legislação previdenciária.</p>
+        <p class="rh-body">Hoje, a empresa organiza seu portfólio em trilhas de conhecimento, com progressão lógica do nível básico ao avançado dentro de cada área de especialização.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Missão / Visão / Filosofia ===== -->
+  <section style="background:var(--tk-cream);border-top:1px solid var(--tk-cream-dark);border-bottom:1px solid var(--tk-cream-dark);padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div class="rh-eyebrow" style="color:var(--tk-brand)">Propósito</div>
+      <h2 class="rh-h2" style="margin-bottom:32px">Missão, visão e filosofia</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+        <div class="rh-card">
+          <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-brand);margin-bottom:10px">Missão</div>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Subsidiar, por meio do conhecimento, a formação do indivíduo para desempenhar suas funções no mercado de trabalho, de forma que as instituições potencializem seus negócios e maximizem seus resultados.</p>
+        </div>
+        <div class="rh-card">
+          <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-brand);margin-bottom:10px">Visão</div>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Buscar a excelência para ser a melhor empresa de cursos e treinamentos no circuito nacional.</p>
+        </div>
+        <div class="rh-card">
+          <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-brand);margin-bottom:10px">Filosofia</div>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Ética, transparência e metodologias participativas — aulas expositivas, dinâmicas de grupo e trabalho em equipe, com aplicação de conhecimento técnico-científico.</p>
+        </div>
+      </div>
+      <div style="margin-top:36px">
+        <div class="rh-eyebrow" style="color:var(--tk-brand);margin-bottom:16px">Valores que nos orientam</div>
+        <ul class="rh-vlist" style="display:grid;grid-template-columns:1fr 1fr;gap:14px 40px">
+          <li class="rh-vitem"><span class="rh-check">✓</span><span>Ética e transparência em todas as relações.</span></li>
+          <li class="rh-vitem"><span class="rh-check">✓</span><span>Responsabilidade, comprometimento e honestidade em cada treinamento.</span></li>
+          <li class="rh-vitem"><span class="rh-check">✓</span><span>Busca constante por resultados, multiplicação da tecnologia e expansão do conhecimento.</span></li>
+          <li class="rh-vitem"><span class="rh-check">✓</span><span>Estímulo à iniciativa, motivação, criatividade e comunicação.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== O que fazemos ===== -->
+  <section style="padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div class="rh-eyebrow">O que fazemos</div>
+      <h2 class="rh-h2" style="margin-bottom:8px">Soluções educacionais integradas</h2>
+      <p class="rh-body" style="max-width:60ch;margin-bottom:32px">Um conjunto de soluções educacionais e de consultoria adaptadas à realidade de cada cliente.</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px">
+        <div class="rh-card">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#235875,#2f7599);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--tk-font-display);font-weight:700;font-size:20px;margin-bottom:16px">§</div>
+          <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-ink);margin:0 0 8px;letter-spacing:-0.01em">Cursos abertos</h3>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Presenciais e online, com temas atualizados para as áreas pública e privada, focados em qualificação técnica e atualização profissional.</p>
+        </div>
+        <div class="rh-card">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#4285f4,#6aa2ff);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--tk-font-display);font-weight:700;font-size:20px;margin-bottom:16px">◆</div>
+          <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-ink);margin:0 0 8px;letter-spacing:-0.01em">Treinamentos in company</h3>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Programas personalizados conforme as necessidades de cada instituição, com adequação de horário, agenda e conteúdo — e redução de custos para o cliente.</p>
+        </div>
+        <div class="rh-card">
+          <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#7a4fd6,#9a74e6);display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--tk-font-display);font-weight:700;font-size:20px;margin-bottom:16px">◈</div>
+          <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-ink);margin:0 0 8px;letter-spacing:-0.01em">Consultoria empresarial</h3>
+          <p class="rh-body" style="font-size:var(--tk-text-body-sm)">Apoio especializado a órgãos públicos e empresas na estruturação de processos, conformidade legal e desenvolvimento de pessoas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Trilhas ===== -->
+  <section style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:32px">
+        <div>
+          <div class="rh-eyebrow">Áreas de conhecimento</div>
+          <h2 class="rh-h2">6 trilhas, aproximadamente 80 cursos</h2>
+        </div>
+        <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);max-width:38ch;margin:0">Cada trilha oferece progressão lógica do básico ao avançado, agrupando cursos correlacionados por especialização.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <sc-for list="{{ trilhas }}" as="t" hint-placeholder-count="6">
+          <div class="rh-card" style="display:flex;gap:18px;align-items:flex-start;padding:24px 26px">
+            <div style="flex:none;width:52px;height:52px;border-radius:14px;background: {{ t.tint }};display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--tk-font-display);font-weight:700;font-size:22px">{{ t.glyph }}</div>
+            <div>
+              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+                <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-body);color:var(--tk-ink);margin:0;letter-spacing:-0.01em;line-height:1.25">{{ t.title }}</h3>
+                <span style="font-size:11px;font-weight:600;color:var(--tk-accent);white-space:nowrap">{{ t.count }} cursos</span>
+              </div>
+              <p class="rh-body" style="font-size:var(--tk-text-body-sm);margin-bottom:8px">{{ t.desc }}</p>
+              <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)"><strong style="color:var(--tk-ink);font-weight:600">Público:</strong> {{ t.audience }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Metodologia ===== -->
+  <section style="padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:0.85fr 1.15fr;gap:52px;align-items:start">
+      <div>
+        <div class="rh-eyebrow">Metodologia</div>
+        <h2 class="rh-h2" style="max-width:14ch">Aprender fazendo, aplicar no mesmo dia</h2>
+      </div>
+      <div>
+        <p class="rh-body">Adotamos uma abordagem participativa e prática, valorizando a aplicação imediata do conhecimento. As capacitações combinam aulas expositivas, dinâmicas de grupo, trabalho em equipe e exercícios práticos — muitas vezes com uso de computador para temas que envolvem sistemas e ferramentas digitais como SIAFI, Tesouro Gerencial, eSocial, Excel e Power BI.</p>
+        <p class="rh-body">Os cursos são oferecidos nas modalidades presencial e online, com turmas em diferentes horários. Cada curso é estruturado por nível — básico, intermediário ou avançado — para que o participante avance de forma consistente dentro de sua trilha de interesse.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA band ===== -->
+  <section style="background:var(--tk-brand);padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="text-align:center">
+      <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);letter-spacing:-0.02em;color:#fff;margin:0 0 12px;text-wrap:balance">Pronto para capacitar sua equipe?</h2>
+      <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);color:rgba(255,255,255,0.82);margin:0 auto 28px;max-width:52ch;text-wrap:pretty">Fale com um especialista sobre cursos abertos, treinamentos in company e consultoria para o setor público e privado.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" hint-size="200px,52px">Fale com um especialista →</x-import>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:56px 0 40px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:48px;width:auto;display:block;margin-bottom:2px">
+        <p style="font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.55;margin:16px 0 0;max-width:34ch">Transformando vidas por meio do conhecimento desde 2007. Brasília – Distrito Federal · www.rhcursos.com.br</p>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Ofertas</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Cursos abertos</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Agenda</a><a href="#" style="color:var(--tk-ink);text-decoration:none">In-company</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Consultoria</a></div>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Empresa</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-brand);text-decoration:none;font-weight:600">Quem Somos</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Blog</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Instrutores</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Contato</a></div>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Acesso</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do aluno</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do instrutor</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Entrar</a></div>
+      </div>
+    </div>
+    <div class="rh-wrap" style="border-top:1px solid var(--tk-border);margin-top:40px;padding-top:24px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos &amp; Soluções. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      trilhas: [
+        { glyph: "§", tint: "linear-gradient(135deg,#235875,#2f7599)", count: "14", title: "Departamento Pessoal, Folha & eSocial", desc: "Da legislação trabalhista à conformidade digital com eSocial, FGTS Digital e LGPD.", audience: "Servidores do DP, RH, gestores de contratos e contadores da Administração Pública." },
+        { glyph: "⚖", tint: "linear-gradient(135deg,#2f7599,#068466)", count: "12", title: "Licitações, Compras & Contratos", desc: "Da legislação básica à fiscalização avançada, com cobertura completa da Lei nº 14.133/2021.", audience: "Pregoeiros, gestores e fiscais de contratos, equipes de licitação e procurement público." },
+        { glyph: "◈", tint: "linear-gradient(135deg,#235875,#3a7d5f)", count: "14", title: "Gestão de Pessoas & Liderança", desc: "Formação humanizada para líderes e equipes: inteligência emocional, cultura e gestão por resultados.", audience: "Gestores, líderes de equipe, servidores e profissionais de RH dos setores público e privado." },
+        { glyph: "✎", tint: "linear-gradient(135deg,#c98a3a,#e0a94f)", count: "10", title: "Comunicação, Redação & Atendimento", desc: "Do atendimento ao cidadão à redação oficial, oratória, mídias digitais e conformidade com LAI/LGPD.", audience: "Servidores, ouvidores, assessores de comunicação, profissionais jurídicos e atendentes." },
+        { glyph: "◆", tint: "linear-gradient(135deg,#4285f4,#235875)", count: "19", title: "Auditoria, Contabilidade & Tributos", desc: "Domínio técnico em contabilidade pública, obrigações acessórias, Tesouro Gerencial, SIAFI e auditoria.", audience: "Contadores, auditores, controllers, analistas financeiros e servidores das áreas de controle." },
+        { glyph: "◇", tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)", count: "11", title: "Tecnologia, Dados & Inovação", desc: "Ferramentas digitais, análise de dados, modelagem de processos, IA e governança.", audience: "Servidores, analistas de TI, gestores de processos e inovação, e todos que usam tecnologia no trabalho." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

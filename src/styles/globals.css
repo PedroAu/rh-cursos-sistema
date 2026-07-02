@@ -21,14 +21,14 @@
 @layer base {
   :root {
     color-scheme: light;
-    --ea-color-primary: #002b5b;
-    --ea-color-deep-navy: #001736;
+    --ea-color-primary: var(--tk-brand);
+    --ea-color-deep-navy: var(--tk-ink);
     --ea-color-on-primary: #ffffff;
-    --ea-color-on-primary-container: #6f8fca;
-    --ea-color-prestige-gold: #8a6200;
-    --ea-color-secondary-container: #f4d277;
-    --ea-color-secondary-fixed-dim: #d6aa45;
-    --ea-color-on-secondary-container: #3f2b00;
+    --ea-color-on-primary-container: var(--tk-accent-soft);
+    --ea-color-prestige-gold: var(--tk-accent);
+    --ea-color-secondary-container: var(--tk-accent-soft);
+    --ea-color-secondary-fixed-dim: var(--tk-accent);
+    --ea-color-on-secondary-container: var(--tk-ink);
     --ea-color-success-green: #007a36; /* AA: era #008a3d (4.47:1 com branco) */
     --ea-color-error: #ba1a1a;
     --ea-color-surface: #f5f5f7;
@@ -56,14 +56,14 @@
     --ea-shadow-soft: 0 8px 22px rgba(0, 23, 54, 0.07);
     --ea-shadow-card: 0 18px 42px rgba(0, 23, 54, 0.14);
     --ea-shadow-level-1: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --ea-focus: var(--ea-color-prestige-gold);
-    --ea-focus-ring: rgba(138, 98, 0, 0.22);
+    --ea-focus: var(--tk-focus);
+    --ea-focus-ring: rgba(77, 101, 255, 0.22);
     --ea-button-radius: var(--ea-radius-lg);
     --ea-button-primary-bg: var(--ea-color-primary);
     --ea-button-primary-fg: var(--ea-color-on-primary);
     --ea-button-primary-hover: var(--ea-color-deep-navy);
     --ea-button-secondary-bg: var(--ea-color-accent);
-    --ea-button-secondary-fg: #ffffff;
+    --ea-button-secondary-fg: var(--tk-surface);
     --ea-button-secondary-border: transparent;
     --ea-button-secondary-hover: var(--ea-color-warning);
     --ea-button-ghost-fg: var(--ea-color-primary);
@@ -136,8 +136,8 @@
     --m3-warning-text: var(--m3-secondary);
 
     /* Executive Precision typography, shape and grid source tokens (Epic 7, EP-0.2). */
-    --m3-font-body: var(--font-inter);
-    --m3-font-display: var(--font-montserrat);
+    --m3-font-body: var(--tk-font-body);
+    --m3-font-display: var(--tk-font-display);
     --m3-type-display-lg-size: 3rem;      /* 48px */
     --m3-type-display-lg-line-height: 3.5rem; /* 56px */
     --m3-type-display-lg-weight: 700;
@@ -213,11 +213,11 @@
     --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
 
     /* Trust Keith Design System — New Tokens (Phase 1) */
-    --trust-keith-teal: #235875;
-    --keith-dark-blue: #194359;
-    --bright-blue: #4285f4;
-    --bright-blue-dark: #2459b3;
-    --bright-blue-light: #e0eeff;
+    --trust-keith-teal: var(--tk-brand);
+    --keith-dark-blue: var(--tk-brand-hover);
+    --bright-blue: var(--tk-accent);
+    --bright-blue-dark: var(--tk-accent-strong);
+    --bright-blue-light: var(--tk-accent-soft);
 
     --text-primary: #222525;
     --text-secondary: #4f5057;
@@ -233,9 +233,9 @@
     --cream-dark: #c3b6aa;
 
     /* Trust Keith Typography */
-    --font-sans-trust: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-serif-trust: 'Merriweather', Georgia, serif;
-    --font-display-trust: 'Quincy CF', serif;
+    --font-sans-trust: var(--tk-font-body);
+    --font-serif-trust: var(--tk-font-serif);
+    --font-display-trust: var(--tk-font-display);
 
     /* Trust Keith Spacing (4px base) */
     --space-xs: 0.25rem;
@@ -255,8 +255,8 @@
 
     /* Trust Keith Shadows */
     --shadow-ambient: 0 4px 16px rgba(0, 0, 0, 0.08);
-    --shadow-standard: 0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.5);
-    --shadow-focus: 0.125rem solid #4d65ff;
+    --shadow-standard: var(--tk-shadow-card);
+    --shadow-focus: var(--tk-focus-ring);
   }
 
   /*
@@ -268,14 +268,14 @@
     --ea-font-sans: var(--m3-font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
     --ea-font-display: var(--m3-font-display), var(--ea-font-sans);
     --ea-container-max: var(--m3-container-max);
-    --ea-color-primary: var(--m3-primary);
-    --ea-color-deep-navy: var(--m3-surface-dark);
+    --ea-color-primary: var(--tk-brand);
+    --ea-color-deep-navy: var(--tk-ink);
     --ea-color-on-primary: var(--m3-on-primary);
-    --ea-color-on-primary-container: var(--m3-on-primary-container);
-    --ea-color-prestige-gold: var(--m3-secondary-container);
-    --ea-color-secondary-container: var(--m3-primary-fixed);
-    --ea-color-secondary-fixed-dim: var(--m3-secondary-fixed-dim);
-    --ea-color-on-secondary-container: var(--m3-on-primary-fixed);
+    --ea-color-on-primary-container: var(--tk-accent-soft);
+    --ea-color-prestige-gold: var(--tk-accent);
+    --ea-color-secondary-container: var(--tk-accent-soft);
+    --ea-color-secondary-fixed-dim: var(--tk-accent);
+    --ea-color-on-secondary-container: var(--tk-ink);
     --ea-color-surface: var(--m3-surface);
     --ea-color-background: var(--m3-background);
     --ea-color-surface-muted: var(--m3-surface-container-low);
@@ -293,34 +293,34 @@
     --ea-color-separator: var(--m3-outline-variant);
     --ea-color-surface-raised: var(--m3-surface-container-lowest);
     --ea-color-control: var(--m3-surface-container);
-    --ea-color-accent: var(--m3-secondary);
+    --ea-color-accent: var(--tk-accent);
     --ea-color-success: var(--m3-success-text);
     --ea-color-warning: var(--m3-warning-text);
     --ea-color-danger: var(--m3-error);
     --ea-shadow-soft: var(--ea-shadow-level-1);
     --ea-shadow-card: 0 8px 20px rgba(0, 67, 100, 0.1);
-    --ea-focus: var(--m3-primary-container);
-    --ea-focus-ring: rgba(13, 91, 133, 0.2);
-    --ea-button-radius: var(--m3-radius-default);
-    --ea-button-primary-bg: var(--m3-secondary-container);
-    --ea-button-primary-fg: var(--m3-on-gold);
-    --ea-button-primary-hover: var(--m3-secondary-fixed-dim);
+    --ea-focus: var(--tk-focus);
+    --ea-focus-ring: rgba(77, 101, 255, 0.2);
+    --ea-button-radius: var(--tk-radius-button);
+    --ea-button-primary-bg: var(--tk-cta);
+    --ea-button-primary-fg: var(--tk-surface);
+    --ea-button-primary-hover: var(--tk-cta-hover);
     --ea-button-secondary-bg: transparent;
-    --ea-button-secondary-fg: var(--m3-primary);
-    --ea-button-secondary-border: var(--m3-primary);
-    --ea-button-secondary-hover: rgba(0, 67, 100, 0.08);
-    --ea-button-ghost-fg: var(--m3-primary);
-    --ea-button-ghost-border: var(--m3-primary);
+    --ea-button-secondary-fg: var(--tk-brand);
+    --ea-button-secondary-border: var(--tk-brand);
+    --ea-button-secondary-hover: var(--tk-accent-soft);
+    --ea-button-ghost-fg: var(--tk-brand);
+    --ea-button-ghost-border: var(--tk-brand);
     --ea-button-ghost-bg: transparent;
-    --ea-button-ghost-hover-bg: rgba(0, 67, 100, 0.08);
-    --ea-card-border: #e1e8ed;
-    --ea-card-bg: #ffffff;
-    --ea-card-accent: var(--m3-primary);
-    --ea-chip-bg: var(--m3-primary-fixed);
-    --ea-chip-fg: var(--m3-on-primary-fixed-variant);
+    --ea-button-ghost-hover-bg: var(--tk-accent-soft);
+    --ea-card-border: var(--tk-line);
+    --ea-card-bg: var(--tk-surface);
+    --ea-card-accent: var(--tk-brand);
+    --ea-chip-bg: var(--tk-accent-soft);
+    --ea-chip-fg: var(--tk-brand);
     --ea-chip-border: transparent;
     --ea-control-radius: var(--m3-radius-default);
-    --ea-footer-bg: var(--m3-surface-dark);
+    --ea-footer-bg: var(--tk-brand);
   }
 
   /*

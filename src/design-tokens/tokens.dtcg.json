@@ -78,15 +78,15 @@
 
       "primary": {
         "base": {
-          "$value": "#0066CC",
+          "$value": "#0c6a83",
           "$description": "Primary brand color"
         },
         "dark": {
-          "$value": "#0052A3",
+          "$value": "#084f63",
           "$description": "Primary hover state"
         },
         "light": {
-          "$value": "#003d99"
+          "$value": "#e0f2f6"
         },
         "foreground": {
           "$value": "#ffffff"
@@ -95,13 +95,13 @@
 
       "accent": {
         "gold": {
-          "$value": "#d4af37"
+          "$value": "#1791a9"
         }
       },
 
       "navy": {
         "deep": {
-          "$value": "#001736"
+          "$value": "#222525"
         }
       },
 

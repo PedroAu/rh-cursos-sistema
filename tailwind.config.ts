@@ -146,6 +146,7 @@ const config: Config = {
       },
       fontWeight: tokens.fontWeight,
       lineHeight: tokens.lineHeight,
+      maxWidth: tokens.maxWidth,
       backgroundImage: {
         "hero-radial":
           "linear-gradient(90deg, rgba(0,23,54,0.96), rgba(0,23,54,0.86) 48%, rgba(0,23,54,0.24))",

@@ -1,5 +1,4 @@
 import type * as React from "react";
-
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 
@@ -16,14 +15,14 @@ export function SelectTrigger({
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "group flex h-[var(--form-input-height)] w-full items-center justify-between rounded-[var(--form-input-radius)] border border-[var(--form-input-border)] bg-[var(--form-input-bg)] px-[var(--form-input-padding-inline)] text-[var(--form-input-font-size)] shadow-sm outline-none transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--form-input-border-hover)] hover:shadow-soft focus:border-[var(--form-input-border-focus)] focus:ring-[var(--form-input-focus-ring)] focus:ring-[var(--form-input-focus-ring-color)] data-[state=open]:-translate-y-0.5 data-[state=open]:border-[var(--form-input-border-focus)] data-[state=open]:shadow-soft data-[state=open]:ring-[var(--form-input-focus-ring)] data-[state=open]:ring-[var(--form-input-focus-ring-color)]",
+        "group flex h-11 w-full items-center justify-between rounded-tk-input border border-tk-line bg-tk-surface px-4 text-sm text-tk-ink outline-none transition duration-200 ease-[var(--tk-ease)] hover:border-tk-accent focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=open]:border-tk-accent",
         className
       )}
       {...props}
     >
       {children}
       <SelectPrimitive.Icon>
-        <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+        <ChevronDown className="h-4 w-4 text-tk-ink-muted transition-transform duration-200 group-data-[state=open]:rotate-180" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -38,7 +37,7 @@ export function SelectContent({
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
         className={cn(
-          "z-50 overflow-hidden rounded-[var(--mantine-radius-lg)] border border-[var(--form-input-border)] bg-[var(--form-input-bg)] shadow-md backdrop-blur-sm data-[state=open]:animate-[selectContentIn_160ms_ease-out]",
+          "z-50 overflow-hidden rounded-tk-glass border border-tk-line bg-tk-surface shadow-tk-card",
           className
         )}
         {...props}
@@ -57,7 +56,7 @@ export function SelectItem({
   return (
     <SelectPrimitive.Item
       className={cn(
-        "relative flex cursor-pointer items-center rounded-[var(--mantine-radius-sm)] py-3 pl-9 pr-3 text-sm outline-none transition-colors duration-150 data-[highlighted]:bg-primary-1 data-[highlighted]:text-primary-7",
+        "relative flex cursor-pointer items-center rounded-tk-md py-3 pl-9 pr-3 text-sm text-tk-ink outline-none transition-colors duration-200 ease-[var(--tk-ease)] data-[highlighted]:bg-tk-accent-soft data-[highlighted]:text-tk-accent-strong",
         className
       )}
       {...props}

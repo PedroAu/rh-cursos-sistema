@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Montserrat } from "next/font/google";
+import { Inter, Merriweather } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { ReactNode } from "react";
@@ -18,14 +18,15 @@ const inter = Inter({
   display: "swap",
   subsets: ["latin"],
   variable: "--font-inter",
-  weight: ["400", "500", "600", "700", "800"]
+  weight: ["400", "500", "600", "700"]
 });
 
-const montserrat = Montserrat({
+const merriweather = Merriweather({
   display: "swap",
   subsets: ["latin"],
-  variable: "--font-montserrat",
-  weight: ["600", "700", "800"]
+  variable: "--font-merriweather",
+  weight: ["300", "400"],
+  style: ["normal", "italic"]
 });
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         <ColorSchemeScript defaultColorScheme="light" />
       </head>
-      <body className={`${inter.variable} ${montserrat.variable}`}>
+      <body className={`${inter.variable} ${merriweather.variable}`}>
         <ErrorBoundary>
           <AppMantineProvider>
             <MotionProvider>{children}</MotionProvider>

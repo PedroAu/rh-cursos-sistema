@@ -6,32 +6,30 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-semibold transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-tk-button font-semibold transition-all duration-200 ease-[var(--tk-ease)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default:
-          "bg-trust-keith-teal text-surface-white shadow-ambient hover:-translate-y-0.5 hover:bg-keith-dark-blue",
-        secondary:
-          "border border-surface-neutral bg-surface-light text-text-primary shadow-ambient hover:-translate-y-0.5 hover:bg-surface-neutral",
-        outline:
-          "border border-surface-neutral bg-surface-white text-bright-blue hover:-translate-y-0.5 hover:border-bright-blue",
-        ghost: "text-text-primary hover:bg-surface-light",
-        tertiary:
-          "!h-auto !min-h-0 !rounded-none !px-0 !py-0 text-bright-blue underline-offset-4 shadow-none hover:underline focus-visible:ring-offset-4",
-        success: "bg-success text-surface-white hover:-translate-y-0.5 hover:opacity-90",
-        danger: "bg-danger text-surface-white hover:opacity-90"
+        primary: "bg-tk-cta text-tk-surface shadow-tk-glass hover:bg-tk-cta-hover",
+        secondary: "bg-[var(--tk-black-5)] text-tk-ink hover:bg-[var(--tk-black-8)]",
+        ghost: "bg-transparent text-tk-ink hover:bg-[var(--tk-black-5)]",
+        outline: "border border-tk-line bg-tk-surface text-tk-ink hover:border-tk-accent hover:bg-tk-accent-soft",
+        tertiary: "h-auto min-h-0 rounded-none px-0 py-0 text-tk-accent-strong underline-offset-4 shadow-none hover:underline",
+        success: "bg-tk-success text-tk-surface hover:opacity-90",
+        danger: "bg-tk-error text-tk-surface hover:opacity-90",
+        default: "bg-tk-cta text-tk-surface shadow-tk-glass hover:bg-tk-cta-hover"
       },
       size: {
-        default: "h-12 px-6",
-        sm: "h-11 px-4 text-xs",
-        lg: "h-14 px-8 text-base",
-        icon: "h-11 w-11"
+        sm: "h-8 px-4 text-caption",
+        md: "h-11 px-5 text-button",
+        lg: "h-[52px] px-8 text-body",
+        default: "h-11 px-5 text-button",
+        icon: "h-10 w-10 p-0"
       }
     },
     defaultVariants: {
-      variant: "default",
-      size: "default"
+      variant: "primary",
+      size: "md"
     }
   }
 );
@@ -47,6 +45,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ children, className, variant, size, asChild = false, disabled, loading = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     const isDisabled = disabled || loading;
+
     const content = asChild ? (
       children
     ) : (

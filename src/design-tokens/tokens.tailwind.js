@@ -1,128 +1,149 @@
 /**
- * Design Tokens - Trust Keith System
- * Tailwind CSS v4 Configuration
- *
- * Usage:
- * import { tokens } from './tokens.tailwind.js'
- *
- * In tailwind.config.ts:
- * theme: {
- *   extend: {
- *     colors: tokens.colors,
- *     spacing: tokens.spacing,
- *     borderRadius: tokens.borderRadius,
- *     boxShadow: tokens.boxShadow,
- *     fontFamily: tokens.fontFamily,
- *     fontSize: tokens.fontSize,
- *     fontWeight: tokens.fontWeight,
- *     lineHeight: tokens.lineHeight,
- *   }
- * }
+ * Trust Keith RH tokens for Tailwind.
+ * Values reference CSS variables from src/design-tokens/tokens.css.
  */
 
 export const tokens = {
-  // COLORS — Trust Keith Palette
   colors: {
-    // Brand Colors
-    'trust-keith-teal': '#235875',
-    'keith-dark-blue': '#194359',
-    'bright-blue': '#0d47a1',
-    'bright-blue-dark': '#0a2850',
-    'bright-blue-light': '#e0eeff',
-
-    // Neutral Scale (7-step)
-    'text-primary': '#222525',
-    'text-secondary': '#4f5057',
-    'surface-light': '#fafafa',
-    'surface-neutral': '#ebebeb',
-    'surface-white': '#ffffff',
-
-    // Semantic
-    'success': '#068466',
-    'danger': '#ea384c',
-    'error': '#ea384c',
-
-    // Warm Accents
-    'cream-light': '#fffaf4',
-    'cream-dark': '#c3b6aa',
+    "trust-keith-teal": "var(--tk-brand)",
+    "keith-dark-blue": "var(--tk-brand-hover)",
+    "bright-blue": "var(--tk-accent)",
+    "bright-blue-dark": "var(--tk-accent-strong)",
+    "bright-blue-light": "var(--tk-accent-soft)",
+    "text-primary": "var(--tk-ink)",
+    "text-secondary": "var(--tk-ink-muted)",
+    "surface-light": "var(--tk-surface-2)",
+    "surface-neutral": "var(--tk-line)",
+    "surface-white": "var(--tk-surface)",
+    success: "var(--tk-success)",
+    danger: "var(--tk-error)",
+    error: "var(--tk-error)",
+    "cream-light": "var(--tk-cream)",
+    "cream-dark": "var(--tk-cream-dark)",
+    "tk-brand": "var(--tk-brand)",
+    "tk-brand-hover": "var(--tk-brand-hover)",
+    "tk-cta": "var(--tk-cta)",
+    "tk-cta-hover": "var(--tk-cta-hover)",
+    "tk-accent": "var(--tk-accent)",
+    "tk-accent-strong": "var(--tk-accent-strong)",
+    "tk-accent-soft": "var(--tk-accent-soft)",
+    "tk-focus": "var(--tk-focus)",
+    "tk-ink": "var(--tk-ink)",
+    "tk-ink-muted": "var(--tk-ink-muted)",
+    "tk-line": "var(--tk-line)",
+    "tk-surface": "var(--tk-surface)",
+    "tk-surface-2": "var(--tk-surface-2)",
+    "tk-cream": "var(--tk-cream)",
+    "tk-cream-dark": "var(--tk-cream-dark)",
+    "tk-success": "var(--tk-success)",
+    "tk-error": "var(--tk-error)",
+    "rh-teal-deep": "var(--rh-teal-deep)",
+    "rh-teal": "var(--rh-teal)",
+    "rh-teal-lt": "var(--rh-teal-lt)",
+    "rh-gray": "var(--rh-gray)",
+    "rh-paper-a": "var(--rh-paper-a)",
+    "rh-paper-b": "var(--rh-paper-b)",
+    "rh-paper-line": "var(--rh-paper-line)",
+    "rh-hero-bg": "var(--rh-hero-bg)",
   },
 
-  // TYPOGRAPHY — Trust Keith Hierarchy
   fontSize: {
-    // Display (Quincy CF 700)
-    'display-hero': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-    'display-large': ['2.75rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-    'section-heading': ['2rem', { lineHeight: '1.25' }],
-
-    // Subheading (Merriweather 300/400)
-    'subheading-large': ['1.5rem', { lineHeight: '1.35' }],
-    'subheading': ['1.25rem', { lineHeight: '1.4' }],
-
-    // Body (Inter 400)
-    'body-large': ['1.0625rem', { lineHeight: '1.45' }],
-    'body': ['1rem', { lineHeight: '1.5' }],
-    'body-small': ['0.875rem', { lineHeight: '1.4' }],
-
-    // UI (Inter 500)
-    'button': ['0.875rem', { lineHeight: '1.2', fontWeight: '500' }],
-    'button-small': ['0.75rem', { lineHeight: '1.1', fontWeight: '500' }],
-    'link': ['0.875rem', { lineHeight: '1.2', fontWeight: '500' }],
-
-    // Captions (Inter 400)
-    'caption': ['0.75rem', { lineHeight: '1.2' }],
-    'caption-small': ['0.6875rem', { lineHeight: '1.1' }],
+    "display-hero": [
+      "var(--tk-text-display-hero)",
+      { lineHeight: "var(--tk-leading-tight)", letterSpacing: "var(--tk-tracking-display)" },
+    ],
+    "display-large": [
+      "var(--tk-text-display-large)",
+      { lineHeight: "var(--tk-leading-snug)", letterSpacing: "var(--tk-tracking-display)" },
+    ],
+    "section-heading": ["var(--tk-text-section)", { lineHeight: "var(--tk-leading-snug)" }],
+    "subheading-large": ["var(--tk-text-subhead-lg)", { lineHeight: "var(--tk-leading-normal)" }],
+    subheading: ["var(--tk-text-subhead)", { lineHeight: "var(--tk-leading-normal)" }],
+    "body-large": ["var(--tk-text-body-lg)", { lineHeight: "var(--tk-leading-relaxed)" }],
+    body: ["var(--tk-text-body)", { lineHeight: "var(--tk-leading-relaxed)" }],
+    "body-small": ["var(--tk-text-body-sm)", { lineHeight: "var(--tk-leading-normal)" }],
+    button: ["var(--tk-text-body-sm)", { lineHeight: "1.2", fontWeight: "var(--tk-weight-medium)" }],
+    "button-small": ["var(--tk-text-caption)", { lineHeight: "1.1", fontWeight: "var(--tk-weight-medium)" }],
+    link: ["var(--tk-text-body-sm)", { lineHeight: "1.2", fontWeight: "var(--tk-weight-medium)" }],
+    caption: ["var(--tk-text-caption)", { lineHeight: "1.2" }],
+    "caption-small": ["var(--tk-text-caption-sm)", { lineHeight: "1.1" }],
   },
 
   fontFamily: {
-    'sans': 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-    'serif': 'Merriweather, Georgia, serif',
-    'display': 'Quincy CF, serif',
+    sans: "var(--tk-font-body)",
+    serif: "var(--tk-font-serif)",
+    display: "var(--tk-font-display)",
+    "tk-body": "var(--tk-font-body)",
+    "tk-serif": "var(--tk-font-serif)",
+    "tk-display": "var(--tk-font-display)",
+    "tk-hand": "var(--tk-font-hand)",
   },
 
   fontWeight: {
-    'light': '300',
-    'normal': '400',
-    'medium': '500',
-    'semibold': '600',
-    'bold': '700',
+    light: "var(--tk-weight-light)",
+    normal: "var(--tk-weight-regular)",
+    medium: "var(--tk-weight-medium)",
+    semibold: "var(--tk-weight-semibold)",
+    bold: "var(--tk-weight-bold)",
   },
 
-  // SPACING — 4px base unit
   spacing: {
-    'xs': '0.25rem',   // 4px
-    'sm': '0.5rem',    // 8px
-    'md': '1rem',      // 16px
-    'lg': '1.5rem',    // 24px
-    'xl': '2rem',      // 32px
-    '2xl': '3rem',     // 48px
-    '3xl': '4rem',     // 64px
+    xs: "var(--tk-space-1)",
+    sm: "var(--tk-space-2)",
+    md: "var(--tk-space-4)",
+    lg: "var(--tk-space-6)",
+    xl: "var(--tk-space-8)",
+    "2xl": "var(--tk-space-12)",
+    "3xl": "var(--tk-space-16)",
+    "tk-1": "var(--tk-space-1)",
+    "tk-2": "var(--tk-space-2)",
+    "tk-3": "var(--tk-space-3)",
+    "tk-4": "var(--tk-space-4)",
+    "tk-5": "var(--tk-space-5)",
+    "tk-6": "var(--tk-space-6)",
+    "tk-8": "var(--tk-space-8)",
+    "tk-12": "var(--tk-space-12)",
+    "tk-16": "var(--tk-space-16)",
   },
 
-  // BORDER RADIUS — Trust Keith Scale
   borderRadius: {
-    'none': '0px',
-    'input': '0px',        // Utilitarian inputs
-    'button': '6px',       // Functional buttons
-    'glass': '16px',       // Glass card variant
-    'card': '24px',        // Primary cards
-    'pill': '100rem',      // Badges, fully rounded
+    none: "0px",
+    input: "var(--tk-radius-input)",
+    button: "var(--tk-radius-button)",
+    md: "var(--tk-radius-md)",
+    glass: "var(--tk-radius-glass)",
+    card: "var(--tk-radius-card)",
+    pill: "var(--tk-radius-pill)",
+    "tk-input": "var(--tk-radius-input)",
+    "tk-button": "var(--tk-radius-button)",
+    "tk-md": "var(--tk-radius-md)",
+    "tk-glass": "var(--tk-radius-glass)",
+    "tk-card": "var(--tk-radius-card)",
+    "tk-pill": "var(--tk-radius-pill)",
   },
 
-  // SHADOWS — Dual-layer glass effect
   boxShadow: {
-    'none': 'none',
-    'ambient': '0 4px 16px rgba(0, 0, 0, 0.08)',  // Glass variant
-    'standard': '0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.5)',  // Primary cards
-    'focus': '0.125rem solid #4d65ff',  // Focus ring (bright blue)
+    none: "none",
+    ambient: "var(--tk-shadow-glass)",
+    standard: "var(--tk-shadow-card)",
+    focus: "var(--tk-focus-ring)",
+    "tk-hairline": "var(--tk-shadow-hairline)",
+    "tk-glass": "var(--tk-shadow-glass)",
+    "tk-card": "var(--tk-shadow-card)",
+    "tk-pop": "var(--tk-shadow-pop)",
   },
 
-  // LINE HEIGHT
   lineHeight: {
-    'tight': '1.1',
-    'snug': '1.2',
-    'normal': '1.4',
-    'relaxed': '1.5',
-    'loose': '1.6',
+    tight: "var(--tk-leading-tight)",
+    snug: "var(--tk-leading-snug)",
+    normal: "var(--tk-leading-normal)",
+    relaxed: "var(--tk-leading-relaxed)",
+    loose: "1.6",
+  },
+
+  maxWidth: {
+    "tk-container": "var(--tk-container)",
+    "tk-container-wide": "var(--tk-container-wide)",
   },
 };
 

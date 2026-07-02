@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#0c6a83">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0c6a83"/>
+    <g fill="#ffffff">
+      <rect x="360" y="300" width="34" height="200"/><rect x="360" y="300" width="150" height="34"/><rect x="476" y="300" width="34" height="92"/><rect x="360" y="382" width="150" height="34"/><rect x="476" y="416" width="34" height="84"/>
+      <rect x="560" y="300" width="34" height="200"/><rect x="560" y="382" width="180" height="34"/>
+    </g>
+    <g fill="#9fb9c4"><rect x="706" y="300" width="34" height="200"/><polygon points="682,336 706,300 706,336"/></g>
+    <path d="M340,512 Q600,548 860,512 L860,522 Q600,566 340,522 Z" fill="#37b7cc"/>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#eef0f2}
+    .rh-page{width:1180px;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--tk-line);border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-wm{font-family:var(--tk-font-display);font-weight:700;color:var(--tk-brand);font-size:22px;letter-spacing:-0.02em;display:inline-flex;align-items:center;gap:.5rem}
+    .rh-wm span{width:27px;height:27px;border-radius:30%;background:var(--tk-brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    .rh-heroA{display:grid;grid-template-columns:1.05fr 0.95fr;gap:52px;align-items:center;padding:72px 40px 80px}
+    .rh-chip{display:inline-flex;align-items:center;gap:8px;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-pill);padding:8px 15px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink);box-shadow:var(--tk-shadow-glass)}
+    .rh-jchip{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;padding:10px 18px;border-radius:var(--tk-radius-pill);border:1px solid var(--tk-border);background:var(--tk-surface);color:var(--tk-ink);cursor:pointer}
+    .rh-jchip[data-on="1"]{background:var(--tk-brand);color:#fff;border-color:var(--tk-brand)}
+    .rh-coursecard{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-glass);box-shadow:var(--tk-shadow-glass);padding:20px;text-align:left;display:flex;flex-direction:column;gap:12px}
+    .rh-optlabel{position:absolute;top:-34px;left:0;display:flex;align-items:center;gap:10px;font-family:var(--tk-font-body)}
+    .rh-badge-id{font-family:var(--tk-font-body);font-weight:700;font-size:13px;color:#fff;background:var(--tk-brand);border-radius:6px;padding:3px 9px}
+
+    /* ---- RH brand merge: real logo palette layered over Trust Keith tokens ---- */
+    .rh2{
+      --rh-teal-deep:#0c6a83; --rh-teal:#1791a9; --rh-teal-lt:#37b7cc;
+      --rh-gray:#7f8c94; --rh-paper-a:#f4f1e9; --rh-paper-b:#e9e4d8; --rh-paper-line:#ded8c9;
+      /* remap DS brand/accent to the RH teal so DS components adopt the brand */
+      --tk-brand:#0c6a83; --tk-brand-hover:#084f63; --tk-cta:#0c6a83; --tk-cta-hover:#084f63;
+      --tk-accent:#1791a9; --tk-accent-strong:#0c6a83; --tk-accent-soft:#e0f2f6;
+    }
+    .rh2 .rh-nav{background:#ffffff}
+    .rh2 .rh-badge-id{background:var(--rh-teal-deep)}
+    .rh-paper{background:linear-gradient(158deg,var(--rh-paper-a),var(--rh-paper-b));border:1px solid var(--rh-paper-line);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card)}
+    .rh-tag{font-family:var(--tk-font-body);color:var(--rh-gray);text-transform:uppercase;font-weight:600;line-height:1.14}
+    .rh-tag b{font-weight:600} .rh-tag span{font-weight:400}
+  </style>
+</helmet>
+
+<section style="padding:48px;display:flex;justify-content:center;background:#eef0f2;font-family:var(--tk-font-body)">
+
+  <!-- ================= Brand merge: real RH logo + Trust Keith system ================= -->
+  <div id="2a" class="rh2" style="position:relative">
+    <div class="rh-page">
+      <nav class="rh-nav">
+        <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamentos Empresariais" style="height:42px;width:auto;display:block">
+        <div style="display:flex;align-items:center;gap:2px">
+          <a class="link" href="#">Cursos</a><a class="link" href="#">Agenda</a><a class="link" href="#">In-company</a><a class="link" href="#">Consultoria</a><a class="link" href="#">Blog</a>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <a class="link" href="#">Entrar</a>
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="180px,32px">Fale com um especialista →</x-import>
+        </div>
+      </nav>
+
+      <div class="rh-heroA" style="background-color: #F3F0E8">
+        <div>
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="accent" dot="true" hint-size="auto,26px">Educação corporativa · Desde 2007</x-import>
+          <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-hero);line-height:1.06;letter-spacing:-0.02em;color:var(--tk-ink);margin:20px 0 20px;text-wrap:balance">Conhecimento técnico que sua equipe <span style="font-style:italic;color:var(--rh-teal-deep)">aplica no mesmo dia</span>.</h1>
+          <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead-lg);line-height:1.45;color:var(--tk-ink-muted);margin:0 0 32px;max-width:48ch;text-wrap:pretty">Cursos abertos, treinamentos in company e consultoria para o setor público e privado. São quase 80 cursos em 6 trilhas de conhecimento, do básico ao avançado, presenciais ou online.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px">
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" hint-size="220px,52px">Ver agenda de cursos →</x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" hint-size="180px,52px" style="color: var(--tk-cta-hover); text-transform: none">Solicitar proposta in company</x-import>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            
+            <span class="rh-chip">80 cursos · 6 trilhas</span><span class="rh-chip">Presencial e online</span>
+            
+          </div>
+        </div>
+
+        <div class="rh-paper" style="padding: 38px 32px; display: flex; flex-direction: column; gap: 22px; align-items: center; background: linear-gradient(158deg, #FFFFFF, #EBEBEB)">
+          
+          <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamentos Empresariais" style="width:100%;max-width:320px;height:auto;display:block;margin:6px 0">
+          <div style="width:100%;height:1px;background:var(--rh-paper-line)"></div>
+          <div style="width:100%">
+            <div style="font-family:var(--tk-font-display);font-weight:700;font-size:15px;color:var(--tk-ink);margin-bottom:12px">Próximas turmas</div>
+            <div style="display:grid;gap:10px">
+              <sc-for list="{{ courses }}" as="c" hint-placeholder-count="3">
+                <div style="display:flex;gap:14px;align-items:center;background:rgba(255,255,255,0.7);border:1px solid var(--rh-paper-line);border-radius:var(--tk-radius-glass);padding:11px 13px">
+                  <div style="flex:none;width:48px;text-align:center">
+                    <div style="font-family:var(--tk-font-display);font-weight:700;font-size:20px;color:var(--rh-teal-deep);line-height:1">{{ c.day }}</div>
+                    <div style="font-size:10px;text-transform:uppercase;letter-spacing:0.06em;color:var(--rh-gray);margin-top:1px">{{ c.month }}</div>
+                  </div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-family:var(--tk-font-body);font-weight:600;font-size:var(--tk-text-body-sm);color:var(--tk-ink);line-height:1.3">{{ c.title }}</div>
+                    <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:2px">{{ c.mode }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <dc-import name="RH Home Sections" hint-size="1180px,2400px"></dc-import>
+    </div>
+  </div>
+
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      courses: [
+        { day: "12", month: "Ago", title: "Nova Lei de Licitações na prática", mode: "Online ao vivo", spots: "Poucas vagas" },
+        { day: "26", month: "Ago", title: "LGPD para o setor público", mode: "Presencial · Brasília", spots: "Inscrições abertas" },
+        { day: "09", month: "Set", title: "Gestão de contratos administrativos", mode: "Online ao vivo", spots: "Turma nova" }
+      ],
+      pick: (e) => {
+        const row = e.currentTarget.parentNode;
+        row.querySelectorAll(".rh-jchip").forEach(b => b.setAttribute("data-on", "0"));
+        e.currentTarget.setAttribute("data-on", "1");
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

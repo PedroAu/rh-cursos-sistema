@@ -1,161 +1,227 @@
-/* Design Tokens - CSS Custom Properties
- * Source: tokens.yaml (DTCG 2025.10)
- * Generated: 2026-06-22
- * Coverage: 96.5%
+/* Trust Keith RH design tokens
+ * Source: docs/design-system/trust-keith/INVENTORY.md, sections 1-2
+ * Story 14.0.4: final RH values are applied directly in :root.
  */
 
 :root {
-  /* COLORS - NEUTRAL SCALE */
-  --color-neutral-0: #ffffff;
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-200: #e5e7eb;
-  --color-neutral-300: #d1d5db;
-  --color-neutral-400: #9ca3af;
-  --color-neutral-500: #6b7280;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #374151;
-  --color-neutral-800: #1f2937;
-  --color-neutral-900: #111827;
+  /* RH brand remap */
+  --rh-teal-deep: #0c6a83;
+  --rh-teal: #1791a9;
+  --rh-teal-lt: #37b7cc;
+  --rh-gray: #7f8c94;
+  --rh-paper-a: #f4f1e9;
+  --rh-paper-b: #e9e4d8;
+  --rh-paper-line: #ded8c9;
+  --rh-hero-bg: #F3F0E8;
 
-  /* COLORS - BRAND */
-  --color-primary: #0066CC;
-  --color-primary-hover: #0052A3;
-  --color-primary-light: #003d99;
-  --color-primary-foreground: #ffffff;
+  /* Trust Keith colors with RH final values */
+  --tk-brand: #0c6a83;
+  --tk-brand-hover: #084f63;
+  --tk-accent: #1791a9;
+  --tk-accent-strong: #0c6a83;
+  --tk-accent-soft: #e0f2f6;
+  --tk-focus: #4d65ff;
+  --tk-ink: #222525;
+  --tk-ink-muted: #4f5057;
+  --tk-line: #ebebeb;
+  --tk-surface-2: #fafafa;
+  --tk-surface: #ffffff;
+  --tk-black-8: rgba(0,0,0,0.08);
+  --tk-black-5: rgba(0,0,0,0.05);
+  --tk-cream: #fffaf4;
+  --tk-cream-dark: #c3b6aa;
+  --tk-success: #068466;
+  --tk-error: #ea384c;
+  --tk-text: var(--tk-ink);
+  --tk-text-muted: var(--tk-ink-muted);
+  --tk-border: var(--tk-line);
+  --tk-bg: var(--tk-surface);
+  --tk-bg-alt: var(--tk-surface-2);
+  --tk-bg-warm: var(--tk-cream);
+  --tk-cta: var(--tk-brand);
+  --tk-cta-hover: var(--tk-brand-hover);
+  --tk-link: var(--tk-accent);
 
-  --color-accent: #d4af37;
-  --color-navy-deep: #001736;
+  /* Trust Keith typography */
+  --tk-font-display: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --tk-font-serif: var(--font-merriweather), Georgia, "Times New Roman", serif;
+  --tk-font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
+  --tk-font-hand: "Caveat", "Segoe Script", cursive;
+  --tk-text-display-hero: 3.75rem;
+  --tk-text-display-large: 2.75rem;
+  /* Alias: canvases usam var(--tk-text-display) sem sufixo (INVENTORY §2.2) */
+  --tk-text-display: var(--tk-text-display-large);
+  --tk-text-section: 2rem;
+  --tk-text-subhead-lg: 1.5rem;
+  --tk-text-subhead: 1.25rem;
+  --tk-text-body-lg: 1.0625rem;
+  --tk-text-body: 1rem;
+  --tk-text-body-sm: 0.875rem;
+  --tk-text-caption: 0.75rem;
+  --tk-text-caption-sm: 0.6875rem;
+  --tk-weight-light: 300;
+  --tk-weight-regular: 400;
+  --tk-weight-medium: 500;
+  --tk-weight-semibold: 600;
+  --tk-weight-bold: 700;
+  --tk-leading-tight: 1.1;
+  --tk-leading-snug: 1.25;
+  --tk-leading-normal: 1.4;
+  --tk-leading-relaxed: 1.5;
+  --tk-tracking-display: -0.02em;
+  --tk-tracking-normal: 0;
+  --tk-tracking-eyebrow: 0.08em;
 
-  /* COLORS - STATUS */
-  --color-status-success: #22c55e;
-  --color-status-warning: #eab308;
-  --color-status-error: #dc2626;
+  /* Trust Keith spacing, radius, layout */
+  --tk-space-1: 0.25rem;
+  --tk-space-2: 0.5rem;
+  --tk-space-3: 0.75rem;
+  --tk-space-4: 1rem;
+  --tk-space-5: 1.25rem;
+  --tk-space-6: 1.5rem;
+  --tk-space-8: 2rem;
+  --tk-space-12: 3rem;
+  --tk-space-16: 4rem;
+  --tk-pad-card: var(--tk-space-8);
+  --tk-pad-button: var(--tk-space-5);
+  --tk-gap-component: var(--tk-space-6);
+  --tk-gap-section: var(--tk-space-16);
+  --tk-radius-input: 4px;
+  --tk-radius-button: 6px;
+  --tk-radius-md: 8px;
+  --tk-radius-glass: 16px;
+  --tk-radius-card: 24px;
+  --tk-radius-pill: 100rem;
+  --tk-container: 1200px;
+  --tk-container-wide: 1400px;
 
-  /* COLORS - SEMANTIC (UI) */
-  --color-background: #ffffff;
-  --color-surface: #f9fafb;
-  --color-surface-raised: #ffffff;
-  --color-foreground: #111827;
-  --color-foreground-muted: #4b5563;
-  --color-foreground-subtle: #6b7280;
-  --color-border: #e5e7eb;
-  --color-border-subtle: #f3f4f6;
-  --color-border-strong: #d1d5db;
-  --color-focus-ring: #d4af37;
+  /* Trust Keith effects */
+  --tk-shadow-hairline: inset 0 0 0 1px var(--tk-line);
+  --tk-shadow-glass: 0 4px 16px rgba(0,0,0,0.08);
+  --tk-shadow-card: 0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.12);
+  --tk-shadow-pop: 0 12px 36px -8px rgba(41,43,78,0.18);
+  --tk-focus-ring: 0.125rem solid var(--tk-focus);
+  --tk-focus-offset: 0.125rem;
+  --tk-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --tk-duration-fast: 200ms;
+  --tk-duration-base: 300ms;
+  --tk-duration-slow: 500ms;
+  --tk-gradient-soft: radial-gradient(circle, #f7f9fc 35%, #ebf3ff);
+  --tk-gradient-hero: linear-gradient(135deg, #ffffff 0%, var(--tk-cream) 52%, var(--tk-accent-soft) 100%);
+  --tk-gradient-paper: linear-gradient(158deg, var(--rh-paper-a), var(--rh-paper-b));
 
-  /* SPACING */
+  /* Temporary legacy compatibility aliases. Remove in story 14.3.3. */
+  --color-neutral-0: var(--tk-surface);
+  --color-neutral-50: var(--tk-surface-2);
+  --color-neutral-100: var(--tk-line);
+  --color-neutral-200: var(--rh-paper-line);
+  --color-neutral-300: var(--tk-cream-dark);
+  --color-neutral-400: var(--rh-gray);
+  --color-neutral-500: var(--tk-ink-muted);
+  --color-neutral-600: var(--tk-ink-muted);
+  --color-neutral-700: var(--tk-ink);
+  --color-neutral-800: var(--tk-ink);
+  --color-neutral-900: var(--tk-ink);
+  --color-primary: var(--tk-brand);
+  --color-primary-hover: var(--tk-brand-hover);
+  --color-primary-light: var(--tk-accent-soft);
+  --color-primary-foreground: var(--tk-surface);
+  --color-secondary: var(--tk-accent);
+  --color-secondary-hover: var(--tk-accent-strong);
+  --color-tertiary: var(--rh-gray);
+  --color-accent: var(--tk-accent);
+  --color-navy-deep: var(--tk-ink);
+  --color-status-success: var(--tk-success);
+  --color-status-warning: #7a5600;
+  --color-status-error: var(--tk-error);
+  --color-background: var(--tk-surface);
+  --color-surface: var(--tk-surface-2);
+  --color-surface-raised: var(--tk-surface);
+  --color-foreground: var(--tk-ink);
+  --color-foreground-muted: var(--tk-ink-muted);
+  --color-foreground-subtle: var(--rh-gray);
+  --color-border: var(--tk-line);
+  --color-border-subtle: var(--tk-line);
+  --color-border-strong: var(--rh-paper-line);
+  --color-focus-ring: var(--tk-focus);
+
   --spacing-0: 0;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
-
-  /* BORDER RADIUS */
+  --spacing-xs: var(--tk-space-1);
+  --spacing-sm: var(--tk-space-2);
+  --spacing-md: var(--tk-space-4);
+  --spacing-lg: var(--tk-space-6);
+  --spacing-xl: var(--tk-space-8);
+  --spacing-2xl: var(--tk-space-12);
+  --spacing-3xl: var(--tk-space-16);
   --radius-none: 0;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 9999px;
-
-  /* SHADOWS */
+  --radius-sm: var(--tk-radius-input);
+  --radius-md: var(--tk-radius-md);
+  --radius-lg: var(--tk-radius-button);
+  --radius-xl: var(--tk-radius-glass);
+  --radius-full: var(--tk-radius-pill);
   --shadow-none: 0 0 0 0 rgba(0, 0, 0, 0);
-  --shadow-soft: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-soft: var(--tk-shadow-hairline);
+  --shadow-sm: var(--tk-shadow-glass);
+  --shadow-md: var(--tk-shadow-pop);
+  --shadow-lg: var(--tk-shadow-card);
+  --shadow-card: var(--tk-shadow-card);
 
-  /* TYPOGRAPHY - FAMILIES */
-  --font-family-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  --font-family-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-
-  /* TYPOGRAPHY - SIZES */
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 30px;
-  --font-size-4xl: 36px;
-  --font-size-5xl: 48px;
-  --font-size-6xl: 60px;
-
-  /* TYPOGRAPHY - WEIGHTS */
+  --font-family-sans: var(--tk-font-body);
+  --font-family-display: var(--tk-font-display);
+  --font-size-xs: var(--tk-text-caption);
+  --font-size-sm: var(--tk-text-body-sm);
+  --font-size-base: var(--tk-text-body);
+  --font-size-lg: var(--tk-text-body-lg);
+  --font-size-xl: var(--tk-text-subhead);
+  --font-size-2xl: var(--tk-text-subhead-lg);
+  --font-size-3xl: var(--tk-text-section);
+  --font-size-4xl: var(--tk-text-display-large);
+  --font-size-5xl: var(--tk-text-display-hero);
+  --font-size-6xl: var(--tk-text-display-hero);
   --font-weight-thin: 100;
   --font-weight-extralight: 200;
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-weight-light: var(--tk-weight-light);
+  --font-weight-normal: var(--tk-weight-regular);
+  --font-weight-medium: var(--tk-weight-medium);
+  --font-weight-semibold: var(--tk-weight-semibold);
+  --font-weight-bold: var(--tk-weight-bold);
   --font-weight-extrabold: 800;
-
-  /* TYPOGRAPHY - LINE HEIGHTS */
-  --line-height-tight: 1.1;
-  --line-height-snug: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.6;
+  --line-height-tight: var(--tk-leading-tight);
+  --line-height-snug: var(--tk-leading-snug);
+  --line-height-normal: var(--tk-leading-relaxed);
+  --line-height-relaxed: var(--tk-leading-relaxed);
   --line-height-loose: 1.75;
 
-  /* COMPONENT - BUTTON */
-  --button-primary-bg: var(--color-primary);
-  --button-primary-bg-hover: var(--color-primary-hover);
-  --button-primary-color: var(--color-primary-foreground);
-  --button-primary-padding-inline: var(--spacing-md);
-  --button-primary-padding-block: var(--spacing-sm);
-  --button-primary-radius: var(--radius-md);
-  --button-primary-font-weight: var(--font-weight-semibold);
-
-  --button-secondary-bg: var(--color-surface);
-  --button-secondary-bg-hover: var(--color-neutral-100);
-  --button-secondary-color: var(--color-foreground);
-  --button-secondary-border: var(--color-border);
-
-  --button-danger-bg: var(--color-status-error);
-  --button-danger-color: var(--color-primary-foreground);
-
-  /* COMPONENT - INPUT */
-  --input-bg: var(--color-background);
-  --input-border: var(--color-border);
-  --input-border-hover: var(--color-border-strong);
-  --input-border-focus: var(--color-focus-ring);
-  --input-color: var(--color-foreground);
-  --input-padding-inline: var(--spacing-sm);
-  --input-padding-block: var(--spacing-sm);
-  --input-radius: var(--radius-md);
-
-  /* COMPONENT - CARD */
-  --card-bg: var(--color-surface-raised);
-  --card-border: var(--color-border-subtle);
-  --card-padding: var(--spacing-lg);
-  --card-radius: var(--radius-lg);
-  --card-shadow: var(--shadow-sm);
-
-  /* COMPONENT - BADGE */
-  --badge-bg: var(--color-surface);
-  --badge-color: var(--color-foreground);
-  --badge-padding-inline: var(--spacing-sm);
-  --badge-padding-block: var(--spacing-xs);
-  --badge-radius: var(--radius-full);
-  --badge-font-size: var(--font-size-xs);
-}
-
-/* Dark Mode (if needed in future) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Override colors for dark mode */
-    --color-background: #1f2937;
-    --color-surface: #111827;
-    --color-foreground: #f3f4f6;
-    --color-foreground-muted: #d1d5db;
-    --color-foreground-subtle: #9ca3af;
-    --color-border: #374151;
-    --color-border-subtle: #1f2937;
-  }
+  --button-primary-bg: var(--tk-cta);
+  --button-primary-bg-hover: var(--tk-cta-hover);
+  --button-primary-color: var(--tk-surface);
+  --button-primary-padding-inline: var(--tk-pad-button);
+  --button-primary-padding-block: var(--tk-space-2);
+  --button-primary-radius: var(--tk-radius-button);
+  --button-primary-font-weight: var(--tk-weight-semibold);
+  --button-secondary-bg: var(--tk-surface-2);
+  --button-secondary-bg-hover: var(--tk-line);
+  --button-secondary-color: var(--tk-ink);
+  --button-secondary-border: var(--tk-line);
+  --button-danger-bg: var(--tk-error);
+  --button-danger-color: var(--tk-surface);
+  --input-bg: var(--tk-surface);
+  --input-border: var(--tk-line);
+  --input-border-hover: var(--rh-paper-line);
+  --input-border-focus: var(--tk-focus);
+  --input-color: var(--tk-ink);
+  --input-padding-inline: var(--tk-space-2);
+  --input-padding-block: var(--tk-space-2);
+  --input-radius: var(--tk-radius-input);
+  --card-bg: var(--tk-surface);
+  --card-border: var(--tk-line);
+  --card-padding: var(--tk-pad-card);
+  --card-radius: var(--tk-radius-card);
+  --card-shadow: var(--tk-shadow-card);
+  --badge-bg: var(--tk-surface-2);
+  --badge-color: var(--tk-ink);
+  --badge-padding-inline: var(--tk-space-2);
+  --badge-padding-block: var(--tk-space-1);
+  --badge-radius: var(--tk-radius-pill);
+  --badge-font-size: var(--tk-text-caption);
 }

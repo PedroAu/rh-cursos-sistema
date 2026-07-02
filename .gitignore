@@ -59,3 +59,6 @@ outputs/
 
 # Estado de execução AIOX (local)
 .aiox/config.yaml
+
+# Storybook build output
+storybook-static/

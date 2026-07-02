@@ -1,314 +1,167 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { tokens } from '@/design-tokens/tokens.tailwind.js';
 
-/**
- * Design System Tokens
- *
- * This story documents all design tokens and their usage.
- * Reference this when building components to ensure consistency.
- *
- * Token layers:
- * - L1: Colors, Typography, Spacing, Shadows
- * - L2: Components (Button, Card, Input)
- * - L3: Generated Tailwind classes
- * - L4: React components
- */
+const colorGroups = {
+  'Trust Keith RH': [
+    'tk-brand',
+    'tk-brand-hover',
+    'tk-cta',
+    'tk-accent',
+    'tk-accent-strong',
+    'tk-accent-soft',
+    'tk-focus',
+  ],
+  'RH canvas': [
+    'rh-teal-deep',
+    'rh-teal',
+    'rh-teal-lt',
+    'rh-gray',
+    'rh-paper-a',
+    'rh-paper-b',
+    'rh-paper-line',
+    'rh-hero-bg',
+  ],
+  Neutral: [
+    'tk-ink',
+    'tk-ink-muted',
+    'tk-line',
+    'tk-surface',
+    'tk-surface-2',
+    'tk-cream',
+    'tk-cream-dark',
+  ],
+  Semantic: ['tk-success', 'tk-error'],
+};
 
-// Color showcase
+const Swatch = ({ name }: { name: string }) => (
+  <div className="min-w-0">
+    <div
+      className="mb-2 h-24 rounded-tk-md border border-tk-line"
+      style={{ backgroundColor: `var(--${name})` }}
+    />
+    <p className="truncate font-mono text-sm text-tk-ink">{name}</p>
+    <p className="truncate font-mono text-xs text-tk-ink-muted">{tokens.colors[name]}</p>
+  </div>
+);
+
 export const Colors: StoryObj = {
   render: () => (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Brand Colors</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(tokens.colors)
-            .filter(([k]) =>
-              ['trust-keith-teal', 'keith-dark-blue', 'bright-blue', 'bright-blue-dark', 'bright-blue-light'].includes(k)
-            )
-            .map(([name, hex]) => (
-              <div key={name}>
-                <div
-                  className="w-full h-24 rounded-lg mb-2 border border-gray-200"
-                  style={{ backgroundColor: hex }}
-                />
-                <p className="font-mono text-sm">{name}</p>
-                <p className="font-mono text-xs text-gray-600">{hex}</p>
-              </div>
+    <div className="space-y-tk-12">
+      {Object.entries(colorGroups).map(([group, names]) => (
+        <section key={group} className="space-y-tk-4">
+          <h2 className="font-tk-display text-section-heading text-tk-ink">{group}</h2>
+          <div className="grid grid-cols-2 gap-tk-4 md:grid-cols-4">
+            {names.map((name) => (
+              <Swatch key={name} name={name} />
             ))}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Neutral Scale</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(tokens.colors)
-            .filter(([k]) =>
-              ['text-primary', 'text-secondary', 'surface-light', 'surface-neutral', 'surface-white'].includes(k)
-            )
-            .map(([name, hex]) => (
-              <div key={name}>
-                <div
-                  className="w-full h-24 rounded-lg mb-2 border border-gray-200"
-                  style={{ backgroundColor: hex }}
-                />
-                <p className="font-mono text-sm">{name}</p>
-                <p className="font-mono text-xs text-gray-600">{hex}</p>
-              </div>
-            ))}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Semantic Colors</h2>
-        <div className="grid grid-cols-2 gap-4">
-          {Object.entries(tokens.colors)
-            .filter(([k]) => ['success', 'danger', 'error', 'cream-light', 'cream-dark'].includes(k))
-            .map(([name, hex]) => (
-              <div key={name}>
-                <div
-                  className="w-full h-24 rounded-lg mb-2 border border-gray-200"
-                  style={{ backgroundColor: hex }}
-                />
-                <p className="font-mono text-sm">{name}</p>
-                <p className="font-mono text-xs text-gray-600">{hex}</p>
-              </div>
-            ))}
-        </div>
-      </div>
+          </div>
+        </section>
+      ))}
     </div>
   ),
 };
 
-// Typography showcase
 export const Typography: StoryObj = {
   render: () => (
-    <div className="space-y-8">
+    <div className="max-w-tk-container space-y-tk-8">
       <div>
-        <h2 className="text-2xl font-bold mb-4">Display Hierarchy (Quincy CF)</h2>
-        <div className="space-y-4">
-          <div>
-            <p className="text-display-hero">Display Hero</p>
-            <p className="text-xs text-gray-600 mt-1">3.75rem • weight 700 • -0.02em spacing</p>
-          </div>
-          <div>
-            <p className="text-display-large">Display Large</p>
-            <p className="text-xs text-gray-600 mt-1">2.75rem • weight 700</p>
-          </div>
-          <div>
-            <p className="text-section-heading">Section Heading</p>
-            <p className="text-xs text-gray-600 mt-1">2rem • weight 700</p>
-          </div>
-        </div>
+        <p className="font-tk-display text-display-hero font-bold text-tk-ink">Display hero</p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-display / 3.75rem / fallback serif</p>
       </div>
-
       <div>
-        <h2 className="text-2xl font-bold mb-4">Body Text (Inter)</h2>
-        <div className="space-y-4">
-          <div>
-            <p className="text-body-large">Body Large Text</p>
-            <p className="text-xs text-gray-600 mt-1">1.0625rem • weight 400 • line-height 1.45</p>
-          </div>
-          <div>
-            <p className="text-body">Body Text (default)</p>
-            <p className="text-xs text-gray-600 mt-1">1rem • weight 400 • line-height 1.5</p>
-          </div>
-          <div>
-            <p className="text-body-small">Body Small Text</p>
-            <p className="text-xs text-gray-600 mt-1">0.875rem • weight 400 • line-height 1.4</p>
-          </div>
-        </div>
+        <p className="font-tk-display text-display-large font-bold text-tk-ink">Display large</p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-display / 2.75rem</p>
       </div>
-
       <div>
-        <h2 className="text-2xl font-bold mb-4">UI Text (Inter 500)</h2>
-        <div className="space-y-4">
-          <div>
-            <p className="text-button">Button Text</p>
-            <p className="text-xs text-gray-600 mt-1">0.875rem • weight 500 • line-height 1.2</p>
-          </div>
-          <div>
-            <p className="text-link">Link Text</p>
-            <p className="text-xs text-gray-600 mt-1">0.875rem • weight 500 • line-height 1.2</p>
-          </div>
-          <div>
-            <p className="text-button-small">Button Small</p>
-            <p className="text-xs text-gray-600 mt-1">0.75rem • weight 500 • line-height 1.1</p>
-          </div>
-        </div>
+        <p className="font-tk-serif text-subheading-large font-light text-tk-ink">
+          Merriweather subheading with a calm editorial rhythm.
+        </p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-serif / 1.5rem / weight 300</p>
+      </div>
+      <div>
+        <p className="font-tk-body text-body-large text-tk-ink">
+          Inter body copy is used for product content, forms, navigation, and repeated operational UI.
+        </p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-body / 1.0625rem</p>
       </div>
     </div>
   ),
 };
 
-// Spacing showcase
-export const Spacing: StoryObj = {
+export const SpacingAndShape: StoryObj = {
   render: () => (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Spacing Scale (4px base)</h2>
-      <div className="space-y-4">
+    <div className="space-y-tk-10">
+      <section className="space-y-tk-4">
+        <h2 className="font-tk-display text-section-heading text-tk-ink">Spacing</h2>
         {Object.entries(tokens.spacing).map(([name, value]) => (
-          <div key={name} className="flex items-center gap-4">
-            <div className="w-32">
-              <p className="font-mono text-sm font-semibold">{name}</p>
-              <p className="font-mono text-xs text-gray-600">{value}</p>
+          <div key={name} className="flex items-center gap-tk-4">
+            <div className="w-28">
+              <p className="font-mono text-sm text-tk-ink">{name}</p>
+              <p className="font-mono text-xs text-tk-ink-muted">{value}</p>
             </div>
-            <div
-              className="bg-bright-blue h-8 rounded"
-              style={{ width: `calc(${value} * 10)` }}
-            />
+            <div className="h-7 rounded-tk-button bg-tk-accent" style={{ width: value }} />
           </div>
         ))}
-      </div>
+      </section>
+
+      <section className="space-y-tk-4">
+        <h2 className="font-tk-display text-section-heading text-tk-ink">Radius</h2>
+        <div className="grid grid-cols-2 gap-tk-6 md:grid-cols-3">
+          {Object.entries(tokens.borderRadius).map(([name, value]) => (
+            <div key={name}>
+              <div className="mb-2 h-24 border border-tk-line bg-tk-accent-soft" style={{ borderRadius: value }} />
+              <p className="font-mono text-sm text-tk-ink">{name}</p>
+              <p className="font-mono text-xs text-tk-ink-muted">{value}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   ),
 };
 
-// Border radius showcase
-export const BorderRadius: StoryObj = {
-  render: () => (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Border Radius Scale</h2>
-      <div className="grid grid-cols-2 gap-8">
-        {Object.entries(tokens.borderRadius).map(([name, value]) => (
-          <div key={name}>
-            <div
-              className="w-full h-32 bg-trust-keith-teal border-2 border-gray-300 mb-2"
-              style={{ borderRadius: value }}
-            />
-            <p className="font-mono text-sm font-semibold">{name}</p>
-            <p className="font-mono text-xs text-gray-600">{value}</p>
-            {name === 'button' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Button</p>
-            )}
-            {name === 'card' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Card</p>
-            )}
-            {name === 'glass' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Card (glass variant)</p>
-            )}
-            {name === 'input' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Input</p>
-            )}
-            {name === 'pill' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Badge</p>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  ),
-};
-
-// Shadows showcase
 export const Shadows: StoryObj = {
   render: () => (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Shadow Variants</h2>
-      <div className="grid grid-cols-2 gap-8">
-        {Object.entries(tokens.boxShadow).map(([name, shadowCSS]) => (
-          <div key={name}>
-            <div
-              className="w-full h-32 bg-white rounded-card mb-2"
-              style={{ boxShadow: shadowCSS }}
-            />
-            <p className="font-mono text-sm font-semibold">{name}</p>
-            <p className="font-mono text-xs text-gray-600 break-all">{shadowCSS}</p>
-            {name === 'standard' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Card (default)</p>
-            )}
-            {name === 'ambient' && (
-              <p className="text-xs text-blue-600 mt-1">Used in: Card (glass variant)</p>
-            )}
-          </div>
-        ))}
-      </div>
+    <div className="grid max-w-tk-container grid-cols-1 gap-tk-6 md:grid-cols-2">
+      {Object.entries(tokens.boxShadow).map(([name, value]) => (
+        <div key={name}>
+          <div className="mb-3 h-32 rounded-tk-card border border-tk-line bg-tk-surface" style={{ boxShadow: value }} />
+          <p className="font-mono text-sm text-tk-ink">{name}</p>
+          <p className="break-all font-mono text-xs text-tk-ink-muted">{value}</p>
+        </div>
+      ))}
     </div>
   ),
 };
 
-// Focus ring showcase
-export const FocusRings: StoryObj = {
-  render: () => (
-    <div className="space-y-8">
-      <h2 className="text-2xl font-bold">Focus Ring Indicators</h2>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Button with Focus Ring</h3>
-        <button
-          className="px-6 py-3 bg-trust-keith-teal text-white rounded-button font-semibold
-           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-2"
-        >
-          Focus me (Tab)
-        </button>
-        <p className="text-sm text-gray-600 mt-4">
-          Classes: <code className="bg-gray-100 px-2 py-1 rounded">focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-2</code>
-        </p>
-        <p className="text-sm text-gray-600 mt-2">
-          Color: <code className="bg-gray-100 px-2 py-1 rounded">#4d65ff (bright-blue)</code> • Offset: <code className="bg-gray-100 px-2 py-1 rounded">2px</code>
-        </p>
-        <p className="text-sm text-amber-600 mt-2">
-          ⚠️ Contrast: 4.54:1 (WCAG AA ✅, not AAA)
-        </p>
-      </div>
-
-      <div>
-        <h3 className="text-lg font-semibold mb-4">Input with Focus Ring</h3>
-        <input
-          type="text"
-          placeholder="Focus me (Tab)"
-          aria-label="Input field demo"
-          className="w-full px-4 py-3 rounded-input border border-surface-neutral bg-surface-white
-           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-1"
-        />
-        <p className="text-sm text-gray-600 mt-4">
-          Classes: <code className="bg-gray-100 px-2 py-1 rounded">focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-1</code>
-        </p>
-        <p className="text-sm text-amber-600 mt-2">
-          ⚠️ See A11Y-FINDINGS.md for contrast audit results
-        </p>
-      </div>
-    </div>
-  ),
-};
-
-// Component examples
 export const ComponentExamples: StoryObj = {
   render: () => (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Button Examples</h2>
-        <div className="flex gap-4 flex-wrap">
-          <button className="px-6 py-3 bg-trust-keith-teal text-white rounded-button font-semibold
-           hover:bg-keith-dark-blue hover:-translate-y-0.5 transition-all">
-            Primary
-          </button>
-          <button className="px-6 py-3 border border-surface-neutral bg-surface-light text-text-primary rounded-button font-semibold
-           hover:bg-surface-neutral transition-all">
-            Secondary
-          </button>
-          <button className="px-6 py-3 border border-surface-neutral bg-surface-white text-bright-blue rounded-button font-semibold
-           hover:border-bright-blue transition-all">
-            Outline
-          </button>
-          <button className="px-6 py-3 text-text-primary rounded-button font-semibold
-           hover:bg-surface-light transition-all">
-            Ghost
-          </button>
-        </div>
+    <div className="max-w-tk-container space-y-tk-8 bg-rh-hero-bg p-tk-8">
+      <div className="flex flex-wrap gap-tk-4">
+        <button className="rounded-tk-button bg-tk-cta px-tk-5 py-tk-2 font-tk-body text-button text-tk-surface shadow-tk-glass transition hover:bg-tk-cta-hover">
+          Primary
+        </button>
+        <button className="rounded-tk-button border border-tk-line bg-tk-surface px-tk-5 py-tk-2 font-tk-body text-button text-tk-ink transition hover:bg-tk-surface-2">
+          Secondary
+        </button>
+        <span className="inline-flex items-center rounded-tk-pill border border-tk-line bg-tk-surface px-tk-4 py-tk-1 font-tk-body text-caption text-rh-gray">
+          Badge
+        </span>
       </div>
 
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Card Examples</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-surface-white border border-surface-neutral rounded-card shadow-standard p-6">
-            <p className="font-semibold mb-2">Card Base</p>
-            <p className="text-sm text-text-secondary">rounded-card • shadow-standard</p>
-          </div>
-          <div className="bg-surface-white border border-surface-neutral rounded-glass shadow-ambient p-6">
-            <p className="font-semibold mb-2">Card Glass</p>
-            <p className="text-sm text-text-secondary">rounded-glass • shadow-ambient</p>
-          </div>
-        </div>
+      <div className="grid gap-tk-6 md:grid-cols-2">
+        <article className="rounded-tk-glass border border-tk-line bg-tk-surface p-tk-6 shadow-tk-glass">
+          <h3 className="font-tk-display text-subheading text-tk-ink">Course card</h3>
+          <p className="mt-tk-2 font-tk-body text-body-small text-tk-ink-muted">
+            Surface, line, glass radius and dark-tinted elevation.
+          </p>
+        </article>
+        <article className="rounded-tk-card border border-rh-paper-line bg-[var(--tk-gradient-paper)] p-tk-8 shadow-tk-card">
+          <h3 className="font-tk-display text-subheading text-tk-ink">Paper card</h3>
+          <p className="mt-tk-2 font-tk-serif text-body text-tk-ink-muted">
+            RH paper gradient with Trust Keith typography.
+          </p>
+        </article>
       </div>
     </div>
   ),
@@ -320,53 +173,8 @@ const meta: Meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: `
-Design system tokens documentation.
-
-**Structure:**
-- Colors: Brand, Neutral, Semantic
-- Typography: Display, Body, UI
-- Spacing: 4px-based scale
-- Border Radius: Component-specific scales
-- Shadows: Dual-layer glass effect
-- Focus Rings: WCAG AA compliant
-
-**Token Layers:**
-1. \`docs/design/tokens.json\` — Source of truth
-2. \`src/design-tokens/tokens.tailwind.js\` — Tailwind config
-3. \`tailwind.config.ts\` — Extended theme
-4. React components — Usage
-
-**Usage Guide:**
-\`\`\`tsx
-// Import tokens (not usually needed)
-import { tokens } from '@/design-tokens/tokens.tailwind.js';
-
-// Use Tailwind classes (preferred)
-<button className="bg-trust-keith-teal text-white rounded-button">
-  Click me
-</button>
-
-// Use CVA for components
-import { cva } from 'class-variance-authority';
-
-const buttonVariants = cva(
-  'rounded-button font-semibold transition-all',
-  {
-    variants: {
-      variant: {
-        primary: 'bg-trust-keith-teal text-white hover:bg-keith-dark-blue',
-        secondary: 'bg-surface-light text-text-primary border border-surface-neutral'
-      }
-    }
-  }
-);
-\`\`\`
-
-**Documentation:**
-- [Tokens → Components Mapping](../../docs/design/TOKENS-TO-COMPONENTS.md)
-- [Accessibility Findings](../../docs/design/A11Y-FINDINGS.md)
-        `,
+        component:
+          'Trust Keith RH token documentation. Final RH remap values live in src/design-tokens/tokens.css and Tailwind references CSS variables from src/design-tokens/tokens.tailwind.js.',
       },
     },
   },

@@ -1,29 +1,41 @@
 import type * as React from "react";
-
 import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex min-h-7 items-center rounded-pill border px-3 py-1.5 text-caption font-semibold uppercase tracking-[0.05em]",
+  "inline-flex min-h-7 items-center gap-2 rounded-tk-pill border px-3 py-1 text-caption font-semibold",
   {
     variants: {
+      tone: {
+        accent: "border-transparent bg-tk-accent-soft text-tk-accent-strong",
+        neutral: "border-tk-line bg-tk-surface-2 text-tk-ink-muted",
+        success: "border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))] text-tk-success",
+        error: "border-transparent bg-[color-mix(in_srgb,var(--tk-error)_10%,var(--tk-surface))] text-tk-error"
+      },
       variant: {
-        default: "border-bright-blue bg-bright-blue-light text-trust-keith-teal",
-        success: "border-success bg-[#f0fdf4] text-[#014D3A]",
-        warning: "border-[#fde68a] bg-[#fffbeb] text-[#92400e]",
-        danger: "border-danger bg-[#fef2f2] text-danger",
-        muted: "border-surface-neutral bg-surface-light text-text-secondary"
+        default: "border-transparent bg-tk-accent-soft text-tk-accent-strong",
+        success: "border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))] text-tk-success",
+        warning: "border-tk-line bg-tk-cream text-tk-ink",
+        danger: "border-transparent bg-[color-mix(in_srgb,var(--tk-error)_10%,var(--tk-surface))] text-tk-error",
+        muted: "border-tk-line bg-tk-surface-2 text-tk-ink-muted"
       }
     },
     defaultVariants: {
-      variant: "default"
+      tone: "accent"
     }
   }
 );
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {
+  dot?: boolean;
+}
 
-export function Badge({ className, variant, ...props }: BadgeProps) {
-  return <div className={cn(badgeVariants({ variant }), className)} {...props} />;
+export function Badge({ className, tone, variant, dot = false, children, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ tone, variant }), className)} {...props}>
+      {dot ? <span className="h-1.5 w-1.5 rounded-tk-pill bg-current" aria-hidden="true" /> : null}
+      {children}
+    </div>
+  );
 }

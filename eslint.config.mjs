@@ -23,7 +23,11 @@ const eslintConfig = [
       "storybook-static/**",
       "test-results/**",
       "supabase/functions/**",
-      "next-env.d.ts"
+      "next-env.d.ts",
+      // Artefatos de referência do redesign Trust Keith (Epic 14) — removidos na story 14.3.3
+      "public/_ds/**",
+      "public/support.js",
+      "docs/design-system/trust-keith/ds-package/**"
     ]
   },
   ...nextCoreWebVitals,

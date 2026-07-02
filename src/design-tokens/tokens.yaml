@@ -79,27 +79,27 @@ core:
     # Brand Colors
     primary-blue:
       $type: "color"
-      $value: "#0066CC"
+      $value: "#0c6a83"
       $description: "Primary brand blue"
 
     primary-blue-dark:
       $type: "color"
-      $value: "#0052A3"
+      $value: "#084f63"
       $description: "Primary blue dark (hover state)"
 
     primary-blue-light:
       $type: "color"
-      $value: "#003d99"
+      $value: "#e0f2f6"
       $description: "Primary blue light (visited)"
 
     prestige-gold:
       $type: "color"
-      $value: "#d4af37"
+      $value: "#1791a9"
       $description: "Premium gold accent"
 
     deep-navy:
       $type: "color"
-      $value: "#001736"
+      $value: "#222525"
       $description: "Deep navy for hero sections"
 
     # Status Colors
@@ -120,7 +120,7 @@ core:
 
     focus-ring:
       $type: "color"
-      $value: "#d4af37"
+      $value: "#1791a9"
       $description: "Focus outline ring color"
 
   # Spacing Scale (Tailwind default base 4px)
