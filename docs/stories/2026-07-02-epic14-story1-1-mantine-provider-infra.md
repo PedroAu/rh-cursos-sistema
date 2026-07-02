@@ -1,7 +1,7 @@
 # Story 14.1.1: Remoção Mantine — Provider e Infraestrutura
 
 ## Status
-Ready
+InReview
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)
@@ -54,18 +54,29 @@ Atualizar esta story: checkboxes, File List, status → InReview, Change Log.
 ---
 
 ## Tasks / Subtasks
-- [ ] Provider removido + sonner Toaster (AC: 1, 2, 6)
-- [ ] use-disclosure criado (AC: 3)
-- [ ] error-boundary sem Mantine (AC: 1)
-- [ ] whatsapp-support sem Mantine (AC: 1)
-- [ ] mantine-tokens.css tratado (AC: 4)
-- [ ] Verificação completa (AC: 1-6)
+- [x] Provider removido + sonner Toaster (AC: 1, 2, 6)
+- [x] use-disclosure criado (AC: 3)
+- [x] error-boundary sem Mantine (AC: 1)
+- [x] whatsapp-support sem Mantine (AC: 1)
+- [x] mantine-tokens.css tratado (AC: 4)
+- [x] Verificação completa (AC: 1-6)
 
 ## File List
 - `docs/stories/2026-07-02-epic14-story1-1-mantine-provider-infra.md`
+- `app/layout.tsx`
+- `src/components/error-boundary.tsx`
+- `src/components/providers/mantine-provider.stories.tsx` (deleted)
+- `src/components/providers/mantine-provider.tsx` (deleted)
+- `src/design-tokens/mantine-tokens.css` (deleted)
+- `src/features/public-shell/components/whatsapp-support.tsx`
+- `src/hooks/use-disclosure.ts`
+- `src/styles/globals.css`
+- `src/theme/mantine-theme.ts` (deleted)
+- `tailwind.config.ts`
 
 ## PO Validation
 2026-07-02 · @po via @aiox-master YOLO · **GO** — escopo cercado com exceção documentada, ACs por comando, dependência 14.0.5 concluída. Status: Draft → Ready.
 
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Story criada como prompt Codex (Epic 14 §4).
+- 2026-07-02 - @dev (Codex) - Removidos `AppMantineProvider`, `mantine-theme` e `mantine-tokens.css`; `error-boundary` e `whatsapp-support` migrados para primitives locais; `use-disclosure` criado; `lint`, `typecheck`, `test:unit` e `build` aprovados. Tentativa de smoke browser em `next dev` bloqueada por ausência do binário do Playwright no ambiente local.
