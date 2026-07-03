@@ -21,9 +21,10 @@ ide:
     claude-desktop: false
     claude-code: true
 mcp:
-  enabled: false
-  configLocation: .claude/mcp.json
-  servers: []
+  enabled: true
+  configLocation: .mcp.json
+  servers:
+    - clickup
 qa:
   qaLocation: docs/qa
 prd:

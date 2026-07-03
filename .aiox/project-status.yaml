@@ -1,15 +1,19 @@
 status:
   branch: main
-  modifiedFiles: []
-  modifiedFilesTotalCount: 0
+  modifiedFiles:
+    - .aiox-core/core-config.yaml
+    - .mcp.json
+    - docs/stories/1.1.story.md
+    - tests/baseline/blog-artigo-baseline-desktop.png
+    - tests/baseline/blog-artigo-baseline-mobile.png
+  modifiedFilesTotalCount: 14
   recentCommits:
-    - 'test: align admin-resources contract auth flow'
-    - 'docs(go-live): registrar Fase 5 pós-deploy (smoke + roles)'
-    - 'chore: consolidate canonical design tokens'
+    - 'feat(public): clarify consultoria journey [Story 1.1]'
+    - 'fix: stabilize auth contract rate limiting'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-03T15:10:00Z'
+  lastUpdate: '2026-07-03T17:48:05.274Z'
   isGitRepo: true
-timestamp: 1783091400000
+timestamp: 1783100885276
 ttl: 60
-gitFingerprint: clean:685249a
+gitFingerprint: 1782438372335.9148:1783100738099.7837
