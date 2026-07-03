@@ -16,6 +16,39 @@ function buildClassSelectionLabel(startDate: string, time: string) {
 }
 
 test.describe("epica 4 — jornadas publicas", () => {
+  test("home e navegacao deixam as tres jornadas claras sem ocultar descoberta", async ({ page }) => {
+    await page.goto("/");
+    const mainNav = page.getByRole("navigation", { name: "Navegacao principal" });
+
+    await expect(mainNav).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Cursos", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "Consultoria", exact: true })).toBeVisible();
+    await expect(mainNav.getByRole("link", { name: "In Company", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Fale com um especialista ->" })).toBeVisible();
+    await expect(page.getByTestId("ui-hero-home").getByRole("link", { name: "Ver agenda de cursos" })).toBeVisible();
+
+    await expect(page.getByRole("heading", { name: "Escolha como quer avançar" })).toBeVisible();
+    await expect(page.getByText("Conteúdo aplicável à legislação vigente e à realidade de organizações públicas e privadas.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Cursos abertos" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Cursos in-company" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Consultoria" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver agenda de cursos →" })).toHaveAttribute("href", "/agenda");
+    await expect(page.getByRole("link", { name: "Levar para minha equipe →" })).toHaveAttribute("href", "/in-company");
+    await expect(page.getByRole("link", { name: "Solicitar proposta →" }).first()).toHaveAttribute("href", "/falar-com-especialista");
+  });
+
+  test("paginas de jornada reforcam posicionamento regulatorio", async ({ page }) => {
+    await page.goto("/cursos");
+    await expect(page.getByText("Turmas presenciais e online ao vivo, com certificação e conteúdo atualizado às exigências legais e regulatórias")).toBeVisible();
+
+    await page.goto("/in-company");
+    await expect(page.getByText("Desenhamos cada programa a partir das exigências legais que se aplicam ao seu órgão ou empresa e da forma como a sua equipe trabalha.")).toBeVisible();
+
+    await page.goto("/consultoria");
+    await expect(page.getByText("Consultoria para aplicar norma com clareza operacional.")).toBeVisible();
+    await expect(page.getByText("A RH Cursos apoia equipes públicas e privadas a traduzirem exigências legais e regulatórias em processos claros, treinamento aplicável e execução acompanhada.")).toBeVisible();
+  });
+
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();

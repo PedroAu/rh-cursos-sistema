@@ -39,12 +39,19 @@ const guarantees = [
   }
 ];
 
+const consultoriaHighlights = [
+  "Diagnóstico do impacto das normas no seu processo atual",
+  "Plano de adequação aplicável à realidade do seu órgão ou empresa",
+  "Acompanhamento especializado para transformar requisito em execução"
+] as const;
+
 type SpecialistContactPageProps = {
   leadOrigin?: Extract<LeadOrigin, "Consultoria" | "Especialista">;
 };
 
 export function SpecialistContactPage({ leadOrigin = "Especialista" }: SpecialistContactPageProps) {
   const { createLead } = useAppStore();
+  const isConsultoriaJourney = leadOrigin === "Consultoria";
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -133,12 +140,28 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
         <div className="ea-container">
           <div className="max-w-3xl space-y-6">
             <span className="inline-flex rounded bg-[#0c6a83] px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
-              Consultoria exclusiva
+              {isConsultoriaJourney ? "Consultoria para órgãos e empresas" : "Consultoria exclusiva"}
             </span>
-            <h1 className="text-white">Fale com um especialista da RH Cursos.</h1>
+            <h1 className="text-white">
+              {isConsultoriaJourney ? "Consultoria para aplicar norma com clareza operacional." : "Fale com um especialista da RH Cursos."}
+            </h1>
             <p className="max-w-2xl text-lead text-white/80">
-              Conte o desafio da sua equipe e receba um diagnóstico orientado antes de qualquer proposta.
+              {isConsultoriaJourney
+                ? "A RH Cursos apoia equipes públicas e privadas a traduzirem exigências legais e regulatórias em processos claros, treinamento aplicável e execução acompanhada."
+                : "Conte o desafio da sua equipe e receba um diagnóstico orientado antes de qualquer proposta."}
             </p>
+            {isConsultoriaJourney ? (
+              <div className="flex flex-wrap gap-3">
+                {consultoriaHighlights.map((item) => (
+                  <span
+                    key={item}
+                    className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/85"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
@@ -151,7 +174,9 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
               <h2 className="text-deep-navy">Entenda o caminho antes de propor a solução.</h2>
               <p className="max-w-2xl text-body-lg leading-8 text-text-muted">
                 O atendimento começa pelo contexto da equipe para orientar o formato mais adequado, com foco em
-                gestão pública, treinamento e resultado prático.
+                {isConsultoriaJourney
+                  ? " exigências legais, requisitos regulatórios e resultado prático."
+                  : " gestão pública, treinamento e resultado prático."}
               </p>
             </div>
 
