@@ -112,7 +112,29 @@ Com isso, a story sai de `InProgress` e volta para `InReview` com ACs completos.
 ## PO Validation
 2026-07-02 · @po via @aiox-master YOLO · **GO** — última barreira antes Fase 2; smoke tests validam integral removal. Status: Draft → Ready.
 
+## QA Results
+
+### Review Date: 2026-07-03
+
+### Reviewed By: Quinn (Test Architect)
+
+**Gate Decision:** PASS → `docs/qa/gates/epic14.1-5-mantine-purge.yml`
+
+**Summary:** All acceptance criteria met. Mantine purge complete with no residual imports, dependencies removed, and all tests passing (134 passed). Security audit clean, no regressions detected.
+
+**Quality Checks:**
+- ✅ Code Quality — No @mantine imports, all lint/typecheck green
+- ✅ Unit Tests — 134 passed, smoke tests passed
+- ✅ Acceptance Criteria — ACs 1-5 complete
+- ✅ No Regressions — Visual baseline stabilized
+- ✅ Performance — No issues, deps removal improves
+- ✅ Security — npm audit clean at high level
+- ✅ Documentation — Change log and dev notes complete
+
+---
+
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Story criada como prompt Codex (Epic 14 §4.5).
 - 2026-07-02 - @dev (Dex) - Purge Mantine concluído: removidas deps `@mantine/*` de `package.json`/`package-lock.json`, eliminados imports restantes em `src/` e `app/`, `src/theme/mantine-theme.ts` removido, provider convertido para pass-through. `npm run lint`, `npm run typecheck`, `npm run test:unit` (394 testes) e `npm run build` verdes. `tests/epic14-mantine-removal.smoke.spec.ts` verde, mas `npm run test:e2e:smoke` ainda falha por testes repo-wide fora do escopo imediato; status mantido em `InProgress`.
 - 2026-07-03 - Codex (@devops/@dev) - Gate de pre-push consolidado: `npm run lint` limpo, `npm test` completo verde (`134 passed`), `npm audit --audit-level=high` sem `high/critical`, smoke tests da remoção Mantine e baseline visual do `/blog` estabilizados. Story atualizada para `InReview` com ACs 1-5 fechados.
+- 2026-07-03 - @qa (Quinn) - QA Gate: PASS. Todos os 7 quality checks validados. Story pronta para @devops push.
