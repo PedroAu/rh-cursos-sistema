@@ -43,6 +43,25 @@ async function loginAsAdmin(request: import("@playwright/test").APIRequestContex
   return (await response.json()) as { token: string };
 }
 
+async function loginAsAdminEdge(request: import("@playwright/test").APIRequestContext) {
+  const { adminEmail, adminPassword, functionsBaseUrl } = getIntegrationEnv();
+
+  await ensureAuthUser({
+    email: adminEmail,
+    name: "Administrador RH Cursos",
+    password: adminPassword,
+    role: "admin",
+  });
+
+  const response = await request.post(`${functionsBaseUrl}/auth-session`, {
+    data: { role: "admin", email: adminEmail, password: adminPassword },
+    headers: edgeHeaders(createUniqueIp("edge-admin-login")),
+  });
+
+  expect(response.ok()).toBeTruthy();
+  return (await response.json()) as { token: string };
+}
+
 test.describe("contratos HTTP — route handler auth-session", () => {
   test("POST valida payload, credenciais, autorização e rate limit", async ({ request }, testInfo) => {
     annotateCanonicalDoc(testInfo, docs.apiCatalog);
@@ -225,7 +244,7 @@ test.describe("contratos HTTP — edge functions", () => {
       error: "Method not allowed",
     });
 
-    const { token } = await loginAsAdmin(request);
+    const { token } = await loginAsAdminEdge(request);
 
     const invalidMutation = await request.post(`${functionsBaseUrl}/admin-resources`, {
       data: { resource: "leads", action: "update-status", id: "lead-1", status: "status-invalido" },
