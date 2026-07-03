@@ -1,15 +1,13 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
-import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import type { ReactNode } from "react";
 
-import "@mantine/core/styles.css";
-import "@mantine/notifications/styles.css";
 import "@/styles/globals.css";
-import { AppMantineProvider } from "@/components/providers/mantine-provider";
 import { MotionProvider } from "@/components/providers/motion-provider";
+import { AppMantineProvider } from "@/components/providers/mantine-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
+import { AppToaster } from "@/components/ui/toaster";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
@@ -51,16 +49,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" {...mantineHtmlProps}>
-      <head>
-        <ColorSchemeScript defaultColorScheme="light" />
-      </head>
+    <html lang="pt-BR">
       <body className={`${inter.variable} ${merriweather.variable}`}>
-        <ErrorBoundary>
-          <AppMantineProvider>
+        <AppMantineProvider>
+          <ErrorBoundary>
             <MotionProvider>{children}</MotionProvider>
-          </AppMantineProvider>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </AppMantineProvider>
+        <AppToaster />
       </body>
       {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>

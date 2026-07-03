@@ -1037,6 +1037,9 @@ export function buildResourceConfig(
         item.title.toLowerCase().includes(search.toLowerCase())
       );
       const categoryOptions = [
+        { value: "Licitações", label: "Licitações" },
+        { value: "LGPD", label: "LGPD" },
+        { value: "Compliance", label: "Compliance" },
         { value: "Departamento Pessoal", label: "Departamento Pessoal" },
         { value: "eSocial", label: "eSocial" },
         { value: "Gestão Pública", label: "Gestão Pública" },

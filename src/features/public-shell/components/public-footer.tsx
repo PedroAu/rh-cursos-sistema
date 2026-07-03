@@ -1,103 +1,96 @@
+"use client";
+
 import Image from "next/image";
 import NextLink from "next/link";
-import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 
-import { publicNavItems } from "@/features/public-shell/config/public-navigation";
-import { company } from "@/lib/company";
+import { useLocation } from "@/lib/router-compat";
+import { cn } from "@/lib/utils";
 
-const quickLinks = [
-  { label: "Administracao", to: "/login" },
-  { label: "Catalogo de cursos", to: "/cursos" },
-  { label: "Consultoria", to: "/consultoria" },
-  { label: "Agenda de turmas", to: "/agenda" },
-  { label: "Falar com especialista", to: "/falar-com-especialista" }
-];
+const footerColumns = [
+  {
+    items: [
+      { label: "Cursos abertos", to: "/cursos" },
+      { label: "Agenda", to: "/agenda" },
+      { label: "In-company", to: "/in-company" },
+      { label: "Consultoria", to: "/consultoria" }
+    ],
+    title: "Ofertas"
+  },
+  {
+    items: [
+      { label: "Sobre", to: "/sobre" },
+      { label: "Blog", to: "/blog" },
+      { label: "Instrutores", to: "/sobre" },
+      { label: "Contato", to: "/contato" }
+    ],
+    title: "Empresa"
+  },
+  {
+    items: [
+      { label: "Área do aluno", to: "/login" },
+      { label: "Área do instrutor", to: "/login" },
+      { label: "Entrar", to: "/login" }
+    ],
+    title: "Acesso"
+  }
+] as const;
 
-const contactLinks: Array<{ label: string; href: string; icon: typeof Mail; external?: boolean }> = [
-  { label: company.email, href: company.links.email, icon: Mail },
-  { label: company.phones.whatsapp, href: company.links.whatsapp, icon: MessageCircle, external: true },
-  { label: company.phones.primary, href: "tel:+556139651929", icon: Phone },
-  { label: company.address.full, href: company.links.maps, icon: MapPin, external: true }
-];
-
-function FooterLinkList({ title, items }: { title: string; items: Array<{ label: string; to: string }> }) {
-  return (
-    <div>
-      <p className="text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-rh-gray">{title}</p>
-      <nav aria-label={title} className="mt-4 grid gap-3">
-        {items.map((item) => (
-          <NextLink
-            key={item.to}
-            href={item.to}
-            className="text-sm text-tk-ink-muted transition hover:text-tk-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
-          >
-            {item.label}
-          </NextLink>
-        ))}
-      </nav>
-    </div>
-  );
+function isActive(pathname: string, to: string) {
+  return pathname === to || pathname.startsWith(`${to}/`);
 }
 
 export function PublicFooter() {
+  const location = useLocation();
+
   return (
-    <footer className="bg-tk-surface-2 py-12 md:py-16">
-      <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] rounded-tk-card border border-tk-line bg-tk-surface p-8 shadow-tk-card md:w-[min(var(--tk-container),calc(100%-40px))] md:p-10">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.7fr_0.7fr_0.9fr]">
-          <div className="max-w-sm">
-            <NextLink href="/" aria-label={company.logo.alt} className="inline-flex rounded-tk-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2">
-              <Image src="/images/brand/logo-horizontal.png" alt={company.logo.alt} width={453} height={285} className="h-12 w-auto" />
-            </NextLink>
-
-            <p className="mt-5 text-sm leading-6 text-tk-ink-muted">
-              Cursos abertos, programas in company e consultoria para decisoes mais seguras em RH, gestao publica e rotinas operacionais.
-            </p>
-
-            <div className="mt-6 grid gap-3">
-              {contactLinks.map((item) => {
-                const Icon = item.icon;
-
-                return (
-                  <a
-                    key={item.label}
-                    href={item.href}
-                    target={item.external ? "_blank" : undefined}
-                    rel={item.external ? "noreferrer" : undefined}
-                    className="inline-flex min-h-11 items-start gap-3 rounded-tk-glass border border-tk-line bg-tk-surface-2 px-4 py-3 text-sm text-tk-ink transition hover:bg-tk-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
-                  >
-                    <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-tk-pill bg-tk-surface text-tk-accent-strong shadow-tk-glass">
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                    <span className="leading-5 text-tk-ink-muted">{item.label}</span>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-
-          <FooterLinkList title="Navegacao" items={publicNavItems} />
-          <FooterLinkList title="Acesso rapido" items={quickLinks} />
-
+    <footer className="border-t border-[#ebebeb] bg-[#fafafa] px-6 py-14 md:px-10 md:pb-10">
+      <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+        <div className="grid gap-10 border-b border-[#ebebeb] pb-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
-            <p className="text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-rh-gray">Atendimento</p>
-            <div className="mt-4 grid gap-4 text-sm text-tk-ink-muted">
-              <div className="rounded-tk-glass border border-tk-line bg-tk-surface-2 px-4 py-4">
-                <p className="font-semibold text-tk-ink">Telefones</p>
-                <p className="mt-2">{company.phones.primary}</p>
-                <p>{company.phones.secondary}</p>
-              </div>
-              <div className="rounded-tk-glass border border-rh-paper-line bg-[linear-gradient(158deg,var(--rh-paper-a),var(--rh-paper-b))] px-4 py-4">
-                <p className="font-semibold text-tk-ink">Base de atendimento</p>
-                <p className="mt-2">{company.address.district}, {company.address.cityState}</p>
+            <NextLink
+              href="/"
+              aria-label="RH Cursos e Treinamentos Empresariais"
+              className="inline-flex rounded-tk-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
+            >
+              <Image
+                src="/images/brand/logo-horizontal.png"
+                alt="RH Cursos e Treinamentos Empresariais"
+                width={453}
+                height={285}
+                className="h-12 w-auto"
+              />
+            </NextLink>
+            <p className="mt-5 max-w-[34ch] text-sm leading-[1.55] text-[#4f5057]">
+              Cursos, treinamento in-company e consultoria para organizações públicas e privadas.
+            </p>
+          </div>
+
+          {footerColumns.map((column) => (
+            <div key={column.title}>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-[#4f5057]">{column.title}</p>
+              <div className="space-y-2.5">
+                {column.items.map((item) => {
+                  const active = isActive(location.pathname, item.to);
+
+                  return (
+                    <NextLink
+                      key={item.to + item.label}
+                      href={item.to}
+                      className={cn(
+                        "block text-sm text-[#222525] transition hover:text-[#0c6a83] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2",
+                        active && "font-semibold text-[#0c6a83]"
+                      )}
+                    >
+                      {item.label}
+                    </NextLink>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-tk-line pt-5 text-sm text-tk-ink-muted md:flex-row md:items-center md:justify-between">
-          <p>{company.legalName} · CNPJ {company.cnpj}</p>
-          <p>Plataforma institucional para cursos, turmas e atendimento.</p>
-        </div>
+        <p className="pt-6 text-xs text-[#4f5057]">© 2026 RH Cursos. Todos os direitos reservados.</p>
       </div>
     </footer>
   );

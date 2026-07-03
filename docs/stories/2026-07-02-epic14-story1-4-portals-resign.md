@@ -1,7 +1,7 @@
 # Story 14.1.4: Remoção Mantine — Portals (StudentPortal, InstructorPortal)
 
 ## Status
-Ready
+InReview
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)
@@ -54,18 +54,39 @@ Atualizar esta story: checkboxes, status → InReview, Change Log.
 ---
 
 ## Tasks / Subtasks
-- [ ] Levantamento (AC: 1)
-- [ ] StudentPortal reescrito (AC: 1)
-- [ ] InstructorPortal reescrito (AC: 1)
-- [ ] Tokens re-apontados (AC: 1)
-- [ ] Verificação completa (AC: 1-4)
+- [x] Levantamento (AC: 1)
+- [x] StudentPortal reescrito (AC: 1)
+- [x] InstructorPortal reescrito (AC: 1)
+- [x] Tokens re-apontados (AC: 1)
+- [x] Verificação completa (AC: 1-4)
+
+## Dev Notes
+
+O código real dos portais não está em `src/features/StudentPortal/` /
+`src/features/InstructorPortal/` (paths do prompt original) — vive em
+`src/views/portal/StudentPortal.tsx` e `src/views/portal/InstructorPortal.tsx`.
+O trabalho desta story foi aplicado nesses dois arquivos, que são os únicos
+consumidores de `@mantine/core` na camada de portals (confirmado via grep).
+
+Substituições Mantine → Trust Keith:
+- `Card` (Mantine) → `@/components/ui/card` (`Card`)
+- `Table`/`Table.Thead`/`Table.Tr`/`Table.Th`/`Table.Td`/`Table.ScrollContainer` → `@/components/ui/table` (`Table`, `TableHeader`, `TableRow`, `TableHead`, `TableCell`; scroll horizontal já embutido no wrapper do componente)
+- `Badge variant="light"` → `@/components/ui/badge` (`Badge variant="muted"`, seguindo padrão já usado em `AdminResourcePage.tsx`)
+- `Alert` (erro/indisponibilidade) → `div role="alert"` com tokens `border-warning/25 bg-warning/10 text-warning` + ícone `AlertCircle` (lucide-react), mesmo padrão de `src/views/public/Login.tsx`
+- `Alert` (lista vazia) → bloco de empty state `rounded-2xl bg-tk-surface-2 p-8 text-center`, mesmo padrão de `src/views/admin/AdminResourcePage.tsx`
+- `Stack`/`Group`/`SimpleGrid`/`Title`/`Text` → `flex`/`grid` Tailwind + `h1`-`h4`/`p` com tokens `text-tk-ink` / `text-tk-ink-muted`
+
+Nenhuma mudança de API, lógica de dados, endpoints ou autenticação. `app/aluno/page.tsx` e `app/instrutor/page.tsx` seguem consumindo `StudentPortal`/`InstructorPortal` sem alterações.
 
 ## File List
 - `docs/stories/2026-07-02-epic14-story1-4-portals-resign.md`
+- `src/views/portal/StudentPortal.tsx`
+- `src/views/portal/InstructorPortal.tsx`
 
 ## PO Validation
 2026-07-02 · @po via @aiox-master YOLO · **GO** — escopo cercado a UI; lógica de dados não toca; ACs claros. Status: Draft → Ready.
 
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Story criada como prompt Codex (Epic 14 §4.4).
+- 2026-07-02 - @dev (Dex) - Removido `@mantine/core` de `src/views/portal/StudentPortal.tsx` e `src/views/portal/InstructorPortal.tsx` (paths reais dos portais); re-skin com primitivas Trust Keith (`Card`, `Table`, `Badge`) + Tailwind. `grep -rn "@mantine"` nesses arquivos → vazio. `npm run lint`, `npm run typecheck` (`tsc --noEmit`), `npm run test:unit` (394 testes) e `npm run build` → todos verdes. Status: Ready → InReview.
 

@@ -132,7 +132,7 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
       <section className="bg-deep-navy py-20 text-white">
         <div className="ea-container">
           <div className="max-w-3xl space-y-6">
-            <span className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-[var(--ea-button-primary-fg,#083b56)]">
+            <span className="inline-flex rounded bg-[#0c6a83] px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
               Consultoria exclusiva
             </span>
             <h1 className="text-white">Fale com um especialista da RH Cursos.</h1>
@@ -178,8 +178,8 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
             <Card className="overflow-hidden border-outline-variant bg-deep-navy text-white">
               <CardContent className="space-y-4 p-6">
                 <div className="flex items-center gap-4">
-                  <Avatar className="h-14 w-14 border border-white/15">
-                    <AvatarFallback className="bg-secondary-container font-display text-xl text-[var(--ea-button-primary-fg,#083b56)]">
+                  <Avatar className="h-14 w-14 border border-white/15 bg-[#0c6a83]">
+                    <AvatarFallback className="bg-[#0c6a83] font-display text-xl text-white">
                       MS
                     </AvatarFallback>
                   </Avatar>

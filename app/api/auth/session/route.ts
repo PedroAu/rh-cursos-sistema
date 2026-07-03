@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 import {
   type DashboardRole,
+  decodeSession,
   encodeSession,
   getCookieOptions,
   normalizeDashboardRole,
@@ -12,7 +13,6 @@ import { SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
-import { getServerSession } from "@/lib/server-session";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 
@@ -51,10 +51,25 @@ async function buildSessionResponse(
   return response;
 }
 
-export async function GET() {
+function readSessionTokenFromCookieHeader(cookieHeader: string | null) {
+  if (!cookieHeader) return null;
+
+  const pair = cookieHeader
+    .split(";")
+    .map((chunk) => chunk.trim())
+    .filter((chunk) => chunk.startsWith(`${SESSION_COOKIE}=`))
+    .at(-1);
+
+  return pair ? decodeURIComponent(pair.slice(SESSION_COOKIE.length + 1)) : null;
+}
+
+export async function GET(request: Request) {
   const cookieStore = await cookies();
-  const currentToken = cookieStore.get(SESSION_COOKIE)?.value ?? null;
-  const session = await getServerSession();
+  const currentToken =
+    cookieStore.get(SESSION_COOKIE)?.value ??
+    readSessionTokenFromCookieHeader(request.headers.get("cookie")) ??
+    null;
+  const session = await decodeSession(currentToken ?? undefined);
 
   if (!session) {
     return NextResponse.json({ ok: false, error: "Sessao invalida ou expirada." }, { status: 401 });

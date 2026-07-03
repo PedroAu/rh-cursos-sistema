@@ -1,7 +1,7 @@
 # Story 14.1.3: Remoção Mantine — Admin Shell (Re-skin Trust Keith)
 
 ## Status
-Ready
+InReview
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)
@@ -61,18 +61,26 @@ Atualizar esta story: checkboxes, status → InReview, Change Log.
 ---
 
 ## Tasks / Subtasks
-- [ ] Levantamento de imports Mantine (AC: 1)
-- [ ] AdminShell.tsx reescrito (AC: 1)
-- [ ] AdminSidebar, AdminHeader, AdminNavigation sem Mantine (AC: 1)
-- [ ] Tokens re-apontados (AC: 1)
-- [ ] Verificação completa (AC: 1-4)
+- [x] Levantamento de imports Mantine (AC: 1)
+- [x] `dashboard-shell.tsx` reescrito — AppShell → grid HTML/Tailwind, `useDisclosure` migrado para `src/hooks/use-disclosure.ts` (AC: 1)
+- [x] `admin-sidebar.tsx`, `admin-topbar.tsx`, `admin-bottom-navigation.tsx` sem Mantine (AC: 1)
+- [x] Tokens re-apontados — `tk-surface-2`, `tk-ink`, `tk-ink-muted`, `tk-focus`; cores hardcoded do shell (`#0e4666`, `#ffe09b`) mantidas como classes arbitrárias Tailwind (AC: 1)
+- [x] Verificação completa (AC: 1-4)
+
+### Nota de escopo (nomes de arquivo)
+A story lista `AdminShell.tsx` / `AdminSidebar.tsx` / `AdminHeader.tsx` / `AdminNavigation.tsx` (PascalCase), mas os arquivos reais na árvore atual do projeto são `dashboard-shell.tsx` e `components/{admin-sidebar,admin-topbar,admin-bottom-navigation}.tsx` (kebab-case). Os 4 arquivos reais de `src/features/admin-shell/` foram os re-skinados; não há arquivos `AdminHeader.tsx`/`AdminNavigation.tsx` distintos no código atual (o topbar e a navegação mobile cobrem esse escopo).
 
 ## File List
 - `docs/stories/2026-07-02-epic14-story1-3-admin-shell-resign.md`
+- `src/features/admin-shell/dashboard-shell.tsx` (modificado)
+- `src/features/admin-shell/components/admin-sidebar.tsx` (modificado)
+- `src/features/admin-shell/components/admin-topbar.tsx` (modificado)
+- `src/features/admin-shell/components/admin-bottom-navigation.tsx` (modificado)
 
 ## PO Validation
 2026-07-02 · @po via @aiox-master YOLO · **GO** — escopo cercado; views já migradas reduzem risco; sem redesign; ACs claros. Status: Draft → Ready.
 
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Story criada como prompt Codex (Epic 14 §4.3).
+- 2026-07-02 - Codex (@dev) - Removido Mantine (`@mantine/core`, `@mantine/hooks`) dos 4 arquivos de `src/features/admin-shell/`. `AppShell`/`AppShell.Navbar`/`AppShell.Header` substituídos por layout Tailwind com `aside` fixo (sidebar desktop, `lg:flex`), `header` fixo (topbar) e `nav` fixo inferior (mobile, `lg:hidden`). `useDisclosure` migrado do Mantine para `src/hooks/use-disclosure.ts` (já existente desde 14.1.1, mesma assinatura de retorno — sem mudança de API). Componentes Mantine (`Group`, `Stack`, `Box`, `Text`, `Divider`, `NavLink`, `ScrollArea`, `ThemeIcon`, `Paper`, `SimpleGrid`, `UnstyledButton`, `ActionIcon`, `Burger`, `TextInput`, `Avatar`) substituídos por HTML+Tailwind e primitivas Trust Keith (`Button`, `Input`, `Avatar`/`AvatarFallback` de `src/components/ui/`). Lógica de rota ativa e estrutura de navegação preservadas sem mudança de comportamento. Views admin e portais não tocados (fora de escopo). Status → InReview.
 

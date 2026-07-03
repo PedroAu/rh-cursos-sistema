@@ -4,13 +4,15 @@ import type { ReactNode } from "react";
 
 import { PublicFooter } from "@/features/public-shell/components/public-footer";
 import { PublicHeader } from "@/features/public-shell/components/public-header";
-import { WhatsAppSupport } from "@/features/public-shell/components/whatsapp-support";
 import { CommandPalette } from "@/components/common/command-palette";
 import { QuoteModalProvider } from "@/components/in-company/quote-modal";
 import { AppToaster } from "@/components/ui/toaster";
-import { Outlet } from "@/lib/router-compat";
+import { Outlet, useLocation } from "@/lib/router-compat";
 
 export function PublicLayout({ children }: { children?: ReactNode }) {
+  const location = useLocation();
+  const hideShellFooter = location.pathname === "/";
+
   return (
     <div className="min-h-screen bg-background">
       <a className="skip-link" href="#main-content">
@@ -24,8 +26,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           {children ?? <Outlet />}
         </main>
 
-        <PublicFooter />
-        <WhatsAppSupport />
+        {!hideShellFooter ? <PublicFooter /> : null}
         <CommandPalette />
       </QuoteModalProvider>
       <AppToaster />

@@ -5,7 +5,7 @@ import {
   createServiceRoleClient,
   createUniqueEmail,
   getCanonicalDocs,
-  resolveAvailableCheckoutCoursePath,
+  resolveAvailableCheckoutTarget,
 } from "./helpers/integration-env";
 
 /**
@@ -32,6 +32,10 @@ async function fillPersonalStep(
   await page.getByLabel("CPF").fill(cpf);
 }
 
+function buildClassSelectionLabel(startDate: string, time: string) {
+  return `Selecionar turma de ${new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(startDate))} às ${time}`;
+}
+
 test.describe("checkout — baseline de receita", () => {
   test("bloqueia avanço da etapa de turma sem seleção e conclui com o backend real", async ({ page }, testInfo) => {
     test.setTimeout(60_000);
@@ -43,8 +47,8 @@ test.describe("checkout — baseline de receita", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      const coursePath = await resolveAvailableCheckoutCoursePath();
-      await page.goto(coursePath);
+      const checkoutTarget = await resolveAvailableCheckoutTarget();
+      await page.goto(checkoutTarget.coursePath);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
       await expect(page.getByRole("dialog")).toBeVisible();
@@ -62,7 +66,7 @@ test.describe("checkout — baseline de receita", () => {
       await expect(page.getByText("Resumo do pedido")).toBeHidden();
 
       // Seleciona turma e avança até confirmação
-      await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
+      await page.getByRole("button", { name: buildClassSelectionLabel(checkoutTarget.startDate, checkoutTarget.time) }).click();
       await page.getByRole("button", { name: "Avançar" }).click();
       await expect(page.getByText("Resumo do pedido")).toBeVisible();
 
@@ -96,8 +100,8 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
-    const coursePath = await resolveAvailableCheckoutCoursePath();
-    await page.goto(coursePath);
+    const checkoutTarget = await resolveAvailableCheckoutTarget();
+    await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
     await fillPersonalStep(page);
@@ -110,8 +114,8 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("inscrição corporativa exige empresa e cargo", async ({ page }) => {
-    const coursePath = await resolveAvailableCheckoutCoursePath();
-    await page.goto(coursePath);
+    const checkoutTarget = await resolveAvailableCheckoutTarget();
+    await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
     await fillPersonalStep(page);
@@ -127,20 +131,20 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
-    const coursePath = await resolveAvailableCheckoutCoursePath();
-    await page.goto(`${coursePath}?checkout=1`);
+    const checkoutTarget = await resolveAvailableCheckoutTarget();
+    await page.goto(`${checkoutTarget.coursePath}?checkout=1`);
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByText("Inscrição guiada")).toBeVisible();
   });
 
   test("fechar o modal com Cancelar mantém o usuário na página do curso", async ({ page }) => {
-    const coursePath = await resolveAvailableCheckoutCoursePath();
-    await page.goto(coursePath);
+    const checkoutTarget = await resolveAvailableCheckoutTarget();
+    await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
     await page.getByRole("button", { name: "Cancelar" }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
-    await expect(page).toHaveURL(new RegExp(coursePath.replace(/[/-]/g, "\\$&")));
+    await expect(page).toHaveURL(new RegExp(checkoutTarget.coursePath.replace(/[/-]/g, "\\$&")));
   });
 });

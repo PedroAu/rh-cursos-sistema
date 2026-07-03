@@ -159,6 +159,9 @@ export type BlogPost = {
   summary: string;
   content: string;
   category:
+    | "Licitações"
+    | "LGPD"
+    | "Compliance"
     | "Departamento Pessoal"
     | "eSocial"
     | "Gestão Pública"

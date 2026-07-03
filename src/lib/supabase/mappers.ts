@@ -207,6 +207,9 @@ function toDbLeadType(value: Lead["type"]): LeadRow["tipo"] {
 
 function fromDbBlogCategory(value: string): BlogPost["category"] {
   const validCategories: BlogPost["category"][] = [
+    "Licitações",
+    "LGPD",
+    "Compliance",
     "Departamento Pessoal",
     "eSocial",
     "Gestão Pública",

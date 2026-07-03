@@ -1,26 +1,16 @@
 "use client";
 
-import {
-  AppShell,
-  Avatar,
-  Box,
-  Button,
-  Divider,
-  Group,
-  NavLink as MantineNavLink,
-  ScrollArea,
-  Stack,
-  Text,
-  ThemeIcon
-} from "@mantine/core";
 import { BookOpen, LogOut, Settings, Sparkles } from "lucide-react";
 
 import type { DashboardRole } from "@/lib/auth";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { useAppStore } from "@/lib/app-store";
 import { getInitials } from "@/lib/get-initials";
 import { Link, useLocation } from "@/lib/router-compat";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
+import { cn } from "@/lib/utils";
 
 function getRoleLabel(role: DashboardRole) {
   if (role === "student") return "portal do aluno";
@@ -36,33 +26,23 @@ export function AdminSidebar({ role }: { role: DashboardRole }) {
   const homePath = getDefaultDashboardPath(role);
 
   return (
-    <AppShell.Navbar
-      p={0}
-      style={{
-        background: "#0e4666",
-        borderInlineEnd: "1px solid rgba(255,255,255,0.08)"
-      }}
-    >
-      <AppShell.Section px="lg" py="xl">
-        <Stack gap={8}>
-          <Group justify="space-between" align="flex-start">
-            <Box component={Link} to="/" style={{ textDecoration: "none", color: "inherit" }}>
-              <Text fw={800} c="white" size="1.9rem" lh={1}>
-                RH Cursos
-              </Text>
-              <Text c="rgba(255,255,255,0.64)" fz="0.72rem" tt="uppercase" fw={700} mt={6} lts="0.16em">
-                {getRoleLabel(role)}
-              </Text>
-            </Box>
-            <ThemeIcon radius="xl" size={38} color="rhGold" variant="light">
-              <Sparkles size={18} />
-            </ThemeIcon>
-          </Group>
-        </Stack>
-      </AppShell.Section>
+    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[248px] flex-col bg-[#0e4666] lg:flex">
+      <div className="px-6 py-8">
+        <div className="flex items-start justify-between gap-2">
+          <Link to="/" className="text-inherit no-underline">
+            <p className="text-[1.9rem] font-extrabold leading-none text-white">RH Cursos</p>
+            <p className="mt-1.5 text-[0.72rem] font-bold uppercase tracking-[0.16em] text-white/64">
+              {getRoleLabel(role)}
+            </p>
+          </Link>
+          <span className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-full bg-[#ffe09b]/25 text-[#ffe09b]">
+            <Sparkles size={18} />
+          </span>
+        </div>
+      </div>
 
-      <AppShell.Section grow component={ScrollArea} px="md" py="sm" scrollbarSize={6}>
-        <Stack gap={8}>
+      <nav className="flex-1 overflow-y-auto px-4 py-2" aria-label="Navegação administrativa principal">
+        <div className="flex flex-col gap-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =
@@ -71,89 +51,54 @@ export function AdminSidebar({ role }: { role: DashboardRole }) {
                 : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 
             return (
-              <MantineNavLink
+              <Link
                 key={item.to}
-                component={Link}
                 to={item.to}
-                label={item.label}
-                leftSection={<Icon size={18} strokeWidth={2.2} />}
-                active={isActive}
-                variant="filled"
-                styles={{
-                  root: {
-                    borderRadius: 14,
-                    color: isActive ? "#1c1c1c" : "rgba(255,255,255,0.78)",
-                    backgroundColor: isActive ? "#ffe09b" : "transparent"
-                  },
-                  label: {
-                    fontWeight: 700,
-                    fontSize: "1rem"
-                  },
-                  section: {
-                    color: isActive ? "#2a2210" : "rgba(255,255,255,0.78)"
-                  }
-                }}
-              />
+                aria-current={isActive ? "page" : undefined}
+                className={cn(
+                  "flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-[1rem] font-bold transition",
+                  isActive ? "bg-[#ffe09b] text-[#1c1c1c]" : "text-white/78 hover:bg-white/10"
+                )}
+              >
+                <Icon size={18} strokeWidth={2.2} className={isActive ? "text-[#2a2210]" : "text-white/78"} />
+                {item.label}
+              </Link>
             );
           })}
-        </Stack>
-      </AppShell.Section>
+        </div>
+      </nav>
 
-      <AppShell.Section px="lg" py="lg">
-        <Divider color="rgba(255,255,255,0.12)" mb="lg" />
-        <Group wrap="nowrap" align="center" mb="md">
-          <Avatar radius="xl" color="rhGold" variant="filled">
-            {initials || "A"}
+      <div className="px-6 py-6">
+        <hr className="mb-6 border-white/12" />
+        <div className="mb-4 flex items-center gap-3">
+          <Avatar>
+            <AvatarFallback className="bg-[#ffe09b] text-[#1c1c1c]">{initials || "A"}</AvatarFallback>
           </Avatar>
-          <Box style={{ minWidth: 0 }}>
-            <Text fw={700} c="white" truncate>
-              {currentSession?.name ?? "Admin"}
-            </Text>
-            <Text size="sm" c="rgba(255,255,255,0.62)" truncate>
-              {currentSession?.email ?? "Diretoria"}
-            </Text>
-          </Box>
-        </Group>
+          <div className="min-w-0">
+            <p className="truncate font-bold text-white">{currentSession?.name ?? "Admin"}</p>
+            <p className="truncate text-sm text-white/62">{currentSession?.email ?? "Diretoria"}</p>
+          </div>
+        </div>
 
-        <Stack gap="xs">
-          <Button
-            component={Link}
-            to="/cursos"
-            justify="flex-start"
-            variant="light"
-            color="rhSlate"
-            leftSection={<BookOpen size={16} />}
-            styles={{
-              root: { backgroundColor: "rgba(255,255,255,0.08)", color: "#ffffff" }
-            }}
-          >
-            Catálogo de cursos
+        <div className="flex flex-col gap-2">
+          <Button asChild variant="ghost" className="justify-start bg-white/8 text-white hover:bg-white/16">
+            <Link to="/cursos">
+              <BookOpen size={16} />
+              Catálogo de cursos
+            </Link>
           </Button>
-          <Button
-            component={Link}
-            to="/sobre"
-            justify="flex-start"
-            variant="light"
-            color="rhSlate"
-            leftSection={<Settings size={16} />}
-            styles={{
-              root: { backgroundColor: "rgba(255,255,255,0.08)", color: "#ffffff" }
-            }}
-          >
-            Informações institucionais
+          <Button asChild variant="ghost" className="justify-start bg-white/8 text-white hover:bg-white/16">
+            <Link to="/sobre">
+              <Settings size={16} />
+              Informações institucionais
+            </Link>
           </Button>
-          <Button
-            justify="flex-start"
-            variant="subtle"
-            color="gray"
-            leftSection={<LogOut size={16} />}
-            onClick={logout}
-            styles={{ root: { color: "rgba(255,255,255,0.85)" } }}
-          >
+          <Button variant="ghost" className="justify-start text-white/85 hover:bg-white/10" onClick={logout}>
+            <LogOut size={16} />
             Sair
           </Button>
-        </Stack>
-      </AppShell.Section>
-    </AppShell.Navbar>
+        </div>
+      </div>
+    </aside>
   );
 }

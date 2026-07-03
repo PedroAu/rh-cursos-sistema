@@ -41,10 +41,10 @@ async function prepareStableCapture(routeName: string, page: import("@playwright
 
   if (routeName === "cursos") {
     await page
-      .getByText("Cursos no catálogo", { exact: true })
+      .getByText(/turmas na agenda/i)
       .waitFor({ state: "visible" });
-    await expect(page.getByText("Nenhum curso encontrado.", { exact: true })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Saiba mais" }).first()).toBeVisible();
+    await expect(page.getByText("Nenhuma turma encontrada", { exact: true })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Ver turma →" }).first()).toBeVisible();
   }
 
   if (routeName === "agenda") {
@@ -54,10 +54,9 @@ async function prepareStableCapture(routeName: string, page: import("@playwright
   }
 
   if (routeName === "blog") {
-    await page
-      .getByText("Artigos visíveis", { exact: true })
-      .waitFor({ state: "visible" });
-    await expect(page.getByText("Nenhum post encontrado.", { exact: true })).toHaveCount(0);
+    await page.getByRole("heading", { name: "Últimos artigos", exact: true }).waitFor({ state: "visible" });
+    await expect(page.getByText(/\d+ publicações · atualizado toda semana/i)).toBeVisible();
+    await expect(page.getByText("Nenhum artigo encontrado", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Ler artigo" }).first()).toBeVisible();
   }
 

@@ -1,6 +1,5 @@
 /* Design System Tokens (Phase 1 — Foundation) */
 @import '../design-tokens/tokens.css';
-@import '../design-tokens/mantine-tokens.css';
 
 @tailwind base;
 @tailwind components;
@@ -412,6 +411,20 @@
     }
   }
 
+}
+
+@layer components {
+  .tk-button-on-strong {
+    color: #ffffff;
+  }
+
+  .tk-button-on-strong svg {
+    color: currentColor;
+  }
+
+  .tk-badge-success {
+    color: #055a45;
+  }
 }
 
 @layer components {

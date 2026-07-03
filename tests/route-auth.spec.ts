@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
+import { ensureAuthUser } from "./helpers/integration-env";
 
 // Modelo híbrido:
 // - páginas públicas seguem acessíveis por SSR/SSG;
@@ -63,11 +64,9 @@ test.describe("rotas publicas", () => {
     }
   });
 
-  test("exibe capas locais nos cards de cursos", async ({ page }) => {
+  test("exibe cards de turmas com CTA de detalhe no catálogo", async ({ page }) => {
     await page.goto("/cursos");
-    await expect(
-      page.locator('img[src^="/images/courses/"], img[src*="%2Fimages%2Fcourses%2F"]').first()
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver turma →" }).first()).toBeVisible();
   });
 });
 
@@ -171,14 +170,42 @@ test.describe("contrato da rota /api/auth/session", () => {
     });
   });
 
-  test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ request }) => {
-    const token = await issueSessionToken("student");
-    const response = await request.get("/api/auth/session", {
-      headers: { cookie: cookieHeader(token) }
+  test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ context, page }) => {
+    const credentials = await ensureAuthUser({
+      email: "student@rhcursos.com.br",
+      name: "Perfil student",
+      role: "student"
+    });
+    const loginResponse = await page.request.post("/api/auth/session", {
+      data: {
+        role: "student",
+        email: credentials.email,
+        password: credentials.password
+      }
+    });
+    expect(loginResponse.status()).toBe(200);
+    const loginPayload = await loginResponse.json() as { token?: string | null };
+    expect(loginPayload.token).toBeTruthy();
+
+    await context.addCookies([
+      {
+        name: SESSION_COOKIE,
+        value: loginPayload.token!,
+        url: "http://127.0.0.1:3100"
+      }
+    ]);
+
+    await page.goto("/");
+    const sessionPayload = await page.evaluate(async () => {
+      const response = await fetch("/api/auth/session");
+      return {
+        status: response.status,
+        body: await response.json()
+      };
     });
 
-    expect(response.status()).toBe(200);
-    await expect(response.json()).resolves.toMatchObject({
+    expect(sessionPayload.status).toBe(200);
+    expect(sessionPayload.body).toMatchObject({
       ok: true,
       session: {
         role: "student",

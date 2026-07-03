@@ -1,13 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { X, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { FormField, MantineFormFieldSelect, MantineFormFieldText, MantineFormFieldMultiSelect } from "@/components/ui/form-field";
-import { TextInput, ActionIcon, Group } from "@mantine/core";
+import { Plus, X } from "lucide-react";
 
-// Re-export Mantine form components for backward compatibility
-export { MantineFormFieldSelect as SelectField, MantineFormFieldText as TextField };
+import { Button } from "@/components/ui/button";
+import {
+  FormField,
+  FormFieldMultiSelect,
+  FormFieldSelect,
+  FormFieldText,
+  FormFieldTextarea,
+} from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+
+export { FormFieldSelect as SelectField, FormFieldText as TextField };
 
 export function ArrayInput({
   label,
@@ -24,73 +30,74 @@ export function ArrayInput({
 }) {
   const [inputValue, setInputValue] = React.useState("");
 
+  const addItem = React.useCallback(() => {
+    const nextValue = inputValue.trim();
+    if (!nextValue) return;
+    onChange([...value, nextValue]);
+    setInputValue("");
+  }, [inputValue, onChange, value]);
+
   return (
     <FormField error={error} hint="Adicione itens um por vez." label={label}>
       {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
         <div className="space-y-2">
-          {value.map((item, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <TextInput
-                id={i === 0 ? fieldId : undefined}
+          {value.map((item, index) => (
+            <div key={`${item}-${index}`} className="flex items-center gap-2">
+              <Input
+                id={index === 0 ? fieldId : undefined}
                 value={item}
-                aria-describedby={i === 0 ? ariaDescribedBy : undefined}
-                aria-invalid={i === 0 ? ariaInvalid : undefined}
-                onChange={(e) => {
+                aria-describedby={index === 0 ? ariaDescribedBy : undefined}
+                aria-invalid={index === 0 ? ariaInvalid : undefined}
+                onChange={(event) => {
                   const copy = [...value];
-                  copy[i] = e.target.value;
+                  copy[index] = event.currentTarget.value;
                   onChange(copy);
                 }}
                 className="flex-1"
               />
-              <ActionIcon
-                variant="subtle"
-                color="red"
-                onClick={() => onChange(value.filter((_, j) => j !== i))}
-                aria-label={`Remover item ${i + 1}`}
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                onClick={() => onChange(value.filter((_, itemIndex) => itemIndex !== index))}
+                aria-label={`Remover item ${index + 1}`}
                 title="Remover"
               >
                 <X className="h-4 w-4" />
-              </ActionIcon>
+              </Button>
             </div>
           ))}
-          <Group gap="sm">
-            <TextInput
+          <div className="flex items-center gap-2">
+            <Input
               id={value.length === 0 ? fieldId : undefined}
               placeholder={placeholder}
               value={inputValue}
               aria-describedby={value.length === 0 ? ariaDescribedBy : undefined}
               aria-invalid={value.length === 0 ? ariaInvalid : undefined}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  if (inputValue.trim()) {
-                    onChange([...value, inputValue.trim()]);
-                    setInputValue("");
-                  }
-                  e.preventDefault();
-                }
+              onChange={(event) => setInputValue(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                addItem();
               }}
               className="flex-1"
             />
-            <Button
-              type="button"
-              size="sm"
-              aria-label={`Adicionar item em ${label}`}
-              onClick={() => {
-                if (inputValue.trim()) {
-                  onChange([...value, inputValue.trim()]);
-                  setInputValue("");
-                }
-              }}
-            >
+            <Button type="button" size="icon" aria-label={`Adicionar item em ${label}`} onClick={addItem}>
               <Plus className="h-4 w-4" />
             </Button>
-          </Group>
+          </div>
         </div>
       )}
     </FormField>
   );
 }
+
+type ModuleValue = {
+  title: string;
+  description: string;
+  topics: string[];
+  duration: string;
+};
 
 export function ModulesBuilder({
   label,
@@ -99,124 +106,105 @@ export function ModulesBuilder({
   error,
 }: {
   label: string;
-  value: Array<{
-    title: string;
-    description: string;
-    topics: string[];
-    duration: string;
-  }>;
-  onChange: (
-    v: Array<{
-      title: string;
-      description: string;
-      topics: string[];
-      duration: string;
-    }>
-  ) => void;
+  value: ModuleValue[];
+  onChange: (v: ModuleValue[]) => void;
   error?: string;
 }) {
+  const updateModule = React.useCallback(
+    (index: number, nextModule: ModuleValue) => {
+      const copy = [...value];
+      copy[index] = nextModule;
+      onChange(copy);
+    },
+    [onChange, value]
+  );
+
   return (
-    <FormField error={error} hint="Cada módulo pode conter título, descrição, duração e tópicos." label={label}>
+    <FormField error={error} hint="Cada modulo pode conter titulo, descricao, duracao e topicos." label={label}>
       {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
         <div className="space-y-3">
-          {value.map((module, i) => (
-            <div
-              key={i}
-              className="space-y-2 rounded-md border bg-muted/30 p-3"
-            >
-              <div className="flex items-start justify-between">
-                <h4 className="text-sm font-medium">Módulo {i + 1}</h4>
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  onClick={() => onChange(value.filter((_, j) => j !== i))}
-                  aria-label={`Remover módulo ${i + 1}`}
+          {value.map((module, index) => (
+            <div key={`module-${index}`} className="space-y-3 rounded-tk-card border border-tk-line bg-tk-surface-2 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <h4 className="text-sm font-semibold text-tk-ink">Modulo {index + 1}</h4>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onChange(value.filter((_, itemIndex) => itemIndex !== index))}
+                  aria-label={`Remover modulo ${index + 1}`}
                 >
                   <X className="h-4 w-4" />
-                </ActionIcon>
+                </Button>
               </div>
 
-              <TextInput
-                id={i === 0 ? fieldId : undefined}
-                placeholder="Ex.: Introdução à legislação"
+              <FormFieldText
+                id={index === 0 ? fieldId : undefined}
+                label="Titulo"
+                placeholder="Ex.: Introducao a legislacao"
                 value={module.title}
-                aria-describedby={i === 0 ? ariaDescribedBy : undefined}
-                aria-invalid={i === 0 ? ariaInvalid : undefined}
-                onChange={(e) => {
-                  const copy = [...value];
-                  copy[i].title = e.target.value;
-                  onChange(copy);
-                }}
+                aria-describedby={index === 0 ? ariaDescribedBy : undefined}
+                aria-invalid={index === 0 ? ariaInvalid : undefined}
+                onChange={(event) => updateModule(index, { ...module, title: event.currentTarget.value })}
               />
 
-              <textarea
-                aria-label={`Descrição do módulo ${i + 1}`}
-                placeholder="Resumo do conteúdo e objetivo do módulo"
+              <FormFieldTextarea
+                label="Descricao"
+                placeholder="Resumo do conteudo e objetivo do modulo"
                 value={module.description}
-                onChange={(e) => {
-                  const copy = [...value];
-                  copy[i].description = e.target.value;
-                  onChange(copy);
-                }}
-                className="w-full min-h-20 rounded-md border border-input px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                onChange={(event) => updateModule(index, { ...module, description: event.currentTarget.value })}
+                rows={4}
               />
 
-              <TextInput
+              <FormFieldText
+                label="Duracao"
                 placeholder="Ex.: 8 horas"
                 value={module.duration}
-                onChange={(e) => {
-                  const copy = [...value];
-                  copy[i].duration = e.target.value;
-                  onChange(copy);
-                }}
+                onChange={(event) => updateModule(index, { ...module, duration: event.currentTarget.value })}
               />
 
-              <div className="border-t pt-2">
-                <p className="mb-2 text-xs font-medium text-muted-foreground">
-                  Tópicos
+              <div className="space-y-2 border-t border-tk-line pt-3">
+                <p className="text-caption font-semibold uppercase tracking-[0.05em] text-tk-ink-muted">
+                  Topicos
                 </p>
-                <div className="space-y-1">
-                  {module.topics.map((topic, j) => (
-                    <Group key={j} gap="sm">
-                      <TextInput
+                <div className="space-y-2">
+                  {module.topics.map((topic, topicIndex) => (
+                    <div key={`topic-${index}-${topicIndex}`} className="flex items-center gap-2">
+                      <Input
                         value={topic}
-                        onChange={(e) => {
-                          const copy = [...value];
-                          copy[i].topics[j] = e.target.value;
-                          onChange(copy);
+                        onChange={(event) => {
+                          const nextTopics = [...module.topics];
+                          nextTopics[topicIndex] = event.currentTarget.value;
+                          updateModule(index, { ...module, topics: nextTopics });
                         }}
                         className="flex-1"
                       />
-                      <ActionIcon
-                        variant="subtle"
-                        color="red"
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
                         onClick={() => {
-                          const copy = [...value];
-                          copy[i].topics = module.topics.filter(
-                            (_, jj) => jj !== j
-                          );
-                          onChange(copy);
+                          updateModule(index, {
+                            ...module,
+                            topics: module.topics.filter((_, itemIndex) => itemIndex !== topicIndex),
+                          });
                         }}
-                        aria-label={`Remover tópico ${j + 1} do módulo ${i + 1}`}
+                        aria-label={`Remover topico ${topicIndex + 1} do modulo ${index + 1}`}
                       >
-                        <X className="h-3 w-3" />
-                      </ActionIcon>
-                    </Group>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
                   ))}
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => {
-                    const copy = [...value];
-                    copy[i].topics.push("");
-                    onChange(copy);
-                  }}
-                  className="mt-2 h-8 w-full text-label"
+                  onClick={() => updateModule(index, { ...module, topics: [...module.topics, ""] })}
+                  className="w-full"
                 >
-                  <Plus className="mr-1 h-3 w-3" />
-                  Adicionar tópico
+                  <Plus className="h-3.5 w-3.5" />
+                  Adicionar topico
                 </Button>
               </div>
             </div>
@@ -226,15 +214,12 @@ export function ModulesBuilder({
             type="button"
             variant="outline"
             onClick={() => {
-              onChange([
-                ...value,
-                { title: "", description: "", topics: [""], duration: "" },
-              ]);
+              onChange([...value, { title: "", description: "", topics: [""], duration: "" }]);
             }}
             className="w-full"
           >
-            <Plus className="mr-2 h-4 w-4" />
-            Adicionar módulo
+            <Plus className="h-4 w-4" />
+            Adicionar modulo
           </Button>
         </div>
       )}
@@ -255,14 +240,5 @@ export function MultiSelectField({
   onChange: (v: string[]) => void;
   error?: string;
 }) {
-  return (
-    <MantineFormFieldMultiSelect
-      label={label}
-      value={value}
-      onChange={onChange}
-      options={options}
-      error={error}
-      placeholder="Selecione as opções..."
-    />
-  );
+  return <FormFieldMultiSelect label={label} value={value} options={options} onChange={onChange} error={error} />;
 }

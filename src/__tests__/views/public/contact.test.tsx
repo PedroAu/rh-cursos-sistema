@@ -1,0 +1,78 @@
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { render, screen, waitFor } from "@/__tests__/utils";
+import { ContactPage } from "@/views/public/Contact";
+
+const mocks = vi.hoisted(() => ({
+  createLead: vi.fn(),
+  toastSuccess: vi.fn(),
+  toastError: vi.fn()
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mocks.toastSuccess,
+    error: mocks.toastError
+  }
+}));
+
+vi.mock("@/lib/app-store", () => ({
+  useAppStore: () => ({
+    createLead: mocks.createLead
+  })
+}));
+
+describe("ContactPage", () => {
+  beforeEach(() => {
+    mocks.createLead.mockReset();
+    mocks.toastSuccess.mockReset();
+    mocks.toastError.mockReset();
+  });
+
+  it("exibe mensagens de validação quando o formulário está inválido", async () => {
+    const user = userEvent.setup();
+
+    render(<ContactPage />);
+
+    await user.click(screen.getByRole("button", { name: /enviar mensagem/i }));
+
+    expect(await screen.findByText("Nome deve ter no mínimo 3 caracteres.")).toBeInTheDocument();
+    expect(screen.getByText("Informe um e-mail válido.")).toBeInTheDocument();
+    expect(screen.getByText("Mensagem deve ter no mínimo 10 caracteres.")).toBeInTheDocument();
+    expect(mocks.createLead).not.toHaveBeenCalled();
+  });
+
+  it("envia o lead com os valores esperados e limpa o formulário", async () => {
+    const user = userEvent.setup();
+    mocks.createLead.mockResolvedValue(undefined);
+
+    render(<ContactPage />);
+
+    await user.type(screen.getByLabelText(/nome completo/i), "Maria Oliveira");
+    await user.type(screen.getByLabelText(/e-mail/i), "maria@empresa.com.br");
+    await user.type(screen.getByLabelText(/telefone \/ whatsapp/i), "61999998888");
+    await user.type(screen.getByLabelText(/empresa \/ órgão/i), "Prefeitura X");
+    await user.type(screen.getByLabelText(/mensagem/i), "Precisamos de apoio com treinamento em eSocial.");
+
+    await user.click(screen.getByRole("button", { name: /enviar mensagem/i }));
+
+    await waitFor(() => {
+      expect(mocks.createLead).toHaveBeenCalledWith({
+        name: "Maria Oliveira",
+        email: "maria@empresa.com.br",
+        phone: "(61) 99999-8888",
+        type: "Contato",
+        courseInterest: "Contato pelo site",
+        organization: "Prefeitura X",
+        origin: "Contato",
+        message: "Precisamos de apoio com treinamento em eSocial."
+      });
+    });
+
+    expect(await screen.findByText(/mensagem registrada\. nossa equipe retorna/i)).toBeInTheDocument();
+    expect(mocks.toastSuccess).toHaveBeenCalledWith("Mensagem registrada para atendimento.");
+    expect(screen.getByLabelText(/nome completo/i)).toHaveValue("");
+    expect(screen.getByLabelText(/e-mail/i)).toHaveValue("");
+  });
+});

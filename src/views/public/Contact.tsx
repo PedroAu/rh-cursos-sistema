@@ -2,26 +2,47 @@
 
 import { Mail, MapPin, MessageCircle, PhoneCall, Send } from "lucide-react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  Container,
-  Grid,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-  Textarea,
-  TextInput,
-  ThemeIcon,
-  Title
-} from "@mantine/core";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const contactSchema = z.object({
+  name: z.string().trim().min(3, "Nome deve ter no mínimo 3 caracteres."),
+  email: z
+    .string()
+    .trim()
+    .min(1, "Informe um e-mail válido.")
+    .refine((value) => emailRegex.test(value), "Informe um e-mail válido."),
+  phone: z
+    .string()
+    .trim()
+    .refine((value) => !value || getPhoneDigits(value).length >= 10, "Informe um telefone válido com pelo menos 10 dígitos."),
+  organization: z.string(),
+  courseInterest: z.string(),
+  message: z.string().trim().min(10, "Mensagem deve ter no mínimo 10 caracteres.")
+});
+
+type ContactFormValues = z.infer<typeof contactSchema>;
+
+const defaultValues: ContactFormValues = {
+  name: "",
+  email: "",
+  phone: "",
+  organization: "",
+  courseInterest: "",
+  message: ""
+};
 
 const contactItems = [
   {
@@ -54,263 +75,242 @@ function getPhoneDigits(value: string) {
 
 export function ContactPage() {
   const { createLead } = useAppStore();
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    organization: "",
-    courseInterest: "",
-    message: ""
-  });
-  const [errors, setErrors] = useState<Partial<Record<keyof typeof form, string>>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const {
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    register,
+    reset
+  } = useForm<ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues
+  });
 
-  const update = (key: keyof typeof form, value: string) => {
-    setErrors((current) => ({ ...current, [key]: undefined }));
+  const clearFeedback = () => {
     setSubmitError(null);
     setSubmitSuccess(null);
-    if (key === "phone") {
-      setForm((current) => ({ ...current, [key]: formatPhone(value) }));
-    } else {
-      setForm((current) => ({ ...current, [key]: value }));
-    }
   };
 
-  const validate = () => {
-    const nextErrors: Partial<Record<keyof typeof form, string>> = {};
+  const submit = handleSubmit(async (values) => {
+    clearFeedback();
 
-    if (!form.name.trim() || form.name.trim().length < 3) {
-      nextErrors.name = "Nome deve ter no mínimo 3 caracteres.";
-    }
-    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      nextErrors.email = "Informe um e-mail válido.";
-    }
-    if (form.phone && getPhoneDigits(form.phone).length < 10) {
-      nextErrors.phone = "Informe um telefone válido com pelo menos 10 dígitos.";
-    }
-    if (!form.message.trim() || form.message.trim().length < 10) {
-      nextErrors.message = "Mensagem deve ter no mínimo 10 caracteres.";
-    }
-
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  };
-
-  const submit = async () => {
-    if (!validate()) return;
-
-    setIsSubmitting(true);
     try {
       await createLead({
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
         type: "Contato",
-        courseInterest: form.courseInterest.trim() || "Contato pelo site",
-        organization: form.organization.trim() || undefined,
+        courseInterest: values.courseInterest.trim() || "Contato pelo site",
+        organization: values.organization.trim() || undefined,
         origin: "Contato",
-        message: form.message
+        message: values.message
       });
 
       const successMessage = "Mensagem registrada. Nossa equipe retorna com orientação inicial e próximos passos.";
       toast.success("Mensagem registrada para atendimento.");
-      setForm({ name: "", email: "", phone: "", organization: "", courseInterest: "", message: "" });
-      setErrors({});
-      setSubmitError(null);
+      reset(defaultValues);
       setSubmitSuccess(successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível enviar sua mensagem.";
       setSubmitError(message);
       toast.error(message);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  });
 
   return (
-    <Box bg="#f6f7fb">
-      <Box component="section" bg="white" style={{ borderBottom: "1px solid #d7dee5" }}>
-        <Container size={1200} px="md" py={{ base: 48, md: 56 }}>
-          <Stack gap="md" maw={840}>
-            <Title order={1} c="rhBlue.9">
-              Entre em Contato
-            </Title>
-            <Text fz="1.12rem" c="#414b56" maw={780}>
-              Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública. Fale conosco através do formulário ou nossos canais diretos.
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+    <div className="bg-[#f6f7fb]">
+      <section className="border-b border-outline-variant bg-white">
+        <div className="ea-container py-12 md:py-14">
+          <div className="max-w-4xl space-y-4">
+            <h1 className="text-deep-navy">Entre em Contato</h1>
+            <p className="max-w-3xl text-body-lg leading-8 text-text-muted">
+              Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública. Fale conosco
+              através do formulário ou nossos canais diretos.
+            </p>
+          </div>
+        </div>
+      </section>
 
-      <Container size={1200} px="md" py="xl">
-        <Grid gap={32}>
-          <Grid.Col span={{ base: 12, xl: 5 }}>
-            <Stack gap="lg">
-              {contactItems.map((item) => {
-                const Icon = item.icon;
+      <section className="page-section">
+        <div className="ea-container grid gap-8 xl:grid-cols-[0.9fr_1.1fr] xl:items-start">
+          <div className="space-y-6">
+            {contactItems.map((item) => {
+              const Icon = item.icon;
 
-                return (
-                  <Card key={item.title} radius="lg" shadow="sm" withBorder padding="xl">
-                    <Group align="flex-start" gap="lg" wrap="nowrap">
-                      <ThemeIcon size={48} radius="lg" variant="light" color="rhBlue">
-                        <Icon size={20} />
-                      </ThemeIcon>
-                      <Box>
-                        <Text fz="sm" fw={700} c="rhBlue.7" tt="uppercase">
-                          {item.title}
-                        </Text>
-                        <Text mt={8} fz="1.1rem" fw={700} c="#23292f">
-                          {item.headline}
-                        </Text>
-                        <Text mt={4} c="#55606a">
-                          {item.detail}
-                        </Text>
-                      </Box>
-                    </Group>
-                  </Card>
-                );
-              })}
+              return (
+                <Card key={item.title} className="border-outline-variant bg-surface-container-lowest shadow-card">
+                  <CardContent className="mt-0 flex items-start gap-4 p-6">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-label font-bold uppercase tracking-[0.08em] text-primary">{item.title}</p>
+                      <p className="mt-2 text-lg font-semibold text-deep-navy">{item.headline}</p>
+                      <p className="mt-1 text-sm leading-6 text-text-muted">{item.detail}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
 
-              <Box
-                h={280}
-                style={{
-                  overflow: "hidden",
-                  borderRadius: "var(--mantine-radius-lg)",
-                  border: "1px solid #cfd7df",
-                  backgroundImage:
-                    "linear-gradient(rgba(60,63,69,0.48), rgba(60,63,69,0.48)), url('/images/home-hero-reference.jpg')",
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  filter: "grayscale(1)"
-                }}
-                role="img"
-                aria-label="Mapa da região de Brasília"
-              />
+            <div
+              className="h-[280px] overflow-hidden rounded-xl border border-outline-variant bg-cover bg-center grayscale"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(60,63,69,0.48), rgba(60,63,69,0.48)), url('/images/home-hero-reference.jpg')"
+              }}
+              role="img"
+              aria-label="Mapa da região de Brasília"
+            />
 
-              <Group gap="sm">
-                <Button
-                  component="a"
-                  href={company.links.whatsapp}
-                  target="_blank"
-                  rel="noreferrer"
-                  color="rhBlue.9"
-                  leftSection={<MessageCircle size={16} />}
-                >
+            <div className="flex flex-wrap gap-3">
+              <Button asChild className="bg-deep-navy text-white hover:bg-deep-navy/92">
+                <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
+                  <MessageCircle className="h-4 w-4" />
                   WhatsApp
-                </Button>
-                <Button
-                  component="a"
-                  href={company.links.email}
-                  variant="default"
-                  c="rhBlue.7"
-                  leftSection={<Mail size={16} />}
-                >
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="border-outline-variant text-deep-navy hover:bg-surface-muted">
+                <a href={company.links.email}>
+                  <Mail className="h-4 w-4" />
                   E-mail
-                </Button>
-              </Group>
-            </Stack>
-          </Grid.Col>
+                </a>
+              </Button>
+            </div>
+          </div>
 
-          <Grid.Col span={{ base: 12, xl: 7 }}>
-            <Card radius="lg" shadow="sm" withBorder padding="xl" data-testid="ui-contact-form">
-              <Group align="center" gap="lg" mb="xl">
-                <Box w={4} h={48} bg="rhGold" aria-hidden />
-                <Title order={2} c="rhBlue.9">
-                  Envie uma mensagem
-                </Title>
-              </Group>
+          <Card className="border-outline-variant bg-surface-container-lowest shadow-card" data-testid="ui-contact-form">
+            <CardContent className="grid gap-6 p-8 md:p-10">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-1 rounded-full bg-prestige-gold" aria-hidden />
+                <div className="space-y-1">
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-primary">Atendimento</p>
+                  <h2 className="font-display text-h2-compact font-bold text-deep-navy">Envie uma mensagem</h2>
+                </div>
+              </div>
 
               {submitError ? (
-                <Alert role="alert" color="red" mb="lg">
+                <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
                   {submitError}
-                </Alert>
+                </div>
               ) : null}
 
               {submitSuccess ? (
-                <Alert color="green" mb="lg" aria-live="polite">
+                <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
                   {submitSuccess}
-                </Alert>
+                </div>
               ) : null}
 
-              <Stack gap="md">
-                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                  <TextInput
-                    label="Nome completo"
-                    withAsterisk
-                    value={form.name}
-                    onChange={(event) => update("name", event.target.value)}
-                    error={errors.name}
-                    placeholder="Seu nome"
-                    autoComplete="name"
-                  />
-                  <TextInput
-                    label="E-mail"
-                    withAsterisk
-                    type="email"
-                    value={form.email}
-                    onChange={(event) => update("email", event.target.value)}
-                    error={errors.email}
-                    placeholder="email@empresa.com.br"
-                    autoComplete="email"
-                  />
-                </SimpleGrid>
+              <form noValidate className="grid gap-5" onSubmit={submit}>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <FormField error={errors.name?.message} label="Nome completo" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input
+                        id={fieldId}
+                        autoComplete="name"
+                        placeholder="Seu nome"
+                        aria-describedby={ariaDescribedBy}
+                        aria-invalid={ariaInvalid}
+                        {...register("name", { onChange: clearFeedback })}
+                      />
+                    )}
+                  </FormField>
 
-                <TextInput
-                  label="Telefone / WhatsApp"
-                  value={form.phone}
-                  onChange={(event) => update("phone", event.target.value)}
-                  error={errors.phone}
-                  placeholder="(00) 00000-0000"
-                  autoComplete="tel"
+                  <FormField error={errors.email?.message} label="E-mail" required>
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input
+                        id={fieldId}
+                        type="email"
+                        autoComplete="email"
+                        placeholder="email@empresa.com.br"
+                        aria-describedby={ariaDescribedBy}
+                        aria-invalid={ariaInvalid}
+                        {...register("email", { onChange: clearFeedback })}
+                      />
+                    )}
+                  </FormField>
+                </div>
+
+                <Controller
+                  control={control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormField error={errors.phone?.message} label="Telefone / WhatsApp">
+                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                        <Input
+                          id={fieldId}
+                          autoComplete="tel"
+                          inputMode="tel"
+                          placeholder="(00) 00000-0000"
+                          value={field.value}
+                          aria-describedby={ariaDescribedBy}
+                          aria-invalid={ariaInvalid}
+                          onChange={(event) => {
+                            clearFeedback();
+                            field.onChange(formatPhone(event.target.value));
+                          }}
+                        />
+                      )}
+                    </FormField>
+                  )}
                 />
 
-                <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
-                  <TextInput
-                    label="Empresa / órgão"
-                    value={form.organization}
-                    onChange={(event) => update("organization", event.target.value)}
-                    placeholder="Prefeitura ou empresa"
-                    autoComplete="organization"
-                  />
-                  <TextInput
-                    label="Curso ou tema de interesse"
-                    value={form.courseInterest}
-                    onChange={(event) => update("courseInterest", event.target.value)}
-                    placeholder="Ex.: eSocial"
-                  />
-                </SimpleGrid>
+                <div className="grid gap-5 md:grid-cols-2">
+                  <FormField label="Empresa / órgão">
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input
+                        id={fieldId}
+                        autoComplete="organization"
+                        placeholder="Prefeitura ou empresa"
+                        aria-describedby={ariaDescribedBy}
+                        aria-invalid={ariaInvalid}
+                        {...register("organization", { onChange: clearFeedback })}
+                      />
+                    )}
+                  </FormField>
 
-                <Textarea
-                  label="Mensagem"
-                  withAsterisk
-                  value={form.message}
-                  onChange={(event) => update("message", event.target.value)}
-                  error={errors.message}
-                  placeholder="Como podemos ajudar sua organização?"
-                  minRows={6}
-                  autosize
-                />
+                  <FormField label="Curso ou tema de interesse">
+                    {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      <Input
+                        id={fieldId}
+                        placeholder="Ex.: eSocial"
+                        aria-describedby={ariaDescribedBy}
+                        aria-invalid={ariaInvalid}
+                        {...register("courseInterest", { onChange: clearFeedback })}
+                      />
+                    )}
+                  </FormField>
+                </div>
+
+                <FormField error={errors.message?.message} label="Mensagem" required>
+                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                    <Textarea
+                      id={fieldId}
+                      placeholder="Como podemos ajudar sua organização?"
+                      rows={6}
+                      aria-describedby={ariaDescribedBy}
+                      aria-invalid={ariaInvalid}
+                      {...register("message", { onChange: clearFeedback })}
+                    />
+                  )}
+                </FormField>
 
                 <Button
-                  onClick={() => void submit()}
+                  type="submit"
                   loading={isSubmitting}
-                  color="rhGold"
-                  c="#3d2c00"
                   size="lg"
-                  fw={700}
-                  rightSection={<Send size={18} />}
-                  w="fit-content"
-                  mt="sm"
+                  className="w-fit bg-[var(--ea-button-primary-fg,#3d2c00)] text-white hover:bg-[var(--ea-button-primary-fg,#3d2c00)]/92"
                 >
+                  <Send className="h-4 w-4" />
                   {isSubmitting ? "Enviando..." : "Enviar mensagem"}
                 </Button>
-              </Stack>
-            </Card>
-          </Grid.Col>
-        </Grid>
-      </Container>
-    </Box>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
   );
 }

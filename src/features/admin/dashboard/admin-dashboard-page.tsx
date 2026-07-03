@@ -1,24 +1,14 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useMemo } from "react";
-import {
-  ActionIcon,
-  Badge,
-  Box,
-  Button,
-  Divider,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-  ThemeIcon,
-  Title
-} from "@mantine/core";
 import { ArrowRight, BookOpen, CircleDollarSign, Download, Pencil, TrendingUp, Trash2, UserPlus, Users } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   buildPerformanceStats,
   buildRecentActivities,
@@ -29,8 +19,8 @@ import { buildDashboardMetrics } from "@/features/admin/dashboard/model/dashboar
 import { useAppStore } from "@/lib/app-store";
 import { useAdminSearch } from "@/lib/hooks/useAdminSearch";
 import { useRealTimeMetrics } from "@/lib/hooks/useRealTimeMetrics";
-import { exportToCSV } from "@/lib/utils/csv-export";
 import { Link } from "@/lib/router-compat";
+import { exportToCSV } from "@/lib/utils/csv-export";
 
 function pickMetric(
   metrics: ReturnType<typeof buildDashboardMetrics>,
@@ -56,19 +46,23 @@ function getActivityTone(kind: DashboardActivity["kind"]) {
 export function AdminDashboardPage() {
   const appStore = useAppStore();
   const { courses, classes, students, leads, enrollments } = appStore;
-
-  // Real-time metrics subscription
   const rtData = useRealTimeMetrics({ courses, classes, students, leads, enrollments });
 
-  // Memoized metrics calculations
   const metrics = useMemo(
-    () => buildDashboardMetrics({ courses: rtData.courses, classes: rtData.classes, students: rtData.students, leads: rtData.leads, enrollments: rtData.enrollments }),
-    [rtData.courses, rtData.classes, rtData.students, rtData.leads, rtData.enrollments]
+    () =>
+      buildDashboardMetrics({
+        courses: rtData.courses,
+        classes: rtData.classes,
+        students: rtData.students,
+        leads: rtData.leads,
+        enrollments: rtData.enrollments
+      }),
+    [rtData.classes, rtData.courses, rtData.enrollments, rtData.leads, rtData.students]
   );
 
   const activities = useMemo(
     () => buildRecentActivities({ enrollments: rtData.enrollments, leads: rtData.leads, courses: rtData.courses }),
-    [rtData.enrollments, rtData.leads, rtData.courses]
+    [rtData.courses, rtData.enrollments, rtData.leads]
   );
 
   const performanceStats = useMemo(
@@ -76,7 +70,6 @@ export function AdminDashboardPage() {
     [rtData.enrollments, rtData.leads]
   );
 
-  // Search functionality
   const { results: searchedCourses, handleSearch, query: searchQuery } = useAdminSearch(
     rtData.courses.slice(0, 100),
     (course, q) => {
@@ -86,7 +79,6 @@ export function AdminDashboardPage() {
     { debounceMs: 300, minChars: 1 }
   );
 
-  // CSV export handler
   const handleExportCourses = useCallback(() => {
     const exportData = rtData.courses.map((course) => ({
       id: course.id,
@@ -158,239 +150,210 @@ export function AdminDashboardPage() {
           students: `${courseEnrollments.length} inscriç${courseEnrollments.length === 1 ? "ão" : "ões"}`
         };
       }),
-    [searchQuery, searchedCourses, rtData.courses, rtData.enrollments]
+    [rtData.courses, rtData.enrollments, searchQuery, searchedCourses]
   );
 
   return (
-    <Stack gap="xl">
-      <Box>
-        <Title order={1} c="#0b4668" fw={800}>
-          Visão Geral
-        </Title>
-      </Box>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold text-[#0b4668]">Visão Geral</h1>
+      </div>
 
-      <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="lg">
+      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {kpis.map((metric) => {
           const Icon = metric.icon;
 
           return (
-            <Paper key={metric.label} radius="xl" p="xl" withBorder shadow="xs">
-              <Group justify="space-between" align="flex-start">
-                <Text maw={140} size="0.9rem" fw={800} c="#303744">
-                  {metric.label}
-                </Text>
-                <ThemeIcon
-                  radius="md"
-                  size={48}
-                  variant="light"
-                  style={{ background: metric.iconTone.background, color: metric.iconTone.color }}
-                >
-                  <Icon size={20} />
-                </ThemeIcon>
-              </Group>
-              <Text mt="xl" fz="2.2rem" fw={800} c="#101828">
-                {metric.value}
-              </Text>
-              <Text mt={6} fw={600} c={metric.accentTone}>
-                {metric.accent}
-              </Text>
-              <Text mt={4} size="sm" c="#667085">
-                {metric.helper}
-              </Text>
-            </Paper>
+            <Card key={metric.label} className="p-8">
+              <CardContent className="mt-0 p-0">
+                <div className="flex items-start justify-between gap-4">
+                  <p className="max-w-[140px] text-[0.9rem] font-extrabold text-[#303744]">{metric.label}</p>
+                  <div
+                    className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                    style={{ background: metric.iconTone.background, color: metric.iconTone.color }}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+                <p className="mt-10 text-[2.2rem] font-extrabold text-[#101828]">{metric.value}</p>
+                <p className="mt-1.5 font-semibold" style={{ color: metric.accentTone }}>{metric.accent}</p>
+                <p className="mt-1 text-sm text-[#667085]">{metric.helper}</p>
+              </CardContent>
+            </Card>
           );
         })}
-      </SimpleGrid>
+      </div>
 
-      <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="lg" verticalSpacing="lg" style={{ alignItems: "start" }}>
-        <Stack gap="md">
-          <Group justify="space-between" align="center">
-            <Title order={2} c="#0b4668">
-              Gerenciar Cursos
-            </Title>
-            <Group gap="sm">
-              <Button color="rhGold" c="white" radius="xl" leftSection={<Download size={16} />} onClick={handleExportCourses} size="sm">
+      <div className="grid gap-6 xl:grid-cols-2">
+        <div className="space-y-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <h2 className="text-2xl font-bold text-[#0b4668]">Gerenciar Cursos</h2>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" onClick={handleExportCourses}>
+                <Download className="h-4 w-4" />
                 Exportar CSV
               </Button>
-              <Button color="rhGold" c="white" radius="xl" leftSection={<Users size={16} />}>
+              <Button type="button" size="sm" variant="outline">
+                <Users className="h-4 w-4" />
                 Novo Cadastro
               </Button>
-            </Group>
-          </Group>
+            </div>
+          </div>
 
-          <TextInput
+          <Input
             placeholder="Buscar por título ou categoria..."
             value={searchQuery}
-            onChange={(e) => handleSearch(e.currentTarget.value)}
-            radius="lg"
-            size="sm"
+            onChange={(event) => handleSearch(event.currentTarget.value)}
           />
 
-          <Paper radius="xl" withBorder shadow="xs" style={{ overflow: "hidden" }}>
-            <Table.ScrollContainer minWidth={720}>
-              <Table verticalSpacing="lg" horizontalSpacing="xl">
-                <Table.Thead bg="#f8fafc">
-                  <Table.Tr>
-                    <Table.Th>Título</Table.Th>
-                    <Table.Th>Categoria</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                    <Table.Th style={{ textAlign: "right" }}>Ações</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {highlightedCourses.map((course) => (
-                    <Table.Tr key={course.id}>
-                      <Table.Td>
-                        <Text fw={700} c="#111827">
-                          {course.title}
-                        </Text>
-                        <Text size="sm" c="#5f6876" mt={4}>
-                          {course.detail}
-                        </Text>
-                      </Table.Td>
-                      <Table.Td>
-                        <Badge radius="xl" color="rhBlue" variant="light">
-                          {course.category}
-                        </Badge>
-                      </Table.Td>
-                      <Table.Td>
-                        <Stack gap={4}>
-                          <Group gap={8}>
-                            <Box
-                              style={{
-                                width: 10,
-                                height: 10,
-                                borderRadius: 999,
-                                background: course.tone
-                              }}
-                            />
-                            <Text fw={600} c={course.tone}>
-                              {course.status}
-                            </Text>
-                          </Group>
-                          <Text size="sm" c="#667085">
-                            {course.students}
-                          </Text>
-                        </Stack>
-                      </Table.Td>
-                      <Table.Td>
-                        <Group justify="flex-end" gap="xs">
-                          <ActionIcon variant="subtle" color="dark" aria-label={`Editar ${course.title}`}>
-                            <Pencil size={18} />
-                          </ActionIcon>
-                          <ActionIcon variant="subtle" color="red" aria-label={`Excluir ${course.title}`}>
-                            <Trash2 size={18} />
-                          </ActionIcon>
-                        </Group>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
+          <Card className="overflow-hidden p-0">
+            <Table className="min-w-[720px]">
+              <TableHeader className="bg-[#f8fafc]">
+                <TableRow className="hover:bg-[#f8fafc]">
+                  <TableHead>Título</TableHead>
+                  <TableHead>Categoria</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {highlightedCourses.map((course) => (
+                  <TableRow key={course.id}>
+                    <TableCell>
+                      <p className="font-bold text-[#111827]">{course.title}</p>
+                      <p className="mt-1 text-sm text-[#5f6876]">{course.detail}</p>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="default" className="rounded-full">{course.category}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full" style={{ background: course.tone }} />
+                          <span className="font-semibold" style={{ color: course.tone }}>{course.status}</span>
+                        </div>
+                        <p className="text-sm text-[#667085]">{course.students}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex justify-end gap-2">
+                        <IconAction label={`Editar ${course.title}`}>
+                          <Pencil className="h-4 w-4" />
+                        </IconAction>
+                        <IconAction label={`Excluir ${course.title}`} danger={true}>
+                          <Trash2 className="h-4 w-4" />
+                        </IconAction>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-            <Group justify="space-between" px="xl" py="md">
-              <Text size="sm" c="#5f6876">
-                Mostrando {highlightedCourses.length} de {courses.length} cursos
-              </Text>
-              <Group gap="xs">
-                <ActionIcon variant="default" aria-label="Página anterior">
-                  <Text component="span">‹</Text>
-                </ActionIcon>
-                <ActionIcon variant="default" color="rhBlue" aria-label="Próxima página">
-                  <Text component="span">›</Text>
-                </ActionIcon>
-              </Group>
-            </Group>
-          </Paper>
-        </Stack>
+            <div className="flex items-center justify-between gap-4 border-t border-tk-line px-6 py-4">
+              <p className="text-sm text-[#5f6876]">Mostrando {highlightedCourses.length} de {courses.length} cursos</p>
+              <div className="flex gap-2">
+                <IconAction label="Página anterior">
+                  <span aria-hidden="true">‹</span>
+                </IconAction>
+                <IconAction label="Próxima página">
+                  <span aria-hidden="true">›</span>
+                </IconAction>
+              </div>
+            </div>
+          </Card>
+        </div>
 
-        <Stack gap="md">
-          <Title order={2} c="#0b4668">
-            Atividades Recentes
-          </Title>
-          <Paper radius="xl" withBorder shadow="xs" p="lg">
-            <Stack gap="lg">
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold text-[#0b4668]">Atividades Recentes</h2>
+          <Card className="p-6">
+            <CardContent className="mt-0 space-y-5 p-0">
               {activities.map((activity) => {
                 const Icon = getActivityIcon(activity.kind);
                 const tone = getActivityTone(activity.kind);
 
                 return (
-                  <Group key={activity.id} align="flex-start" wrap="nowrap">
-                    <ThemeIcon radius="md" size={44} variant="light" style={{ background: tone.background, color: tone.color }}>
-                      <Icon size={20} />
-                    </ThemeIcon>
-                    <Box>
-                      <Text fw={500} lh={1.55} c="#111827">
-                        {activity.description}
-                      </Text>
-                      <Text size="sm" c="#5f6876" mt={4}>
+                  <div key={activity.id} className="flex items-start gap-4">
+                    <div
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl"
+                      style={{ background: tone.background, color: tone.color }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="leading-7 text-[#111827]">{activity.description}</p>
+                      <p className="mt-1 text-sm text-[#5f6876]">
                         {formatRelativeTime(new Date(activity.timestamp).toISOString())}
-                      </Text>
-                    </Box>
-                  </Group>
+                      </p>
+                    </div>
+                  </div>
                 );
               })}
-            </Stack>
-            <Button
-              component={Link}
-              to="/admin/leads"
-              variant="subtle"
-              color="rhBlue"
-              mt="lg"
-              px={0}
-              rightSection={<ArrowRight size={16} />}
-            >
-              Ver todo o histórico
-            </Button>
-          </Paper>
-        </Stack>
-      </SimpleGrid>
-
-      <Paper radius="xl" p="xl" shadow="sm" style={{ background: "#0b4668", color: "#ffffff" }}>
-        <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="xl">
-          <Stack gap="lg">
-            <Box>
-              <Title order={2} c="white">
-                Relatório de Performance
-              </Title>
-              <Text mt="md" size="lg" c="rgba(255,255,255,0.82)" maw={760}>
-                Analise o engajamento dos alunos por departamento e identifique as turmas com melhor aproveitamento do conteúdo.
-              </Text>
-            </Box>
-            <Group>
-              <Button color="rhGold" c="#5f4700" radius="md">
-                Gerar Relatório PDF
+              <Button asChild variant="ghost" className="justify-start px-0 text-[#0b4668] hover:bg-transparent hover:text-[#0b4668]">
+                <Link to="/admin/leads">
+                  Ver todo o histórico
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </Button>
-              <Button variant="outline" color="gray" radius="md">
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <Card className="border-[#0b4668] bg-[#0b4668] p-8 text-white">
+        <div className="grid gap-8 xl:grid-cols-2 xl:items-start">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold">Relatório de Performance</h2>
+              <p className="mt-4 max-w-[760px] text-lg leading-8 text-white/82">
+                Analise o engajamento dos alunos por departamento e identifique as turmas com melhor aproveitamento do conteúdo.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button type="button" className="bg-[#f6be39] text-[#5f4700] hover:bg-[#ffcb5b]">Gerar Relatório PDF</Button>
+              <Button type="button" variant="outline" className="border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white">
                 Configurar Alertas
               </Button>
-            </Group>
-          </Stack>
+            </div>
+          </div>
 
-          <SimpleGrid cols={2} spacing="md">
+          <div className="grid gap-4 sm:grid-cols-2">
             {performanceStats.map((stat) => (
-              <Paper
+              <div
                 key={stat.label}
-                radius="lg"
-                p="md"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.12)" }}
+                className="rounded-[20px] border border-white/15 bg-white/10 p-5"
               >
-                <Text size="xs" fw={700} c="rgba(255,255,255,0.74)">
-                  {stat.label}
-                </Text>
-                <Text mt="sm" fz="2rem" fw={800}>
-                  {stat.value}
-                </Text>
-                <Divider my="sm" color="rgba(255,255,255,0.1)" />
-                <Text size="sm" c="rgba(255,255,255,0.74)">
-                  {stat.helper}
-                </Text>
-              </Paper>
+                <p className="text-xs font-bold uppercase tracking-[0.12em] text-white/74">{stat.label}</p>
+                <p className="mt-3 text-[2rem] font-extrabold">{stat.value}</p>
+                <div className="my-4 h-px bg-white/10" />
+                <p className="text-sm text-white/74">{stat.helper}</p>
+              </div>
             ))}
-          </SimpleGrid>
-        </SimpleGrid>
-      </Paper>
-    </Stack>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function IconAction({
+  label,
+  danger = false,
+  children
+}: {
+  label: string;
+  danger?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      className={`inline-flex h-9 w-9 items-center justify-center rounded-full transition ${
+        danger ? "text-[#cc4f4f] hover:bg-[#fff1f1]" : "text-[#111827] hover:bg-[#f3f4f6]"
+      }`}
+    >
+      {children}
+    </button>
   );
 }

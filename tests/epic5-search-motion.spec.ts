@@ -24,7 +24,7 @@ test.describe("epica 5 - busca, loading, motion e imagens", () => {
 
   test("buscas locais expõem limpar e resumo de resultados", async ({ page }) => {
     // Cursos com busca
-    await page.goto("/cursos?q=esocial");
+    await page.goto("/cursos?q=lgpd");
     await expect(page.locator("role=search").first()).toBeVisible();
     await expect(page.getByRole("button", { name: "Limpar busca do catálogo" })).toBeVisible();
 

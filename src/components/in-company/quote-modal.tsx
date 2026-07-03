@@ -219,9 +219,9 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
                       )}
                     </FormField>
                     <FormField error={errors.teamSize} label="Número de colaboradores" required>
-                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      {({ fieldId, labelId, ariaDescribedBy, ariaInvalid }) => (
                         <Select value={form.teamSize} onValueChange={(value) => update("teamSize", value)}>
-                          <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
+                          <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-labelledby={labelId} aria-invalid={ariaInvalid}>
                             <SelectValue placeholder="Selecione uma faixa" />
                           </SelectTrigger>
                           <SelectContent>
@@ -245,9 +245,9 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
                       )}
                     </FormField>
                     <FormField error={errors.modality} label="Modalidade preferencial" required>
-                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                      {({ fieldId, labelId, ariaDescribedBy, ariaInvalid }) => (
                         <Select value={form.modality} onValueChange={(value) => update("modality", value)}>
-                          <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-invalid={ariaInvalid}>
+                          <SelectTrigger id={fieldId} aria-describedby={ariaDescribedBy} aria-labelledby={labelId} aria-invalid={ariaInvalid}>
                             <SelectValue placeholder="Selecione a modalidade" />
                           </SelectTrigger>
                           <SelectContent>

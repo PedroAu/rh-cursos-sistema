@@ -2,11 +2,17 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
-import { Burger, Drawer } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { ArrowRight, UserRound } from "lucide-react";
+import { ArrowRight, Menu, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { useDisclosure } from "@/hooks/use-disclosure";
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
 import { company } from "@/lib/company";
 
@@ -14,15 +20,32 @@ export function PublicMobileNavigation() {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <>
-      <Burger opened={opened} onClick={open} aria-label="Abrir menu" color="#0c6a83" />
+    <Dialog
+      open={opened}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
+          open();
+          return;
+        }
+        close();
+      }}
+    >
+      <button
+        type="button"
+        aria-label="Abrir menu"
+        aria-expanded={opened}
+        onClick={open}
+        className="inline-flex h-11 w-11 items-center justify-center rounded-tk-button border border-[var(--tk-black-8)] bg-tk-surface text-[#0c6a83] transition hover:bg-[var(--tk-black-5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
+      >
+        <Menu className="h-5 w-5" aria-hidden="true" />
+      </button>
 
-      <Drawer
-        opened={opened}
-        onClose={close}
-        keepMounted={false}
-        position="right"
-        title={
+      <DialogContent className="left-auto right-0 top-0 h-screen w-[min(24rem,100vw)] translate-x-0 translate-y-0 rounded-none border-l border-[#ddd7c7] bg-[#f3f0e8] p-0">
+        <DialogHeader className="border-b border-[#ddd7c7] px-6 py-5">
+          <DialogTitle className="sr-only">Menu principal</DialogTitle>
+          <DialogDescription className="sr-only">
+            Navegação móvel principal do site RH Cursos.
+          </DialogDescription>
           <Image
             src={company.logo.src}
             alt={company.logo.alt}
@@ -30,14 +53,9 @@ export function PublicMobileNavigation() {
             height={164}
             className="h-12 w-auto"
           />
-        }
-        styles={{
-          content: { background: "#f3f0e8" },
-          header: { background: "#f3f0e8", borderBottom: "1px solid #ddd7c7" },
-          title: { lineHeight: 0 }
-        }}
-      >
-        <div className="grid gap-2">
+        </DialogHeader>
+
+        <div className="grid gap-2 px-6 py-5">
           {publicNavItems.map((item) => (
             <NextLink
               key={item.to}
@@ -50,7 +68,7 @@ export function PublicMobileNavigation() {
           ))}
         </div>
 
-        <div className="mt-5 grid gap-3 border-t border-[#ddd7c7] pt-5">
+        <div className="grid gap-3 border-t border-[#ddd7c7] px-6 py-5">
           <Button asChild className="bg-[#0c6a83] text-white hover:bg-[#084f63]" onClick={close}>
             <NextLink href="/falar-com-especialista">
               Fale com um especialista
@@ -79,7 +97,7 @@ export function PublicMobileNavigation() {
             </NextLink>
           </Button>
         </div>
-      </Drawer>
-    </>
+      </DialogContent>
+    </Dialog>
   );
 }

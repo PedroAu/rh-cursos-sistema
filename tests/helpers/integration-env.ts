@@ -183,14 +183,20 @@ export async function cleanupEnrollmentArtifacts(email: string) {
 }
 
 export async function resolveAvailableCheckoutCoursePath() {
+  const target = await resolveAvailableCheckoutTarget();
+  return target.coursePath;
+}
+
+export async function resolveAvailableCheckoutTarget() {
   const supabase = createServiceRoleClient();
 
   const { data: classes, error: classesError } = await supabase
     .from("turma")
-    .select("curso_id")
+    .select("id,curso_id,data_inicio,horario,modalidade,local,status,vagas_restantes")
     .in("status", ["Aberta", "PoucasVagas"])
     .gt("vagas_restantes", 0)
     .is("deleted_at", null)
+    .order("vagas_restantes", { ascending: false })
     .order("data_inicio", { ascending: true })
     .limit(20);
 
@@ -209,15 +215,25 @@ export async function resolveAvailableCheckoutCoursePath() {
 
   if (coursesError) throw coursesError;
 
-  const course = courseIds
-    .map((courseId) => courses?.find((item) => item.id === courseId))
-    .find((item): item is NonNullable<typeof courses>[number] => Boolean(item?.slug));
+  const selectedClass = classes.find((item) =>
+    courses?.some((course) => course.id === item.curso_id && Boolean(course.slug))
+  );
+  const course = selectedClass
+    ? courses?.find((item) => item.id === selectedClass.curso_id && Boolean(item.slug))
+    : null;
 
-  if (!course) {
+  if (!selectedClass || !course) {
     throw new Error("Nenhum curso ativo com turma disponível foi encontrado no ambiente de integração.");
   }
 
-  return `/cursos/${course.slug}`;
+  return {
+    classId: selectedClass.id,
+    coursePath: `/cursos/${course.slug}`,
+    location: selectedClass.local,
+    modality: selectedClass.modalidade,
+    startDate: selectedClass.data_inicio,
+    time: selectedClass.horario
+  };
 }
 
 export function createUniqueEmail(prefix: string) {

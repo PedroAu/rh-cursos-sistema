@@ -1,539 +1,427 @@
 "use client";
 
 import Image from "next/image";
-import {
-  ArrowRight,
-  BookOpen,
-  BriefcaseBusiness,
-  CalendarDays,
-  ClipboardCheck,
-  GraduationCap,
-  Landmark,
-  MessageSquareText,
-  ShieldCheck,
-  Sparkles,
-  Users
-} from "lucide-react";
-import type { CSSProperties } from "react";
+import { ArrowRight, BookOpen, BriefcaseBusiness, CheckCircle2, Star } from "lucide-react";
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { H1, H2, H3, P, Typography } from "@/components/ui/typography";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
 import { Link } from "@/lib/router-compat";
+import { cn } from "@/lib/utils";
 
-const themeVars = {
-  "--rh-teal-deep": "#0c6a83",
-  "--rh-teal": "#1791a9",
-  "--rh-teal-light": "#37b7cc",
-  "--rh-paper": "#f3f0e8",
-  "--rh-paper-border": "#ddd7c7",
-  "--rh-paper-strong": "#ebe5d8",
-  "--rh-copy-soft": "#5b6670",
-  "--rh-ink": "#1f2a33",
-  "--rh-border": "rgba(12, 106, 131, 0.12)"
-} as CSSProperties;
+type JourneyCard = {
+  badge: string;
+  badgeTone?: "accent";
+  bordered?: boolean;
+  description: string;
+  href: string;
+  icon: typeof BookOpen;
+  iconSolid?: boolean;
+  linkLabel: string;
+  title: string;
+};
 
-const promiseCards = [
+type ConsultingStep = {
+  description: string;
+  solid?: boolean;
+  title: string;
+};
+
+const journeyCards: JourneyCard[] = [
   {
-    icon: ShieldCheck,
-    title: "Segurança técnica",
-    description: "Conteúdo ancorado em legislação, operação real e decisões que reduzem risco para a equipe."
+    badge: "Para profissionais",
+    description:
+      "Turmas com agenda pública, presenciais e online ao vivo, com certificação e conteúdo atualizado.",
+    href: "/agenda",
+    icon: BookOpen,
+    linkLabel: "Ver agenda de cursos →",
+    title: "Cursos abertos"
   },
   {
-    icon: Sparkles,
-    title: "Aprendizado aplicável",
-    description: "Aulas desenhadas para sair do treinamento com roteiro, modelo e clareza de execução."
-  },
-  {
-    icon: Users,
-    title: "Formatos flexíveis",
-    description: "Atendimento para profissionais individuais, equipes corporativas e órgãos públicos."
-  }
-];
-
-const serviceCards = [
-  {
-    icon: GraduationCap,
-    title: "Cursos abertos",
-    description: "Turmas presenciais e online ao vivo para atualização técnica com calendário contínuo.",
-    cta: "Ver agenda",
-    href: "/agenda"
-  },
-  {
+    badge: "Para organizações",
+    description:
+      "Programas sob medida para a sua equipe, no seu contexto operacional, com o seu calendário e os seus casos reais.",
+    href: "/in-company",
     icon: BriefcaseBusiness,
-    title: "In company",
-    description: "Programas customizados para nivelar equipes, acelerar implantação e padronizar operação.",
-    cta: "Solicitar proposta",
-    href: "/in-company"
+    linkLabel: "Levar para minha equipe →",
+    title: "Cursos in-company"
   },
   {
-    icon: Landmark,
-    title: "Consultoria",
-    description: "Apoio para revisão de processos, adequação normativa e desenho de jornadas mais seguras.",
-    cta: "Conhecer consultoria",
-    href: "/consultoria"
+    badge: "Novo",
+    badgeTone: "accent",
+    bordered: true,
+    description:
+      "Apoio especializado para aplicar normas e requisitos regulatórios à realidade do seu órgão ou empresa do diagnóstico à execução.",
+    href: "/falar-com-especialista",
+    icon: Star,
+    iconSolid: true,
+    linkLabel: "Solicitar proposta →",
+    title: "Consultoria"
   }
-];
+] as const;
 
-const processSteps = [
+const consultingSteps: ConsultingStep[] = [
   {
-    number: "01",
-    title: "Mapeie a necessidade",
-    description: "Escolha a trilha, modalidade e formato conforme o desafio operacional da equipe."
+    description: "Entendemos o seu cenário, as normas aplicáveis e as prioridades.",
+    title: "Conversa de diagnóstico"
   },
   {
-    number: "02",
-    title: "Capacite com contexto real",
-    description: "Aprenda com casos práticos, materiais aplicáveis e mediação de especialistas da área."
+    description: "Uma proposta com escopo, etapas e resultados esperados.",
+    title: "Plano sob medida"
   },
   {
-    number: "03",
-    title: "Implemente com segurança",
-    description: "Volte para a rotina com critérios claros, mais rapidez e menos retrabalho."
+    description: "Aplicamos junto com a sua equipe, ajustando ao longo do caminho.",
+    solid: true,
+    title: "Execução acompanhada"
   }
-];
+] as const;
 
-const faqItems = [
+const consultingBullets = [
+  "Diagnóstico do seu contexto normativo e operacional",
+  "Plano de adequação aplicável, com passos priorizados",
+  "Acompanhamento por especialistas com experiência de campo"
+] as const;
+
+const stats = [
+  { label: "formando servidores e profissionais de organizações públicas e privadas", value: "+15 anos" },
+  { label: "turmas realizadas entre cursos abertos e programas in-company", value: "+320" },
+  { label: "de recomendação média nas avaliações de turmas concluídas", value: "96%" },
+  { label: "organizações atendidas em treinamento e consultoria", value: "+80" }
+] as const;
+
+const footerColumns = [
   {
-    value: "faq-1",
-    question: "Como faço minha inscrição?",
-    answer: "Você pode se inscrever pela página do curso, pela agenda de turmas ou com apoio consultivo da equipe comercial."
+    items: ["Cursos abertos", "Agenda", "In-company", "Consultoria"],
+    title: "Ofertas"
   },
   {
-    value: "faq-2",
-    question: "Os cursos emitem certificado?",
-    answer: "Sim. As turmas oferecem certificado conforme a carga horária e os critérios de participação informados na matrícula."
+    items: ["Sobre", "Blog", "Instrutores", "Contato"],
+    title: "Empresa"
   },
   {
-    value: "faq-3",
-    question: "Vocês atendem órgãos públicos e empresas?",
-    answer: "Sim. A RH Cursos atua com cursos abertos, treinamentos in company e consultoria para setor público e privado."
+    items: ["Área do aluno", "Área do instrutor", "Entrar"],
+    title: "Acesso"
   }
-];
-
-const pathIcons = [
-  BookOpen,
-  ClipboardCheck,
-  MessageSquareText,
-  Users,
-  BriefcaseBusiness,
-  CalendarDays
-];
+] as const;
 
 function getClassDateParts(value: string) {
   const date = new Date(value);
-  const day = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date);
-  const month = new Intl.DateTimeFormat("pt-BR", { month: "short" }).format(date).replace(".", "");
-  return { day, month };
+
+  return {
+    day: new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date),
+    month: new Intl.DateTimeFormat("pt-BR", { month: "short" }).format(date).replace(".", "").toUpperCase()
+  };
+}
+
+function formatHeroMode(modality: string, location: string) {
+  if (modality === "Ao vivo online" || modality === "Gravado") {
+    return "Online ao vivo";
+  }
+
+  if (/Bras[ií]lia/i.test(location)) {
+    return "Presencial · Brasília";
+  }
+
+  if (/S[aã]o Paulo/i.test(location)) {
+    return "Presencial · São Paulo";
+  }
+
+  return modality;
 }
 
 export function HomePage() {
-  const { classes, courses, testimonials, trainingPaths } = useAppStore();
+  const { classes, courses } = useAppStore();
 
   const upcomingClasses = [...classes]
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime())
     .slice(0, 3)
     .map((trainingClass) => ({
       ...trainingClass,
-      courseTitle: courses.find((course) => course.id === trainingClass.courseId)?.title ?? "Curso RH Cursos"
+      courseTitle: courses.find((course) => course.id === trainingClass.courseId)?.title ?? "Curso RH Cursos",
+      modeLabel: formatHeroMode(trainingClass.modality, trainingClass.location)
     }));
 
-  const highlightedPaths = trainingPaths.slice(0, 6).map((path, index) => ({
-    ...path,
-    icon: pathIcons[index % pathIcons.length]
-  }));
-
-  const heroStats = [
-    `${Math.max(courses.length, 80)} cursos · ${Math.max(trainingPaths.length, 6)} trilhas`,
-    "Presencial e online"
-  ];
-
-  const featuredTestimonials = testimonials.slice(0, 2);
-  const openClassesCount = classes.filter((item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas").length;
-  const socialProofItems = [
-    { value: `${Math.max(courses.length, 80)}`, label: "cursos ativos" },
-    { value: `${Math.max(openClassesCount, 3)}`, label: "turmas com matrícula" },
-    { value: `${Math.max(trainingPaths.length, 6)}`, label: "trilhas estruturadas" }
-  ];
-
   return (
-    <div className="bg-[#eef0f2] pb-16 pt-0 md:pb-24" style={themeVars}>
-      <div className="mx-auto w-[min(1180px,calc(100%-24px))] overflow-hidden rounded-b-[24px] border border-t-0 border-[var(--rh-border)] bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] md:w-[min(1180px,calc(100%-40px))]">
+    <div className="bg-[#eef0f2] pb-16 md:pb-24">
+      <div className="mx-auto w-[min(1180px,calc(100%-24px))] overflow-hidden rounded-[24px] border border-[#ebebeb] bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)] md:w-[min(1180px,calc(100%-40px))]">
         <section
           data-testid="ui-hero-home"
-          className="grid gap-10 bg-[var(--rh-paper)] px-6 py-12 md:grid-cols-[1.05fr_0.95fr] md:px-10 md:py-20"
+          className="grid gap-10 bg-[#f3f0e8] px-6 py-12 md:grid-cols-[1.05fr_0.95fr] md:px-10 md:py-[72px]"
         >
-          <div className="max-w-2xl">
-            <Badge className="border-[var(--rh-border)] bg-white px-4 py-2 normal-case tracking-normal text-[var(--rh-teal-deep)] shadow-[0_8px_24px_rgba(12,106,131,0.08)]">
-              Educação corporativa · Desde {company.foundedYear}
-            </Badge>
-
-            <H1 className="mt-6 text-[2.6rem] leading-[1.02] tracking-[-0.03em] text-[var(--rh-ink)] md:text-[4.2rem]">
-              Conhecimento técnico que sua equipe{" "}
-              <span className="italic text-[var(--rh-teal-deep)]">aplica no mesmo dia</span>.
-            </H1>
-
-            <Typography
-              as="p"
-              variant="subheading-large"
-              className="mt-6 max-w-[48ch] text-[1.1rem] text-[var(--rh-copy-soft)] md:text-[1.45rem]"
-            >
-              Cursos abertos, treinamentos in company e consultoria para o setor público e privado.
-              São quase 80 cursos em trilhas de conhecimento do básico ao avançado, presenciais ou online.
-            </Typography>
+          <div>
+            <div className="inline-flex items-center rounded-full bg-[#dff3fb] px-4 py-2 text-sm font-semibold text-[#0c6a83]">
+              <span className="mr-2 h-2 w-2 rounded-full bg-[#1791a9]" />
+              Educação corporativa · Desde 2007
+            </div>
+            <h1 className="mt-5 max-w-[10ch] font-display text-[3rem] font-bold leading-[1.06] tracking-[-0.02em] text-[#222525] md:max-w-none md:text-[3.75rem]">
+              Conhecimento técnico que sua equipe <span className="italic text-[#0c6a83]">aplica no mesmo dia</span>.
+            </h1>
+            <p className="mt-5 max-w-[48ch] font-serif text-[1.2rem] font-light leading-[1.45] text-[#4f5057] md:text-[1.5rem]">
+              Cursos abertos, treinamentos in company e consultoria para o setor público e privado. São quase 80 cursos em
+              6 trilhas de conhecimento, do básico ao avançado, presenciais ou online.
+            </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-[var(--rh-teal-deep)] hover:bg-[#084f63]">
+              <Button asChild size="lg" className="bg-[#0c6a83] hover:bg-[#084f63]">
                 <Link to="/agenda">
                   Ver agenda de cursos
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
                 variant="secondary"
-                className="border-[var(--rh-border)] bg-white text-[var(--rh-teal-deep)] hover:bg-[var(--rh-paper-strong)]"
+                className="border-[#ddd7c7] bg-white text-[#084f63] hover:bg-[#ebe5d8]"
               >
                 <Link to="/in-company">Solicitar proposta in company</Link>
               </Button>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              {heroStats.map((item) => (
+            <div className="mt-7 flex flex-wrap gap-[10px]">
+              {["80 cursos · 6 trilhas", "Presencial e online"].map((item) => (
                 <span
                   key={item}
-                  className="inline-flex min-h-11 items-center rounded-full border border-[var(--rh-border)] bg-white px-4 text-sm font-medium text-[var(--rh-ink)] shadow-[0_8px_24px_rgba(12,106,131,0.08)]"
+                  className="inline-flex items-center rounded-full border border-[#ddd7c7] bg-white px-[15px] py-[8px] text-sm text-[#222525] shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
                 >
                   {item}
                 </span>
               ))}
             </div>
-
           </div>
 
-          <div className="rounded-[24px] border border-[var(--rh-paper-border)] bg-[linear-gradient(158deg,#ffffff,#ebebeb)] p-6 shadow-[0_20px_60px_-30px_rgba(0,0,0,0.3)] md:p-8">
-            <div className="flex flex-col items-center gap-5">
+          <div className="rounded-[24px] border border-[#ded8c9] bg-[linear-gradient(158deg,#ffffff,#ebebeb)] px-8 py-[38px] shadow-[0_2px_16px_rgba(0,0,0,0.02),0_16px_64px_rgba(0,0,0,0.12)]">
+            <div className="flex flex-col items-center gap-[22px]">
               <Image
                 src={company.logo.src}
                 alt={company.logo.alt}
-                width={360}
-                height={226}
-                className="h-auto w-full max-w-[320px]"
+                width={320}
+                height={110}
                 priority
+                className="h-auto w-full max-w-[320px]"
               />
-              <div className="h-px w-full bg-[var(--rh-paper-border)]" />
+              <div className="h-px w-full bg-[#ded8c9]" />
             </div>
 
             <div className="mt-5">
-              <H3 className="font-display text-[0.95rem] uppercase tracking-[0.08em] text-[var(--rh-ink)]">
-                Próximas turmas
-              </H3>
-              <div className="mt-4 grid gap-3">
+              <p className="mb-3 font-display text-[15px] font-bold text-[#222525]">Próximas turmas</p>
+              <div className="grid gap-[10px]">
                 {upcomingClasses.map((trainingClass) => {
                   const { day, month } = getClassDateParts(trainingClass.startDate);
+
                   return (
                     <div
                       key={trainingClass.id}
-                      className="flex items-center gap-4 rounded-[18px] border border-[var(--rh-paper-border)] bg-white/80 px-4 py-3"
+                      className="flex items-center gap-[14px] rounded-2xl border border-[#ded8c9] bg-white/70 px-[13px] py-[11px]"
                     >
-                      <div className="w-12 shrink-0 text-center">
-                        <div className="font-display text-2xl font-bold leading-none text-[var(--rh-teal-deep)]">
-                          {day}
-                        </div>
-                        <div className="mt-1 text-[10px] uppercase tracking-[0.08em] text-[var(--rh-copy-soft)]">
-                          {month}
-                        </div>
+                      <div className="w-12 text-center">
+                        <div className="font-display text-[20px] font-bold leading-none text-[#0c6a83]">{day}</div>
+                        <div className="mt-px text-[10px] uppercase tracking-[0.06em] text-[#7f8c94]">{month}</div>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold leading-5 text-[var(--rh-ink)]">
-                          {trainingClass.courseTitle}
-                        </p>
-                        <p className="mt-1 text-xs text-[var(--rh-copy-soft)]">
-                          {trainingClass.modality} · {trainingClass.location}
-                        </p>
+                        <p className="text-sm font-semibold leading-[1.3] text-[#222525]">{trainingClass.courseTitle}</p>
+                        <p className="mt-0.5 text-xs text-[#4f5057]">{trainingClass.modeLabel}</p>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+          </div>
+        </section>
 
-              <Button asChild variant="tertiary" className="mt-5 text-[var(--rh-teal-deep)] hover:text-[var(--rh-teal)]">
-                <Link to="/agenda">Explorar calendário completo</Link>
+        <section className="px-6 py-[72px] md:px-10 md:py-[88px]">
+          <div className="mb-11 max-w-[640px]">
+            <div className="inline-flex items-center rounded-full bg-[#dff3fb] px-4 py-2 text-sm font-semibold text-[#0c6a83]">
+              Três caminhos, um só objetivo
+            </div>
+            <h2 className="mt-[18px] font-display text-[2.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#222525]">
+              Escolha como quer avançar
+            </h2>
+            <p className="mt-[14px] font-serif text-[1.25rem] font-light leading-[1.45] text-[#4f5057]">
+              Conteúdo aplicável à legislação vigente e à realidade de organizações públicas e privadas.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {journeyCards.map((card) => {
+              const Icon = card.icon;
+
+              return (
+                <article
+                  key={card.title}
+                  className={cn(
+                    "flex min-h-[288px] flex-col gap-4 rounded-[24px] border bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.02),0_16px_64px_rgba(0,0,0,0.12)]",
+                    card.bordered ? "border-[#0c6a83]" : "border-[#ebebeb]"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div
+                      className={cn(
+                        "inline-flex h-12 w-12 items-center justify-center rounded-xl",
+                        card.iconSolid ? "bg-[#0c6a83] text-white" : "bg-[#e0eeff] text-[#0c6a83]"
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-semibold",
+                        card.badgeTone === "accent" ? "bg-[#dff3fb] text-[#0c6a83]" : "bg-[#f3f4f6] text-[#4f5057]"
+                      )}
+                    >
+                      {card.badge}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-display text-[1.5rem] font-bold tracking-[-0.01em] text-[#222525]">{card.title}</h3>
+                    <p className="mt-4 text-base leading-[1.55] text-[#4f5057]">{card.description}</p>
+                  </div>
+
+                  <Link to={card.href} className="mt-auto text-sm font-semibold text-[#0c6a83] transition hover:text-[#084f63]">
+                    {card.linkLabel}
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="border-y border-[#c3b6aa] bg-[#fffaf4] px-6 py-16 md:px-10 md:py-20">
+          <div className="grid gap-10 md:grid-cols-[1.05fr_0.95fr] md:items-center md:gap-14">
+            <div>
+              <div className="inline-flex items-center rounded-full bg-[#0c6a83] px-4 py-2 text-sm font-semibold text-white">
+                Consultoria
+              </div>
+              <h2 className="mt-[18px] max-w-[12ch] font-display text-[2.75rem] font-bold leading-[1.1] tracking-[-0.02em] text-[#222525]">
+                A norma aplicada ao <span className="italic">seu</span> contexto
+              </h2>
+              <p className="mb-7 mt-4 max-w-[28ch] font-serif text-[1.25rem] font-light leading-[1.5] text-[#4f5057]">
+                Cada norma pesa de um jeito na sua operação. Nossa consultoria traduz requisitos legais em processos claros,
+                que a sua equipe aplica no dia a dia.
+              </p>
+
+              <div className="space-y-[14px]">
+                {consultingBullets.map((item) => (
+                  <div key={item} className="flex items-start gap-3 text-[#222525]">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#0c6a83]" />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+
+              <Button asChild size="lg" className="mt-8 bg-[#0c6a83] hover:bg-[#084f63]">
+                <Link to="/falar-com-especialista">Solicitar proposta →</Link>
               </Button>
             </div>
-          </div>
-        </section>
 
-        <section className="px-6 py-12 md:px-10 md:py-16">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-              Diferenciais
-            </p>
-            <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-              Formação corporativa com foco em aplicação, clareza e decisão.
-            </H2>
-            <P className="mt-4 max-w-[60ch] text-[var(--rh-copy-soft)]">
-              Conteúdo técnico, mediação experiente e formatos desenhados para acelerar a decisão de quem
-              precisa capacitar equipes com critério e rapidez.
-            </P>
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {promiseCards.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Card key={item.title} variant="glass" className="border-[var(--rh-border)] bg-white" size="lg">
-                  <CardHeader className="p-0">
-                    <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(23,145,169,0.12)] text-[var(--rh-teal-deep)]">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </div>
-                    <CardTitle className="text-[1.35rem] text-[var(--rh-ink)]">{item.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0 pt-3">
-                    <P className="text-[var(--rh-copy-soft)]">{item.description}</P>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="bg-[#f7f8f9] px-6 py-12 md:px-10 md:py-16">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-                Trilhas de conhecimento
-              </p>
-              <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-                Escolha a frente que mais pressiona sua operação hoje.
-              </H2>
-            </div>
-            <Button asChild variant="secondary" className="border-[var(--rh-border)] bg-white text-[var(--rh-teal-deep)]">
-              <Link to="/cursos">Ver catálogo completo</Link>
-            </Button>
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {highlightedPaths.map((path) => {
-              const Icon = path.icon;
-              return (
-                <Card key={path.id} variant="elevated" className="border-[var(--rh-border)] bg-white" size="lg">
-                  <CardHeader className="p-0">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(12,106,131,0.1)] text-[var(--rh-teal-deep)]">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
+            <div className="rounded-[24px] border border-[#ebebeb] bg-white p-8 shadow-[0_2px_16px_rgba(0,0,0,0.02),0_16px_64px_rgba(0,0,0,0.12)]">
+              <p className="mb-5 text-xs font-semibold uppercase tracking-[0.08em] text-[#4f5057]">Como funciona</p>
+              <div className="space-y-5">
+                {consultingSteps.map((step, index) => (
+                  <div key={step.title}>
+                    <div className="flex gap-4">
+                      <div
+                        className={cn(
+                          "inline-flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+                          step.solid ? "bg-[#0c6a83] text-white" : "bg-[#e0eeff] text-[#0c6a83]"
+                        )}
+                      >
+                        {index + 1}
                       </div>
-                      <span className="rounded-full bg-[rgba(12,106,131,0.08)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--rh-teal-deep)]">
-                        {path.courseCount} cursos
-                      </span>
-                    </div>
-                    <CardTitle className="mt-5 text-[1.35rem] text-[var(--rh-ink)]">{path.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-0 pt-3">
-                    <P className="text-[var(--rh-copy-soft)]">{path.description}</P>
-                    <Button asChild variant="tertiary" className="mt-4 text-[var(--rh-teal-deep)] hover:text-[var(--rh-teal)]">
-                      <Link to="/cursos">Explorar trilha</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="px-6 py-12 md:px-10 md:py-16">
-          <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-                Formatos de atendimento
-              </p>
-              <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-                A mesma profundidade técnica em jornadas diferentes.
-              </H2>
-              <P className="mt-4 max-w-[58ch] text-[var(--rh-copy-soft)]">
-                Escolha o formato conforme o momento da sua operação: atualizar profissionais, nivelar um
-                time inteiro ou revisar processos com apoio consultivo.
-              </P>
-            </div>
-            <div className="grid gap-4">
-              {serviceCards.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Card key={item.title} variant="glass" className="border-[var(--rh-border)] bg-white/90" size="lg">
-                    <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                      <div className="flex gap-4">
-                        <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[rgba(23,145,169,0.12)] text-[var(--rh-teal-deep)]">
-                          <Icon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <div>
-                          <H3 className="text-[1.3rem] text-[var(--rh-ink)]">{item.title}</H3>
-                          <P className="mt-2 text-[var(--rh-copy-soft)]">{item.description}</P>
-                        </div>
+                      <div>
+                        <h3 className="font-semibold text-[#222525]">{step.title}</h3>
+                        <p className="mt-1 text-sm leading-[1.55] text-[#4f5057]">{step.description}</p>
                       </div>
-                      <Button asChild variant="secondary" className="border-[var(--rh-border)] bg-white text-[var(--rh-teal-deep)]">
-                        <Link to={item.href}>{item.cta}</Link>
-                      </Button>
                     </div>
-                  </Card>
-                );
-              })}
+                    {index < consultingSteps.length - 1 ? <div className="mt-5 h-px bg-[#ebebeb]" /> : null}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-[var(--rh-teal-deep)] px-6 py-12 text-white md:px-10 md:py-16">
-          <div className="max-w-3xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-white/80">
-              Como funciona
-            </p>
-            <H2 className="mt-4 text-[2rem] text-white md:text-[3rem]">
-              Três passos para sair da intenção e chegar na execução.
-            </H2>
-          </div>
-
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {processSteps.map((step) => (
-              <div
-                key={step.number}
-                className="rounded-[24px] border border-white/10 bg-white/5 p-6 backdrop-blur-[1px]"
-              >
-                <div className="text-sm font-semibold uppercase tracking-[0.14em] text-white">
-                  {step.number}
-                </div>
-                <H3 className="mt-4 text-[1.4rem] text-white">{step.title}</H3>
-                <P className="mt-3 text-white/78">{step.description}</P>
+        <section className="px-6 py-16 md:px-10 md:py-20">
+          <h2 className="mb-11 text-center font-display text-[2rem] font-bold tracking-[-0.02em] text-[#222525]">
+            A RH Cursos em números
+          </h2>
+          <div className="grid gap-x-6 gap-y-8 md:grid-cols-2 xl:grid-cols-4">
+            {stats.map((item) => (
+              <div key={item.value} className="text-center">
+                <p className="font-display text-[2.6rem] font-bold text-[#0c6a83]">{item.value}</p>
+                <p className="mx-auto mt-3 max-w-[24ch] text-sm leading-[1.55] text-[#4f5057]">{item.label}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="px-6 py-12 md:px-10 md:py-16">
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-                Credibilidade
-              </p>
-              <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-                Segurança para quem contrata e para quem precisa aplicar.
-              </H2>
-              <P className="mt-4 text-[var(--rh-copy-soft)]">
-                Catálogo ativo, trilhas estruturadas e agenda recorrente formam uma base clara para comparar
-                opções e contratar com mais confiança.
-              </P>
-            </div>
-
-            <div className="grid gap-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                {socialProofItems.map((item) => (
-                  <Card key={item.label} variant="glass" className="border-[var(--rh-border)] bg-[#f7f8f9]" size="lg">
-                    <CardContent className="p-0">
-                      <p className="font-display text-[2rem] leading-none text-[var(--rh-teal-deep)]">{item.value}</p>
-                      <p className="mt-2 text-sm font-medium text-[var(--rh-copy-soft)]">{item.label}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+        <section className="px-6 pb-[88px] md:px-10">
+          <div className="mx-auto max-w-[840px] rounded-[24px] border border-[#efe6d9] bg-[#fffaf4] px-8 py-10 shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+            <p className="font-display text-[2rem] font-bold leading-tight text-[#222525]">
+              “A RH Cursos traduziu exigências legais complexas em processos que a nossa equipe realmente consegue executar no
+              dia a dia.”
+            </p>
+            <div className="mt-8 flex items-center gap-4">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#dff3fb] text-sm font-semibold text-[#0c6a83]">
+                MA
               </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-              {(featuredTestimonials.length ? featuredTestimonials : promiseCards).map((item, index) => {
-                const isTestimonial = "text" in item;
-
-                return (
-                  <Card key={isTestimonial ? item.id : item.title} variant="elevated" className="border-[var(--rh-border)] bg-white" size="lg">
-                    <CardContent className="p-0">
-                      {isTestimonial ? (
-                        <>
-                          <p className="text-sm font-semibold uppercase tracking-[0.08em] text-[var(--rh-teal)]">
-                            {item.organization}
-                          </p>
-                          <P className="mt-4 italic text-[var(--rh-copy-soft)]">“{item.text}”</P>
-                          <div className="mt-5">
-                            <p className="font-semibold text-[var(--rh-ink)]">{item.name}</p>
-                            <p className="text-sm text-[var(--rh-copy-soft)]">{item.role}</p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[rgba(12,106,131,0.1)] text-[var(--rh-teal-deep)]">
-                            {index === 0 ? <ShieldCheck className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}
-                          </div>
-                          <H3 className="text-[1.3rem] text-[var(--rh-ink)]">{item.title}</H3>
-                          <P className="mt-3 text-[var(--rh-copy-soft)]">{item.description}</P>
-                        </>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              <div>
+                <p className="font-semibold text-[#222525]">Mariana Alves</p>
+                <p className="text-sm text-[#4f5057]">Coordenadora de Compras, Prefeitura Municipal</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f7f8f9] px-6 py-12 md:px-10 md:py-16">
-          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+        <section className="bg-[#0c6a83] px-6 py-16 text-center md:px-10 md:py-20">
+          <div className="mx-auto max-w-[760px]">
+            <h2 className="font-display text-[2.75rem] font-bold leading-[1.12] tracking-[-0.02em] text-white">
+              Pronto para capacitar a sua equipe?
+            </h2>
+            <p className="mx-auto mb-8 mt-4 max-w-[34ch] font-serif text-[1.25rem] font-light leading-[1.5] text-white/85">
+              Converse com um especialista e monte a trilha certa — curso aberto, in-company ou consultoria.
+            </p>
+            <Link
+              to="/falar-com-especialista"
+              className="inline-flex items-center rounded-[6px] bg-white px-6 py-4 text-base font-medium text-[#0c6a83] transition hover:bg-[#f3f4f6]"
+            >
+              Fale com um especialista →
+            </Link>
+          </div>
+        </section>
+
+        <footer className="bg-[#fafafa] px-6 py-14 md:px-10 md:pb-10">
+          <div className="grid gap-10 border-b border-[#ebebeb] pb-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-                Dúvidas frequentes
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-[26px] w-[26px] items-center justify-center rounded-[30%] bg-[#0c6a83] text-xs font-bold text-white">
+                  RH
+                </span>
+                <span className="font-display text-[20px] font-bold tracking-[-0.02em] text-[#0c6a83]">RH Cursos</span>
+              </div>
+              <p className="mt-4 max-w-[34ch] text-sm leading-[1.55] text-[#4f5057]">
+                Cursos, treinamento in-company e consultoria para organizações públicas e privadas.
               </p>
-              <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-                O essencial para decidir sem fricção.
-              </H2>
             </div>
 
-            <Accordion type="single" collapsible className="grid gap-3">
-              {faqItems.map((item) => (
-                <AccordionItem
-                  key={item.value}
-                  value={item.value}
-                  className="rounded-[20px] border border-[var(--rh-border)] bg-white px-5"
-                >
-                  <AccordionTrigger className="text-[var(--rh-ink)]">{item.question}</AccordionTrigger>
-                  <AccordionContent className="text-[var(--rh-copy-soft)]">{item.answer}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+            {footerColumns.map((column) => (
+              <div key={column.title}>
+                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.08em] text-[#4f5057]">{column.title}</p>
+                <div className="space-y-2.5">
+                  {column.items.map((item) => (
+                    <p key={item} className="text-sm text-[#222525]">
+                      {item}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        </section>
 
-        <section className="bg-[var(--rh-paper)] px-6 py-12 md:px-10 md:py-16">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--rh-teal-deep)]">
-                Próximo passo
-              </p>
-              <H2 className="mt-4 text-[2rem] text-[var(--rh-ink)] md:text-[3rem]">
-                Fale com a RH Cursos e direcione a próxima capacitação com mais precisão.
-              </H2>
-              <P className="mt-4 text-[var(--rh-copy-soft)]">
-                Se você já sabe a necessidade, vá para a agenda. Se precisa desenhar a solução com mais cuidado,
-                converse com um especialista.
-              </P>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-[var(--rh-teal-deep)] hover:bg-[#084f63]">
-                <Link to="/agenda">
-                  Ver agenda
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="secondary"
-                className="border-[var(--rh-border)] bg-white text-[var(--rh-teal-deep)] hover:bg-[var(--rh-paper-strong)]"
-              >
-                <Link to="/falar-com-especialista">Fale com um especialista</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+          <p className="pt-6 text-xs text-[#4f5057]">© 2026 RH Cursos. Todos os direitos reservados.</p>
+        </footer>
       </div>
     </div>
   );

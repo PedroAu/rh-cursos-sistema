@@ -16,7 +16,7 @@
  * bundle graph.
  */
 
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export function init(_options?: unknown): void {}
 

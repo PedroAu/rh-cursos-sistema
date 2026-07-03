@@ -1,11 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Group, Modal, SimpleGrid, Stack, Text, Textarea, ThemeIcon, UnstyledButton } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import { MessageCircle, PhoneCall } from "lucide-react";
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useDisclosure } from "@/hooks/use-disclosure";
 import { company } from "@/lib/company";
 import { trackEvent } from "@/lib/analytics";
 import { useAppStore } from "@/lib/app-store";
@@ -22,94 +31,116 @@ export function WhatsAppSupport() {
   const { createLead } = useAppStore();
   const [opened, { open, close }] = useDisclosure(false);
   const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submitLead = async () => {
+    try {
+      setIsSubmitting(true);
+      await createLead({
+        name: "Lead do atendimento",
+        email: company.email,
+        phone: company.phones.whatsapp,
+        type: "Contato",
+        courseInterest: "Atendimento geral",
+        origin: "WhatsApp",
+        message: message || "Solicitação enviada pelo atendimento rápido"
+      });
+      trackEvent("lead_enviado", { origin: "atendimento_rapido" });
+      toast.success("A equipe vai retornar pelo canal institucional.");
+      close();
+      setMessage("");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Não foi possível enviar a solicitação."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <>
-      <UnstyledButton
+    <Dialog
+      open={opened}
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
+          open();
+          return;
+        }
+
+        close();
+      }}
+    >
+      <button
         id="atendimento"
         onClick={open}
         aria-label="Abrir atendimento"
-        className="fixed bottom-5 right-5 z-40"
+        className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--m3-secondary-container)] text-[var(--ea-color-deep-navy)] shadow-[0_16px_36px_rgba(10,32,56,0.2)] transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
+        type="button"
       >
-        <ThemeIcon radius="xl" size={58} color="rhGold" c="#0a2038" style={{ boxShadow: "0 16px 36px rgba(10, 32, 56, 0.2)" }}>
-          <MessageCircle className="h-6 w-6" />
-        </ThemeIcon>
-      </UnstyledButton>
+        <MessageCircle className="h-6 w-6" aria-hidden="true" />
+      </button>
 
-      <Modal
-        opened={opened}
-        onClose={close}
-        keepMounted={false}
-        title="Atendimento rápido"
-        centered
-        size="lg"
-        styles={{ body: { paddingTop: 0 } }}
+      <DialogContent
+        className="w-[min(92vw,40rem)] rounded-lg border-border bg-card p-0"
+        onPointerDownOutside={() => {
+          if (!isSubmitting) {
+            close();
+          }
+        }}
       >
-        <Stack gap="md">
-          <Text c="dimmed">
-            Escolha um assunto inicial ou escreva sua solicitação para a equipe de atendimento.
-          </Text>
+        <div className="space-y-6 p-6">
+          <DialogHeader className="mb-0 space-y-2">
+            <DialogTitle>Atendimento rápido</DialogTitle>
+            <DialogDescription>
+              Escolha um assunto inicial ou escreva sua solicitação para a
+              equipe de atendimento.
+            </DialogDescription>
+          </DialogHeader>
 
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+          <div className="grid gap-3 sm:grid-cols-2">
             {supportOptions.map((option) => (
-              <UnstyledButton
+              <button
                 key={option}
                 onClick={() => setMessage(option)}
-                style={{
-                  border: "1px solid var(--mantine-color-gray-3)",
-                  borderRadius: "10px",
-                  padding: "14px 16px",
-                  background: "#f8fafc",
-                  fontSize: "0.92rem",
-                  fontWeight: 600,
-                  textAlign: "left"
-                }}
+                className="rounded-lg border border-border bg-muted px-4 py-3 text-left text-sm font-semibold text-foreground transition-colors hover:border-tk-accent hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
+                type="button"
               >
                 {option}
-              </UnstyledButton>
+              </button>
             ))}
-          </SimpleGrid>
+          </div>
 
           <Textarea
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             placeholder="Escreva sua mensagem para a equipe de atendimento"
-            minRows={4}
-            autosize
+            rows={4}
           />
 
-          <Group grow>
+          <DialogFooter className="flex-col gap-3 sm:grid sm:grid-cols-2 sm:justify-stretch">
             <Button
-              color="rhBlue"
-              leftSection={<PhoneCall className="h-4 w-4" />}
-              onClick={async () => {
-                try {
-                  await createLead({
-                    name: "Lead do atendimento",
-                    email: company.email,
-                    phone: company.phones.whatsapp,
-                    type: "Contato",
-                    courseInterest: "Atendimento geral",
-                    origin: "WhatsApp",
-                    message: message || "Solicitação enviada pelo atendimento rápido"
-                  });
-                  trackEvent("lead_enviado", { origin: "atendimento_rapido" });
-                  toast.success("A equipe vai retornar pelo canal institucional.");
-                  close();
-                  setMessage("");
-                } catch (error) {
-                  toast.error(error instanceof Error ? error.message : "Não foi possível enviar a solicitação.");
-                }
-              }}
+              variant="primary"
+              className="w-full"
+              onClick={submitLead}
+              loading={isSubmitting}
             >
+              <PhoneCall className="h-4 w-4" aria-hidden="true" />
               Enviar solicitação
             </Button>
-            <Button component="a" href={company.links.whatsapp} target="_blank" rel="noreferrer" variant="light" color="rhBlue">
-              Ir para WhatsApp
+            <Button asChild variant="outline" className="w-full">
+              <a
+                href={company.links.whatsapp}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Ir para WhatsApp
+              </a>
             </Button>
-          </Group>
-        </Stack>
-      </Modal>
-    </>
+          </DialogFooter>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

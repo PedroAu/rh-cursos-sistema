@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   cleanupEnrollmentArtifacts,
   createUniqueEmail,
-  resolveAvailableCheckoutCoursePath,
+  resolveAvailableCheckoutTarget,
 } from "./helpers/integration-env";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
@@ -11,16 +11,20 @@ function createUniqueCpf() {
   return Date.now().toString().slice(-11).padStart(11, "0");
 }
 
+function buildClassSelectionLabel(startDate: string, time: string) {
+  return `Selecionar turma de ${new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(startDate))} às ${time}`;
+}
+
 test.describe("epica 4 — jornadas publicas", () => {
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
-    const coursePath = await resolveAvailableCheckoutCoursePath();
+    const checkoutTarget = await resolveAvailableCheckoutTarget();
 
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      await page.goto(coursePath);
+      await page.goto(checkoutTarget.coursePath);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
       await page.getByRole("button", { name: "Avançar" }).click();
@@ -36,7 +40,7 @@ test.describe("epica 4 — jornadas publicas", () => {
 
       await page.getByRole("button", { name: "Avançar" }).click();
 
-      await page.locator("button").filter({ hasText: /vaga\(s\)/ }).first().click();
+      await page.getByRole("button", { name: buildClassSelectionLabel(checkoutTarget.startDate, checkoutTarget.time) }).click();
       await page.getByRole("button", { name: "Avançar" }).click();
 
       await expect(page.getByText("Resumo do pedido")).toBeVisible();
@@ -44,7 +48,8 @@ test.describe("epica 4 — jornadas publicas", () => {
 
       await expect(page).toHaveURL(/\/inscricao-confirmada/);
       await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
-      await expect(page.getByText("Aluno")).toBeVisible();
+      await expect(page.getByText("Aluno", { exact: true })).toBeVisible();
+      await expect(page.getByText("Maria Oliveira", { exact: true })).toBeVisible();
     } finally {
       await cleanupEnrollmentArtifacts(enrollmentEmail);
     }
@@ -89,8 +94,8 @@ test.describe("epica 4 — jornadas publicas", () => {
 
   test("sobre e artigo reforçam leitura institucional e taxonomia", async ({ page }) => {
     await page.goto("/sobre");
-    await expect(page.getByText("Leitura institucional")).toBeVisible();
-    await expect(page.getByText("1. Diagnóstico")).toBeVisible();
+    await expect(page.getByText("Nossa história")).toBeVisible();
+    await expect(page.getByText("Missão, visão e filosofia")).toBeVisible();
 
     await page.goto(blogArticlePath);
     await expect(page.getByText("Leitura guiada")).toBeVisible();

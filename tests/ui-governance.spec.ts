@@ -5,7 +5,7 @@ const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
 const a11yRoutes = [
   "/",
-  "/cursos?q=esocial",
+  "/cursos?q=lgpd",
   "/agenda?q=bras%C3%ADlia",
   "/contato",
   "/falar-com-especialista",
@@ -102,7 +102,7 @@ test.describe("epica 6 — governanca de design", () => {
   });
 
   test("painel de filtros do catálogo mantém baseline visual", async ({ page }) => {
-    await gotoStable(page, "/cursos?q=esocial");
+    await gotoStable(page, "/cursos?q=lgpd");
 
     await expect(page.getByTestId("ui-courses-filters")).toHaveScreenshot(
       "courses-filters-governance.png",
@@ -110,9 +110,7 @@ test.describe("epica 6 — governanca de design", () => {
     );
   });
 
-  test.skip("painel de filtros da agenda mantém baseline visual", async ({ page }) => {
-    // Skipped: SSR hydration issue with agenda page causing timeouts
-    // Visual baseline for agenda is verified by visual.baseline.spec.ts
+  test("painel de filtros da agenda mantém baseline visual", async ({ page }) => {
     await gotoStable(page, "/agenda");
 
     const filters = page.getByTestId("ui-agenda-filters");

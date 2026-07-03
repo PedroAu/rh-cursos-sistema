@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-07-03T05:33:27.085Z",
+  "baseUrl": "http://127.0.0.1:3100",
+  "viewport": {
+    "width": 1180,
+    "height": 2400
+  },
+  "outputDir": "/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity",
+  "targets": [
+    {
+      "id": "home",
+      "routePath": "/",
+      "routeScreenshot": "home-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20Home.dc.html",
+        "/RH%20Home%20Sections.dc.html"
+      ],
+      "canvasScreenshots": [
+        "home-canvas-1.png",
+        "home-canvas-2.png"
+      ]
+    },
+    {
+      "id": "courses",
+      "routePath": "/cursos",
+      "routeScreenshot": "courses-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20Cata%CC%81logo.dc.html"
+      ],
+      "canvasScreenshots": [
+        "courses-canvas.png"
+      ]
+    },
+    {
+      "id": "agenda",
+      "routePath": "/agenda",
+      "routeScreenshot": "agenda-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20Agenda.dc.html"
+      ],
+      "canvasScreenshots": [
+        "agenda-canvas.png"
+      ]
+    },
+    {
+      "id": "in-company",
+      "routePath": "/in-company",
+      "routeScreenshot": "in-company-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20In-company.dc.html"
+      ],
+      "canvasScreenshots": [
+        "in-company-canvas.png"
+      ]
+    },
+    {
+      "id": "about",
+      "routePath": "/sobre",
+      "routeScreenshot": "about-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20Quem%20Somos.dc.html"
+      ],
+      "canvasScreenshots": [
+        "about-canvas.png"
+      ]
+    },
+    {
+      "id": "blog",
+      "routePath": "/blog",
+      "routeScreenshot": "blog-route.png",
+      "canvasPaths": [
+        "/RH%20Cursos%20Blog.dc.html"
+      ],
+      "canvasScreenshots": [
+        "blog-canvas.png"
+      ]
+    }
+  ]
+}

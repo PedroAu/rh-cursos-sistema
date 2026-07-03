@@ -1,282 +1,329 @@
-import Image from "next/image";
-import {
-  Box,
-  Button,
-  Card,
-  Container,
-  Grid,
-  Group,
-  List,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title
-} from "@mantine/core";
+import { Check, Diamond, Gem, Scale, Section, SquareDashedMousePointer } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/lib/router-compat";
 
-const leadership = [
+const institutionalStats = [
+  { label: "Ano de fundação", value: "2007" },
+  { label: "Cursos no portfólio", value: "~80" },
+  { label: "Trilhas de conhecimento", value: "6" },
+  { label: "Alcance de atuação", value: "Nacional" }
+];
+
+const values = [
+  "Ética e transparência em todas as relações.",
+  "Responsabilidade, comprometimento e honestidade em cada treinamento.",
+  "Busca constante por resultados, multiplicação da tecnologia e expansão do conhecimento.",
+  "Estímulo à iniciativa, motivação, criatividade e comunicação."
+];
+
+const solutions = [
   {
-    name: "Dr. Ricardo Henrique",
-    role: "Diretor Executivo",
-    image: "/images/courses/auditoria-tributaria.jpg"
+    description:
+      "Presenciais e online, com temas atualizados para as áreas pública e privada, focados em qualificação técnica e atualização profissional.",
+    icon: Section,
+    tint: "linear-gradient(135deg,#235875,#2f7599)",
+    title: "Cursos abertos"
   },
   {
-    name: "Dra. Ana Silveira",
-    role: "Diretora Acadêmica",
-    image: "/images/courses/pessoas-lideranca.jpg"
+    description:
+      "Programas personalizados conforme as necessidades de cada instituição, com adequação de horário, agenda e conteúdo e redução de custos para o cliente.",
+    icon: Diamond,
+    tint: "linear-gradient(135deg,#4285f4,#6aa2ff)",
+    title: "Treinamentos in company"
   },
   {
-    name: "Marcus Oliveira",
-    role: "Head de Inovação",
-    image: "/images/courses/tecnologia-inovacao.jpg"
-  },
-  {
-    name: "Carla Mendes",
-    role: "Relacionamento Institucional",
-    image: "/images/courses/comunicacao-atendimento.jpg"
+    description:
+      "Apoio especializado a órgãos públicos e empresas na estruturação de processos, conformidade legal e desenvolvimento de pessoas.",
+    icon: Gem,
+    tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)",
+    title: "Consultoria empresarial"
   }
 ];
 
-const timeline = [
+const tracks = [
   {
-    year: "2007",
-    title: "Fundação",
-    description: "Iniciamos nossas atividades com o propósito de suprir a carência de treinamentos específicos para RH no setor público em Brasília."
+    audience: "Servidores do DP, RH, gestores de contratos e contadores da Administração Pública.",
+    count: "14 cursos",
+    description: "Da legislação trabalhista à conformidade digital com eSocial, FGTS Digital e LGPD.",
+    icon: Section,
+    tint: "linear-gradient(135deg,#235875,#2f7599)",
+    title: "Departamento Pessoal, Folha & eSocial"
   },
   {
-    year: "2012",
-    title: "Expansão Nacional",
-    description: "Consolidação como referência no Centro-Oeste e início dos primeiros treinamentos In Company em outros estados brasileiros."
+    audience: "Pregoeiros, gestores e fiscais de contratos, equipes de licitação e procurement público.",
+    count: "12 cursos",
+    description: "Da legislação básica à fiscalização avançada, com cobertura completa da Lei nº 14.133/2021.",
+    icon: Scale,
+    tint: "linear-gradient(135deg,#2f7599,#068466)",
+    title: "Licitações, Compras & Contratos"
   },
   {
-    year: "2018",
-    title: "Transformação Digital",
-    description: "Lançamento da plataforma de EAD própria, democratizando o acesso a cursos de alta qualidade para municípios remotos."
+    audience: "Gestores, líderes de equipe, servidores e profissionais de RH dos setores público e privado.",
+    count: "14 cursos",
+    description: "Formação humanizada para líderes e equipes: inteligência emocional, cultura e gestão por resultados.",
+    icon: Gem,
+    tint: "linear-gradient(135deg,#235875,#3a7d5f)",
+    title: "Gestão de Pessoas & Liderança"
   },
   {
-    year: "HOJE",
-    title: "Liderança em Capacitação",
-    description: "Com milhares de alunos e parcerias com órgãos públicos, seguimos inovando com metodologias 100% práticas."
+    audience: "Servidores, ouvidores, assessores de comunicação, profissionais jurídicos e atendentes.",
+    count: "10 cursos",
+    description: "Do atendimento ao cidadão à redação oficial, oratória, mídias digitais e conformidade com LAI/LGPD.",
+    icon: SquareDashedMousePointer,
+    tint: "linear-gradient(135deg,#c98a3a,#e0a94f)",
+    title: "Comunicação, Redação & Atendimento"
+  },
+  {
+    audience: "Contadores, auditores, controllers, analistas financeiros e servidores das áreas de controle.",
+    count: "19 cursos",
+    description: "Domínio técnico em contabilidade pública, obrigações acessórias, Tesouro Gerencial, SIAFI e auditoria.",
+    icon: Diamond,
+    tint: "linear-gradient(135deg,#4285f4,#235875)",
+    title: "Auditoria, Contabilidade & Tributos"
+  },
+  {
+    audience: "Servidores, analistas de TI, gestores de processos e inovação, e todos que usam tecnologia no trabalho.",
+    count: "11 cursos",
+    description: "Ferramentas digitais, análise de dados, modelagem de processos, IA e governança.",
+    icon: Gem,
+    tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)",
+    title: "Tecnologia, Dados & Inovação"
   }
 ];
 
-const methodSteps = [
-  {
-    title: "1. Diagnóstico",
-    description: "Entendemos contexto, papel profissional e objetivo da turma antes de sugerir a trilha."
-  },
-  {
-    title: "2. Curadoria",
-    description: "Conectamos cursos, agenda, formato e instrutores com aderência operacional."
-  },
-  {
-    title: "3. Aplicação",
-    description: "Priorizamos conteúdos que saem do campo conceitual e entram na rotina de execução."
-  }
-];
+function SectionEyebrow({ children }: { children: string }) {
+  return (
+    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#3b97b5]">
+      {children}
+    </p>
+  );
+}
 
 export function AboutPage() {
   return (
-    <Box bg="#f6f7fb">
-      <Box component="section" style={{ borderBottom: "1px solid #d7dee5", background: "#0b4668" }}>
-        <Container size={1200} px="md" py={{ base: 56, md: 72 }}>
-          <Stack gap="md" maw={640}>
-            <Text fz="sm" fw={700} c="rhGold.5" tt="uppercase">
-              Desde 2007
-            </Text>
-            <Title order={1} c="white">
-              Formando quem transforma o setor público.
-            </Title>
-            <Text fz="lg" c="rgba(255,255,255,0.8)">
-              Somos parceiros estratégicos na capacitação de gestores e profissionais de Recursos Humanos, entregando conhecimento prático e soluções inovadoras para a administração moderna.
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+    <div className="bg-white text-[#222525]">
+      <section className="border-b border-[#e7ecef] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
+          <span className="inline-flex rounded-full bg-[#dff2f7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#287f98]">
+            Documento institucional · Desde 2007
+          </span>
+          <h1 className="mt-5 max-w-[10ch] font-display text-[2.75rem] font-bold leading-[1.03] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+            Transformando vidas por meio do <em className="italic">conhecimento</em>
+          </h1>
+          <p className="mt-4 max-w-[62ch] font-serif text-[1.14rem] font-light leading-[1.45] text-[#59646d]">
+            A RH Cursos &amp; Soluções é uma empresa brasileira de educação corporativa, consultoria e treinamento
+            empresarial, sediada em Brasília – DF, especializada na capacitação de servidores públicos e profissionais
+            do setor privado.
+          </p>
+        </div>
+      </section>
 
-      <Container size={1200} px="md" py="xl">
-        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="md">
-          <Card radius="lg" shadow="sm" withBorder padding="xl">
-            <ThemeIcon size={40} radius="md" variant="light" color="rhBlue">
-              ◎
-            </ThemeIcon>
-            <Title order={3} mt="md" c="rhBlue.9">
-              Missão
-            </Title>
-            <Text mt="md" c="#56606a">
-              Capacitar profissionais através de treinamentos de alta performance, unindo teoria robusta e prática aplicável.
-            </Text>
-          </Card>
-
-          <Card radius="lg" padding="xl" style={{ background: "#0b4668" }} c="white">
-            <ThemeIcon size={40} radius="md" color="rhGold" c="#715300">
-              ◉
-            </ThemeIcon>
-            <Title order={3} mt="md" c="white">
-              Visão
-            </Title>
-            <Text mt="md" c="rgba(255,255,255,0.8)">
-              Ser a principal referência nacional em educação corporativa para o setor público, reconhecida pela excelência técnica e pelo impacto transformador.
-            </Text>
-            <Group gap="sm" mt={64} c="rgba(255,255,255,0.8)">
-              <Box w={96} h={2} bg="rhGold" />
-              <Text fz="xs" fw={700} tt="uppercase">
-                Progresso
-              </Text>
-            </Group>
-          </Card>
-
-          <Stack gap="md">
-            <Card radius="lg" shadow="sm" withBorder padding="xl">
-              <ThemeIcon size={40} radius="md" variant="light" color="rhBlue">
-                ◌
-              </ThemeIcon>
-              <Title order={3} mt="md" c="rhBlue.9">
-                Valores
-              </Title>
-              <List mt="md" spacing="sm" c="#56606a" listStyleType="none">
-                <List.Item>• Excelência Técnica</List.Item>
-                <List.Item>• Ética e Transparência</List.Item>
-                <List.Item>• Foco em Resultados</List.Item>
-                <List.Item>• Inovação Contínua</List.Item>
-              </List>
-            </Card>
-            <Card radius="lg" padding="xl" style={{ background: "#1d6c98" }} c="white">
-              <Text fz="3rem" fw={800} lh={1}>
-                15k+
-              </Text>
-              <Text mt="xs" fz="sm" fw={700} tt="uppercase" c="rgba(255,255,255,0.8)">
-                Alunos formados
-              </Text>
-            </Card>
-          </Stack>
-        </SimpleGrid>
-      </Container>
-
-      <Box component="section" bg="white" style={{ borderTop: "1px solid #d7dee5", borderBottom: "1px solid #d7dee5" }}>
-        <Container size={1200} px="md" py={{ base: 48, md: 56 }}>
-          <Grid gap={48}>
-            <Grid.Col span={{ base: 12, lg: 4 }}>
-              <Text fz="sm" fw={700} c="rhGold.8" tt="uppercase">
-                Leitura institucional
-              </Text>
-              <Title order={2} c="rhBlue.9" mt="xs">
-                Nossa Trajetória
-              </Title>
-              <Text mt="md" c="#56606a">
-                Desde a nossa fundação em 2007, evoluímos junto com as necessidades da administração pública brasileira.
-              </Text>
-              <Box mt="xl" style={{ overflow: "hidden", borderRadius: "var(--mantine-radius-lg)", border: "1px solid #d7dee5" }}>
-                <Image
-                  src="/images/home-hero-reference.jpg"
-                  alt="Trajetória RH Cursos"
-                  width={480}
-                  height={320}
-                  style={{ height: 220, width: "100%", objectFit: "cover" }}
-                />
-              </Box>
-            </Grid.Col>
-
-            <Grid.Col span={{ base: 12, lg: 8 }}>
-              <Stack gap="xl">
-                {timeline.map((item) => (
-                  <Group key={item.title} align="flex-start" gap="lg" wrap="nowrap">
-                    <Box mt={8} w={16} h={16} bg="rhBlue.9" style={{ borderRadius: 999, flexShrink: 0 }} />
-                    <Box style={{ flex: 1 }}>
-                      <Title order={3} c="rhBlue.9">
-                        {item.title}
-                      </Title>
-                      <Text mt={8} c="#56606a">
-                        {item.description}
-                      </Text>
-                    </Box>
-                    <Text fz="3rem" fw={800} lh={1} c="#7f93a6" ta="right">
-                      {item.year}
-                    </Text>
-                  </Group>
-                ))}
-              </Stack>
-            </Grid.Col>
-          </Grid>
-        </Container>
-      </Box>
-
-      <Container size={1200} px="md" py="xl">
-        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="md">
-          {methodSteps.map((item) => (
-            <Card key={item.title} radius="lg" shadow="sm" withBorder padding="lg" bg="#f8fafc">
-              <Text fz="xs" fw={700} c="rhGold.8" tt="uppercase">
-                {item.title}
-              </Text>
-              <Text mt="md" c="#56606a">
-                {item.description}
-              </Text>
-            </Card>
+      <section className="border-b border-[#e7ecef] bg-white">
+        <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))] md:grid-cols-2 xl:grid-cols-4">
+          {institutionalStats.map((item, index) => (
+            <div
+              key={item.label}
+              className={["px-5 py-8", index < institutionalStats.length - 1 ? "xl:border-r xl:border-[#edf1f4]" : ""].join(" ")}
+            >
+              <p className="font-display text-[2rem] font-bold tracking-[-0.02em] text-[#0c6a83]">{item.value}</p>
+              <p className="mt-1 text-sm text-[#69747e]">{item.label}</p>
+            </div>
           ))}
-        </SimpleGrid>
-      </Container>
+        </div>
+      </section>
 
-      <Container size={1200} px="md" py={{ base: 48, md: 56 }}>
-        <Stack gap="md" align="center" ta="center" maw={680} mx="auto">
-          <Title order={2} c="rhBlue.9">
-            Nossa Liderança
-          </Title>
-          <Text c="#56606a">
-            Especialistas comprometidos com a excelência acadêmica e a transformação institucional.
-          </Text>
-        </Stack>
+      <section className="py-16">
+        <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-12 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <SectionEyebrow>Nossa história</SectionEyebrow>
+            <h2 className="mt-2 max-w-[12ch] font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+              Nascida do sonho de compartilhar conhecimento
+            </h2>
+          </div>
+          <div className="space-y-5 text-[15px] leading-8 text-[#59646d]">
+            <p>
+              Fundada em 2007, a RH Cursos &amp; Soluções nasceu da união do casal <strong className="text-[#2d3135]">Ester e Nilson</strong>,
+              que combinaram suas experiências em advocacia, consultoria e ensino para construir uma instituição voltada a transformar vidas por meio do conhecimento.
+            </p>
+            <p>
+              Originalmente constituída no Distrito Federal e sediada em Taguatinga, a empresa estruturou-se para oferecer cursos abertos e treinamentos in company em todo o território nacional, consolidando um histórico robusto em temas técnicos de alta relevância para o setor público, como GFIP/SEFIP, SIAFI/CPR, escrituração fiscal digital, cálculos trabalhistas, fiscalização de contratos e legislação previdenciária.
+            </p>
+            <p>
+              Hoje, a empresa organiza seu portfólio em trilhas de conhecimento, com progressão lógica do nível básico ao avançado dentro de cada área de especialização.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="lg" mt="xl">
-          {leadership.map((person) => (
-            <Card key={person.name} radius="lg" shadow="sm" padding={0}>
-              <Image
-                src={person.image}
-                alt={person.name}
-                width={320}
-                height={420}
-                style={{ height: 292, width: "100%", objectFit: "cover" }}
-              />
-              <Box p="md">
-                <Title order={3} fz="1.1rem" c="#1a1c1e">
-                  {person.name}
-                </Title>
-                <Text mt={4} fz="sm" c="rhBlue.9">
-                  {person.role}
-                </Text>
-              </Box>
-            </Card>
-          ))}
-        </SimpleGrid>
-      </Container>
+      <section className="border-y border-[#ded8c9] bg-[#f4f1e9] py-16">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          <SectionEyebrow>Propósito</SectionEyebrow>
+          <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+            Missão, visão e filosofia
+          </h2>
 
-      <Box component="section" pb="xl">
-        <Container size={1200} px="md">
-          <Card radius="lg" padding={48} style={{ background: "#0b4668" }} ta="center">
-            <Title order={2} c="white">
-              Pronto para transformar sua gestão?
-            </Title>
-            <Text mx="auto" mt="md" maw={680} fz="lg" c="rgba(255,255,255,0.8)">
-              Conheça nossos cursos ou solicite uma proposta personalizada para sua instituição.
-            </Text>
-            <Group justify="center" gap="md" mt="xl">
-              <Button component={Link} to="/cursos" color="rhGold" c="#083b56" fw={700}>
-                Ver Catálogo de Cursos
-              </Button>
-              <Button
-                component={Link}
-                to="/falar-com-especialista"
-                variant="outline"
-                color="gray.0"
-                styles={{ root: { borderColor: "rgba(255,255,255,0.7)" }, label: { color: "#ffffff" } }}
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              {
+                body: "Subsidiar, por meio do conhecimento, a formação do indivíduo para desempenhar suas funções no mercado de trabalho, de forma que as instituições potencializem seus negócios e maximizem seus resultados.",
+                title: "Missão"
+              },
+              {
+                body: "Buscar a excelência para ser a melhor empresa de cursos e treinamentos no circuito nacional.",
+                title: "Visão"
+              },
+              {
+                body: "Ética, transparência e metodologias participativas, aulas expositivas, dinâmicas de grupo e trabalho em equipe, com aplicação de conhecimento técnico-científico.",
+                title: "Filosofia"
+              }
+            ].map((item) => (
+              <Card
+                key={item.title}
+                className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
               >
-                Falar com Consultor
-              </Button>
-            </Group>
-          </Card>
-        </Container>
-      </Box>
-    </Box>
+                <CardContent className="p-8">
+                  <h3 className="font-display text-[1.5rem] font-bold tracking-[-0.02em] text-[#0c6a83]">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-[#59646d]">{item.body}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <SectionEyebrow>Valores que nos orientam</SectionEyebrow>
+            <div className="mt-4 grid gap-x-10 gap-y-4 md:grid-cols-2">
+              {values.map((item) => (
+                <div key={item} className="flex gap-3 text-sm leading-6 text-[#59646d]">
+                  <div className="mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#dff2f7] text-[#2a7a93]">
+                    <Check className="h-3.5 w-3.5" />
+                  </div>
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          <SectionEyebrow>O que fazemos</SectionEyebrow>
+          <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+            Soluções educacionais integradas
+          </h2>
+          <p className="mt-3 max-w-[60ch] text-[15px] leading-8 text-[#59646d]">
+            Um conjunto de soluções educacionais e de consultoria adaptadas à realidade de cada cliente.
+          </p>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {solutions.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <Card
+                  key={item.title}
+                  className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                >
+                  <CardContent className="p-8">
+                    <div
+                      className="flex h-11 w-11 items-center justify-center rounded-[12px] text-white"
+                      style={{ background: item.tint }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="mt-4 font-display text-[1.5rem] font-bold tracking-[-0.02em] text-[#2d3135]">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-[#59646d]">{item.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-[#e7ecef] bg-[#fafbfc] py-16">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <SectionEyebrow>Áreas de conhecimento</SectionEyebrow>
+              <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+                6 trilhas, aproximadamente 80 cursos
+              </h2>
+            </div>
+            <p className="max-w-[38ch] text-sm leading-7 text-[#59646d]">
+              Cada trilha oferece progressão lógica do básico ao avançado, agrupando cursos correlacionados por especialização.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 xl:grid-cols-2">
+            {tracks.map((track) => {
+              const Icon = track.icon;
+
+              return (
+                <Card
+                  key={track.title}
+                  className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                >
+                  <CardContent className="flex gap-5 p-7">
+                    <div
+                      className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-[14px] text-white"
+                      style={{ background: track.tint }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-baseline gap-2">
+                        <h3 className="font-display text-base font-bold tracking-[-0.01em] text-[#2d3135]">{track.title}</h3>
+                        <span className="text-[11px] font-semibold text-[#0c6a83]">{track.count}</span>
+                      </div>
+                      <p className="mt-2 text-sm leading-7 text-[#59646d]">{track.description}</p>
+                      <p className="mt-2 text-xs leading-6 text-[#69747e]">
+                        <strong className="text-[#2d3135]">Público:</strong> {track.audience}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-12 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <SectionEyebrow>Metodologia</SectionEyebrow>
+            <h2 className="mt-2 max-w-[10ch] font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+              Aprender fazendo, aplicar no mesmo dia
+            </h2>
+          </div>
+          <div className="space-y-5 text-[15px] leading-8 text-[#59646d]">
+            <p>
+              Adotamos uma abordagem participativa e prática, valorizando a aplicação imediata do conhecimento. As capacitações combinam aulas expositivas, dinâmicas de grupo, trabalho em equipe e exercícios práticos, muitas vezes com uso de computador para temas que envolvem sistemas e ferramentas digitais como SIAFI, Tesouro Gerencial, eSocial, Excel e Power BI.
+            </p>
+            <p>
+              Os cursos são oferecidos nas modalidades presencial e online, com turmas em diferentes horários. Cada curso é estruturado por nível, básico, intermediário ou avançado, para que o participante avance de forma consistente dentro de sua trilha de interesse.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#0c6a83] py-16 text-center text-white">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          <p className="text-sm text-white/78">Pronto para capacitar sua equipe?</p>
+          <h2 className="mt-3 font-display text-[2.2rem] font-bold tracking-[-0.03em]">Fale com um especialista</h2>
+          <p className="mx-auto mt-4 max-w-[52ch] font-serif text-[1.14rem] font-light leading-[1.5] text-white/82">
+            Fale com um especialista sobre cursos abertos, treinamentos in company e consultoria para o setor público e privado.
+          </p>
+          <div className="mt-8">
+            <Button asChild variant="secondary" size="lg" className="bg-white text-[#0c6a83] hover:bg-white/90">
+              <Link to="/falar-com-especialista">Fale com um especialista →</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 }

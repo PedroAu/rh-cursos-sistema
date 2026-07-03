@@ -1,11 +1,10 @@
 "use client";
 
-import { Paper, SimpleGrid, Text, UnstyledButton } from "@mantine/core";
-
 import type { DashboardRole } from "@/lib/auth";
 import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { Link, useLocation } from "@/lib/router-compat";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
+import { cn } from "@/lib/utils";
 
 export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
   const location = useLocation();
@@ -13,25 +12,12 @@ export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
   const homePath = getDefaultDashboardPath(role);
 
   return (
-    <Paper
-      component="nav"
+    <nav
       aria-label="Navegação administrativa"
-      hiddenFrom="lg"
-      radius={0}
-      px="xs"
-      pt="xs"
-      pb="calc(env(safe-area-inset-bottom,0px) + 0.4rem)"
-      shadow="lg"
-      style={{
-        position: "fixed",
-        insetInline: 0,
-        bottom: 0,
-        zIndex: 120,
-        borderTop: "1px solid #d5dae2",
-        background: "rgba(255,255,255,0.98)"
-      }}
+      className="fixed inset-x-0 bottom-0 z-[120] border-t border-[#d5dae2] bg-white/98 px-2 pt-2 shadow-lg lg:hidden"
+      style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.4rem)" }}
     >
-      <SimpleGrid cols={5} spacing={6}>
+      <div className="grid grid-cols-5 gap-1.5">
         {mobileNavItems.map((item) => {
           const Icon = item.icon;
           const isActive =
@@ -40,30 +26,21 @@ export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
               : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
 
           return (
-            <UnstyledButton
+            <Link
               key={item.to}
-              component={Link}
               to={item.to}
-              style={{
-                minHeight: 68,
-                borderRadius: 16,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 6,
-                backgroundColor: isActive ? "#0e4666" : "transparent",
-                color: isActive ? "#ffffff" : "#5f6876"
-              }}
+              aria-current={isActive ? "page" : undefined}
+              className={cn(
+                "flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-2xl",
+                isActive ? "bg-[#0e4666] text-white" : "text-[#5f6876]"
+              )}
             >
               <Icon size={17} />
-              <Text size="0.68rem" fw={700}>
-                {item.mobileLabel}
-              </Text>
-            </UnstyledButton>
+              <span className="text-[0.68rem] font-bold">{item.mobileLabel}</span>
+            </Link>
           );
         })}
-      </SimpleGrid>
-    </Paper>
+      </div>
+    </nav>
   );
 }

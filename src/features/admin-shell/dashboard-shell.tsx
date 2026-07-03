@@ -1,7 +1,5 @@
 "use client";
 
-import { AppShell } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
 import type { ReactNode } from "react";
 
 import type { DashboardRole } from "@/lib/auth";
@@ -9,6 +7,7 @@ import { AppToaster } from "@/components/ui/toaster";
 import { AdminBottomNavigation } from "@/features/admin-shell/components/admin-bottom-navigation";
 import { AdminSidebar } from "@/features/admin-shell/components/admin-sidebar";
 import { AdminTopbar } from "@/features/admin-shell/components/admin-topbar";
+import { useDisclosure } from "@/hooks/use-disclosure";
 import { Outlet } from "@/lib/router-compat";
 
 export function DashboardShell({ role, children }: { role: DashboardRole; children?: ReactNode }) {
@@ -16,30 +15,14 @@ export function DashboardShell({ role, children }: { role: DashboardRole; childr
 
   return (
     <>
-      <AppShell
-        header={{ height: 72 }}
-        navbar={{
-          width: 248,
-          breakpoint: "lg",
-          collapsed: { mobile: !mobileOpened }
-        }}
-        padding={0}
-        styles={{
-          main: {
-            background: "#f4f6f9",
-            color: "#111827"
-          }
-        }}
-      >
-        <AdminTopbar opened={mobileOpened} onToggle={toggleMobile} role={role} />
+      <div className="min-h-screen bg-tk-surface-2 text-tk-ink">
         <AdminSidebar role={role} />
+        <AdminTopbar opened={mobileOpened} onToggle={toggleMobile} role={role} />
 
-        <AppShell.Main pb={{ base: 88, lg: 0 }}>
-          <div style={{ padding: "1.5rem 1rem" }}>
-            <div style={{ paddingInline: "clamp(0rem, 1vw, 0.5rem)" }}>{children ?? <Outlet />}</div>
-          </div>
-        </AppShell.Main>
-      </AppShell>
+        <main className="pb-[88px] pt-[72px] lg:pb-0 lg:pl-[248px]">
+          <div className="px-4 py-6 lg:px-8">{children ?? <Outlet />}</div>
+        </main>
+      </div>
 
       <AdminBottomNavigation role={role} />
       <AppToaster />

@@ -1,30 +1,112 @@
-import { Mail } from "lucide-react";
-import { useMemo, useRef, useState, useEffect } from "react";
-import { toast } from "sonner";
-import { useSearchParams } from "@/lib/router-compat";
+"use client";
 
-import { BlogCard } from "@/components/blog/blog-card";
-import { EmptyState } from "@/components/common/empty-state";
-import { LoadingBlocks } from "@/components/common/loading-blocks";
-import { SearchInput } from "@/components/common/search-input";
-import { SectionTitle } from "@/components/common/section-title";
+import { Search } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { useAppStore } from "@/lib/app-store";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
+import { useAppStore } from "@/lib/app-store";
+import { Link, useSearchParams } from "@/lib/router-compat";
+import type { BlogPost } from "@/types";
+import { cn, formatDate } from "@/lib/utils";
 
-const categories = ["Todos", "Departamento Pessoal", "eSocial", "Gestão Pública", "Liderança", "Tecnologia", "Assédio e Compliance"] as const;
+const canvasCategories = ["Todos", "Licitações", "LGPD", "Compliance", "Gestão Pública"] as const;
+
+const curatedFeaturedSlug = "nova-lei-licitacoes-7-erros-pregoes-2026";
+
+const curatedGridSlugs = [
+  "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
+  "ripd-quando-deixa-de-ser-opcional",
+  "canal-denuncias-que-as-pessoas-realmente-usam",
+  "planejamento-orcamentario-do-ppa-a-execucao-sem-surpresas",
+  "fiscalizacao-de-contratos-o-que-registrar",
+  "encarregado-de-dados-no-setor-publico-funcao-na-pratica",
+  "due-diligence-de-fornecedores-sem-burocratizar-a-compra",
+  "gestao-de-riscos-transformando-matriz-em-decisao",
+  "pregao-eletronico-pontos-de-atencao-no-julgamento"
+] as const;
+
+const trendingEditorial = [
+  {
+    category: "Licitações",
+    read: "5 min de leitura",
+    slug: "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
+    title: "Lei 14.133: o que muda no rito de contratação direta"
+  },
+  {
+    category: "LGPD",
+    read: "7 min de leitura",
+    slug: "ripd-quando-deixa-de-ser-opcional",
+    title: "Compartilhamento de dados entre órgãos: o que a lei permite"
+  },
+  {
+    category: "Compliance",
+    read: "4 min de leitura",
+    slug: "canal-denuncias-que-as-pessoas-realmente-usam",
+    title: "Conflito de interesses: como declarar e como fiscalizar"
+  },
+  {
+    category: "Gestão Pública",
+    read: "6 min de leitura",
+    slug: "gestao-de-riscos-transformando-matriz-em-decisao",
+    title: "Indicadores que a alta gestão realmente acompanha"
+  }
+] as const;
+
+const categoryPresentation: Record<string, { glyph: string; tint: string }> = {
+  Compliance: { glyph: "✓", tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)" },
+  "Departamento Pessoal": { glyph: "•", tint: "linear-gradient(135deg,#5b6a74,#8a97a3)" },
+  eSocial: { glyph: "•", tint: "linear-gradient(135deg,#5b6a74,#8a97a3)" },
+  "Gestão Pública": { glyph: "◇", tint: "linear-gradient(135deg,#2f7599,#3a897c)" },
+  LGPD: { glyph: "◆", tint: "linear-gradient(135deg,#4285f4,#6aa2ff)" },
+  Liderança: { glyph: "✦", tint: "linear-gradient(135deg,#c98a3a,#e0a94f)" },
+  Licitações: { glyph: "§", tint: "linear-gradient(135deg,#235875,#2f7599)" },
+  Tecnologia: { glyph: "◈", tint: "linear-gradient(135deg,#4c7dd8,#5f90ea)" }
+};
+
+function normalizeBlogCategory(category: BlogPost["category"]) {
+  const aliases: Partial<Record<BlogPost["category"], (typeof canvasCategories)[number]>> = {
+    "Departamento Pessoal": "Todos",
+    eSocial: "Todos",
+    Liderança: "Todos",
+    Tecnologia: "Todos",
+    "Assédio e Compliance": "Compliance",
+    Compliance: "Compliance",
+    "Gestão Pública": "Gestão Pública",
+    LGPD: "LGPD",
+    Licitações: "Licitações"
+  };
+
+  return aliases[category] ?? "Todos";
+}
+
+function getPresentation(post: BlogPost) {
+  return categoryPresentation[post.category] ?? {
+    glyph: "•",
+    tint: "linear-gradient(135deg,#235875,#2f7599)"
+  };
+}
+
+function SectionEyebrow({ children }: { children: string }) {
+  return (
+    <span className="inline-flex rounded-full bg-[#dff2f7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f6d85]">
+      {children}
+    </span>
+  );
+}
 
 export function BlogPage() {
   const { blogPosts, createLead } = useAppStore();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [category, setCategory] = useState<(typeof categories)[number]>(
-    (searchParams.get("category") as (typeof categories)[number]) || "Todos"
+  const [category, setCategory] = useState<(typeof canvasCategories)[number]>(
+    (searchParams.get("category") as (typeof canvasCategories)[number]) || "Todos"
   );
+  const [newsletterName, setNewsletterName] = useState("");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
@@ -34,7 +116,7 @@ export function BlogPage() {
     if (query) params.q = query;
     if (category !== "Todos") params.category = category;
     setSearchParams(params);
-  }, [query, category, setSearchParams]);
+  }, [category, query, setSearchParams]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -44,30 +126,45 @@ export function BlogPage() {
     }
   );
 
-  const posts = useMemo(
+  const publishedPosts = useMemo(
     () =>
-      blogPosts.filter(
-        (post) =>
-          post.status !== "Arquivado" &&
-          (!query || [post.title, post.summary, post.category].join(" ").toLowerCase().includes(query.toLowerCase())) &&
-          (category === "Todos" || post.category === category)
-      ),
-    [blogPosts, category, query]
+      [...blogPosts]
+        .filter((post) => post.status === "Publicado")
+        .sort((left, right) => right.date.localeCompare(left.date)),
+    [blogPosts]
   );
 
-  const featuredPost = posts[0];
-  const visiblePosts = featuredPost ? posts.slice(1) : posts;
+  const filteredPosts = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return publishedPosts.filter((post) => {
+      const displayCategory = normalizeBlogCategory(post.category);
+      const matchesCategory = category === "Todos" || displayCategory === category;
+      const haystack = [post.title, post.summary, post.author, post.category, ...post.tags].join(" ").toLowerCase();
+      const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
+
+      return matchesCategory && matchesQuery;
+    });
+  }, [category, publishedPosts, query]);
+
+  const isEditorialDefault = !query.trim() && category === "Todos";
+  const featuredPost = isEditorialDefault
+    ? publishedPosts.find((post) => post.slug === curatedFeaturedSlug) ?? filteredPosts[0]
+    : filteredPosts[0];
+  const gridPosts = isEditorialDefault
+    ? curatedGridSlugs
+        .map((slug) => publishedPosts.find((post) => post.slug === slug))
+        .filter((post): post is BlogPost => Boolean(post))
+    : filteredPosts.filter((post) => post.slug !== featuredPost?.slug).slice(0, 9);
   const loading = useSimulatedLoading([query, category]);
-  const categorySummary = categories
-    .filter((item) => item !== "Todos")
-    .map((item) => ({
-      label: item,
-      count: blogPosts.filter((post) => post.status !== "Arquivado" && post.category === item).length,
-    }))
-    .filter((item) => item.count > 0)
-    .slice(0, 3);
+  const visibleCount = isEditorialDefault ? 9 : filteredPosts.length;
 
   const submitNewsletter = async () => {
+    if (!newsletterName.trim()) {
+      toast.error("Informe seu nome para continuar.");
+      return;
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newsletterEmail)) {
       toast.error("Informe um e-mail válido para continuar.");
       return;
@@ -76,15 +173,17 @@ export function BlogPage() {
     try {
       setIsSubmittingNewsletter(true);
       await createLead({
-        name: newsletterEmail.split("@")[0],
-        email: newsletterEmail,
+        name: newsletterName.trim(),
+        email: newsletterEmail.trim(),
         phone: "",
         type: "Newsletter",
         courseInterest: "Newsletter",
         origin: "Blog",
         message: "Cadastro de newsletter pelo blog."
       });
+      setNewsletterName("");
       setNewsletterEmail("");
+      toast.success("Cadastro concluído para a newsletter.");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Não foi possível concluir o cadastro.");
     } finally {
@@ -93,38 +192,130 @@ export function BlogPage() {
   };
 
   return (
-    <section className="page-section">
-      <div className="container space-y-8">
-        <SectionTitle
-          eyebrow="Conteúdo e SEO"
-          title="Conteúdo institucional para apoiar decisão e atualização profissional."
-          description="Artigos por categoria com temas de departamento pessoal, gestão pública, liderança e compliance."
-        />
+    <div className="bg-white text-[#222525]">
+      <section className="border-b border-[#e7ecef] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
+          <SectionEyebrow>Conteúdo · Análises · Prática</SectionEyebrow>
+          <h1 className="mt-5 max-w-[12ch] font-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+            A norma explicada de um jeito que você <em className="italic">usa</em>
+          </h1>
+          <p className="mt-4 max-w-[60ch] font-serif text-[1.16rem] font-light leading-[1.45] text-[#59646d]">
+            Análises práticas de licitações, LGPD, compliance e gestão pública: escritas por quem aplica essas normas
+            no dia a dia de organizações públicas e privadas.
+          </p>
+        </div>
+      </section>
 
-        <div className="surface-card grid gap-4 p-6 xl:grid-cols-[1.5fr_1fr]">
-          <SearchInput
-            ref={searchRef}
-            placeholder="Busque por tema, categoria ou assunto"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            onClear={() => setQuery("")}
-            clearLabel="Limpar busca do blog"
-            resultsLabel={
-              query
-                ? `${posts.length} artigo${posts.length === 1 ? "" : "s"} encontrado${posts.length === 1 ? "" : "s"} para “${query}”.`
-                : "Busque por tema, categoria ou assunto para refinar a leitura."
-            }
-            loading={loading}
-          />
-          <div className="flex flex-wrap gap-2">
-            {categories.map((item) => (
+      <section className="py-14">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          {featuredPost ? (
+            <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
+              <Card className="overflow-hidden rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+                <div
+                  className="relative flex h-[300px] items-start overflow-hidden px-8 py-7 text-white"
+                  style={{ background: getPresentation(featuredPost).tint }}
+                >
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
+                    Em destaque · {featuredPost.category}
+                  </span>
+                  <span className="absolute bottom-3 right-4 font-display text-[96px] font-bold leading-none text-white/25">
+                    14.133
+                  </span>
+                </div>
+                <CardContent className="flex h-[calc(100%-300px)] flex-col gap-4 p-8">
+                  <p className="text-sm text-[#69747e]">
+                    {featuredPost.author} · {formatDate(featuredPost.date)} · {featuredPost.readingTime} de leitura
+                  </p>
+                  <h2 className="max-w-[18ch] font-display text-[2rem] font-bold leading-[1.12] tracking-[-0.025em] text-[#2d3135]">
+                    {featuredPost.title}
+                  </h2>
+                  <p className="max-w-[44ch] font-serif text-[1.08rem] font-light leading-[1.5] text-[#59646d]">
+                    {featuredPost.summary}
+                  </p>
+                  <Link to={`/blog/${featuredPost.slug}`} className="mt-auto font-semibold text-[#0c6a83]">
+                    Ler artigo completo →
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+                <CardContent className="p-7">
+                  <div className="flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-[#d64545]" aria-hidden />
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f6972]">Em alta esta semana</p>
+                  </div>
+                  <div className="mt-5">
+                    {trendingEditorial.map((item, index) => (
+                      <Link
+                        key={item.title}
+                        to={`/blog/${item.slug}`}
+                        className={cn(
+                          "flex gap-4 py-4 transition hover:text-[#0c6a83]",
+                          index < trendingEditorial.length - 1 && "border-b border-[#edf1f4]"
+                        )}
+                      >
+                        <span className="w-6 font-display text-2xl font-bold text-[#d0d7dd]">{index + 1}</span>
+                        <div>
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0c6a83]">{item.category}</p>
+                          <p className="mt-1 font-display text-base font-bold leading-[1.28] tracking-[-0.01em] text-[#2d3135]">
+                            {item.title}
+                          </p>
+                          <p className="mt-1 text-xs text-[#69747e]">{item.read}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="pb-6">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <h2 className="font-display text-[2rem] font-bold tracking-[-0.02em] text-[#2d3135]">Últimos artigos</h2>
+              <p className="mt-1 text-sm text-[#69747e]">{visibleCount} publicações · atualizado toda semana</p>
+            </div>
+            <div role="search" className="flex w-full max-w-[420px] items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b97a1]" />
+                <Input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Buscar por tema ou palavra-chave"
+                  className="h-12 rounded-[12px] border-[#dde4e8] pl-11"
+                  aria-label="Buscar por tema ou palavra-chave"
+                />
+              </div>
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="rounded-[12px] border border-[#dde4e8] px-3 py-3 text-sm font-medium text-[#4f5963] transition hover:border-[#cfd8dd] hover:text-[#2d3135]"
+                  aria-label="Limpar busca do blog"
+                >
+                  Limpar
+                </button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap gap-2">
+            {canvasCategories.map((item) => (
               <button
                 key={item}
                 type="button"
                 onClick={() => setCategory(item)}
                 className={cn(
-                  "rounded-lg px-4 py-2 text-sm font-semibold transition",
-                  category === item ? "bg-deep-navy text-white" : "bg-muted text-muted-foreground hover:bg-secondary hover:text-deep-navy"
+                  "rounded-full border px-4 py-2 text-sm font-semibold transition",
+                  category === item
+                    ? "border-[#0c6a83] bg-[#0c6a83] text-white"
+                    : "border-[#dde4e8] bg-white text-[#4f5963] hover:border-[#cfd8dd] hover:text-[#2d3135]"
                 )}
               >
                 {item}
@@ -132,80 +323,95 @@ export function BlogPage() {
             ))}
           </div>
         </div>
+      </section>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="surface-card p-5" aria-live="polite">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Artigos visíveis</p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">{posts.length}</p>
-            <p className="mt-2 text-sm leading-6 text-label-secondary">
-              {query ? `Busca ativa para “${query}”.` : "Explore temas para apoiar sua decisão."}
-            </p>
-          </div>
-          <div className="surface-card p-5">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Categoria ativa</p>
-            <p className="mt-2 text-2xl font-semibold text-foreground">{category}</p>
-            <p className="mt-2 text-sm leading-6 text-label-secondary">
-              Troque a categoria para comparar pautas técnicas e editoriais.
-            </p>
-          </div>
-          <div className="surface-card p-5">
-            <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Temas em destaque</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {categorySummary.map((item) => (
-                <span
-                  key={item.label}
-                  className="rounded-full border border-outline-variant bg-surface-muted px-3 py-1.5 text-label font-bold text-deep-navy"
-                >
-                  {item.label} · {item.count}
-                </span>
+      <section className="pb-16">
+        <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
+          {loading ? (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="h-[420px] animate-pulse rounded-[24px] bg-[#f2f5f7]" />
               ))}
             </div>
-          </div>
-        </div>
+          ) : gridPosts.length ? (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {gridPosts.map((post) => {
+                const presentation = getPresentation(post);
 
-        {featuredPost ? (
-          <div className="grid gap-5 lg:grid-cols-[1.2fr_0.8fr]">
-            <BlogCard post={featuredPost} featured />
-            <Card>
-              <CardContent className="space-y-5 p-6">
-                <div className="rounded-lg bg-secondary/60 p-3 text-primary">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <div className="space-y-2">
-                  <h3 className="text-xl font-semibold">Newsletter</h3>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    Capture leads interessados em conteúdo e capacitações futuras.
-                  </p>
-                </div>
-                <Input
-                  placeholder="Seu e-mail"
-                  value={newsletterEmail}
-                  onChange={(event) => setNewsletterEmail(event.target.value)}
-                />
-                <Button
-                  className="w-full bg-deep-navy text-white hover:bg-deep-navy/92"
-                  loading={isSubmittingNewsletter}
-                  onClick={submitNewsletter}
-                >
-                  Quero receber conteúdos
-                </Button>
+                return (
+                  <Link key={post.id} to={`/blog/${post.slug}`} className="block">
+                    <Card className="h-full overflow-hidden rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)] transition hover:-translate-y-1">
+                      <div className="relative h-[158px] px-5 py-4 text-white" style={{ background: presentation.tint }}>
+                        <span className="inline-flex rounded-full bg-white/18 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                          {post.category}
+                        </span>
+                        <span className="absolute bottom-2 right-4 font-display text-[56px] font-bold leading-none text-white/30">
+                          {presentation.glyph}
+                        </span>
+                      </div>
+                      <CardContent className="flex h-[calc(100%-158px)] flex-col gap-3 p-6">
+                        <h3 className="font-display text-[1.8rem] font-bold leading-[1.15] tracking-[-0.02em] text-[#2d3135]">
+                          {post.title}
+                        </h3>
+                        <p className="text-sm leading-7 text-[#66727b]">{post.summary}</p>
+                        <p className="mt-auto pt-2 text-sm text-[#69747e]">
+                          {post.author} · {formatDate(post.date)} · {post.readingTime}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+              <CardContent className="p-10 text-center">
+                <h3 className="font-display text-[1.5rem] font-bold text-[#2d3135]">Nenhum artigo encontrado</h3>
+                <p className="mt-3 text-sm text-[#69747e]">Tente outra palavra-chave ou categoria.</p>
               </CardContent>
             </Card>
-          </div>
-        ) : null}
+          )}
+        </div>
+      </section>
 
-        {loading ? (
-          <LoadingBlocks count={3} summary="Atualizando seleção editorial..." />
-        ) : visiblePosts.length ? (
-          <div className="grid gap-5 xl:grid-cols-3">
-            {visiblePosts.map((post) => (
-              <BlogCard key={post.id} post={post} />
-            ))}
+      <section className="border-y border-[#ded8c9] bg-[#f4f1e9] py-16">
+        <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-10 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div>
+            <span className="inline-flex rounded-full bg-[#0c6a83] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white">
+              Newsletter quinzenal
+            </span>
+            <h2 className="mt-5 max-w-[12ch] font-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.03em] text-[#2d3135]">
+              Receba a leitura certa antes da <em className="italic">próxima</em> mudança
+            </h2>
+            <p className="mt-4 max-w-[36ch] font-serif text-[1.12rem] font-light leading-[1.5] text-[#59646d]">
+              Uma edição a cada duas semanas com o que mudou nas normas, o que fazer a respeito e os artigos que valem
+              o seu tempo. Sem spam.
+            </p>
           </div>
-        ) : !posts.length ? (
-          <EmptyState title="Nenhum post encontrado." description="Ajuste a busca ou escolha outra categoria para visualizar conteúdos." />
-        ) : null}
-      </div>
-    </section>
+
+          <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+            <CardContent className="space-y-4 p-8">
+              <Input
+                value={newsletterName}
+                onChange={(event) => setNewsletterName(event.target.value)}
+                placeholder="Seu nome"
+                aria-label="Seu nome"
+              />
+              <Input
+                type="email"
+                value={newsletterEmail}
+                onChange={(event) => setNewsletterEmail(event.target.value)}
+                placeholder="Seu melhor e-mail"
+                aria-label="Seu melhor e-mail"
+              />
+              <Button className="w-full" size="lg" loading={isSubmittingNewsletter} onClick={submitNewsletter}>
+                Quero receber →
+              </Button>
+              <p className="text-center text-xs text-[#69747e]">+4.200 profissionais já recebem. Cancele quando quiser.</p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+    </div>
   );
 }

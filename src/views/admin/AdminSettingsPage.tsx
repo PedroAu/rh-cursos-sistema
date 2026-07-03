@@ -1,32 +1,22 @@
 "use client";
 
-import {
-  Badge,
-  Box,
-  Button,
-  FileButton,
-  Group,
-  Paper,
-  SimpleGrid,
-  Stack,
-  Switch,
-  Table,
-  Tabs,
-  Text,
-  TextInput,
-  ThemeIcon,
-  Title
-} from "@mantine/core";
 import { CheckCircle2, Globe, Mail, MessageCircle, Palette, Plus, Upload } from "lucide-react";
 import type { ReactNode } from "react";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   type AdminSettings,
   loadAdminSettings,
   saveAdminSettings
 } from "@/features/admin/settings/model/admin-settings";
+import { cn } from "@/lib/utils";
 
 const notificationCopy: Record<keyof AdminSettings["notifications"], { title: string; description: string }> = {
   newEnrollments: {
@@ -60,129 +50,118 @@ export function AdminSettingsPage() {
   }
 
   return (
-    <Stack gap="xl">
-      <Box maw={760}>
-        <Title order={1} c="#0b4668" fw={800}>
-          Painel de Configurações
-        </Title>
-        <Text mt="sm" size="lg" lh={1.7} c="#4b5563">
+    <div className="space-y-8">
+      <div className="max-w-3xl space-y-3">
+        <h1 className="text-3xl font-extrabold tracking-tight text-[#0b4668]">Painel de Configurações</h1>
+        <p className="text-base leading-7 text-slate-600 md:text-lg">
           Gerencie a identidade, comunicações e acessos da plataforma RH Cursos.
-        </Text>
-      </Box>
+        </p>
+      </div>
 
-      <Tabs defaultValue="gerais" color="rhBlue">
-        <Tabs.List>
-          <Tabs.Tab value="gerais">Configurações Gerais</Tabs.Tab>
-          <Tabs.Tab value="notificacoes">Notificações</Tabs.Tab>
-          <Tabs.Tab value="integracoes">Integrações</Tabs.Tab>
-          <Tabs.Tab value="usuarios">Gerenciamento de Usuários</Tabs.Tab>
-        </Tabs.List>
+      <Tabs defaultValue="gerais" className="space-y-6">
+        <TabsList className="w-full justify-start overflow-x-auto rounded-2xl bg-slate-100 p-2">
+          <TabsTrigger value="gerais">Configurações Gerais</TabsTrigger>
+          <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
+          <TabsTrigger value="integracoes">Integrações</TabsTrigger>
+          <TabsTrigger value="usuarios">Gerenciamento de Usuários</TabsTrigger>
+        </TabsList>
 
-        <Tabs.Panel value="gerais" pt="xl">
-          <Stack gap="xl">
-            <SimpleGrid cols={{ base: 1, xl: 2 }} spacing="lg" verticalSpacing="lg" style={{ alignItems: "start" }}>
-              <Paper radius="xl" withBorder shadow="xs" p="xl">
-                <Group mb="lg">
-                  <ThemeIcon variant="light" color="rhBlue" radius="xl" size={42}>
-                    <Globe size={20} />
-                  </ThemeIcon>
-                  <Title order={2} c="#111827">
-                    Identidade do Site
-                  </Title>
-                </Group>
-                <Stack gap="md">
-                  <TextInput
-                    label="Nome do Site"
-                    value={settings.identity.siteName}
-                    onChange={(event) => updateIdentity("siteName", event.currentTarget.value)}
-                  />
-                  <TextInput
-                    label="Slogan Institucional"
-                    value={settings.identity.tagline}
-                    onChange={(event) => updateIdentity("tagline", event.currentTarget.value)}
-                  />
-                  <TextInput
-                    label="E-mail de Contato Oficial"
-                    type="email"
-                    value={settings.identity.contactEmail}
-                    onChange={(event) => updateIdentity("contactEmail", event.currentTarget.value)}
-                  />
-                </Stack>
-              </Paper>
-
-              <Paper radius="xl" shadow="sm" p="xl" style={{ background: "#0b4668", color: "#ffffff" }}>
-                <Title order={2} c="#ffd573">
-                  Resumo das Alterações
-                </Title>
-                <Text mt="lg" size="lg" lh={1.7} c="rgba(255,255,255,0.84)">
-                  Suas alterações de identidade afetam como os alunos visualizam a marca nos certificados e e-mails automáticos.
-                </Text>
-                <Button color="rhGold" c="#6a4b00" radius="md" fullWidth mt="xl" onClick={handleSave}>
-                  Salvar Alterações
-                </Button>
-              </Paper>
-            </SimpleGrid>
-
-            <Paper radius="xl" withBorder shadow="xs" p="xl">
-              <Group mb="lg">
-                <ThemeIcon variant="light" color="rhBlue" radius="xl" size={42}>
-                  <Palette size={20} />
-                </ThemeIcon>
-                <Title order={2} c="#111827">
-                  Logotipo e Favicon
-                </Title>
-              </Group>
-              <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-                <LogoUpload
-                  label="Logo Principal"
-                  value={settings.identity.logo}
-                  fallback="RH"
-                  onChange={(value) => updateIdentity("logo", value)}
+        <TabsContent value="gerais" className="space-y-6">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <SectionCard>
+              <div className="mb-6 flex items-start gap-4">
+                <IconChip>
+                  <Globe className="h-5 w-5" />
+                </IconChip>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900">Identidade do Site</h2>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <Input
+                  label="Nome do Site"
+                  value={settings.identity.siteName}
+                  onChange={(event) => updateIdentity("siteName", event.currentTarget.value)}
                 />
-                <LogoUpload
-                  label="Favicon"
-                  value={settings.identity.favicon}
-                  fallback="RH"
-                  onChange={(value) => updateIdentity("favicon", value)}
+                <Input
+                  label="Slogan Institucional"
+                  value={settings.identity.tagline}
+                  onChange={(event) => updateIdentity("tagline", event.currentTarget.value)}
                 />
-              </SimpleGrid>
-            </Paper>
-          </Stack>
-        </Tabs.Panel>
+                <Input
+                  label="E-mail de Contato Oficial"
+                  type="email"
+                  value={settings.identity.contactEmail}
+                  onChange={(event) => updateIdentity("contactEmail", event.currentTarget.value)}
+                />
+              </div>
+            </SectionCard>
 
-        <Tabs.Panel value="notificacoes" pt="xl">
-          <Stack gap="lg">
-            <Paper radius="xl" withBorder shadow="xs" p="xl">
-              <Title order={2} c="#111827">
-                Preferências de Notificação
-              </Title>
-              <Text mt={6} c="#667085">
-                Escolha quais eventos disparam alertas para o administrador.
-              </Text>
-
-              <Stack gap={0} mt="lg">
-                {(Object.keys(notificationCopy) as Array<keyof AdminSettings["notifications"]>).map((key) => (
-                  <NotificationRow
-                    key={key}
-                    title={notificationCopy[key].title}
-                    description={notificationCopy[key].description}
-                    checked={settings.notifications[key]}
-                    onCheckedChange={(value) => toggleNotification(key, value)}
-                  />
-                ))}
-              </Stack>
-            </Paper>
-
-            <Group justify="flex-end">
-              <Button color="rhBlue" radius="md" onClick={handleSave}>
+            <div className="rounded-2xl bg-[#0b4668] p-8 text-white shadow-sm">
+              <h2 className="text-xl font-semibold text-[#ffd573]">Resumo das Alterações</h2>
+              <p className="mt-6 text-base leading-7 text-white/85">
+                Suas alterações de identidade afetam como os alunos visualizam a marca nos certificados e e-mails automáticos.
+              </p>
+              <Button className="mt-8 w-full bg-[#ffd573] text-[#6a4b00] hover:bg-[#f3ca63]" onClick={handleSave}>
                 Salvar Alterações
               </Button>
-            </Group>
-          </Stack>
-        </Tabs.Panel>
+            </div>
+          </div>
 
-        <Tabs.Panel value="integracoes" pt="xl">
-          <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="lg">
+          <SectionCard>
+            <div className="mb-6 flex items-start gap-4">
+              <IconChip>
+                <Palette className="h-5 w-5" />
+              </IconChip>
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">Logotipo e Favicon</h2>
+              </div>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
+              <LogoUpload
+                label="Logo Principal"
+                value={settings.identity.logo}
+                fallback="RH"
+                onChange={(value) => updateIdentity("logo", value)}
+              />
+              <LogoUpload
+                label="Favicon"
+                value={settings.identity.favicon}
+                fallback="RH"
+                onChange={(value) => updateIdentity("favicon", value)}
+              />
+            </div>
+          </SectionCard>
+        </TabsContent>
+
+        <TabsContent value="notificacoes" className="space-y-6">
+          <SectionCard>
+            <h2 className="text-xl font-semibold text-slate-900">Preferências de Notificação</h2>
+            <p className="mt-1 text-sm text-slate-500">
+              Escolha quais eventos disparam alertas para o administrador.
+            </p>
+
+            <div className="mt-6">
+              {(Object.keys(notificationCopy) as Array<keyof AdminSettings["notifications"]>).map((key, index) => (
+                <NotificationRow
+                  key={key}
+                  title={notificationCopy[key].title}
+                  description={notificationCopy[key].description}
+                  checked={settings.notifications[key]}
+                  first={index === 0}
+                  onCheckedChange={(value) => toggleNotification(key, value)}
+                />
+              ))}
+            </div>
+          </SectionCard>
+
+          <div className="flex justify-end">
+            <Button onClick={handleSave}>Salvar Alterações</Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="integracoes">
+          <div className="grid gap-6 lg:grid-cols-2">
             <IntegrationCard
               icon={MessageCircle}
               title="WhatsApp Business"
@@ -190,15 +169,13 @@ export function AdminSettingsPage() {
               body="Conecte sua conta do WhatsApp para enviar notificações de cursos e suporte em tempo real para seus alunos."
               footer={
                 <>
-                  <Group gap="xs">
-                    <CheckCircle2 size={16} color="#2f8b4f" />
-                    <Text size="sm" fw={500} c="#2f8b4f">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-[#2f8b4f]" />
+                    <span className="text-sm font-medium text-[#2f8b4f]">
                       Conectado · último envio hoje, 10:45
-                    </Text>
-                  </Group>
-                  <Button variant="light" color="rhBlue">
-                    Gerenciar webhooks
-                  </Button>
+                    </span>
+                  </div>
+                  <Button variant="outline">Gerenciar webhooks</Button>
                 </>
               }
             />
@@ -209,80 +186,77 @@ export function AdminSettingsPage() {
               description="RD Station · Mailchimp · ActiveCampaign"
               body="Sincronize sua base de alunos com sua plataforma de marketing favorita para campanhas de remarketing."
               footer={
-                <Stack gap="sm">
+                <div className="space-y-3">
                   {["RD Station CRM", "Mailchimp"].map((provider) => (
-                    <Paper key={provider} withBorder radius="lg" p="md" bg="#f8fafc">
-                      <Group justify="space-between">
-                        <Text fw={500} c="#111827">
-                          {provider}
-                        </Text>
-                        <Button variant="default" radius="md">
-                          Conectar
-                        </Button>
-                      </Group>
-                    </Paper>
+                    <div key={provider} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
+                      <span className="font-medium text-slate-900">{provider}</span>
+                      <Button variant="outline">Conectar</Button>
+                    </div>
                   ))}
-                </Stack>
+                </div>
               }
             />
-          </SimpleGrid>
-        </Tabs.Panel>
+          </div>
+        </TabsContent>
 
-        <Tabs.Panel value="usuarios" pt="xl">
-          <Paper radius="xl" withBorder shadow="xs" p="xl">
-            <Group justify="space-between" align="center" mb="lg">
-              <Box>
-                <Title order={2} c="#111827">
-                  Administradores do Sistema
-                </Title>
-                <Text mt={6} c="#667085">
+        <TabsContent value="usuarios">
+          <SectionCard>
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">Administradores do Sistema</h2>
+                <p className="mt-1 text-sm text-slate-500">
                   Acessos com permissão de gestão da plataforma.
-                </Text>
-              </Box>
-              <Button color="rhGold" c="white" radius="xl" leftSection={<Plus size={16} />}>
+                </p>
+              </div>
+              <Button className="rounded-full bg-[#d39b10] hover:bg-[#ba870d]">
+                <Plus className="h-4 w-4" />
                 Novo Admin
               </Button>
-            </Group>
+            </div>
 
-            <Table.ScrollContainer minWidth={640}>
-              <Table verticalSpacing="md" horizontalSpacing="xl">
-                <Table.Thead bg="#f7f8fb">
-                  <Table.Tr>
-                    <Table.Th>Administrador</Table.Th>
-                    <Table.Th>Permissão</Table.Th>
-                    <Table.Th>Status</Table.Th>
-                  </Table.Tr>
-                </Table.Thead>
-                <Table.Tbody>
-                  {settings.admins.map((admin) => (
-                    <Table.Tr key={admin.email}>
-                      <Table.Td>
-                        <Stack gap={2}>
-                          <Text fw={700} c="#111827">
-                            {admin.name}
-                          </Text>
-                          <Text size="sm" c="#667085">
-                            {admin.email}
-                          </Text>
-                        </Stack>
-                      </Table.Td>
-                      <Table.Td>
-                        <Text c="#111827">{admin.role}</Text>
-                      </Table.Td>
-                      <Table.Td>
-                        <Badge color={admin.active ? "green" : "red"} variant="light" radius="xl">
-                          {admin.active ? "Ativo" : "Inativo"}
-                        </Badge>
-                      </Table.Td>
-                    </Table.Tr>
-                  ))}
-                </Table.Tbody>
-              </Table>
-            </Table.ScrollContainer>
-          </Paper>
-        </Tabs.Panel>
+            <Table className="min-w-[640px]">
+              <TableHeader className="bg-slate-50">
+                <TableRow className="hover:bg-slate-50">
+                  <TableHead>Administrador</TableHead>
+                  <TableHead>Permissão</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {settings.admins.map((admin) => (
+                  <TableRow key={admin.email}>
+                    <TableCell>
+                      <div className="space-y-0.5">
+                        <div className="font-semibold text-slate-900">{admin.name}</div>
+                        <div className="text-sm text-slate-500">{admin.email}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-slate-900">{admin.role}</TableCell>
+                    <TableCell>
+                      <Badge variant={admin.active ? "success" : "danger"}>
+                        {admin.active ? "Ativo" : "Inativo"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </SectionCard>
+        </TabsContent>
       </Tabs>
-    </Stack>
+    </div>
+  );
+}
+
+function SectionCard({ children, className }: { children: ReactNode; className?: string }) {
+  return <section className={cn("rounded-3xl border border-slate-200 bg-white p-8 shadow-sm", className)}>{children}</section>;
+}
+
+function IconChip({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e8f1f6] text-[#0b4668]">
+      {children}
+    </div>
   );
 }
 
@@ -300,27 +274,19 @@ function IntegrationCard({
   footer: ReactNode;
 }) {
   return (
-    <Paper radius="xl" withBorder shadow="xs" p="xl">
-      <Group align="flex-start">
-        <ThemeIcon variant="light" color="rhBlue" radius="xl" size={42}>
-          <Icon size={20} />
-        </ThemeIcon>
-        <Box>
-          <Title order={2} c="#111827">
-            {title}
-          </Title>
-          <Text size="sm" c="#667085">
-            {description}
-          </Text>
-        </Box>
-      </Group>
-      <Text mt="md" lh={1.7} c="#4b5563">
-        {body}
-      </Text>
-      <Stack mt="lg" gap="md">
-        {footer}
-      </Stack>
-    </Paper>
+    <SectionCard>
+      <div className="flex items-start gap-4">
+        <IconChip>
+          <Icon className="h-5 w-5" />
+        </IconChip>
+        <div>
+          <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
+          <p className="text-sm text-slate-500">{description}</p>
+        </div>
+      </div>
+      <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
+      <div className="mt-6 space-y-4">{footer}</div>
+    </SectionCard>
   );
 }
 
@@ -328,28 +294,30 @@ function NotificationRow({
   title,
   description,
   checked,
+  first,
   onCheckedChange
 }: {
   title: string;
   description: string;
   checked: boolean;
+  first: boolean;
   onCheckedChange: (checked: boolean) => void;
 }) {
   const labelId = useId();
   const descId = useId();
 
   return (
-    <Group justify="space-between" align="flex-start" py="md" style={{ borderTop: "1px solid #e8ecf2" }}>
-      <Box maw={620}>
-        <Text id={labelId} fw={600} c="#111827">
+    <div className={cn("flex flex-col gap-4 py-5 sm:flex-row sm:items-start sm:justify-between", !first && "border-t border-slate-200")}>
+      <div className="max-w-2xl">
+        <p id={labelId} className="font-semibold text-slate-900">
           {title}
-        </Text>
-        <Text id={descId} size="sm" lh={1.7} c="#667085" mt={4}>
+        </p>
+        <p id={descId} className="mt-1 text-sm leading-7 text-slate-500">
           {description}
-        </Text>
-      </Box>
-      <Switch checked={checked} onChange={(event) => onCheckedChange(event.currentTarget.checked)} aria-labelledby={labelId} aria-describedby={descId} />
-    </Group>
+        </p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-labelledby={labelId} aria-describedby={descId} />
+    </div>
   );
 }
 
@@ -364,40 +332,36 @@ function LogoUpload({
   fallback: string;
   onChange: (value: string | null) => void;
 }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   return (
-    <Paper withBorder radius="xl" p="lg" style={{ borderStyle: "dashed" }}>
-      <Stack align="center" gap="md">
-        <Box
+    <div className="rounded-3xl border border-dashed border-slate-300 p-6">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <div
           role="img"
           aria-label={`Pré-visualização de ${label}`}
+          className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl bg-[#0b4668] text-[1.6rem] font-extrabold text-white"
           style={{
-            width: 72,
-            height: 72,
-            borderRadius: 14,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            overflow: "hidden",
             backgroundColor: value ? "#ffffff" : "#0b4668",
             backgroundImage: value ? `url(${value})` : undefined,
             backgroundPosition: "center",
-            backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
-            color: "#ffffff",
-            fontSize: "1.6rem",
-            fontWeight: 800
+            backgroundSize: "contain"
           }}
         >
           {value ? null : fallback}
-        </Box>
+        </div>
 
-        <Stack gap={4} align="center">
-          <Text fw={700} c="#0b4668">
-            {label}
-          </Text>
-          <FileButton
+        <div className="space-y-1">
+          <p className="font-semibold text-[#0b4668]">{label}</p>
+          <input
+            ref={inputRef}
+            type="file"
             accept="image/*"
-            onChange={(file) => {
+            aria-label={`Selecionar arquivo para ${label}`}
+            className="hidden"
+            onChange={(event) => {
+              const file = event.currentTarget.files?.[0];
               if (!file) return;
               const reader = new FileReader();
               reader.onload = () => {
@@ -405,15 +369,13 @@ function LogoUpload({
               };
               reader.readAsDataURL(file);
             }}
-          >
-            {(props) => (
-              <Button {...props} variant="subtle" color="rhBlue" leftSection={<Upload size={16} />}>
-                Alterar {label}
-              </Button>
-            )}
-          </FileButton>
-        </Stack>
-      </Stack>
-    </Paper>
+          />
+          <Button variant="ghost" type="button" onClick={() => inputRef.current?.click()}>
+            <Upload className="h-4 w-4" />
+            Alterar {label}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }

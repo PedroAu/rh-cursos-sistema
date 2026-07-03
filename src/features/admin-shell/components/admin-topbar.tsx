@@ -1,9 +1,10 @@
 "use client";
 
-import { ActionIcon, AppShell, Burger, Group, TextInput } from "@mantine/core";
-import { Bell, CircleHelp, Search } from "lucide-react";
+import { Bell, CircleHelp, Menu, Search } from "lucide-react";
 
 import type { DashboardRole } from "@/lib/auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 import { useLocation } from "@/lib/router-compat";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
@@ -44,41 +45,38 @@ export function AdminTopbar({
   const placeholder = resolvePlaceholder(location.pathname, role);
 
   return (
-    <AppShell.Header
-      style={{
-        background: "rgba(255,255,255,0.96)",
-        backdropFilter: "blur(16px)",
-        borderBottom: "1px solid #d9dee7"
-      }}
-    >
-      <Group h="100%" px={{ base: "md", sm: "lg", lg: "xl" }} justify="space-between" wrap="nowrap">
-        <Group gap="sm" wrap="nowrap">
-          <Burger opened={opened} onClick={onToggle} hiddenFrom="lg" size="sm" aria-label="Alternar navegação" />
-        </Group>
+    <header className="fixed inset-x-0 top-0 z-40 flex h-[72px] items-center gap-3 border-b border-[#d9dee7] bg-white/96 px-4 backdrop-blur-md sm:px-5 lg:left-[248px] lg:px-6">
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggle}
+        aria-expanded={opened}
+        aria-label="Alternar navegação"
+        className="rounded-full lg:hidden"
+      >
+        <Menu size={20} />
+      </Button>
 
-        <Group gap="sm" justify="flex-end" wrap="nowrap" style={{ flex: 1 }}>
-          <TextInput
+      <div className="flex flex-1 items-center justify-end gap-3">
+        <div className="relative hidden w-full max-w-[19rem] sm:block">
+          <Search
+            size={18}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-tk-ink-muted"
+            aria-hidden="true"
+          />
+          <Input
             aria-label={placeholder}
             placeholder={placeholder}
-            leftSection={<Search size={18} />}
-            visibleFrom="sm"
-            styles={{
-              root: { width: "100%", maxWidth: "19rem" },
-              input: {
-                height: 44,
-                backgroundColor: "#f5f6f8",
-                borderColor: "#d5dae2"
-              }
-            }}
+            className="h-11 border-[#d5dae2] bg-[#f5f6f8] pl-10"
           />
-          <ActionIcon variant="subtle" color="dark" radius="xl" size={42} aria-label="Notificações">
-            <Bell size={19} />
-          </ActionIcon>
-          <ActionIcon variant="subtle" color="dark" radius="xl" size={42} aria-label="Ajuda">
-            <CircleHelp size={19} />
-          </ActionIcon>
-        </Group>
-      </Group>
-    </AppShell.Header>
+        </div>
+        <Button variant="ghost" size="icon" className="rounded-full text-tk-ink" aria-label="Notificações">
+          <Bell size={19} />
+        </Button>
+        <Button variant="ghost" size="icon" className="rounded-full text-tk-ink" aria-label="Ajuda">
+          <CircleHelp size={19} />
+        </Button>
+      </div>
+    </header>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
+import { mockCatalog } from "@/lib/mock-public-data";
 import { fetchPublicCatalogFromSupabaseServer } from "@/lib/supabase/rh-cursos-api";
 
 type PageProps = {
@@ -10,9 +11,11 @@ type PageProps = {
 async function getCourses() {
   try {
     const catalog = await fetchPublicCatalogFromSupabaseServer();
-    return catalog?.courses ?? [];
+    return [...(catalog?.courses ?? []), ...mockCatalog.courses].filter(
+      (course, index, collection) => collection.findIndex((item) => item.slug === course.slug) === index
+    );
   } catch {
-    return [];
+    return mockCatalog.courses;
   }
 }
 
@@ -36,15 +39,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
   const catalog = await fetchPublicCatalogFromSupabaseServer().catch(() => null);
+  const liveCourseExists = catalog?.courses.some((course) => course.slug === slug) ?? false;
+  const initialCatalog = liveCourseExists
+    ? catalog
+    : {
+        courses: mockCatalog.courses,
+        classes: mockCatalog.classes,
+        instructors: mockCatalog.instructors
+      };
 
   return (
     <CourseDetailClient
       initialData={{
-        courses: catalog?.courses ?? [],
-        classes: catalog?.classes ?? [],
-        instructors: catalog?.instructors ?? []
+        courses: initialCatalog?.courses ?? [],
+        classes: initialCatalog?.classes ?? [],
+        instructors: initialCatalog?.instructors ?? []
       }}
     />
   );

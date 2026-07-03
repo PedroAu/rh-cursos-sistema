@@ -1,17 +1,18 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabasePublishableKey =
+const supabaseServerKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ??
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const isSupabaseServerConfigured = Boolean(supabaseUrl && supabasePublishableKey);
+export const isSupabaseServerConfigured = Boolean(supabaseUrl && supabaseServerKey);
 
 export function createSupabaseServerClient() {
   if (!isSupabaseServerConfigured) {
     return null;
   }
 
-  return createClient(supabaseUrl!, supabasePublishableKey!, {
+  return createClient(supabaseUrl!, supabaseServerKey!, {
     auth: {
       persistSession: false,
       autoRefreshToken: false

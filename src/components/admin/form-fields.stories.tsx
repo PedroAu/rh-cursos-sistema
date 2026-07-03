@@ -6,7 +6,7 @@ import { ArrayInput, ModulesBuilder, MultiSelectField } from "./form-fields";
 /**
  * Campos compostos do CRUD administrativo:
  * - `ArrayInput`: listas de strings (objetivos, benefícios) adicionadas item a item.
- * - `MultiSelectField`: seleção múltipla a partir de opções fixas.
+ * - `MultiSelectField`: seleção múltipla com popover, checkboxes e chips.
  * - `ModulesBuilder`: editor estruturado de módulos do curso.
  *
  * Todos seguem o contrato controlado `value` + `onChange`.

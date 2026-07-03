@@ -10,14 +10,14 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-tk-cta text-tk-surface shadow-tk-glass hover:bg-tk-cta-hover",
+        primary: "tk-button-on-strong bg-tk-cta shadow-tk-glass hover:bg-tk-cta-hover",
         secondary: "bg-[var(--tk-black-5)] text-tk-ink hover:bg-[var(--tk-black-8)]",
         ghost: "bg-transparent text-tk-ink hover:bg-[var(--tk-black-5)]",
         outline: "border border-tk-line bg-tk-surface text-tk-ink hover:border-tk-accent hover:bg-tk-accent-soft",
         tertiary: "h-auto min-h-0 rounded-none px-0 py-0 text-tk-accent-strong underline-offset-4 shadow-none hover:underline",
-        success: "bg-tk-success text-tk-surface hover:opacity-90",
-        danger: "bg-tk-error text-tk-surface hover:opacity-90",
-        default: "bg-tk-cta text-tk-surface shadow-tk-glass hover:bg-tk-cta-hover"
+        success: "tk-button-on-strong bg-tk-success hover:opacity-90",
+        danger: "tk-button-on-strong bg-tk-error hover:opacity-90",
+        default: "tk-button-on-strong bg-tk-cta shadow-tk-glass hover:bg-tk-cta-hover"
       },
       size: {
         sm: "h-8 px-4 text-caption",

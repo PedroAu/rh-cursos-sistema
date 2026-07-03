@@ -11,16 +11,18 @@ import { company } from "@/lib/company";
 import { useLocation } from "@/lib/router-compat";
 import { cn } from "@/lib/utils";
 
-const primaryNavItems = publicNavItems.filter((item) =>
-  ["/cursos", "/agenda", "/in-company", "/consultoria", "/blog"].includes(item.to)
-);
-
 function isItemActive(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
 export function PublicHeader() {
   const location = useLocation();
+  const navOrder = location.pathname.startsWith("/sobre")
+    ? ["/cursos", "/agenda", "/in-company", "/consultoria", "/sobre", "/blog"]
+    : ["/cursos", "/agenda", "/in-company", "/consultoria", "/blog"];
+  const primaryNavItems = navOrder
+    .map((to) => publicNavItems.find((item) => item.to === to))
+    .filter((item): item is (typeof publicNavItems)[number] => Boolean(item));
 
   return (
     <header className="sticky top-0 z-30 border-b border-[var(--tk-black-8)] bg-tk-surface">
@@ -47,7 +49,7 @@ export function PublicHeader() {
                   active && "bg-tk-accent-soft text-tk-accent-strong"
                 )}
               >
-                {item.label}
+                {item.to === "/sobre" ? "Quem Somos" : item.label}
               </NextLink>
             );
           })}

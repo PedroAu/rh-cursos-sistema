@@ -10,12 +10,12 @@ const badgeVariants = cva(
       tone: {
         accent: "border-transparent bg-tk-accent-soft text-tk-accent-strong",
         neutral: "border-tk-line bg-tk-surface-2 text-tk-ink-muted",
-        success: "border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))] text-tk-success",
+        success: "tk-badge-success border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))]",
         error: "border-transparent bg-[color-mix(in_srgb,var(--tk-error)_10%,var(--tk-surface))] text-tk-error"
       },
       variant: {
         default: "border-transparent bg-tk-accent-soft text-tk-accent-strong",
-        success: "border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))] text-tk-success",
+        success: "tk-badge-success border-transparent bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))]",
         warning: "border-tk-line bg-tk-cream text-tk-ink",
         danger: "border-transparent bg-[color-mix(in_srgb,var(--tk-error)_10%,var(--tk-surface))] text-tk-error",
         muted: "border-tk-line bg-tk-surface-2 text-tk-ink-muted"
