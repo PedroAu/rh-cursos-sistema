@@ -1,4 +1,5 @@
 import { loadEnvFile } from "node:process";
+import { randomBytes } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
 import type { TestInfo } from "@playwright/test";
@@ -242,12 +243,7 @@ export function createUniqueEmail(prefix: string) {
 }
 
 export function createUniqueIp(seed: string) {
-  const normalized = seed.replace(/[^a-z0-9]/gi, "");
-  let hash = 0;
-
-  for (const char of normalized) {
-    hash = (hash * 31 + char.charCodeAt(0)) % 250;
-  }
-
-  return `198.51.100.${Math.max(1, hash)}`;
+  const random = randomBytes(8).toString("hex");
+  const seedFragment = Buffer.from(seed).toString("hex").slice(0, 8).padEnd(8, "0");
+  return `2001:db8:${seedFragment.slice(0, 4)}:${seedFragment.slice(4, 8)}:${random.slice(0, 4)}:${random.slice(4, 8)}:${random.slice(8, 12)}:${random.slice(12, 16)}`;
 }

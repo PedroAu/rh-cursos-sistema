@@ -21,29 +21,33 @@ function edgeHeaders(ip: string, origin = "https://rhcursos.com.br") {
     Origin: origin,
     "Content-Type": "application/json",
     "x-forwarded-for": ip,
+    "x-real-ip": ip,
   };
 }
 
-async function loginAsAdmin(request: import("@playwright/test").APIRequestContext) {
-  const { adminEmail, adminPassword } = getIntegrationEnv();
+async function edgeRequest(
+  path: string,
+  options: {
+    method?: "GET" | "POST" | "DELETE";
+    ip: string;
+    origin?: string;
+    body?: unknown;
+    headers?: Record<string, string>;
+  }
+) {
+  const { functionsBaseUrl } = getIntegrationEnv();
 
-  await ensureAuthUser({
-    email: adminEmail,
-    name: "Administrador RH Cursos",
-    password: adminPassword,
-    role: "admin",
+  return fetch(`${functionsBaseUrl}${path}`, {
+    method: options.method ?? "POST",
+    headers: {
+      ...edgeHeaders(options.ip, options.origin),
+      ...options.headers,
+    },
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
-
-  const response = await request.post("/api/auth/session", {
-    data: { role: "admin", email: adminEmail, password: adminPassword },
-    headers: { "x-forwarded-for": createUniqueIp("api-contract-admin-login") },
-  });
-
-  expect(response.ok()).toBeTruthy();
-  return (await response.json()) as { token: string };
 }
 
-async function loginAsAdminEdge(request: import("@playwright/test").APIRequestContext) {
+async function loginAsAdminEdge() {
   const { adminEmail, adminPassword, functionsBaseUrl } = getIntegrationEnv();
 
   await ensureAuthUser({
@@ -53,12 +57,13 @@ async function loginAsAdminEdge(request: import("@playwright/test").APIRequestCo
     role: "admin",
   });
 
-  const response = await request.post(`${functionsBaseUrl}/auth-session`, {
-    data: { role: "admin", email: adminEmail, password: adminPassword },
+  const response = await fetch(`${functionsBaseUrl}/auth-session`, {
+    method: "POST",
     headers: edgeHeaders(createUniqueIp("edge-admin-login")),
+    body: JSON.stringify({ role: "admin", email: adminEmail, password: adminPassword }),
   });
 
-  expect(response.ok()).toBeTruthy();
+  expect(response.ok).toBeTruthy();
   return (await response.json()) as { token: string };
 }
 
@@ -139,35 +144,36 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 });
 
 test.describe("contratos HTTP — edge functions", () => {
-  test("auth-session cobre 400, 403 e 405", async ({ request }, testInfo) => {
+  test("auth-session cobre 400, 403 e 405", async ({}, testInfo) => {
     annotateCanonicalDoc(testInfo, docs.apiCatalog);
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
-    const { functionsBaseUrl } = getIntegrationEnv();
 
-    const invalidBody = await request.post(`${functionsBaseUrl}/auth-session`, {
-      data: { role: "admin", email: "", password: "" },
-      headers: edgeHeaders(createUniqueIp("edge-auth-invalid-body")),
+    const invalidBody = await edgeRequest("/auth-session", {
+      body: { role: "admin", email: "", password: "" },
+      ip: createUniqueIp("edge-auth-invalid-body"),
     });
-    expect(invalidBody.status()).toBe(400);
+    expect(invalidBody.status).toBe(400);
     await expect(invalidBody.json()).resolves.toEqual({
       ok: false,
       error: "Dados de login inválidos.",
     });
 
-    const forbiddenOrigin = await request.post(`${functionsBaseUrl}/auth-session`, {
-      data: { role: "admin", email: "", password: "" },
-      headers: edgeHeaders(createUniqueIp("edge-auth-forbidden"), "https://forbidden.example"),
+    const forbiddenOrigin = await edgeRequest("/auth-session", {
+      body: { role: "admin", email: "", password: "" },
+      ip: createUniqueIp("edge-auth-forbidden"),
+      origin: "https://forbidden.example",
     });
-    expect(forbiddenOrigin.status()).toBe(403);
+    expect(forbiddenOrigin.status).toBe(403);
     await expect(forbiddenOrigin.json()).resolves.toEqual({
       ok: false,
       error: "Origin not allowed",
     });
 
-    const methodNotAllowed = await request.get(`${functionsBaseUrl}/auth-session`, {
-      headers: edgeHeaders(createUniqueIp("edge-auth-405")),
+    const methodNotAllowed = await edgeRequest("/auth-session", {
+      method: "GET",
+      ip: createUniqueIp("edge-auth-405"),
     });
-    expect(methodNotAllowed.status()).toBe(405);
+    expect(methodNotAllowed.status).toBe(405);
     await expect(methodNotAllowed.json()).resolves.toEqual({
       ok: false,
       error: "Method not allowed",
@@ -221,39 +227,39 @@ test.describe("contratos HTTP — edge functions", () => {
     expect(lead405.status()).toBe(405);
   });
 
-  test("admin-resources cobre 401, 405 e 422", async ({ request }, testInfo) => {
+  test("admin-resources cobre 401, 405 e 422", async ({}, testInfo) => {
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
-    const { functionsBaseUrl } = getIntegrationEnv();
 
-    const unauthorized = await request.post(`${functionsBaseUrl}/admin-resources`, {
-      data: { resource: "leads", action: "list" },
-      headers: edgeHeaders(createUniqueIp("edge-admin-401")),
+    const unauthorized = await edgeRequest("/admin-resources", {
+      body: { resource: "leads", action: "list" },
+      ip: createUniqueIp("edge-admin-401"),
     });
-    expect(unauthorized.status()).toBe(401);
+    expect(unauthorized.status).toBe(401);
     await expect(unauthorized.json()).resolves.toEqual({
       ok: false,
       error: "Não autorizado.",
     });
 
-    const methodNotAllowed = await request.get(`${functionsBaseUrl}/admin-resources`, {
-      headers: edgeHeaders(createUniqueIp("edge-admin-405")),
+    const methodNotAllowed = await edgeRequest("/admin-resources", {
+      method: "GET",
+      ip: createUniqueIp("edge-admin-405"),
     });
-    expect(methodNotAllowed.status()).toBe(405);
+    expect(methodNotAllowed.status).toBe(405);
     await expect(methodNotAllowed.json()).resolves.toEqual({
       ok: false,
       error: "Method not allowed",
     });
 
-    const { token } = await loginAsAdminEdge(request);
+    const { token } = await loginAsAdminEdge();
 
-    const invalidMutation = await request.post(`${functionsBaseUrl}/admin-resources`, {
-      data: { resource: "leads", action: "update-status", id: "lead-1", status: "status-invalido" },
+    const invalidMutation = await edgeRequest("/admin-resources", {
+      body: { resource: "leads", action: "update-status", id: "lead-1", status: "status-invalido" },
+      ip: createUniqueIp("edge-admin-422"),
       headers: {
-        ...edgeHeaders(createUniqueIp("edge-admin-422")),
         "x-rh-session": token,
       },
     });
-    expect(invalidMutation.status()).toBe(422);
+    expect(invalidMutation.status).toBe(422);
     await expect(invalidMutation.json()).resolves.toMatchObject({
       ok: false,
       error: expect.any(String),

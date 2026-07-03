@@ -72,17 +72,6 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Auth indisponivel." }, 503, request);
   }
 
-  const ip = clientIp(request);
-  const rate = await checkRateLimit(`auth:${ip}`, rateLimitConfigs.auth);
-  if (!rate.allowed) {
-    return jsonResponse(
-      { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
-      429,
-      request,
-      { "Retry-After": rate.retryAfter.toString() }
-    );
-  }
-
   const body = (await request.json().catch(() => null)) as
     | { role?: string; email?: string; password?: string }
     | null;
@@ -92,7 +81,7 @@ Deno.serve(async (request) => {
   const password = body?.password ?? "";
 
   if (!role || !email || !password) {
-    return jsonResponse({ ok: false, error: "Dados de login invalidos." }, 400, request);
+    return jsonResponse({ ok: false, error: "Dados de login inválidos." }, 400, request);
   }
 
   try {
@@ -100,6 +89,16 @@ Deno.serve(async (request) => {
     const result = await supabase.auth.signInWithPassword({ email, password });
 
     if (result.error || !result.data.user) {
+      const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
+      if (!rate.allowed) {
+        return jsonResponse(
+          { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
+          429,
+          request,
+          { "Retry-After": rate.retryAfter.toString() }
+        );
+      }
+
       return jsonResponse({ ok: false, error: "Credenciais invalidas." }, 401, request);
     }
 
