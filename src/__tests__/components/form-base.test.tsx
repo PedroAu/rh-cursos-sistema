@@ -79,7 +79,7 @@ describe('Form Components', () => {
       );
 
       const section = container.querySelector('section');
-      expect(section).toHaveClass('rounded-card');
+      expect(section).toHaveClass('rounded-tk-card');
       expect(section).toHaveClass('bg-card');
     });
   });
@@ -159,7 +159,7 @@ describe('Form Components', () => {
       const input = container.querySelector('input');
 
       expect(input).toHaveClass('focus:ring-2');
-      expect(input).toHaveClass('focus:ring-bright-blue');
+      expect(input).toHaveClass('focus:ring-tk-focus');
     });
   });
 
@@ -263,7 +263,7 @@ describe('Form Components', () => {
 
     it('applies danger color styling', () => {
       const { container } = render(<FormError>Error text</FormError>);
-      expect(container.querySelector('p')).toHaveClass('text-danger');
+      expect(container.querySelector('p')).toHaveClass('text-tk-error');
     });
   });
 
@@ -276,7 +276,7 @@ describe('Form Components', () => {
 
     it('applies success color styling', () => {
       const { container } = render(<FormSuccess>Success</FormSuccess>);
-      expect(container.querySelector('p')).toHaveClass('text-success');
+      expect(container.querySelector('p')).toHaveClass('text-tk-success');
     });
   });
 
@@ -288,7 +288,7 @@ describe('Form Components', () => {
 
     it('applies secondary text color', () => {
       const { container } = render(<FormHelperText>Helper</FormHelperText>);
-      expect(container.querySelector('p')).toHaveClass('text-text-secondary');
+      expect(container.querySelector('p')).toHaveClass('text-tk-ink-muted');
     });
   });
 });

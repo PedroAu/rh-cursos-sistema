@@ -63,26 +63,26 @@ export function EnrollmentSuccessPage() {
         <Card className="w-full max-w-4xl border-outline-variant">
           <CardContent className="space-y-8 p-8 text-center md:p-10">
             <span className="eyebrow">Inscrição recebida com sucesso</span>
-            <h1 className="text-4xl font-extrabold text-primary">Tudo pronto para a próxima etapa.</h1>
-            <p className="text-base leading-7 text-muted-foreground">
+            <h1 className="text-4xl font-extrabold text-tk-brand">Tudo pronto para a próxima etapa.</h1>
+            <p className="text-base leading-7 text-tk-ink-muted">
               Recebemos sua inscrição. Confira o resumo e acompanhe os próximos passos pelo seu e-mail.
             </p>
 
-            <div className="grid gap-4 rounded-lg bg-secondary/60 p-6 text-left md:grid-cols-2">
+            <div className="grid gap-4 rounded-lg bg-tk-accent-soft/60 p-6 text-left md:grid-cols-2">
               <div>
-                <div className="text-xs uppercase tracking-[0.16em] text-primary/70">Curso</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-tk-brand/70">Curso</div>
                 <div className="mt-2 font-semibold text-foreground">{course?.title ?? "Curso selecionado"}</div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.16em] text-primary/70">Turma</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-tk-brand/70">Turma</div>
                 <div className="mt-2 font-semibold text-foreground">{trainingClass ? formatDate(trainingClass.startDate) : "Turma escolhida"}</div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.16em] text-primary/70">Aluno</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-tk-brand/70">Aluno</div>
                 <div className="mt-2 font-semibold text-foreground">{state?.studentName ?? "Participante"}</div>
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.16em] text-primary/70">Forma de pagamento</div>
+                <div className="text-xs uppercase tracking-[0.16em] text-tk-brand/70">Forma de pagamento</div>
                 <div className="mt-2 font-semibold text-foreground">{state?.paymentMethod ?? "Pagamento"}</div>
               </div>
             </div>
@@ -104,7 +104,7 @@ export function EnrollmentSuccessPage() {
               ].map((item) => (
                 <div key={item.label} className="surface-card p-5">
                   <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
-                  <p className="mt-2 text-sm leading-6 text-text-muted">{item.description}</p>
+                  <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.description}</p>
                 </div>
               ))}
             </div>

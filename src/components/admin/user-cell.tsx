@@ -8,7 +8,7 @@ export function UserCell({ name, email }: { name: string; email: string }) {
   return (
     <div className="flex items-center gap-3">
       <span
-        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary"
+        className="flex size-9 shrink-0 items-center justify-center rounded-full bg-tk-brand/10 text-xs font-semibold text-tk-brand"
         aria-hidden="true"
       >
         {getInitials(name)}

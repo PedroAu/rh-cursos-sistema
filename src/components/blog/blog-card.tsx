@@ -14,7 +14,7 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
       size="md"
       className={cn("h-full overflow-hidden", featured && "bg-deep-navy text-white")}
     >
-      <div className={cn("min-h-40 border-b p-6", featured ? "border-white/10 bg-white/5" : "border-primary/8 bg-secondary/30")}>
+      <div className={cn("min-h-40 border-b p-6", featured ? "border-white/10 bg-white/5" : "border-tk-brand/8 bg-tk-accent-soft/30")}>
         <div
           className={cn(
             "inline-flex rounded px-4 py-2 text-label font-semibold uppercase tracking-[0.16em]",
@@ -29,11 +29,11 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
           <h3 className={cn("text-article font-bold", featured && "text-white")}>
             {post.title}
           </h3>
-          <p className={cn("text-sm leading-7", featured ? "text-white/75" : "text-muted-foreground")}>
+          <p className={cn("text-sm leading-7", featured ? "text-white/75" : "text-tk-ink-muted")}>
             {post.summary}
           </p>
         </div>
-        <div className={cn("grid gap-2 text-sm", featured ? "text-white/70" : "text-muted-foreground")}>
+        <div className={cn("grid gap-2 text-sm", featured ? "text-white/70" : "text-tk-ink-muted")}>
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4" />
             {formatDate(post.date)}
@@ -50,7 +50,7 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
         <Button
           asChild
           variant={featured ? "secondary" : "outline"}
-          className={featured ? "bg-white text-primary hover:bg-white/[0.92]" : ""}
+          className={featured ? "bg-white text-tk-brand hover:bg-white/[0.92]" : ""}
         >
           <Link to={`/blog/${post.slug}`}>Ler artigo</Link>
         </Button>

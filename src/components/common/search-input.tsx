@@ -35,7 +35,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
     return (
       <div className="space-y-2">
         <div className="relative" role="search">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
           <Input
             ref={ref}
             className={cn(hasValue || loading ? "pl-11 pr-24" : "pl-11", className)}
@@ -44,12 +44,12 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
             {...props}
           />
           <div className="absolute right-3 top-1/2 flex -translate-y-1/2 items-center gap-2">
-            {loading ? <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" aria-hidden="true" /> : null}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin text-tk-ink-muted" aria-hidden="true" /> : null}
             {hasValue && onClear ? (
               <button
                 type="button"
                 onClick={onClear}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition hover:bg-surface-muted hover:text-tk-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                 aria-label={clearLabel}
               >
                 <X className="h-4 w-4" />

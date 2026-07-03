@@ -32,7 +32,7 @@ export function SeatProgress({ filled, total }: SeatProgressProps) {
         aria-label={`Inscritos: ${safeFilled} de ${safeTotal}`}
       >
         <div
-          className={cn("h-full rounded-full transition-all", isFull ? "bg-success" : "bg-primary")}
+          className={cn("h-full rounded-full transition-all", isFull ? "bg-tk-success" : "bg-tk-brand")}
           style={{ width: `${percent}%` }}
         />
       </div>

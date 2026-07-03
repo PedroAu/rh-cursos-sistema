@@ -26,7 +26,7 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        "rounded-xl px-4 py-2 text-sm font-semibold text-muted-foreground transition data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm",
+        "rounded-xl px-4 py-2 text-sm font-semibold text-muted-foreground transition data-[state=active]:bg-white data-[state=active]:text-tk-brand data-[state=active]:shadow-sm",
         className
       )}
       {...props}

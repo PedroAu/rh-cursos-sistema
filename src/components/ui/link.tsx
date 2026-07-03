@@ -4,14 +4,14 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const linkVariants = cva(
-  "inline-flex items-center gap-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-2",
+  "inline-flex items-center gap-1 font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2",
   {
     variants: {
       variant: {
-        primary: "text-bright-blue hover:text-bright-blue-dark underline underline-offset-2",
-        ghost: "text-text-primary hover:text-bright-blue",
-        muted: "text-text-secondary hover:text-text-primary",
-        accent: "text-trust-keith-teal hover:text-keith-dark-blue font-semibold"
+        primary: "text-tk-accent hover:text-tk-accent-strong underline underline-offset-2",
+        ghost: "text-tk-ink hover:text-tk-accent",
+        muted: "text-tk-ink-muted hover:text-tk-ink",
+        accent: "text-tk-brand hover:text-tk-brand-hover font-semibold"
       },
       size: {
         sm: "text-sm",

@@ -77,9 +77,9 @@ export function CommandPalette() {
                     setOpen(false);
                     setQuery("");
                   }}
-                  className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 text-left transition hover:border-primary/30 hover:bg-secondary"
+                  className="flex items-center gap-3 rounded-2xl border border-border bg-white px-4 py-3 text-left transition hover:border-tk-brand/30 hover:bg-tk-accent-soft"
                 >
-                  <div className="rounded-full bg-secondary p-2 text-primary">
+                  <div className="rounded-full bg-tk-accent-soft p-2 text-tk-brand">
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="text-sm font-medium">{item.label}</div>

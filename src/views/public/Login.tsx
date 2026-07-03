@@ -164,7 +164,7 @@ export function LoginPage() {
             <CardContent className="grid gap-8 p-8 md:p-10">
               <div className="space-y-1.5">
                 <h1 className="text-deep-navy">Acesse sua conta</h1>
-                <p className="text-body-lg text-text-muted">Bem-vindo de volta. Entre com suas credenciais.</p>
+                <p className="text-body-lg text-tk-ink-muted">Bem-vindo de volta. Entre com suas credenciais.</p>
               </div>
 
               {status === "required" ? (
@@ -199,7 +199,7 @@ export function LoginPage() {
               </div>
 
               {error ? (
-                <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                <div role="alert" className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
                   <div className="flex items-start gap-3">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                     <div>
@@ -273,7 +273,7 @@ export function LoginPage() {
                 <Button
                   type="button"
                   variant="ghost"
-                  className="justify-start px-0 text-primary hover:bg-transparent hover:text-primary/85"
+                  className="justify-start px-0 text-tk-brand hover:bg-transparent hover:text-tk-brand/85"
                   onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}
                 >
                   Esqueci minha senha

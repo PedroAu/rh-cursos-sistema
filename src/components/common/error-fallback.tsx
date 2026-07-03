@@ -29,15 +29,15 @@ export function ErrorFallback({
 }: ErrorFallbackProps) {
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center">
-      <div className="rounded-full bg-secondary p-4 text-primary">
+      <div className="rounded-full bg-tk-accent-soft p-4 text-tk-brand">
         <AlertTriangle className="h-8 w-8" aria-hidden="true" />
       </div>
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold">{title}</h1>
-        <p className="max-w-xl text-sm leading-6 text-muted-foreground">{description}</p>
+        <p className="max-w-xl text-sm leading-6 text-tk-ink-muted">{description}</p>
       </div>
       {errorId ? (
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-tk-ink-muted">
           Código do erro: <code className="font-mono">{errorId}</code>
         </p>
       ) : null}
@@ -55,7 +55,7 @@ export function ErrorFallback({
           </a>
         </Button>
       </div>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-tk-ink-muted">
         Se o problema persistir, entre em contato:{" "}
         <a className="underline" href={`mailto:${company.email}`}>
           {company.email}

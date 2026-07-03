@@ -125,7 +125,7 @@ export function ContactPage() {
         <div className="ea-container py-12 md:py-14">
           <div className="max-w-4xl space-y-4">
             <h1 className="text-deep-navy">Entre em Contato</h1>
-            <p className="max-w-3xl text-body-lg leading-8 text-text-muted">
+            <p className="max-w-3xl text-body-lg leading-8 text-tk-ink-muted">
               Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública. Fale conosco
               através do formulário ou nossos canais diretos.
             </p>
@@ -142,13 +142,13 @@ export function ContactPage() {
               return (
                 <Card key={item.title} className="border-outline-variant bg-surface-container-lowest shadow-card">
                   <CardContent className="mt-0 flex items-start gap-4 p-6">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tk-brand/10 text-tk-brand">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-label font-bold uppercase tracking-[0.08em] text-primary">{item.title}</p>
+                      <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">{item.title}</p>
                       <p className="mt-2 text-lg font-semibold text-deep-navy">{item.headline}</p>
-                      <p className="mt-1 text-sm leading-6 text-text-muted">{item.detail}</p>
+                      <p className="mt-1 text-sm leading-6 text-tk-ink-muted">{item.detail}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -186,19 +186,19 @@ export function ContactPage() {
               <div className="flex items-center gap-4">
                 <div className="h-12 w-1 rounded-full bg-prestige-gold" aria-hidden />
                 <div className="space-y-1">
-                  <p className="text-label font-bold uppercase tracking-[0.08em] text-primary">Atendimento</p>
+                  <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">Atendimento</p>
                   <h2 className="font-display text-h2-compact font-bold text-deep-navy">Envie uma mensagem</h2>
                 </div>
               </div>
 
               {submitError ? (
-                <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                <div role="alert" className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
                   {submitError}
                 </div>
               ) : null}
 
               {submitSuccess ? (
-                <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
+                <div aria-live="polite" className="rounded-lg border border-tk-success/25 bg-tk-success/10 px-4 py-3 text-sm text-tk-success">
                   {submitSuccess}
                 </div>
               ) : null}

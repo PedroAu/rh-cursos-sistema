@@ -45,8 +45,8 @@ const formSectionVariants = cva('flex flex-col gap-4', {
   variants: {
     variant: {
       default: '',
-      card: 'rounded-card border border-outline-variant bg-card p-6',
-      outlined: 'rounded-card border-2 border-outline-variant p-4',
+      card: 'rounded-tk-card border border-outline-variant bg-card p-6',
+      outlined: 'rounded-tk-card border-2 border-outline-variant p-4',
     },
   },
   defaultVariants: {
@@ -66,8 +66,8 @@ export const FormSection = React.forwardRef<HTMLDivElement, FormSectionProps>(
     <section ref={ref} className={cn(formSectionVariants({ variant }), className)}>
       {label && (
         <div className="flex flex-col gap-1">
-          <h3 className="font-display text-section-heading font-bold text-text-primary">{label}</h3>
-          {description && <p className="text-body-small text-text-secondary">{description}</p>}
+          <h3 className="font-display text-section-heading font-bold text-tk-ink">{label}</h3>
+          {description && <p className="text-body-small text-tk-ink-muted">{description}</p>}
         </div>
       )}
       <div className="flex flex-col gap-4" {...props} />
@@ -133,7 +133,7 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>(
             className="text-label-bold font-semibold uppercase tracking-[0.05em] text-label-primary"
           >
             {label}
-            {required && <span className="ml-1 text-danger">*</span>}
+            {required && <span className="ml-1 text-tk-error">*</span>}
           </label>
         )}
 
@@ -156,7 +156,7 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>(
         )}
 
         {error && (
-          <p className="text-sm leading-6 text-danger" id={errorId} role="alert">
+          <p className="text-sm leading-6 text-tk-error" id={errorId} role="alert">
             {error}
           </p>
         )}
@@ -171,11 +171,11 @@ FormControl.displayName = 'FormControl';
  */
 const inputVariants = cva(
   cn(
-    'w-full rounded-input border border-input bg-surface-white px-3 py-2',
-    'font-sans text-body placeholder:text-text-secondary',
-    'transition-colors focus:outline-none focus:ring-2 focus:ring-bright-blue focus:ring-offset-0',
+    'w-full rounded-tk-input border border-input bg-tk-surface px-3 py-2',
+    'font-sans text-body placeholder:text-tk-ink-muted',
+    'transition-colors focus:outline-none focus:ring-2 focus:ring-tk-focus focus:ring-offset-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
-    'aria-invalid:border-danger aria-invalid:focus:ring-danger'
+    'aria-invalid:border-tk-error aria-invalid:focus:ring-tk-error'
   ),
   {
     variants: {
@@ -212,11 +212,11 @@ Input.displayName = 'Input';
  */
 const textareaVariants = cva(
   cn(
-    'w-full rounded-input border border-input bg-surface-white px-3 py-2',
-    'font-sans text-body placeholder:text-text-secondary',
-    'transition-colors focus:outline-none focus:ring-2 focus:ring-bright-blue focus:ring-offset-0',
+    'w-full rounded-tk-input border border-input bg-tk-surface px-3 py-2',
+    'font-sans text-body placeholder:text-tk-ink-muted',
+    'transition-colors focus:outline-none focus:ring-2 focus:ring-tk-focus focus:ring-offset-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
-    'aria-invalid:border-danger aria-invalid:focus:ring-danger',
+    'aria-invalid:border-tk-error aria-invalid:focus:ring-tk-error',
     'resize-vertical'
   ),
   {
@@ -258,11 +258,11 @@ Textarea.displayName = 'Textarea';
  */
 const selectVariants = cva(
   cn(
-    'w-full rounded-input border border-input bg-surface-white px-3 py-2',
+    'w-full rounded-tk-input border border-input bg-tk-surface px-3 py-2',
     'font-sans text-body',
-    'transition-colors focus:outline-none focus:ring-2 focus:ring-bright-blue focus:ring-offset-0',
+    'transition-colors focus:outline-none focus:ring-2 focus:ring-tk-focus focus:ring-offset-0',
     'disabled:cursor-not-allowed disabled:opacity-50',
-    'aria-invalid:border-danger aria-invalid:focus:ring-danger',
+    'aria-invalid:border-tk-error aria-invalid:focus:ring-tk-error',
     'appearance-none cursor-pointer'
   ),
   {
@@ -313,15 +313,15 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         ref={ref}
         type="checkbox"
         className={cn(
-          'w-5 h-5 rounded-sm border border-input bg-surface-white',
-          'focus:outline-none focus:ring-2 focus:ring-bright-blue focus:ring-offset-2',
+          'w-5 h-5 rounded-sm border border-input bg-tk-surface',
+          'focus:outline-none focus:ring-2 focus:ring-tk-focus focus:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          'checked:bg-bright-blue checked:border-bright-blue',
+          'checked:bg-tk-accent checked:border-tk-accent',
           className
         )}
         {...props}
       />
-      {label && <span className="text-body text-text-primary">{label}</span>}
+      {label && <span className="text-body text-tk-ink">{label}</span>}
     </label>
   )
 );
@@ -341,15 +341,15 @@ export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
         ref={ref}
         type="radio"
         className={cn(
-          'w-5 h-5 rounded-full border-2 border-input bg-surface-white',
-          'focus:outline-none focus:ring-2 focus:ring-bright-blue focus:ring-offset-2',
+          'w-5 h-5 rounded-full border-2 border-input bg-tk-surface',
+          'focus:outline-none focus:ring-2 focus:ring-tk-focus focus:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          'checked:border-bright-blue',
+          'checked:border-tk-accent',
           className
         )}
         {...props}
       />
-      {label && <span className="text-body text-text-primary">{label}</span>}
+      {label && <span className="text-body text-tk-ink">{label}</span>}
     </label>
   )
 );
@@ -379,7 +379,7 @@ export const FormHelperText = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm leading-6 text-text-secondary', className)}
+    className={cn('text-sm leading-6 text-tk-ink-muted', className)}
     {...props}
   />
 ));
@@ -395,7 +395,7 @@ export const FormError = React.forwardRef<
   <p
     ref={ref}
     role="alert"
-    className={cn('text-sm leading-6 text-danger', className)}
+    className={cn('text-sm leading-6 text-tk-error', className)}
     {...props}
   />
 ));
@@ -411,7 +411,7 @@ export const FormSuccess = React.forwardRef<
   <p
     ref={ref}
     role="status"
-    className={cn('text-sm leading-6 text-success', className)}
+    className={cn('text-sm leading-6 text-tk-success', className)}
     {...props}
   />
 ));

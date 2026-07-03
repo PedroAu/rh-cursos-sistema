@@ -5,16 +5,6 @@
 
 export const tokens = {
   colors: {
-    "trust-keith-teal": "var(--tk-brand)",
-    "keith-dark-blue": "var(--tk-brand-hover)",
-    "bright-blue": "var(--tk-accent)",
-    "bright-blue-dark": "var(--tk-accent-strong)",
-    "bright-blue-light": "var(--tk-accent-soft)",
-    "text-primary": "var(--tk-ink)",
-    "text-secondary": "var(--tk-ink-muted)",
-    "surface-light": "var(--tk-surface-2)",
-    "surface-neutral": "var(--tk-line)",
-    "surface-white": "var(--tk-surface)",
     success: "var(--tk-success)",
     danger: "var(--tk-error)",
     error: "var(--tk-error)",

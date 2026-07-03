@@ -472,13 +472,13 @@ export function InCompanyPage() {
 
               <div className="p-8 md:p-10">
                 {submitError ? (
-                  <div role="alert" className="mb-6 rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                  <div role="alert" className="mb-6 rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
                     {submitError}
                   </div>
                 ) : null}
 
                 {submitSuccess ? (
-                  <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
+                  <div aria-live="polite" className="rounded-lg border border-tk-success/25 bg-tk-success/10 px-4 py-3 text-sm text-tk-success">
                     {submitSuccess}
                   </div>
                 ) : null}

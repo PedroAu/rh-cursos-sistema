@@ -192,7 +192,7 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
                     <div>
                       <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">Curso selecionado</p>
                       <p className="mt-1 font-semibold text-deep-navy">{course.title}</p>
-                      <p className="mt-1 text-sm text-text-muted">
+                      <p className="mt-1 text-sm text-tk-ink-muted">
                         {course.durationLabel} • {course.level}
                       </p>
                     </div>
@@ -200,7 +200,7 @@ export function QuoteModalProvider({ children }: { children: ReactNode }) {
                 ) : null}
 
                 {submitError ? (
-                  <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                  <div role="alert" className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
                     {submitError}
                   </div>
                 ) : null}

@@ -38,8 +38,8 @@ export function BlogPostPage() {
             <div className="space-y-4">
               <span className="eyebrow">{post.category}</span>
               <h1 className="text-4xl font-semibold md:text-5xl">{post.title}</h1>
-              <p className="text-lg leading-8 text-muted-foreground">{post.summary}</p>
-              <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <p className="text-lg leading-8 text-tk-ink-muted">{post.summary}</p>
+              <div className="flex flex-wrap gap-4 text-sm text-tk-ink-muted">
                 <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(post.date)}</div>
                 <div className="flex items-center gap-2"><Clock3 className="h-4 w-4" />{post.readingTime}</div>
               </div>
@@ -54,7 +54,7 @@ export function BlogPostPage() {
             <Card className="border-outline-variant">
               <CardContent className="space-y-5 p-7 md:p-10">
                 {safeContent.split("\n\n").map((paragraph) => (
-                  <p key={paragraph} className="mx-auto max-w-3xl text-base leading-8 text-muted-foreground">
+                  <p key={paragraph} className="mx-auto max-w-3xl text-base leading-8 text-tk-ink-muted">
                     {paragraph}
                   </p>
                 ))}
@@ -66,7 +66,7 @@ export function BlogPostPage() {
             <Card className="border-outline-variant bg-surface-muted">
               <CardContent className="space-y-4 p-6">
                 <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Leitura guiada</div>
-                <ul className="space-y-3 text-sm leading-6 text-text-muted">
+                <ul className="space-y-3 text-sm leading-6 text-tk-ink-muted">
                   {leadParagraphs.map((paragraph, index) => (
                     <li key={paragraph} className="flex gap-3">
                       <span className="mt-0.5 font-bold text-deep-navy">{index + 1}.</span>
@@ -76,7 +76,7 @@ export function BlogPostPage() {
                 </ul>
               </CardContent>
             </Card>
-            <Card className="bg-primary text-white">
+            <Card className="bg-tk-brand text-white">
               <CardContent className="space-y-4 p-6">
                 <div className="text-sm uppercase tracking-[0.18em] text-blue-100/80">CTA relacionado</div>
                 <h3 className="text-2xl font-semibold text-white">{relatedCourse?.title}</h3>
@@ -84,7 +84,7 @@ export function BlogPostPage() {
                   Conecte o conteúdo do artigo à jornada comercial com um CTA direto para o curso relacionado.
                 </p>
                 {relatedCourse ? (
-                  <Button asChild className="bg-white text-primary hover:bg-white/90">
+                  <Button asChild className="bg-white text-tk-brand hover:bg-white/90">
                     <Link to={`/cursos/${relatedCourse.slug}`}>
                       Ver curso relacionado
                       <ArrowRight className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function BlogPostPage() {
             <Card className="border-outline-variant bg-white">
               <CardContent className="space-y-4 p-6">
                 <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Taxonomia</div>
-                <div className="space-y-3 text-sm leading-6 text-text-muted">
+                <div className="space-y-3 text-sm leading-6 text-tk-ink-muted">
                   <p><strong className="text-deep-navy">Categoria:</strong> {post.category}</p>
                   <p><strong className="text-deep-navy">Autor:</strong> {post.author}</p>
                   <p><strong className="text-deep-navy">Leitura estimada:</strong> {post.readingTime}</p>

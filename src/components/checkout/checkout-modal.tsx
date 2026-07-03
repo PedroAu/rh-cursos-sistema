@@ -114,11 +114,11 @@ function PaymentSelector({
             className={cn(
               "flex h-full flex-col items-center justify-center gap-2 rounded-xl border-2 p-4 text-center transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               selected
-                ? "border-primary bg-secondary/60"
+                ? "border-tk-brand bg-tk-accent-soft/60"
                 : "border-outline-variant bg-white hover:bg-surface-muted"
             )}
           >
-            <Icon className="h-6 w-6 text-primary" aria-hidden />
+            <Icon className="h-6 w-6 text-tk-brand" aria-hidden />
             <span className="text-sm font-bold text-deep-navy">{method.label}</span>
           </button>
         );
@@ -269,8 +269,8 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                       step === index + 1
                         ? "border-deep-navy bg-deep-navy text-white"
                         : step > index + 1
-                          ? "border-success/30 bg-success/10 text-success"
-                          : "border-outline-variant bg-white text-text-muted"
+                          ? "border-tk-success/30 bg-tk-success/10 text-tk-success"
+                          : "border-outline-variant bg-white text-tk-ink-muted"
                     )}
                   >
                     <div className="text-label font-bold uppercase tracking-[0.08em]">{index + 1}. etapa</div>
@@ -286,7 +286,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                   <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">
                     {checkoutSteps[step - 1]?.title}
                   </p>
-                  <p className="mt-2 text-sm leading-6 text-text-muted">
+                  <p className="mt-2 text-sm leading-6 text-tk-ink-muted">
                     {checkoutSteps[step - 1]?.description}
                   </p>
                 </div>
@@ -377,7 +377,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                         </Select>
                       )}
                     </FormField>
-                    <div className="rounded-xl border border-outline-variant bg-surface-muted px-4 py-4 text-sm leading-6 text-text-muted">
+                    <div className="rounded-xl border border-outline-variant bg-surface-muted px-4 py-4 text-sm leading-6 text-tk-ink-muted">
                       {requiresOrganizationContext
                         ? "Para inscrições corporativas ou por órgão público, coletamos empresa e cargo para alinhar proposta e faturamento."
                         : "Para pessoa física, empresa e cargo são opcionais. Você pode informar agora ou concluir sem esse contexto."}
@@ -428,7 +428,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                 {step === 3 ? (
                   <div className="grid gap-4">
                     {fieldErrors.classId ? (
-                      <div className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+                      <div className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error" role="alert">
                         {fieldErrors.classId}
                       </div>
                     ) : null}
@@ -443,7 +443,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                         }}
                         className={cn(
                           "rounded-xl border p-5 text-left transition",
-                          form.classId === trainingClass.id ? "border-deep-navy bg-secondary/60" : "border-border bg-white hover:border-accent"
+                          form.classId === trainingClass.id ? "border-deep-navy bg-tk-accent-soft/60" : "border-border bg-white hover:border-accent"
                         )}
                       >
                         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -453,7 +453,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                               {" · "}
                               {new Intl.DateTimeFormat("pt-BR", { year: "numeric" }).format(new Date(trainingClass.startDate))}
                             </div>
-                            <div className="mt-1 text-sm text-muted-foreground">
+                            <div className="mt-1 text-sm text-tk-ink-muted">
                               {trainingClass.time} • {trainingClass.modality} • {trainingClass.location}
                             </div>
                           </div>
@@ -469,7 +469,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                 {step === 4 ? (
                   <div className="grid gap-4">
                     {submitError ? (
-                      <div className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger" role="alert">
+                      <div className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error" role="alert">
                         {submitError}
                       </div>
                     ) : null}
@@ -503,7 +503,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                     <div className="grid gap-3">
                       <div>
                         <p className="text-sm font-bold text-deep-navy">Forma de pagamento</p>
-                        <p className="mt-1 text-sm leading-6 text-text-muted">
+                        <p className="mt-1 text-sm leading-6 text-tk-ink-muted">
                           A equipe confirma a forma escolhida no contato de pós-inscrição.
                         </p>
                       </div>
@@ -572,7 +572,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
                   "Orientações da turma enviadas após reserva."
                 ].map((item) => (
                   <div key={item} className="flex gap-3 text-sm leading-6 text-white/80">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-tk-success" />
                     <span>{item}</span>
                   </div>
                 ))}

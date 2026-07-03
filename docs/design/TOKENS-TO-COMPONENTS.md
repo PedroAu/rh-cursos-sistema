@@ -1,332 +1,145 @@
-# Design System Mapping — Tokens → Components → CSS
+# Design System Mapping — Canonical Tokens → Components
 
-**Generated:** 2026-06-29 | **Status:** ✅ Consolidated & Verified
+**Status:** Active reference  
+**Last Updated:** 2026-07-03  
+**Primary source of truth:** [docs/design-system/trust-keith/INVENTORY.md](../design-system/trust-keith/INVENTORY.md)
 
 ---
 
 ## Overview
 
-Este documento mapeia todos os tokens definidos em `tokens.json` para seus componentes implementados e classes CSS correspondentes.
+Este documento descreve o mapeamento canônico entre os tokens ativos do redesign RH e a implementação em componentes.
+Ele substitui o mapeamento legado baseado em nomes como `primary`, `secondary` e `surface-light`.
 
-**Estrutura:**
-- **L1: Design Tokens** (`docs/design/tokens.json`)
-- **L2: Tailwind Config** (`src/design-tokens/tokens.tailwind.js`)
-- **L3: React Components** (`src/components/ui/`)
-- **L4: CSS Classes** (Tailwind classe generated)
+## Token Families
 
----
+### Brand and Accent
 
-## Colors
+| Token | Final value | Usage |
+|---|---:|---|
+| `--tk-brand` | `#0c6a83` | marca principal RH |
+| `--tk-brand-hover` | `#084f63` | hover de CTA primário |
+| `--tk-cta` | `#0c6a83` | CTA primário |
+| `--tk-cta-hover` | `#084f63` | hover de CTA primário |
+| `--tk-accent` | `#1791a9` | acentos, links, controles secundários |
+| `--tk-accent-strong` | `#0c6a83` | reforço de acento |
+| `--tk-accent-soft` | `#e0f2f6` | fundos suaves de destaque |
 
-| Token | Hex | Tailwind Class | Used In | Status |
-|-------|-----|--|----------|--------|
-| `primary` | `#235875` | `text-trust-keith-teal` | Button, Badge | ✅ |
-| `secondary` | `#4285f4` | `text-bright-blue` | Links, Focus rings | ✅ |
-| `success` | `#068466` | `text-success` | Alerts, Status | ✅ |
-| `error`/`danger` | `#ea384c` | `text-danger` / `text-error` | Error states | ✅ |
-| `text-primary` | `#222525` | `text-text-primary` | Body text | ✅ |
-| `text-secondary` | `#4f5057` | `text-text-secondary` | Muted text | ✅ |
-| `surface-white` | `#ffffff` | `bg-surface-white` | Cards, Inputs | ✅ |
-| `surface-light` | `#fafafa` | `bg-surface-light` | Secondary bg | ✅ |
-| `surface-neutral` | `#ebebeb` | `border-surface-neutral` | Borders | ✅ |
+### Neutral and Semantic
 
-**Note:** Todos os nomes de cores foram consolidados de `tokens.json` → `tokens.tailwind.js`.
+| Token | Final value | Usage |
+|---|---:|---|
+| `--tk-ink` | `#222525` | texto principal |
+| `--tk-ink-muted` | `#4f5057` | texto secundário |
+| `--tk-line` | `#ebebeb` | bordas |
+| `--tk-surface` | `#ffffff` | superfície principal |
+| `--tk-surface-2` | `#fafafa` | superfície alternativa |
+| `--tk-success` | `#068466` | estados de sucesso |
+| `--tk-error` | `#ea384c` | estados de erro |
+| `--tk-focus` | `#4d65ff` | anel de foco AA |
 
----
+### RH Extensions
 
-## Typography
+| Token | Final value | Usage |
+|---|---:|---|
+| `--rh-teal-deep` | `#0c6a83` | destaque editorial |
+| `--rh-teal` | `#1791a9` | teal intermediário |
+| `--rh-teal-lt` | `#37b7cc` | detalhes claros |
+| `--rh-gray` | `#7f8c94` | eyebrow/tag |
+| `--rh-paper-a` | `#f4f1e9` | paper gradient start |
+| `--rh-paper-b` | `#e9e4d8` | paper gradient end |
+| `--rh-paper-line` | `#ded8c9` | paper border |
 
-### Font Sizes
-
-| Token | Size | Used In | Status |
-|-------|------|---------|--------|
-| `display-hero` | 3.75rem | Hero sections | ✅ |
-| `display-large` | 2.75rem | Page titles | ✅ |
-| `section-heading` | 2rem | Section headers | ✅ |
-| `body-large` | 1.0625rem | Article text | ✅ |
-| `body` | 1rem | Default body | ✅ |
-| `button` | 0.875rem | Button text | ✅ Button.tsx |
-| `link` | 0.875rem | Links | ✅ Link.tsx |
-
-### Font Families
-
-| Token | Font | Used In | Status |
-|-------|------|---------|--------|
-| `sans` | Inter | Body, buttons, inputs | ✅ |
-| `display` | Quincy CF | Headings | ✅ |
-| `serif` | Merriweather | Subheadings | ✅ |
-
----
-
-## Spacing
-
-| Token | Value | Tailwind | Used In | Status |
-|-------|-------|----------|---------|--------|
-| `xs` | 0.25rem | `p-xs` | Small gaps | ✅ |
-| `sm` | 0.5rem | `p-sm` | Input padding | ✅ |
-| `md` | 1rem | `p-md` | Default padding | ✅ |
-| `lg` | 1.5rem | `p-lg` | Component padding | ✅ |
-| `xl` | 2rem | `p-xl` | Card padding (lg) | ✅ |
-| `2xl` | 3rem | `p-2xl` | Large spacing | ✅ |
-
----
-
-## Border Radius
-
-| Token | Value | Tailwind | Used In | Status |
-|-------|-------|----------|---------|--------|
-| `input` | 0px | `rounded-input` | Input.tsx | ✅ |
-| `button` | 6px | `rounded-button` | Button.tsx | ✅ |
-| `glass` | 16px | `rounded-glass` | Card (glass variant) | ✅ |
-| `card` | 24px | `rounded-card` | Card.tsx | ✅ |
-| `pill` | 100rem | `rounded-pill` | Badge.tsx | ✅ |
-
----
-
-## Components Mapping
+## Component Mapping
 
 ### Button
 
-**Token Definition** (`tokens.json`):
-```json
-"button-primary": {
-  "bg": "#235875",
-  "text": "#ffffff",
-  "radius": "6px",
-  "padding": "20px 20px",
-  "hover_bg": "#194359"
-}
-```
+Canonical semantics:
 
-**Implementation** (`button.tsx`):
-```typescript
-const buttonVariants = cva(
-  "inline-flex min-h-11 items-center justify-center gap-2 whitespace-nowrap rounded-button text-sm font-semibold ...",
-  {
-    variants: {
-      variant: {
-        default: "bg-trust-keith-teal text-surface-white hover:bg-keith-dark-blue",
-        secondary: "border border-surface-neutral bg-surface-light text-text-primary",
-        outline: "border border-surface-neutral bg-surface-white text-bright-blue",
-        ghost: "text-text-primary hover:bg-surface-light",
-        tertiary: "... text-bright-blue underline-offset-4",
-        success: "bg-success text-surface-white",
-        danger: "bg-danger text-surface-white"
-      },
-      size: {
-        default: "h-12 px-6",    // 1.5rem padding
-        sm: "h-11 px-4 text-xs", // 1rem padding
-        lg: "h-14 px-8 text-base" // 2rem padding
-      }
-    }
-  }
-);
-```
+- `primary` → background `--tk-cta`, hover `--tk-cta-hover`, text on `--tk-surface`
+- `secondary` → border `--tk-line`, background `--tk-surface`, text `--tk-ink`
+- `destructive` → background `--tk-error`, text on `--tk-surface`
+- `ghost` or `link` → text/accent usage only when justified by interaction model
 
-**CSS Classes Generated:**
-- Default: `bg-trust-keith-teal text-surface-white rounded-button h-12 px-6`
-- Secondary: `border-surface-neutral bg-surface-light rounded-button h-12 px-6`
-- Hover state: `hover:bg-keith-dark-blue hover:-translate-y-0.5`
+Implementation target:
 
-**Status:** ✅ Fully aligned
-
----
+- [src/components/ui/button.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/button.tsx)
 
 ### Card
 
-**Token Definition** (`tokens.json`):
-```json
-"card": {
-  "radius": "24px",
-  "bg": "#ffffff",
-  "padding": "32px",
-  "shadow": "0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)",
-  "variants": {
-    "glass": {
-      "radius": "16px",
-      "padding": "28px",
-      "shadow": "0 4px 16px rgba(0,0,0,0.08)"
-    },
-    "item": {
-      "bg": "#fafafa"
-    }
-  }
-}
-```
+Canonical variants:
 
-**Implementation** (`card.tsx`):
-```typescript
-const cardVariants = cva(
-  "bg-surface-white border border-surface-neutral overflow-hidden transition-shadow",
-  {
-    variants: {
-      variant: {
-        base: "rounded-card shadow-standard",
-        elevated: "rounded-card shadow-standard hover:shadow-ambient",
-        outlined: "rounded-card border-2 shadow-none",
-        glass: "rounded-glass shadow-ambient",  // 16px radius
-        filled: "rounded-card bg-surface-light border-none shadow-standard"
-      },
-      size: {
-        sm: "p-3",  // ~12px
-        md: "p-6",  // ~24px (aligned with xl in spacing)
-        lg: "p-8"   // ~32px
-      }
-    }
-  }
-);
-```
+- `surface` → `--tk-surface` + `--tk-radius-card` + `--tk-shadow-card`
+- `glass` → `--tk-surface` + `--tk-radius-glass` + `--tk-shadow-glass`
+- `paper` → RH paper gradient + `--rh-paper-line`
 
-**CSS Classes Generated:**
-- Base: `bg-surface-white border-surface-neutral rounded-card shadow-standard p-6`
-- Glass: `bg-surface-white rounded-glass shadow-ambient p-6`
-- Item: `bg-surface-light rounded-card shadow-standard`
+Implementation targets:
 
-**Status:** ✅ Fully aligned
+- [src/components/ui/card.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/card.tsx)
+- [src/components/patterns/paper-card.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/patterns/paper-card.tsx)
 
----
+### Form Controls
 
-### Input
+Canonical requirements:
 
-**Token Definition** (`tokens.json` — Updated):
-```json
-"input-text": {
-  "bg": "#ffffff",
-  "text": "#222525",
-  "border": "#ebebeb",
-  "radius": "0px",
-  "padding": "8px 12px",
-  "focus_border": "#4d65ff",
-  "focus_outline": "0.125rem solid #4d65ff",
-  "states": {
-    "disabled": {
-      "cursor": "not-allowed",
-      "opacity": "0.5",
-      "bg": "#fafafa"
-    }
-  }
-}
-```
+- labels visíveis
+- hint and error linked via `aria-describedby`
+- invalid state via `aria-invalid`
+- focus driven by `--tk-focus`
 
-**Implementation** (`input.tsx`):
-```typescript
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  ({ className, ...props }, ref) => (
-    <input
-      ref={ref}
-      className={cn(
-        "flex h-11 w-full rounded-input border border-surface-neutral bg-surface-white px-4 py-3 text-sm text-text-primary shadow-sm outline-none transition placeholder:text-text-secondary hover:border-bright-blue focus-visible:border-bright-blue focus-visible:ring-2 focus-visible:ring-bright-blue focus-visible:ring-offset-1",
-        className
-      )}
-      {...props}
-    />
-  )
-);
-```
+Implementation targets:
 
-**CSS Classes Generated:**
-- Default: `rounded-input border-surface-neutral bg-surface-white px-4 py-3`
-- Focus: `focus-visible:border-bright-blue focus-visible:ring-2`
-- Disabled: `disabled:opacity-50 disabled:bg-surface-light disabled:cursor-not-allowed`
+- [src/components/ui/form-field.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/form-field.tsx)
+- [src/components/ui/input.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/input.tsx)
+- [src/components/ui/textarea.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/textarea.tsx)
+- [src/components/ui/select.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/ui/select.tsx)
 
-**Status:** ✅ Fully aligned (updated with proper disabled state)
+### Chips and Tags
 
----
+Canonical patterns:
 
-## Validation Checklist
+- `rh-chip` → informational surface chip
+- `rh-fchip` → toggle/filter chip
+- `rh-tag` → eyebrow/tag text pattern
 
-- [x] Colors: All 18 primary colors mapped
-- [x] Typography: All 13 font sizes + 3 families mapped
-- [x] Spacing: All 6 spacing levels mapped
-- [x] Border Radius: All 5 radius scales mapped
-- [x] Shadows: 4 shadow variants mapped
-- [x] Button: 7 variants + 3 sizes aligned
-- [x] Card: 5 variants + 3 sizes aligned
-- [x] Input: States (default, focus, disabled) aligned
-- [x] Focus Ring: Bright blue (#4d65ff) consistent across components
-- [x] Hover States: All use `hover:-translate-y-0.5` for elevation
+Rule:
 
----
+- `.rh-jchip` is not canonical and should not receive new implementation work
 
-## Files Modified
+## Typography Mapping
 
-| File | Changes | Status |
-|------|---------|--------|
-| `docs/design/tokens.json` | Removed invalid `rotate(45deg)`, fixed input states | ✅ |
-| `docs/design/tokens-extended.json` | Same fixes as tokens.json | ✅ |
-| `src/design-tokens/tokens.tailwind.js` | No changes (already correct) | ✅ |
-| `src/components/ui/button.tsx` | No changes needed | ✅ |
-| `src/components/ui/card.tsx` | No changes needed | ✅ |
-| `src/components/ui/input.tsx` | No changes needed | ✅ |
+| Token family | Component usage |
+|---|---|
+| `--tk-font-display` + display scale | hero, section headers, editorial titles |
+| `--tk-font-serif` + subhead/body large | supporting editorial copy |
+| `--tk-font-body` + body/caption scales | UI, forms, cards, navigation |
 
----
+## Legacy Mapping Status
 
-## Remaining Tasks
+Os nomes abaixo devem ser tratados como legados e não devem orientar novas implementações:
 
-### P0 — Completed ✅
-- [x] Remove invalid `rotate(45deg)` transform
-- [x] Fix input `cursor` from `not-allowed` to `text`
-- [x] Add proper disabled state to input
-- [x] Create tokens-to-components mapping
+- `primary`
+- `secondary`
+- `surface-white`
+- `surface-light`
+- `text-primary`
+- `text-secondary`
+- `bright-blue` como sinônimo de cor de marca
 
-### P1 — Verify (Next Sprint)
-- [ ] Visual regression test after token changes
-- [ ] Screenshot comparison: before/after Button hover states
-- [ ] Screenshot comparison: Card variants (glass vs. item)
-- [ ] Accessibility: Focus ring contrast check (WCAG AAA)
+Motivo:
 
-### P2 — Documentation
-- [ ] Update Storybook stories with token references
-- [ ] Create designer → developer handoff guide
-- [ ] Add token change log
+- esses nomes refletem a fase pré-remap RH ou abstrações intermediárias
+- a taxonomia ativa agora está explicitamente capturada em `--tk-*` e `--rh-*`
 
----
+## Validation Rules
 
-## Usage Guide for Developers
+- nenhum CTA final deve renderizar `#235875` como cor de marca
+- toda nova variante deve mapear para token existente antes de criar novo alias
+- documentação derivada deve apontar para o inventário Trust Keith RH, não duplicar a definição
 
-### Using Design Tokens in Components
+## Implementation References
 
-**Import tokens:**
-```typescript
-import { tokens } from '@/design-tokens/tokens.tailwind.js';
-```
-
-**Apply in Tailwind:**
-```tsx
-<button className={cn(
-  "bg-trust-keith-teal text-surface-white rounded-button",
-  "px-6 py-3",
-  "hover:bg-keith-dark-blue hover:-translate-y-0.5",
-  "focus-visible:ring-2 focus-visible:ring-bright-blue"
-)}>
-  Click me
-</button>
-```
-
-**Using CVA (preferred for complex components):**
-```typescript
-const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-button font-semibold transition-all",
-  {
-    variants: {
-      variant: {
-        primary: "bg-trust-keith-teal text-surface-white hover:bg-keith-dark-blue",
-        secondary: "bg-surface-light text-text-primary border border-surface-neutral"
-      }
-    }
-  }
-);
-```
-
----
-
-## Questions?
-
-- **Token Name:** Check `tokens.tailwind.js` for available token names
-- **Component Implementation:** Refer to `src/components/ui/` for working examples
-- **Tailwind Classes:** Use `rounded-{button|card|glass|input|pill}` for border-radius
-- **Color Names:** Prefer semantic names (`text-primary`, `bg-success`) over hex values
-
----
-
-**Maintained by:** Orion (AIOX Master) | **Last Updated:** 2026-06-29
+- Inventory: [docs/design-system/trust-keith/INVENTORY.md](../design-system/trust-keith/INVENTORY.md)
+- Token story: [src/stories/design-tokens.stories.tsx](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/stories/design-tokens.stories.tsx)
+- Token CSS: [src/design-tokens/tokens.css](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/design-tokens/tokens.css)
+- Tailwind tokens: [src/design-tokens/tokens.tailwind.js](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/design-tokens/tokens.tailwind.js)

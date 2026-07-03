@@ -61,7 +61,7 @@ export function CourseDetailPage() {
     <>
       <section className="py-20">
         <div className="ea-container space-y-10">
-          <div className="text-sm text-muted-foreground">
+          <div className="text-sm text-tk-ink-muted">
             <Link to="/">Home</Link> / <Link to="/cursos">Cursos</Link> / {course.title}
           </div>
 
@@ -73,9 +73,9 @@ export function CourseDetailPage() {
                   <Badge variant="muted">{course.modality}</Badge>
                   <Badge variant="success">{course.durationLabel}</Badge>
                 </div>
-                <h1 className="font-display text-primary">{course.title}</h1>
-                <p className="max-w-3xl text-lg leading-8 text-muted-foreground">{course.fullDescription}</p>
-                <div className="flex flex-wrap gap-5 text-sm text-muted-foreground">
+                <h1 className="font-display text-tk-brand">{course.title}</h1>
+                <p className="max-w-3xl text-lg leading-8 text-tk-ink-muted">{course.fullDescription}</p>
+                <div className="flex flex-wrap gap-5 text-sm text-tk-ink-muted">
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-accent" />
                     {course.rating.toFixed(1)} de avaliação
@@ -99,20 +99,20 @@ export function CourseDetailPage() {
 
               <div className="flex flex-wrap gap-8 border-t border-outline-variant pt-6">
                 <div>
-                  <span className="ea-label text-text-muted">Investimento</span>
-                  <p className="mt-1 font-bold text-primary">{currency(course.price)}</p>
+                  <span className="ea-label text-tk-ink-muted">Investimento</span>
+                  <p className="mt-1 font-bold text-tk-brand">{currency(course.price)}</p>
                 </div>
                 <div>
-                  <span className="ea-label text-text-muted">Carga</span>
-                  <p className="mt-1 font-bold text-primary">{course.durationLabel}</p>
+                  <span className="ea-label text-tk-ink-muted">Carga</span>
+                  <p className="mt-1 font-bold text-tk-brand">{course.durationLabel}</p>
                 </div>
                 <div>
-                  <span className="ea-label text-text-muted">Modalidade</span>
-                  <p className="mt-1 font-bold text-primary">{course.modality}</p>
+                  <span className="ea-label text-tk-ink-muted">Modalidade</span>
+                  <p className="mt-1 font-bold text-tk-brand">{course.modality}</p>
                 </div>
                 <div>
-                  <span className="ea-label text-text-muted">Certificação</span>
-                  <p className="mt-1 font-bold text-primary">Profissional</p>
+                  <span className="ea-label text-tk-ink-muted">Certificação</span>
+                  <p className="mt-1 font-bold text-tk-brand">Profissional</p>
                 </div>
               </div>
 
@@ -139,7 +139,7 @@ export function CourseDetailPage() {
                   <div key={item.label} className="surface-card p-5">
                     <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
                     <p className="mt-2 font-display text-3xl font-bold text-deep-navy">{item.value}</p>
-                    <p className="mt-2 text-sm leading-6 text-text-muted">{item.helper}</p>
+                    <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.helper}</p>
                   </div>
                 ))}
               </div>
@@ -153,8 +153,8 @@ export function CourseDetailPage() {
                   sizes="(min-width: 1024px) 50vw, 100vw"
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 flex items-center justify-center bg-primary/35">
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-primary shadow-card">
+                <div className="absolute inset-0 flex items-center justify-center bg-tk-brand/35">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-tk-brand shadow-card">
                     <Play className="h-9 w-9 fill-current" />
                   </div>
                 </div>
@@ -169,8 +169,8 @@ export function CourseDetailPage() {
                   <Card key={objective} className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-deep-navy text-white" : ""}>
                     <CardContent className="space-y-3 p-8">
                       <ShieldCheck className="h-8 w-8 text-prestige-gold" />
-                      <h3 className={index === 1 ? "text-white" : "text-primary"}>{objective}</h3>
-                      <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-text-muted"}>
+                      <h3 className={index === 1 ? "text-white" : "text-tk-brand"}>{objective}</h3>
+                      <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-tk-ink-muted"}>
                         Aplicação prática com foco em decisão, rotina profissional e segurança na execução.
                       </p>
                     </CardContent>
@@ -202,7 +202,7 @@ export function CourseDetailPage() {
                     ].map((item) => (
                       <div key={item.title} className="rounded-xl border border-outline-variant bg-surface-muted p-4">
                         <h3 className="text-base font-bold text-deep-navy">{item.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-text-muted">{item.description}</p>
+                        <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.description}</p>
                       </div>
                     ))}
                   </div>
@@ -217,12 +217,12 @@ export function CourseDetailPage() {
                       {course.targetAudience.map((audience) => (
                         <div key={audience} className="flex items-center gap-3 rounded-lg border border-outline-variant bg-white/50 p-4">
                           <ShieldCheck className="h-5 w-5 shrink-0 text-accent" />
-                          <span className="text-sm font-medium text-primary">{audience}</span>
+                          <span className="text-sm font-medium text-tk-brand">{audience}</span>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-sm text-muted-foreground">Público-alvo não especificado.</p>
+                    <p className="text-sm text-tk-ink-muted">Público-alvo não especificado.</p>
                   )}
                 </CardContent>
               </Card>
@@ -237,7 +237,7 @@ export function CourseDetailPage() {
                         <AccordionContent>
                           <div className="space-y-3">
                             <p>{module.description}</p>
-                            <div className="text-xs uppercase tracking-[0.16em] text-muted-foreground">{module.duration}</div>
+                            <div className="text-xs uppercase tracking-[0.16em] text-tk-ink-muted">{module.duration}</div>
                             <ul className="grid gap-2">
                               {module.topics.map((topic) => (
                                 <li key={topic}>• {topic}</li>
@@ -281,7 +281,7 @@ export function CourseDetailPage() {
                 <ul className="space-y-3 text-sm text-white/80">
                   {course.benefits.slice(0, 4).map((benefit) => (
                     <li key={benefit} className="flex gap-3">
-                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                      <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-tk-success" />
                       {benefit}
                     </li>
                   ))}
@@ -331,15 +331,15 @@ export function CourseDetailPage() {
                         />
                       </div>
                     ) : (
-                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-outline-variant bg-surface-container text-xl font-semibold text-primary">
+                      <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-outline-variant bg-surface-container text-xl font-semibold text-tk-brand">
                         {instructor.avatar}
                       </div>
                     )}
                   </div>
                 )}
-                <div className="text-sm text-muted-foreground">Especialidade: {instructor?.specialty}</div>
-                <div className="text-sm text-muted-foreground">Avaliação média: {instructor?.rating.toFixed(1)}</div>
-                <div className="text-sm text-muted-foreground">Cursos vinculados: {instructor?.courseIds.length ?? 0}</div>
+                <div className="text-sm text-tk-ink-muted">Especialidade: {instructor?.specialty}</div>
+                <div className="text-sm text-tk-ink-muted">Avaliação média: {instructor?.rating.toFixed(1)}</div>
+                <div className="text-sm text-tk-ink-muted">Cursos vinculados: {instructor?.courseIds.length ?? 0}</div>
               </CardContent>
             </Card>
           </div>
@@ -349,7 +349,7 @@ export function CourseDetailPage() {
             <Card className="border-outline-variant bg-surface-muted">
               <CardContent className="space-y-4 p-6">
                 <h3 className="font-display text-2xl font-bold text-deep-navy">Prefere validar com a equipe antes da matrícula?</h3>
-                <p className="text-sm leading-6 text-text-muted">
+                <p className="text-sm leading-6 text-tk-ink-muted">
                   Fale com atendimento para confirmar aderência do conteúdo, política comercial e formato ideal para sua turma.
                 </p>
                 <div className="flex flex-wrap gap-3">

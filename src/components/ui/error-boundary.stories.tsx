@@ -22,8 +22,8 @@ const ThrowingComponent = ({ shouldThrow }: { shouldThrow: boolean }) => {
   }
 
   return (
-    <div className="p-6 bg-surface-light rounded-card">
-      <p className="text-text-primary">Component rendered successfully!</p>
+    <div className="rounded-tk-card bg-tk-surface-2 p-6">
+      <p className="text-tk-ink">Component rendered successfully!</p>
     </div>
   );
 };
@@ -54,9 +54,9 @@ export const WithCustomFallback: Story = {
   render: () => (
     <ErrorBoundary
       fallback={
-        <div className="p-6 bg-danger/10 rounded-card border border-danger">
-          <h2 className="text-lg font-bold text-danger mb-2">Custom Error UI</h2>
-          <p className="text-text-secondary">
+        <div className="rounded-tk-card border border-tk-error bg-tk-error/10 p-6">
+          <h2 className="mb-2 text-lg font-bold text-tk-error">Custom Error UI</h2>
+          <p className="text-tk-ink-muted">
             This is a custom fallback UI displayed when an error occurs.
           </p>
         </div>
@@ -100,23 +100,23 @@ export const MultipleErrorBoundaries: Story = {
   render: () => (
     <div className="space-y-4">
       <ErrorBoundary>
-        <div className="p-4 bg-surface-light rounded-card">
+        <div className="rounded-tk-card bg-tk-surface-2 p-4">
           <h3 className="font-bold mb-2">Boundary 1 (Safe)</h3>
-          <p className="text-text-secondary">This component is safe</p>
+          <p className="text-tk-ink-muted">This component is safe</p>
         </div>
       </ErrorBoundary>
 
       <ErrorBoundary>
-        <div className="p-4 bg-surface-light rounded-card">
+        <div className="rounded-tk-card bg-tk-surface-2 p-4">
           <h3 className="font-bold mb-2">Boundary 2 (Error)</h3>
           <ThrowingComponent shouldThrow={true} />
         </div>
       </ErrorBoundary>
 
       <ErrorBoundary>
-        <div className="p-4 bg-surface-light rounded-card">
+        <div className="rounded-tk-card bg-tk-surface-2 p-4">
           <h3 className="font-bold mb-2">Boundary 3 (Safe)</h3>
-          <p className="text-text-secondary">This component is also safe</p>
+          <p className="text-tk-ink-muted">This component is also safe</p>
         </div>
       </ErrorBoundary>
     </div>
