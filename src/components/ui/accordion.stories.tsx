@@ -32,7 +32,7 @@ export const Single: Story = {
         <AccordionItem
           key={item.value}
           value={item.value}
-          className="rounded-lg border border-primary/10 bg-white px-5"
+          className="rounded-lg border border-tk-brand/10 bg-white px-5"
         >
           <AccordionTrigger>{item.q}</AccordionTrigger>
           <AccordionContent>{item.a}</AccordionContent>
@@ -49,7 +49,7 @@ export const Multiple: Story = {
         <AccordionItem
           key={item.value}
           value={item.value}
-          className="rounded-lg border border-primary/10 bg-white px-5"
+          className="rounded-lg border border-tk-brand/10 bg-white px-5"
         >
           <AccordionTrigger>{item.q}</AccordionTrigger>
           <AccordionContent>{item.a}</AccordionContent>

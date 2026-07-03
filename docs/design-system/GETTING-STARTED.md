@@ -120,7 +120,7 @@ export function CourseGrid({ courses }) {
           <CardContent className="space-y-4 p-4">
             <h3 className="font-bold text-lg">{course.title}</h3>
             <p className="text-sm text-muted-foreground">{course.description}</p>
-            <p className="text-sm font-semibold text-primary">{course.price}</p>
+            <p className="text-sm font-semibold text-tk-brand">{course.price}</p>
           </CardContent>
         </Card>
       ))}
@@ -147,7 +147,7 @@ export function FeaturedCard() {
       variant="filled" 
       interactive={false} 
       size="lg"
-      className="bg-gradient-to-r from-primary to-secondary text-white"
+      className="bg-gradient-to-r from-tk-brand to-tk-accent text-white"
     >
       <CardContent className="py-12 text-center space-y-6">
         <h2 className="text-3xl font-bold">Limited Time Offer</h2>
@@ -217,23 +217,23 @@ export function EmailForm() {
 
 ```tsx
 // Primary brand color
-className="text-primary bg-primary/10"  // Deep Blue
+className="text-tk-brand bg-tk-brand/10"  // Deep Teal
 
 // Secondary supporting color
-className="text-secondary bg-secondary/30"  // Light Blue
+className="text-tk-accent-strong bg-tk-accent-soft"  // Accent + soft tint
 
 // Status colors
-className="text-green-600"  // Success
-className="text-yellow-500"  // Warning
-className="text-red-500"    // Error
+className="text-tk-success"  // Success
+className="text-[#7a5600]"   // Warning
+className="text-tk-error"    // Error
 
 // Text colors
-className="text-foreground"         // Main text (dark gray)
-className="text-muted-foreground"   // Secondary text (light gray)
+className="text-tk-ink"         // Main text
+className="text-tk-ink-muted"   // Secondary text
 
 // Neutral
-className="bg-background"  // White
-className="border-border"  // Light gray border
+className="bg-tk-surface"  // White
+className="border-tk-line" // Light border
 ```
 
 ### Quick Spacing Tokens

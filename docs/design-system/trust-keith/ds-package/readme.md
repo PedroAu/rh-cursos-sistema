@@ -30,7 +30,7 @@ This system was built from a structured design extraction of the Trust Keith hom
 
 **Atmosphere:** professional, premium, calm — an "apple-glass" archetype. Roomy, breathing layouts signal confidence; complexity is orchestrated, never crammed.
 
-- **Color:** brand teal-navy `#235875` carries authority and is reserved for primary CTAs/logo only. Bright blue `#4285f4` is the high-frequency UI accent (links, secondary CTAs, highlights). Neutrals run white → `#fafafa` → `#ebebeb` (lines) → `#4f5057` (muted) → `#222525` (ink — **never true black**). Warm creams (`#fffaf4`, `#c3b6aa`) humanize technical content. Semantic: success `#068466`, error `#ea384c`.
+- **Color:** `tk-brand` `#235875` carries authority and is reserved for primary CTAs/logo only. `tk-accent` `#4285f4` is the high-frequency UI accent (links, secondary CTAs, highlights). Neutrals run white → `#fafafa` → `#ebebeb` (lines) → `#4f5057` (muted) → `#222525` (ink — **never true black**). Warm creams (`#fffaf4`, `#c3b6aa`) humanize technical content. Semantic: success `#068466`, error `#ea384c`.
 - **Type:** three families used as a hierarchy by *weight*, not styling. **Quincy CF 700** (display serif) for all headlines — the brand's typographic DNA, tracked tight at -0.02em. **Merriweather 300/400** (serif) for elegant subheadings that slow the reader down. **Inter 400/500/600** for body & UI. Caveat (handwriting) is an accent-only reserve. No all-caps headings.
 - **Spacing:** 4px base, deliberately roomy. Cards pad at 32px, buttons 20px, sections 48–64px apart. Nothing is ever trapped at <16px.
 - **Backgrounds:** mostly clean white. Subtle light radial/linear gradients on hero areas (`radial-gradient(circle,#f7f9fc 35%,#ebf3ff)`); warm cream blocks for testimonial/featured sections; teal block for the closing CTA band. No photographic full-bleed textures, no busy patterns.
@@ -38,9 +38,9 @@ This system was built from a structured design extraction of the Trust Keith hom
 - **Cards:** white, 1px `#ebebeb` border, 24px radius, 32px padding, signature **dual-layer dark shadow** (a crisp 2px edge + a soft diffuse layer) for a glass-pane lift. (Source spec lists a very heavy second layer; toned to a tasteful `rgba(0,0,0,0.12)` here — see Caveats.)
 - **Shadows:** **always dark-tinted, never colored.** Hairline (`inset 0 0 0 1px #ebebeb`) for flat surfaces; ambient `0 4px 16px rgba(0,0,0,0.08)` for glass; dual-layer for standard cards. **No glassmorphism** — "glass" = radius + shadow, never `backdrop-filter: blur()`.
 - **Borders & dividers:** 1px `#ebebeb`, no shadow.
-- **Hover states:** cards lift `translateY(-2px)` + dim to opacity .92 (motion/opacity, not color). Buttons darken (primary teal → `#194359`; secondary fill 5% → 8% black). Links shift to bright blue.
+- **Hover states:** cards lift `translateY(-2px)` + dim to opacity .92 (motion/opacity, not color). Buttons darken (`tk-brand` → `#194359`; secondary fill 5% → 8% black). Links shift to `tk-accent`.
 - **Press states:** buttons nudge down ~0.5px; no scale-shrink.
-- **Focus:** bright-blue ring `0.125rem solid #4d65ff` with 0.125rem offset — a strong, deliberate signal.
+- **Focus:** `tk-focus` ring `0.125rem solid #4d65ff` with 0.125rem offset — a strong, deliberate signal.
 - **Motion:** a single easing curve `cubic-bezier(.25,.46,.45,.94)`. Transitions are calm fades/slides (200–500ms). The one keyframe in the source is a slow `spin`. No bounces.
 - **Transparency/blur:** transparency used only for subtle fills (`rgba(0,0,0,0.05)` secondary buttons, soft tint badges). Blur is avoided by design.
 - **Imagery vibe:** warm, bright, human — smiling people on light backgrounds, friendly product screenshots with rounded corners; never cold or grainy.

@@ -3,7 +3,7 @@
 **Story:** 14.0.1 (`docs/stories/2026-07-02-epic14-story0-1-trust-keith-inventory.md`)
 **Épico:** 14 — Redesign Trust Keith: Fidelidade Total + Remoção do Mantine
 **Data:** 2026-07-02
-**Fontes:** `ds-package/_ds_manifest.json`, `ds-package/tokens/*.css`, `ds-package/readme.md`, `DESIGN.md`, canvases `public/*.dc.html`
+**Fontes:** `ds-package/_ds_manifest.json`, `ds-package/tokens/*.css`, `ds-package/readme.md`, `DESIGN.md`, canvases históricos `public/*.dc.html` (removidos do repositório)
 
 ---
 
@@ -197,6 +197,8 @@ Namespace do bundle: `TrustKeithDesignSystem_e3aaec`.
 | `RH Cursos Quem Somos.dc.html` | `/sobre` | `src/views/public/About.tsx` | |
 | `RH Cursos Blog.dc.html` | `/blog` (+ `/blog/[slug]` na 14.2.6) | `src/views/public/Blog.tsx` | |
 
+Observação: os canvases listados acima foram removidos do `public/`; a tabela permanece para rastreabilidade entre referência histórica e implementação final.
+
 Os canvases usam `sc-for`/`{{ placeholders }}` para dados dinâmicos (ex.: próximas turmas) — o contrato de dados real (Supabase) é definido por página nas specs da story 14.0.2. Canvases são desktop **1180px** (`.rh-page`); breakpoints mobile serão definidos na 14.0.2.
 
 ---
@@ -214,8 +216,8 @@ Os canvases usam `sc-for`/`{{ placeholders }}` para dados dinâmicos (ex.: próx
 
 | Asset | Função |
 |---|---|
-| `public/*.dc.html` (7 canvases) + `public/RH Cursos Home.html` / `RH Cursos Agenda.html` | Referência visual renderizável |
-| `public/_ds/` | Bundle do DS que os canvases importam |
+| `public/*.dc.html` (7 canvases) + `public/RH Cursos Home.html` / `RH Cursos Agenda.html` | Referência visual histórica; canvases `.dc.html` removidos do repositório |
+| `public/_ds/` | Export consumidor histórico do DS para canvases `.dc.html`; removido do repositório na normalização atual |
 | `public/support.js` | Runtime dos canvases |
 | `public/uploads/logoHorizontal_800X600.png` | Path que os canvases esperam para o logo |
 

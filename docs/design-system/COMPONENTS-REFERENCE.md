@@ -327,23 +327,23 @@ All are presentational components with no props — just children.
 
 ```
 // Primary brand
-text-primary, bg-primary, border-primary
+text-tk-brand, bg-tk-brand, border-tk-brand
 
 // Secondary
-text-secondary, bg-secondary, border-secondary/30
+text-tk-accent-strong, bg-tk-accent-soft, border-tk-accent/30
 
 // Status colors
-text-green-600, bg-green-100
-text-orange-500, bg-orange-100
-text-red-500, bg-red-100
+text-tk-success, bg-tk-success/10
+text-[#7a5600], bg-[#7a5600]/10
+text-tk-error, bg-tk-error/10
 
 // Text colors
-text-foreground      (dark text)
-text-muted-foreground (light gray text)
+text-tk-ink       (dark text)
+text-tk-ink-muted (muted text)
 
 // Backgrounds
-bg-background (white)
-bg-secondary/30 (light tint)
+bg-tk-surface (white)
+bg-tk-accent-soft (light tint)
 ```
 
 ### Spacing Classes
@@ -407,7 +407,7 @@ leading-tight    leading-normal    leading-relaxed
 ### Featured Section
 
 ```tsx
-<Card variant="filled" interactive={false} size="lg" className="bg-primary text-white">
+<Card variant="filled" interactive={false} size="lg" className="bg-tk-brand text-white">
   <CardContent className="py-12 text-center space-y-6">
     <h2>Featured Title</h2>
     <p>Description with white text</p>
@@ -446,7 +446,7 @@ const [error, setError] = useState('');
 → Check ClassCard, CourseCard, BlogCard, TestimonialCard
 
 **Need to style something?**
-→ Use token classes: `text-primary`, `bg-secondary`, `gap-6`, etc.
+→ Use token classes: `text-tk-brand`, `bg-tk-accent-soft`, `gap-6`, etc.
 
 **Need to group multiple items?**
 → Use `grid grid-cols-*` or `flex` with `gap-*`

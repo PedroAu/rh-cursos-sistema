@@ -30,7 +30,7 @@ export function FAQAccordion() {
           <AccordionItem
             key={item.value}
             value={item.value}
-            className="rounded-lg border border-primary/10 bg-white px-5 shadow-soft"
+            className="rounded-lg border border-tk-brand/10 bg-white px-5 shadow-soft"
           >
             <AccordionTrigger className="text-left font-display text-base font-bold text-deep-navy hover:no-underline">
               {item.question}

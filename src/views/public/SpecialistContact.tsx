@@ -162,7 +162,7 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
                 return (
                   <Card key={item.title} className="border-outline-variant bg-surface-container-lowest shadow-card">
                     <CardContent className="flex items-start gap-4 p-6">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-tk-brand/10 text-tk-brand">
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="space-y-1">
@@ -199,19 +199,19 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
           <Card className="border-outline-variant bg-surface-container-lowest shadow-card" data-testid="ui-specialist-form">
             <CardContent className="grid gap-6 p-8 md:p-10">
               <div className="space-y-2">
-                <p className="text-label font-bold uppercase tracking-[0.08em] text-primary">Formulário</p>
+                <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">Formulário</p>
                 <h2 className="font-display text-h2-compact font-bold text-deep-navy">Solicite o contato</h2>
                 <p className="text-sm leading-7 text-text-muted">
                   Preencha os dados e o tema; retornaremos com orientação objetiva.
                 </p>
               </div>
               {submitError ? (
-                <div role="alert" className="rounded-lg border border-danger/25 bg-danger/10 px-4 py-3 text-sm text-danger">
+                <div role="alert" className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
                   {submitError}
                 </div>
               ) : null}
               {submitSuccess ? (
-                <div aria-live="polite" className="rounded-lg border border-success/25 bg-success/10 px-4 py-3 text-sm text-success">
+                <div aria-live="polite" className="rounded-lg border border-tk-success/25 bg-tk-success/10 px-4 py-3 text-sm text-tk-success">
                   {submitSuccess}
                 </div>
               ) : null}
@@ -298,7 +298,7 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
                 size="lg"
                 loading={isSubmitting}
                 onClick={submit}
-                className="justify-center bg-[var(--color-primary-hover)] hover:bg-[var(--color-primary-light)]"
+                className="justify-center bg-tk-brand-hover hover:bg-tk-accent-soft hover:text-tk-accent-strong"
               >
                 <Send className="h-4 w-4" />
                 Solicitar contato

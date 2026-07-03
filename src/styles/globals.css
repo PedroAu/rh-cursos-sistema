@@ -211,51 +211,6 @@
     --ea-font-size-display: 2.75rem;   /* 44px — display section / h1 mobile large */
     --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
 
-    /* Trust Keith Design System — New Tokens (Phase 1) */
-    --trust-keith-teal: var(--tk-brand);
-    --keith-dark-blue: var(--tk-brand-hover);
-    --bright-blue: var(--tk-accent);
-    --bright-blue-dark: var(--tk-accent-strong);
-    --bright-blue-light: var(--tk-accent-soft);
-
-    --text-primary: #222525;
-    --text-secondary: #4f5057;
-    --surface-light: #fafafa;
-    --surface-neutral: #ebebeb;
-    --surface-white: #ffffff;
-
-    --success: #068466;
-    --danger: #ea384c;
-    --error: #ea384c;
-
-    --cream-light: #fffaf4;
-    --cream-dark: #c3b6aa;
-
-    /* Trust Keith Typography */
-    --font-sans-trust: var(--tk-font-body);
-    --font-serif-trust: var(--tk-font-serif);
-    --font-display-trust: var(--tk-font-display);
-
-    /* Trust Keith Spacing (4px base) */
-    --space-xs: 0.25rem;
-    --space-sm: 0.5rem;
-    --space-md: 1rem;
-    --space-lg: 1.5rem;
-    --space-xl: 2rem;
-    --space-2xl: 3rem;
-    --space-3xl: 4rem;
-
-    /* Trust Keith Border Radius */
-    --radius-input: 0px;
-    --radius-button: 6px;
-    --radius-glass: 16px;
-    --radius-card: 24px;
-    --radius-pill: 100rem;
-
-    /* Trust Keith Shadows */
-    --shadow-ambient: 0 4px 16px rgba(0, 0, 0, 0.08);
-    --shadow-standard: var(--tk-shadow-card);
-    --shadow-focus: var(--tk-focus-ring);
   }
 
   /*
@@ -467,7 +422,7 @@
   }
 
   .tone-panel {
-    @apply border border-primary;
+    @apply border;
     border-radius: var(--ea-radius-xl);
     background-color: rgba(0, 23, 54, 0.04);
     border-color: rgba(0, 23, 54, 0.1);
@@ -1160,7 +1115,7 @@
   }
 
   .skip-link {
-    @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-white px-4 py-3 text-sm font-bold text-primary shadow-card transition;
+    @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-white px-4 py-3 text-sm font-bold text-tk-brand shadow-card transition;
   }
 
   .skip-link:focus {

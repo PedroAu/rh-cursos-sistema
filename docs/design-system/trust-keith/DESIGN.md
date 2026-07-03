@@ -1,19 +1,18 @@
 name: Trust Keith
 colors:
-  primary: "#235875"
-  secondary: "#4285f4"
-  tertiary: "#2459b3"
-  neutral: "#4f5057"
-  surface: "#ebebeb"
-  text: "#222525"
-  text-muted: "#4f5057"
-  border: "#ebebeb"
-  error: "#ea384c"
-  success: "#068466"
-  bright-blue-light: "#e0eeff"
-  dark-cream: "#c3b6aa"
-  light-cream: "#fffaf4"
-  lightest-grey: "#fafafa"
+  tk-brand: "#235875"
+  tk-accent: "#4285f4"
+  tk-accent-strong: "#2459b3"
+  tk-ink-muted: "#4f5057"
+  tk-line: "#ebebeb"
+  tk-ink: "#222525"
+  tk-error: "#ea384c"
+  tk-success: "#068466"
+  tk-accent-soft: "#e0eeff"
+  tk-cream-dark: "#c3b6aa"
+  tk-cream: "#fffaf4"
+  tk-surface-2: "#fafafa"
+  tk-surface: "#ffffff"
 typography:
   display-hero:
     fontFamily: "Quincy CF"
@@ -182,7 +181,7 @@ Typography is layered and purposeful: bold, heavy sans-serif headlines (Quincy C
 Shadow and depth are used expressively, particularly in cards (dual-layer shadows at 2px and 16px blur offsets) to create a subtle glass-like elevation that suggests layers of intelligent processing happening beneath a clean surface.
 
 **Key Characteristics:**
-- Teal-navy brand color used sparingly for trust and authority, bright blue for interactive affordance
+- `tk-brand` used sparingly for trust and authority, `tk-accent` for interactive affordance
 - High card radius (24px) creates gentle, approachable surfaces; button radius (6px) stays tight and functional
 - Generous whitespace and 1.5–2rem padding signals confidence and openness, not clutter
 - Serif subheadings paired with sans-serif body establish hierarchy without formality
@@ -193,32 +192,32 @@ Shadow and depth are used expressively, particularly in cards (dual-layer shadow
 ## 2. Color Palette & Roles
 
 ### Primary
-- **Trust Keith Teal** (`#235875`): Brand identity anchor, appears in logo, primary CTAs ("Talk to an expert"), and hero emphasis moments. Used sparingly to maintain authority.
-- **Keith Dark Blue** (`#194359`): Button hover state, reinforces interactive feedback with darkened teal.
+- **`tk-brand`** (`#235875`): Brand identity anchor, appears in logo, primary CTAs ("Talk to an expert"), and hero emphasis moments. Used sparingly to maintain authority.
+- **`tk-brand-hover`** (`#194359`): Button hover state, reinforces interactive feedback with darkened teal.
 
 ### Secondary Action
-- **Bright Blue** (`#4285f4`): Google-inspired blue used for secondary CTAs, links, and interactive highlights across the UI. This is the high-frequency UI accent that drives engagement without competing with brand authority.
-- **Bright Blue Dark** (`#2459b3`): Hover state for secondary actions, adds depth and confirms interaction.
+- **`tk-accent`** (`#4285f4`): Google-inspired blue used for secondary CTAs, links, and interactive highlights across the UI. This is the high-frequency UI accent that drives engagement without competing with brand authority.
+- **`tk-accent-strong`** (`#2459b3`): Hover state for secondary actions, adds depth and confirms interaction.
 
 ### Neutral Scale
-- **Dark Gray** (`#222525`): Default body text, high contrast for accessibility.
-- **Gray** (`#4f5057`): Secondary text, muted labels, reduced visual weight.
-- **Light Gray New** (`#ebebeb`): Navigation backgrounds, borders, dividers, surface contrast.
-- **Lightest Gray New** (`#fafafa`): Subtle background tints, alternate row shading.
-- **White** (`#ffffff`): Primary surface, card backgrounds, maximum contrast canvas.
+- **`tk-ink`** (`#222525`): Default body text, high contrast for accessibility.
+- **`tk-ink-muted`** (`#4f5057`): Secondary text, muted labels, reduced visual weight.
+- **`tk-line`** (`#ebebeb`): Navigation backgrounds, borders, dividers, surface contrast.
+- **`tk-surface-2`** (`#fafafa`): Subtle background tints, alternate row shading.
+- **`tk-surface`** (`#ffffff`): Primary surface, card backgrounds, maximum contrast canvas.
 
 ### Surface & Depth
-- **Light Cream** (`#fffaf4`): Warm, inviting backgrounds for testimonial or featured content sections.
-- **Dark Cream** (`#c3b6aa`): Subtle accent or divider in cream-themed contexts.
+- **`tk-cream`** (`#fffaf4`): Warm, inviting backgrounds for testimonial or featured content sections.
+- **`tk-cream-dark`** (`#c3b6aa`): Subtle accent or divider in cream-themed contexts.
 - **Black with 8% opacity** (`#00000014`): Universal shadow overlay, used for depth and subtle focus rings.
 
 ### Interactive & Feedback
-- **Success** (`#068466`): Confirmation badges, positive states (shown in green tooltip circles).
-- **Error** (`#ea384c`): Alert, destructive action indicators.
-- **Light Blue** (`#e0eeff`): Hover background for blue-accented elements, creates subtle visual feedback.
+- **`tk-success`** (`#068466`): Confirmation badges, positive states (shown in green tooltip circles).
+- **`tk-error`** (`#ea384c`): Alert, destructive action indicators.
+- **`tk-accent-soft`** (`#e0eeff`): Hover background for blue-accented elements, creates subtle visual feedback.
 
 ### Color Philosophy
-The palette deliberately separates **brand identity** (teal navy, used sparingly) from **UI accent** (bright blue, used frequently). This follows the principle that brand colors anchor perception while UI affordances must be visible and responsive. The warm cream accents soften the technical nature of privacy compliance, humanizing the interface. Grays are used consciously across a seven-step scale—no true black body text, but dark enough for WCAG AA contrast. Shadows are always dark-tinted (never colored), creating a professional glass effect rather than a playful or material-design aesthetic.
+The palette deliberately separates **brand identity** (`tk-brand`, used sparingly) from **UI accent** (`tk-accent`, used frequently). This follows the principle that brand colors anchor perception while UI affordances must be visible and responsive. The warm cream accents soften the technical nature of privacy compliance, humanizing the interface. Grays are used consciously across a seven-step scale—no true black body text, but dark enough for WCAG AA contrast. Shadows are always dark-tinted (never colored), creating a professional glass effect rather than a playful or material-design aesthetic.
 
 ## 3. Typography Rules
 
@@ -261,12 +260,12 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 ### Buttons
 
 **Primary Button** (`button-primary`)
-- Background: `#235875` (teal navy, brand)
+- Background: `#235875` (`tk-brand`, teal navy brand)
 - Text: `#ffffff` (white)
 - Padding: 20px horizontal, 20px vertical
 - Border Radius: 6px (tight, functional)
 - Font: 14px Inter, weight 500
-- Hover: Background darkens to `#194359` (keith-dark-blue)
+- Hover: Background darkens to `#194359` (`tk-brand-hover`)
 - Use: Primary CTA ("Talk to an expert", "Explore Privacy OS", major actions)
 
 **Secondary Button** (`button-secondary`)
@@ -314,7 +313,7 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 - Border: 1px `#ebebeb` (light gray)
 - Border Radius: 0px (square, utilitarian)
 - Padding: 8px horizontal, 12px vertical
-- Focus State: Outline `0.125rem solid #4d65ff` (bright blue, custom)
+- Focus State: Outline `0.125rem solid #4d65ff` (`tk-focus`, custom)
 - Focus Outline Offset: `0.125rem`
 - Font: 14px Inter, regular weight
 - Transition: border-color 0.2s ease
@@ -345,7 +344,7 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 
 ### Decorative Elements
 - **Dividers**: 1px `#ebebeb` solid (light gray), no shadows
-- **Focus Rings**: `0.125rem solid #4d65ff` (bright blue outline, strong signal)
+- **Focus Rings**: `0.125rem solid #4d65ff` (`tk-focus` outline, strong signal)
 - **Shadow Accents**: Always dark (`#0000001f`, `#00000014`) — no colored shadows
 - **No Glassmorphism**: The system deliberately avoids `backdrop-filter: blur()`. "Glass" refers to the shadow and radius treatment, not frosted-glass backgrounds.
 
@@ -381,7 +380,7 @@ Trust Keith's whitespace is a design *choice*, not an absence of content. The "v
 | Standard | Dual shadow `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)` | Primary cards, elevated content, default elevated state |
 | Elevated | `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)` + `translateY(-2px)` on hover | Interactive cards, engagement cues |
 | Deep | Not explicitly used in the system; depth maxes out at Standard level | Modals, overlays, or full-page takeovers (reserved for future) |
-| Ring | `0.125rem solid #4d65ff` outline (bright blue focus ring) | Focus states, keyboard navigation, accessibility |
+| Ring | `0.125rem solid #4d65ff` outline (`tk-focus`) | Focus states, keyboard navigation, accessibility |
 
 ### Shadow Philosophy
 Trust Keith's shadow system is **always dark-tinted**, never colored. The logic is simple: shadows represent light being blocked, which is always darker. The dual-layer approach (2px crisp edge + 16px soft diffusion) mimics real-world light falloff and creates the "glass" effect—surfaces feel like polished glass panes floating over the page, not like they're floating in 3D space. Shadows intensify on hover to confirm interactivity without changing scale or position (minimalist feedback).
@@ -392,7 +391,7 @@ Trust Keith's shadow system is **always dark-tinted**, never colored. The logic 
 - **Do use Quincy CF weight 700 for all headlines.** This is the brand's typographic DNA. Never substitute with Inter Bold for headlines; the distinctive serif italic of Quincy CF is what makes Trust Keith visually recognizable.
 - **Do respect the 24px card radius as the visual anchor.** It's the most prominent curved element and defines the brand's softer, approachable premium aesthetic.
 - **Do apply the dual-shadow formula to all elevated surfaces.** The 2px + 16px combination is Trust Keith's signature; single-layer shadows flatten the design.
-- **Do use teal navy (`#235875`) for primary CTAs only.** This color carries authority; overusing it dilutes the brand signal. Links and secondary actions should be bright blue.
+- **Do use `tk-brand` (`#235875`) for primary CTAs only.** This color carries authority; overusing it dilutes the brand signal. Links and secondary actions should use `tk-accent`.
 - **Do increase line-height for small text.** 12px body should get 1.2 line-height, not 1.5. The inverse relationship improves legibility at small sizes.
 - **Do include 32px padding in cards.** Cramping padding makes the interface feel claustrophobic and undermines the "off your plate, confidently" positioning.
 
@@ -434,10 +433,10 @@ Trust Keith's shadow system is **always dark-tinted**, never colored. The logic 
 ## 9. Agent Prompt Guide
 
 ### Quick Color Reference
-- Primary CTA Button: Trust Keith Teal (`#235875`)
-- Secondary CTA Button: Bright Blue (`#4285f4`)
-- CTA Hover (Primary): Keith Dark Blue (`#194359`)
-- CTA Hover (Secondary): Bright Blue Dark (`#2459b3`)
+- Primary CTA Button: `tk-brand` (`#235875`)
+- Secondary CTA Button: `tk-accent` (`#4285f4`)
+- CTA Hover (Primary): `tk-brand-hover` (`#194359`)
+- CTA Hover (Secondary): `tk-accent-strong` (`#2459b3`)
 - Page Background: White (`#ffffff`)
 - Card Surface: White (`#ffffff`)
 - Card Border / Divider: Light Gray (`#ebebeb`)
@@ -446,17 +445,17 @@ Trust Keith's shadow system is **always dark-tinted**, never colored. The logic 
 - Muted/Secondary Text: Gray (`#4f5057`)
 - Success/Confirmation: Green (`#068466`)
 - Alert/Error: Red (`#ea384c`)
-- Warm Accent (Features): Light Cream (`#fffaf4`)
+- Warm Accent (Features): `tk-cream` (`#fffaf4`)
 
 ### Example Component Prompts
 
-> Create a hero section with white background. Hero headline at 60px Quincy CF weight 700, line-height 1.1, color #222525, tracking -0.02em. Subtitle at 20px Merriweather weight 300, line-height 1.4, color #4f5057. Two CTAs below: primary button with teal background (#235875), white text, 20px padding, 6px radius; secondary button with transparent background, dark gray text (#222525), light gray border (#ebebeb), 6px radius, 20px padding. Both buttons Inter 14px weight 500. Hero imagery on the right (desktop) or below (mobile) with 16:9 aspect ratio.
+> Create a hero section with white background. Hero headline at 60px Quincy CF weight 700, line-height 1.1, color `tk-ink` (#222525), tracking -0.02em. Subtitle at 20px Merriweather weight 300, line-height 1.4, color `tk-ink-muted` (#4f5057). Two CTAs below: primary button with `tk-brand` background (#235875), white text, 20px padding, 6px radius; secondary button with transparent background, dark gray text (`tk-ink`, #222525), light gray border (`tk-line`, #ebebeb), 6px radius, 20px padding. Both buttons Inter 14px weight 500. Hero imagery on the right (desktop) or below (mobile) with 16:9 aspect ratio.
 
-> Build a feature card with white background (#ffffff), 1px border #ebebeb, 24px border-radius, 32px padding. Card title: 20px Merriweather weight 400, color #222525. Card description: 16px Inter weight 400, color #4f5057, line-height 1.5. Include an optional icon in 40×40px size. Apply shadow: `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)`. On hover, translate the card up 2px and reduce opacity to .92.
+> Build a feature card with `tk-surface` background (#ffffff), 1px `tk-line` border (#ebebeb), 24px border-radius, 32px padding. Card title: 20px Merriweather weight 400, color `tk-ink` (#222525). Card description: 16px Inter weight 400, color `tk-ink-muted` (#4f5057), line-height 1.5. Include an optional icon in 40×40px size. Apply shadow: `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)`. On hover, translate the card up 2px and reduce opacity to .92.
 
-> Design a navigation bar with light gray background (#ebebeb), dark gray text (#222525). Nav height auto, padding 16px vertical 20px horizontal. Nav items: 14px Inter weight 500. Active/hover state: text color stays #222525, add bottom border 2px teal (#235875). On mobile, transform to hamburger menu; menu items stack vertically with 8px gap. Navigation dropdown menus appear on hover (desktop) or on click (mobile) with 200ms ease transition.
+> Design a navigation bar with `tk-line` background (#ebebeb), `tk-ink` text (#222525). Nav height auto, padding 16px vertical 20px horizontal. Nav items: 14px Inter weight 500. Active/hover state: text color stays `tk-ink` (#222525), add bottom border 2px `tk-brand` (#235875). On mobile, transform to hamburger menu; menu items stack vertically with 8px gap. Navigation dropdown menus appear on hover (desktop) or on click (mobile) with 200ms ease transition.
 
-> Build an email input field: white background (#ffffff), 1px border #ebebeb, 0px border-radius (square), 8px horizontal 12px vertical padding, 14px Inter weight 400. Placeholder text #999 (gray). On focus, remove default outline, apply custom outline: `0.125rem solid #4d65ff` with 0.125rem offset. Include a validation state: error state shows border #ea384c (red) with error message at 12px Inter weight 400, color #ea384c, positioned 4px below the input.
+> Build an email input field: `tk-surface` background (#ffffff), 1px `tk-line` border (#ebebeb), 0px border-radius (square), 8px horizontal 12px vertical padding, 14px Inter weight 400. Placeholder text #999 (gray). On focus, remove default outline, apply custom outline: `0.125rem solid #4d65ff` (`tk-focus`) with 0.125rem offset. Include a validation state: error state shows `tk-error` border #ea384c with error message at 12px Inter weight 400, color `tk-error` #ea384c, positioned 4px below the input.
 
 ### Iteration Guide
 
@@ -476,6 +475,6 @@ Trust Keith's shadow system is **always dark-tinted**, never colored. The logic 
 
 8. **Hover states for cards add translateY(-2px) and opacity .92.** This is a subtle lift and dim, not a color shift. No background color changes on hover; motion and opacity are the feedback signals.
 
-9. **Links and secondary CTAs use bright blue (#4285f4), never teal.** Teal is reserved for primary actions ("Talk to an expert"). Bright blue is for secondary engagement (links, "Learn more", secondary CTAs).
+9. **Links and secondary CTAs use `tk-accent` (#4285f4), never `tk-brand`.** `tk-brand` is reserved for primary actions ("Talk to an expert"). `tk-accent` is for secondary engagement (links, "Learn more", secondary CTAs).
 
 10. **Typography hierarchy is weight-based, not style-based.** Use weight progression (300 → 400 → 500 → 600 → 700) to signal importance. Avoid italic, all-caps, or underlining for hierarchy; these are reserved for semantic emphasis (quotes, code, definitions).

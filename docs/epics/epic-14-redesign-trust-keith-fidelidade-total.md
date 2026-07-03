@@ -10,7 +10,7 @@
 
 ## 1. Contexto
 
-As páginas de referência do novo design estão em `public/` como canvases de design (`*.dc.html`) que consomem o design system **Trust Keith** (`_ds/trust-keith-design-system-e3aaece8-.../styles.css` + `_ds_bundle.js`). Os arquivos `.html` grandes (~1,4 MB) são bundles auto-contidos que embutem o DS completo e desempacotam via JS no browser.
+As páginas de referência do novo design foram mantidas temporariamente em `public/` como canvases de design (`*.dc.html`) que consumiam o design system **Trust Keith** (`_ds/trust-keith-design-system-e3aaece8-.../styles.css` + `_ds_bundle.js`). Esses artefatos foram removidos do repositório nesta limpeza.
 
 ### Mapeamento canvas → rota
 
@@ -24,6 +24,8 @@ As páginas de referência do novo design estão em `public/` como canvases de d
 | `RH Cursos Quem Somos.dc.html` | `/sobre` | `src/views/public/About.tsx` |
 | `RH Cursos Blog.dc.html` | `/blog` | `src/views/public/Blog.tsx` |
 
+Observação: os canvases acima são agora referências históricas removidas do `public/`; o mapeamento permanece apenas para rastreabilidade documental.
+
 ### Fonte do design system (RESOLVIDO em 2026-07-02)
 
 O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos V2` e copiado para o repo:
@@ -31,7 +33,7 @@ O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos
 - `docs/design-system/trust-keith/ds-package/` — `_ds_manifest.json` (todos os tokens `--tk-*` com valores), `tokens/{colors,typography,spacing,effects,fonts}.css`, `_ds_bundle.js` (componentes JSX: Avatar, Badge, Button, Card, Checkbox, Input, Logo, Switch, FeatureListItem, ProgressBar, StatBlock, Testimonial, NavBar), `readme.md`
 - `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Quincy CF / Merriweather / Inter / Caveat, espaçamento, raios, sombras)
 - `docs/design/redesign/reference/screenshots/` — screenshots de referência (agenda, overview)
-- `public/_ds/`, `public/support.js`, `public/uploads/logoHorizontal_800X600.png` — **somente para renderizar os canvases `.dc.html` em dev**; removidos na story 14.3.3
+- `public/_ds/`, `public/*.dc.html`, `public/support.js`, `public/uploads/logoHorizontal_800X600.png` — artefatos temporários de renderização dos canvases; `public/_ds/` e os `.dc.html` já foram removidos do repositório nesta limpeza
 - `public/images/brand/logo-horizontal.png` — logo horizontal oficial (asset definitivo do site)
 
 **⚠️ Nota crítica de tokens:** o DS base usa `--tk-brand: #235875` (azul Trust Keith original). Os canvases aplicam o remap de marca RH via classe `.rh2`, sobrescrevendo `--tk-brand/--tk-cta → #0c6a83`, `--tk-accent → #1791a9`, `--tk-accent-soft → #e0f2f6`. **Os tokens finais do site = tokens do ds-package + remap `.rh2` dos canvases.**

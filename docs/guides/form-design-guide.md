@@ -25,15 +25,15 @@ This guide consolidates form styling using the **Trust Keith design token system
 
 | Token | Value | Usage | CSS Variable |
 |-------|-------|-------|-------------|
-| **text-primary** | #222525 | Labels, field text | `var(--text-primary)` |
-| **text-secondary** | #4f5057 | Hints, descriptions | `var(--text-secondary)` |
-| **surface-white** | #ffffff | Input backgrounds | `var(--surface-white)` |
-| **surface-light** | #fafafa | Form section backgrounds | `var(--surface-light)` |
-| **success** | #068466 | Success states, checkmarks | `var(--success)` |
-| **danger** | #ea384c | Error states, validation | `var(--danger)` |
-| **surface-neutral** | #ebebeb | Borders, dividers | `var(--surface-neutral)` |
-| **bright-blue** | #4285f4 | Focus ring, highlights | `var(--bright-blue)` |
-| **trust-keith-teal** | #235875 | Primary CTA buttons | `var(--trust-keith-teal)` |
+| **tk-ink** | #222525 | Labels, field text | `var(--tk-ink)` |
+| **tk-ink-muted** | #4f5057 | Hints, descriptions | `var(--tk-ink-muted)` |
+| **tk-surface** | #ffffff | Input backgrounds | `var(--tk-surface)` |
+| **tk-surface-2** | #fafafa | Form section backgrounds | `var(--tk-surface-2)` |
+| **tk-success** | #068466 | Success states, checkmarks | `var(--tk-success)` |
+| **tk-error** | #ea384c | Error states, validation | `var(--tk-error)` |
+| **tk-line** | #ebebeb | Borders, dividers | `var(--tk-line)` |
+| **tk-focus** | #4d65ff | Focus ring, highlights | `var(--tk-focus)` |
+| **tk-brand** | #0c6a83 | Primary CTA buttons | `var(--tk-brand)` |
 
 ### 1.2 Form Spacing Scale
 
@@ -52,7 +52,7 @@ This guide consolidates form styling using the **Trust Keith design token system
 
 | Token | Radius | Usage |
 |-------|--------|-------|
-| **input** | 0px | Text inputs, textareas (utilitarian) |
+| **input** | 4px | Text inputs, textareas (utilitarian) |
 | **button** | 6px | Form buttons, select boxes |
 | **card** | 24px | Form containers, card sections |
 
@@ -70,9 +70,9 @@ This guide consolidates form styling using the **Trust Keith design token system
 
 | Token | Shadow | Usage |
 |-------|--------|-------|
-| **focus** | `0.125rem solid #4d65ff` | Focus ring (input states) |
+| **focus** | `0.125rem solid var(--tk-focus)` | Focus ring (input states) |
 | **ambient** | `0 4px 16px rgba(0, 0, 0, 0.08)` | Form container shadows |
-| **standard** | `0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.5)` | Dropdown shadows |
+| **standard** | `0 2px 16px rgba(0, 0, 0, 0.02), 0 16px 64px rgba(0, 0, 0, 0.12)` | Dropdown shadows |
 
 ---
 
@@ -101,8 +101,8 @@ interface FormControlProps {
 ┌─────────────────────────────┐
 │ Email Address *             │  ← Label (text-label-bold)
 │ [            ]              │  ← Input (with focus ring)
-│ Enter your email address    │  ← Hint (text-secondary)
-│ This field is required      │  ← Error (danger color)
+│ Enter your email address    │  ← Hint (tk-ink-muted)
+│ This field is required      │  ← Error (tk-error)
 └─────────────────────────────┘
 ```
 
@@ -121,9 +121,9 @@ interface FormControlProps {
 
 | State | Text Color | Border Color | Background | Focus Ring |
 |-------|-----------|--------------|------------|-----------|
-| **default** | text-primary | surface-neutral | surface-white | bright-blue |
-| **error** | danger | danger | danger (opacity 8%) | danger |
-| **success** | success | success | success (opacity 5%) | success |
+| **default** | tk-ink | tk-line | tk-surface | tk-focus |
+| **error** | tk-error | tk-error | tk-error (opacity 8%) | tk-error |
+| **success** | tk-success | tk-success | tk-success (opacity 5%) | tk-success |
 | **warning** | warning (gold) | warning | warning (opacity 5%) | warning |
 
 **Example Usage:**
@@ -163,8 +163,8 @@ interface FormSectionProps {
 | Variant | Background | Border | Padding | Usage |
 |---------|-----------|--------|---------|-------|
 | **default** | transparent | none | none | Logical grouping, no visual separation |
-| **card** | surface-light | 1px surface-neutral | 24px (lg) | Emphasized grouping (profile section) |
-| **outlined** | transparent | 2px surface-neutral | 16px (md) | Important sections (payment info) |
+| **card** | tk-surface-2 | 1px tk-line | 24px (lg) | Emphasized grouping (profile section) |
+| **outlined** | transparent | 2px tk-line | 16px (md) | Important sections (payment info) |
 
 **Spacing:**
 - Section to section: `xl` (32px)
@@ -239,35 +239,35 @@ interface FormProps {
 
 **Base Styling:**
 ```css
-border-radius: var(--radius-input); /* 0px */
-border: 1px solid var(--surface-neutral);
-padding: var(--spacing-md) var(--spacing-md); /* 16px */
-font-family: var(--font-sans);
+border-radius: var(--tk-radius-input); /* 4px */
+border: 1px solid var(--tk-line);
+padding: var(--tk-space-4) var(--tk-space-4); /* 16px */
+font-family: var(--tk-font-body);
 font-size: 1rem;
 line-height: 1.5;
-color: var(--text-primary);
-background-color: var(--surface-white);
+color: var(--tk-ink);
+background-color: var(--tk-surface);
 transition: all 200ms ease-in-out;
 ```
 
 **States:**
-- **Default:** Border surface-neutral, no outline
-- **Hover:** Border surface-neutral (no change per Trust Keith)
-- **Focus:** Border bright-blue, outline 2px offset 2px (focus ring shadow)
-- **Error:** Border danger, error message shown below
-- **Disabled:** Background surface-light, color text-secondary (opacity 60%)
-- **Placeholder:** text-secondary (opacity 60%)
+- **Default:** Border tk-line, no outline
+- **Hover:** Border tk-line (no change per Trust Keith)
+- **Focus:** Border tk-focus, outline 2px offset 2px (focus ring shadow)
+- **Error:** Border tk-error, error message shown below
+- **Disabled:** Background tk-surface-2, color tk-ink-muted (opacity 60%)
+- **Placeholder:** tk-ink-muted (opacity 60%)
 
 ### 3.2 Select (`<select>`)
 
 **Base Styling:**
 ```css
-border-radius: var(--radius-button); /* 6px */
-border: 1px solid var(--surface-neutral);
-padding: var(--spacing-sm) var(--spacing-md); /* 8px 16px */
+border-radius: var(--tk-radius-button); /* 6px */
+border: 1px solid var(--tk-line);
+padding: var(--tk-space-2) var(--tk-space-4); /* 8px 16px */
 font-size: 0.875rem;
-color: var(--text-primary);
-background-color: var(--surface-white);
+color: var(--tk-ink);
+background-color: var(--tk-surface);
 background-image: url('data:image/svg+xml...');
 background-position: right 8px center;
 padding-right: 28px;
@@ -275,7 +275,7 @@ cursor: pointer;
 ```
 
 **Dropdown Arrow:**
-- SVG chevron (dark text-secondary)
+- SVG chevron (dark tk-ink-muted)
 - Position: right 8px, center vertically
 - Only visible in closed state
 
@@ -283,10 +283,10 @@ cursor: pointer;
 
 **Base Styling:**
 ```css
-border-radius: var(--radius-input); /* 0px */
-border: 1px solid var(--surface-neutral);
-padding: var(--spacing-md); /* 16px */
-font-family: var(--font-sans);
+border-radius: var(--tk-radius-input); /* 4px */
+border: 1px solid var(--tk-line);
+padding: var(--tk-space-4); /* 16px */
+font-family: var(--tk-font-body);
 font-size: 1rem;
 line-height: 1.5;
 min-height: 120px;
@@ -304,20 +304,20 @@ resize: vertical;
 ```css
 width: 20px;
 height: 20px;
-border-radius: var(--radius-button); /* 6px */
-border: 2px solid var(--surface-neutral);
+border-radius: var(--tk-radius-button); /* 6px */
+border: 2px solid var(--tk-line);
 cursor: pointer;
-accent-color: var(--trust-keith-teal);
+accent-color: var(--tk-brand);
 ```
 
 **Radio:**
 ```css
 width: 20px;
 height: 20px;
-border-radius: var(--radius-pill); /* 100% */
-border: 2px solid var(--surface-neutral);
+border-radius: var(--tk-radius-pill); /* 100% */
+border: 2px solid var(--tk-line);
 cursor: pointer;
-accent-color: var(--trust-keith-teal);
+accent-color: var(--tk-brand);
 ```
 
 ---
@@ -334,7 +334,7 @@ accent-color: var(--trust-keith-teal);
 5. Next field
 
 **Focus Indicators:**
-- **Outline:** 2px solid bright-blue (#4285f4)
+- **Outline:** 2px solid tk-focus (#4d65ff)
 - **Offset:** 2px from element edge
 - **Transition:** 200ms ease-in-out (smooth appearance)
 - **Contrast:** Minimum 3:1 (meets WCAG AA)
@@ -432,10 +432,10 @@ export function FormDialog() {
 - Borders (border-, rounded-)
 
 **Use CSS Variables for:**
-- Color values: `var(--text-primary)`
-- Spacing: `var(--spacing-md)`
-- Border radius: `var(--radius-input)`
-- Shadows: `var(--shadow-focus)`
+- Color values: `var(--tk-ink)`
+- Spacing: `var(--tk-space-4)`
+- Border radius: `var(--tk-radius-input)`
+- Shadows: `var(--tk-focus-ring)`
 
 **Example:**
 ```tsx
@@ -443,9 +443,9 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>(
   ({ label, error, hint, children, ...props }, ref) => (
     <div ref={ref} className="flex flex-col gap-2">
       {label && (
-        <label className="text-label-bold font-semibold text-text-primary">
+        <label className="text-label-bold font-semibold text-tk-ink">
           {label}
-          {required && <span className="ml-1 text-danger">*</span>}
+          {required && <span className="ml-1 text-tk-error">*</span>}
         </label>
       )}
       <div className="relative">
@@ -459,8 +459,8 @@ export const FormControl = React.forwardRef<HTMLDivElement, FormControlProps>(
           return child;
         })}
       </div>
-      {hint && <p className="text-body-small text-text-secondary">{hint}</p>}
-      {error && <p className="text-caption text-danger" role="alert">{error}</p>}
+      {hint && <p className="text-body-small text-tk-ink-muted">{hint}</p>}
+      {error && <p className="text-caption text-tk-error" role="alert">{error}</p>}
     </div>
   )
 );

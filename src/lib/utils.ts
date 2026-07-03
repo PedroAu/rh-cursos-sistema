@@ -11,7 +11,7 @@ import { twMerge } from "tailwind-merge";
  * - `twMerge` deduplica classes Tailwind conflitantes, vencendo a última
  *   declarada (ex.: `cn("px-2", "px-4")` → `"px-4"`).
  *
- * @example cn("rounded border", isActive && "border-primary", { "opacity-50": disabled })
+ * @example cn("rounded border", isActive && "border-tk-brand", { "opacity-50": disabled })
  */
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
