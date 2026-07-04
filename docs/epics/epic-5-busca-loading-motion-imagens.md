@@ -2,6 +2,8 @@
 
 **Status:** COMPLETE — stories 5.1 a 5.5 `Done`
 
+> **⚠️ Guarda de regressão (2026-07-03):** Os critérios **S7** (busca real), **S8** (reduced-motion em JS) e **S9** (`next/image`) estão implementados e vivos, mas o **Épico 14 (Redesign Trust Keith)** reescreve os mesmos arquivos (`Home.tsx`, `course-card.tsx`, `section-title.tsx`, shell público, catálogo). Os canvases do redesign são estáticos e não descrevem esses comportamentos. Eles foram registrados como **invariantes preservados** na fase 2 e no gate final do Épico 14 (`docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`). Não reabrir esta épica; verificar preservação lá.
+
 **PRD:** `docs/prd/modernizacao-ui-2026.md`
 **Prioridade:** P3
 **Depende de:** Épicas 1, 2 (tokens + componentes)

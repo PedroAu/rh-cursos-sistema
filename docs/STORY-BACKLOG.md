@@ -14,11 +14,11 @@ Centralized tracking of follow-up tasks, technical debt, and optimization opport
 
 | Metric | Count |
 | --- | --- |
-| Total items | 1 |
+| Total items | 2 |
 | 🔴 HIGH | 0 |
 | 🟡 MEDIUM | 0 |
-| 🟢 LOW | 0 |
-| 📋 TODO | 0 |
+| 🟢 LOW | 1 |
+| 📋 TODO | 1 |
 | ✅ DONE | 1 |
 
 ---
@@ -37,7 +37,14 @@ _None._
 
 ## 🟢 LOW Priority
 
-_None._
+#### [1.2-F1] Admin CRUD para conteúdo da página de consultoria (FR9 diferido)
+- **Source**: PRD gap analysis (@aiox-master, 2026-07-03)
+- **Priority**: 🟢 LOW
+- **Effort**: TBD (nova superfície admin)
+- **Status**: 📋 TODO
+- **Assignee**: —
+- **Description**: FR9 lista "consulting-related public content" como gerenciável no admin. Decisão de escopo (2026-07-03): conteúdo da página de consultoria é **estático no código** no MVP (Story 1.2 AC5). A gestão editorial via admin fica diferida para story futura explícita, para evitar acoplar nova superfície admin ao re-skin do Épico 14 (ADR-014 D9).
+- **Dependência**: modelo de dados de conteúdo + re-skin admin (Épico 14) concluídos.
 
 ---
 

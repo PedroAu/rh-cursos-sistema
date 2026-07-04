@@ -85,3 +85,4 @@ The next major gap is role-based experience. The admin area is active and protec
 | Change | Date | Version | Description | Author |
 | --- | --- | --- | --- | --- |
 | Initial brownfield PRD draft | 2026-06-30 | 0.1 | Created validated context and initial requirements for public consulting, admin, student, and instructor expansion | Morgan |
+| NFR5 errata + Epic 14 cross-dependency | 2026-07-03 | 0.2 | Superseded Mantine reference in NFR5 (points to ADR-014); registered mandatory sequencing between Epic 1 (consulting/portals) and Epic 14 (Trust Keith redesign) in both epic docs | Orion (@aiox-master) |

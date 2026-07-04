@@ -4,6 +4,19 @@
 
 **Integration Requirements**: Preserve existing public catalog, agenda, in-company, checkout/enrollment, admin, auth, Supabase, RLS, OpenAPI, test, and Cloudflare deployment behavior while introducing consulting conversion and authenticated role-based surfaces incrementally.
 
+## Cross-Epic Dependency — Epic 14 (Redesign Trust Keith)
+
+> **Registrado em 2026-07-03.** Este épico compartilha arquivos com o Épico 14 (`docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`), que remove 100% do Mantine e substitui o sistema de forms, os portais e as páginas públicas pelo design system Trust Keith. Sequenciamento obrigatório para evitar retrabalho:
+
+| Story deste épico | Depende de | Motivo |
+|---|---|---|
+| 1.2 (página de consultoria) | **Gate F0 + F1** do Épico 14 | A página usa `form-field.tsx` e componentes base; construir antes do redesign gera retrabalho garantido. A página **deve ser adicionada à story 14.2.7** (páginas sem canvas) para receber spec de fidelidade do @ux-design-expert. |
+| 1.4 (portal aluno) | **Story 14.1.4** (reescrita de `StudentPortal.tsx`) | Ativar o portal antes da purga do Mantine reintroduz a dependência que o Épico 14 remove. |
+| 1.5 (portal instrutor) | **Story 14.1.4** (reescrita de `InstructorPortal.tsx`) | Idem 1.4. |
+| 1.3 (leads/admin) | — (pode rodar em paralelo) | Sem UI pública nova relevante; segue o re-skin admin mínimo do ADR-014 (D9). |
+
+**Diretriz para @dev/Codex:** toda tela deste épico segue `docs/architecture/adr-014-redesign-trust-keith.md` (Radix + Tailwind + cva, react-hook-form + zod, tokens `--tk-*`), **não** o Mantine — a NFR5 original foi corrigida por errata em `docs/prd/requirements.md`.
+
 ## Story 1.1 Public Positioning and Journey Clarity
 
 As a public visitor,
@@ -35,6 +48,7 @@ so that I can understand the offer and request commercial follow-up.
 2. Consulting lead capture records contact details, organization context, area of interest, and message.
 3. Consulting conversion paths are reachable from relevant public surfaces without replacing core course enrollment flows.
 4. Consulting capture follows existing accessibility, validation, and anti-abuse standards.
+5. **(FR9 — content scope, decided 2026-07-03):** For the MVP the consulting page **content** (headline, positioning, audience/problem blocks, CTAs) is served **statically in code** — no admin CRUD for consulting content in this epic. The lead-management portion of FR9 is covered by Story 1.3; admin-managed consulting content is **deferred to an explicit future story** (see Story Backlog). This decision keeps the MVP lean and avoids a new admin surface coupled to the Epic 14 admin re-skin.
 
 ### Integration Verification
 
@@ -73,6 +87,7 @@ so that I can see my enrollments and related course/class information.
 2. Student access is limited to the authenticated student's own authorized records.
 3. The MVP excludes advanced artifacts such as certificates, materials, payment history, and support workflows unless explicitly added through a later scoped story.
 4. Student route protection, empty states, and session behavior align with the existing auth model.
+5. **(NFR10)** The student area must not reintroduce demo-auth behavior or mock-only data paths into production workflows; authentication and record access resolve exclusively through the real Supabase session and RLS model.
 
 ### Integration Verification
 
@@ -92,6 +107,7 @@ so that I can see my courses, classes, and authorized student lists.
 2. Instructor access is limited to records tied to the authenticated instructor relationship model.
 3. Instructor operational actions such as attendance, publishing, or student communication remain out of MVP unless explicitly added through a later scoped story.
 4. Instructor route protection, empty states, and session behavior align with the existing auth model.
+5. **(NFR10)** The instructor area must not reintroduce demo-auth behavior or mock-only data paths into production workflows; authentication and record access resolve exclusively through the real Supabase session and RLS model.
 
 ### Integration Verification
 

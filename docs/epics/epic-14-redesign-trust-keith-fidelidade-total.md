@@ -66,6 +66,15 @@ O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos
 
 ---
 
+### Dependência cruzada — Épico 1 (Consultoria + Portais)
+
+> **Registrado em 2026-07-03.** O Épico 1 (`docs/prd/epic-1-...activation.md`) ativa portais de aluno/instrutor e cria a página pública de consultoria — todos sobre arquivos que este épico reescreve. Contrato entre os dois:
+
+- **Gates F0 + F1 deste épico precedem** as stories 1.2 (consultoria), 1.4 (portal aluno) e 1.5 (portal instrutor) do Épico 1. Implementar aquelas telas antes da purga do Mantine gera retrabalho.
+- A **página de consultoria (story 1.2)** entra na story 14.2.7 acima (recebe spec de fidelidade do @ux-design-expert como as demais páginas sem canvas).
+- A story 1.3 (leads/admin do Épico 1) **pode rodar em paralelo** — não depende do redesign, apenas segue o re-skin admin mínimo (D9 do ADR-014).
+- A **NFR5 do PRD foi corrigida por errata** (`docs/prd/requirements.md`): a referência a "Mantine/Tailwind transition constraints" está superada por este épico.
+
 ## 2. Decisões arquiteturais (para ratificação por @architect)
 
 | # | Decisão | Racional |
@@ -121,16 +130,26 @@ Cada story segue o mesmo template: implementar a rota conforme `spec-{pagina}.md
 | 14.2.4 | In-company (`/in-company`) | @dev (Codex) | @qa sonnet |
 | 14.2.5 | Quem Somos (`/sobre`) | @dev (Codex) | @qa sonnet |
 | 14.2.6 | Blog (`/blog` + `/blog/[slug]`) | @dev (Codex) | @qa sonnet |
-| 14.2.7 | Páginas sem canvas (Login, Contato, CourseDetail, EnrollmentSuccess, SpecialistContact): re-skin com tokens/componentes novos, coerência com o DS | @ux-design-expert (spec) → @dev (Codex) | @qa sonnet |
+| 14.2.7 | Páginas sem canvas (Login, Contato, CourseDetail, EnrollmentSuccess, SpecialistContact, **Consultoria** — página nova do Épico 1 / story 1.2): re-skin com tokens/componentes novos, coerência com o DS | @ux-design-expert (spec) → @dev (Codex) | @qa sonnet |
 
 **Critério de fidelidade (cada story 2.x):** screenshot Playwright 1180px da rota vs render do canvas — layout, cores, tipografia, espaçamentos e raios idênticos; divergências só onde a spec 14.0.2 documentar adaptação (dados reais, responsivo).
+
+**⚠️ Invariantes preservados do Épico 5 (regressão — NÃO reintroduzir):** o Épico 5 (`docs/epics/epic-5-busca-loading-motion-imagens.md`, status `Done`) já entregou os critérios abaixo. Os canvases são estáticos e **não os descrevem**, então cada story 2.x que reescreva os arquivos correspondentes deve **conservar** o comportamento existente, tratando-o como parte do contrato de fidelidade funcional (não visual):
+
+| Critério | Comportamento a preservar | Onde vive hoje |
+|---|---|---|
+| **S7 — busca real** | Busca global do header (`CommandPalette`) navega para o catálogo; catálogo lê/aplica `?q=` e reescreve o termo na URL. O redesign do header **não pode** virar campo decorativo. | `src/features/public-shell/public-layout.tsx`, `src/components/common/command-palette.tsx`, `src/views/public/Courses.tsx` |
+| **S8 — reduced-motion (JS)** | Todo hover/transição de entrada (`translateY`, `transform .25s` das specs) respeita `prefers-reduced-motion`. Implementar via `framer-motion` sob o `MotionProvider` (guard global) ou `useReducedMotion()` — **nunca** CSS `transition: transform` cru sem media query. | `app/layout.tsx` (`MotionProvider`), `section-title.tsx`, `course-card.tsx` |
+| **S9 — sem `<img>` cru** | Imagens via `next/image` (dimensões, `priority` só no hero, `alt` correto); zero warning de lint. | cards, detalhe, hero |
+
+**Diretriz para o @sm ao gerar as stories 2.x:** incluir esses três itens como AC verificável na story de cada página que tocar os arquivos listados (ex.: Home 14.2.1 → S7 header + S8 hover cards/section-title; Catálogo 14.2.2 → S7 aplicação de `?q=` + S8 hover cards).
 
 ### FASE 3 — Verificação final e entrega
 
 | Story | Tarefa | Agente | Modelo |
 |---|---|---|---|
-| 14.3.1 | Auditoria visual completa (todas as rotas vs canvases), a11y (`test:a11y`), Lighthouse | @qa | **opus** (gate final) |
-| 14.3.2 | Regressão funcional: e2e smoke, fluxos de inscrição/login/admin | @qa | sonnet |
+| 14.3.1 | Auditoria visual completa (todas as rotas vs canvases), a11y (`test:a11y`), Lighthouse. **+ Invariantes Épico 5:** verificar **S8** (nenhum movimento essencial sob `prefers-reduced-motion` — reexecutar `test:a11y` com a preferência ativa) e **S9** (zero warning de `<img>` no lint). | @qa | **opus** (gate final) |
+| 14.3.2 | Regressão funcional: e2e smoke, fluxos de inscrição/login/admin. **+ Invariante Épico 5 — S7:** e2e confirma que a busca do header aplica termo real no catálogo (`/cursos?q=…`) e o catálogo filtra por ele. | @qa | sonnet |
 | 14.3.3 | Limpeza: remover canvases/bundles de `public/` (mover para `docs/design/redesign/reference/` — não devem ir ao deploy), `.dc.html` fora do worker | @dev (Codex) | — |
 | 14.3.4 | Commit/PR para `redesign/ep-0-fundacao`, CI verde, `bundle:check` final | @devops | haiku |
 

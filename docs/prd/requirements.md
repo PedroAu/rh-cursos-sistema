@@ -33,7 +33,8 @@ MVP clarification:
 - **NFR2:** Student, instructor, and admin access must fail closed and must not expose private records across roles.
 - **NFR3:** Public lead capture must preserve existing rate limiting, validation, CORS, and anti-abuse protections.
 - **NFR4:** The consulting conversion path must meet the same accessibility baseline as existing public pages, including keyboard access, labels, focus handling, and WCAG-oriented checks.
-- **NFR5:** New public and authenticated screens must follow the existing design system, Mantine/Tailwind transition constraints, and feature-first organization.
+- **NFR5:** New public and authenticated screens must follow the current design system and feature-first organization.
+  > **Errata (2026-07-03):** A referência original a "Mantine/Tailwind transition constraints" está **superada**. O Épico 14 (Redesign Trust Keith) remove 100% do Mantine e adota Radix + Tailwind + cva, react-hook-form + zod e tokens `--tk-*`, conforme `docs/architecture/adr-014-redesign-trust-keith.md` (decisões D1–D9). Toda tela nova (consultoria, portais de aluno/instrutor) deve seguir o ADR-014, **não** o Mantine. Ver dependência cruzada em `docs/prd/epic-1-rh-cursos-platform-repositioning-and-role-based-experience-activation.md`.
 - **NFR6:** The enhancement must include automated verification for critical public conversion, admin lead management, and role-based access flows.
 - **NFR7:** New database policies or migrations must preserve existing RLS guarantees and be covered by database or integration tests where role visibility changes.
 - **NFR8:** The site must remain deployable through the existing Cloudflare Workers/OpenNext process.
