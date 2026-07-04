@@ -1,19 +1,20 @@
 status:
   branch: main
   modifiedFiles:
-    - .aiox-core/core-config.yaml
-    - .mcp.json
+    - docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md
+    - >-
+      docs/prd/epic-1-rh-cursos-platform-repositioning-and-role-based-experience-activation.md
+    - docs/prd/intro-project-analysis-and-context.md
+    - docs/prd/requirements.md
     - docs/stories/1.1.story.md
-    - tests/baseline/blog-artigo-baseline-desktop.png
-    - tests/baseline/blog-artigo-baseline-mobile.png
-  modifiedFilesTotalCount: 14
+  modifiedFilesTotalCount: 5
   recentCommits:
+    - 'docs: record story 1.1 qa and mcp setup'
     - 'feat(public): clarify consultoria journey [Story 1.1]'
-    - 'fix: stabilize auth contract rate limiting'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-03T17:48:05.274Z'
+  lastUpdate: '2026-07-03T18:48:31.705Z'
   isGitRepo: true
-timestamp: 1783100885276
+timestamp: 1783104511706
 ttl: 60
-gitFingerprint: 1782438372335.9148:1783100738099.7837
+gitFingerprint: 1782438372335.9148:1783101178801.9812

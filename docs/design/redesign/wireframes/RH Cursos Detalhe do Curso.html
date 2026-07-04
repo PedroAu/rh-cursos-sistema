@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RH Cursos - Detalhe do Curso</title>
+  <style>
+    *{box-sizing:border-box}
+    :focus-visible{outline:2px solid #4d65ff;outline-offset:2px;border-radius:4px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.001ms!important;animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+    :root{
+      --tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6;--tk-focus:#4d65ff;
+      --tk-ink:#222525;--tk-ink-muted:#4f5057;--tk-line:#ebebeb;--tk-surface-2:#fafafa;--tk-surface:#fff;--tk-cream:#fffaf4;--tk-cream-dark:#c3b6aa;
+      --tk-success:#068466;--tk-error:#ea384c;--tk-font-display:"Iowan Old Style","Palatino Linotype",Georgia,serif;--tk-font-serif:Georgia,"Times New Roman",serif;--tk-font-body:Inter,"Helvetica Neue",Arial,sans-serif;
+      --tk-text-display-hero:3.75rem;--tk-text-display-large:2.75rem;--tk-text-section:2rem;--tk-text-subhead-lg:1.5rem;--tk-text-subhead:1.25rem;--tk-text-body-lg:1.0625rem;--tk-text-body:1rem;--tk-text-body-sm:.875rem;--tk-text-caption:.75rem;
+      --tk-radius-button:6px;--tk-radius-md:8px;--tk-radius-glass:16px;--tk-radius-card:24px;--tk-radius-pill:100rem;--tk-space-3:.75rem;--tk-space-4:1rem;--tk-space-5:1.25rem;--tk-space-6:1.5rem;--tk-space-8:2rem;--tk-space-12:3rem;--tk-space-16:4rem;
+      --tk-shadow-glass:0 4px 16px rgba(0,0,0,.08);--tk-shadow-card:0 2px 16px rgba(0,0,0,.02),0 16px 64px rgba(0,0,0,.12);--tk-shadow-pop:0 12px 36px -8px rgba(41,43,78,.18);
+      --rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--rh-paper-a:#f4f1e9;--rh-paper-b:#e9e4d8;--rh-paper-line:#ded8c9;
+    }
+    body{margin:0;background:#eef0f2;color:var(--tk-ink);font-family:var(--tk-font-body)}
+    .rh-page{width:min(1180px,calc(100% - 32px));margin:32px auto;background:var(--tk-surface);border:1px solid var(--tk-line);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:#fff;border-bottom:1px solid rgba(0,0,0,.08);padding:16px 40px}
+    .rh-nav a{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a:hover{opacity:1;background:rgba(0,0,0,.04)}.rh-nav a[data-cur="1"]{opacity:1;color:var(--tk-brand);font-weight:600}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}.rh-section{padding:72px 0}.rh-section-tight{padding:52px 0}.rh-muted{color:var(--tk-ink-muted)}
+    .rh-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--tk-line);border-radius:var(--tk-radius-pill);background:#fff;color:var(--tk-brand);font-size:var(--tk-text-caption);font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 12px;box-shadow:var(--tk-shadow-glass)}
+    .rh-dot{width:7px;height:7px;border-radius:50%;background:var(--tk-accent);display:inline-block}.rh-chip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--tk-line);border-radius:var(--tk-radius-pill);padding:8px 15px;font-size:var(--tk-text-body-sm);color:var(--tk-ink);box-shadow:var(--tk-shadow-glass)}
+    .rh-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--tk-line);border-radius:var(--tk-radius-button);background:#fff;color:var(--tk-ink);font-size:var(--tk-text-body-sm);font-weight:700;text-decoration:none;padding:14px 20px;min-height:48px}.rh-btn.primary{background:var(--tk-brand);border-color:var(--tk-brand);color:#fff}.rh-btn.gold{background:#e2af2f;border-color:#e2af2f;color:#352603}
+    .rh-card{background:#fff;border:1px solid var(--tk-line);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);padding:var(--tk-space-8)}.rh-glass{background:#fff;border:1px solid var(--tk-line);border-radius:var(--tk-radius-glass);box-shadow:var(--tk-shadow-glass)}
+    .rh-hero{background:radial-gradient(circle at 50% -10%,#f7f9fc 30%,#ebf3ff 130%);border-bottom:1px solid var(--tk-line);padding:56px 0 64px}.rh-hero-grid{display:grid;grid-template-columns:minmax(0,1.08fr) 380px;gap:48px;align-items:start}
+    .rh-h1{font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-hero);line-height:1.06;letter-spacing:-.02em;color:var(--tk-ink);margin:18px 0 18px;text-wrap:balance}.rh-lead{font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead-lg);line-height:1.45;color:var(--tk-ink-muted);margin:0;max-width:52ch;text-wrap:pretty}
+    .rh-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}.rh-kpi{padding:18px;border:1px solid var(--tk-line);border-radius:var(--tk-radius-glass);background:#fff}.rh-kpi span{display:block;font-size:var(--tk-text-caption);letter-spacing:.08em;text-transform:uppercase;color:var(--tk-ink-muted);font-weight:700}.rh-kpi strong{display:block;font-family:var(--tk-font-display);font-size:25px;line-height:1.1;color:var(--tk-brand);margin-top:7px}
+    .rh-media{aspect-ratio:16/10;border-radius:var(--tk-radius-card);background:linear-gradient(135deg,#0b4a5f,#1791a9 58%,#d9eef3);position:relative;overflow:hidden;box-shadow:var(--tk-shadow-card)}.rh-media::before{content:"";position:absolute;inset:18px;border:1px solid rgba(255,255,255,.22);border-radius:18px}.rh-media::after{content:"Nova Lei de Licitações";position:absolute;left:24px;bottom:24px;color:#fff;font-family:var(--tk-font-display);font-weight:700;font-size:28px;max-width:9ch;line-height:1.05}.rh-play{position:absolute;inset:0;display:grid;place-items:center}.rh-play span{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.94);color:var(--tk-brand);font-size:28px}
+    .rh-checkout{margin-top:16px;background:#092d3f;color:#fff;border-radius:var(--tk-radius-card);padding:26px;box-shadow:var(--tk-shadow-pop)}.rh-checkout .mini{font-size:var(--tk-text-caption);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.66)}.rh-price{font-family:var(--tk-font-display);font-weight:700;font-size:42px;line-height:1;color:#f3c95e;margin:12px 0 18px}.rh-check-row{display:flex;justify-content:space-between;gap:14px;color:rgba(255,255,255,.78);font-size:var(--tk-text-body-sm);padding:10px 0;border-top:1px solid rgba(255,255,255,.12)}.rh-check-row strong{color:#fff}.rh-note{margin-top:14px;padding:14px;border:1px dashed rgba(255,255,255,.25);border-radius:14px;color:rgba(255,255,255,.72);font-size:var(--tk-text-body-sm);line-height:1.5}
+    .rh-heading{max-width:660px;margin-bottom:34px}.rh-heading h2{font-family:var(--tk-font-display);font-size:var(--tk-text-display-large);line-height:1.1;letter-spacing:-.02em;margin:16px 0 10px}.rh-heading p{font-family:var(--tk-font-serif);font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0}
+    .rh-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}.rh-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.rh-grid-2{display:grid;grid-template-columns:1.1fr .9fr;gap:24px}.rh-feature{min-height:188px}.rh-feature.dark{background:var(--tk-brand);color:#fff}.rh-feature.dark p{color:rgba(255,255,255,.82)}
+    .rh-module{padding:20px 0;border-top:1px solid var(--tk-line)}.rh-module:first-child{border-top:0;padding-top:0}.rh-module strong,.rh-card h3{font-family:var(--tk-font-display);font-size:var(--tk-text-subhead);line-height:1.2}.rh-module p,.rh-card p{color:var(--tk-ink-muted);line-height:1.55;margin:8px 0 0}.rh-class{display:grid;grid-template-columns:72px 1fr auto;gap:18px;align-items:center;padding:18px;border:1px solid var(--tk-line);border-radius:var(--tk-radius-glass);background:#fff}.rh-date{text-align:center;border-right:1px solid var(--tk-line);padding-right:16px}.rh-date strong{display:block;font-family:var(--tk-font-display);font-size:28px;color:var(--tk-brand);line-height:1}.rh-date span{font-size:var(--tk-text-caption);font-weight:700;text-transform:uppercase;color:var(--tk-ink-muted)}
+    .rh-footer{background:var(--tk-surface-2);border-top:1px solid var(--tk-line);padding:56px 0 40px}.rh-footer-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px}.rh-footer a{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm)}.rh-foot-title{font-size:var(--tk-text-caption);font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px}.rh-link-stack{display:grid;gap:10px}
+    @media(max-width:980px){.rh-page{width:calc(100% - 20px);margin:10px auto}.rh-nav{padding:16px 20px;flex-wrap:wrap}.rh-wrap{padding:0 22px}.rh-hero-grid,.rh-grid-2,.rh-grid-3,.rh-grid-4,.rh-footer-grid{grid-template-columns:1fr}.rh-kpis{grid-template-columns:repeat(2,1fr)}.rh-h1{font-size:42px}.rh-class{grid-template-columns:1fr}.rh-date{text-align:left;border-right:0;border-bottom:1px solid var(--tk-line);padding:0 0 12px}}
+  </style>
+</head>
+<body>
+  <div class="rh-page rh2">
+    <nav class="rh-nav" aria-label="Navegação principal">
+      <img src="../../../../public/uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+      <div style="display:flex;align-items:center;gap:2px;flex-wrap:wrap">
+        <a data-cur="1" href="#">Cursos</a><a href="#">Agenda</a><a href="#">In-company</a><a href="#">Consultoria</a><a href="#">Blog</a>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <a href="#">Entrar</a><a class="rh-btn primary" style="min-height:34px;padding:8px 14px" href="#">Fale com um especialista</a>
+      </div>
+    </nav>
+
+    <header class="rh-hero">
+      <div class="rh-wrap rh-hero-grid">
+        <div>
+          <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-bottom:18px">Home / Cursos / Nova Lei de Licitações na prática</div>
+          <span class="rh-badge"><span class="rh-dot"></span>Licitações e Contratos · Online ao vivo · 16h</span>
+          <h1 class="rh-h1">Nova Lei de Licitações <span style="font-style:italic;color:var(--tk-brand)">na prática</span>.</h1>
+          <p class="rh-lead">Página de decisão comercial para combinar prova de valor, resumo executivo, agenda e CTA de matrícula sem esconder preço, formato ou aderência.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 0">
+            <a class="rh-btn primary" href="#">Inscrever-se agora</a>
+            <a class="rh-btn" href="#">Programa PDF</a>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:24px">
+            <span class="rh-chip">4,9 de avaliação</span><span class="rh-chip">1.240 alunos</span><span class="rh-chip">Certificação profissional</span>
+          </div>
+          <div class="rh-kpis">
+            <div class="rh-kpi"><span>Investimento</span><strong>R$ 1.290</strong></div>
+            <div class="rh-kpi"><span>Carga</span><strong>16h</strong></div>
+            <div class="rh-kpi"><span>Modalidade</span><strong>Online</strong></div>
+            <div class="rh-kpi"><span>Turmas</span><strong>4 abertas</strong></div>
+          </div>
+        </div>
+        <aside>
+          <div class="rh-media"><div class="rh-play"><span>▶</span></div></div>
+          <div class="rh-checkout">
+            <div class="mini">Inscrição garantida</div>
+            <div class="rh-price">R$ 1.290</div>
+            <a class="rh-btn gold" style="width:100%;margin-bottom:10px" href="#">Inscrever-se agora</a>
+            <div class="rh-check-row"><span>Próxima turma</span><strong>12 Ago</strong></div>
+            <div class="rh-check-row"><span>Formato</span><strong>Online ao vivo</strong></div>
+            <div class="rh-check-row"><span>Vagas abertas</span><strong>18</strong></div>
+            <div class="rh-note">Inclui material de apoio, confirmação por e-mail e atendimento da equipe RH Cursos.</div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <section class="rh-section" style="background:#fff">
+      <div class="rh-wrap">
+        <div class="rh-heading">
+          <span class="rh-badge">Objetivos centrais</span>
+          <h2>O que o aluno leva para a rotina</h2>
+          <p>Cards editoriais de valor antes do conteúdo programático, para reduzir dúvida e acelerar a decisão.</p>
+        </div>
+        <div class="rh-grid-4">
+          <div class="rh-card rh-feature"><h3>Diagnóstico de riscos</h3><p>Identificar falhas recorrentes em edital, julgamento e fiscalização.</p></div>
+          <div class="rh-card rh-feature dark"><h3>Norma aplicada</h3><p>Traduzir obrigação jurídica em rotina operacional real.</p></div>
+          <div class="rh-card rh-feature"><h3>Checklist de decisão</h3><p>Validar público, agenda, orçamento e aderência antes da matrícula.</p></div>
+          <div class="rh-card rh-feature"><h3>Execução segura</h3><p>Reduzir retrabalho nas fases críticas da contratação pública.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rh-section" style="background:var(--tk-surface-2);border-top:1px solid var(--tk-line);border-bottom:1px solid var(--tk-line)">
+      <div class="rh-wrap rh-grid-2">
+        <div class="rh-card">
+          <span class="rh-badge">Conteúdo programático</span>
+          <h2 style="font-family:var(--tk-font-display);font-size:var(--tk-text-section);margin:18px 0 20px">Módulos do curso</h2>
+          <div class="rh-module"><strong>Módulo 1 · Fundamentos e transição</strong><p>Cenário regulatório, impactos e pontos de ruptura na prática institucional.</p></div>
+          <div class="rh-module"><strong>Módulo 2 · Planejamento, edital e julgamento</strong><p>Checklist de preparação, riscos de redação e erros que travam pregões.</p></div>
+          <div class="rh-module"><strong>Módulo 3 · Fiscalização e execução contratual</strong><p>Critérios de acompanhamento, papéis e segurança de decisão.</p></div>
+        </div>
+        <div class="rh-card">
+          <span class="rh-badge">Decisão rápida</span>
+          <h2 style="font-family:var(--tk-font-display);font-size:var(--tk-text-section);margin:18px 0 20px">Para quem é</h2>
+          <div class="rh-module"><strong>Pregoeiros e equipes de compras</strong></div>
+          <div class="rh-module"><strong>Fiscais e gestores de contrato</strong></div>
+          <div class="rh-module"><strong>Jurídico e controle interno</strong></div>
+          <div class="rh-module"><strong>Gestores públicos e procurement corporativo</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="rh-section">
+      <div class="rh-wrap">
+        <div class="rh-heading">
+          <span class="rh-badge">Próximas turmas</span>
+          <h2>Agenda ligada à conversão</h2>
+          <p>A agenda precisa parecer continuação natural da decisão, com disponibilidade, formato e instrutor escaneáveis.</p>
+        </div>
+        <div style="display:grid;gap:14px">
+          <article class="rh-class"><div class="rh-date"><strong>12</strong><span>Ago</span></div><div><strong>Online ao vivo · 4 encontros</strong><p>18 vagas · Dra. Helena Prado · certificado incluso</p></div><a class="rh-btn primary" href="#">Inscrever-se</a></article>
+          <article class="rh-class"><div class="rh-date"><strong>26</strong><span>Ago</span></div><div><strong>Brasília · 3 dias presenciais</strong><p>10 vagas · Marcos Vinícius · material de apoio</p></div><a class="rh-btn" href="#">Ver turma</a></article>
+          <article class="rh-class"><div class="rh-date"><strong>09</strong><span>Set</span></div><div><strong>Online ao vivo · turma nova</strong><p>Valor promocional · atendimento consultivo</p></div><a class="rh-btn" href="#">Ver turma</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="rh-section" style="background:var(--tk-cream);border-top:1px solid var(--tk-cream-dark)">
+      <div class="rh-wrap rh-grid-2">
+        <div class="rh-card">
+          <span class="rh-badge">Instrutor e autoridade</span>
+          <div style="display:flex;gap:18px;align-items:center;margin-top:20px">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--tk-brand);color:#fff;display:grid;place-items:center;font-family:var(--tk-font-display);font-size:26px;font-weight:700">HP</div>
+            <div><h3 style="margin:0">Dra. Helena Prado</h3><p>Especialista em licitações, compras públicas e fiscalização contratual.</p></div>
+          </div>
+        </div>
+        <div class="rh-card">
+          <span class="rh-badge">Atendimento</span>
+          <h2 style="font-family:var(--tk-font-display);font-size:var(--tk-text-section);margin:18px 0 10px">Validar antes da matrícula</h2>
+          <p class="rh-muted">CTA para atendimento humano e solução in-company, preservando a jornada de quem ainda precisa consultar a equipe.</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:22px">
+            <a class="rh-btn primary" href="#">Solicitar orientação</a><a class="rh-btn" href="#">Ver in-company</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="rh-footer">
+      <div class="rh-wrap rh-footer-grid">
+        <div><img src="../../../../public/uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:48px;width:auto;display:block"><p class="rh-muted" style="font-size:var(--tk-text-body-sm);line-height:1.55;max-width:34ch">Cursos, treinamento in-company e consultoria para organizações públicas e privadas.</p></div>
+        <div><div class="rh-foot-title">Ofertas</div><div class="rh-link-stack"><a href="#">Cursos abertos</a><a href="#">Agenda</a><a href="#">In-company</a><a href="#">Consultoria</a></div></div>
+        <div><div class="rh-foot-title">Empresa</div><div class="rh-link-stack"><a href="#">Sobre</a><a href="#">Blog</a><a href="#">Instrutores</a><a href="#">Contato</a></div></div>
+        <div><div class="rh-foot-title">Acesso</div><div class="rh-link-stack"><a href="#">Área do aluno</a><a href="#">Área do instrutor</a><a href="#">Entrar</a></div></div>
+      </div>
+      <div class="rh-wrap" style="border-top:1px solid var(--tk-line);margin-top:40px;padding-top:24px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos. Todos os direitos reservados.</div>
+    </footer>
+  </div>
+</body>
+</html>

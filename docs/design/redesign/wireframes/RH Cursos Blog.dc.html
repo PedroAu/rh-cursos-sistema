@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    :focus-visible{outline:2px solid #4d65ff;outline-offset:2px;border-radius:4px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0.001ms !important;animation-duration:0.001ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important}}
+    body{margin:0;background:#eef0f2}
+    .rh-page{width:1180px;margin:0 auto;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--tk-line);border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-nav a.link[data-cur="1"]{opacity:1;color:var(--tk-brand);font-weight:600}
+    .rh-wm{font-family:var(--tk-font-display);font-weight:700;color:var(--tk-brand);font-size:22px;letter-spacing:-0.02em;display:inline-flex;align-items:center;gap:.5rem}
+    .rh-wm span{width:27px;height:27px;border-radius:30%;background:var(--tk-brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    /* ---- RH brand merge: real logo palette over Trust Keith tokens ---- */
+    .rh-page.rh2{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--rh-paper-line:#ded8c9;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .rh-page.rh2 .rh-nav{background:#ffffff}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+    .rh-fchip{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;padding:9px 16px;border-radius:var(--tk-radius-pill);border:1px solid var(--tk-border);background:var(--tk-surface);color:var(--tk-ink);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-fchip:hover{border-color:var(--tk-accent)}
+    .rh-fchip[data-on="1"]{background:var(--tk-brand);color:#fff;border-color:var(--tk-brand)}
+    .rh-featgrid{display:grid;grid-template-columns:1.35fr 1fr;gap:36px;align-items:stretch}
+    @media(max-width:860px){.rh-featgrid{grid-template-columns:1fr}}
+    .rh-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .rh-card{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .25s cubic-bezier(.25,.46,.45,.94),opacity .25s}
+    .rh-card:hover{transform:translateY(-3px)}
+    .rh-cardtop{height:158px;display:flex;align-items:flex-start;justify-content:space-between;padding:16px 18px;position:relative}
+    .rh-kicker{font-family:var(--tk-font-display);font-weight:700;font-size:56px;line-height:1;color:rgba(255,255,255,0.28);position:absolute;right:16px;bottom:6px;letter-spacing:-0.03em}
+    .rh-cattag{display:inline-flex;align-items:center;gap:6px;font-family:var(--tk-font-body);font-size:11px;font-weight:600;color:#fff;background:rgba(255,255,255,0.18);padding:5px 11px;border-radius:var(--tk-radius-pill);backdrop-filter:none}
+    .rh-meta{display:flex;align-items:center;gap:8px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)}
+    .rh-dot{width:3px;height:3px;border-radius:50%;background:var(--tk-ink-muted);display:inline-block}
+    .rh-jlink{color:var(--tk-accent);font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:600;text-decoration:none}
+    .rh-jlink:hover{color:var(--tk-accent-strong)}
+    .rh-trend{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--tk-line);cursor:pointer}
+    .rh-trend:last-child{border-bottom:none}
+    .rh-trend:hover .rh-trend-title{color:var(--tk-accent)}
+    .rh-trend-num{flex:none;font-family:var(--tk-font-display);font-weight:700;font-size:24px;color:var(--tk-border);line-height:1;width:30px}
+    .rh-search{width:100%;font-family:var(--tk-font-body);font-size:var(--tk-text-body);color:var(--tk-ink);padding:12px 16px 12px 42px;border:1px solid var(--tk-border);border-radius:var(--tk-radius-button);background:var(--tk-surface);outline:none}
+    .rh-search:focus{border-color:var(--tk-accent);box-shadow:0 0 0 3px var(--tk-accent-soft)}
+    .rh-empty{grid-column:1/-1;text-align:center;padding:64px 20px;color:var(--tk-ink-muted);font-family:var(--tk-font-body)}
+  </style>
+</helmet>
+
+<div class="rh-page rh2">
+  <nav class="rh-nav" aria-label="Navegação principal">
+    <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="link" href="#">Cursos</a><a class="link" href="#">Agenda</a><a class="link" href="#">In-company</a><a class="link" href="#">Consultoria</a><a class="link" data-cur="1" href="#">Blog</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a class="link" href="#">Entrar</a>
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="180px,32px">Fale com um especialista →</x-import>
+    </div>
+  </nav>
+
+  <!-- ===== Header ===== -->
+  <header style="background:radial-gradient(circle at 50% -10%, #f7f9fc 30%, #ebf3ff 130%);border-bottom:1px solid var(--tk-border);padding:60px 0 46px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="accent" dot="true" hint-size="auto,26px">Conteúdo · Análises · Prática</x-import>
+      <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-large);line-height:1.08;letter-spacing:-0.02em;color:var(--tk-ink);margin:18px 0 14px;max-width:22ch;text-wrap:balance">A norma explicada de um jeito que você <span style="font-style:italic">usa</span></h1>
+      <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0;max-width:60ch;text-wrap:pretty">Análises práticas de licitações, LGPD, compliance e gestão pública — escritas por quem aplica essas normas no dia a dia de organizações públicas e privadas.</p>
+    </div>
+  </header>
+
+  <!-- ===== Featured + trending ===== -->
+  <section style="padding:52px 0 8px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div class="rh-featgrid">
+
+        <!-- Featured post -->
+        <article class="rh-card" style="cursor:pointer">
+          <div class="rh-cardtop" style="height:300px;background:linear-gradient(135deg,#235875,#2f7599);align-items:flex-start">
+            <span class="rh-cattag" style="background:rgba(255,255,255,0.22)"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block"></span>Em destaque · Licitações</span>
+            <span class="rh-kicker" style="font-size:96px;color:rgba(255,255,255,0.22)">14.133</span>
+          </div>
+          <div style="padding:26px 28px 28px;display:flex;flex-direction:column;gap:14px;flex:1">
+            <div class="rh-meta"><span>Ana Ribeiro</span><span class="rh-dot"></span><span>28 Jun 2026</span><span class="rh-dot"></span><span>8 min de leitura</span></div>
+            <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display);line-height:1.14;letter-spacing:-0.02em;color:var(--tk-ink);margin:0;text-wrap:balance">Nova Lei de Licitações: os 7 erros que ainda travam pregões em 2026</h2>
+            <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.5;color:var(--tk-ink-muted);margin:0;text-wrap:pretty">Depois da transição definitiva para a Lei 14.133/21, os mesmos deslizes se repetem nas comissões. Mapeamos os mais comuns — e o que fazer antes de publicar o edital.</p>
+            <a href="#" class="rh-jlink" style="margin-top:auto">Ler artigo completo →</a>
+          </div>
+        </article>
+
+        <!-- Trending -->
+        <aside style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);padding:26px 28px;display:flex;flex-direction:column">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--tk-error);display:inline-block"></span>
+            <span style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted)">Em alta esta semana</span>
+          </div>
+          <sc-for list="{{ trending }}" as="t" hint-placeholder-count="4">
+            <div class="rh-trend">
+              <span class="rh-trend-num">{{ t.n }}</span>
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--tk-accent);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:5px">{{ t.category }}</div>
+                <div class="rh-trend-title" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-body);line-height:1.28;color:var(--tk-ink);letter-spacing:-0.01em;transition:color .2s">{{ t.title }}</div>
+                <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:5px">{{ t.read }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </aside>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Filters + search ===== -->
+  <section style="padding:44px 0 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:26px">
+        <div>
+          <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:0 0 4px">Últimos artigos</h2>
+          <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin:0">{{ count }} publicações · atualizado toda semana</p>
+        </div>
+        <div style="position:relative;width:300px;max-width:100%">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" style="position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--tk-ink-muted)"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <input class="rh-search" type="text" aria-label="Buscar artigos" placeholder="Buscar por tema ou palavra-chave" value="{{ query }}" oninput="{{ onSearch }}">
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:9px;margin-bottom:32px">
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="5">
+          <button type="button" class="rh-fchip" data-on="{{ cat.on }}" aria-pressed="{{ cat.pressed }}" data-cat="{{ cat.name }}" onclick="{{ pick }}">{{ cat.name }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Post grid ===== -->
+  <section style="padding:0 0 64px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div class="rh-grid">
+        <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+          <div class="rh-empty">
+            <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-ink);margin-bottom:8px">Nenhum artigo encontrado</div>
+            <div style="font-size:var(--tk-text-body-sm)">Tente outra palavra-chave ou categoria.</div>
+          </div>
+        </sc-if>
+        <sc-for list="{{ visible }}" as="p" hint-placeholder-count="6">
+          <article class="rh-card">
+            <div class="rh-cardtop" style="background: {{ p.tint }}">
+              <span class="rh-cattag">{{ p.category }}</span>
+              <span class="rh-kicker">{{ p.glyph }}</span>
+            </div>
+            <div style="padding:20px 22px 22px;display:flex;flex-direction:column;gap:11px;flex:1">
+              <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);line-height:1.22;letter-spacing:-0.01em;color:var(--tk-ink);margin:0;text-wrap:balance">{{ p.title }}</h3>
+              <p style="font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);line-height:1.55;color:var(--tk-ink-muted);margin:0">{{ p.excerpt }}</p>
+              <div class="rh-meta" style="margin-top:auto;padding-top:6px"><span>{{ p.author }}</span><span class="rh-dot"></span><span>{{ p.date }}</span><span class="rh-dot"></span><span>{{ p.read }}</span></div>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Newsletter CTA ===== -->
+  <section style="background:var(--tk-cream);border-top:1px solid var(--tk-cream-dark);border-bottom:1px solid var(--tk-cream-dark);padding:64px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:48px;align-items:center">
+      <div>
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="brand" hint-size="auto,26px">Newsletter quinzenal</x-import>
+        <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-large);letter-spacing:-0.02em;line-height:1.1;color:var(--tk-ink);margin:16px 0 12px;text-wrap:balance">Receba a leitura certa antes da <span style="font-style:italic">próxima</span> mudança</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.5;color:var(--tk-ink-muted);margin:0;text-wrap:pretty">Uma edição a cada duas semanas com o que mudou nas normas, o que fazer a respeito e os artigos que valem o seu tempo. Sem spam.</p>
+      </div>
+      <div style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);padding:var(--tk-space-8);display:flex;flex-direction:column;gap:14px">
+        <input class="rh-search" style="padding-left:16px" type="text" aria-label="Seu nome" placeholder="Seu nome">
+        <input class="rh-search" style="padding-left:16px" type="email" aria-label="Seu melhor e-mail" placeholder="Seu melhor e-mail">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" hint-size="100%,52px">Quero receber →</x-import>
+        <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);text-align:center">+4.200 profissionais já recebem. Cancele quando quiser.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:56px 0 40px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:48px;width:auto;display:block;margin-bottom:2px">
+        <p style="font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.55;margin:16px 0 0;max-width:34ch">Cursos, treinamento in-company e consultoria para organizações públicas e privadas.</p>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Ofertas</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Cursos abertos</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Agenda</a><a href="#" style="color:var(--tk-ink);text-decoration:none">In-company</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Consultoria</a></div>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Empresa</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Sobre</a><a href="#" style="color:var(--tk-brand);text-decoration:none;font-weight:600">Blog</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Instrutores</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Contato</a></div>
+      </div>
+      <div>
+        <div style="font-family:var(--tk-font-body);font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Acesso</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do aluno</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do instrutor</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Entrar</a></div>
+      </div>
+    </div>
+    <div class="rh-wrap" style="border-top:1px solid var(--tk-border);margin-top:40px;padding-top:24px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos. Todos os direitos reservados.</div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { cat: "Todos", query: "" };
+
+  allPosts() {
+    return [
+      { category: "Licitações", glyph: "§", tint: "linear-gradient(135deg,#235875,#2f7599)", title: "Pesquisa de preços: como montar uma que resiste ao TCU", excerpt: "O passo a passo para documentar a estimativa de valor sem cair nas inconsistências que mais geram apontamento.", author: "Ana Ribeiro", date: "24 Jun 2026", read: "6 min" },
+      { category: "LGPD", glyph: "◆", tint: "linear-gradient(135deg,#4285f4,#6aa2ff)", title: "Relatório de impacto (RIPD): quando ele deixa de ser opcional", excerpt: "Nem todo tratamento exige um RIPD — mas ignorá-lo nos casos certos é o erro que mais expõe o órgão.", author: "Carlos Menezes", date: "20 Jun 2026", read: "7 min" },
+      { category: "Compliance", glyph: "✓", tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)", title: "Canal de denúncias que as pessoas realmente usam", excerpt: "Estrutura, sigilo e resposta: os três pilares que separam um canal decorativo de um canal eficaz.", author: "Júlia Santos", date: "17 Jun 2026", read: "5 min" },
+      { category: "Gestão Pública", glyph: "◈", tint: "linear-gradient(135deg,#235875,#3a7d5f)", title: "Planejamento orçamentário: do PPA à execução sem surpresas", excerpt: "Como amarrar planejamento e execução para que o orçamento aprovado vire entrega real ao longo do ano.", author: "Roberto Lima", date: "13 Jun 2026", read: "9 min" },
+      { category: "Licitações", glyph: "⚖", tint: "linear-gradient(135deg,#2f7599,#068466)", title: "Fiscalização de contratos: o que registrar (e o que não esquecer)", excerpt: "Um roteiro objetivo para o fiscal acompanhar a execução sem virar refém de planilhas soltas.", author: "Ana Ribeiro", date: "10 Jun 2026", read: "6 min" },
+      { category: "LGPD", glyph: "◆", tint: "linear-gradient(135deg,#4285f4,#235875)", title: "Encarregado de dados no setor público: função na prática", excerpt: "Entre a teoria da lei e a rotina do órgão: o que o DPO faz de verdade na primeira semana.", author: "Carlos Menezes", date: "06 Jun 2026", read: "8 min" },
+      { category: "Compliance", glyph: "✓", tint: "linear-gradient(135deg,#235875,#4285f4)", title: "Due diligence de fornecedores sem burocratizar a compra", excerpt: "Proporcionalidade é a palavra: como avaliar risco de terceiros sem travar o setor de compras.", author: "Júlia Santos", date: "02 Jun 2026", read: "5 min" },
+      { category: "Gestão Pública", glyph: "◈", tint: "linear-gradient(135deg,#c98a3a,#e0a94f)", title: "Gestão de riscos: transformando matriz em decisão", excerpt: "A matriz de risco só vale se muda uma decisão. Veja como sair do documento de gaveta para a ação.", author: "Roberto Lima", date: "29 Mai 2026", read: "7 min" },
+      { category: "Licitações", glyph: "§", tint: "linear-gradient(135deg,#1f6b52,#068466)", title: "Pregão eletrônico: os pontos de atenção no julgamento", excerpt: "Diligência, negociação e habilitação — onde a condução do pregão costuma escorregar.", author: "Ana Ribeiro", date: "25 Mai 2026", read: "6 min" }
+    ];
+  }
+
+  renderVals() {
+    const cats = ["Todos", "Licitações", "LGPD", "Compliance", "Gestão Pública"];
+    const q = this.state.query.trim().toLowerCase();
+    const all = this.allPosts();
+    const visible = all.filter(p =>
+      (this.state.cat === "Todos" || p.category === this.state.cat) &&
+      (q === "" || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q) || p.category.toLowerCase().includes(q))
+    );
+    return {
+      categories: cats.map(name => ({ name, on: name === this.state.cat ? "1" : "0", pressed: name === this.state.cat ? "true" : "false" })),
+      visible,
+      count: all.length,
+      empty: visible.length === 0,
+      query: this.state.query,
+      trending: [
+        { n: "1", category: "Licitações", title: "Lei 14.133: o que muda no rito de contratação direta", read: "5 min de leitura" },
+        { n: "2", category: "LGPD", title: "Compartilhamento de dados entre órgãos: o que a lei permite", read: "7 min de leitura" },
+        { n: "3", category: "Compliance", title: "Conflito de interesses: como declarar e como fiscalizar", read: "4 min de leitura" },
+        { n: "4", category: "Gestão Pública", title: "Indicadores que a alta gestão realmente acompanha", read: "6 min de leitura" }
+      ],
+      pick: (e) => this.setState({ cat: e.currentTarget.getAttribute("data-cat") }),
+      onSearch: (e) => this.setState({ query: e.target.value })
+    };
+  }
+}
+</script>
+</body>
+</html>
