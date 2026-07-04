@@ -114,9 +114,11 @@ O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos
 | 14.1.3 | **Admin shell**: `dashboard-shell.tsx` (AppShell→layout CSS grid), `admin-sidebar/topbar/bottom-navigation`, Burger/Drawer→Radix Dialog; `public-mobile-navigation.tsx` | @dev (Codex) | — | shells sem Mantine |
 | 14.1.4 | **Admin views + portais**: `AdminResourcePage` (Table/Modal), `AdminSettingsPage`, `admin-dashboard-page`, `StudentPortal`, `InstructorPortal`; notifications→sonner; `useDisclosure` próprio | @dev (Codex) | — | zero import `@mantine` em `src/` |
 | 14.1.5 | **Purge final**: remover `@mantine/*` e `@emotion/react` do `package.json`; `npm run bundle:check` (< 3 MiB gzip); `npm run epic8:verify` | @dev (Codex) | — | lockfile limpo, bundle validado |
-| 14.1.6 | QA gate fase 1: `grep -r "@mantine" src/` vazio, typecheck, testes unitários, e2e smoke, a11y | @qa | sonnet | QA gate PASS |
+| 14.1.6 | QA gate fase 1: **`npm run purge:gate`** (zero import/pacote `@mantine`+`@emotion`, exit≠0 bloqueia), typecheck, testes unitários, e2e smoke, a11y | @qa | sonnet | QA gate PASS |
 
 **Gate F1:** app 100% sem Mantine, bundle abaixo do limite, testes verdes. *(Fase 1 pode rodar em paralelo com 14.0.2, pois a remoção no admin não depende das specs das páginas públicas.)*
+
+> **⚠️ Estado real verificado (2026-07-03):** a purga de **dependência** já está concluída — `npm run purge:gate` retorna **PASS**: zero `@mantine/*`/`@emotion/*` no `package.json`, em `node_modules` e nos imports de `app/`+`src/`; `mantine-theme.ts` e `mantine-tokens.css` já removidos; `form-field.tsx` não importa mais `@mantine/form`. **Resta apenas resíduo de nomenclatura** (não bloqueia o gate): o stub morto `src/components/providers/mantine-provider.tsx` (`AppMantineProvider`, um pass-through no-op) ainda referenciado em `app/layout.tsx`. As tarefas 14.1.1–14.1.5 devem tratar isso como **limpeza cosmética + verificação**, não como purga de 22 arquivos. O `purge:gate` é agora o invariante que impede **reintrodução** do Mantine.
 
 ### FASE 2 — Páginas públicas com fidelidade total (1 story por canvas)
 
@@ -161,7 +163,7 @@ Toda story de @dev deve ser gerada por @sm (`sonnet`) e validada por @po (`haiku
 
 1. **Contexto mínimo autossuficiente** (o Codex não vê esta conversa): paths absolutos dos arquivos, spec da página, tokens relevantes.
 2. **File List** explícita (criar/modificar/deletar).
-3. **Acceptance Criteria verificáveis por comando**: `npm run lint && npm run typecheck && npm run test:unit`, `grep -r "@mantine" src/` (fases 1+), `npm run bundle:check`.
+3. **Acceptance Criteria verificáveis por comando**: `npm run lint && npm run typecheck && npm run test:unit`, `npm run purge:gate` (fases 1+ — invariante anti-reintrodução Mantine/Emotion), `npm run bundle:check`.
 4. **Proibições**: não tocar em `.aiox-core/`, não fazer `git push` (exclusivo @devops), não adicionar dependências além das listadas na story.
 5. Atualização do story file (checkboxes + File List) ao concluir.
 
