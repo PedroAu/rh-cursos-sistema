@@ -136,20 +136,20 @@ Cada story segue o mesmo template: implementar a rota conforme `spec-{pagina}.md
 
 **⚠️ Invariantes preservados do Épico 5 (regressão — NÃO reintroduzir):** o Épico 5 (`docs/epics/epic-5-busca-loading-motion-imagens.md`, status `Done`) já entregou os critérios abaixo. Os canvases são estáticos e **não os descrevem**, então cada story 2.x que reescreva os arquivos correspondentes deve **conservar** o comportamento existente, tratando-o como parte do contrato de fidelidade funcional (não visual):
 
-| Critério | Comportamento a preservar | Onde vive hoje |
+| Critério | Comportamento a preservar | Guardado hoje por (teste vivo) |
 |---|---|---|
-| **S7 — busca real** | Busca global do header (`CommandPalette`) navega para o catálogo; catálogo lê/aplica `?q=` e reescreve o termo na URL. O redesign do header **não pode** virar campo decorativo. | `src/features/public-shell/public-layout.tsx`, `src/components/common/command-palette.tsx`, `src/views/public/Courses.tsx` |
-| **S8 — reduced-motion (JS)** | Todo hover/transição de entrada (`translateY`, `transform .25s` das specs) respeita `prefers-reduced-motion`. Implementar via `framer-motion` sob o `MotionProvider` (guard global) ou `useReducedMotion()` — **nunca** CSS `transition: transform` cru sem media query. | `app/layout.tsx` (`MotionProvider`), `section-title.tsx`, `course-card.tsx` |
-| **S9 — sem `<img>` cru** | Imagens via `next/image` (dimensões, `priority` só no hero, `alt` correto); zero warning de lint. | cards, detalhe, hero |
+| **S7 — busca real** | Busca é **local por página**, não global no header. O header público **não tem** barra de busca global (foi removida de propósito). O catálogo (`/cursos?q=`) e o blog (`/blog?q=`) leem/aplicam o termo da URL e expõem botão "Limpar busca" + resumo de resultados. `role=search` presente e rotulado. | `tests/epic5-search-motion.spec.ts` (asserts header sem busca global + busca local em catálogo/blog); `src/views/public/Courses.tsx`, `src/components/common/command-palette.tsx` (⌘K, não é barra de header) |
+| **S8 — reduced-motion (JS)** | Todo hover/transição de entrada (`translateY`, `transform .25s` das specs) respeita `prefers-reduced-motion`. Implementar via `framer-motion` sob o `MotionProvider` (guard global) ou `useReducedMotion()` — **nunca** CSS `transition: transform` cru sem media query. | `tests/epic5-search-motion.spec.ts` (contexto `reducedMotion: "reduce"` → `animatedInlineStyles === 0`); `app/layout.tsx` (`MotionProvider`), `section-title.tsx`, `course-card.tsx` |
+| **S9 — sem `<img>` cru** | Imagens via `next/image` (dimensões, `priority` só no hero, `alt` correto); zero warning de lint; sem `apple-material` em conteúdo. | `tests/epic5-search-motion.spec.ts` (`rawImgOffenders === []` + `materialOffenders === []`) |
 
-**Diretriz para o @sm ao gerar as stories 2.x:** incluir esses três itens como AC verificável na story de cada página que tocar os arquivos listados (ex.: Home 14.2.1 → S7 header + S8 hover cards/section-title; Catálogo 14.2.2 → S7 aplicação de `?q=` + S8 hover cards).
+**Diretriz para o @sm ao gerar as stories 2.x:** esses invariantes **já têm testes determinísticos** — não reescrever verificação nova. Cada story que tocar os arquivos correspondentes referencia `npm run test:epic14:fidelity` como AC (roda `epic5-search-motion` + `epic14-mantine-removal.smoke`). Ex.: Catálogo 14.2.2 → confirmar `?q=` aplicado + hover de cards sob reduced-motion; Home 14.2.1 → hover de cards/section-title sob reduced-motion. O @qa executa o comando e lê o verdict (tarefa de **haiku**, não sonnet).
 
 ### FASE 3 — Verificação final e entrega
 
 | Story | Tarefa | Agente | Modelo |
 |---|---|---|---|
-| 14.3.1 | Auditoria visual completa (todas as rotas vs canvases), a11y (`test:a11y`), Lighthouse. **+ Invariantes Épico 5:** verificar **S8** (nenhum movimento essencial sob `prefers-reduced-motion` — reexecutar `test:a11y` com a preferência ativa) e **S9** (zero warning de `<img>` no lint). | @qa | **opus** (gate final) |
-| 14.3.2 | Regressão funcional: e2e smoke, fluxos de inscrição/login/admin. **+ Invariante Épico 5 — S7:** e2e confirma que a busca do header aplica termo real no catálogo (`/cursos?q=…`) e o catálogo filtra por ele. | @qa | sonnet |
+| 14.3.1 | Auditoria visual: `npm run test:epic14:fidelity:capture` gera route vs canvas em `artifacts/epic14-fidelity/` para comparação lado a lado; a11y (`npm run test:a11y`), Lighthouse. Diff visual é revisão humana/opus (a captura não emite verdict automático). | @qa | **opus** (gate final) |
+| 14.3.2 | Regressão funcional: `npm run test:epic14:fidelity` (invariantes S7/S8/S9 + smoke Mantine) + `npm run test:e2e:smoke` (inscrição/login/admin). S7 = busca **local** aplica `?q=` em catálogo/blog; header sem busca global. | @qa | sonnet |
 | 14.3.3 | Limpeza: remover canvases/bundles de `public/` (mover para `docs/design/redesign/reference/` — não devem ir ao deploy), `.dc.html` fora do worker | @dev (Codex) | — |
 | 14.3.4 | Commit/PR para `redesign/ep-0-fundacao`, CI verde, `bundle:check` final | @devops | haiku |
 
