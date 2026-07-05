@@ -371,7 +371,7 @@ export function HomePage() {
             <h2 className="font-tk-display text-display-large font-bold leading-[1.12] tracking-[var(--tk-tracking-display)] text-tk-surface">
               Pronto para capacitar a sua equipe?
             </h2>
-            <p className="mt-4 font-tk-serif text-subheading font-light leading-[1.5] text-tk-surface/85">
+            <p className="mt-4 font-tk-serif text-subheading font-light leading-[1.5] text-tk-surface">
               Converse com um especialista e monte a trilha certa: curso aberto, in-company ou consultoria.
             </p>
             <Button

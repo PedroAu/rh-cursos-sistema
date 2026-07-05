@@ -7,12 +7,9 @@ import { PublicHeader } from "@/features/public-shell/components/public-header";
 import { CommandPalette } from "@/components/common/command-palette";
 import { QuoteModalProvider } from "@/components/in-company/quote-modal";
 import { AppToaster } from "@/components/ui/toaster";
-import { Outlet, useLocation } from "@/lib/router-compat";
+import { Outlet } from "@/lib/router-compat";
 
 export function PublicLayout({ children }: { children?: ReactNode }) {
-  const location = useLocation();
-  const hideShellFooter = location.pathname === "/";
-
   return (
     <div className="min-h-screen bg-background">
       <a className="skip-link" href="#main-content">
@@ -26,7 +23,7 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
           {children ?? <Outlet />}
         </main>
 
-        {!hideShellFooter ? <PublicFooter /> : null}
+        <PublicFooter />
         <CommandPalette />
       </QuoteModalProvider>
       <AppToaster />
