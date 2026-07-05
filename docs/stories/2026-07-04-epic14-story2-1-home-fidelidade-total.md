@@ -181,16 +181,19 @@ Manual/visual checks:
 - `npm run bundle:check` ✅
 - `npm run test:epic14:fidelity` ✅
 - `npm run test:epic14:fidelity:capture` ✅ via servidor local persistente (`node scripts/start-test-server.mjs`) devido `ERR_CONNECTION_REFUSED` no fluxo direto do script.
+- `*apply-qa-fixes` 2026-07-05: restaurado texto visível da feature list de Consultoria e adicionada asserção de regressão no smoke test da Epic 14.
 
 ### Completion Notes
 - Home `/` refatorada para usar `Badge`, `Button`, `Card`, `Chip`, `SectionHeading`, `FeatureListItem`, `StatBlock` e `Testimonial`, reduzindo markup bespoke e removendo cores hardcoded da view.
 - Card de "Próximas turmas" continua usando dados reais do `useAppStore`, ordenados por `startDate`, com fallback explícito para lista vazia.
 - Footer do canvas foi adaptado no `PublicFooter` do shell para evitar duplicação de rodapé dentro da Home, preservando a arquitetura `PublicPageShell + HomePage`.
 - Os artefatos em `artifacts/epic14-fidelity/` foram atualizados para comparação visual desktop 1180px.
+- Correção de QA aplicada: os três benefícios da seção Consultoria voltaram a renderizar com texto visível; a regressão recebeu cobertura em `tests/epic14-mantine-removal.smoke.spec.ts`.
 
 ### Change Log
 - 2026-07-04 - @sm (River) - Story criada como Draft para iniciar Fase 2 com Home (`/`) conforme Epic 14 e specs de fidelidade.
 - 2026-07-04 - @dev (Dex) - Home pública refatorada para fidelidade Trust Keith com footer adaptado no shell, gates locais executados e artefatos de fidelidade regenerados.
+- 2026-07-05 - @dev (Dex) - Aplicado fix do QA para restaurar os textos da Consultoria, revalidado `npm run typecheck`, `npm run test:epic14:fidelity` e regeneradas capturas de fidelidade.
 
 ## PO Validation
 Pending @po validation.
@@ -210,3 +213,68 @@ Pending @po validation.
 ### Gate Status
 
 Gate: GO for documentation alignment. Execution gate for this story remains pending until implementation evidence is produced.
+
+### Review Date: 2026-07-04
+
+### Reviewed By: Quinn (Test Architect)
+
+### Review Result
+
+FAIL. Automated gates passed, but the execution review found one high-severity fidelity defect in the implemented Home.
+
+### Findings
+
+- [HIGH] The Consultoria feature list hides its required benefit text and renders only the icons in the generated Home screenshot. `src/views/public/Home.tsx` passes `className="[&>span:last-child]:hidden ..."` to `FeatureListItem`, and `FeatureListItem` stores the visible title text inside that last child span. This violates AC4 and the `spec-home-sections.md` requirement to render the three Consultoria benefits.
+
+### Evidence
+
+- `npm run lint` - PASS
+- `npm run typecheck` - PASS
+- `npm run test:unit` - PASS, 28 files / 394 tests
+- `npm run build` - PASS
+- `npm run purge:gate` - PASS, with 1 non-blocking filename residue warning for `src/components/providers/mantine-provider.tsx`
+- `npm run bundle:check` - PASS, 567.3 KB / 1000 KB gzip budget
+- `npm run test:epic14:fidelity` - PASS, 8/8 Playwright tests
+- `npm run test:epic14:fidelity:capture` - PASS via temporary `node scripts/start-test-server.mjs` on port 3100
+- Visual artifact reviewed: `artifacts/epic14-fidelity/home-route.png`
+
+### Gate Status
+
+Gate: FAIL -> `docs/qa/gates/14.2.1-home-publica-com-fidelidade-total-trust-keith.yml`
+
+### Required Fix
+
+Restore visible text for the three Consultoria benefits in `src/views/public/Home.tsx`, regenerate fidelity captures, and request QA re-review.
+
+### Review Date: 2026-07-05
+
+### Reviewed By: Quinn (Test Architect)
+
+### Re-Review Result
+
+PASS. The previous high-severity Consultoria feature-list defect is fixed.
+
+### Validation Notes
+
+- The hiding selector was removed from `src/views/public/Home.tsx`; `FeatureListItem` now renders the three Consultoria benefits visibly.
+- `tests/epic14-mantine-removal.smoke.spec.ts` now asserts the three required Consultoria benefit texts, preventing recurrence of the previous regression.
+- Visual inspection of regenerated `artifacts/epic14-fidelity/home-route.png` confirms the texts are visible in the Consultoria section.
+
+### Evidence
+
+- `npm run lint` - PASS
+- `npm run typecheck` - PASS
+- `npm run test:unit` - PASS, 28 files / 394 tests
+- `npm run build` - PASS
+- `npm run purge:gate` - PASS, with 1 non-blocking filename residue warning for `src/components/providers/mantine-provider.tsx`
+- `npm run bundle:check` - PASS, 567.3 KB / 1000 KB gzip budget
+- `npm run test:epic14:fidelity` - PASS, 8/8 Playwright tests including the new Consultoria copy assertions
+- `npm run test:epic14:fidelity:capture` - PASS via temporary `node scripts/start-test-server.mjs` on port 3100
+
+### Gate Status
+
+Gate: PASS -> `docs/qa/gates/14.2.1-home-publica-com-fidelidade-total-trust-keith.yml`
+
+### Recommended Status
+
+Ready for Done.

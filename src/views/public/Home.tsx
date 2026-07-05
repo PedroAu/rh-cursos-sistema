@@ -302,7 +302,7 @@ export function HomePage() {
                     icon={CheckCircle2}
                     title={item}
                     description=""
-                    className="[&>span:last-child]:hidden [&>span:first-child]:bg-tk-brand [&>span:first-child]:text-tk-surface"
+                    className="[&>span:first-child]:bg-tk-brand [&>span:first-child]:text-tk-surface [&_strong]:leading-6"
                   />
                 ))}
               </div>

@@ -21,8 +21,13 @@ test.describe("epic 14 smoke — mantine removal", () => {
     const runtimeErrors = attachRuntimeErrorProbe(page);
 
     await page.goto("/");
+    const consultoriaSection = page.locator("section").filter({ hasText: "A norma aplicada ao seu contexto" });
+
     await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.getByRole("link", { name: /ver agenda de cursos/i }).first()).toBeVisible();
+    await expect(consultoriaSection).toContainText("Diagnóstico do seu contexto normativo e operacional");
+    await expect(consultoriaSection).toContainText("Plano de adequação aplicável, com passos priorizados");
+    await expect(consultoriaSection).toContainText("Acompanhamento por especialistas com experiência de campo");
     expect(runtimeErrors).toEqual([]);
   });
 

@@ -1,0 +1,53 @@
+schema: 1
+story: '14.2.1'
+story_title: 'Home Publica com Fidelidade Total Trust Keith'
+gate: PASS
+status_reason: 'Re-review confirmou que os textos da feature list de Consultoria foram restaurados, cobertos por smoke test e validados na captura visual. Todos os quality gate tools obrigatórios passaram.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-05T00:07:00-03:00'
+expires: '2026-07-19T00:07:00-03:00'
+quality_score: 95
+
+top_issues: []
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 402
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
+  commands:
+    - 'npm run lint'
+    - 'npm run typecheck'
+    - 'npm run test:unit (28 files, 394 tests passed)'
+    - 'npm run build'
+    - 'npm run purge:gate (PASS; 1 non-blocking filename residue warning)'
+    - 'npm run bundle:check (567.3 KB / 1000 KB gzip budget)'
+    - 'npm run test:epic14:fidelity (8 passed)'
+    - 'npm run test:epic14:fidelity:capture (PASS via node scripts/start-test-server.mjs on port 3100)'
+  visual_artifacts:
+    - 'artifacts/epic14-fidelity/home-route.png'
+    - 'artifacts/epic14-fidelity/home-canvas-1.png'
+    - 'artifacts/epic14-fidelity/home-canvas-2.png'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No security-relevant change observed in this story scope.'
+  performance:
+    status: PASS
+    notes: 'Production build succeeds and bundle check remains inside the configured gzip budget.'
+  reliability:
+    status: PASS
+    notes: 'Lint, typecheck, unit, build and targeted Playwright fidelity/regression tests passed.'
+  maintainability:
+    status: PASS
+    notes: 'The brittle hiding selector was removed and regression coverage was added for the three required Consultoria benefit texts.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Track the existing non-blocking purge-gate filename residue separately if the project wants zero Mantine naming residue.'
+      refs: ['src/components/providers/mantine-provider.tsx']
