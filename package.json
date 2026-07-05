@@ -39,6 +39,7 @@
     "epic8:verify": "npm run purge:gate && npm run lint && npm run typecheck && npm run test:coverage && npm run storybook:build",
     "test:watch": "vitest",
     "devops:all": "node scripts/devops-run-all.mjs",
+    "devops:post-push": "node scripts/devops-post-push.mjs",
     "seed:admin": "node --env-file=.env.local scripts/seed-admin.js"
   },
   "dependencies": {

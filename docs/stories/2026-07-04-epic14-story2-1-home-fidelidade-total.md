@@ -1,7 +1,7 @@
 # Story 14.2.1: Home Publica com Fidelidade Total Trust Keith
 
 ## Status
-Ready for Review
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -75,7 +75,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 
 ## Quality Gate Tasks
 - [x] Pre-Commit (@dev): lint, typecheck, unit, build, purge gate, fidelity regression, bundle check.
-- [ ] QA Review (@qa): comparar captura 1180px contra referencia, validar responsivo e ler resultado de `npm run test:epic14:fidelity`.
+- [x] QA Review (@qa): comparar captura 1180px contra referencia, validar responsivo e ler resultado de `npm run test:epic14:fidelity`.
 - [ ] Pre-PR (@devops): somente apos story aprovada; push/PR sao exclusivos de @devops.
 
 ## Tasks / Subtasks
@@ -194,6 +194,35 @@ Manual/visual checks:
 - 2026-07-04 - @sm (River) - Story criada como Draft para iniciar Fase 2 com Home (`/`) conforme Epic 14 e specs de fidelidade.
 - 2026-07-04 - @dev (Dex) - Home pública refatorada para fidelidade Trust Keith com footer adaptado no shell, gates locais executados e artefatos de fidelidade regenerados.
 - 2026-07-05 - @dev (Dex) - Aplicado fix do QA para restaurar os textos da Consultoria, revalidado `npm run typecheck`, `npm run test:epic14:fidelity` e regeneradas capturas de fidelidade.
+- 2026-07-05 - @sm (River) - Status administrativo normalizado para `Done` após QA PASS, PO GO e checklist documental READY.
+
+## Story Checklist
+### Review Date: 2026-07-05
+
+### Reviewed By: River (Scrum Master)
+
+### Checklist
+
+`.aiox-core/product/checklists/story-draft-checklist.md`
+
+### Validation Result
+
+READY. A story fornece contexto suficiente para implementação e encerramento administrativo, com objetivo, Epic 14, dependências, fontes, arquivos, critérios verificáveis e evidências de QA/PO registrados.
+
+### Category Results
+
+- Goal & Context Clarity: PASS
+- Technical Implementation Guidance: PASS
+- Reference Effectiveness: PASS
+- Self-Containment Assessment: PASS
+- Testing Guidance: PASS
+- CodeRabbit Integration: N/A, pois não há `coderabbit_integration.enabled` em `.aiox-core/core-config.yaml` e a story registra integração desabilitada.
+
+### Notes
+
+- Score documental: 9/10.
+- A validação foi executada após implementação, portanto funciona como confirmação de suficiência documental e rastreabilidade final, não como gate pré-implementação.
+- Não há gaps bloqueantes. O status foi normalizado de `Ready for Review` para `Done` porque QA re-review está PASS e PO validation está GO.
 
 ## PO Validation
 ### Review Date: 2026-07-05
@@ -208,7 +237,7 @@ GO. A story esta implementada, possui evidencia de execucao para todos os gates 
 
 - Acceptance Criteria 1-10 estao cobertos por evidencia registrada no Dev Agent Record e no gate `docs/qa/gates/14.2.1-home-publica-com-fidelidade-total-trust-keith.yml`.
 - O gate de QA em 2026-07-05 resolveu o defeito de alta severidade previamente aberto na secao Consultoria.
-- O unico ponto residual e de higiene de processo: o valor de `Status` continua como `Ready for Review`, enquanto o template canonico usa estados como `Review` ou `Done`. Isso nao bloqueia a validacao de produto, mas a normalizacao do status deve ocorrer no fluxo de encerramento da story.
+- O ponto residual de higiene de processo foi resolvido em 2026-07-05: o valor de `Status` foi normalizado para `Done` apos QA PASS, PO GO e checklist documental READY.
 
 ## QA Results
 
