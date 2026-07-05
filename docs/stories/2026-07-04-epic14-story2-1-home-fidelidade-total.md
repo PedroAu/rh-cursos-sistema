@@ -196,7 +196,19 @@ Manual/visual checks:
 - 2026-07-05 - @dev (Dex) - Aplicado fix do QA para restaurar os textos da Consultoria, revalidado `npm run typecheck`, `npm run test:epic14:fidelity` e regeneradas capturas de fidelidade.
 
 ## PO Validation
-Pending @po validation.
+### Review Date: 2026-07-05
+
+### Reviewed By: Pax (Product Owner)
+
+### Validation Result
+
+GO. A story esta implementada, possui evidencia de execucao para todos os gates exigidos, QA re-review em PASS e rastreabilidade suficiente entre Epic 14, specs de Home e artefatos gerados.
+
+### Notes
+
+- Acceptance Criteria 1-10 estao cobertos por evidencia registrada no Dev Agent Record e no gate `docs/qa/gates/14.2.1-home-publica-com-fidelidade-total-trust-keith.yml`.
+- O gate de QA em 2026-07-05 resolveu o defeito de alta severidade previamente aberto na secao Consultoria.
+- O unico ponto residual e de higiene de processo: o valor de `Status` continua como `Ready for Review`, enquanto o template canonico usa estados como `Review` ou `Done`. Isso nao bloqueia a validacao de produto, mas a normalizacao do status deve ocorrer no fluxo de encerramento da story.
 
 ## QA Results
 
