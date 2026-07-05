@@ -1,0 +1,55 @@
+schema: 1
+story: 'custom-1.1'
+story_title: 'Implementar Design System Trust Keith com Economia de Tokens'
+gate: PASS
+status_reason: 'Phase 1-2 foundation scope is validated: Trust Keith tokens and base components compile, unit tests pass, and targeted a11y/visual/public-regression suites are green. Remaining page/admin rollout and broader fidelity work are formally carried by custom-1.2 and Epic 14 follow-up stories.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-04T04:07:50Z'
+expires: '2026-07-18T04:07:50Z'
+quality_score: 95
+
+top_issues: []
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 430
+  risks_identified: 0
+  scope_basis:
+    - 'docs/stories/custom-1.1.story.md declares Phase 1-2 checkpoint complete and Phase 3-4 deferred.'
+    - 'docs/stories/custom-1.2.story.md exists as the continuation for public/admin rollout and quality gates.'
+  trace:
+    ac_covered: ['Phase 1 token foundation', 'Phase 2 base components', 'quality smoke for foundation']
+    ac_gaps: []
+  commands:
+    - 'npm run lint'
+    - 'npm run typecheck'
+    - 'npm run build'
+    - 'npm run test:unit (28 files, 394 tests passed)'
+    - 'npm run bundle:check (565.8 KB / 1000 KB gzip budget)'
+    - 'npx playwright test tests/checkout.e2e.spec.ts --workers=1 (5 passed)'
+    - 'npx playwright test tests/a11y.spec.ts tests/epic14-mantine-removal.smoke.spec.ts tests/epic5-search-motion.spec.ts tests/public-journeys.spec.ts tests/ui-governance.spec.ts --workers=1 (31 passed)'
+    - 'coderabbit doctor (9 passed)'
+  notes:
+    - 'Aggregate npm test was attempted; typecheck/build passed, but the Playwright aggregate runner received SIGTERM after starting the 136-test suite. Relevant suites were rerun in stable focused blocks and passed.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'clientIp now prioritizes cf-connecting-ip for Cloudflare deployments; unit coverage passes.'
+  performance:
+    status: PASS
+    notes: 'Production build succeeds and bundle check is inside the configured gzip budget.'
+  reliability:
+    status: PASS
+    notes: 'Lint, typecheck, build, unit tests, checkout E2E, a11y, public journey, motion, Epic 14 smoke, and visual governance checks passed.'
+  maintainability:
+    status: PASS
+    notes: 'Base design-system primitives are centralized under src/components/ui and follow tokenized Trust Keith classes. Legacy rollout work is tracked by follow-up stories.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Execute custom-1.2 for public/admin page rollout, stricter CSS-size accounting, and remaining fidelity work.'
+      refs: ['docs/stories/custom-1.2.story.md']
+    - action: 'Have Dev update the story File List if this QA fix is retained in the same change set.'
+      refs: ['src/lib/rate-limit.ts', 'docs/stories/custom-1.1.story.md']

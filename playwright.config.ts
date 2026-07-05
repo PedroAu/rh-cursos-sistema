@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const playwrightPort = process.env.PLAYWRIGHT_PORT ?? "3100";
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${playwrightPort}`;
+const useExternalServer = process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1";
+
 export default defineConfig({
   testDir: "./tests",
   reporter: "list",
@@ -10,7 +14,7 @@ export default defineConfig({
     adminFixture: "tests/fixtures/admin-store.ts",
   },
   use: {
-    baseURL: "http://127.0.0.1:3100"
+    baseURL
   },
   projects: [
     // Specs funcionais existentes (auth, rotas) — rodam uma vez, viewport padrão.
@@ -31,11 +35,13 @@ export default defineConfig({
       use: { ...devices["Pixel 5"] }
     }
   ],
-  webServer: {
-    // Usa o bundle de produção do Next.js já gerado por `npm run build`.
-    command: "node scripts/start-test-server.mjs",
-    url: "http://127.0.0.1:3100",
-    reuseExistingServer: false,
-    timeout: 120_000
-  }
+  webServer: useExternalServer
+    ? undefined
+    : {
+        // Usa o bundle de produção do Next.js já gerado por `npm run build`.
+        command: "node scripts/start-test-server.mjs",
+        url: baseURL,
+        reuseExistingServer: false,
+        timeout: 120_000
+      }
 });

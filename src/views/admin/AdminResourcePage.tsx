@@ -190,13 +190,13 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     <div className="space-y-8">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div className="max-w-3xl space-y-3">
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#0b4668]">{pageTitle}</h1>
-          <p className="text-base leading-7 text-slate-600 md:text-lg">{pageDescription}</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-tk-brand">{pageTitle}</h1>
+          <p className="text-base leading-7 text-tk-ink-muted md:text-lg">{pageDescription}</p>
         </div>
 
         {canCreate ? (
           <Button
-            className="rounded-full bg-[#d39b10] hover:bg-[#ba870d]"
+            className="rounded-full bg-tk-accent text-white hover:bg-tk-accent-strong"
             onClick={() => {
               setEditingId(null);
               setForm({});
@@ -218,14 +218,14 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             return (
               <Panel key={stat.label} className="p-8">
                 <div className="flex items-start justify-between gap-4">
-                  <p className="max-w-[160px] text-[0.95rem] font-extrabold text-slate-600">{stat.label}</p>
+                  <p className="max-w-[160px] text-[0.95rem] font-extrabold text-tk-ink-muted">{stat.label}</p>
                   {Icon ? (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e8f1f6] text-[#0b4668]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-tk-accent-soft text-tk-brand">
                       <Icon className="h-5 w-5" />
                     </div>
                   ) : null}
                 </div>
-                <p className="mt-10 text-[2.2rem] font-extrabold text-slate-900">{stat.value}</p>
+                <p className="mt-10 text-[2.2rem] font-extrabold text-tk-ink">{stat.value}</p>
                 <p className="mt-1.5 font-semibold" style={{ color: accentTone }}>
                   {stat.helper}
                 </p>
@@ -236,23 +236,23 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       ) : (
         <div className="grid gap-6 md:grid-cols-3">
           <Panel className="p-8">
-            <p className="text-[0.95rem] font-extrabold text-slate-600">Registros visíveis</p>
-            <p className="mt-10 text-[2.2rem] font-extrabold text-slate-900">{rows.length}</p>
-            <p className="mt-1.5 font-semibold text-[#2f8b4f]">
+            <p className="text-[0.95rem] font-extrabold text-tk-ink-muted">Registros visíveis</p>
+            <p className="mt-10 text-[2.2rem] font-extrabold text-tk-ink">{rows.length}</p>
+            <p className="mt-1.5 font-semibold text-tk-success">
               {search ? `Filtro ativo para “${search}”.` : "Visão operacional atual."}
             </p>
           </Panel>
           <Panel className="p-8">
-            <p className="text-[0.95rem] font-extrabold text-slate-600">Modo de operação</p>
-            <p className="mt-10 text-[2.2rem] font-extrabold text-slate-900">{canCreate ? "CRUD" : "Supervisionado"}</p>
-            <p className="mt-1.5 font-semibold text-[#2f8b4f]">
+            <p className="text-[0.95rem] font-extrabold text-tk-ink-muted">Modo de operação</p>
+            <p className="mt-10 text-[2.2rem] font-extrabold text-tk-ink">{canCreate ? "CRUD" : "Supervisionado"}</p>
+            <p className="mt-1.5 font-semibold text-tk-success">
               {canCreate ? "Criação e edição liberadas" : "Atualização sob controle"}
             </p>
           </Panel>
           <Panel className="p-8">
-            <p className="text-[0.95rem] font-extrabold text-slate-600">Atalho</p>
-            <p className="mt-10 text-[2.2rem] font-extrabold text-slate-900">N</p>
-            <p className="mt-1.5 font-semibold text-[#2f8b4f]">Cria um novo registro rapidamente</p>
+            <p className="text-[0.95rem] font-extrabold text-tk-ink-muted">Atalho</p>
+            <p className="mt-10 text-[2.2rem] font-extrabold text-tk-ink">N</p>
+            <p className="mt-1.5 font-semibold text-tk-success">Cria um novo registro rapidamente</p>
           </Panel>
         </div>
       )}
@@ -260,7 +260,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       <Panel className="p-6">
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-[#0b4668]">
+            <h2 className="text-2xl font-semibold text-tk-brand">
               {resource === "classes" ? "Listagem de Turmas Ativas" : resource === "students" ? "Gerenciar Usuários" : config.title}
             </h2>
           </div>
@@ -280,8 +280,8 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
 
         {rows.length ? (
           <Table className="min-w-[860px]">
-            <TableHeader className="bg-slate-50">
-              <TableRow className="hover:bg-slate-50">
+            <TableHeader className="bg-tk-surface-2">
+              <TableRow className="hover:bg-tk-surface-2">
                 {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
                   <TableHead key={column.key}>{column.label}</TableHead>
                 ))}
@@ -318,9 +318,9 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             </TableBody>
           </Table>
         ) : (
-          <div className="rounded-2xl bg-slate-50 p-8 text-center">
-            <p className="font-semibold text-slate-900">Nenhum registro encontrado.</p>
-            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
+          <div className="rounded-2xl bg-tk-surface-2 p-8 text-center">
+            <p className="font-semibold text-tk-ink">Nenhum registro encontrado.</p>
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-tk-ink-muted">
               {canCreate
                 ? "Crie um novo item para iniciar a operação desta área."
                 : "Os registros aparecem aqui conforme são gerados pelos fluxos do sistema."}
@@ -345,7 +345,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="w-[min(96vw,1100px)] overflow-y-auto p-0">
           <div className="max-h-[calc(100vh-2rem)] overflow-y-auto">
-            <DialogHeader className="border-b border-slate-200 px-6 py-5">
+            <DialogHeader className="border-b border-tk-line px-6 py-5">
               <DialogTitle>{editingId ? "Editar registro" : "Criar novo registro"}</DialogTitle>
               <DialogDescription>
                 Revise os dados antes de salvar para evitar retrabalho operacional.
@@ -355,10 +355,10 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             <div className="space-y-6 px-6 py-5">
               {validationErrors.length > 0 ? (
                 <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-                  <p className="font-semibold text-red-700">Erros encontrados</p>
+                  <p className="font-semibold text-tk-error">Erros encontrados</p>
                   <div className="mt-3 space-y-1">
                     {validationErrors.map((error, index) => (
-                      <p key={`${error.field}-${index}`} className="text-sm text-red-700">
+                      <p key={`${error.field}-${index}`} className="text-sm text-tk-error">
                         {error.message}
                       </p>
                     ))}
@@ -369,8 +369,8 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               {fieldSections.map((section) => (
                 <Panel key={section.title} className="p-5">
                   <div className="space-y-1">
-                    <p className="font-semibold text-slate-900">{section.title}</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-semibold text-tk-ink">{section.title}</p>
+                    <p className="text-sm text-tk-ink-muted">
                       {section.title === "Ação operacional"
                         ? "Atualize apenas o que interfere na operação do time."
                         : "Revise os dados antes de salvar para evitar retrabalho operacional."}
@@ -393,7 +393,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               ))}
             </div>
 
-            <DialogFooter className="border-t border-slate-200 px-6 py-5">
+            <DialogFooter className="border-t border-tk-line px-6 py-5">
               <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancelar
               </Button>
@@ -409,7 +409,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
 }
 
 function Panel({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cn("rounded-3xl border border-slate-200 bg-white shadow-sm", className)}>{children}</section>;
+  return <section className={cn("rounded-3xl border border-tk-line bg-tk-surface shadow-tk-card", className)}>{children}</section>;
 }
 
 function IconButton({
@@ -429,8 +429,8 @@ function IconButton({
       aria-label={label}
       onClick={onClick}
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50",
-        tone === "danger" && "text-red-600 hover:bg-red-50"
+        "inline-flex h-9 w-9 items-center justify-center rounded-xl border border-tk-line bg-tk-surface text-tk-ink-muted transition hover:bg-tk-surface-2 hover:text-tk-ink",
+        tone === "danger" && "text-tk-error hover:bg-red-50 hover:text-tk-error"
       )}
     >
       {children}
@@ -449,7 +449,7 @@ function SearchField({
 }) {
   return (
     <div className="relative min-w-0 sm:min-w-[320px]">
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
       <Input
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
@@ -461,7 +461,7 @@ function SearchField({
           type="button"
           aria-label="Limpar busca"
           onClick={() => onChange("")}
-          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-tk-ink-muted transition hover:bg-tk-surface-2 hover:text-tk-ink"
         >
           <X className="h-4 w-4" />
         </button>
@@ -483,9 +483,9 @@ function RenderField({
 }) {
   if (field.type === "readonly") {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-slate-500">{field.label}</p>
-        <p className="mt-3 text-sm text-slate-900">{String(form[field.key] ?? "—")}</p>
+      <div className="rounded-2xl border border-tk-line bg-tk-surface-2 p-4">
+        <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-tk-ink-muted">{field.label}</p>
+        <p className="mt-3 text-sm text-tk-ink">{String(form[field.key] ?? "—")}</p>
       </div>
     );
   }
@@ -616,13 +616,13 @@ function FieldShell({
   children: ReactNode;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-slate-900">
+    <label className="grid gap-2 text-sm font-medium text-tk-ink">
       <span>
         {label}
-        {required ? <span className="ml-1 text-red-600">*</span> : null}
+        {required ? <span className="ml-1 text-tk-error">*</span> : null}
       </span>
       {children}
-      {error ? <span className="text-xs text-red-600">{error}</span> : null}
+      {error ? <span className="text-xs text-tk-error">{error}</span> : null}
     </label>
   );
 }
@@ -649,7 +649,7 @@ function NativeSelectField({
         onChange={(event) => onChange(event.currentTarget.value)}
         className={cn(
           "flex h-11 w-full rounded-tk-input border border-tk-line bg-tk-surface px-4 text-sm text-tk-ink outline-none transition duration-200 ease-[var(--tk-ease)] hover:border-tk-accent focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2",
-          error && "border-red-400"
+          error && "border-tk-error"
         )}
       >
         <option value="">Selecione</option>
@@ -680,7 +680,7 @@ function MultiSelectLite({
 }) {
   return (
     <FieldShell label={label} required={required} error={error}>
-      <div className={cn("rounded-2xl border border-slate-200 bg-white p-4", error && "border-red-300")}>
+      <div className={cn("rounded-2xl border border-tk-line bg-tk-surface p-4", error && "border-tk-error")}>
         <div className="mb-3 flex flex-wrap gap-2">
           {value.length ? (
             value.map((item) => {
@@ -692,14 +692,14 @@ function MultiSelectLite({
               );
             })
           ) : (
-            <span className="text-sm text-slate-500">Nenhuma opção selecionada.</span>
+            <span className="text-sm text-tk-ink-muted">Nenhuma opção selecionada.</span>
           )}
         </div>
         <div className="grid gap-2">
           {options.map((option) => {
             const checked = value.includes(option.value);
             return (
-              <label key={option.value} className="flex items-center gap-3 rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700">
+              <label key={option.value} className="flex items-center gap-3 rounded-xl border border-tk-line px-3 py-2 text-sm text-tk-ink">
                 <input
                   type="checkbox"
                   aria-label={option.label}
@@ -711,7 +711,7 @@ function MultiSelectLite({
                     }
                     onChange(value.filter((item) => item !== option.value));
                   }}
-                  className="h-4 w-4 rounded border-slate-300 text-[#0b4668] focus:ring-[#0b4668]"
+                  className="h-4 w-4 rounded border-tk-line text-tk-brand focus:ring-tk-focus"
                 />
                 <span>{option.label}</span>
               </label>
@@ -812,9 +812,9 @@ function ModulesBuilderLite({
     <FieldShell label={label} error={error}>
       <div className="space-y-3">
         {value.map((module, moduleIndex) => (
-          <div key={moduleIndex} className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div key={moduleIndex} className="space-y-3 rounded-2xl border border-tk-line bg-tk-surface-2 p-4">
             <div className="flex items-start justify-between gap-3">
-              <h4 className="text-sm font-semibold text-slate-900">Módulo {moduleIndex + 1}</h4>
+              <h4 className="text-sm font-semibold text-tk-ink">Módulo {moduleIndex + 1}</h4>
               <IconButton
                 label={`Remover módulo ${moduleIndex + 1}`}
                 tone="danger"
@@ -854,8 +854,8 @@ function ModulesBuilderLite({
               }}
             />
 
-            <div className="border-t border-slate-200 pt-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tópicos</p>
+            <div className="border-t border-tk-line pt-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-tk-ink-muted">Tópicos</p>
               <div className="space-y-2">
                 {module.topics.map((topic, topicIndex) => (
                   <div key={topicIndex} className="flex items-center gap-2">
@@ -948,7 +948,7 @@ function FileUploadField({
 
   return (
     <FieldShell label={label} required={required} error={error}>
-      <div className={cn("rounded-2xl border border-dashed border-slate-300 p-4", error && "border-red-300")}>
+      <div className={cn("rounded-2xl border border-dashed border-tk-line p-4", error && "border-tk-error")}>
         <input
           ref={inputRef}
           type="file"
@@ -959,9 +959,9 @@ function FileUploadField({
         />
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-slate-600">Selecione uma imagem para este registro.</p>
+            <p className="text-sm text-tk-ink-muted">Selecione uma imagem para este registro.</p>
             {value ? (
-              <div id={previewId} className="text-xs text-slate-500">
+              <div id={previewId} className="text-xs text-tk-ink-muted">
                 Arquivo carregado e pronto para salvar.
               </div>
             ) : null}
@@ -972,7 +972,7 @@ function FileUploadField({
           </Button>
         </div>
         {value ? (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-tk-line bg-tk-surface-2">
             <Image src={value} alt="" width={640} height={192} unoptimized className="max-h-48 w-full object-contain" />
           </div>
         ) : null}

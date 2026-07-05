@@ -52,14 +52,14 @@ export function AdminSettingsPage() {
   return (
     <div className="space-y-8">
       <div className="max-w-3xl space-y-3">
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#0b4668]">Painel de Configurações</h1>
-        <p className="text-base leading-7 text-slate-600 md:text-lg">
+        <h1 className="text-3xl font-extrabold tracking-tight text-tk-brand">Painel de Configurações</h1>
+        <p className="text-base leading-7 text-tk-ink-muted md:text-lg">
           Gerencie a identidade, comunicações e acessos da plataforma RH Cursos.
         </p>
       </div>
 
       <Tabs defaultValue="gerais" className="space-y-6">
-        <TabsList className="w-full justify-start overflow-x-auto rounded-2xl bg-slate-100 p-2">
+        <TabsList className="w-full justify-start overflow-x-auto rounded-tk-glass bg-tk-surface-2 p-2">
           <TabsTrigger value="gerais">Configurações Gerais</TabsTrigger>
           <TabsTrigger value="notificacoes">Notificações</TabsTrigger>
           <TabsTrigger value="integracoes">Integrações</TabsTrigger>
@@ -74,7 +74,7 @@ export function AdminSettingsPage() {
                   <Globe className="h-5 w-5" />
                 </IconChip>
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-900">Identidade do Site</h2>
+                  <h2 className="text-xl font-semibold text-tk-ink">Identidade do Site</h2>
                 </div>
               </div>
               <div className="space-y-4">
@@ -97,12 +97,12 @@ export function AdminSettingsPage() {
               </div>
             </SectionCard>
 
-            <div className="rounded-2xl bg-[#0b4668] p-8 text-white shadow-sm">
-              <h2 className="text-xl font-semibold text-[#ffd573]">Resumo das Alterações</h2>
+            <div className="rounded-tk-card bg-tk-brand p-8 text-white shadow-tk-card">
+              <h2 className="text-xl font-semibold text-tk-accent-soft">Resumo das Alterações</h2>
               <p className="mt-6 text-base leading-7 text-white/85">
                 Suas alterações de identidade afetam como os alunos visualizam a marca nos certificados e e-mails automáticos.
               </p>
-              <Button className="mt-8 w-full bg-[#ffd573] text-[#6a4b00] hover:bg-[#f3ca63]" onClick={handleSave}>
+              <Button className="mt-8 w-full bg-tk-accent text-white hover:bg-tk-accent-strong" onClick={handleSave}>
                 Salvar Alterações
               </Button>
             </div>
@@ -114,7 +114,7 @@ export function AdminSettingsPage() {
                 <Palette className="h-5 w-5" />
               </IconChip>
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Logotipo e Favicon</h2>
+                  <h2 className="text-xl font-semibold text-tk-ink">Logotipo e Favicon</h2>
               </div>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
@@ -136,8 +136,8 @@ export function AdminSettingsPage() {
 
         <TabsContent value="notificacoes" className="space-y-6">
           <SectionCard>
-            <h2 className="text-xl font-semibold text-slate-900">Preferências de Notificação</h2>
-            <p className="mt-1 text-sm text-slate-500">
+            <h2 className="text-xl font-semibold text-tk-ink">Preferências de Notificação</h2>
+            <p className="mt-1 text-sm text-tk-ink-muted">
               Escolha quais eventos disparam alertas para o administrador.
             </p>
 
@@ -170,8 +170,8 @@ export function AdminSettingsPage() {
               footer={
                 <>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-[#2f8b4f]" />
-                    <span className="text-sm font-medium text-[#2f8b4f]">
+                    <CheckCircle2 className="h-4 w-4 text-tk-success" />
+                    <span className="text-sm font-medium text-tk-success">
                       Conectado · último envio hoje, 10:45
                     </span>
                   </div>
@@ -188,8 +188,8 @@ export function AdminSettingsPage() {
               footer={
                 <div className="space-y-3">
                   {["RD Station CRM", "Mailchimp"].map((provider) => (
-                    <div key={provider} className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 p-4">
-                      <span className="font-medium text-slate-900">{provider}</span>
+                    <div key={provider} className="flex items-center justify-between rounded-xl border border-tk-line bg-tk-surface-2 p-4">
+                      <span className="font-medium text-tk-ink">{provider}</span>
                       <Button variant="outline">Conectar</Button>
                     </div>
                   ))}
@@ -203,20 +203,20 @@ export function AdminSettingsPage() {
           <SectionCard>
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-semibold text-slate-900">Administradores do Sistema</h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <h2 className="text-xl font-semibold text-tk-ink">Administradores do Sistema</h2>
+                <p className="mt-1 text-sm text-tk-ink-muted">
                   Acessos com permissão de gestão da plataforma.
                 </p>
               </div>
-              <Button className="rounded-full bg-[#d39b10] hover:bg-[#ba870d]">
+              <Button className="rounded-full bg-tk-accent text-white hover:bg-tk-accent-strong">
                 <Plus className="h-4 w-4" />
                 Novo Admin
               </Button>
             </div>
 
             <Table className="min-w-[640px]">
-              <TableHeader className="bg-slate-50">
-                <TableRow className="hover:bg-slate-50">
+              <TableHeader className="bg-tk-surface-2">
+                <TableRow className="hover:bg-tk-surface-2">
                   <TableHead>Administrador</TableHead>
                   <TableHead>Permissão</TableHead>
                   <TableHead>Status</TableHead>
@@ -227,11 +227,11 @@ export function AdminSettingsPage() {
                   <TableRow key={admin.email}>
                     <TableCell>
                       <div className="space-y-0.5">
-                        <div className="font-semibold text-slate-900">{admin.name}</div>
-                        <div className="text-sm text-slate-500">{admin.email}</div>
+                        <div className="font-semibold text-tk-ink">{admin.name}</div>
+                        <div className="text-sm text-tk-ink-muted">{admin.email}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-slate-900">{admin.role}</TableCell>
+                    <TableCell className="text-tk-ink">{admin.role}</TableCell>
                     <TableCell>
                       <Badge variant={admin.active ? "success" : "danger"}>
                         {admin.active ? "Ativo" : "Inativo"}
@@ -249,12 +249,12 @@ export function AdminSettingsPage() {
 }
 
 function SectionCard({ children, className }: { children: ReactNode; className?: string }) {
-  return <section className={cn("rounded-3xl border border-slate-200 bg-white p-8 shadow-sm", className)}>{children}</section>;
+  return <section className={cn("rounded-3xl border border-tk-line bg-tk-surface p-8 shadow-tk-card", className)}>{children}</section>;
 }
 
 function IconChip({ children }: { children: ReactNode }) {
   return (
-    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#e8f1f6] text-[#0b4668]">
+    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-tk-accent-soft text-tk-brand">
       {children}
     </div>
   );
@@ -280,11 +280,11 @@ function IntegrationCard({
           <Icon className="h-5 w-5" />
         </IconChip>
         <div>
-          <h2 className="text-xl font-semibold text-slate-900">{title}</h2>
-          <p className="text-sm text-slate-500">{description}</p>
+          <h2 className="text-xl font-semibold text-tk-ink">{title}</h2>
+          <p className="text-sm text-tk-ink-muted">{description}</p>
         </div>
       </div>
-      <p className="mt-4 text-sm leading-7 text-slate-600">{body}</p>
+      <p className="mt-4 text-sm leading-7 text-tk-ink-muted">{body}</p>
       <div className="mt-6 space-y-4">{footer}</div>
     </SectionCard>
   );
@@ -307,12 +307,12 @@ function NotificationRow({
   const descId = useId();
 
   return (
-    <div className={cn("flex flex-col gap-4 py-5 sm:flex-row sm:items-start sm:justify-between", !first && "border-t border-slate-200")}>
+    <div className={cn("flex flex-col gap-4 py-5 sm:flex-row sm:items-start sm:justify-between", !first && "border-t border-tk-line")}>
       <div className="max-w-2xl">
-        <p id={labelId} className="font-semibold text-slate-900">
+        <p id={labelId} className="font-semibold text-tk-ink">
           {title}
         </p>
-        <p id={descId} className="mt-1 text-sm leading-7 text-slate-500">
+        <p id={descId} className="mt-1 text-sm leading-7 text-tk-ink-muted">
           {description}
         </p>
       </div>
@@ -335,14 +335,14 @@ function LogoUpload({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="rounded-3xl border border-dashed border-slate-300 p-6">
+    <div className="rounded-3xl border border-dashed border-tk-line p-6">
       <div className="flex flex-col items-center gap-4 text-center">
         <div
           role="img"
           aria-label={`Pré-visualização de ${label}`}
-          className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl bg-[#0b4668] text-[1.6rem] font-extrabold text-white"
+          className="flex h-[72px] w-[72px] items-center justify-center overflow-hidden rounded-2xl bg-tk-brand text-[1.6rem] font-extrabold text-white"
           style={{
-            backgroundColor: value ? "#ffffff" : "#0b4668",
+            backgroundColor: value ? "var(--tk-surface)" : "var(--tk-brand)",
             backgroundImage: value ? `url(${value})` : undefined,
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -353,7 +353,7 @@ function LogoUpload({
         </div>
 
         <div className="space-y-1">
-          <p className="font-semibold text-[#0b4668]">{label}</p>
+          <p className="font-semibold text-tk-brand">{label}</p>
           <input
             ref={inputRef}
             type="file"
