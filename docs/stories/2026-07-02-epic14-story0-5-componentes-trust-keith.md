@@ -1,7 +1,7 @@
 # Story 14.0.5: Biblioteca de Componentes Trust Keith RH
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 

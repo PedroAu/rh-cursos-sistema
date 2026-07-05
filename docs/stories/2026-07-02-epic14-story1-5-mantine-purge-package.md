@@ -1,7 +1,7 @@
 # Story 14.1.5: Remoção Mantine — Purge package.json e Smoke Tests
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)

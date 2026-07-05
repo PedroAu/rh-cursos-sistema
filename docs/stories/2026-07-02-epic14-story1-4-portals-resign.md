@@ -1,7 +1,7 @@
 # Story 14.1.4: Remoção Mantine — Portals (StudentPortal, InstructorPortal)
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)

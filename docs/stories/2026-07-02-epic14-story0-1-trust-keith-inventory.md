@@ -1,7 +1,7 @@
 # Story 14.0.1: Inventario do Design System Trust Keith
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 

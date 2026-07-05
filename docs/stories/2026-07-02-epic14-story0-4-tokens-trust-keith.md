@@ -1,7 +1,7 @@
 # Story 14.0.4: Migração de Tokens — Trust Keith RH
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 

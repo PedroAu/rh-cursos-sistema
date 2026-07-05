@@ -1,7 +1,7 @@
 # Story 14.0.2: Specs de Fidelidade por Página
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 

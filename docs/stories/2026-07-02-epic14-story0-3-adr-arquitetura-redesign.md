@@ -1,7 +1,7 @@
 # Story 14.0.3: ADR — Arquitetura do Redesign Trust Keith
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 

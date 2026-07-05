@@ -1,7 +1,7 @@
 # Story 14.1.2: Remoção Mantine — Sistema de Forms (react-hook-form + zod)
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)

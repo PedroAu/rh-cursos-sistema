@@ -1,7 +1,7 @@
 # Story 14.1.1: Remoção Mantine — Provider e Infraestrutura
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)

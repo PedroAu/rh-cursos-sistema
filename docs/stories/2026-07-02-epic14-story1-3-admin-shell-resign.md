@@ -1,7 +1,7 @@
 # Story 14.1.3: Remoção Mantine — Admin Shell (Re-skin Trust Keith)
 
 ## Status
-InReview
+Done
 
 ## Executor Assignment
 executor: "Codex" (@dev delegado)
