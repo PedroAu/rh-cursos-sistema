@@ -139,27 +139,29 @@ npm run bundle:check
 Manual checks:
 - `git status --short --untracked-files=all` antes de staging.
 - PR inclui links dos gates e historias da Fase 3.
-- CI remoto verde antes de marcar story como `Done`.
+- CI remoto verde antes de marcar story como `Done`; se o ambiente estiver sem credencial GitHub/`gh`, registrar o bloqueio e manter `In Progress`.
 
 ## Expected File List
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/stories/2026-07-06-epic14-story3-4-devops-commit-pr-ci.md`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Dev Agent Record
-- 2026-07-06 - @devops (Gage) - Branch de entrega `codex-epic14-phase3-delivery` criada a partir de `main` para preparar commit/PR contra `main`.
-- 2026-07-06 - @devops (Gage) - `npm run devops:all -- --story docs/stories/2026-07-06-epic14-story3-4-devops-commit-pr-ci.md --skip-coderabbit` bloqueou apenas pelo story gate do runner (`Status: Ready`), sem falha tecnica de codigo.
-- 2026-07-06 - @devops (Gage) - Suite equivalente executada manualmente: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test:unit` ✅, `npm run build` ✅, `npm run purge:gate` ✅, `npm run bundle:check` ✅, `npm run test:e2e:smoke` ✅ (84 passed).
-- 2026-07-06 - @devops (Gage) - `npm run test:epic14:fidelity` ficou bloqueado nesta sessao por indisponibilidade de bind/porta do runner isolado (`No free port found in range 3100-3120` / `listen EPERM` fora da faixa), sem indício de regressao de app; os mesmos specs permaneceram verdes dentro do smoke funcional e no registro previo da 14.3.2.
+- 2026-07-06 - @devops (Gage) - Branch de entrega `codex-epic14-phase3-delivery` confirmada a partir de `main`; o `origin` atual expõe apenas `main` e `staging/phase-2`, portanto a base real de PR para a Fase 3 e `main`.
+- 2026-07-06 - @devops (Gage) - `npm run devops:all` ficou preso no passo `coderabbit review --agent --type uncommitted`, apesar de a story marcar CodeRabbit como desabilitado; por isso a validacao seguiu pela suite equivalente permitida no AC 4.
+- 2026-07-06 - @devops (Gage) - Suite equivalente executada manualmente nesta sessao: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test:unit` ✅ (394 passed), `npm run build` ✅, `npm run purge:gate` ✅, `npm run test:epic14:fidelity` ✅ (8 passed), `npm run test:e2e:smoke` ✅ (84 passed) e `npm run bundle:check` ✅.
+- 2026-07-06 - @devops (Gage) - `gh auth status` retornou token invalido para `github.com` (`PedroAu`), entao push/PR/CI remoto dependem de renovacao de credencial antes da conclusao da story.
 
 ## PO Validation
 2026-07-06 · @po (Pax) via Codex · **GO com observação** — checklist 10/10; a story respeita autoridade exclusiva de @devops, define gates mínimos, evidências obrigatórias e comportamento em caso de CI falha. Observação não bloqueante: branch alvo e política base/target devem ser confirmados pelo @devops contra o estado remoto real antes do PR. Status: Draft → Ready.
 
 ## QA Results
-2026-07-06 - Evidencias de 14.3.1, 14.3.2 e 14.3.3 consolidadas com gates individuais PASS. Para esta story, o pre-push local ficou aprovado via suite equivalente documentada; pendentes apenas commit, push, PR e leitura do CI remoto.
+2026-07-06 - Evidencias de 14.3.1, 14.3.2 e 14.3.3 consolidadas com gates individuais PASS. Para esta story, o pre-push local ficou aprovado via suite equivalente documentada; commit local pode seguir, mas push/PR/CI remoto seguem bloqueados por credencial GitHub invalida no ambiente (`gh auth status`).
 
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para DevOps commit, push, PR e CI verde.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @devops. Status: Draft → Ready.
 - 2026-07-06 - @devops (Gage) - Execucao iniciada em branch dedicada `codex-epic14-phase3-delivery`; gates locais equivalentes validados e aguardando operacoes remotas. Status: Ready → In Progress.
+- 2026-07-06 - @devops (Gage) - Base real do repositório confirmada como `main`; bloqueio remoto identificado por credencial GitHub invalida no `gh`. Story permanece `In Progress` ate push/PR/CI.
