@@ -100,7 +100,7 @@ function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
     return {
       bgClass: "bg-[#fdeef0]",
-      colorClass: "text-[var(--tk-error)]",
+      colorClass: "text-[#8f1d2c]",
       label: "Poucas vagas"
     };
   }
@@ -108,14 +108,14 @@ function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Em breve") {
     return {
       bgClass: "bg-[var(--tk-accent-soft)]",
-      colorClass: "text-[var(--tk-focus)]",
+      colorClass: "text-[#3048c4]",
       label: "Turma nova"
     };
   }
 
   return {
     bgClass: "bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))]",
-    colorClass: "text-[var(--tk-success)]",
+    colorClass: "text-[#0b5c49]",
     label: "Inscrições abertas"
   };
 }
@@ -151,8 +151,8 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
         mode,
         modeClassName:
           mode === "Online"
-            ? "bg-[var(--tk-accent-soft)] text-[var(--tk-accent-strong)]"
-            : "bg-[#fdeef0] text-[var(--tk-error)]",
+            ? "bg-[var(--tk-accent-soft)] text-[#3048c4]"
+            : "bg-[#fdeef0] text-[#8f1d2c]",
         modeLabel: mode === "Online" ? "Online ao vivo" : "Presencial",
         place: formatPlace(trainingClass),
         price: trainingClass.price || course.price,

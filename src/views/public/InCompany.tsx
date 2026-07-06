@@ -685,6 +685,7 @@ export function InCompanyPage() {
                                 clearFeedback();
                                 field.onChange(checked);
                               }}
+                              aria-label="Concordo em ser contatado pela equipe da RH Cursos"
                               aria-invalid={errors.consent ? true : undefined}
                               aria-describedby={errors.consent ? "in-company-consent-error" : undefined}
                             />

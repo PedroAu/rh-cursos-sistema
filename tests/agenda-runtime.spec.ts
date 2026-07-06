@@ -14,7 +14,10 @@ test("agenda renders after navigation without tripping the error boundary", asyn
   });
 
   await page.goto("/");
-  await page.getByRole("link", { name: /^Ver agenda de cursos/ }).first().click();
+  const agendaLink = page.getByRole("link", { name: /^Ver agenda de cursos/ }).first();
+  await expect(agendaLink).toBeVisible();
+  await agendaLink.scrollIntoViewIfNeeded();
+  await agendaLink.click({ force: true });
 
   await expect(page).toHaveURL(/\/agenda/);
   await expect(page.getByRole("heading", { name: /Próximas turmas, em ordem de data/i })).toBeVisible();

@@ -67,14 +67,14 @@ function createCategoryGradient(category: string) {
 
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
-    return { label: "Poucas vagas", colorClass: "text-[var(--tk-error)]" };
+    return { label: "Poucas vagas", colorClass: "text-[#8f1d2c]" };
   }
 
   if (trainingClass.status === "Em breve") {
-    return { label: "Turma nova", colorClass: "text-[var(--tk-focus)]" };
+    return { label: "Turma nova", colorClass: "text-[#3048c4]" };
   }
 
-  return { label: "Inscrições abertas", colorClass: "text-[var(--tk-success)]" };
+  return { label: "Inscrições abertas", colorClass: "text-[#0b5c49]" };
 }
 
 function formatCatalogDate(value: string) {

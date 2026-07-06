@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, MessageCircle, Play, ShieldCheck, Star, Users } from "lucide-react";
 import Image from "next/image";
 import { Link, useParams, useSearchParams } from "@/lib/router-compat";
+import { toast } from "sonner";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { FAQAccordion } from "@/components/common/faq-accordion";
@@ -26,7 +27,13 @@ export function CourseDetailPage() {
   const querySlug = params.get("slug") ?? "";
 
   const course = courses.find((item) => item.slug === (slugParam || querySlug));
-  const courseClasses = useMemo(() => classes.filter((item) => item.courseId === course?.id), [classes, course?.id]);
+  const courseClasses = useMemo(
+    () =>
+      classes
+        .filter((item) => item.courseId === course?.id)
+        .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime()),
+    [classes, course?.id]
+  );
   const relatedTestimonials = testimonials.filter((item) => item.course === course?.title).slice(0, 3);
   const instructor = instructors.find((item) => item.id === course?.instructorId);
   const nextClass = courseClasses[0];
@@ -40,6 +47,15 @@ export function CourseDetailPage() {
     },
     [course?.slug]
   );
+
+  const handleProgramPdfRequest = useCallback(() => {
+    trackEvent("lead_enviado", {
+      course: course?.slug ?? "",
+      fallback: "specialist-contact"
+    });
+    toast.message("Programa completo disponível sob solicitação pelo atendimento especializado.");
+    window.location.assign("/falar-com-especialista");
+  }, [course?.slug]);
 
   useEffect(() => {
     if (params.get("checkout") === "1") {
@@ -91,7 +107,7 @@ export function CourseDetailPage() {
                 <Button size="lg" onClick={() => startCheckout("hero_cta")}>
                   Inscrever-se agora
                 </Button>
-                <Button variant="outline" size="lg">
+                <Button variant="outline" size="lg" onClick={handleProgramPdfRequest}>
                   <Download className="h-4 w-4" />
                   Programa PDF
                 </Button>
@@ -128,7 +144,9 @@ export function CourseDetailPage() {
                   {
                     label: "Turmas abertas",
                     value: openClassesCount,
-                    helper: "Escolha a agenda com melhor aderência ao seu calendário."
+                    helper: openClassesCount
+                      ? "Escolha a agenda com melhor aderência ao seu calendário."
+                      : "Novas aberturas são compartilhadas sob consulta."
                   },
                   {
                     label: "Benefícios-chave",
@@ -304,11 +322,20 @@ export function CourseDetailPage() {
       <section className="page-section bg-white">
         <div className="container space-y-8">
           <SectionTitle eyebrow="Próximas turmas" title="Escolha a turma ideal para sua agenda." />
-          <div className="grid gap-5 xl:grid-cols-3">
-            {courseClasses.map((trainingClass) => (
-              <ClassCard key={trainingClass.id} trainingClass={trainingClass} course={course} instructor={instructor} />
-            ))}
-          </div>
+          {courseClasses.length ? (
+            <div className="grid gap-5 xl:grid-cols-3">
+              {courseClasses.map((trainingClass) => (
+                <ClassCard key={trainingClass.id} trainingClass={trainingClass} course={course} instructor={instructor} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="Sem turmas abertas no momento."
+              description="Este curso segue disponível para atendimento consultivo e novas aberturas de agenda."
+              actionLabel="Falar com atendimento"
+              onAction={() => window.location.assign("/falar-com-especialista")}
+            />
+          )}
         </div>
       </section>
 
