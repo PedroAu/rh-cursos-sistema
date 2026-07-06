@@ -14,7 +14,9 @@ const auditTargets = [
   {
     id: "home",
     routePath: "/",
-    canvasPaths: ["/RH%20Cursos%20Home.html"],
+    canvasPaths: [],
+    referenceNote:
+      "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Home.html and is no longer served from public/.",
   },
   {
     id: "courses",
@@ -24,7 +26,9 @@ const auditTargets = [
   {
     id: "agenda",
     routePath: "/agenda",
-    canvasPaths: ["/RH%20Cursos%20Agenda.html"],
+    canvasPaths: [],
+    referenceNote:
+      "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Agenda.html and is no longer served from public/.",
   },
   {
     id: "in-company",
@@ -142,7 +146,14 @@ async function main() {
         canvasEvidence:
           target.canvasPaths.length > 0
             ? canvasMetas
-            : [{ status: "unavailable", reason: "No reference canvas asset exists in public/ for this route." }],
+            : [
+                {
+                  status: "unavailable",
+                  reason:
+                    target.referenceNote ??
+                    "No reference canvas asset exists in public/ for this route.",
+                },
+              ],
       });
     }
   } finally {

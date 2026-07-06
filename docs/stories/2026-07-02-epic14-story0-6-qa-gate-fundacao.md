@@ -39,7 +39,7 @@ issues:
     description: "Verificação visual das stories do Storybook (variantes/estados) não realizada neste gate."
     recommendation: "Coberta pela auditoria visual da 14.3.1 e pelas comparações Playwright das 14.2.x."
 notes:
-  - "Correção de infra aplicada neste gate: eslint.config.mjs ignora public/_ds/**, public/support.js e ds-package/** (artefatos de referência do Epic 14, removidos na 14.3.3)."
+  - "Correção de infra aplicada neste gate: eslint.config.mjs ignora public/_ds/**, public/support.js, docs/design/redesign/reference/canvases/** e ds-package/** (artefatos de referência do Epic 14; os públicos foram removidos na 14.3.3)."
   - "Radix Checkbox/Switch não instalados — executor implementou versões locais acessíveis (conforme proibição de novas deps). Avaliar padronização futura."
 ```
 

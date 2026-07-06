@@ -29,7 +29,7 @@
     "test:epic14:fidelity:capture": "node scripts/capture-epic14-fidelity.mjs",
     "test:epic14:fidelity": "node scripts/run-playwright.mjs epic5-search-motion.spec.ts epic14-mantine-removal.smoke.spec.ts --project=functional",
     "test:a11y": "node scripts/run-playwright.mjs a11y.spec.ts --project=functional",
-    "test:lighthouse": "npm run build && lhci autorun --config=./lighthouserc.cjs",
+    "test:lighthouse": "npm run build && node scripts/run-lighthouse.mjs",
     "test:harness:audit": "npm run test:coverage && npm run test:e2e:smoke",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",

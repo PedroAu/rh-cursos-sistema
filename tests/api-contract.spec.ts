@@ -25,6 +25,14 @@ function edgeHeaders(ip: string, origin = "https://rhcursos.com.br") {
   };
 }
 
+function routeHeaders(ip: string) {
+  return {
+    "cf-connecting-ip": ip,
+    "x-forwarded-for": ip,
+    "x-real-ip": ip,
+  };
+}
+
 async function edgeRequest(
   path: string,
   options: {
@@ -81,7 +89,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 
     const invalidBody = await request.post("/api/auth/session", {
       data: { role: "admin", email: "", password: "" },
-      headers: { "x-forwarded-for": createUniqueIp("next-auth-invalid-body") },
+      headers: routeHeaders(createUniqueIp("next-auth-invalid-body")),
     });
     expect(invalidBody.status()).toBe(400);
     await expect(invalidBody.json()).resolves.toEqual({
@@ -91,7 +99,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 
     const invalidCredentials = await request.post("/api/auth/session", {
       data: { role: "admin", email: "nao-existe@rhcursos.test", password: "senha-errada" },
-      headers: { "x-forwarded-for": createUniqueIp("next-auth-invalid-credentials") },
+      headers: routeHeaders(createUniqueIp("next-auth-invalid-credentials")),
     });
     expect(invalidCredentials.status()).toBe(401);
     await expect(invalidCredentials.json()).resolves.toEqual({
@@ -101,7 +109,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 
     const unauthorizedRole = await request.post("/api/auth/session", {
       data: { role: "admin", email: studentEmail, password: studentPassword },
-      headers: { "x-forwarded-for": createUniqueIp("next-auth-unauthorized-role") },
+      headers: routeHeaders(createUniqueIp("next-auth-unauthorized-role")),
     });
     expect(unauthorizedRole.status()).toBe(403);
     await expect(unauthorizedRole.json()).resolves.toEqual({
@@ -114,7 +122,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
     for (let attempt = 0; attempt < 6; attempt += 1) {
       rateLimited = await request.post("/api/auth/session", {
         data: { role: "admin", email: "nao-existe@rhcursos.test", password: "senha-errada" },
-        headers: { "x-forwarded-for": rateLimitIp },
+        headers: routeHeaders(rateLimitIp),
       });
     }
 
@@ -131,7 +139,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 
     const response = await request.delete("/api/auth/session", {
       data: {},
-      headers: { "x-forwarded-for": createUniqueIp("next-auth-delete") },
+      headers: routeHeaders(createUniqueIp("next-auth-delete")),
     });
 
     expect(response.status()).toBe(200);

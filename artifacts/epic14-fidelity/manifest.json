@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-06T15:41:44.110Z",
+  "generatedAt": "2026-07-06T16:54:18.543Z",
   "baseUrl": "http://127.0.0.1:3100",
   "viewport": {
     "width": 1180,
@@ -12,19 +12,13 @@
       "routePath": "/",
       "routeScreenshot": "home-route.png",
       "routeStatus": 200,
-      "canvasPaths": [
-        "/RH%20Cursos%20Home.html"
-      ],
-      "canvasScreenshots": [
-        "home-canvas.png"
-      ],
-      "canvasAvailable": true,
+      "canvasPaths": [],
+      "canvasScreenshots": [],
+      "canvasAvailable": false,
       "canvasEvidence": [
         {
-          "path": "/RH%20Cursos%20Home.html",
-          "screenshot": "home-canvas.png",
-          "status": 200,
-          "finalUrl": "http://127.0.0.1:3100/RH%20Cursos%20Home.html"
+          "status": "unavailable",
+          "reason": "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Home.html and is no longer served from public/."
         }
       ]
     },
@@ -48,19 +42,13 @@
       "routePath": "/agenda",
       "routeScreenshot": "agenda-route.png",
       "routeStatus": 200,
-      "canvasPaths": [
-        "/RH%20Cursos%20Agenda.html"
-      ],
-      "canvasScreenshots": [
-        "agenda-canvas.png"
-      ],
-      "canvasAvailable": true,
+      "canvasPaths": [],
+      "canvasScreenshots": [],
+      "canvasAvailable": false,
       "canvasEvidence": [
         {
-          "path": "/RH%20Cursos%20Agenda.html",
-          "screenshot": "agenda-canvas.png",
-          "status": 200,
-          "finalUrl": "http://127.0.0.1:3100/RH%20Cursos%20Agenda.html"
+          "status": "unavailable",
+          "reason": "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Agenda.html and is no longer served from public/."
         }
       ]
     },

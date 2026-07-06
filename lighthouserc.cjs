@@ -1,9 +1,12 @@
+const port = Number(process.env.LHCI_PORT ?? "3001");
+const baseUrl = `http://localhost:${port}`;
+
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: "npm start",
+      startServerCommand: `npm start -- -p ${port}`,
       startServerReadyPattern: "Local:",
-      url: ["http://localhost:3000/", "http://localhost:3000/cursos", "http://localhost:3000/login"],
+      url: [`${baseUrl}/`, `${baseUrl}/cursos`, `${baseUrl}/login`],
       numberOfRuns: 1,
       settings: {
         // Per-route resource and timing performance budgets.

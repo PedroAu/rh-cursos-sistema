@@ -216,9 +216,9 @@ Os canvases usam `sc-for`/`{{ placeholders }}` para dados dinâmicos (ex.: próx
 
 | Asset | Função |
 |---|---|
-| `public/*.dc.html` (7 canvases) + `public/RH Cursos Home.html` / `RH Cursos Agenda.html` | Referência visual histórica; canvases `.dc.html` removidos do repositório |
-| `public/_ds/` | Export consumidor histórico do DS para canvases `.dc.html`; removido do repositório na normalização atual |
-| `public/support.js` | Runtime dos canvases |
+| `docs/design/redesign/wireframes/*.dc.html` + `docs/design/redesign/reference/canvases/RH Cursos Home.html` / `RH Cursos Agenda.html` | Referência visual histórica preservada fora do deploy |
+| `docs/design/redesign/reference/canvases/_ds/` | Export consumidor histórico do DS preservado apenas para leitura documental |
+| `docs/design/redesign/reference/canvases/support.js` | Runtime histórico dos canvases, preservado fora do deploy |
 | `public/uploads/logoHorizontal_800X600.png` | Path que os canvases esperam para o logo |
 
 **Atenção (limite Cloudflare Free < 3 MiB):** esses arquivos ficam em `public/` (assets estáticos, fora do worker bundle), mas não devem ir ao deploy final — a limpeza é AC da 14.3.3.

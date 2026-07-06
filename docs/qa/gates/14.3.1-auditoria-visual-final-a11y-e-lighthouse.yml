@@ -1,0 +1,67 @@
+schema: 1
+story: '14.3.1'
+story_title: 'Auditoria visual final, a11y e lighthouse'
+gate: PASS
+status_reason: 'As evidencias finais do Epic 14 ficaram coerentes apos o cleanup: o manifest de fidelidade registra todas as rotas com HTTP 200, Home e Agenda apontam os canvases historicos preservados fora do deploy, Axe passou nas rotas publicas e o Lighthouse nao reportou erros bloqueantes de accessibility.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-06T17:30:00-03:00'
+expires: '2026-07-20T17:30:00-03:00'
+quality_score: 90
+
+top_issues:
+  - severity: low
+    summary: 'Lighthouse permaneceu com warnings de performance em /, /cursos e /login, sem blocker de accessibility.'
+    refs:
+      - 'docs/stories/2026-07-06-epic14-story3-1-auditoria-visual-final.md'
+
+waiver:
+  active: false
+
+evidence:
+  tests_reviewed: 14
+  risks_identified: 1
+  trace:
+    ac_covered:
+      - 'Fidelity capture manifest regenerated'
+      - 'Public a11y WCAG AA smoke'
+      - 'Lighthouse accessibility review'
+      - 'Production build and bundle budget'
+    ac_gaps: []
+  commands:
+    - 'npm run test:epic14:fidelity:capture'
+    - 'npm run test:a11y'
+    - 'npm run test:lighthouse'
+    - 'npm run build'
+    - 'npm run bundle:check'
+  visual_artifacts:
+    - 'artifacts/epic14-fidelity/manifest.json'
+    - 'artifacts/epic14-fidelity/home-route.png'
+    - 'artifacts/epic14-fidelity/agenda-route.png'
+    - 'docs/design/redesign/reference/canvases/RH Cursos Home.html'
+    - 'docs/design/redesign/reference/canvases/RH Cursos Agenda.html'
+  reports:
+    - 'https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1783374000840-77965.report.html'
+    - 'https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1783374001911-15208.report.html'
+    - 'https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1783374002940-48384.report.html'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Nenhum novo risco de seguranca foi introduzido na fase final de auditoria.'
+  performance:
+    status: PASS
+    notes: 'Build e bundle check passaram; warnings de Lighthouse foram classificados como nao bloqueantes.'
+  reliability:
+    status: PASS
+    notes: 'Capture script continua funcional sem depender de canvases servidos do public.'
+  maintainability:
+    status: PASS
+    notes: 'As referencias historicas foram preservadas em docs e explicitadas no manifest.'
+
+recommendations:
+  immediate: []
+  future:
+    - action: 'Revisar os warnings de performance do Lighthouse em rota publica apos a entrega do Epic 14.'
+      refs:
+        - 'lighthouserc.cjs'
+        - 'scripts/run-lighthouse.mjs'
