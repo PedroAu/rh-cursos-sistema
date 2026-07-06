@@ -1,7 +1,7 @@
 # Story 14.2.2: Catalogo Publico com Fidelidade Total Trust Keith
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -161,8 +161,13 @@ Manual/visual checks:
 ## QA Results
 2026-07-06 - Evidência técnica regenerada após correção do capture script: `/cursos` permanece sem asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.2-catalogo-publico-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
+2026-07-06 - Re-review formal @qa: PASS. Validei `/cursos` por route capture 200, manifesto corrigido, inspeção visual da captura, smoke Epic 14, smoke e2e completo, a11y, lint, typecheck, unit, build, purge e bundle. O blocker anterior de canvas 404 não se aplica mais: o script não referencia asset inexistente e agora falha em HTTP 4xx/5xx. Gate atualizado para PASS em `docs/qa/gates/14.2.2-catalogo-publico-com-fidelidade-total-trust-keith.yml`. Recomendação QA: GO; ajuste de `Status` permanece fora da autoridade de QA.
+
+2026-07-06 - @dev atualizou o lifecycle da story após PASS formal de @qa. Status final: Done.
+
 ## Change Log
 
 - 2026-07-05 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-05 - @dev (Dex) - Catálogo `/cursos` reskinned com primitives Trust Keith, busca/filtros preservados e gates iniciais (`lint`, `typecheck`, `unit`, `build`, `test:epic14:fidelity`) executados. Status: Ready → In Progress.
 - 2026-07-05 - @dev (Dex) - Gates restantes concluídos (`purge:gate`, `bundle:check`, `test:epic14:fidelity:capture`) e artefatos de fidelidade do catálogo regenerados.
+- 2026-07-06 - @dev (Dex) - PASS formal de QA incorporado à story e lifecycle encerrado. Status: In Progress → Done.

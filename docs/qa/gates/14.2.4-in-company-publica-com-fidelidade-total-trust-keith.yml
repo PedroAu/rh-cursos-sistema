@@ -1,31 +1,47 @@
 schema: 1
 story: '14.2.4'
 story_title: 'In-company Publica com Fidelidade Total Trust Keith'
-gate: CONCERNS
-status_reason: 'Gates tecnicos e route capture foram regenerados com sucesso, mas /in-company nao possui asset canvas dedicado em public/ e a revisao formal de @qa ainda nao ocorreu.'
-reviewer: 'Dex (@dev) - technical evidence refresh'
-updated: '2026-07-06T12:40:00-03:00'
-quality_score: 82
-top_issues:
-  - id: 'QA-PENDING-14.2.4'
-    severity: medium
-    finding: 'Story segue aguardando revisao formal de @qa.'
-    suggested_action: 'Executar review visual/responsivo final do formulario e das wordmarks placeholder.'
-    refs:
-      - 'docs/stories/2026-07-05-epic14-story2-4-in-company-fidelidade-total.md'
+gate: PASS
+status_reason: 'Re-review formal de QA validou /in-company com route capture 200, formulario coberto por smoke, build/a11y verdes e manifest declarando corretamente ausencia de canvas dedicado.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-06T12:44:37-03:00'
+expires: '2026-07-20T12:44:37-03:00'
+quality_score: 90
+top_issues: []
 waiver: { active: false }
 evidence:
+  tests_reviewed: 486
+  risks_identified: 0
   commands:
     - 'npm run lint'
     - 'npm run typecheck'
-    - 'npm run test:unit'
+    - 'npm run test:unit (28 files, 394 tests passed)'
     - 'npm run build'
-    - 'npm run purge:gate'
-    - 'npm run bundle:check'
-    - 'npm run test:epic14:fidelity'
+    - 'npm run purge:gate (PASS; 1 non-blocking filename residue warning)'
+    - 'npm run bundle:check (569.5 KB / 1000 KB gzip budget)'
+    - 'npm run test:epic14:fidelity (8 passed)'
     - 'npm run test:epic14:fidelity:capture'
+    - 'npm run test:e2e:smoke (84 passed)'
   visual_artifacts:
     - 'artifacts/epic14-fidelity/in-company-route.png'
     - 'artifacts/epic14-fidelity/manifest.json'
   notes:
-    - 'manifest.json declara canvasAvailable=false para /in-company porque nao existe asset de referencia em public/.'
+    - 'manifest.json declara canvasAvailable=false para /in-company porque nao existe asset de referencia dedicado em public/.'
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No security blocker found in in-company form scope.'
+  performance:
+    status: PASS
+    notes: 'Bundle within budget after production build.'
+  reliability:
+    status: PASS
+    notes: 'Inline submission confirmation passed in smoke.'
+  maintainability:
+    status: PASS
+    notes: 'High concentration of color literals remains documented as non-blocking cleanup debt.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Prioritize InCompany.tsx in the next token-compliance cleanup.'
+      refs: ['artifacts/epic14-fidelity/phase2-token-compliance-audit.md']

@@ -1,7 +1,7 @@
 # Story 14.2.7: Paginas Sem Canvas com Coerencia Trust Keith
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -174,7 +174,12 @@ Manual/visual checks:
 ## QA Results
 2026-07-06 - O blocker de evidência visual foi corrigido em `scripts/capture-epic14-fidelity.mjs`: o script agora usa apenas assets reais em `public/`, falha em HTTP 4xx/5xx e declara explicitamente quando uma rota não possui canvas de referência. Gate individual técnico criado em `docs/qa/gates/14.2.7-paginas-sem-canvas-com-coerencia-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
+2026-07-06 - Re-review formal @qa: PASS. Validei a Fase 2 agregada e as páginas sem canvas por manifesto corrigido, route captures 200, inspeção visual das capturas, smoke Epic 14, smoke e2e completo, a11y, lint, typecheck, unit, build, purge e bundle. O risco operacional anterior foi resolvido; resíduos de tokenização foram registrados como debt não bloqueante em `artifacts/epic14-fidelity/phase2-token-compliance-audit.md`. Gate individual atualizado para PASS em `docs/qa/gates/14.2.7-paginas-sem-canvas-com-coerencia-trust-keith.yml` e gate agregado atualizado para PASS em `docs/qa/gates/14.2-fase-2-paginas-publicas-fidelidade-total.yml`. Recomendação QA: GO; ajuste de `Status` permanece fora da autoridade de QA.
+
+2026-07-06 - @dev atualizou o lifecycle da story após PASS formal de @qa. Status final: Done.
+
 ## Change Log
 
 - 2026-07-05 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-06 - @dev (Dex) - Story 14.2.7 entrou em implementação documental com fechamento do detalhe de curso, fallback operacional de `Programa PDF`, smoke agregado da Fase 2 restabelecido e artefatos de fidelity regenerados. Status: Ready → In Progress.
+- 2026-07-06 - @dev (Dex) - PASS formal de QA incorporado à story e lifecycle encerrado. Status: In Progress → Done.

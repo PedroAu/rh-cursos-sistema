@@ -1,7 +1,7 @@
 # Story 14.2.4: In-company Publica com Fidelidade Total Trust Keith
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -156,8 +156,13 @@ Manual/visual checks:
 ## QA Results
 2026-07-06 - Evidência técnica regenerada após correção do capture script: `/in-company` não possui asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.4-in-company-publica-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
+2026-07-06 - Re-review formal @qa: PASS. Validei `/in-company` por route capture 200, manifesto corrigido, inspeção visual da captura, smoke de submissão inline, smoke e2e completo, a11y, lint, typecheck, unit, build, purge e bundle. A ausência de canvas dedicado está documentada e não há mais captura inválida por 404. Gate atualizado para PASS em `docs/qa/gates/14.2.4-in-company-publica-com-fidelidade-total-trust-keith.yml`. Recomendação QA: GO; ajuste de `Status` permanece fora da autoridade de QA.
+
+2026-07-06 - @dev atualizou o lifecycle da story após PASS formal de @qa. Status final: Done.
+
 ## Change Log
 
 - 2026-07-05 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-05 - @dev (Dex) - In-company entrou em implementação com formulário atualizado para a spec Trust Keith, incluindo selects semânticos e consentimento explícito. Status: Ready → In Progress.
 - 2026-07-05 - @dev (Dex) - Gates técnicos concluídos (`lint`, `typecheck`, `unit`, `build`, `purge:gate`, `test:epic14:fidelity`, `test:epic14:fidelity:capture`, `bundle:check`) e artefatos de fidelidade do in-company regenerados.
+- 2026-07-06 - @dev (Dex) - PASS formal de QA incorporado à story e lifecycle encerrado. Status: In Progress → Done.

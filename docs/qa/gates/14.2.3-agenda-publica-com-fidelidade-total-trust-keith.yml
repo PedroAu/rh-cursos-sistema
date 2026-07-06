@@ -1,29 +1,46 @@
 schema: 1
 story: '14.2.3'
 story_title: 'Agenda Publica com Fidelidade Total Trust Keith'
-gate: CONCERNS
-status_reason: 'Gates tecnicos, route capture e canvas real da agenda foram regenerados com sucesso, mas a revisao formal de @qa ainda nao ocorreu.'
-reviewer: 'Dex (@dev) - technical evidence refresh'
-updated: '2026-07-06T12:40:00-03:00'
-quality_score: 86
-top_issues:
-  - id: 'QA-PENDING-14.2.3'
-    severity: medium
-    finding: 'Story segue aguardando revisao formal de @qa.'
-    suggested_action: 'Executar review visual/responsivo final da agenda, especialmente lista e calendario.'
-    refs:
-      - 'docs/stories/2026-07-05-epic14-story2-3-agenda-fidelidade-total.md'
+gate: PASS
+status_reason: 'Re-review formal de QA validou /agenda com route capture 200, canvas real 200, smoke/a11y/build verdes e manifesto corrigido.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-06T12:44:37-03:00'
+expires: '2026-07-20T12:44:37-03:00'
+quality_score: 94
+top_issues: []
 waiver: { active: false }
 evidence:
+  tests_reviewed: 486
+  risks_identified: 0
   commands:
     - 'npm run lint'
     - 'npm run typecheck'
-    - 'npm run test:unit'
+    - 'npm run test:unit (28 files, 394 tests passed)'
     - 'npm run build'
-    - 'npm run purge:gate'
-    - 'npm run bundle:check'
-    - 'npm run test:epic14:fidelity'
+    - 'npm run purge:gate (PASS; 1 non-blocking filename residue warning)'
+    - 'npm run bundle:check (569.5 KB / 1000 KB gzip budget)'
+    - 'npm run test:epic14:fidelity (8 passed)'
     - 'npm run test:epic14:fidelity:capture'
+    - 'npm run test:e2e:smoke (84 passed)'
   visual_artifacts:
     - 'artifacts/epic14-fidelity/agenda-route.png'
     - 'artifacts/epic14-fidelity/agenda-canvas.png'
+    - 'artifacts/epic14-fidelity/manifest.json'
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No security blocker found in agenda scope.'
+  performance:
+    status: PASS
+    notes: 'Bundle within budget after production build.'
+  reliability:
+    status: PASS
+    notes: 'Route health, smoke and capture evidence passed.'
+  maintainability:
+    status: PASS
+    notes: 'Status badge color literals are documented as accessibility-driven exceptions.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Review token alternatives for status badges without regressing WCAG contrast.'
+      refs: ['artifacts/epic14-fidelity/phase2-token-compliance-audit.md']
