@@ -1,8 +1,11 @@
 import { Check, Diamond, Gem, Scale, Section, SquareDashedMousePointer } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useAppStore } from "@/lib/app-store";
 import { Link } from "@/lib/router-compat";
+import { cn } from "@/lib/utils";
 
 const institutionalStats = [
   { label: "Ano de fundação", value: "2007" },
@@ -42,52 +45,58 @@ const solutions = [
   }
 ];
 
-const tracks = [
+const trackDefinitions = [
   {
     audience: "Servidores do DP, RH, gestores de contratos e contadores da Administração Pública.",
-    count: "14 cursos",
     description: "Da legislação trabalhista à conformidade digital com eSocial, FGTS Digital e LGPD.",
+    fallbackCount: 14,
     icon: Section,
+    matchCategories: ["Departamento Pessoal", "eSocial"],
     tint: "linear-gradient(135deg,#235875,#2f7599)",
     title: "Departamento Pessoal, Folha & eSocial"
   },
   {
     audience: "Pregoeiros, gestores e fiscais de contratos, equipes de licitação e procurement público.",
-    count: "12 cursos",
     description: "Da legislação básica à fiscalização avançada, com cobertura completa da Lei nº 14.133/2021.",
+    fallbackCount: 12,
     icon: Scale,
+    matchCategories: ["Licitações e Contratos", "Licitações"],
     tint: "linear-gradient(135deg,#2f7599,#068466)",
     title: "Licitações, Compras & Contratos"
   },
   {
     audience: "Gestores, líderes de equipe, servidores e profissionais de RH dos setores público e privado.",
-    count: "14 cursos",
     description: "Formação humanizada para líderes e equipes: inteligência emocional, cultura e gestão por resultados.",
+    fallbackCount: 14,
     icon: Gem,
+    matchCategories: ["Gestão de Pessoas", "Liderança"],
     tint: "linear-gradient(135deg,#235875,#3a7d5f)",
     title: "Gestão de Pessoas & Liderança"
   },
   {
     audience: "Servidores, ouvidores, assessores de comunicação, profissionais jurídicos e atendentes.",
-    count: "10 cursos",
     description: "Do atendimento ao cidadão à redação oficial, oratória, mídias digitais e conformidade com LAI/LGPD.",
+    fallbackCount: 10,
     icon: SquareDashedMousePointer,
+    matchCategories: ["Comunicação"],
     tint: "linear-gradient(135deg,#c98a3a,#e0a94f)",
     title: "Comunicação, Redação & Atendimento"
   },
   {
     audience: "Contadores, auditores, controllers, analistas financeiros e servidores das áreas de controle.",
-    count: "19 cursos",
     description: "Domínio técnico em contabilidade pública, obrigações acessórias, Tesouro Gerencial, SIAFI e auditoria.",
+    fallbackCount: 19,
     icon: Diamond,
+    matchCategories: ["Compliance", "Auditoria", "Contabilidade", "Tributos"],
     tint: "linear-gradient(135deg,#4285f4,#235875)",
     title: "Auditoria, Contabilidade & Tributos"
   },
   {
     audience: "Servidores, analistas de TI, gestores de processos e inovação, e todos que usam tecnologia no trabalho.",
-    count: "11 cursos",
     description: "Ferramentas digitais, análise de dados, modelagem de processos, IA e governança.",
+    fallbackCount: 11,
     icon: Gem,
+    matchCategories: ["Tecnologia"],
     tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)",
     title: "Tecnologia, Dados & Inovação"
   }
@@ -95,24 +104,43 @@ const tracks = [
 
 function SectionEyebrow({ children }: { children: string }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#3b97b5]">
-      {children}
-    </p>
+    <Badge tone="accent" className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">{children}</Badge>
   );
 }
 
 export function AboutPage() {
+  const { courses } = useAppStore();
+  const countsByCategory = courses.reduce<Map<string, number>>((accumulator, course) => {
+    const categories = [course.category, course.pathName, ...(course.categories ?? [])].filter(Boolean) as string[];
+
+    categories.forEach((category) => {
+      accumulator.set(category, (accumulator.get(category) ?? 0) + 1);
+    });
+
+    return accumulator;
+  }, new Map<string, number>());
+
+  const tracks = trackDefinitions.map((track) => {
+    const derivedCount = track.matchCategories.reduce((total, category) => total + (countsByCategory.get(category) ?? 0), 0);
+
+    return {
+      ...track,
+      count: `${derivedCount || track.fallbackCount} cursos`,
+      usesFallback: derivedCount === 0
+    };
+  });
+
   return (
-    <div className="bg-white text-[#222525]">
-      <section className="border-b border-[#e7ecef] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+    <div className="bg-tk-surface text-tk-ink">
+      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
-          <span className="inline-flex rounded-full bg-[#dff2f7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#287f98]">
+          <Badge tone="accent" dot className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
             Documento institucional · Desde 2007
-          </span>
-          <h1 className="mt-5 max-w-[10ch] font-display text-[2.75rem] font-bold leading-[1.03] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+          </Badge>
+          <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.75rem] font-bold leading-[1.03] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
             Transformando vidas por meio do <em className="italic">conhecimento</em>
           </h1>
-          <p className="mt-4 max-w-[62ch] font-serif text-[1.14rem] font-light leading-[1.45] text-[#59646d]">
+          <p className="mt-4 max-w-[62ch] font-tk-serif text-[1.14rem] font-light leading-[1.45] text-tk-ink-muted">
             A RH Cursos &amp; Soluções é uma empresa brasileira de educação corporativa, consultoria e treinamento
             empresarial, sediada em Brasília – DF, especializada na capacitação de servidores públicos e profissionais
             do setor privado.
@@ -120,15 +148,19 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="border-b border-[#e7ecef] bg-white">
+      <section className="border-b border-tk-line bg-tk-surface">
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))] md:grid-cols-2 xl:grid-cols-4">
           {institutionalStats.map((item, index) => (
             <div
               key={item.label}
-              className={["px-5 py-8", index < institutionalStats.length - 1 ? "xl:border-r xl:border-[#edf1f4]" : ""].join(" ")}
+              className={cn(
+                "px-5 py-8 md:border-b md:border-tk-line xl:border-b-0",
+                index < institutionalStats.length - 1 && "xl:border-r xl:border-tk-line",
+                index >= 2 && "md:border-b-0"
+              )}
             >
-              <p className="font-display text-[2rem] font-bold tracking-[-0.02em] text-[#0c6a83]">{item.value}</p>
-              <p className="mt-1 text-sm text-[#69747e]">{item.label}</p>
+              <p className="font-tk-display text-[var(--tk-text-display)] font-bold tracking-[-0.02em] text-tk-brand">{item.value}</p>
+              <p className="mt-1 text-sm text-tk-ink-muted">{item.label}</p>
             </div>
           ))}
         </div>
@@ -138,13 +170,13 @@ export function AboutPage() {
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-12 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <SectionEyebrow>Nossa história</SectionEyebrow>
-            <h2 className="mt-2 max-w-[12ch] font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+            <h2 className="mt-2 max-w-[12ch] font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
               Nascida do sonho de compartilhar conhecimento
             </h2>
           </div>
-          <div className="space-y-5 text-[15px] leading-8 text-[#59646d]">
+          <div className="space-y-5 text-[15px] leading-8 text-tk-ink-muted">
             <p>
-              Fundada em 2007, a RH Cursos &amp; Soluções nasceu da união do casal <strong className="text-[#2d3135]">Ester e Nilson</strong>,
+              Fundada em 2007, a RH Cursos &amp; Soluções nasceu da união do casal <strong className="text-tk-ink">Ester e Nilson</strong>,
               que combinaram suas experiências em advocacia, consultoria e ensino para construir uma instituição voltada a transformar vidas por meio do conhecimento.
             </p>
             <p>
@@ -157,10 +189,10 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-[#ded8c9] bg-[#f4f1e9] py-16">
+      <section className="border-y border-[var(--rh-paper-line)] bg-[var(--rh-paper-a)] py-16">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <SectionEyebrow>Propósito</SectionEyebrow>
-          <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+          <h2 className="mt-2 font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
             Missão, visão e filosofia
           </h2>
 
@@ -181,11 +213,11 @@ export function AboutPage() {
             ].map((item) => (
               <Card
                 key={item.title}
-                className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                className="rounded-[24px] border-tk-line bg-tk-surface"
               >
                 <CardContent className="p-8">
-                  <h3 className="font-display text-[1.5rem] font-bold tracking-[-0.02em] text-[#0c6a83]">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-7 text-[#59646d]">{item.body}</p>
+                  <h3 className="font-tk-display text-[1.5rem] font-bold tracking-[-0.02em] text-tk-brand">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-tk-ink-muted">{item.body}</p>
                 </CardContent>
               </Card>
             ))}
@@ -195,8 +227,8 @@ export function AboutPage() {
             <SectionEyebrow>Valores que nos orientam</SectionEyebrow>
             <div className="mt-4 grid gap-x-10 gap-y-4 md:grid-cols-2">
               {values.map((item) => (
-                <div key={item} className="flex gap-3 text-sm leading-6 text-[#59646d]">
-                  <div className="mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#dff2f7] text-[#2a7a93]">
+                <div key={item} className="flex gap-3 text-sm leading-6 text-tk-ink-muted">
+                  <div className="mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-tk-accent-soft text-tk-accent-strong">
                     <Check className="h-3.5 w-3.5" />
                   </div>
                   <span>{item}</span>
@@ -210,10 +242,10 @@ export function AboutPage() {
       <section className="py-16">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <SectionEyebrow>O que fazemos</SectionEyebrow>
-          <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+          <h2 className="mt-2 font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
             Soluções educacionais integradas
           </h2>
-          <p className="mt-3 max-w-[60ch] text-[15px] leading-8 text-[#59646d]">
+          <p className="mt-3 max-w-[60ch] text-[15px] leading-8 text-tk-ink-muted">
             Um conjunto de soluções educacionais e de consultoria adaptadas à realidade de cada cliente.
           </p>
 
@@ -224,7 +256,7 @@ export function AboutPage() {
               return (
                 <Card
                   key={item.title}
-                  className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                  className="rounded-[24px] border-tk-line bg-tk-surface"
                 >
                   <CardContent className="p-8">
                     <div
@@ -233,8 +265,8 @@ export function AboutPage() {
                     >
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="mt-4 font-display text-[1.5rem] font-bold tracking-[-0.02em] text-[#2d3135]">{item.title}</h3>
-                    <p className="mt-3 text-sm leading-7 text-[#59646d]">{item.description}</p>
+                    <h3 className="mt-4 font-tk-display text-[1.5rem] font-bold tracking-[-0.02em] text-tk-ink">{item.title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-tk-ink-muted">{item.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -243,16 +275,16 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="border-y border-[#e7ecef] bg-[#fafbfc] py-16">
+      <section className="border-y border-tk-line bg-tk-surface-2 py-16">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
               <SectionEyebrow>Áreas de conhecimento</SectionEyebrow>
-              <h2 className="mt-2 font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
-                6 trilhas, aproximadamente 80 cursos
+              <h2 className="mt-2 font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
+                6 trilhas, aproximadamente {courses.length || 80} cursos
               </h2>
             </div>
-            <p className="max-w-[38ch] text-sm leading-7 text-[#59646d]">
+            <p className="max-w-[38ch] text-sm leading-7 text-tk-ink-muted">
               Cada trilha oferece progressão lógica do básico ao avançado, agrupando cursos correlacionados por especialização.
             </p>
           </div>
@@ -264,7 +296,7 @@ export function AboutPage() {
               return (
                 <Card
                   key={track.title}
-                  className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                  className="rounded-[24px] border-tk-line bg-tk-surface"
                 >
                   <CardContent className="flex gap-5 p-7">
                     <div
@@ -275,13 +307,18 @@ export function AboutPage() {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-baseline gap-2">
-                        <h3 className="font-display text-base font-bold tracking-[-0.01em] text-[#2d3135]">{track.title}</h3>
-                        <span className="text-[11px] font-semibold text-[#0c6a83]">{track.count}</span>
+                        <h3 className="font-tk-display text-base font-bold tracking-[-0.01em] text-tk-ink">{track.title}</h3>
+                        <span className="text-[11px] font-semibold text-tk-accent-strong">{track.count}</span>
                       </div>
-                      <p className="mt-2 text-sm leading-7 text-[#59646d]">{track.description}</p>
-                      <p className="mt-2 text-xs leading-6 text-[#69747e]">
-                        <strong className="text-[#2d3135]">Público:</strong> {track.audience}
+                      <p className="mt-2 text-sm leading-7 text-tk-ink-muted">{track.description}</p>
+                      <p className="mt-2 text-xs leading-6 text-tk-ink-muted">
+                        <strong className="text-tk-ink">Público:</strong> {track.audience}
                       </p>
+                      {track.usesFallback ? (
+                        <p className="mt-2 text-[11px] leading-5 text-tk-ink-muted">
+                          Contagem exibida com fallback institucional enquanto essa trilha ainda nao possui cursos suficientes no catalogo publico atual.
+                        </p>
+                      ) : null}
                     </div>
                   </CardContent>
                 </Card>
@@ -295,11 +332,11 @@ export function AboutPage() {
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-12 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <SectionEyebrow>Metodologia</SectionEyebrow>
-            <h2 className="mt-2 max-w-[10ch] font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+            <h2 className="mt-2 max-w-[10ch] font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
               Aprender fazendo, aplicar no mesmo dia
             </h2>
           </div>
-          <div className="space-y-5 text-[15px] leading-8 text-[#59646d]">
+          <div className="space-y-5 text-[15px] leading-8 text-tk-ink-muted">
             <p>
               Adotamos uma abordagem participativa e prática, valorizando a aplicação imediata do conhecimento. As capacitações combinam aulas expositivas, dinâmicas de grupo, trabalho em equipe e exercícios práticos, muitas vezes com uso de computador para temas que envolvem sistemas e ferramentas digitais como SIAFI, Tesouro Gerencial, eSocial, Excel e Power BI.
             </p>
@@ -310,15 +347,14 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-[#0c6a83] py-16 text-center text-white">
+      <section className="bg-tk-brand py-16 text-center text-tk-surface">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
-          <p className="text-sm text-white/78">Pronto para capacitar sua equipe?</p>
-          <h2 className="mt-3 font-display text-[2.2rem] font-bold tracking-[-0.03em]">Fale com um especialista</h2>
-          <p className="mx-auto mt-4 max-w-[52ch] font-serif text-[1.14rem] font-light leading-[1.5] text-white/82">
+          <h2 className="mt-3 font-tk-display text-[var(--tk-text-display)] font-bold tracking-[-0.03em]">Pronto para capacitar sua equipe?</h2>
+          <p className="mx-auto mt-4 max-w-[52ch] font-tk-serif text-[1.14rem] font-light leading-[1.5] text-white/82">
             Fale com um especialista sobre cursos abertos, treinamentos in company e consultoria para o setor público e privado.
           </p>
           <div className="mt-8">
-            <Button asChild variant="secondary" size="lg" className="bg-white text-[#0c6a83] hover:bg-white/90">
+            <Button asChild variant="secondary" size="lg" className="bg-white text-tk-brand hover:bg-white/90">
               <Link to="/falar-com-especialista">Fale com um especialista →</Link>
             </Button>
           </div>

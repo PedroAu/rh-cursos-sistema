@@ -57,18 +57,20 @@ test.describe("epic 14 smoke — mantine removal", () => {
   test("in-company submete e exibe confirmação inline", async ({ page }) => {
     await page.goto("/in-company");
 
-    await page.getByLabel("Nome completo").fill("Ana Souza");
-    await page.getByLabel("E-mail corporativo").fill("ana@empresa.com.br");
-    await page.getByLabel("Telefone ou WhatsApp").fill("61999998888");
-    await page.getByLabel("Nome da empresa").fill("Secretaria de Gestão");
-    await page.getByLabel("Tamanho da equipe").fill("35");
-    await page.getByRole("combobox", { name: "Área de Interesse" }).click();
-    await page.getByRole("option", { name: "Online ao vivo" }).click();
+    await page.getByLabel(/Nome completo/i).fill("Ana Souza");
+    await page.getByLabel(/E-mail corporativo/i).fill("ana@empresa.com.br");
+    await page.getByLabel(/Telefone ou WhatsApp/i).fill("61999998888");
+    await page.getByPlaceholder("Nome da organização").fill("Secretaria de Gestão");
+    await page.getByRole("combobox", { name: /Área de interesse/i }).click();
+    await page.getByRole("option", { name: /gestão pública/i }).click();
+    await page.getByRole("combobox", { name: /Tamanho da equipe/i }).click();
+    await page.getByRole("option", { name: /16 a 40 pessoas/i }).click();
     await page.getByLabel("Objetivo do treinamento").fill("Atualizar a equipe para nova legislação.");
     await page.getByLabel("Tema a ser abordado").fill("eSocial e departamento pessoal.");
     await page.getByLabel("Desafios principais").fill("Reduzir retrabalho e padronizar execução.");
+    await page.getByText("Ao enviar, você concorda em ser contatado pela equipe da RH Cursos.").click();
     await page.getByRole("button", { name: /enviar solicitação de proposta/i }).click();
 
-    await expect(page.getByText(/Solicitação registrada\./)).toBeVisible();
+    await expect(page.getByText(/Recebemos os seus dados\./)).toBeVisible();
   });
 });

@@ -18,8 +18,10 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { useQuoteModal } from "@/components/in-company/quote-modal";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -37,17 +39,17 @@ const inCompanySchema = z.object({
     .trim()
     .min(1, "Informe um e-mail corporativo válido.")
     .refine((value) => emailRegex.test(value), "Informe um e-mail corporativo válido."),
-  company: z.string().trim().min(1, "Preencha o nome da empresa."),
+  company: z.string().trim().min(1, "Preencha o nome da organização."),
   phone: z.string().trim().refine((value) => getPhoneDigits(value).length >= 10, "Informe um telefone ou WhatsApp válido."),
   groupSize: z
     .string()
     .trim()
-    .refine((value) => Boolean(value) && Number(value) > 0, "Informe o tamanho da equipe."),
-  modality: z.string().trim().min(1, "Selecione a modalidade."),
+    .min(1, "Selecione o tamanho da equipe."),
+  modality: z.string().trim().min(1, "Selecione a área de interesse."),
   trainingObjective: z.string().trim().min(1, "Informe o objetivo do treinamento."),
   trainingTheme: z.string().trim().min(1, "Informe o tema a ser abordado."),
   mainChallenges: z.string().trim().min(1, "Informe os desafios principais."),
-  consent: z.boolean()
+  consent: z.boolean().refine((value) => value, "Você precisa concordar com o contato da equipe.")
 });
 
 type InCompanyFormValues = z.infer<typeof inCompanySchema>;
@@ -65,7 +67,20 @@ const defaultValues: InCompanyFormValues = {
   consent: false
 };
 
-const modalityOptions = ["Online ao vivo", "Presencial", "Híbrido", "In company"] as const;
+const interestAreaOptions = [
+  "Licitações e contratos",
+  "LGPD e privacidade",
+  "Compliance e integridade",
+  "Gestão pública",
+  "Outro tema"
+] as const;
+
+const teamSizeOptions = [
+  "Até 15 pessoas",
+  "16 a 40 pessoas",
+  "41 a 100 pessoas",
+  "Mais de 100 pessoas"
+] as const;
 
 const heroPoints = [
   {
@@ -170,24 +185,21 @@ function formatPhone(value: string) {
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
 }
 
-function formatTeamSize(value: string) {
-  return value.replace(/\D/g, "").slice(0, 5);
-}
-
 function getPhoneDigits(value: string) {
   return value.replace(/\D/g, "");
 }
 
 function SectionEyebrow({ children, tone = "accent" }: { children: string; tone?: "accent" | "brand" }) {
   return (
-    <span
+    <Badge
+      tone={tone === "accent" ? "accent" : "neutral"}
       className={cn(
-        "inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]",
-        tone === "accent" ? "bg-[#dff2f7] text-[#1f6d85]" : "bg-[#0c6a83] text-white"
+        "px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]",
+        tone === "brand" && "border-transparent bg-tk-brand text-tk-surface"
       )}
     >
       {children}
-    </span>
+    </Badge>
   );
 }
 
@@ -221,12 +233,13 @@ export function InCompanyPage() {
         email: values.email,
         mainChallenges: values.mainChallenges,
         message: `Empresa: ${values.company}. Telefone/WhatsApp: ${values.phone}. Tamanho da equipe: ${values.groupSize} pessoa(s). Modalidade: ${values.modality}. Objetivo: ${values.trainingObjective}. Tema: ${values.trainingTheme}. Desafios principais: ${values.mainChallenges}`,
+        
         name: values.name,
         organization: values.company,
         origin: "Site",
         phone: values.phone,
-        preferredModality: values.modality,
-        teamSize: Number(values.groupSize),
+        preferredModality: "In company",
+        teamSize: teamSizeOptions.indexOf(values.groupSize as (typeof teamSizeOptions)[number]) + 1,
         trainingObjective: values.trainingObjective,
         trainingTheme: values.trainingTheme,
         type: "InCompany"
@@ -234,7 +247,7 @@ export function InCompanyPage() {
 
       reset(defaultValues);
       toast.success("Proposta registrada para atendimento consultivo.");
-      setSubmitSuccess("Solicitação registrada. A equipe retorna com recomendação de formato, trilha e próximos passos.");
+      setSubmitSuccess("Recebemos os seus dados. Um especialista da RH Cursos entrará em contato em breve.");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Não foi possível enviar a proposta.";
       setSubmitError(message);
@@ -515,7 +528,7 @@ export function InCompanyPage() {
                     </div>
 
                     <div className="grid gap-5 md:grid-cols-2">
-                      <FormField error={errors.company?.message} label="Nome da empresa" required>
+                      <FormField error={errors.company?.message} label="Organização" required>
                         {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
                           <Input
                             id={fieldId}
@@ -576,7 +589,7 @@ export function InCompanyPage() {
                                   <SelectValue placeholder="Selecione uma área" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {modalityOptions.map((option) => (
+                                  {interestAreaOptions.map((option) => (
                                     <SelectItem key={option} value={option}>
                                       {option}
                                     </SelectItem>
@@ -593,19 +606,30 @@ export function InCompanyPage() {
                         name="groupSize"
                         render={({ field }) => (
                           <FormField error={errors.groupSize?.message} label="Tamanho da equipe" required>
-                            {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
-                              <Input
-                                id={fieldId}
-                                inputMode="numeric"
-                                placeholder="Até 15 pessoas"
+                            {({ ariaDescribedBy, ariaInvalid, fieldId, labelId }) => (
+                              <Select
                                 value={field.value}
-                                aria-describedby={ariaDescribedBy}
-                                aria-invalid={ariaInvalid}
-                                onChange={(event) => {
+                                onValueChange={(value) => {
                                   clearFeedback();
-                                  field.onChange(formatTeamSize(event.target.value));
+                                  field.onChange(value);
                                 }}
-                              />
+                              >
+                                <SelectTrigger
+                                  id={fieldId}
+                                  aria-describedby={ariaDescribedBy}
+                                  aria-invalid={ariaInvalid}
+                                  aria-labelledby={labelId}
+                                >
+                                  <SelectValue placeholder="Selecione o tamanho da equipe" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {teamSizeOptions.map((option) => (
+                                    <SelectItem key={option} value={option}>
+                                      {option}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             )}
                           </FormField>
                         )}
@@ -649,9 +673,31 @@ export function InCompanyPage() {
                       )}
                     </FormField>
 
-                    <p className="text-xs leading-5 text-[#69747e]">
-                      Ao enviar, você concorda em ser contatado pela equipe da RH Cursos.
-                    </p>
+                    <Controller
+                      control={control}
+                      name="consent"
+                      render={({ field }) => (
+                        <div className="space-y-2">
+                          <label className="flex items-start gap-3 text-xs leading-5 text-[#69747e]">
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={(checked) => {
+                                clearFeedback();
+                                field.onChange(checked);
+                              }}
+                              aria-invalid={errors.consent ? true : undefined}
+                              aria-describedby={errors.consent ? "in-company-consent-error" : undefined}
+                            />
+                            <span>Ao enviar, você concorda em ser contatado pela equipe da RH Cursos.</span>
+                          </label>
+                          {errors.consent?.message ? (
+                            <p id="in-company-consent-error" className="text-caption text-tk-error" role="alert">
+                              {errors.consent.message}
+                            </p>
+                          ) : null}
+                        </div>
+                      )}
+                    />
 
                     <Button
                       type="submit"

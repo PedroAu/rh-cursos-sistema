@@ -2,8 +2,8 @@ import { ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import { Link, useParams } from "@/lib/router-compat";
 
 import { BlogCard } from "@/components/blog/blog-card";
+import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/common/empty-state";
-import { SectionTitle } from "@/components/common/section-title";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppStore } from "@/lib/app-store";
@@ -32,26 +32,30 @@ export function BlogPostPage() {
 
   return (
     <>
-      <section className="page-section">
-        <div className="container grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="bg-tk-surface py-14 md:py-16">
+        <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-8 md:w-[min(var(--tk-container),calc(100%-40px))] xl:grid-cols-[1.1fr_0.9fr]">
           <article className="space-y-8">
             <div className="space-y-4">
-              <span className="eyebrow">{post.category}</span>
-              <h1 className="text-4xl font-semibold md:text-5xl">{post.title}</h1>
-              <p className="text-lg leading-8 text-tk-ink-muted">{post.summary}</p>
+              <Badge tone="accent" className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                {post.category}
+              </Badge>
+              <h1 className="max-w-[16ch] font-tk-display text-[2.6rem] font-bold leading-[1.05] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
+                {post.title}
+              </h1>
+              <p className="max-w-[44ch] font-tk-serif text-lg leading-8 text-tk-ink-muted">{post.summary}</p>
               <div className="flex flex-wrap gap-4 text-sm text-tk-ink-muted">
                 <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4" />{formatDate(post.date)}</div>
                 <div className="flex items-center gap-2"><Clock3 className="h-4 w-4" />{post.readingTime}</div>
               </div>
               <div className="flex flex-wrap gap-2">
                 {post.tags.map((tag) => (
-                  <span key={tag} className="rounded-full border border-outline-variant bg-surface-muted px-3 py-1.5 text-label font-bold text-deep-navy">
+                  <span key={tag} className="rounded-full border border-tk-line bg-tk-surface-2 px-3 py-1.5 text-sm font-semibold text-tk-ink">
                     {tag}
                   </span>
                 ))}
               </div>
             </div>
-            <Card className="border-outline-variant">
+            <Card className="border-tk-line bg-tk-surface">
               <CardContent className="space-y-5 p-7 md:p-10">
                 {safeContent.split("\n\n").map((paragraph) => (
                   <p key={paragraph} className="mx-auto max-w-3xl text-base leading-8 text-tk-ink-muted">
@@ -63,13 +67,13 @@ export function BlogPostPage() {
           </article>
 
           <div className="space-y-6">
-            <Card className="border-outline-variant bg-surface-muted">
+            <Card className="border-tk-line bg-tk-surface-2">
               <CardContent className="space-y-4 p-6">
-                <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Leitura guiada</div>
+                <div className="text-sm uppercase tracking-[0.18em] text-tk-ink-muted">Leitura guiada</div>
                 <ul className="space-y-3 text-sm leading-6 text-tk-ink-muted">
                   {leadParagraphs.map((paragraph, index) => (
                     <li key={paragraph} className="flex gap-3">
-                      <span className="mt-0.5 font-bold text-deep-navy">{index + 1}.</span>
+                      <span className="mt-0.5 font-bold text-tk-ink">{index + 1}.</span>
                       <span>{paragraph}</span>
                     </li>
                   ))}
@@ -79,7 +83,9 @@ export function BlogPostPage() {
             <Card className="bg-tk-brand text-white">
               <CardContent className="space-y-4 p-6">
                 <div className="text-sm uppercase tracking-[0.18em] text-blue-100/80">CTA relacionado</div>
-                <h3 className="text-2xl font-semibold text-white">{relatedCourse?.title}</h3>
+                <h3 className="font-tk-display text-2xl font-bold text-white">
+                  {relatedCourse?.title ?? "Curso relacionado indisponível no momento"}
+                </h3>
                 <p className="text-sm leading-6 text-blue-50/80">
                   Conecte o conteúdo do artigo à jornada comercial com um CTA direto para o curso relacionado.
                 </p>
@@ -94,24 +100,39 @@ export function BlogPostPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-outline-variant bg-white">
+            <Card className="border-tk-line bg-tk-surface">
               <CardContent className="space-y-4 p-6">
-                <div className="text-sm uppercase tracking-[0.18em] text-label-secondary">Taxonomia</div>
+                <div className="text-sm uppercase tracking-[0.18em] text-tk-ink-muted">Taxonomia</div>
                 <div className="space-y-3 text-sm leading-6 text-tk-ink-muted">
-                  <p><strong className="text-deep-navy">Categoria:</strong> {post.category}</p>
-                  <p><strong className="text-deep-navy">Autor:</strong> {post.author}</p>
-                  <p><strong className="text-deep-navy">Leitura estimada:</strong> {post.readingTime}</p>
+                  <p><strong className="text-tk-ink">Categoria:</strong> {post.category}</p>
+                  <p><strong className="text-tk-ink">Autor:</strong> {post.author}</p>
+                  <p><strong className="text-tk-ink">Leitura estimada:</strong> {post.readingTime}</p>
                 </div>
               </CardContent>
             </Card>
 
             <div className="space-y-4">
-              <SectionTitle eyebrow="Relacionados" title="Outros conteúdos da mesma categoria" />
-              <div className="grid gap-4">
-                {relatedPosts.map((item) => (
-                  <BlogCard key={item.id} post={item} />
-                ))}
+              <div>
+                <Badge tone="accent" className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
+                  Relacionados
+                </Badge>
+                <h2 className="mt-3 font-tk-display text-[1.75rem] font-bold leading-tight text-tk-ink">
+                  Outros conteúdos da mesma categoria
+                </h2>
               </div>
+              {relatedPosts.length ? (
+                <div className="grid gap-4">
+                  {relatedPosts.map((item) => (
+                    <BlogCard key={item.id} post={item} />
+                  ))}
+                </div>
+              ) : (
+                <Card className="border-tk-line bg-tk-surface">
+                  <CardContent className="p-6 text-sm text-tk-ink-muted">
+                    Nenhum outro artigo relacionado foi publicado nesta categoria até agora.
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </div>
         </div>

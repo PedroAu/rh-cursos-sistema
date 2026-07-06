@@ -25,7 +25,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
@@ -97,22 +100,22 @@ function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
     return {
       bgClass: "bg-[#fdeef0]",
-      colorClass: "text-[#c0293b]",
+      colorClass: "text-[var(--tk-error)]",
       label: "Poucas vagas"
     };
   }
 
   if (trainingClass.status === "Em breve") {
     return {
-      bgClass: "bg-[#e0eeff]",
-      colorClass: "text-[#2459b3]",
+      bgClass: "bg-[var(--tk-accent-soft)]",
+      colorClass: "text-[var(--tk-focus)]",
       label: "Turma nova"
     };
   }
 
   return {
-    bgClass: "bg-[#e8f7f2]",
-    colorClass: "text-[#0f6f5f]",
+    bgClass: "bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))]",
+    colorClass: "text-[var(--tk-success)]",
     label: "Inscrições abertas"
   };
 }
@@ -147,7 +150,9 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
         instructor: instructorsById.get(trainingClass.instructorId),
         mode,
         modeClassName:
-          mode === "Online" ? "bg-[#e0eeff] text-[#2459b3]" : "bg-[#fdeef0] text-[#c0293b]",
+          mode === "Online"
+            ? "bg-[var(--tk-accent-soft)] text-[var(--tk-accent-strong)]"
+            : "bg-[#fdeef0] text-[var(--tk-error)]",
         modeLabel: mode === "Online" ? "Online ao vivo" : "Presencial",
         place: formatPlace(trainingClass),
         price: trainingClass.price || course.price,
@@ -385,19 +390,18 @@ export function AgendaPage() {
   };
 
   return (
-    <div className="bg-[#eef0f2]">
-      <section className="border-b border-[#ebebeb] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)] py-16">
+    <div className="bg-tk-surface-2">
+      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)] py-16">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 xl:px-10">
           <div className="space-y-8">
             <div className="space-y-4">
-              <div className="inline-flex items-center rounded-full bg-[#dff3fb] px-4 py-2 text-sm font-semibold text-[#0c6a83]">
-                <span className="mr-2 h-2 w-2 rounded-full bg-[#1791a9]" />
+              <Badge tone="accent" dot className="w-fit px-4 py-2 text-sm">
                 Agenda
-              </div>
-              <h1 className="max-w-[20ch] font-display text-[2.75rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#222525]">
-                Próximas turmas, em <em className="italic text-[#0c6a83]">ordem</em> de data
+              </Badge>
+              <h1 className="max-w-[20ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.5rem] lg:text-[2.75rem]">
+                Próximas turmas, em <em className="italic text-tk-accent-strong">ordem</em> de data
               </h1>
-              <p className="max-w-[58ch] font-serif text-[1.35rem] font-light leading-[1.45] text-[#4f5057]">
+              <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-light leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
                 Todas as turmas presenciais e online ao vivo confirmadas no calendário. Busque pelo nome do curso ou refine
                 por modalidade, área e local.
               </p>
@@ -406,29 +410,29 @@ export function AgendaPage() {
             <div className="space-y-4" data-testid="ui-agenda-filters">
               <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
                 <label className="relative block min-w-[240px] flex-1 lg:max-w-[360px]">
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7f8c94]" />
-                  <input
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
+                  <Input
                     ref={searchRef}
                     type="search"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     aria-label="Buscar por curso, tema ou instrutor"
                     placeholder="Buscar por curso, tema ou instrutor..."
-                    className="h-11 w-full rounded-[4px] border border-[#ebebeb] bg-white px-11 pr-12 text-sm text-[#222525] outline-none transition focus:border-[#1791a9] focus:ring-4 focus:ring-[#e0f2f6]"
+                    className="h-11 px-11 pr-12"
                   />
                   {query ? (
                     <button
                       type="button"
                       onClick={() => setQuery("")}
                       aria-label="Limpar busca da agenda"
-                      className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-[#7f8c94] transition hover:bg-[#f3f4f6] hover:text-[#222525]"
+                      className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-tk-ink-muted transition hover:bg-tk-surface-2 hover:text-tk-ink"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   ) : null}
                 </label>
 
-                <div className="flex h-11 flex-wrap rounded-[6px] border border-[#ebebeb] bg-white p-1">
+                <div className="flex h-11 flex-wrap rounded-[6px] border border-tk-line bg-tk-surface p-1">
                   {[
                     { label: "Todas", value: "" },
                     { label: "Online", value: "Online" },
@@ -439,8 +443,8 @@ export function AgendaPage() {
                       type="button"
                       onClick={() => setMode(option.value as "" | AgendaMode)}
                       className={cn(
-                        "rounded-[4px] px-4 text-sm font-medium text-[#4f5057] transition",
-                        mode === option.value && "bg-[#0c6a83] font-semibold text-white"
+                        "rounded-[4px] px-4 text-sm font-medium text-tk-ink-muted transition",
+                        mode === option.value && "bg-tk-brand font-semibold text-tk-surface"
                       )}
                     >
                       {option.label}
@@ -453,8 +457,8 @@ export function AgendaPage() {
                   value={area}
                   onChange={(event) => setArea(event.target.value)}
                   className={cn(
-                    "h-11 min-w-[210px] rounded-[4px] border border-[#ebebeb] bg-white px-3 text-sm text-[#222525] outline-none transition",
-                    area && "border-[#0c6a83] bg-[#e0f2f6] font-semibold text-[#0c6a83]"
+                    "h-11 min-w-[210px] rounded-[4px] border border-tk-line bg-tk-surface px-3 text-sm text-tk-ink outline-none transition focus:border-tk-accent",
+                    area && "border-tk-brand bg-tk-accent-soft font-semibold text-tk-brand"
                   )}
                 >
                   <option value="">Todas as áreas</option>
@@ -470,8 +474,8 @@ export function AgendaPage() {
                   value={city}
                   onChange={(event) => setCity(event.target.value)}
                   className={cn(
-                    "h-11 min-w-[210px] rounded-[4px] border border-[#ebebeb] bg-white px-3 text-sm text-[#222525] outline-none transition",
-                    city && "border-[#0c6a83] bg-[#e0f2f6] font-semibold text-[#0c6a83]"
+                    "h-11 min-w-[210px] rounded-[4px] border border-tk-line bg-tk-surface px-3 text-sm text-tk-ink outline-none transition focus:border-tk-accent",
+                    city && "border-tk-brand bg-tk-accent-soft font-semibold text-tk-brand"
                   )}
                 >
                   <option value="">Todos os locais</option>
@@ -488,14 +492,14 @@ export function AgendaPage() {
                   aria-label="Ordenar agenda"
                   value={sort}
                   onChange={(event) => setSort(event.target.value as SortMode)}
-                  className="h-11 min-w-[210px] rounded-[4px] border border-[#ebebeb] bg-white px-3 text-sm text-[#222525] outline-none transition focus:border-[#1791a9]"
+                  className="h-11 min-w-[210px] rounded-[4px] border border-tk-line bg-tk-surface px-3 text-sm text-tk-ink outline-none transition focus:border-tk-accent"
                 >
                   <option value="data">Data · mais próxima</option>
                   <option value="preco-asc">Preço · menor primeiro</option>
                   <option value="preco-desc">Preço · maior primeiro</option>
                 </select>
 
-                <div className="flex h-11 rounded-[6px] border border-[#ebebeb] bg-white p-1">
+                <div className="flex h-11 rounded-[6px] border border-tk-line bg-tk-surface p-1">
                   {[
                     { icon: List, label: "Lista", value: "lista" },
                     { icon: CalendarDays, label: "Calendário", value: "calendario" }
@@ -508,8 +512,8 @@ export function AgendaPage() {
                         type="button"
                         onClick={() => setView(option.value as AgendaView)}
                         className={cn(
-                          "inline-flex items-center gap-2 rounded-[4px] px-4 text-sm font-medium text-[#4f5057] transition",
-                          view === option.value && "bg-[#0c6a83] text-white"
+                          "inline-flex items-center gap-2 rounded-[4px] px-4 text-sm font-medium text-tk-ink-muted transition",
+                          view === option.value && "bg-tk-brand text-tk-surface"
                         )}
                       >
                         <Icon className="h-4 w-4" />
@@ -522,16 +526,16 @@ export function AgendaPage() {
 
               {hasActiveFilters ? (
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-medium text-[#4f5057]">Filtrando por:</span>
+                  <span className="text-xs font-medium text-tk-ink-muted">Filtrando por:</span>
                   {activeChips.map((chip) => (
                     <button
                       key={chip.key}
                       type="button"
                       onClick={chip.onRemove}
-                      className="inline-flex items-center gap-2 rounded-full border border-[#ebebeb] bg-[#fafafa] px-3 py-1.5 text-sm text-[#222525] transition hover:border-[#1791a9]"
+                      className="inline-flex items-center gap-2 rounded-full border border-tk-line bg-tk-surface-2 px-3 py-1.5 text-sm text-tk-ink transition hover:border-tk-accent"
                     >
                       {chip.label}
-                      <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-black/5 text-[11px]">
+                      <span className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[var(--tk-black-5)] text-[11px]">
                         ×
                       </span>
                     </button>
@@ -539,7 +543,7 @@ export function AgendaPage() {
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="text-sm font-medium text-[#0c6a83] transition hover:text-[#084f63]"
+                    className="text-sm font-medium text-tk-accent-strong transition hover:text-tk-brand-hover"
                   >
                     Limpar tudo
                   </button>
@@ -550,42 +554,42 @@ export function AgendaPage() {
         </div>
       </section>
 
-      <section className="bg-white py-12">
+      <section className="bg-tk-surface py-12">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 xl:px-10">
           <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm text-[#222525]">
+            <p className="text-sm text-tk-ink">
               <strong className="font-semibold">{loading ? "..." : filteredEntries.length}</strong> {formatResultsLabel(filteredEntries.length)}
             </p>
-            <Link to="/cursos" className="text-sm font-medium text-[#0c6a83] transition hover:text-[#084f63]">
+            <Link to="/cursos" className="text-sm font-medium text-tk-accent-strong transition hover:text-tk-brand-hover">
               Ver catálogo completo →
             </Link>
           </div>
 
           {loading ? (
-            <div className="py-16 text-center text-[#4f5057]">Atualizando agenda...</div>
+            <div className="py-16 text-center text-tk-ink-muted">Atualizando agenda...</div>
           ) : filteredEntries.length ? (
             view === "calendario" ? (
               <section>
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <h2 className="font-display text-2xl font-bold capitalize text-[#222525]">
+                    <h2 className="font-tk-display text-2xl font-bold capitalize text-tk-ink">
                       {format(calendarDate, "MMMM yyyy", { locale: ptBR })}
                     </h2>
-                    <p className="text-xs text-[#4f5057]">{monthEntries.length} turmas</p>
+                    <p className="text-xs text-tk-ink-muted">{monthEntries.length} turmas</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       aria-label="Mês anterior"
                       onClick={() => setCalendarDate((current) => subMonths(current, 1))}
-                      className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[6px] border border-[#ebebeb] text-[#4f5057] transition hover:border-[#1791a9] hover:text-[#1791a9]"
+                      className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[6px] border border-tk-line text-tk-ink-muted transition hover:border-tk-accent hover:text-tk-accent"
                     >
                       <ChevronLeft className="h-4 w-4" />
                     </button>
                     <button
                       type="button"
                       onClick={() => setCalendarDate(startOfMonth(new Date()))}
-                      className="inline-flex h-[38px] items-center rounded-[6px] border border-[#ebebeb] px-4 text-sm font-medium text-[#222525] transition hover:border-[#1791a9] hover:text-[#1791a9]"
+                      className="inline-flex h-[38px] items-center rounded-[6px] border border-tk-line px-4 text-sm font-medium text-tk-ink transition hover:border-tk-accent hover:text-tk-accent"
                     >
                       Hoje
                     </button>
@@ -593,7 +597,7 @@ export function AgendaPage() {
                       type="button"
                       aria-label="Próximo mês"
                       onClick={() => setCalendarDate((current) => addMonths(current, 1))}
-                      className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[6px] border border-[#ebebeb] text-[#4f5057] transition hover:border-[#1791a9] hover:text-[#1791a9]"
+                      className="inline-flex h-[38px] w-[38px] items-center justify-center rounded-[6px] border border-tk-line text-tk-ink-muted transition hover:border-tk-accent hover:text-tk-accent"
                     >
                       <ChevronRight className="h-4 w-4" />
                     </button>
@@ -604,7 +608,7 @@ export function AgendaPage() {
                   {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
                     <div
                       key={label}
-                      className="py-2 text-center text-[11px] font-semibold uppercase tracking-[0.06em] text-[#4f5057]"
+                      className="py-2 text-center text-[11px] font-semibold uppercase tracking-[0.06em] text-tk-ink-muted"
                     >
                       {label}
                     </div>
@@ -623,12 +627,12 @@ export function AgendaPage() {
                         key={key}
                         className={cn(
                           "flex min-h-[104px] flex-col gap-1 rounded-xl border p-[10px]",
-                          !inMonth && "border-dashed border-[#ebebeb] bg-[#fafafa]",
-                          inMonth && !entry && "border-[#ebebeb] bg-white",
-                          inMonth && entry && "border-[#1791a9] bg-white shadow-[inset_0_0_0_1px_#e0f2f6]"
+                          !inMonth && "border-dashed border-tk-line bg-tk-surface-2",
+                          inMonth && !entry && "border-tk-line bg-tk-surface",
+                          inMonth && entry && "border-tk-accent bg-tk-surface shadow-[inset_0_0_0_1px_var(--tk-accent-soft)]"
                         )}
                       >
-                        <span className={cn("text-sm font-semibold", entry ? "text-[#0c6a83]" : "text-[#4f5057]")}>
+                        <span className={cn("text-sm font-semibold", entry ? "text-tk-accent-strong" : "text-tk-ink-muted")}>
                           {format(day, "d")}
                         </span>
                         {entry ? (
@@ -636,11 +640,11 @@ export function AgendaPage() {
                             <span className={cn("inline-flex w-fit rounded-full px-2.5 py-1 text-[11px] font-semibold", entry.modeClassName)}>
                               {entry.modeLabel}
                             </span>
-                            <span className="line-clamp-2 text-[11.5px] font-semibold leading-[1.25] text-[#222525]">
+                            <span className="line-clamp-2 text-[11.5px] font-semibold leading-[1.25] text-tk-ink">
                               {entry.course.title}
                             </span>
                             {count > 1 ? (
-                              <span className="mt-auto text-[11px] text-[#4f5057]">+{count - 1} turma{count - 1 === 1 ? "" : "s"}</span>
+                              <span className="mt-auto text-[11px] text-tk-ink-muted">+{count - 1} turma{count - 1 === 1 ? "" : "s"}</span>
                             ) : null}
                           </>
                         ) : null}
@@ -653,48 +657,50 @@ export function AgendaPage() {
               <div className="space-y-11">
                 {months.map((month) => (
                   <section key={month.key}>
-                    <div className="mb-[18px] flex items-baseline gap-3 border-b border-[#ebebeb] pb-3">
-                      <h2 className="font-display text-2xl font-bold capitalize text-[#222525]">{month.label}</h2>
-                      <p className="text-xs text-[#4f5057]">{month.items.length} turmas</p>
+                    <div className="mb-[18px] flex items-baseline gap-3 border-b border-tk-line pb-3">
+                      <h2 className="font-tk-display text-2xl font-bold capitalize text-tk-ink">{month.label}</h2>
+                      <p className="text-xs text-tk-ink-muted">{month.items.length} turmas</p>
                     </div>
 
                     <div className="space-y-4">
                       {month.items.map((entry) => (
-                        <article
+                        <Card
                           key={entry.trainingClass.id}
-                          className="grid gap-5 rounded-[24px] border border-[#ebebeb] bg-white px-6 py-5 shadow-[0_4px_16px_rgba(0,0,0,0.08)] transition hover:-translate-y-0.5 hover:shadow-[0_2px_16px_rgba(0,0,0,0.02),0_16px_64px_rgba(0,0,0,0.12)] md:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_170px] lg:items-center lg:gap-[26px]"
+                          interactive
+                          variant="glass"
+                          className="grid gap-5 rounded-[24px] px-6 py-5 md:grid-cols-[96px_minmax(0,1fr)] lg:grid-cols-[96px_minmax(0,1fr)_170px] lg:items-center lg:gap-[26px]"
                         >
-                          <div className="border-b border-[#ebebeb] pb-4 text-center md:border-b-0 md:border-r md:pb-0 md:pr-5">
-                            <div className="font-display text-[34px] font-bold leading-none tracking-[-0.02em] text-[#0c6a83]">
+                          <div className="border-b border-tk-line pb-4 text-center md:border-b-0 md:border-r md:pb-0 md:pr-5">
+                            <div className="font-tk-display text-[34px] font-bold leading-none tracking-[-0.02em] text-tk-accent-strong">
                               {entry.day}
                             </div>
-                            <div className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-[#4f5057]">
+                            <div className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-tk-ink-muted">
                               {entry.monthShort}
                             </div>
-                            <div className="mt-1 text-[11px] capitalize text-[#4f5057]">{entry.weekday}</div>
+                            <div className="mt-1 text-[11px] capitalize text-tk-ink-muted">{entry.weekday}</div>
                           </div>
 
                           <div>
-                            <div className="mb-[7px] flex flex-wrap items-center gap-2 text-xs text-[#4f5057]">
+                            <div className="mb-[7px] flex flex-wrap items-center gap-2 text-xs text-tk-ink-muted">
                               <span className={cn("inline-flex rounded-full px-2.5 py-1 font-semibold", entry.modeClassName)}>
                                 {entry.modeLabel}
                               </span>
                               <span>{entry.category}</span>
                             </div>
-                            <h3 className="mb-2 font-display text-[1.25rem] font-bold leading-[1.25] tracking-[-0.01em] text-[#222525]">
+                            <h3 className="mb-2 font-tk-display text-[1.25rem] font-bold leading-[1.25] tracking-[-0.01em] text-tk-ink">
                               {entry.course.title}
                             </h3>
-                            <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-[#4f5057]">
+                            <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-tk-ink-muted">
                               <span className="inline-flex items-center gap-2">
-                                <Clock3 className="h-4 w-4 text-[#1791a9]" />
+                                <Clock3 className="h-4 w-4 text-tk-accent" />
                                 {entry.trainingClass.time} · {entry.course.durationLabel}
                               </span>
                               <span className="inline-flex items-center gap-2">
-                                <MapPin className="h-4 w-4 text-[#1791a9]" />
+                                <MapPin className="h-4 w-4 text-tk-accent" />
                                 {entry.place}
                               </span>
                               <span className="inline-flex items-center gap-2">
-                                <UserRound className="h-4 w-4 text-[#1791a9]" />
+                                <UserRound className="h-4 w-4 text-tk-accent" />
                                 {entry.instructor?.name ?? "Instrutor a definir"}
                               </span>
                             </div>
@@ -711,14 +717,14 @@ export function AgendaPage() {
                               {entry.spotLabel}
                             </span>
                             <div>
-                              <p className="text-[11px] uppercase tracking-[0.08em] text-[#4f5057]">a partir de</p>
-                              <p className="font-display text-[20px] font-bold text-[#0c6a83]">{currency(entry.price)}</p>
+                              <p className="text-[11px] uppercase tracking-[0.08em] text-tk-ink-muted">a partir de</p>
+                              <p className="font-tk-display text-[20px] font-bold text-tk-accent-strong">{currency(entry.price)}</p>
                             </div>
                             <Button asChild size="sm" className="min-w-[130px]">
                               <Link to={`/cursos/${entry.course.slug}?checkout=1`}>Inscrever-se →</Link>
                             </Button>
                           </div>
-                        </article>
+                        </Card>
                       ))}
                     </div>
                   </section>
@@ -726,27 +732,27 @@ export function AgendaPage() {
               </div>
             )
           ) : (
-            <div className="rounded-[24px] border border-[#ebebeb] bg-[#fafafa] px-8 py-14 text-center">
-              <h2 className="font-display text-[2rem] font-bold text-[#222525]">Nenhuma turma nesse filtro</h2>
-              <p className="mx-auto mt-3 max-w-[52ch] text-[#4f5057]">
+            <Card variant="filled" className="px-8 py-14 text-center">
+              <h2 className="font-tk-display text-[2rem] font-bold text-tk-ink">Nenhuma turma nesse filtro</h2>
+              <p className="mx-auto mt-3 max-w-[52ch] text-tk-ink-muted">
                 Ajuste a busca ou fale com um especialista para montar uma turma aderente ao calendário da sua equipe.
               </p>
               <Button asChild variant="outline" className="mt-6">
                 <Link to="/falar-com-especialista">Falar com especialista →</Link>
               </Button>
-            </div>
+            </Card>
           )}
         </div>
       </section>
 
-      <section className="bg-[#eef0f2] pb-14">
+      <section className="bg-tk-surface-2 pb-14">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 xl:px-10">
-          <div className="rounded-[24px] border border-[#ded8c9] bg-[linear-gradient(158deg,#f4f1e9,#e9e4d8)] px-8 py-10 shadow-[0_2px_16px_rgba(0,0,0,0.02),0_16px_64px_rgba(0,0,0,0.12)] md:flex md:items-center md:justify-between md:gap-8">
+          <Card variant="base" className="rounded-[24px] border-[var(--rh-paper-line)] bg-[linear-gradient(158deg,var(--rh-paper-a),var(--rh-paper-b))] px-8 py-10 md:flex md:items-center md:justify-between md:gap-8">
             <div className="max-w-[620px]">
-              <h2 className="font-display text-[2rem] font-bold leading-tight text-[#222525]">
+              <h2 className="font-tk-display text-[2rem] font-bold leading-tight text-tk-ink">
                 Nenhuma data serve para a sua equipe?
               </h2>
-              <p className="mt-3 font-serif text-xl font-light leading-[1.45] text-[#4f5057]">
+              <p className="mt-3 font-tk-serif text-xl font-light leading-[1.45] text-tk-ink-muted">
                 Montamos uma turma fechada com o seu tema, no seu calendário e com o contexto da sua organização.
               </p>
             </div>
@@ -758,7 +764,7 @@ export function AgendaPage() {
                 <Link to="/falar-com-especialista">Solicitar proposta</Link>
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
     </div>

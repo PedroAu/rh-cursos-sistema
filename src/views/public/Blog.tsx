@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -93,9 +94,7 @@ function getPresentation(post: BlogPost) {
 
 function SectionEyebrow({ children }: { children: string }) {
   return (
-    <span className="inline-flex rounded-full bg-[#dff2f7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#1f6d85]">
-      {children}
-    </span>
+    <Badge tone="accent" className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">{children}</Badge>
   );
 }
 
@@ -192,14 +191,14 @@ export function BlogPage() {
   };
 
   return (
-    <div className="bg-white text-[#222525]">
-      <section className="border-b border-[#e7ecef] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+    <div className="bg-tk-surface text-tk-ink">
+      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <SectionEyebrow>Conteúdo · Análises · Prática</SectionEyebrow>
-          <h1 className="mt-5 max-w-[12ch] font-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+          <h1 className="mt-5 max-w-[12ch] font-tk-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
             A norma explicada de um jeito que você <em className="italic">usa</em>
           </h1>
-          <p className="mt-4 max-w-[60ch] font-serif text-[1.16rem] font-light leading-[1.45] text-[#59646d]">
+          <p className="mt-4 max-w-[60ch] font-tk-serif text-[1.16rem] font-light leading-[1.45] text-tk-ink-muted">
             Análises práticas de licitações, LGPD, compliance e gestão pública: escritas por quem aplica essas normas
             no dia a dia de organizações públicas e privadas.
           </p>
@@ -210,7 +209,7 @@ export function BlogPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           {featuredPost ? (
             <div className="grid gap-8 lg:grid-cols-[1.35fr_1fr]">
-              <Card className="overflow-hidden rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+              <Card className="overflow-hidden rounded-[24px] border-tk-line bg-tk-surface">
                 <div
                   className="relative flex h-[300px] items-start overflow-hidden px-8 py-7 text-white"
                   style={{ background: getPresentation(featuredPost).tint }}
@@ -224,26 +223,26 @@ export function BlogPage() {
                   </span>
                 </div>
                 <CardContent className="flex h-[calc(100%-300px)] flex-col gap-4 p-8">
-                  <p className="text-sm text-[#69747e]">
+                  <p className="text-sm text-tk-ink-muted">
                     {featuredPost.author} · {formatDate(featuredPost.date)} · {featuredPost.readingTime} de leitura
                   </p>
-                  <h2 className="max-w-[18ch] font-display text-[2rem] font-bold leading-[1.12] tracking-[-0.025em] text-[#2d3135]">
+                  <h2 className="max-w-[18ch] font-tk-display text-[var(--tk-text-display)] font-bold leading-[1.12] tracking-[-0.025em] text-tk-ink">
                     {featuredPost.title}
                   </h2>
-                  <p className="max-w-[44ch] font-serif text-[1.08rem] font-light leading-[1.5] text-[#59646d]">
+                  <p className="max-w-[44ch] font-tk-serif text-[1.08rem] font-light leading-[1.5] text-tk-ink-muted">
                     {featuredPost.summary}
                   </p>
-                  <Link to={`/blog/${featuredPost.slug}`} className="mt-auto font-semibold text-[#0c6a83]">
+                  <Link to={`/blog/${featuredPost.slug}`} className="mt-auto font-semibold text-tk-accent-strong">
                     Ler artigo completo →
                   </Link>
                 </CardContent>
               </Card>
 
-              <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+              <Card className="rounded-[24px] border-tk-line bg-tk-surface">
                 <CardContent className="p-7">
                   <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-[#d64545]" aria-hidden />
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#5f6972]">Em alta esta semana</p>
+                    <span className="h-2 w-2 rounded-full bg-tk-error" aria-hidden />
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tk-ink-muted">Em alta esta semana</p>
                   </div>
                   <div className="mt-5">
                     {trendingEditorial.map((item, index) => (
@@ -251,17 +250,17 @@ export function BlogPage() {
                         key={item.title}
                         to={`/blog/${item.slug}`}
                         className={cn(
-                          "flex gap-4 py-4 transition hover:text-[#0c6a83]",
-                          index < trendingEditorial.length - 1 && "border-b border-[#edf1f4]"
+                          "flex gap-4 py-4 transition hover:text-tk-accent-strong",
+                          index < trendingEditorial.length - 1 && "border-b border-tk-line"
                         )}
                       >
-                        <span className="w-6 font-display text-2xl font-bold text-[#d0d7dd]">{index + 1}</span>
+                        <span className="w-6 font-tk-display text-2xl font-bold text-[var(--rh-paper-line)]">{index + 1}</span>
                         <div>
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#0c6a83]">{item.category}</p>
-                          <p className="mt-1 font-display text-base font-bold leading-[1.28] tracking-[-0.01em] text-[#2d3135]">
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tk-accent-strong">{item.category}</p>
+                          <p className="mt-1 font-tk-display text-base font-bold leading-[1.28] tracking-[-0.01em] text-tk-ink">
                             {item.title}
                           </p>
-                          <p className="mt-1 text-xs text-[#69747e]">{item.read}</p>
+                          <p className="mt-1 text-xs text-tk-ink-muted">{item.read}</p>
                         </div>
                       </Link>
                     ))}
@@ -277,18 +276,18 @@ export function BlogPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div>
-              <h2 className="font-display text-[2rem] font-bold tracking-[-0.02em] text-[#2d3135]">Últimos artigos</h2>
-              <p className="mt-1 text-sm text-[#69747e]">{visibleCount} publicações · atualizado toda semana</p>
+              <h2 className="font-tk-display text-[2rem] font-bold tracking-[-0.02em] text-tk-ink">Últimos artigos</h2>
+              <p className="mt-1 text-sm text-tk-ink-muted">{visibleCount} publicações · atualizado toda semana</p>
             </div>
             <div role="search" className="flex w-full max-w-[420px] items-center gap-2">
               <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b97a1]" />
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
                 <Input
                   ref={searchRef}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Buscar por tema ou palavra-chave"
-                  className="h-12 rounded-[12px] border-[#dde4e8] pl-11"
+                  className="h-12 rounded-[12px] pl-11"
                   aria-label="Buscar por tema ou palavra-chave"
                 />
               </div>
@@ -296,7 +295,7 @@ export function BlogPage() {
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="rounded-[12px] border border-[#dde4e8] px-3 py-3 text-sm font-medium text-[#4f5963] transition hover:border-[#cfd8dd] hover:text-[#2d3135]"
+                  className="rounded-[12px] border border-tk-line px-3 py-3 text-sm font-medium text-tk-ink-muted transition hover:border-[var(--rh-paper-line)] hover:text-tk-ink"
                   aria-label="Limpar busca do blog"
                 >
                   Limpar
@@ -314,8 +313,8 @@ export function BlogPage() {
                 className={cn(
                   "rounded-full border px-4 py-2 text-sm font-semibold transition",
                   category === item
-                    ? "border-[#0c6a83] bg-[#0c6a83] text-white"
-                    : "border-[#dde4e8] bg-white text-[#4f5963] hover:border-[#cfd8dd] hover:text-[#2d3135]"
+                    ? "border-tk-brand bg-tk-brand text-tk-surface"
+                    : "border-tk-line bg-tk-surface text-tk-ink-muted hover:border-[var(--rh-paper-line)] hover:text-tk-ink"
                 )}
               >
                 {item}
@@ -330,7 +329,7 @@ export function BlogPage() {
           {loading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="h-[420px] animate-pulse rounded-[24px] bg-[#f2f5f7]" />
+                <div key={index} className="h-[420px] animate-pulse rounded-[24px] bg-tk-surface-2" />
               ))}
             </div>
           ) : gridPosts.length ? (
@@ -340,7 +339,7 @@ export function BlogPage() {
 
                 return (
                   <Link key={post.id} to={`/blog/${post.slug}`} className="block">
-                    <Card className="h-full overflow-hidden rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)] transition hover:-translate-y-1">
+                    <Card interactive className="h-full overflow-hidden rounded-[24px] border-tk-line bg-tk-surface transition hover:-translate-y-1">
                       <div className="relative h-[158px] px-5 py-4 text-white" style={{ background: presentation.tint }}>
                         <span className="inline-flex rounded-full bg-white/18 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                           {post.category}
@@ -350,11 +349,11 @@ export function BlogPage() {
                         </span>
                       </div>
                       <CardContent className="flex h-[calc(100%-158px)] flex-col gap-3 p-6">
-                        <h3 className="font-display text-[1.8rem] font-bold leading-[1.15] tracking-[-0.02em] text-[#2d3135]">
+                        <h3 className="font-tk-display text-[1.8rem] font-bold leading-[1.15] tracking-[-0.02em] text-tk-ink">
                           {post.title}
                         </h3>
-                        <p className="text-sm leading-7 text-[#66727b]">{post.summary}</p>
-                        <p className="mt-auto pt-2 text-sm text-[#69747e]">
+                        <p className="text-sm leading-7 text-tk-ink-muted">{post.summary}</p>
+                        <p className="mt-auto pt-2 text-sm text-tk-ink-muted">
                           {post.author} · {formatDate(post.date)} · {post.readingTime}
                         </p>
                       </CardContent>
@@ -364,32 +363,32 @@ export function BlogPage() {
               })}
             </div>
           ) : (
-            <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+            <Card className="rounded-[24px] border-tk-line bg-tk-surface">
               <CardContent className="p-10 text-center">
-                <h3 className="font-display text-[1.5rem] font-bold text-[#2d3135]">Nenhum artigo encontrado</h3>
-                <p className="mt-3 text-sm text-[#69747e]">Tente outra palavra-chave ou categoria.</p>
+                <h3 className="font-tk-display text-[1.5rem] font-bold text-tk-ink">Nenhum artigo encontrado</h3>
+                <p className="mt-3 text-sm text-tk-ink-muted">Tente outra palavra-chave ou categoria.</p>
               </CardContent>
             </Card>
           )}
         </div>
       </section>
 
-      <section className="border-y border-[#ded8c9] bg-[#f4f1e9] py-16">
+      <section className="border-y border-[var(--rh-paper-line)] bg-[var(--rh-paper-a)] py-16">
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-10 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <span className="inline-flex rounded-full bg-[#0c6a83] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white">
+            <Badge tone="neutral" className="w-fit border-transparent bg-tk-brand px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-tk-surface">
               Newsletter quinzenal
-            </span>
-            <h2 className="mt-5 max-w-[12ch] font-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.03em] text-[#2d3135]">
+            </Badge>
+            <h2 className="mt-5 max-w-[12ch] font-tk-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.03em] text-tk-ink">
               Receba a leitura certa antes da <em className="italic">próxima</em> mudança
             </h2>
-            <p className="mt-4 max-w-[36ch] font-serif text-[1.12rem] font-light leading-[1.5] text-[#59646d]">
+            <p className="mt-4 max-w-[36ch] font-tk-serif text-[1.12rem] font-light leading-[1.5] text-tk-ink-muted">
               Uma edição a cada duas semanas com o que mudou nas normas, o que fazer a respeito e os artigos que valem
               o seu tempo. Sem spam.
             </p>
           </div>
 
-          <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+          <Card className="rounded-[24px] border-tk-line bg-tk-surface">
             <CardContent className="space-y-4 p-8">
               <Input
                 value={newsletterName}
@@ -407,7 +406,7 @@ export function BlogPage() {
               <Button className="w-full" size="lg" loading={isSubmittingNewsletter} onClick={submitNewsletter}>
                 Quero receber →
               </Button>
-              <p className="text-center text-xs text-[#69747e]">+4.200 profissionais já recebem. Cancele quando quiser.</p>
+              <p className="text-center text-xs text-tk-ink-muted">+4.200 profissionais já recebem. Cancele quando quiser.</p>
             </CardContent>
           </Card>
         </div>

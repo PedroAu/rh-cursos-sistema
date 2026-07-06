@@ -41,6 +41,7 @@ function isActive(pathname: string, to: string) {
 
 export function PublicFooter() {
   const location = useLocation();
+  const isAboutPage = location.pathname.startsWith("/sobre");
 
   return (
     <footer className="border-t border-tk-line bg-tk-surface-2 px-6 py-14 md:px-10 md:pb-10">
@@ -61,7 +62,9 @@ export function PublicFooter() {
               />
             </NextLink>
             <p className="mt-5 max-w-[34ch] text-sm leading-[1.55] text-tk-ink-muted">
-              Cursos, treinamento in-company e consultoria para organizações públicas e privadas.
+              {isAboutPage
+                ? "Transformando vidas por meio do conhecimento desde 2007. Brasília – Distrito Federal · www.rhcursos.com.br"
+                : "Cursos, treinamento in-company e consultoria para organizações públicas e privadas."}
             </p>
           </div>
 
@@ -83,7 +86,7 @@ export function PublicFooter() {
                         active && "font-semibold text-tk-brand"
                       )}
                     >
-                      {item.label}
+                      {item.to === "/sobre" ? "Quem Somos" : item.label}
                     </NextLink>
                   );
                 })}
@@ -92,7 +95,11 @@ export function PublicFooter() {
           ))}
         </div>
 
-        <p className="pt-6 text-xs text-tk-ink-muted">© 2026 RH Cursos. Todos os direitos reservados.</p>
+        <p className="pt-6 text-xs text-tk-ink-muted">
+          {isAboutPage
+            ? "© 2026 RH Cursos & Soluções. Todos os direitos reservados."
+            : "© 2026 RH Cursos. Todos os direitos reservados."}
+        </p>
       </div>
     </footer>
   );
