@@ -85,11 +85,11 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 - [x] Conferir `git status --short --untracked-files=all`.
 - [x] Executar `npm run devops:all` ou suite equivalente.
 - [x] Se necessario, executar explicitamente lint, typecheck, unit, build, purge, fidelity, e2e smoke e bundle.
-- [ ] Criar commit atomico para Epic 14/Fase 3.
+- [x] Criar commit atomico para Epic 14/Fase 3.
 - [ ] Fazer push remoto exclusivamente via @devops.
 - [ ] Criar PR exclusivamente via @devops.
-- [ ] Acompanhar CI remoto ate status verde ou registrar bloqueio.
-- [ ] Atualizar esta story com commit, branch, PR URL, CI e Change Log.
+- [x] Acompanhar CI remoto ate status verde ou registrar bloqueio.
+- [x] Atualizar esta story com commit, branch, PR URL, CI e Change Log.
 
 ## Dev Notes
 
@@ -153,15 +153,18 @@ Manual checks:
 - 2026-07-06 - @devops (Gage) - `npm run devops:all` ficou preso no passo `coderabbit review --agent --type uncommitted`, apesar de a story marcar CodeRabbit como desabilitado; por isso a validacao seguiu pela suite equivalente permitida no AC 4.
 - 2026-07-06 - @devops (Gage) - Suite equivalente executada manualmente nesta sessao: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test:unit` ✅ (394 passed), `npm run build` ✅, `npm run purge:gate` ✅, `npm run test:epic14:fidelity` ✅ (8 passed), `npm run test:e2e:smoke` ✅ (84 passed) e `npm run bundle:check` ✅.
 - 2026-07-06 - @devops (Gage) - `gh auth status` retornou token invalido para `github.com` (`PedroAu`), entao push/PR/CI remoto dependem de renovacao de credencial antes da conclusao da story.
+- 2026-07-06 - @devops (Gage) - Commits locais finais presentes no branch `codex-epic14-phase3-delivery`: `6f78e38 feat(epic14): finalize phase 3 delivery package` e `41529e9 docs(epic14): record phase 3 devops handoff status`.
+- 2026-07-06 - @devops (Gage) - Tentativa de `git push -u origin codex-epic14-phase3-delivery` falhou com `remote: Invalid username or token` e `fatal: Authentication failed for 'https://github.com/PedroAu/rh-cursos-sistema.git/'`.
 
 ## PO Validation
 2026-07-06 · @po (Pax) via Codex · **GO com observação** — checklist 10/10; a story respeita autoridade exclusiva de @devops, define gates mínimos, evidências obrigatórias e comportamento em caso de CI falha. Observação não bloqueante: branch alvo e política base/target devem ser confirmados pelo @devops contra o estado remoto real antes do PR. Status: Draft → Ready.
 
 ## QA Results
-2026-07-06 - Evidencias de 14.3.1, 14.3.2 e 14.3.3 consolidadas com gates individuais PASS. Para esta story, o pre-push local ficou aprovado via suite equivalente documentada; commit local pode seguir, mas push/PR/CI remoto seguem bloqueados por credencial GitHub invalida no ambiente (`gh auth status`).
+2026-07-06 - Evidencias de 14.3.1, 14.3.2 e 14.3.3 consolidadas com gates individuais PASS. Para esta story, o pre-push local ficou aprovado via suite equivalente documentada e os commits locais foram criados; push/PR/CI remoto seguem bloqueados por credencial GitHub invalida no ambiente (`gh auth status` e `git push` via HTTPS falhando por token invalido).
 
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para DevOps commit, push, PR e CI verde.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @devops. Status: Draft → Ready.
 - 2026-07-06 - @devops (Gage) - Execucao iniciada em branch dedicada `codex-epic14-phase3-delivery`; gates locais equivalentes validados e aguardando operacoes remotas. Status: Ready → In Progress.
 - 2026-07-06 - @devops (Gage) - Base real do repositório confirmada como `main`; bloqueio remoto identificado por credencial GitHub invalida no `gh`. Story permanece `In Progress` ate push/PR/CI.
+- 2026-07-06 - @devops (Gage) - Commits locais finais gerados e tentativa de push ao `origin` falhou por autenticacao HTTPS invalida; bloqueio remoto mantido e documentado.
