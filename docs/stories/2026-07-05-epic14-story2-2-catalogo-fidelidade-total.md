@@ -141,7 +141,7 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Courses.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/features/public/courses/courses-page.tsx` (se migrar implementation)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/courses-route.png`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/courses-canvas.png`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
 - 2026-07-05 - `src/views/public/Courses.tsx` recebeu reskin Trust Keith com `Badge`, `Chip` e `Card`, removendo a maior parte dos hardcoded colors da view e preservando busca local `?q=`, filtros por categoria e dados reais via `useAppStore()`.
@@ -159,7 +159,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; epic, spec, ADR, rotas reais e invariantes do Epic 5 estão explícitos; ACs são verificáveis por rota, comportamento e comando; escopo está cercado contra regressão visual e reintrodução de Mantine. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - Evidência técnica regenerada após correção do capture script: `/cursos` permanece sem asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.2-catalogo-publico-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 

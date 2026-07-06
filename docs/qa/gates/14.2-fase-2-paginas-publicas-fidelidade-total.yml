@@ -1,0 +1,75 @@
+schema: 1
+story: '14.2'
+story_title: 'Fase 2 - Paginas publicas com fidelidade total'
+gate: CONCERNS
+status_reason: 'A evidencia visual invalida foi corrigida: o capture agora usa apenas assets reais, falha em HTTP 4xx/5xx e declara ausencia de canvas no manifesto. O smoke funcional continua verde. A fase segue sem PASS formal apenas porque 14.2.2-14.2.7 ainda aguardam re-review de @qa.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-06T12:45:00-03:00'
+expires: '2026-07-20T12:45:00-03:00'
+quality_score: 81
+
+top_issues:
+  - id: 'REQ-14.2-001'
+    severity: low
+    finding: 'O blocker original da captura invalida foi resolvido, mas apenas `home` e `agenda` possuem canvas de referencia real em `public/`; as demais rotas dependem de route capture + manifesto.'
+    suggested_action: 'Validar com @qa se route capture + manifesto e suficiente para as rotas sem asset canvas dedicado.'
+    refs:
+      - 'scripts/capture-epic14-fidelity.mjs:17'
+      - 'artifacts/epic14-fidelity/manifest.json'
+  - id: 'GOV-14.2-002'
+    severity: medium
+    finding: 'Stories 14.2.2-14.2.7 agora possuem gates individuais tecnicos, mas ainda aguardam re-review formal de @qa.'
+    suggested_action: 'Executar o review final por story e promover os gates individuais de CONCERNS para PASS/FAIL formais.'
+    refs:
+      - 'docs/qa/gates/14.2.2-catalogo-publico-com-fidelidade-total-trust-keith.yml'
+      - 'docs/qa/gates/14.2.3-agenda-publica-com-fidelidade-total-trust-keith.yml'
+      - 'docs/qa/gates/14.2.4-in-company-publica-com-fidelidade-total-trust-keith.yml'
+      - 'docs/qa/gates/14.2.5-quem-somos-com-fidelidade-total-trust-keith.yml'
+      - 'docs/qa/gates/14.2.6-blog-e-post-com-fidelidade-trust-keith.yml'
+      - 'docs/qa/gates/14.2.7-paginas-sem-canvas-com-coerencia-trust-keith.yml'
+  - id: 'MNT-14.2-003'
+    severity: medium
+    finding: 'A auditoria de token compliance foi registrada, mas ainda existem hex literals residuais em parte das rotas publicas da Fase 2.'
+    suggested_action: 'Usar o audit registrado para decidir o que vira debt aceita e o que precisa de tokenizacao adicional.'
+    refs:
+      - 'artifacts/epic14-fidelity/phase2-token-compliance-audit.md'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 3
+  trace:
+    ac_covered: ['Epic 5 invariants smoke', 'Mantine removal smoke']
+    ac_gaps: ['Visual fidelity evidence for 14.2.1-14.2.6', 'Formal QA closure for 14.2.2-14.2.7']
+  commands:
+    - 'npm run test:epic14:fidelity (8 passed)'
+    - 'npm run test:epic14:fidelity:capture (regenerado apos fix do script)'
+    - 'find public -maxdepth 1 -type f (apenas RH Cursos Home.html e RH Cursos Agenda.html existem como canvas reais)'
+    - 'npm run test:e2e:smoke (84 passed)'
+  visual_artifacts:
+    - 'artifacts/epic14-fidelity/home-canvas.png'
+    - 'artifacts/epic14-fidelity/agenda-canvas.png'
+    - 'artifacts/epic14-fidelity/manifest.json'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'No new security blocker found in this aggregate review.'
+  performance:
+    status: CONCERNS
+    notes: 'Bundle was not rerun in this aggregate review because the gate fails earlier on invalid visual evidence; dev record reports previous bundle pass.'
+  reliability:
+    status: PASS
+    notes: 'The capture script now fails on HTTP 4xx/5xx and records explicit canvas availability in the manifest.'
+  maintainability:
+    status: CONCERNS
+    notes: 'The governance gap shrank with individual technical gates, but formal QA promotion per story is still pending.'
+
+recommendations:
+  immediate:
+    - action: 'Executar re-review formal de QA nas stories 14.2.2-14.2.7 usando os novos gates individuais e o manifesto corrigido.'
+      refs: ['docs/qa/gates/14.2.2-catalogo-publico-com-fidelidade-total-trust-keith.yml', 'docs/qa/gates/14.2.7-paginas-sem-canvas-com-coerencia-trust-keith.yml']
+  future:
+    - action: 'Tokenizar os hex literals residuais aceitos apenas por excecao de spec ou acessibilidade quando houver janela de cleanup visual.'
+      refs: ['artifacts/epic14-fidelity/phase2-token-compliance-audit.md']

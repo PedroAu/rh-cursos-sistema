@@ -154,7 +154,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; scope, dependências e duas visualizações (lista/calendário) estão bem definidos; referências locais existem; ACs cobrem filtros, dados reais, responsivo e comandos obrigatórios sem lacunas bloqueantes. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - Evidência técnica regenerada com canvas real `/RH Cursos Agenda.html` e route capture válido. Gate individual técnico criado em `docs/qa/gates/14.2.3-agenda-publica-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 

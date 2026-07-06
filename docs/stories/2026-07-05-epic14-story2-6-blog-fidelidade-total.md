@@ -140,7 +140,7 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/blog/[slug]/page.tsx` (somente se data handoff exigir ajuste)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/epic5-search-motion.spec.ts` (se labels/contratos de busca mudarem)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/blog-route.png`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/blog-canvas.png`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
 - 2026-07-06 - `src/views/public/Blog.tsx` recebeu reskin Trust Keith com destaque editorial, trending, busca local `?q=`, chips de categoria, grid de cards e CTA de newsletter usando o design system atual.
@@ -159,7 +159,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; as duas rotas (`/blog` e `/blog/[slug]`) estão cobertas com specs específicas, comportamento de busca local, newsletter e estados de fallback; referências e limites técnicos estão suficientes para execução segura. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - Evidência técnica regenerada após correção do capture script: `/blog` não possui asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.6-blog-e-post-com-fidelidade-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 

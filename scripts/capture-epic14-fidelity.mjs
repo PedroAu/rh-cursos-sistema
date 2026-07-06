@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { chromium } from "playwright";
@@ -14,32 +14,32 @@ const auditTargets = [
   {
     id: "home",
     routePath: "/",
-    canvasPaths: ["/RH%20Cursos%20Home.dc.html", "/RH%20Home%20Sections.dc.html"],
+    canvasPaths: ["/RH%20Cursos%20Home.html"],
   },
   {
     id: "courses",
     routePath: "/cursos",
-    canvasPaths: ["/RH%20Cursos%20Cata%CC%81logo.dc.html"],
+    canvasPaths: [],
   },
   {
     id: "agenda",
     routePath: "/agenda",
-    canvasPaths: ["/RH%20Cursos%20Agenda.dc.html"],
+    canvasPaths: ["/RH%20Cursos%20Agenda.html"],
   },
   {
     id: "in-company",
     routePath: "/in-company",
-    canvasPaths: ["/RH%20Cursos%20In-company.dc.html"],
+    canvasPaths: [],
   },
   {
     id: "about",
     routePath: "/sobre",
-    canvasPaths: ["/RH%20Cursos%20Quem%20Somos.dc.html"],
+    canvasPaths: [],
   },
   {
     id: "blog",
     routePath: "/blog",
-    canvasPaths: ["/RH%20Cursos%20Blog.dc.html"],
+    canvasPaths: [],
   },
 ];
 
@@ -50,15 +50,52 @@ async function waitForStablePage(page) {
   await page.waitForTimeout(1200);
 }
 
-async function capture(page, path, filePath) {
+async function capture(page, path, filePath, options = {}) {
   console.log(`Capturing ${path} -> ${filePath}`);
-  await page.goto(path, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  const status = response?.status() ?? 0;
+
+  if (options.requireOk !== false && (!response || status >= 400)) {
+    throw new Error(`Capture target ${path} responded with invalid status ${status}.`);
+  }
+
   await waitForStablePage(page);
   await page.screenshot({ path: filePath, fullPage: true });
+
+  return {
+    status,
+    finalUrl: page.url(),
+  };
+}
+
+function cleanupStaleArtifacts(filesToKeep) {
+  const keep = new Set(filesToKeep);
+
+  for (const entry of readdirSync(OUTPUT_DIR)) {
+    if (keep.has(entry)) continue;
+    if (!entry.endsWith(".png") && entry !== "manifest.json") continue;
+
+    unlinkSync(join(OUTPUT_DIR, entry));
+  }
 }
 
 async function main() {
   mkdirSync(OUTPUT_DIR, { recursive: true });
+
+  const filesToKeep = ["manifest.json"];
+  for (const target of auditTargets) {
+    filesToKeep.push(`${target.id}-route.png`);
+
+    if (target.canvasPaths.length === 1) {
+      filesToKeep.push(`${target.id}-canvas.png`);
+    } else {
+      for (let index = 0; index < target.canvasPaths.length; index += 1) {
+        filesToKeep.push(`${target.id}-canvas-${index + 1}.png`);
+      }
+    }
+  }
+
+  cleanupStaleArtifacts(filesToKeep);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ baseURL: BASE_URL, viewport, bypassCSP: true });
@@ -75,24 +112,37 @@ async function main() {
   try {
     for (const target of auditTargets) {
       const routeFile = `${target.id}-route.png`;
-      await capture(page, target.routePath, join(OUTPUT_DIR, routeFile));
+      const routeMeta = await capture(page, target.routePath, join(OUTPUT_DIR, routeFile));
 
       const canvasFiles = [];
+      const canvasMetas = [];
       for (let index = 0; index < target.canvasPaths.length; index += 1) {
         const canvasFile =
           target.canvasPaths.length === 1
             ? `${target.id}-canvas.png`
             : `${target.id}-canvas-${index + 1}.png`;
-        await capture(page, target.canvasPaths[index], join(OUTPUT_DIR, canvasFile));
+        const canvasMeta = await capture(page, target.canvasPaths[index], join(OUTPUT_DIR, canvasFile));
         canvasFiles.push(canvasFile);
+        canvasMetas.push({
+          path: target.canvasPaths[index],
+          screenshot: canvasFile,
+          status: canvasMeta.status,
+          finalUrl: canvasMeta.finalUrl,
+        });
       }
 
       manifest.targets.push({
         id: target.id,
         routePath: target.routePath,
         routeScreenshot: routeFile,
+        routeStatus: routeMeta.status,
         canvasPaths: target.canvasPaths,
         canvasScreenshots: canvasFiles,
+        canvasAvailable: target.canvasPaths.length > 0,
+        canvasEvidence:
+          target.canvasPaths.length > 0
+            ? canvasMetas
+            : [{ status: "unavailable", reason: "No reference canvas asset exists in public/ for this route." }],
       });
     }
   } finally {

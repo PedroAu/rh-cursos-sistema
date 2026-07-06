@@ -172,7 +172,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO com observações** — checklist 10/10; story cobre adequadamente o pacote de rotas auxiliares, contratos atuais de auth/lead/checkout e comandos de verificação. Observações não bloqueantes já estão embutidas na própria story: decisão final de `Programa PDF` e rota de atendimento em enrollment success devem ser registradas em completion notes ao implementar. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - O blocker de evidência visual foi corrigido em `scripts/capture-epic14-fidelity.mjs`: o script agora usa apenas assets reais em `public/`, falha em HTTP 4xx/5xx e declara explicitamente quando uma rota não possui canvas de referência. Gate individual técnico criado em `docs/qa/gates/14.2.7-paginas-sem-canvas-com-coerencia-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 

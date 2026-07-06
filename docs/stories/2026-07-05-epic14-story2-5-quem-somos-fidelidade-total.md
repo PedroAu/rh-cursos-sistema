@@ -133,7 +133,7 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/features/public/about/about-page.tsx` (se migrar implementation)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/features/public-shell/components/public-footer.tsx` (somente se footer exigir suporte a variante)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/about-route.png`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/about-canvas.png`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
 - 2026-07-06 - `src/views/public/About.tsx` recebeu reskin Trust Keith com `Badge`, `Card` e tokens do design system, preservando a copy institucional da spec.
@@ -153,7 +153,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; conteúdo institucional, dependências, rota real e adaptação do token `--tk-text-display` estão documentados; ACs delimitam claramente o que deve ser estático versus derivado do catálogo. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - Evidência técnica regenerada após correção do capture script: `/sobre` não possui asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.5-quem-somos-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 

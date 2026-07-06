@@ -135,7 +135,7 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/InCompany.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/epic14-mantine-removal.smoke.spec.ts` (se labels/copy mudarem)
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/in-company-route.png`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/in-company-canvas.png`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
 - 2026-07-05 - `src/views/public/InCompany.tsx` foi alinhado ao contrato da spec com área de interesse por select, tamanho da equipe por select, consentimento explícito e submit preservando `createLead`.
@@ -154,7 +154,7 @@ Manual/visual checks:
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; story está autossuficiente para implementação, com paths reais, fonte de lead existente (`createLead`), ACs testáveis e restrições claras sobre logos, acessibilidade e anti-Mantine. Status: Draft → Ready.
 
 ## QA Results
-Pending @qa review.
+2026-07-06 - Evidência técnica regenerada após correção do capture script: `/in-company` não possui asset canvas dedicado em `public/`, então a referência válida para esta story é o route capture + manifesto (`artifacts/epic14-fidelity/manifest.json`). Gate individual técnico criado em `docs/qa/gates/14.2.4-in-company-publica-com-fidelidade-total-trust-keith.yml`. Revisão formal de @qa ainda pendente.
 
 ## Change Log
 
