@@ -297,7 +297,7 @@ await story.save();
 - `npm run lint` - Check code style
 - `npm run build` - Build project
 - `npm run devops:all` - Run the local pre-push DevOps gate
-- `npm run devops:post-push` - Verify post-push sync/status and suggest next DevOps actions
+- `npm run pos-push` - Verify post-push sync/status and suggest next DevOps actions
 <!-- AIOX-MANAGED-END: common-commands -->
 
 ## Debugging
