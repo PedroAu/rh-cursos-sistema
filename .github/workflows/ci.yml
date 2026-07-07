@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://example.supabase.co' }}
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_ci_placeholder_key' }}
+  NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000' }}
+  AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET || 'ci-auth-session-secret-placeholder-32' }}
+
 # Cancel superseded runs on the same ref to keep the queue fast.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
