@@ -221,7 +221,7 @@ Os canvases usam `sc-for`/`{{ placeholders }}` para dados dinâmicos (ex.: próx
 | `docs/design/redesign/reference/canvases/support.js` | Runtime histórico dos canvases, preservado fora do deploy |
 | `public/uploads/logoHorizontal_800X600.png` | Path que os canvases esperam para o logo |
 
-**Atenção (limite Cloudflare Free < 3 MiB):** esses arquivos ficam em `public/` (assets estáticos, fora do worker bundle), mas não devem ir ao deploy final — a limpeza é AC da 14.3.3.
+**Atenção (limite Cloudflare Free < 3 MiB):** os artefatos históricos listados acima ficam documentados em `docs/design/redesign/reference/canvases/` e `docs/design/redesign/wireframes/`; eles não são uploads públicos do deploy final. Apenas `public/uploads/logoHorizontal_800X600.png` permanece como asset estático legado para render local dos canvases.
 
 ---
 

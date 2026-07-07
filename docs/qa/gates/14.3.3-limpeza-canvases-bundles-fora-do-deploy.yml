@@ -28,8 +28,8 @@ evidence:
     - 'npm run test:epic14:fidelity:capture (PASS; manifest regenerated)'
     - 'npm run test:e2e:smoke (PASS; 84 passed)'
     - 'npm run build (PASS)'
-    - 'npm run purge:gate (PASS; public canvases not redeployed)'
-    - 'npm run bundle:check (PASS; 569.5 KB / 1000 KB gzip budget)'
+    - 'npm run purge:gate (PASS; 0 @mantine/@emotion, 0 nominal residues; public canvases not redeployed)'
+    - 'npm run bundle:check (PASS; 568.8 KB / 1000 KB gzip budget)'
   cleanup_observed:
     public_artifacts_removed:
       - 'public/RH Cursos Home.html'

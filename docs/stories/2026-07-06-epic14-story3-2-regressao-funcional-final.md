@@ -28,7 +28,7 @@ clickup:
 ## Epic
 EPIC 14 - Redesign Trust Keith: Fidelidade Total + Remocao do Mantine
 
-Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
+Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Prerequisites
 - Story 14.3.1 concluida com gate visual/a11y/performance aceitavel.
@@ -93,12 +93,12 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Dev Notes
 
 ### Sources
-- Epic Fase 3: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
-- Epic 5 invariants: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-5-busca-loading-motion-imagens.md`
-- Epic 5 regression test: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/epic5-search-motion.spec.ts`
-- Epic 14 smoke test: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/epic14-mantine-removal.smoke.spec.ts`
-- Purge gate: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/purge-gate.mjs`
-- Bundle check: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/check-bundle-size.mjs`
+- Epic Fase 3: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
+- Epic 5 invariants: `docs/epics/epic-5-busca-loading-motion-imagens.md`
+- Epic 5 regression test: `tests/epic5-search-motion.spec.ts`
+- Epic 14 smoke test: `tests/epic14-mantine-removal.smoke.spec.ts`
+- Purge gate: `scripts/purge-gate.mjs`
+- Bundle check: `scripts/check-bundle-size.mjs`
 
 ### Current State Observed by @sm
 - `npm run test:epic14:fidelity` executa `epic5-search-motion.spec.ts` e `epic14-mantine-removal.smoke.spec.ts`.
@@ -132,16 +132,18 @@ Manual checks:
 - Se `purge:gate` reportar warning de nomenclatura, confirmar que nao ha import/pacote `@mantine/*` ou `@emotion/*`.
 
 ## Expected File List
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/stories/2026-07-06-epic14-story3-2-regressao-funcional-final.md`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/test-results/` (se Playwright gerar artefatos)
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/playwright-report/` (se Playwright gerar relatorio)
+- `docs/stories/2026-07-06-epic14-story3-2-regressao-funcional-final.md`
+- `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`
+- `test-results/` (se Playwright gerar artefatos)
+- `playwright-report/` (se Playwright gerar relatorio)
 
 ## Dev Agent Record
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run test:epic14:fidelity` ✅ (8 testes passados).
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test:unit` ✅, `npm run build` ✅, `npm run purge:gate` ✅, `npm run bundle:check` ✅.
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run test:e2e:smoke` ✅ (84 testes passados em 58.8s) após estabilizar `tests/api-contract.spec.ts` para enviar `cf-connecting-ip`, `x-forwarded-for` e `x-real-ip` no contrato do route handler de auth-session.
 - 2026-07-06 - Warning não bloqueante mantido: `purge:gate` segue com 1 resíduo nominal em `src/components/providers/mantine-provider.tsx`, sem imports/pacotes `@mantine/*` ou `@emotion/*`.
+- 2026-07-07 - Follow-up técnico por @dev: removido o stub vazio `src/components/providers/mantine-provider.tsx` e seu uso em `app/layout.tsx`; `npm run purge:gate` agora passa com zero imports/pacotes `@mantine/@emotion` e zero resíduos nominais.
+- 2026-07-07 - Validação pós-ajuste: `npm run lint` ✅, `npm run typecheck` ✅, `npm run purge:gate` ✅ sem warnings e `npm run bundle:check` ✅ 568.8 KB / 1000 KB.
 
 ## PO Validation
 2026-07-06 · @po (Pax) via Codex · **GO** — checklist 10/10; a story está autossuficiente, com comandos reais, invariantes S7/S8/S9 explicitados, gate de saída objetivo e autoridade de QA preservada. Dependências e referências citadas existem no workspace. Status: Draft → Ready.
@@ -153,8 +155,11 @@ Manual checks:
 
 2026-07-07 - Re-review formal @qa Fase 3: PASS em `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`. O blocker anterior caiu: `node scripts/run-playwright.mjs api-contract.spec.ts --project=functional` passou 5/5 e `npm run test:e2e:smoke` passou 84/84. Tambem passaram `test:epic14:fidelity` 8/8, lint, typecheck, unit 394/394, build, purge e bundle; permanece apenas debt nominal nao bloqueante em `src/components/providers/mantine-provider.tsx`.
 
+2026-07-07 - Follow-up formal @qa pós-ajuste: PASS mantido em `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`. O debt nominal foi removido: `npm run purge:gate` passou com zero imports/pacotes `@mantine/@emotion` e zero resíduos nominais; `lint`, `typecheck` e `bundle:check` também passaram.
+
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para regressao funcional final da Fase 3.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @qa. Status: Draft → Ready.
 - 2026-07-06 - @dev (Dex) - Pré-validação técnica da regressão final executada com smoke completo verde e estabilização do contrato de rate limit no route handler de auth-session; verdict formal continua pendente de @qa.
 - 2026-07-06 - @dev (Dex) - Story atualizada após PASS formal de QA. Status: Ready → Done.
+- 2026-07-07 - @dev (Dex) - Follow-up de cleanup: removido provider Mantine residual e revalidado `purge:gate` sem resíduos nominais.

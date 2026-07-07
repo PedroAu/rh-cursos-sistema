@@ -1,7 +1,24 @@
 import { spawn } from "node:child_process";
+
 function onceExit(child) {
-  return new Promise((resolve) => {
-    child.once("exit", (code, signal) => resolve({ code, signal }));
+  return new Promise((resolve, reject) => {
+    let settled = false;
+
+    const finishResolve = (result) => {
+      if (settled) return;
+      settled = true;
+      resolve(result);
+    };
+
+    const finishReject = (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    };
+
+    child.once("error", finishReject);
+    child.once("exit", (code, signal) => finishResolve({ code, signal }));
+    child.once("close", (code, signal) => finishResolve({ code, signal }));
   });
 }
 

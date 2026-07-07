@@ -29,7 +29,7 @@ clickup:
 ## Epic
 EPIC 14 - Redesign Trust Keith: Fidelidade Total + Remocao do Mantine
 
-Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
+Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Prerequisites
 - Story 14.3.1 concluida com auditoria visual/a11y/performance aceitavel.
@@ -94,10 +94,10 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Dev Notes
 
 ### Sources
-- Epic Fase 3 entrega: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
-- AIOX Constitution Agent Authority: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/.aiox-core/constitution.md#ii-agent-authority-non-negotiable`
-- Package scripts: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/package.json`
-- DevOps script: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/devops-run-all.mjs`
+- Epic Fase 3 entrega: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
+- AIOX Constitution Agent Authority: `.aiox-core/constitution.md#ii-agent-authority-non-negotiable`
+- Package scripts: `package.json`
+- DevOps script: `scripts/devops-run-all.mjs`
 
 ### Current State Observed by @sm
 - O branch local observado antes deste draft era `main`.
@@ -142,11 +142,11 @@ Manual checks:
 - CI remoto verde antes de marcar story como `Done`; se o ambiente estiver sem credencial GitHub/`gh`, registrar o bloqueio e manter `In Progress`.
 
 ## Expected File List
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/stories/2026-07-06-epic14-story3-4-devops-commit-pr-ci.md`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
+- `docs/stories/2026-07-06-epic14-story3-4-devops-commit-pr-ci.md`
+- `docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`
+- `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`
+- `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`
+- `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Dev Agent Record
 - 2026-07-06 - @devops (Gage) - Branch de entrega `codex-epic14-phase3-delivery` confirmada a partir de `main`; o `origin` atual expõe apenas `main` e `staging/phase-2`, portanto a base real de PR para a Fase 3 e `main`.
@@ -155,6 +155,9 @@ Manual checks:
 - 2026-07-06 - @devops (Gage) - `gh auth status` retornou token invalido para `github.com` (`PedroAu`), entao push/PR/CI remoto dependem de renovacao de credencial antes da conclusao da story.
 - 2026-07-06 - @devops (Gage) - Commits locais finais presentes no branch `codex-epic14-phase3-delivery`: `6f78e38 feat(epic14): finalize phase 3 delivery package` e `41529e9 docs(epic14): record phase 3 devops handoff status`.
 - 2026-07-06 - @devops (Gage) - Tentativa de `git push -u origin codex-epic14-phase3-delivery` falhou com `remote: Invalid username or token` e `fatal: Authentication failed for 'https://github.com/PedroAu/rh-cursos-sistema.git/'`.
+- 2026-07-07 - @devops (Gage) - Credencial GitHub foi renovada com sucesso (`gh auth status` OK para `PedroAu`, scopes `repo` e `workflow`), a branch `codex-epic14-phase3-delivery` foi publicada no `origin` e o repositório já expõe PR aberto `#5` para `main`.
+- 2026-07-07 - @devops (Gage) - Estado remoto atual confirmado: PR `#5 fix(epic14): stabilize final smoke gate` em `https://github.com/PedroAu/rh-cursos-sistema/pull/5`, `reviewDecision: CHANGES_REQUESTED` e dois checks históricos falhando (`Build & A11y & E2E`, `DB Tests`) antes do follow-up local desta sessão.
+- 2026-07-07 - @devops (Gage) - Follow-up local executado após o review: `npm run lint` ✅, `npm run typecheck` ✅, `npm run purge:gate` ✅, `LHCI_PORT=3102 npm run test:lighthouse` ✅ e `npm run test:e2e:smoke` ✅ (84 passed) em execução sequencial para evitar race de build em `.next`.
 
 ## PO Validation
 2026-07-06 · @po (Pax) via Codex · **GO com observação** — checklist 10/10; a story respeita autoridade exclusiva de @devops, define gates mínimos, evidências obrigatórias e comportamento em caso de CI falha. Observação não bloqueante: branch alvo e política base/target devem ser confirmados pelo @devops contra o estado remoto real antes do PR. Status: Draft → Ready.
@@ -168,3 +171,4 @@ Manual checks:
 - 2026-07-06 - @devops (Gage) - Execucao iniciada em branch dedicada `codex-epic14-phase3-delivery`; gates locais equivalentes validados e aguardando operacoes remotas. Status: Ready → In Progress.
 - 2026-07-06 - @devops (Gage) - Base real do repositório confirmada como `main`; bloqueio remoto identificado por credencial GitHub invalida no `gh`. Story permanece `In Progress` ate push/PR/CI.
 - 2026-07-06 - @devops (Gage) - Commits locais finais gerados e tentativa de push ao `origin` falhou por autenticacao HTTPS invalida; bloqueio remoto mantido e documentado.
+- 2026-07-07 - @devops (Gage) - Story atualizada com o estado remoto real da branch/PR e com a nova rodada de evidências locais gerada para responder ao review pós-PR.

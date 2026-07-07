@@ -28,7 +28,7 @@ clickup:
 ## Epic
 EPIC 14 - Redesign Trust Keith: Fidelidade Total + Remocao do Mantine
 
-Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
+Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Prerequisites
 - Story 14.3.1 concluida: captura visual final realizada antes de remover referencias do deploy.
@@ -93,11 +93,11 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Dev Notes
 
 ### Sources
-- Epic Fase 3 cleanup: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
-- ADR D6: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/architecture/adr-014-redesign-trust-keith.md`
-- Capture script: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/capture-epic14-fidelity.mjs`
-- Bundle check: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/check-bundle-size.mjs`
-- Public assets directory: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/public`
+- Epic Fase 3 cleanup: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-3-verificacao-final-e-entrega`
+- ADR D6: `docs/architecture/adr-014-redesign-trust-keith.md`
+- Capture script: `scripts/capture-epic14-fidelity.mjs`
+- Bundle check: `scripts/check-bundle-size.mjs`
+- Public assets directory: `public/`
 
 ### Current State Observed by @sm
 - `public/RH Cursos Home.html`, `public/RH Cursos Agenda.html`, `public/support.js` e `public/_ds/` ja foram removidos do deploy durante a execucao desta story e preservados em `docs/design/redesign/reference/canvases/`.
@@ -133,16 +133,16 @@ Manual checks:
 - Conferir `artifacts/epic14-fidelity/manifest.json` apos cleanup.
 
 ## File List
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/stories/2026-07-06-epic14-story3-3-limpeza-canvases-bundles-public.md`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/eslint.config.mjs`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design-system/trust-keith/INVENTORY.md`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/reference/canvases/`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/public/RH Cursos Home.html` (movido para `docs/design/redesign/reference/canvases/`)
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/public/RH Cursos Agenda.html` (movido para `docs/design/redesign/reference/canvases/`)
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/public/support.js` (movido para `docs/design/redesign/reference/canvases/`)
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/public/_ds/` (movido para `docs/design/redesign/reference/canvases/_ds/`)
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/scripts/capture-epic14-fidelity.mjs`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
+- `docs/stories/2026-07-06-epic14-story3-3-limpeza-canvases-bundles-public.md`
+- `eslint.config.mjs`
+- `docs/design-system/trust-keith/INVENTORY.md`
+- `docs/design/redesign/reference/canvases/`
+- `public/RH Cursos Home.html` (movido para `docs/design/redesign/reference/canvases/`)
+- `public/RH Cursos Agenda.html` (movido para `docs/design/redesign/reference/canvases/`)
+- `public/support.js` (movido para `docs/design/redesign/reference/canvases/`)
+- `public/_ds/` (movido para `docs/design/redesign/reference/canvases/_ds/`)
+- `scripts/capture-epic14-fidelity.mjs`
+- `artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
 - 2026-07-06 - `public/RH Cursos Home.html`, `public/RH Cursos Agenda.html`, `public/support.js` e `public/_ds/` foram removidos do deploy e preservados em `docs/design/redesign/reference/canvases/`.
@@ -169,9 +169,12 @@ Manual checks:
 
 2026-07-07 - Re-review formal @qa Fase 3: PASS em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. O pre-requisito `14.3.2` voltou a PASS, a limpeza segue valida com canvases fora de `public/`, referencias preservadas em `docs/design/redesign/reference/canvases/`, manifest de fidelidade regenerado e `test:e2e:smoke` 84/84 verde. Handoff para `14.3.4`/@devops fica liberado pela perspectiva de QA.
 
+2026-07-07 - Follow-up formal @qa pós-ajuste: PASS mantido em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. `purge:gate` agora passa sem resíduos nominais, `bundle:check` passou com 568.8 KB / 1000 KB e os canvases permanecem fora de `public/`.
+
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para cleanup final de canvases e bundles fora do deploy.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-06 - @dev (Dex) - Limpeza iniciada: canvases HTML, runtime `support.js` e bundle consumidor `_ds/` saíram de `public/` e foram preservados em `docs/design/redesign/reference/canvases/`. Status: Ready → In Progress.
 - 2026-07-06 - @dev (Dex) - Gates locais de cleanup concluídos (`lint`, `typecheck`, `unit`, `build`, `purge:gate`, `test:epic14:fidelity`, `test:epic14:fidelity:capture`, `bundle:check`) e manifesto de fidelidade regenerado sem dependência de canvases no deploy.
 - 2026-07-06 - @dev (Dex) - Story atualizada após PASS formal de QA e resolução da regressão funcional transitória durante a 14.3.2. Status: In Progress → Done.
+- 2026-07-07 - @dev (Dex) - Follow-up de cleanup final: `purge:gate` revalidado sem resíduos nominais e `bundle:check` revalidado em 568.8 KB / 1000 KB.
