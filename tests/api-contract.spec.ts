@@ -6,6 +6,7 @@ import {
   ensureAuthUser,
   getCanonicalDocs,
   getIntegrationEnv,
+  hasRealIntegrationEnv,
 } from "./helpers/integration-env";
 
 const docs = getCanonicalDocs();
@@ -77,6 +78,7 @@ async function loginAsAdminEdge() {
 
 test.describe("contratos HTTP — route handler auth-session", () => {
   test("POST valida payload, credenciais, autorização e rate limit", async ({ request }, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Requer ambiente Supabase real para contrato auth-session.");
     annotateCanonicalDoc(testInfo, docs.apiCatalog);
     annotateCanonicalDoc(testInfo, docs.authSession);
 
@@ -153,6 +155,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 
 test.describe("contratos HTTP — edge functions", () => {
   test("auth-session cobre 400, 403 e 405", async ({}, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Requer edge functions reais do Supabase.");
     annotateCanonicalDoc(testInfo, docs.apiCatalog);
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
 
@@ -189,6 +192,7 @@ test.describe("contratos HTTP — edge functions", () => {
   });
 
   test("enrollments e leads cobrem 400, 403 e 405 mínimos", async ({ request }, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Requer edge functions reais do Supabase.");
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
     const { functionsBaseUrl } = getIntegrationEnv();
 
@@ -236,6 +240,7 @@ test.describe("contratos HTTP — edge functions", () => {
   });
 
   test("admin-resources cobre 401, 405 e 422", async ({}, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Requer edge functions reais do Supabase.");
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
 
     const unauthorized = await edgeRequest("/admin-resources", {
