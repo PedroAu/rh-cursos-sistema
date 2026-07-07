@@ -108,4 +108,6 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - uses: supabase/setup-cli@v1
+        with:
+          version: 2.105.0
       - run: npm run test:db

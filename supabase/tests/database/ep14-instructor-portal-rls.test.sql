@@ -45,17 +45,19 @@ values ('ep14-instrutor', 'Instrutor EP14', 'Ativo', '00000000-0000-0000-0000-00
 insert into public.aluno (id, nome_completo, email, tipo_aluno)
 values ('ep14-aluno', 'Aluno EP14', 'aluno-ep14@rhcursos.test', 'PF');
 
+insert into public.curso (id, titulo, slug, status)
+values ('ep14-course', 'Curso EP14', 'curso-ep14', 'Ativo');
+
 insert into public.turma (
-  id, curso_id, instrutor_id, data_inicio, vagas_total, vagas_preenchidas, vagas_restantes, preco_turma, modalidade, status
+  id, curso_id, instrutor_id, data_inicio, vagas_total, vagas_preenchidas, preco_turma, modalidade, status
 )
 values (
   'ep14-turma',
-  'course-1',
+  'ep14-course',
   'ep14-instrutor',
   now()::date + interval '7 days',
   30,
   1,
-  29,
   0,
   'Online',
   'Aberta'
