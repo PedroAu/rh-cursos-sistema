@@ -1,17 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { attachRuntimeErrorProbe } from "./helpers/runtime-errors";
 
 test("agenda renders after navigation without tripping the error boundary", async ({ page }) => {
-  const runtimeErrors: string[] = [];
-
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      runtimeErrors.push(message.text());
-    }
-  });
-
-  page.on("pageerror", (error) => {
-    runtimeErrors.push(error.stack ?? error.message);
-  });
+  const runtimeErrors = attachRuntimeErrorProbe(page);
 
   await page.goto("/");
   const agendaLink = page.getByRole("link", { name: /^Ver agenda de cursos/ }).first();

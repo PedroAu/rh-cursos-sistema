@@ -1,20 +1,5 @@
 import { expect, test } from "@playwright/test";
-
-function attachRuntimeErrorProbe(page: import("@playwright/test").Page) {
-  const runtimeErrors: string[] = [];
-
-  page.on("console", (message) => {
-    if (message.type() === "error") {
-      runtimeErrors.push(message.text());
-    }
-  });
-
-  page.on("pageerror", (error) => {
-    runtimeErrors.push(error.stack ?? error.message);
-  });
-
-  return runtimeErrors;
-}
+import { attachRuntimeErrorProbe } from "./helpers/runtime-errors";
 
 test.describe("epic 14 smoke — mantine removal", () => {
   test("home renderiza sem erro de runtime", async ({ page }) => {
