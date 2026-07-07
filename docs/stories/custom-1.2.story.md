@@ -3,7 +3,7 @@ epicNum: custom
 storyNum: "1.2"
 storyId: "custom-1.2"
 title: "Aplicar Design System Trust Keith em Páginas e Quality Gates"
-status: Draft
+status: ReadyForReview
 created: 2026-06-28
 priority: P0
 estimatedPoints: 14
@@ -238,7 +238,77 @@ Story é considerada **DONE** quando:
 
 ---
 
-**Story Status:** Draft  
+## File List
+- `docs/stories/custom-1.2.story.md`
+- `src/views/public/Home.tsx`
+- `src/views/public/Courses.tsx`
+- `src/views/public/Agenda.tsx`
+- `src/views/public/Blog.tsx`
+- `src/views/public/InCompany.tsx`
+- `src/views/public/Contact.tsx`
+- `src/views/public/Login.tsx`
+- `src/views/admin/AdminResourcePage.tsx`
+- `src/views/admin/AdminDashboard.tsx`
+
+## Change Log
+- 2026-07-07 - Story atualizada para refletir o estado atual da implementação Trust Keith na Fase 3.
+
+**Story Status:** ReadyForReview  
 **Created:** 2026-06-28  
 **Blocked By:** custom-1.1 (Phase 1-2)  
 **Author:** @dev (Dex)
+
+## QA Results
+
+### Review Date: 2026-07-07
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+Gate FAIL. The implementation has useful evidence for accessibility, visual baseline, keyboard navigation, unit tests, lint, and typecheck, but the story cannot be approved because explicit acceptance criteria are not met: `npm test` is failing, production build compilation time was measured at 4.0s against the 2.5s limit, and the production CSS chunk is 92,762 bytes raw against the 30KB limit. CodeRabbit also reported major findings in the moved canvas runtime reference artifact and a stale `.aiox/project-status.yaml` snapshot.
+
+### Refactoring Performed
+
+No refactoring performed during QA. The review identified blockers that should return to @dev for targeted fixes before another gate attempt.
+
+### Compliance Check
+
+- Coding Standards: CONCERNS - configured standards docs from `core-config.yaml` were not present at `docs/framework/*`; lint passed.
+- Project Structure: CONCERNS - story File List is incomplete versus the branch diff and omits files materially changed by this delivery.
+- Testing Strategy: FAIL - `npm test` failed 1/136 Playwright tests, despite unit tests passing 394/394.
+- All ACs Met: FAIL - ACs for `npm run test`, CSS size, and build time are not met.
+
+### Improvements Checklist
+
+- [x] Ran `npm run lint` - passed.
+- [x] Ran `npm run typecheck` - passed.
+- [x] Ran `npm run test:unit` - 28 files, 394 tests passed.
+- [x] Ran `npm test` - build completed and 135/136 Playwright tests passed, but one contract test failed.
+- [x] Ran CodeRabbit review against `main` - 14 findings, including major findings.
+- [ ] Fix `/api/auth/session` rate-limit contract so `tests/api-contract.spec.ts:131` receives 429 instead of 401 after repeated invalid attempts.
+- [ ] Bring measured build time under 2.5s or update the story with an agreed metric if this target is no longer realistic for Next 16/Turbopack production builds.
+- [ ] Bring production CSS raw size under 30KB or clarify that the intended budget is gzip size; measured raw 92,762 bytes and gzip 17,244 bytes.
+- [ ] Resolve CodeRabbit major findings in `docs/design/redesign/reference/canvases/support.js` or document why the reference canvas runtime is non-executable/non-shipping.
+- [ ] Update `.aiox/project-status.yaml` and the story File List so project automation and QA evidence reflect the actual branch diff.
+
+### Security Review
+
+CONCERNS. Application auth/session security was not approved because the aggregate test suite failed in the auth-session rate-limit contract. CodeRabbit also flagged the reference canvas `support.js` external import path as needing an allowlist before external module load/execution; this may be lower runtime risk if the artifact is documentation-only, but it needs explicit disposition.
+
+### Performance Considerations
+
+FAIL. `next build` reported compilation in 4.0s, above the story target of 2.5s. The production CSS chunk measured 92,762 bytes raw; gzip is 17,244 bytes, but the story criterion does not specify gzip.
+
+### Files Modified During Review
+
+- `docs/stories/custom-1.2.story.md`
+- `docs/qa/gates/custom-1.2-aplicar-design-system-trust-keith-em-paginas-e-quality-gates.yml`
+
+### Gate Status
+
+Gate: FAIL -> docs/qa/gates/custom-1.2-aplicar-design-system-trust-keith-em-paginas-e-quality-gates.yml
+
+### Recommended Status
+
+Changes Required. Return to @dev for fixes, then rerun `npm run lint`, `npm run typecheck`, `npm test`, CSS-size measurement, and CodeRabbit review.
