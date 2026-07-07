@@ -7,6 +7,8 @@ const useExternalServer = process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1";
 export default defineConfig({
   testDir: "./tests",
   reporter: "list",
+  // Reuse the committed visual baselines across local macOS and CI Linux runs.
+  snapshotPathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}-darwin.png",
   metadata: {
     harnessMode: "production-build + local webServer",
     smokeProject: "functional",
