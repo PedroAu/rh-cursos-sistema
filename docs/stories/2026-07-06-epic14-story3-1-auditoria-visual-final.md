@@ -151,6 +151,10 @@ Manual/visual checks:
 ## QA Results
 2026-07-06 - Gate formal @qa: PASS em `docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`. Captura, a11y, build e bundle ficaram verdes; o Lighthouse manteve apenas warnings nao bloqueantes de performance e `timing-budget` desconhecido, já classificados no gate. O manifest final aponta Home e Agenda para os HTMLs históricos preservados em `docs/design/redesign/reference/canvases/`.
 
+2026-07-06 - Re-review formal @qa: PASS mantido em `docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`. Reexecutei `test:epic14:fidelity:capture`, `test:a11y`, `test:lighthouse` em porta isolada `3102` e `bundle:check`; todos passaram. Lighthouse segue com warnings não bloqueantes de performance (`/` 0.78, `/cursos` 0.80, `/login` 0.80) e warning conhecido de `timing-budget` não reconhecido.
+
+2026-07-07 - Re-review formal @qa Fase 3: PASS mantido em `docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`. Reexecutei `test:epic14:fidelity:capture`, `test:a11y` (9/9), `LHCI_PORT=3102 npm run test:lighthouse` e `bundle:check`; todos passaram. Lighthouse reportou apenas warnings nao bloqueantes de performance 0.80 em `/`, `/cursos` e `/login`, alem de `timing-budget` desconhecido.
+
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para auditoria visual final da Fase 3.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @qa. Status: Draft → Ready.

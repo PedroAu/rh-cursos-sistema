@@ -20,7 +20,8 @@ function isPortFree(port) {
       server.close(() => resolve(true));
     });
 
-    server.listen(port, "127.0.0.1");
+    // Probe the real wildcard bind so we also detect listeners opened on IPv6/dual-stack.
+    server.listen(port);
   });
 }
 

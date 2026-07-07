@@ -149,6 +149,10 @@ Manual checks:
 ## QA Results
 2026-07-06 - Gate formal @qa: PASS em `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`. `test:epic14:fidelity`, `test:e2e:smoke`, lint, typecheck, unit, build, purge e bundle ficaram verdes; o único resíduo mantido é nominal em `src/components/providers/mantine-provider.tsx`.
 
+2026-07-06 - Re-review formal @qa: FAIL em `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`. `npm run test:epic14:fidelity` passou 8/8, mas `npm run test:e2e:smoke` reportou 1 falha em `tests/api-contract.spec.ts:129`: o contrato de rate limit do `POST /api/auth/session` esperava `429` e recebeu `401`. Reproduzi a falha em execução isolada na porta 3101 contra o build atual (`api-contract.spec.ts`: 4 passed, 1 failed), então o gate volta a FAIL até correção por @dev.
+
+2026-07-07 - Re-review formal @qa Fase 3: PASS em `docs/qa/gates/14.3.2-regressao-funcional-final-do-epic-14.yml`. O blocker anterior caiu: `node scripts/run-playwright.mjs api-contract.spec.ts --project=functional` passou 5/5 e `npm run test:e2e:smoke` passou 84/84. Tambem passaram `test:epic14:fidelity` 8/8, lint, typecheck, unit 394/394, build, purge e bundle; permanece apenas debt nominal nao bloqueante em `src/components/providers/mantine-provider.tsx`.
+
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para regressao funcional final da Fase 3.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @qa. Status: Draft → Ready.

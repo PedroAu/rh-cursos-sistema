@@ -165,6 +165,10 @@ Manual checks:
 ## QA Results
 2026-07-06 - Gate formal @qa: PASS em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. Os artefatos históricos saíram de `public/`, foram preservados em `docs/design/redesign/reference/canvases/` e os gates técnicos seguiram verdes após a limpeza.
 
+2026-07-06 - Re-review formal @qa: FAIL em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. A limpeza de assets continua tecnicamente válida, mas o pré-requisito de regressão funcional final não está atendido: `14.3.2` voltou a FAIL porque `test:e2e:smoke` falha no contrato de rate limit de `/api/auth/session`. Recomendação QA: não seguir para `14.3.4`/@devops até a regressão ser corrigida e revalidada.
+
+2026-07-07 - Re-review formal @qa Fase 3: PASS em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. O pre-requisito `14.3.2` voltou a PASS, a limpeza segue valida com canvases fora de `public/`, referencias preservadas em `docs/design/redesign/reference/canvases/`, manifest de fidelidade regenerado e `test:e2e:smoke` 84/84 verde. Handoff para `14.3.4`/@devops fica liberado pela perspectiva de QA.
+
 ## Change Log
 - 2026-07-06 - @sm (River) - Draft criada para cleanup final de canvases e bundles fora do deploy.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
