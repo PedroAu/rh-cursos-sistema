@@ -172,6 +172,7 @@ Manual checks:
 2026-07-07 - Follow-up formal @qa pós-ajuste: PASS mantido em `docs/qa/gates/14.3.3-limpeza-canvases-bundles-fora-do-deploy.yml`. `purge:gate` agora passa sem resíduos nominais, `bundle:check` passou com 568.8 KB / 1000 KB e os canvases permanecem fora de `public/`.
 
 ## Change Log
+
 - 2026-07-06 - @sm (River) - Draft criada para cleanup final de canvases e bundles fora do deploy.
 - 2026-07-06 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-06 - @dev (Dex) - Limpeza iniciada: canvases HTML, runtime `support.js` e bundle consumidor `_ds/` saíram de `public/` e foram preservados em `docs/design/redesign/reference/canvases/`. Status: Ready → In Progress.

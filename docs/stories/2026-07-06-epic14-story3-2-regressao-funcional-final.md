@@ -138,6 +138,7 @@ Manual checks:
 - `playwright-report/` (se Playwright gerar relatorio)
 
 ## Dev Agent Record
+
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run test:epic14:fidelity` ✅ (8 testes passados).
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run lint` ✅, `npm run typecheck` ✅, `npm run test:unit` ✅, `npm run build` ✅, `npm run purge:gate` ✅, `npm run bundle:check` ✅.
 - 2026-07-06 - Pré-validação técnica por @dev: `npm run test:e2e:smoke` ✅ (84 testes passados em 58.8s) após estabilizar `tests/api-contract.spec.ts` para enviar `cf-connecting-ip`, `x-forwarded-for` e `x-real-ip` no contrato do route handler de auth-session.

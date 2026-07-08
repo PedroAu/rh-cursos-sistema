@@ -28,6 +28,7 @@ EPIC 14 - Redesign Trust Keith: Fidelidade Total + Remocao do Mantine
 Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 
 ## Prerequisites
+
 - Fase 2 concluida: stories 14.2.1 a 14.2.7 com `Status: Done`.
 - Gate agregado da Fase 2 PASS: `docs/qa/gates/14.2-fase-2-paginas-publicas-fidelidade-total.yml`.
 - Capturas atuais existem em `artifacts/epic14-fidelity/`.
