@@ -24,9 +24,10 @@ const eslintConfig = [
       "test-results/**",
       "supabase/functions/**",
       "next-env.d.ts",
-      // Artefatos de referência do redesign Trust Keith (Epic 14) — removidos na story 14.3.3
+      // Artefatos de referência do redesign Trust Keith (Epic 14) — preservados apenas como documentação
       "public/_ds/**",
       "public/support.js",
+      "docs/design/redesign/reference/canvases/**",
       "docs/design-system/trust-keith/ds-package/**"
     ]
   },

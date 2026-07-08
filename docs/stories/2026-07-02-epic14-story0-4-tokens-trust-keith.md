@@ -118,7 +118,7 @@ Codex GPT-5 (@dev/Dex), 2026-07-02.
 - `npm run build` → PASS.
 - `npm run test:unit` → PASS (27 arquivos, 392 testes).
 - Render check via Chrome headless em `http://localhost:3001` → PASS: 12 elementos CTA/link com `rgb(12, 106, 131)`, incluindo "Fale com um especialista" e "Ver agenda de cursos".
-- `npm run lint` → BLOCKED por arquivos de referência/canvas fora do escopo: `docs/design-system/trust-keith/ds-package/_ds_bundle.js`, `public/_ds/.../_ds_bundle.js`, `public/support.js`. Lint focado nos arquivos TS/JS alterados desta story passou (`app/layout.tsx`, `src/design-tokens/tokens.tailwind.js`, `src/stories/design-tokens.stories.tsx`); `src/styles/globals.css` é ignorado pela config ESLint.
+- `npm run lint` → BLOCKED, na época, por arquivos de referência/canvas fora do escopo: `docs/design-system/trust-keith/ds-package/_ds_bundle.js`, `public/_ds/.../_ds_bundle.js`, `public/support.js`. Após a 14.3.3, esses artefatos foram removidos de `public/` e o diretório documental `docs/design/redesign/reference/canvases/**` passou a ser ignorado pela config ESLint.
 
 ### Completion Notes List
 

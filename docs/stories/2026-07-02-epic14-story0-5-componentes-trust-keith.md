@@ -155,7 +155,7 @@ GPT-5 Codex
 - `grep -rn "backdrop-filter\|backdrop-blur" src/components/ src/features/public-shell/` -> sem ocorrências.
 - `grep -rn "235875" src/components/ src/features/` -> sem ocorrências.
 - `npx eslint` focado nos arquivos desta story -> passou.
-- `npm run lint` completo -> bloqueado por erros pré-existentes nos artefatos de canvas `docs/design-system/trust-keith/ds-package/_ds_bundle.js`, `public/_ds/.../_ds_bundle.js` e `public/support.js`.
+- `npm run lint` completo -> bloqueado, na época, por erros pré-existentes nos artefatos de canvas `docs/design-system/trust-keith/ds-package/_ds_bundle.js`, `public/_ds/.../_ds_bundle.js` e `public/support.js`. Após a 14.3.3, os artefatos públicos foram removidos do deploy.
 - `npm run typecheck` -> passou.
 - `npm run test:unit` -> passou, 27 arquivos / 392 testes.
 - `npm run storybook:build` -> passou.

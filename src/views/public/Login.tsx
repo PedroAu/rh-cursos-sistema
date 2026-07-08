@@ -132,7 +132,6 @@ export function LoginPage() {
             fill
             sizes="50vw"
             className="object-cover opacity-35"
-            priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#051d31] via-[#072d48]/85 to-[#072d48]/45" />
 

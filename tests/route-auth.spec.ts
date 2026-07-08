@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-import { ensureAuthUser } from "./helpers/integration-env";
+import { ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
 
 // Modelo híbrido:
 // - páginas públicas seguem acessíveis por SSR/SSG;
@@ -171,6 +171,7 @@ test.describe("contrato da rota /api/auth/session", () => {
   });
 
   test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ context, page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Validação de sessão real requer ambiente Supabase real.");
     const credentials = await ensureAuthUser({
       email: "student@rhcursos.com.br",
       name: "Perfil student",

@@ -27,6 +27,14 @@ const CANONICAL_DOCS = {
 let envCache: IntegrationEnv | null = null;
 let serviceClientCache: ReturnType<typeof createClient> | null = null;
 
+function isPlaceholderValue(value: string) {
+  return (
+    !value ||
+    value.includes("example.supabase.co") ||
+    value.includes("placeholder")
+  );
+}
+
 function ensureEnvLoaded() {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.SUPABASE_URL) {
     try {
@@ -39,6 +47,24 @@ function ensureEnvLoaded() {
 
 export function getCanonicalDocs() {
   return CANONICAL_DOCS;
+}
+
+export function hasRealIntegrationEnv() {
+  ensureEnvLoaded();
+
+  const supabaseUrl =
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "";
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    "";
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+
+  return ![
+    supabaseUrl,
+    publishableKey,
+    serviceRoleKey,
+  ].some(isPlaceholderValue);
 }
 
 export function annotateCanonicalDoc(testInfo: TestInfo, docPath: string) {

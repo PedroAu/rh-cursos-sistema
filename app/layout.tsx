@@ -4,8 +4,6 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
-import { MotionProvider } from "@/components/providers/motion-provider";
-import { AppMantineProvider } from "@/components/providers/mantine-provider";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AppToaster } from "@/components/ui/toaster";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
@@ -51,11 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className={`${inter.variable} ${merriweather.variable}`}>
-        <AppMantineProvider>
-          <ErrorBoundary>
-            <MotionProvider>{children}</MotionProvider>
-          </ErrorBoundary>
-        </AppMantineProvider>
+        <ErrorBoundary>{children}</ErrorBoundary>
         <AppToaster />
       </body>
       {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}

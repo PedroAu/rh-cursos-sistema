@@ -4,6 +4,7 @@ import {
   cleanupEnrollmentArtifacts,
   createServiceRoleClient,
   createUniqueEmail,
+  hasRealIntegrationEnv,
   getCanonicalDocs,
   resolveAvailableCheckoutTarget,
 } from "./helpers/integration-env";
@@ -38,6 +39,7 @@ function buildClassSelectionLabel(startDate: string, time: string) {
 
 test.describe("checkout — baseline de receita", () => {
   test("bloqueia avanço da etapa de turma sem seleção e conclui com o backend real", async ({ page }, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     test.setTimeout(60_000);
     annotateCanonicalDoc(testInfo, getCanonicalDocs().edgeFunctions);
     const enrollmentEmail = createUniqueEmail("checkout-e2e");
@@ -100,6 +102,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
@@ -114,6 +117,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("inscrição corporativa exige empresa e cargo", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
@@ -131,6 +135,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(`${checkoutTarget.coursePath}?checkout=1`);
     await expect(page.getByRole("dialog")).toBeVisible();
@@ -138,6 +143,7 @@ test.describe("checkout — baseline de receita", () => {
   });
 
   test("fechar o modal com Cancelar mantém o usuário na página do curso", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();

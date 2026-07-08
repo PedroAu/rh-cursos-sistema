@@ -4,6 +4,7 @@ import {
   ensureAuthUser,
   getCanonicalDocs,
   getIntegrationEnv,
+  hasRealIntegrationEnv,
 } from "./helpers/integration-env";
 
 // A suíte mistura contrato real para o caminho feliz e cenários controlados
@@ -23,6 +24,7 @@ test.describe("mensagens de erro do login", () => {
   test("login bem-sucedido persiste a sessão real e respeita o next informado", async ({
     page
   }, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Fluxo real de login requer ambiente Supabase real.");
     annotateCanonicalDoc(testInfo, getCanonicalDocs().authSession);
     const { adminEmail, adminPassword } = getIntegrationEnv();
 
@@ -47,6 +49,7 @@ test.describe("mensagens de erro do login", () => {
   });
 
   test("logout encerra a sessão e volta a bloquear /admin", async ({ page }, testInfo) => {
+    test.skip(!hasRealIntegrationEnv(), "Fluxo real de logout requer ambiente Supabase real.");
     annotateCanonicalDoc(testInfo, getCanonicalDocs().authSession);
     const { adminEmail, adminPassword } = getIntegrationEnv();
 

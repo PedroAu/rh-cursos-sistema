@@ -1,0 +1,102 @@
+schema: 1
+story: 'custom-1.2'
+story_title: 'Aplicar Design System Trust Keith em Páginas e Quality Gates'
+gate: FAIL
+status_reason: 'Explicit story gates are not met: npm test fails in the auth-session rate-limit contract, build compilation measured 4.0s against the 2.5s limit, and production CSS raw size measured 92,762 bytes against the 30KB limit. CodeRabbit also reported major findings requiring disposition before approval.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-07T18:33:10Z'
+expires: '2026-07-21T18:33:10Z'
+quality_score: 40
+
+top_issues:
+  - id: 'QA-1'
+    severity: high
+    category: reliability
+    description: '`npm test` fails because the auth-session POST rate-limit contract expected 429 but received 401 after repeated invalid credentials.'
+    refs:
+      - 'tests/api-contract.spec.ts:131'
+      - 'app/api/auth/session/route.ts'
+    suggested_owner: dev
+  - id: 'QA-2'
+    severity: high
+    category: performance
+    description: 'Production build compilation measured 4.0s, exceeding the story acceptance criterion of build time < 2.5s.'
+    refs:
+      - 'package.json'
+    suggested_owner: dev
+  - id: 'QA-3'
+    severity: medium
+    category: performance
+    description: 'Production CSS chunk measured 92,762 bytes raw, exceeding the story acceptance criterion of CSS file size < 30KB. Gzip size measured 17,244 bytes, so the metric needs either optimization or explicit clarification.'
+    refs:
+      - '.next/static/chunks/1sdhf7b36uddn.css'
+    suggested_owner: dev
+  - id: 'QA-4'
+    severity: medium
+    category: security
+    description: 'CodeRabbit reported major findings in the reference canvas runtime, including external import loading without an allowlist and unsafe/fragile runtime paths. If this artifact is documentation-only, document that disposition; otherwise fix before approval.'
+    refs:
+      - 'docs/design/redesign/reference/canvases/support.js'
+    suggested_owner: dev
+  - id: 'QA-5'
+    severity: medium
+    category: maintainability
+    description: 'Story File List and `.aiox/project-status.yaml` do not match the actual branch diff, weakening Story-Driven Development traceability and automation evidence.'
+    refs:
+      - 'docs/stories/custom-1.2.story.md'
+      - '.aiox/project-status.yaml'
+    suggested_owner: dev
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 530
+  risks_identified: 5
+  trace:
+    ac_covered: [3, 4, 6, 7, 8]
+    ac_gaps: [1, 2, 5, 9, 10]
+  commands:
+    - 'coderabbit review --agent --type committed --base main (14 findings: major/minor/trivial)'
+    - 'npm run lint (passed)'
+    - 'npm run typecheck (passed)'
+    - 'npm test (failed: 135 passed, 1 failed; build compile 4.0s)'
+    - 'npm run test:unit (28 files, 394 tests passed)'
+    - 'CSS measurement: .next/static/chunks/1sdhf7b36uddn.css = 92,762 bytes raw; gzip = 17,244 bytes'
+  notes:
+    - 'Configured standards documents at docs/framework/* were missing, so compliance used available project tests, story criteria, and branch evidence.'
+    - 'Visual, contrast, keyboard, and a11y baseline suites passed during npm test before the final aggregate failure report.'
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: 'Auth-session rate-limit contract failed; CodeRabbit also flagged external import behavior in the reference canvas runtime.'
+  performance:
+    status: FAIL
+    notes: 'Build time and raw CSS size exceed explicit story thresholds.'
+  reliability:
+    status: FAIL
+    notes: 'Aggregate npm test is not 100% passing due to auth-session POST rate-limit behavior.'
+  maintainability:
+    status: CONCERNS
+    notes: 'Story File List and project-status snapshot are out of sync with the branch diff; several CodeRabbit documentation consistency findings remain.'
+
+recommendations:
+  immediate:
+    - action: 'Fix the auth-session rate-limit contract and rerun npm test.'
+      refs:
+        - 'app/api/auth/session/route.ts'
+        - 'tests/api-contract.spec.ts:131'
+    - action: 'Resolve or formally waive the performance budget misses for build time and CSS size.'
+      refs:
+        - 'package.json'
+        - '.next/static/chunks/1sdhf7b36uddn.css'
+    - action: 'Triage CodeRabbit major findings in the reference canvas runtime and decide whether to fix or document non-shipping scope.'
+      refs:
+        - 'docs/design/redesign/reference/canvases/support.js'
+    - action: 'Update story File List and project status snapshot to match actual branch changes.'
+      refs:
+        - 'docs/stories/custom-1.2.story.md'
+        - '.aiox/project-status.yaml'
+  future:
+    - action: 'Add an explicit script for the CSS budget so the <30KB criterion is measured consistently in CI.'
+      refs:
+        - 'package.json'

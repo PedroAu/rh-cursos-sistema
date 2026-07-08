@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   cleanupEnrollmentArtifacts,
   createUniqueEmail,
+  hasRealIntegrationEnv,
   resolveAvailableCheckoutTarget,
 } from "./helpers/integration-env";
 
@@ -50,6 +51,7 @@ test.describe("epica 4 — jornadas publicas", () => {
   });
 
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Jornada pública com checkout real requer Supabase real.");
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
     const checkoutTarget = await resolveAvailableCheckoutTarget();

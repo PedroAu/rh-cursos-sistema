@@ -3,7 +3,7 @@
 **Status:** Draft
 **Owner:** @aiox-master (Orion) — orquestração
 **Executor de implementação:** Codex (stories de @dev serão prompts autossuficientes)
-**Branch alvo:** `redesign/ep-0-fundacao`
+**Branch alvo:** `main` (via PR de branch de entrega)
 **Data:** 2026-07-02
 
 ---
@@ -33,7 +33,7 @@ O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos
 - `docs/design-system/trust-keith/ds-package/` — `_ds_manifest.json` (todos os tokens `--tk-*` com valores), `tokens/{colors,typography,spacing,effects,fonts}.css`, `_ds_bundle.js` (componentes JSX: Avatar, Badge, Button, Card, Checkbox, Input, Logo, Switch, FeatureListItem, ProgressBar, StatBlock, Testimonial, NavBar), `readme.md`
 - `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Quincy CF / Merriweather / Inter / Caveat, espaçamento, raios, sombras)
 - `docs/design/redesign/reference/screenshots/` — screenshots de referência (agenda, overview)
-- `public/_ds/`, `public/*.dc.html`, `public/support.js`, `public/uploads/logoHorizontal_800X600.png` — artefatos temporários de renderização dos canvases; `public/_ds/` e os `.dc.html` já foram removidos do repositório nesta limpeza
+- `docs/design/redesign/reference/canvases/`, `docs/design/redesign/wireframes/*.dc.html`, `public/uploads/logoHorizontal_800X600.png` — artefatos históricos de renderização dos canvases preservados fora do deploy; `_ds/`, `support.js` e os HTMLs finais já foram removidos de `public/` na 14.3.3
 - `public/images/brand/logo-horizontal.png` — logo horizontal oficial (asset definitivo do site)
 
 **⚠️ Nota crítica de tokens:** o DS base usa `--tk-brand: #235875` (azul Trust Keith original). Os canvases aplicam o remap de marca RH via classe `.rh2`, sobrescrevendo `--tk-brand/--tk-cta → #0c6a83`, `--tk-accent → #1791a9`, `--tk-accent-soft → #e0f2f6`. **Os tokens finais do site = tokens do ds-package + remap `.rh2` dos canvases.**
@@ -153,7 +153,7 @@ Cada story segue o mesmo template: implementar a rota conforme `spec-{pagina}.md
 | 14.3.1 | Auditoria visual: `npm run test:epic14:fidelity:capture` gera route vs canvas em `artifacts/epic14-fidelity/` para comparação lado a lado; a11y (`npm run test:a11y`), Lighthouse. Diff visual é revisão humana/opus (a captura não emite verdict automático). | @qa | **opus** (gate final) |
 | 14.3.2 | Regressão funcional: `npm run test:epic14:fidelity` (invariantes S7/S8/S9 + smoke Mantine) + `npm run test:e2e:smoke` (inscrição/login/admin). S7 = busca **local** aplica `?q=` em catálogo/blog; header sem busca global. | @qa | sonnet |
 | 14.3.3 | Limpeza: remover canvases/bundles de `public/` (mover para `docs/design/redesign/reference/` — não devem ir ao deploy), `.dc.html` fora do worker | @dev (Codex) | — |
-| 14.3.4 | Commit/PR para `redesign/ep-0-fundacao`, CI verde, `bundle:check` final | @devops | haiku |
+| 14.3.4 | Commit/PR para `main`, CI verde, `bundle:check` final | @devops | haiku |
 
 ---
 
