@@ -69,7 +69,16 @@ if (compileSeconds !== null) {
 console.log(`   Wall:    ${wallSeconds.toFixed(1)}s / ${WALL_BUDGET_S}s budget`);
 
 const violations = [];
-if (compileSeconds !== null && compileSeconds > COMPILE_BUDGET_S) {
+if (compileSeconds === null) {
+  // Fail closed: se a métrica de compile não aparece na saída do build
+  // ("Compiled successfully in Xs"), o budget de compile não pode ser
+  // verificado — provavelmente o formato do output mudou. Silenciar deixaria
+  // passar regressões de compile despercebidas, então tratamos como violação.
+  violations.push(
+    'Métrica de compile não encontrada na saída do build ("Compiled successfully in Xs"); ' +
+      "o budget de compile não pôde ser verificado — ajuste o parser ou o comando de build."
+  );
+} else if (compileSeconds > COMPILE_BUDGET_S) {
   violations.push(`Compile ${compileSeconds.toFixed(1)}s excede o budget de ${COMPILE_BUDGET_S}s.`);
 }
 if (wallSeconds > WALL_BUDGET_S) {
