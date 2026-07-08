@@ -94,9 +94,19 @@ jobs:
           node-version: '24'
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
+      # Single production build that also enforces the build-time budget.
+      # Budgets are intentionally generous for shared CI runners (slower than a
+      # dev laptop): they catch gross regressions without flaking on variance.
+      # Override locally via BUILD_COMPILE_BUDGET_S / BUILD_WALL_BUDGET_S.
+      - name: Build + build-time budget
+        run: npm run build:time-check
+        env:
+          BUILD_COMPILE_BUDGET_S: '30'
+          BUILD_WALL_BUDGET_S: '120'
       - name: Bundle size budget
         run: npm run bundle:check
+      - name: CSS size budget
+        run: npm run css:check
       - name: Lighthouse CI (per-route budgets)
         run: npx lhci autorun --config=./lighthouserc.cjs
 
