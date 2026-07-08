@@ -1,13 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
-/**
- * Boundary de último recurso. Captura erros lançados no próprio root layout e,
- * por isso, substitui `<html>`/`<body>` inteiros — os providers (Mantine) e o
- * `globals.css` NÃO estão disponíveis aqui. Mantemos a UI auto-contida com
- * estilos inline para garantir que o fallback renderize mesmo nesse cenário.
- */
 export default function GlobalError({
   error,
   reset
@@ -17,11 +12,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     console.error("[global-error-boundary]", error.digest ?? "sem-digest", error);
-    void import("@sentry/nextjs")
-      .then((Sentry) => {
-        Sentry.captureException(error);
-      })
-      .catch(() => undefined);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
@@ -34,8 +25,7 @@ export default function GlobalError({
           alignItems: "center",
           justifyContent: "center",
           padding: "24px",
-          fontFamily:
-            "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+          fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
           background: "#f8fafc",
           color: "#0f172a"
         }}
