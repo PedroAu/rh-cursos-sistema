@@ -51,8 +51,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${inter.variable} ${merriweather.variable}`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <AppToaster />
+        {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
       </body>
-      {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
     </html>
   );
 }

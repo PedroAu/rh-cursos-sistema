@@ -90,6 +90,8 @@ No repositório GitHub, vá em **Settings** → **Secrets and variables** → **
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Anon key Supabase | Supabase Dashboard → Settings → API |
 | `NEXT_PUBLIC_APP_URL` | URL pública (https://www.rhcursos.com.br) | Você define |
 
+Antes de publicar o frontend, rode `npm run env:check:production` para barrar deploy com secret ausente ou placeholder.
+
 #### Edge Functions (Supabase)
 
 | Secret | Descrição |

@@ -1,38 +1,60 @@
 schema: 1
 story: '1.1'
-gate: PASS
-status_reason: 'All acceptance criteria and integration verifications are satisfied in the current workspace. Lint, typecheck, build, public journey coverage, and home visual governance all passed without findings.'
-reviewer: 'Quinn'
-updated: '2026-07-03T17:50:02Z'
-top_issues: []
+story_title: 'Public Positioning and Journey Clarity'
+gate: CONCERNS
+status_reason: 'Re-review de login/shell publico corrigiu uma regressao real de logout e confirmou lint, typecheck, unit focado, Playwright focado e npm test completo verdes. Resta pendencia de governanca: File List/Change Log da story nao refletem os arquivos alterados durante a revisao, e QA nao pode editar essas secoes.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-08T17:35:00-03:00'
+expires: '2026-07-22T17:35:00-03:00'
+quality_score: 88
+top_issues:
+  - id: QA-1
+    severity: medium
+    finding: 'Rastreabilidade da story incompleta para o re-review de login: src/lib/app-store.tsx e src/__tests__/lib/app-store.test.ts foram modificados por QA, mas File List/Change Log permanecem fora da autoridade de edicao de QA.'
+    suggested_owner: dev
+    refs:
+      - 'docs/stories/1.1.story.md'
+      - 'src/lib/app-store.tsx'
+      - 'src/__tests__/lib/app-store.test.ts'
 waiver: { active: false }
-
----
-
-## Review Summary
-
-### Code Quality
-- ✅ `npm run lint` passed
-- ✅ `npm run typecheck` passed
-- ✅ No regressions detected in the audited public journey copy and CTA hierarchy
-
-### Testing
-- ✅ `npm run build` passed
-- ✅ `npx playwright test tests/public-journeys.spec.ts` passed (6/6)
-- ✅ `npx playwright test tests/ui-governance.spec.ts -g "home"` passed (3/3)
-
-### Requirements Traceability
-- AC 1: Public navigation and key entry points expose the three main journeys clearly ✓
-- AC 2: Public positioning communicates legal/regulatory applicability across audited pages ✓
-- AC 3: Course and agenda discovery flows remain available and understandable ✓
-- AC 4: Enrollment-oriented CTAs retain visibility and hierarchy ✓
-- IV1: Existing public routes continue to render and navigate correctly ✓
-- IV2: Public navigation changes preserve shell/layout integration and route structure ✓
-- IV3: No material regression detected in current public conversion and discovery paths ✓
-
-### Risk Assessment
-- Blast Radius: LOW
-- Residual Risk: LOW — current evidence is targeted and green; no open defects were identified for this story
-
-### Recommendation
-**APPROVED.** Story 1.1 is ready to proceed with a PASS quality gate.
+evidence:
+  tests_reviewed: 172
+  risks_identified: 1
+  commands:
+    - 'npm run lint - PASS'
+    - 'npm run typecheck - PASS'
+    - 'npm run test:unit -- src/__tests__/lib/app-store.test.ts src/__tests__/app/api/auth-session-route.test.ts src/__tests__/lib/session-token.test.ts src/__tests__/lib/auth.test.ts - PASS, 36/36'
+    - 'node scripts/run-playwright.mjs --project=functional tests/login-errors.spec.ts tests/route-auth.spec.ts tests/public-journeys.spec.ts - PASS, 36/36'
+    - 'npm test - PASS, 136/136 Playwright after typecheck and build'
+  trace:
+    ac_covered: [1, 2, 3, 4]
+    ac_gaps: []
+  notes:
+    - 'Initial focused Playwright run exposed logout regression: localStorage rh_cursos_admin_token remained after Sair.'
+    - 'Fix prevents session sync from rehydrating after logout and avoids anonymous /api/auth/session 401 noise on public routes.'
+    - 'Server log AuthSessionMissingError during global Supabase signout remains non-blocking because local-only logout contract passes.'
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Logout now clears local HMAC token reliably and blocks stale session rehydration while logout is in progress.'
+  performance:
+    status: PASS
+    notes: 'Anonymous public pages no longer issue unnecessary session GETs; npm test build compiled successfully in 4.1s.'
+  reliability:
+    status: PASS
+    notes: 'Focused login/auth/public journey suite passed 36/36; full npm test passed 136/136.'
+  maintainability:
+    status: CONCERNS
+    notes: 'Implementation has focused regression coverage, but story File List/Change Log need owner update for AIOX traceability.'
+recommendations:
+  immediate:
+    - action: 'Update story File List/Change Log, or create a follow-up story, to account for the login/session sync files touched during QA.'
+      refs:
+        - 'docs/stories/1.1.story.md'
+        - 'src/lib/app-store.tsx'
+        - 'src/__tests__/lib/app-store.test.ts'
+  future:
+    - action: 'Consider formalizing the authenticated public-header CTA behavior in a dedicated auth/navigation story if this behavior should be product-owned beyond this re-review.'
+      refs:
+        - 'src/features/public-shell/components/public-header.tsx'
+        - 'src/features/public-shell/components/public-mobile-navigation.tsx'

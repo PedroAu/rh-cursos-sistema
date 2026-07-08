@@ -12,6 +12,7 @@
     "docs:api:lint": "node scripts/lint-openapi.mjs",
     "docs:api:build": "node scripts/build-api-docs.mjs",
     "docs:api:check-drift": "node scripts/check-openapi-drift.mjs",
+    "env:check:production": "node scripts/check-production-env.mjs",
     "test:db": "node scripts/test-db.mjs",
     "build:workers": "opennextjs-cloudflare build",
     "start": "next start",

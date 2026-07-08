@@ -2,8 +2,6 @@
 
 import { useEffect } from "react";
 
-import * as Sentry from "@sentry/nextjs";
-
 /**
  * Boundary de último recurso. Captura erros lançados no próprio root layout e,
  * por isso, substitui `<html>`/`<body>` inteiros — os providers (Mantine) e o
@@ -18,8 +16,12 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
     console.error("[global-error-boundary]", error.digest ?? "sem-digest", error);
+    void import("@sentry/nextjs")
+      .then((Sentry) => {
+        Sentry.captureException(error);
+      })
+      .catch(() => undefined);
   }, [error]);
 
   return (

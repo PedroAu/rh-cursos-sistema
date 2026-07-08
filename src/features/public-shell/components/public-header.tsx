@@ -7,8 +7,10 @@ import { UserRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PublicMobileNavigation } from "@/features/public-shell/components/public-mobile-navigation";
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
+import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
 import { useLocation } from "@/lib/router-compat";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 import { cn } from "@/lib/utils";
 
 function isItemActive(pathname: string, to: string) {
@@ -17,6 +19,7 @@ function isItemActive(pathname: string, to: string) {
 
 export function PublicHeader() {
   const location = useLocation();
+  const { currentSession } = useAppStore();
   const navOrder = location.pathname.startsWith("/sobre")
     ? ["/cursos", "/agenda", "/in-company", "/consultoria", "/sobre", "/blog"]
     : ["/cursos", "/agenda", "/in-company", "/consultoria", "/blog"];
@@ -57,12 +60,12 @@ export function PublicHeader() {
 
         <div className="hidden shrink-0 items-center gap-2 md:flex">
           <NextLink
-            href="/login"
-            aria-label="Entrar"
+            href={currentSession ? getDefaultDashboardPath(currentSession.role) : "/login"}
+            aria-label={currentSession ? "Ir para o painel" : "Entrar"}
             className="inline-flex h-10 items-center gap-2 rounded-tk-button px-3 text-sm font-medium text-tk-ink transition hover:bg-[var(--tk-black-5)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
           >
             <UserRound className="h-4 w-4" aria-hidden="true" />
-            Entrar
+            {currentSession ? "Ir para o painel" : "Entrar"}
           </NextLink>
 
           <Button asChild size="sm">

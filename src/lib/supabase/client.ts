@@ -7,6 +7,12 @@ const supabasePublishableKey =
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabasePublishableKey);
 
+if (process.env.NODE_ENV === "production" && !isSupabaseConfigured) {
+  console.error(
+    "Supabase client não configurado em produção. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY antes do deploy."
+  );
+}
+
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl!, supabasePublishableKey!, {
       auth: {

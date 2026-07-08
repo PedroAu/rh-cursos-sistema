@@ -224,6 +224,7 @@ export function AppStoreProvider({
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
   // recriar sua identidade a cada mudança (evita re-renders em cascata).
   const stateRef = useRef(state);
+  const logoutInProgressRef = useRef(false);
 
   useEffect(() => {
     stateRef.current = state;
@@ -280,11 +281,13 @@ export function AppStoreProvider({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!state.currentSession) return;
+    if (!state.currentSession && !getSessionToken()) return;
 
     let cancelled = false;
 
     const syncSession = async () => {
+      if (logoutInProgressRef.current) return;
+
       try {
         const response = await fetch("/api/auth/session", {
           method: "GET",
@@ -530,11 +533,13 @@ export function AppStoreProvider({
   }, []);
 
   const setSession = useCallback<AppStoreValue["setSession"]>((session) => {
+    logoutInProgressRef.current = false;
     setState((current) => ({ ...current, currentSession: session }));
     toast.success("Login realizado.");
   }, []);
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
+    logoutInProgressRef.current = true;
     const accessToken = getSupabaseSession()?.access_token;
     const notifyLocalOnlyFallback = () => {
       toast.success("Sessão local encerrada.");
@@ -568,6 +573,9 @@ export function AppStoreProvider({
         notifyLocalOnlyFallback();
       } catch {
         notifyLocalOnlyFallback();
+      } finally {
+        clearSessionToken();
+        setState((current) => (current.currentSession ? { ...current, currentSession: null } : current));
       }
     })();
 

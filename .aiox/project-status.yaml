@@ -1,22 +1,21 @@
 status:
-  branch: codex-epic14-phase3-delivery
+  branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
-    - app/api/auth/session/route.ts
-    - docs/qa/gates/custom-1.2-aplicar-design-system-trust-keith-em-paginas-e-quality-gates.yml
-    - docs/stories/custom-1.2.story.md
-    - src/__tests__/app/api/auth-session-route.test.ts
-    - src/__tests__/lib/rate-limit.test.ts
-    - src/lib/rate-limit.ts
-    - supabase/functions/auth-session/index.ts
-  modifiedFilesTotalCount: 8
+    - src/__tests__/lib/app-store.test.ts
+    - src/features/public-shell/components/public-header.tsx
+    - src/features/public-shell/components/public-mobile-navigation.tsx
+    - src/lib/app-store.tsx
+  modifiedFilesTotalCount: 9
   recentCommits:
-    - 'fix(ci): ignore external asset dns noise in smoke runtime probe'
-    - 'fix(ci): stabilize e2e smoke in placeholder env'
+    - >-
+      feat(custom-1.2): land auth-session hardening, rate-limit fix and QA gate
+      (#7)
+    - 'ci(perf): gate CSS gzip + build-time budgets in Performance lane (#6)'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-07T18:51:58.661Z'
+  lastUpdate: '2026-07-08T17:23:18.766Z'
   isGitRepo: true
-timestamp: 1783450318671
+timestamp: 1783531398767
 ttl: 60
-gitFingerprint: 1783375646341.3386:1783450318671.0000
+gitFingerprint: 1783527338283.8445:1783527509299.3784

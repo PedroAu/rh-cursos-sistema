@@ -415,6 +415,58 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
   });
 
+  it("does not rehydrate from the session endpoint after logout starts", async () => {
+    const session: CurrentSession = {
+      role: "admin",
+      email: "session@example.com",
+      name: "Session User",
+    };
+    mocks.fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ session, token: "initial.token" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const harness = renderStore(session);
+    await waitFor(() => expect(harness.store.currentSession).toEqual(session));
+
+    mocks.fetchMock.mockClear();
+    mocks.setSessionToken.mockClear();
+    mocks.fetchMock.mockImplementation((_input, init) => {
+      if ((init as RequestInit | undefined)?.method === "DELETE") {
+        return Promise.resolve(
+          new Response(JSON.stringify({ ok: true, mode: "local-only", revoked: false }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          })
+        );
+      }
+
+      return Promise.resolve(
+        new Response(JSON.stringify({ session, token: "stale.token" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+    });
+
+    await act(async () => {
+      harness.store.logout();
+    });
+
+    await waitFor(() => expect(screen.getByTestId("session-email")).toHaveTextContent("none"));
+    await waitFor(() =>
+      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accessToken: undefined }),
+      })
+    );
+    expect(mocks.fetchMock.mock.calls.every(([, init]) => (init as RequestInit | undefined)?.method === "DELETE")).toBe(true);
+    expect(mocks.setSessionToken).not.toHaveBeenCalledWith("stale.token");
+  });
+
   it("warns when the logout falls back to local-only despite having an access token", async () => {
     const harness = renderStore();
     const session: CurrentSession = {

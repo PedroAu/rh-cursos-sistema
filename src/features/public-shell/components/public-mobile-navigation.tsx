@@ -14,10 +14,13 @@ import {
 } from "@/components/ui/dialog";
 import { useDisclosure } from "@/hooks/use-disclosure";
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
+import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
+import { getDefaultDashboardPath } from "@/lib/session-routing";
 
 export function PublicMobileNavigation() {
   const [opened, { open, close }] = useDisclosure(false);
+  const { currentSession } = useAppStore();
 
   return (
     <Dialog
@@ -91,9 +94,9 @@ export function PublicMobileNavigation() {
             className="text-[#1f2a33] hover:bg-white/70"
             onClick={close}
           >
-            <NextLink href="/login">
+            <NextLink href={currentSession ? getDefaultDashboardPath(currentSession.role) : "/login"}>
               <UserRound className="h-4 w-4" aria-hidden="true" />
-              Entrar
+              {currentSession ? "Ir para o painel" : "Entrar"}
             </NextLink>
           </Button>
         </div>
