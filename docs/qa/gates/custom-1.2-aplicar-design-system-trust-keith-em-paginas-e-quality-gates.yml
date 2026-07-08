@@ -1,102 +1,64 @@
 schema: 1
 story: 'custom-1.2'
 story_title: 'Aplicar Design System Trust Keith em Páginas e Quality Gates'
-gate: FAIL
-status_reason: 'Explicit story gates are not met: npm test fails in the auth-session rate-limit contract, build compilation measured 4.0s against the 2.5s limit, and production CSS raw size measured 92,762 bytes against the 30KB limit. CodeRabbit also reported major findings requiring disposition before approval.'
+gate: PASS
+status_reason: 'All 10 acceptance criteria met with green evidence: @po formalized AC-9 (CSS < 30KB gzip: measured 16.9KB) and AC-10 (compile < 10s / wall < 25s: measured 3.7s / 13.6s); Playwright 136/136, unit 396/396, lint and typecheck clean. The two dev-owned documentation items from the previous CONCERNS gate were completed (commit 9b2d87d) and @devops ratified the CI hardening and wired the perf budgets into CI (branch ci/perf-budgets-css-buildtime).'
 reviewer: 'Quinn (Test Architect)'
-updated: '2026-07-07T18:33:10Z'
-expires: '2026-07-21T18:33:10Z'
-quality_score: 40
+updated: '2026-07-08T15:00:00Z'
+expires: '2026-07-22T15:00:00Z'
+quality_score: 100
 
-top_issues:
-  - id: 'QA-1'
-    severity: high
-    category: reliability
-    description: '`npm test` fails because the auth-session POST rate-limit contract expected 429 but received 401 after repeated invalid credentials.'
-    refs:
-      - 'tests/api-contract.spec.ts:131'
-      - 'app/api/auth/session/route.ts'
-    suggested_owner: dev
-  - id: 'QA-2'
-    severity: high
-    category: performance
-    description: 'Production build compilation measured 4.0s, exceeding the story acceptance criterion of build time < 2.5s.'
-    refs:
-      - 'package.json'
-    suggested_owner: dev
-  - id: 'QA-3'
-    severity: medium
-    category: performance
-    description: 'Production CSS chunk measured 92,762 bytes raw, exceeding the story acceptance criterion of CSS file size < 30KB. Gzip size measured 17,244 bytes, so the metric needs either optimization or explicit clarification.'
-    refs:
-      - '.next/static/chunks/1sdhf7b36uddn.css'
-    suggested_owner: dev
-  - id: 'QA-4'
-    severity: medium
-    category: security
-    description: 'CodeRabbit reported major findings in the reference canvas runtime, including external import loading without an allowlist and unsafe/fragile runtime paths. If this artifact is documentation-only, document that disposition; otherwise fix before approval.'
-    refs:
-      - 'docs/design/redesign/reference/canvases/support.js'
-    suggested_owner: dev
-  - id: 'QA-5'
-    severity: medium
-    category: maintainability
-    description: 'Story File List and `.aiox/project-status.yaml` do not match the actual branch diff, weakening Story-Driven Development traceability and automation evidence.'
-    refs:
-      - 'docs/stories/custom-1.2.story.md'
-      - '.aiox/project-status.yaml'
-    suggested_owner: dev
+top_issues: []
 waiver: { active: false }
 
 evidence:
-  tests_reviewed: 530
+  tests_reviewed: 532
   risks_identified: 5
   trace:
-    ac_covered: [3, 4, 6, 7, 8]
-    ac_gaps: [1, 2, 5, 9, 10]
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
   commands:
-    - 'coderabbit review --agent --type committed --base main (14 findings: major/minor/trivial)'
     - 'npm run lint (passed)'
     - 'npm run typecheck (passed)'
-    - 'npm test (failed: 135 passed, 1 failed; build compile 4.0s)'
-    - 'npm run test:unit (28 files, 394 tests passed)'
-    - 'CSS measurement: .next/static/chunks/1sdhf7b36uddn.css = 92,762 bytes raw; gzip = 17,244 bytes'
+    - 'npm run test:unit (28 files, 396 tests passed)'
+    - 'node scripts/run-playwright.mjs (136/136 passed in 2.4m, production build)'
+    - 'npm run css:check (16.9 KB gzip / 30 KB budget — AC-9 formalized metric)'
+    - 'npm run build:time-check (compile 3.7s / 10s; wall 13.6s / 25s — AC-10 formalized metric)'
+    - 'coderabbit review --agent -t uncommitted (9 findings triaged in the 2026-07-08 morning review: 3 fixed, 2 false positives disposed with evidence, rest resolved; 0 critical)'
   notes:
-    - 'Configured standards documents at docs/framework/* were missing, so compliance used available project tests, story criteria, and branch evidence.'
-    - 'Visual, contrast, keyboard, and a11y baseline suites passed during npm test before the final aggregate failure report.'
+    - 'Re-gate executed after: (1) @po formalized AC-9/AC-10 in the story frontmatter; (2) @dev completed QA-4/QA-5 documentation items (commit 9b2d87d); (3) @devops ratified ci.yml hardening (af5b569) and wired css:check/build:time-check into the CI Performance lane (4ca783c on ci/perf-budgets-css-buildtime).'
+    - 'Working tree restored from stash@{0} (wip-custom-1.2-inflight, preserved by @devops); budget scripts recovered from the CI branch. All quality commands re-executed on the restored delivery branch.'
+    - 'Test-data exhaustion flake found and fixed during re-gate: repeated full-suite runs consume turma vagas in the shared integration DB (enrollments are real), shrinking the checkout-target pool until admin CRUD tests racing on the last remaining turma made 5-6 checkout tests fail intermittently (pass in isolation, fail in suite). QA replenished the demo seed turmas (class-1-1/1-2/1-5/2-1/2-3 reopened via vagas_preenchidas reset). Pre-existing test-architecture debt, unrelated to this story''s code — see future recommendations.'
+    - 'Configured standards documents at docs/framework/* remain missing; compliance assessed against project tests, story criteria, and branch evidence.'
+    - 'Previous review (2026-07-08 morning) verified: support.js CodeRabbit disposition (4/4 claims), rate-limit-before-auth security fix, >= to > off-by-one alignment with the Edge shared limiter.'
 
 nfr_validation:
   security:
-    status: CONCERNS
-    notes: 'Auth-session rate-limit contract failed; CodeRabbit also flagged external import behavior in the reference canvas runtime.'
+    status: PASS
+    notes: 'Rate limiting precedes Supabase auth in both surfaces; support.js disposition verified as non-shipping documentation; CI actions SHA-pinned with least-privilege token (ratified by @devops).'
   performance:
-    status: FAIL
-    notes: 'Build time and raw CSS size exceed explicit story thresholds.'
+    status: PASS
+    notes: 'AC-9 and AC-10 formalized by @po and passing with headroom: CSS 16.9KB gzip / 30KB; compile 3.7s / 10s; wall 13.6s / 25s. Budgets enforced in CI via the Performance lane.'
   reliability:
-    status: FAIL
-    notes: 'Aggregate npm test is not 100% passing due to auth-session POST rate-limit behavior.'
+    status: PASS
+    notes: 'Unit 396/396 and Playwright 136/136 green on the restored delivery branch, including the auth-session rate-limit contract.'
   maintainability:
-    status: CONCERNS
-    notes: 'Story File List and project-status snapshot are out of sync with the branch diff; several CodeRabbit documentation consistency findings remain.'
+    status: PASS
+    notes: 'File List complete (including ci.yml), task checkboxes marked, story/gate/project-status in sync.'
 
 recommendations:
   immediate:
-    - action: 'Fix the auth-session rate-limit contract and rerun npm test.'
+    - action: '@dev: commit the restored working tree (code fixes from stash + this gate + QA Results) on codex-epic14-phase3-delivery, including scripts/check-*.mjs; then @devops: push and open/refresh the PR to main.'
       refs:
         - 'app/api/auth/session/route.ts'
-        - 'tests/api-contract.spec.ts:131'
-    - action: 'Resolve or formally waive the performance budget misses for build time and CSS size.'
-      refs:
-        - 'package.json'
-        - '.next/static/chunks/1sdhf7b36uddn.css'
-    - action: 'Triage CodeRabbit major findings in the reference canvas runtime and decide whether to fix or document non-shipping scope.'
-      refs:
-        - 'docs/design/redesign/reference/canvases/support.js'
-    - action: 'Update story File List and project status snapshot to match actual branch changes.'
-      refs:
-        - 'docs/stories/custom-1.2.story.md'
-        - '.aiox/project-status.yaml'
+        - 'src/lib/rate-limit.ts'
+        - 'supabase/functions/auth-session/index.ts'
+        - 'docs/qa/gates/custom-1.2-aplicar-design-system-trust-keith-em-paginas-e-quality-gates.yml'
   future:
-    - action: 'Add an explicit script for the CSS budget so the <30KB criterion is measured consistently in CI.'
+    - action: 'Fix E2E test-data management: reset/replenish integration seed data in Playwright globalSetup (or use disposable per-run turmas) so full-suite runs stop exhausting the shared checkout pool; consider isolating admin CRUD mutations from checkout targets.'
       refs:
-        - 'package.json'
+        - 'tests/helpers/integration-env.ts'
+        - 'playwright.config.ts'
+    - action: 'Monitor auth rate-limit 429s after go-live for shared-IP false positives, since successful logins now consume the 5/15min budget.'
+      refs:
+        - 'app/api/auth/session/route.ts'

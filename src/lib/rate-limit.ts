@@ -105,7 +105,7 @@ async function checkPostgres(
   const windowStart = Math.floor(Date.now() / windowMs) * windowMs;
   const retryAfter = Math.ceil((windowStart + windowMs - Date.now()) / 1000);
 
-  if (count >= config.maxRequests) {
+  if (count > config.maxRequests) {
     return { allowed: false, remaining: 0, retryAfter };
   }
 

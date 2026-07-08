@@ -84,21 +84,21 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Dados de login inválidos." }, 400, request);
   }
 
+  const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
+  if (!rate.allowed) {
+    return jsonResponse(
+      { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
+      429,
+      request,
+      { "Retry-After": rate.retryAfter.toString() }
+    );
+  }
+
   try {
     const supabase = anonClient();
     const result = await supabase.auth.signInWithPassword({ email, password });
 
     if (result.error || !result.data.user) {
-      const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
-      if (!rate.allowed) {
-        return jsonResponse(
-          { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
-          429,
-          request,
-          { "Retry-After": rate.retryAfter.toString() }
-        );
-      }
-
       return jsonResponse({ ok: false, error: "Credenciais invalidas." }, 401, request);
     }
 

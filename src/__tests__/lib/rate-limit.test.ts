@@ -35,6 +35,17 @@ describe('rate-limit', () => {
       expect(result.allowed).toBe(true);
     });
 
+    it('returns allowed=true when RPC count matches the configured limit', async () => {
+      mocks.rpc.mockReturnValue(
+        rpcBuilder(() => Promise.resolve({ data: 5, error: null })),
+      );
+
+      const result = await checkRateLimit('user-a-limit', rateLimitConfigs.auth);
+
+      expect(result.allowed).toBe(true);
+      expect(result.remaining).toBe(0);
+    });
+
     it('returns allowed=false with a retryAfter when RPC count exceeds maxRequests', async () => {
       mocks.rpc.mockReturnValue(
         rpcBuilder(() => Promise.resolve({ data: 21, error: null })),

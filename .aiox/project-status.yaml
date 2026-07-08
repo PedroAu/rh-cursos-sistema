@@ -1,19 +1,22 @@
 status:
   branch: codex-epic14-phase3-delivery
   modifiedFiles:
-    - artifacts/epic14-fidelity/agenda-canvas.png
-    - artifacts/epic14-fidelity/home-canvas.png
-    - artifacts/epic14-fidelity/manifest.json
-    - docs/design-system/trust-keith/INVENTORY.md
-    - docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md
-  modifiedFilesTotalCount: 26
+    - .aiox/project-status.yaml
+    - app/api/auth/session/route.ts
+    - docs/qa/gates/custom-1.2-aplicar-design-system-trust-keith-em-paginas-e-quality-gates.yml
+    - docs/stories/custom-1.2.story.md
+    - src/__tests__/app/api/auth-session-route.test.ts
+    - src/__tests__/lib/rate-limit.test.ts
+    - src/lib/rate-limit.ts
+    - supabase/functions/auth-session/index.ts
+  modifiedFilesTotalCount: 8
   recentCommits:
-    - 'docs(epic14): mark phase 2 public stories qa-approved'
-    - 'docs(epic-14): fix phase 2 fidelity evidence governance'
+    - 'fix(ci): ignore external asset dns noise in smoke runtime probe'
+    - 'fix(ci): stabilize e2e smoke in placeholder env'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-06T22:15:01.376Z'
+  lastUpdate: '2026-07-07T18:51:58.661Z'
   isGitRepo: true
-timestamp: 1783376101378
+timestamp: 1783450318671
 ttl: 60
-gitFingerprint: 1783375646341.3386:1783376091868.9658
+gitFingerprint: 1783375646341.3386:1783450318671.0000
