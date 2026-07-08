@@ -105,6 +105,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
   }
 
+  const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(rate.retryAfter)
+        }
+      }
+    );
+  }
+
   const supabase = createSupabaseServerClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
@@ -113,19 +126,6 @@ export async function POST(request: Request) {
   const result = await supabase.auth.signInWithPassword({ email, password });
 
   if (result.error || !result.data.user) {
-    const rate = await checkRateLimit(`auth:${clientIp(request)}`, rateLimitConfigs.auth);
-    if (!rate.allowed) {
-      return NextResponse.json(
-        { ok: false, error: "Muitas tentativas. Tente novamente mais tarde." },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rate.retryAfter)
-          }
-        }
-      );
-    }
-
     return NextResponse.json({ ok: false, error: "Credenciais invalidas." }, { status: 401 });
   }
 

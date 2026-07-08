@@ -5,7 +5,15 @@ const mocks = vi.hoisted(() => ({
     get: vi.fn(),
   },
   signOut: vi.fn(),
+  signInWithPassword: vi.fn(),
   checkRateLimit: vi.fn(),
+  supabaseServerClient: null as
+    | null
+    | {
+        auth: {
+          signInWithPassword: ReturnType<typeof vi.fn>;
+        };
+      },
   supabaseAdmin: null as
     | null
     | {
@@ -25,6 +33,11 @@ vi.mock("@/lib/server-session", () => ({
   getServerSession: vi.fn(),
 }));
 
+vi.mock("@/lib/supabase/server", () => ({
+  createSupabaseServerClient: () => mocks.supabaseServerClient,
+  isSupabaseServerConfigured: true,
+}));
+
 vi.mock("@/lib/supabase/admin", () => ({
   get supabaseAdmin() {
     return mocks.supabaseAdmin;
@@ -42,6 +55,51 @@ vi.mock("@/lib/rate-limit", () => ({
     admin: { windowMs: 60 * 1000, maxRequests: 30 },
   },
 }));
+
+describe("app/api/auth/session POST", () => {
+  beforeEach(() => {
+    mocks.signInWithPassword.mockReset();
+    mocks.checkRateLimit.mockReset();
+    mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4, retryAfter: 0 });
+    mocks.supabaseServerClient = {
+      auth: {
+        signInWithPassword: mocks.signInWithPassword,
+      },
+    };
+  });
+
+  it("blocks login attempts before Supabase auth when the rate limiter is exhausted", async () => {
+    mocks.checkRateLimit.mockResolvedValue({ allowed: false, remaining: 0, retryAfter: 60 });
+
+    const { POST } = await import("../../../../app/api/auth/session/route");
+
+    const response = await POST(
+      new Request("http://localhost/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "admin",
+          email: "admin@rhcursos.test",
+          password: "senha-invalida",
+        }),
+      })
+    );
+
+    expect(mocks.checkRateLimit).toHaveBeenCalledWith(
+      "auth:203.0.113.9",
+      expect.objectContaining({
+        maxRequests: 5,
+      })
+    );
+    expect(mocks.signInWithPassword).not.toHaveBeenCalled();
+    expect(response.status).toBe(429);
+    expect(response.headers.get("Retry-After")).toBe("60");
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Muitas tentativas. Tente novamente mais tarde.",
+    });
+  });
+});
 
 describe("app/api/auth/session DELETE", () => {
   beforeEach(() => {
