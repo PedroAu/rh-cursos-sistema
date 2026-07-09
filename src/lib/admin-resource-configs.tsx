@@ -31,6 +31,7 @@ import {
 import type {
   BlogPost,
   Course,
+  CourseModule,
   Enrollment,
   Instructor,
   Lead,
@@ -38,6 +39,31 @@ import type {
   TrainingClass,
   TrainingPath,
 } from "@/types";
+
+// O form state genérico (ConfigDeps.form) é Record<string, unknown> — os
+// inputs guardam string (text/select/date), number (number) ou string[]
+// (array/multiselect). Estes helpers normalizam para o tipo esperado nos
+// pontos de leitura, em vez de confiar em `any`.
+function str(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  return "";
+}
+function optStr(value: unknown): string | undefined {
+  const result = str(value);
+  return result ? result : undefined;
+}
+function strArr(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((item) => String(item)) : [];
+}
+function numOrUndef(value: unknown): number | undefined {
+  if (value === "" || value === undefined || value === null) return undefined;
+  const parsed = Number(value);
+  return Number.isNaN(parsed) ? undefined : parsed;
+}
+function modulesArr(value: unknown): CourseModule[] {
+  return Array.isArray(value) ? (value as CourseModule[]) : [];
+}
 
 export type ResourceKey =
   | "courses"
@@ -101,10 +127,8 @@ export type ResourceConfig = {
 type ConfigDeps = {
   search: string;
   editingId: string | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  form: Record<string, any>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setForm: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  form: Record<string, unknown>;
+  setForm: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
   setEditingId: (id: string | null) => void;
   setValidationErrors: (errors: ValidationError[]) => void;
   setOpen: (open: boolean) => void;
@@ -299,42 +323,49 @@ export function buildResourceConfig(
         },
         onDelete: (row: Course) => store.deleteCourse(row.id),
         onSave: async () => {
+          const modalities = strArr(form.modalities);
+          const categories = strArr(form.categories);
+          const targetAudience = strArr(form.targetAudience);
+          const objectives = strArr(form.objectives);
+          const benefits = strArr(form.benefits);
+          const modules = modulesArr(form.modules);
+
           const validation = validateCourse(
             {
               ...form,
-              modality: form.modalities?.[0] ?? "",
-              modalities: JSON.stringify(form.modalities || []),
-              categories: JSON.stringify(form.categories || []),
-              targetAudience: JSON.stringify(form.targetAudience || []),
-              objectives: JSON.stringify(form.objectives),
-              benefits: JSON.stringify(form.benefits),
+              modality: modalities[0] ?? "",
+              modalities: JSON.stringify(modalities),
+              categories: JSON.stringify(categories),
+              targetAudience: JSON.stringify(targetAudience),
+              objectives: JSON.stringify(objectives),
+              benefits: JSON.stringify(benefits),
             },
-            form.modules
+            modules
           );
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
             await store.upsertCourse({
               id: editingId ?? undefined,
-              title: form.title,
-              pathId: form.pathId,
-              modality: (form.modalities?.[0] ?? "Ao vivo online") as Course["modality"],
-              modalities: (form.modalities || []) as Course["modality"][],
-              durationLabel: form.durationLabel,
-              durationHours: Number(form.durationLabel?.replace(/\D/g, "") || 8),
+              title: str(form.title),
+              pathId: str(form.pathId),
+              modality: (modalities[0] ?? "Ao vivo online") as Course["modality"],
+              modalities: modalities as Course["modality"][],
+              durationLabel: str(form.durationLabel),
+              durationHours: Number(str(form.durationLabel).replace(/\D/g, "") || 8),
               price: Number(form.price || 0),
-              status: form.status as Course["status"],
-              shortDescription: form.shortDescription,
-              fullDescription: form.fullDescription,
-              image: form.image,
-              level: form.level as Course["level"],
-              targetAudience: form.targetAudience || [],
-              category: form.categories?.[0],
-              categories: form.categories || [],
+              status: str(form.status) as Course["status"],
+              shortDescription: str(form.shortDescription),
+              fullDescription: str(form.fullDescription),
+              image: str(form.image),
+              level: str(form.level) as Course["level"],
+              targetAudience,
+              category: categories[0],
+              categories,
               featured: form.featured === "Sim",
-              featuredCourseIds: form.featuredCourseIds || [],
-              objectives: form.objectives || [],
-              benefits: form.benefits || [],
-              modules: form.modules || [],
+              featuredCourseIds: strArr(form.featuredCourseIds),
+              objectives,
+              benefits,
+              modules,
             });
             setOpen(false);
             setValidationErrors([]);
@@ -501,14 +532,14 @@ export function buildResourceConfig(
             const manualFilledSeats = Number(form.manualFilledSeats || 0);
             await store.upsertClass({
               id: editingId ?? undefined,
-              courseId: form.courseId,
-              startDate: normalizeDateTimeForStorage(form.startDate),
-              endDate: normalizeDateTimeForStorage(form.endDate, "18:00:00.000Z"),
-              time: form.time,
-              modality: form.modality as TrainingClass["modality"],
-              status: form.status as TrainingClass["status"],
-              location: form.location,
-              instructorId: form.instructorId || undefined,
+              courseId: str(form.courseId),
+              startDate: normalizeDateTimeForStorage(str(form.startDate)),
+              endDate: normalizeDateTimeForStorage(str(form.endDate), "18:00:00.000Z"),
+              time: str(form.time),
+              modality: str(form.modality) as TrainingClass["modality"],
+              status: str(form.status) as TrainingClass["status"],
+              location: str(form.location),
+              instructorId: optStr(form.instructorId),
               totalSeats,
               manualFilledSeats,
               filledSeats: Math.min(totalSeats, confirmedEnrollments + manualFilledSeats),
@@ -613,10 +644,10 @@ export function buildResourceConfig(
           try {
             await store.updateStudent({
               id: editingId,
-              name: form.name,
-              email: form.email,
-              organization: form.organization,
-              enrollmentStatus: form.enrollmentStatus as Student["enrollmentStatus"],
+              name: str(form.name),
+              email: str(form.email),
+              organization: str(form.organization),
+              enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
             });
             setOpen(false);
             setValidationErrors([]);
@@ -744,37 +775,37 @@ export function buildResourceConfig(
             if (editingId) {
               await store.updateLead({
                 id: editingId,
-                name: form.name,
-                email: form.email,
-                phone: form.phone || "(61) 90000-0000",
-                type: form.type as Lead["type"],
-                courseInterest: form.courseInterest,
-                courseId: form.courseId || undefined,
-                origin: form.origin as Lead["origin"],
-                status: form.status as Lead["status"],
-                organization: form.organization || undefined,
-                teamSize: form.teamSize ? parseInt(form.teamSize) : undefined,
-                preferredModality: form.preferredModality || undefined,
-                trainingObjective: form.trainingObjective || undefined,
-                trainingTheme: form.trainingTheme || undefined,
-                mainChallenges: form.mainChallenges || undefined,
+                name: str(form.name),
+                email: str(form.email),
+                phone: optStr(form.phone) || "(61) 90000-0000",
+                type: str(form.type) as Lead["type"],
+                courseInterest: str(form.courseInterest),
+                courseId: optStr(form.courseId),
+                origin: str(form.origin) as Lead["origin"],
+                status: str(form.status) as Lead["status"],
+                organization: optStr(form.organization),
+                teamSize: numOrUndef(form.teamSize),
+                preferredModality: optStr(form.preferredModality),
+                trainingObjective: optStr(form.trainingObjective),
+                trainingTheme: optStr(form.trainingTheme),
+                mainChallenges: optStr(form.mainChallenges),
               });
             } else {
               await store.createLead({
-                name: form.name,
-                email: form.email,
-                phone: form.phone || "(61) 90000-0000",
-                type: form.type as Lead["type"],
-                courseInterest: form.courseInterest,
-                courseId: form.courseId || undefined,
-                origin: form.origin as Lead["origin"],
-                organization: form.organization || undefined,
-                teamSize: form.teamSize ? parseInt(form.teamSize) : undefined,
-                preferredModality: form.preferredModality || undefined,
-                trainingObjective: form.trainingObjective || undefined,
-                trainingTheme: form.trainingTheme || undefined,
-                mainChallenges: form.mainChallenges || undefined,
-                message: form.message || "Lead criado manualmente no admin.",
+                name: str(form.name),
+                email: str(form.email),
+                phone: optStr(form.phone) || "(61) 90000-0000",
+                type: str(form.type) as Lead["type"],
+                courseInterest: str(form.courseInterest),
+                courseId: optStr(form.courseId),
+                origin: str(form.origin) as Lead["origin"],
+                organization: optStr(form.organization),
+                teamSize: numOrUndef(form.teamSize),
+                preferredModality: optStr(form.preferredModality),
+                trainingObjective: optStr(form.trainingObjective),
+                trainingTheme: optStr(form.trainingTheme),
+                mainChallenges: optStr(form.mainChallenges),
+                message: optStr(form.message) || "Lead criado manualmente no admin.",
               });
             }
             setOpen(false);
@@ -897,7 +928,7 @@ export function buildResourceConfig(
           const validation = validateEnrollment(form);
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
-            await store.updateEnrollmentStatus(editingId, form.status as Enrollment["status"]);
+            await store.updateEnrollmentStatus(editingId, str(form.status) as Enrollment["status"]);
             setOpen(false);
             setValidationErrors([]);
           } catch (error) {
@@ -1003,15 +1034,15 @@ export function buildResourceConfig(
           try {
             await store.upsertInstructor({
               id: editingId ?? undefined,
-              name: form.name,
-              email: form.email,
-              phone: form.phone || undefined,
-              specialty: form.specialty || undefined,
-              bio: form.bio || undefined,
-              education: form.education || undefined,
-              photoUrl: form.photoUrl || undefined,
-              status: form.status as Instructor["status"],
-              courseIds: form.courseIds || [],
+              name: str(form.name),
+              email: str(form.email),
+              phone: optStr(form.phone),
+              specialty: optStr(form.specialty),
+              bio: optStr(form.bio),
+              education: optStr(form.education),
+              photoUrl: optStr(form.photoUrl),
+              status: str(form.status) as Instructor["status"],
+              courseIds: strArr(form.courseIds),
             });
             setOpen(false);
             setValidationErrors([]);
@@ -1120,16 +1151,16 @@ export function buildResourceConfig(
           try {
             await store.upsertBlogPost({
               id: editingId ?? undefined,
-              title: form.title,
-              category: form.category as BlogPost["category"],
-              author: form.author,
-              status: form.status as BlogPost["status"],
-              summary: form.summary,
-              content: form.content,
-              tags: form.tags || [],
-              image: form.image,
-              readingTime: form.readingTime || "5 min",
-              relatedCourseId: form.relatedCourseId || undefined,
+              title: str(form.title),
+              category: str(form.category) as BlogPost["category"],
+              author: str(form.author),
+              status: str(form.status) as BlogPost["status"],
+              summary: str(form.summary),
+              content: str(form.content),
+              tags: strArr(form.tags),
+              image: str(form.image),
+              readingTime: optStr(form.readingTime) || "5 min",
+              relatedCourseId: optStr(form.relatedCourseId),
             });
             setOpen(false);
             setValidationErrors([]);
