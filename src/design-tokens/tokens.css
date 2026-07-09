@@ -43,7 +43,7 @@
   --tk-link: var(--tk-accent);
 
   /* Trust Keith typography */
-  --tk-font-display: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --tk-font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   --tk-font-serif: var(--font-merriweather), Georgia, "Times New Roman", serif;
   --tk-font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   --tk-font-hand: "Caveat", "Segoe Script", cursive;

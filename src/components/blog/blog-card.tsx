@@ -12,13 +12,13 @@ export function BlogCard({ post, featured = false }: { post: BlogPost; featured?
       variant={featured ? "filled" : "base"}
       interactive={false}
       size="md"
-      className={cn("h-full overflow-hidden", featured && "bg-deep-navy text-white")}
+      className={cn("h-full overflow-hidden", featured && "bg-tk-brand-hover text-white")}
     >
       <div className={cn("min-h-40 border-b p-6", featured ? "border-white/10 bg-white/5" : "border-tk-brand/8 bg-tk-accent-soft/30")}>
         <div
           className={cn(
             "inline-flex rounded px-4 py-2 text-label font-semibold uppercase tracking-[0.16em]",
-            featured ? "bg-white/12 text-white" : "bg-surface-muted text-deep-navy"
+            featured ? "bg-white/12 text-white" : "bg-surface-muted text-tk-ink"
           )}
         >
           {post.category}

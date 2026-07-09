@@ -137,19 +137,19 @@ export function HomePage() {
 
   return (
     <div className="bg-tk-surface-2 pb-16 md:pb-24">
-      <div className="mx-auto w-[min(1180px,calc(100%-24px))] overflow-hidden rounded-tk-card border border-tk-line bg-tk-surface shadow-tk-card md:w-[min(1180px,calc(100%-40px))]">
+      <div className="mx-auto w-full max-w-[1180px] bg-tk-surface">
         <section
           data-testid="ui-hero-home"
-          className="grid gap-10 bg-tk-cream px-6 py-12 md:grid-cols-[1.05fr_0.95fr] md:px-10 md:py-[72px]"
+          className="grid gap-10 bg-tk-cream px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-[72px]"
         >
           <div>
             <Badge tone="accent" dot className="w-fit">
               Educação corporativa · Desde 2007
             </Badge>
-            <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.75rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink md:max-w-none md:text-display-hero">
+            <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink sm:text-[2.75rem] lg:max-w-none lg:text-display-hero">
               Conhecimento técnico que sua equipe <span className="italic text-tk-brand">aplica no mesmo dia</span>.
             </h1>
-            <p className="mt-5 max-w-[48ch] font-tk-serif text-subheading font-light leading-[1.45] text-tk-ink-muted md:text-subheading-lg">
+            <p className="mt-5 max-w-[48ch] font-tk-serif text-base font-light leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
               Cursos abertos, treinamentos in company e consultoria para o setor público e privado. São quase 80 cursos em
               6 trilhas de conhecimento, do básico ao avançado, presenciais ou online.
             </p>
@@ -182,7 +182,7 @@ export function HomePage() {
 
           <Card
             variant="base"
-            className="border-[color:var(--rh-paper-line)] bg-[linear-gradient(158deg,var(--tk-surface),var(--tk-line))] px-8 py-[38px]"
+            className="self-start border-[color:var(--rh-paper-line)] bg-[linear-gradient(158deg,var(--tk-surface),var(--tk-line))] px-5 py-6 sm:px-8 sm:py-[38px]"
           >
             <div className="flex flex-col items-center gap-[22px]">
               <Image
@@ -234,7 +234,7 @@ export function HomePage() {
           </Card>
         </section>
 
-        <section className="px-6 py-[72px] md:px-10 md:py-[88px]">
+        <section className="px-5 py-16 sm:px-8 lg:px-10 lg:py-[88px]">
           <SectionHeading
             eyebrow="Três caminhos, um só objetivo"
             title="Escolha como quer avançar"
@@ -281,8 +281,8 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="border-y border-tk-cream-dark bg-tk-cream px-6 py-16 md:px-10 md:py-20">
-          <div className="grid gap-9 md:grid-cols-[1.05fr_0.95fr] md:gap-14">
+        <section className="border-y border-tk-cream-dark bg-tk-cream px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
+          <div className="grid gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
             <div>
               <Badge tone="accent" className="w-fit bg-tk-brand text-tk-surface">
                 Consultoria
@@ -315,7 +315,7 @@ export function HomePage() {
               </Button>
             </div>
 
-            <Card variant="base" className="p-8">
+            <Card variant="base" className="p-5 sm:p-8">
               <p className="mb-5 text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
                 Como funciona
               </p>
@@ -343,7 +343,7 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="px-6 py-16 md:px-10 md:py-20">
+        <section className="px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
           <h2 className="mb-11 text-center font-tk-display text-section-heading font-bold tracking-[var(--tk-tracking-display)] text-tk-ink md:text-section">
             A RH Cursos em números
           </h2>
@@ -354,8 +354,8 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="px-6 pb-[88px] md:px-10">
-          <div className="max-w-[840px]">
+        <section className="px-5 pb-16 sm:px-8 lg:px-10 lg:pb-[88px]">
+          <div className="mx-auto max-w-[840px] lg:mx-0">
             <Testimonial
               quote="A RH Cursos traduziu exigências legais complexas em processos que a nossa equipe realmente consegue executar no dia a dia."
               name="Mariana Alves"
@@ -366,7 +366,7 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="bg-tk-brand px-6 py-16 text-center md:px-10 md:py-20">
+        <section className="bg-tk-brand px-5 py-16 text-center sm:px-8 lg:px-10 lg:py-20">
           <div className="mx-auto max-w-[760px]">
             <h2 className="font-tk-display text-display-large font-bold leading-[1.12] tracking-[var(--tk-tracking-display)] text-tk-surface">
               Pronto para capacitar a sua equipe?

@@ -26,20 +26,20 @@ const items = [
 export function FAQAccordion() {
   return (
     <Accordion type="single" collapsible className="mx-auto grid max-w-4xl gap-3">
-        {items.map((item) => (
-          <AccordionItem
-            key={item.value}
-            value={item.value}
-            className="rounded-lg border border-tk-brand/10 bg-white px-5 shadow-soft"
-          >
-            <AccordionTrigger className="text-left font-display text-base font-bold text-deep-navy hover:no-underline">
-              {item.question}
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-7 text-text-muted">
-              {item.answer}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      {items.map((item) => (
+        <AccordionItem
+          key={item.value}
+          value={item.value}
+          className="rounded-lg border border-tk-brand/10 bg-white px-5 shadow-soft"
+        >
+          <AccordionTrigger className="text-left font-tk-display text-base font-bold tracking-[var(--tk-tracking-display)] text-tk-ink hover:no-underline">
+            {item.question}
+          </AccordionTrigger>
+          <AccordionContent className="text-sm leading-7 text-tk-ink-muted">
+            {item.answer}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
   );
 }

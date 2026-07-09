@@ -20,7 +20,7 @@ import { currency } from "@/lib/utils";
 
 export function CourseDetailPage() {
   const { slug } = useParams();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const { courses, classes, instructors, testimonials } = useAppStore();
   const [openCheckout, setOpenCheckout] = useState(false);
   const slugParam = Array.isArray(slug) ? slug[0] : slug;
@@ -57,11 +57,31 @@ export function CourseDetailPage() {
     window.location.assign("/falar-com-especialista");
   }, [course?.slug]);
 
+  const clearCheckoutParam = useCallback(() => {
+    if (params.get("checkout") !== "1") return;
+
+    const nextParams = new URLSearchParams(params.toString());
+    nextParams.delete("checkout");
+    setParams(nextParams);
+  }, [params, setParams]);
+
+  const handleCheckoutOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      setOpenCheckout(nextOpen);
+
+      if (!nextOpen) {
+        clearCheckoutParam();
+      }
+    },
+    [clearCheckoutParam]
+  );
+
   useEffect(() => {
-    if (params.get("checkout") === "1") {
+    if (params.get("checkout") === "1" && !openCheckout) {
       startCheckout("deeplink");
+      clearCheckoutParam();
     }
-  }, [params, startCheckout]);
+  }, [clearCheckoutParam, openCheckout, params, startCheckout]);
 
   if (!course) {
     return (
@@ -89,8 +109,12 @@ export function CourseDetailPage() {
                   <Badge variant="muted">{course.modality}</Badge>
                   <Badge variant="success">{course.durationLabel}</Badge>
                 </div>
-                <h1 className="font-display text-tk-brand">{course.title}</h1>
-                <p className="max-w-3xl text-lg leading-8 text-tk-ink-muted">{course.fullDescription}</p>
+                <h1 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-brand md:text-display-hero">
+                  {course.title}
+                </h1>
+                <p className="max-w-3xl font-tk-serif text-subheading leading-relaxed text-tk-ink-muted">
+                  {course.fullDescription}
+                </p>
                 <div className="flex flex-wrap gap-5 text-sm text-tk-ink-muted">
                   <div className="flex items-center gap-2">
                     <Star className="h-4 w-4 text-accent" />
@@ -156,7 +180,9 @@ export function CourseDetailPage() {
                 ].map((item) => (
                   <div key={item.label} className="surface-card p-5">
                     <p className="text-label font-bold uppercase tracking-[0.08em] text-label-secondary">{item.label}</p>
-                    <p className="mt-2 font-display text-3xl font-bold text-deep-navy">{item.value}</p>
+                    <p className="mt-2 font-tk-display text-3xl font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                      {item.value}
+                    </p>
                     <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.helper}</p>
                   </div>
                 ))}
@@ -184,9 +210,12 @@ export function CourseDetailPage() {
               <SectionTitle eyebrow="Objetivos centrais" title="O que voce vai desenvolver" align="center" />
               <div className="mt-8 grid gap-6 md:grid-cols-3">
                 {[...course.objectives, ...course.benefits].slice(0, 4).map((objective, index) => (
-                  <Card key={objective} className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-deep-navy text-white" : ""}>
+                  <Card
+                    key={objective}
+                    className={index === 0 || index === 3 ? "md:col-span-2" : index === 1 ? "bg-tk-brand-hover text-white" : ""}
+                  >
                     <CardContent className="space-y-3 p-8">
-                      <ShieldCheck className="h-8 w-8 text-prestige-gold" />
+                      <ShieldCheck className="h-8 w-8 text-tk-accent" />
                       <h3 className={index === 1 ? "text-white" : "text-tk-brand"}>{objective}</h3>
                       <p className={index === 1 ? "text-sm leading-7 text-white/75" : "text-sm leading-7 text-tk-ink-muted"}>
                         Aplicação prática com foco em decisão, rotina profissional e segurança na execução.
@@ -219,7 +248,9 @@ export function CourseDetailPage() {
                       }
                     ].map((item) => (
                       <div key={item.title} className="rounded-xl border border-outline-variant bg-surface-muted p-4">
-                        <h3 className="text-base font-bold text-deep-navy">{item.title}</h3>
+                        <h3 className="font-tk-display text-base font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                          {item.title}
+                        </h3>
                         <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.description}</p>
                       </div>
                     ))}
@@ -270,13 +301,13 @@ export function CourseDetailPage() {
               </Card>
             </div>
 
-            <Card className="h-fit border-outline-variant bg-deep-navy text-white lg:sticky lg:top-24">
+            <Card className="h-fit border-outline-variant bg-tk-brand-hover text-white lg:sticky lg:top-24">
               <CardContent className="space-y-5 p-6">
                 <div className="space-y-1">
-                  <div className="inline-flex rounded bg-prestige-gold px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
-                  <div className="text-4xl font-extrabold text-prestige-gold">{currency(course.price)}</div>
+                  <div className="inline-flex rounded bg-tk-accent px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">Inscrição garantida</div>
+                  <div className="text-4xl font-extrabold text-tk-accent">{currency(course.price)}</div>
                 </div>
-                <Button className="w-full bg-prestige-gold text-white hover:bg-warning hover:text-white" size="lg" onClick={() => startCheckout("sidebar_cta")}>
+                <Button className="w-full bg-tk-accent text-white hover:bg-tk-brand hover:text-white" size="lg" onClick={() => startCheckout("sidebar_cta")}>
                   Inscrever-se agora
                 </Button>
                 <div className="rounded-lg border border-white/15 bg-white/10 p-4 text-sm font-medium text-white">
@@ -375,7 +406,9 @@ export function CourseDetailPage() {
             <FAQAccordion />
             <Card className="border-outline-variant bg-surface-muted">
               <CardContent className="space-y-4 p-6">
-                <h3 className="font-display text-2xl font-bold text-deep-navy">Prefere validar com a equipe antes da matrícula?</h3>
+                <h3 className="font-tk-display text-2xl font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                  Prefere validar com a equipe antes da matrícula?
+                </h3>
                 <p className="text-sm leading-6 text-tk-ink-muted">
                   Fale com atendimento para confirmar aderência do conteúdo, política comercial e formato ideal para sua turma.
                 </p>
@@ -404,7 +437,7 @@ export function CourseDetailPage() {
         </div>
       </section>
 
-      <CheckoutModal course={course} open={openCheckout} onOpenChange={setOpenCheckout} />
+      <CheckoutModal course={course} open={openCheckout} onOpenChange={handleCheckoutOpenChange} />
     </>
   );
 }

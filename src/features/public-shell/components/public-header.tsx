@@ -20,9 +20,7 @@ function isItemActive(pathname: string, to: string) {
 export function PublicHeader() {
   const location = useLocation();
   const { currentSession } = useAppStore();
-  const navOrder = location.pathname.startsWith("/sobre")
-    ? ["/cursos", "/agenda", "/in-company", "/consultoria", "/sobre", "/blog"]
-    : ["/cursos", "/agenda", "/in-company", "/consultoria", "/blog"];
+  const navOrder = ["/cursos", "/agenda", "/in-company", "/consultoria", "/sobre", "/blog"];
   const primaryNavItems = navOrder
     .map((to) => publicNavItems.find((item) => item.to === to))
     .filter((item): item is (typeof publicNavItems)[number] => Boolean(item));

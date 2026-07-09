@@ -120,12 +120,14 @@ export function ContactPage() {
   });
 
   return (
-    <div className="bg-[#f6f7fb]">
+    <div className="bg-tk-surface-2">
       <section className="border-b border-outline-variant bg-white">
         <div className="ea-container py-12 md:py-14">
           <div className="max-w-4xl space-y-4">
-            <h1 className="text-deep-navy">Entre em Contato</h1>
-            <p className="max-w-3xl text-body-lg leading-8 text-tk-ink-muted">
+            <h1 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
+              Entre em Contato
+            </h1>
+            <p className="max-w-3xl font-tk-serif text-subheading leading-relaxed text-tk-ink-muted">
               Estamos prontos para atender suas dúvidas sobre treinamentos corporativos e gestão pública. Fale conosco
               através do formulário ou nossos canais diretos.
             </p>
@@ -147,7 +149,9 @@ export function ContactPage() {
                     </div>
                     <div>
                       <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">{item.title}</p>
-                      <p className="mt-2 text-lg font-semibold text-deep-navy">{item.headline}</p>
+                      <p className="mt-2 font-tk-display text-[1.35rem] font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                        {item.headline}
+                      </p>
                       <p className="mt-1 text-sm leading-6 text-tk-ink-muted">{item.detail}</p>
                     </div>
                   </CardContent>
@@ -166,13 +170,13 @@ export function ContactPage() {
             />
 
             <div className="flex flex-wrap gap-3">
-              <Button asChild className="bg-deep-navy text-white hover:bg-deep-navy/92">
+              <Button asChild>
                 <a href={company.links.whatsapp} target="_blank" rel="noreferrer">
                   <MessageCircle className="h-4 w-4" />
                   WhatsApp
                 </a>
               </Button>
-              <Button asChild variant="outline" className="border-outline-variant text-deep-navy hover:bg-surface-muted">
+              <Button asChild variant="outline" className="border-outline-variant text-tk-ink hover:bg-surface-muted">
                 <a href={company.links.email}>
                   <Mail className="h-4 w-4" />
                   E-mail
@@ -184,10 +188,12 @@ export function ContactPage() {
           <Card className="border-outline-variant bg-surface-container-lowest shadow-card" data-testid="ui-contact-form">
             <CardContent className="grid gap-6 p-8 md:p-10">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-1 rounded-full bg-prestige-gold" aria-hidden />
+                <div className="h-12 w-1 rounded-full bg-tk-accent" aria-hidden />
                 <div className="space-y-1">
                   <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">Atendimento</p>
-                  <h2 className="font-display text-h2-compact font-bold text-deep-navy">Envie uma mensagem</h2>
+                  <h2 className="font-tk-display text-h2-compact font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                    Envie uma mensagem
+                  </h2>
                 </div>
               </div>
 
@@ -301,7 +307,7 @@ export function ContactPage() {
                   type="submit"
                   loading={isSubmitting}
                   size="lg"
-                  className="w-fit bg-[var(--ea-button-primary-fg,#3d2c00)] text-white hover:bg-[var(--ea-button-primary-fg,#3d2c00)]/92"
+                  className="w-fit"
                 >
                   <Send className="h-4 w-4" />
                   {isSubmitting ? "Enviando..." : "Enviar mensagem"}

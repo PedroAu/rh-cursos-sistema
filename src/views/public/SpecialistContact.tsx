@@ -136,16 +136,16 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
 
   return (
     <>
-      <section className="bg-deep-navy py-20 text-white">
+      <section className="bg-tk-brand-hover py-20 text-white">
         <div className="ea-container">
           <div className="max-w-3xl space-y-6">
-            <span className="inline-flex rounded bg-[#0c6a83] px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
+            <span className="inline-flex rounded bg-tk-brand px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-white">
               {isConsultoriaJourney ? "Consultoria para órgãos e empresas" : "Consultoria exclusiva"}
             </span>
-            <h1 className="text-white">
+            <h1 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-white md:text-display-hero">
               {isConsultoriaJourney ? "Consultoria para aplicar norma com clareza operacional." : "Fale com um especialista da RH Cursos."}
             </h1>
-            <p className="max-w-2xl text-lead text-white/80">
+            <p className="max-w-2xl font-tk-serif text-subheading leading-relaxed text-white/80 md:text-subheading-large">
               {isConsultoriaJourney
                 ? "A RH Cursos apoia equipes públicas e privadas a traduzirem exigências legais e regulatórias em processos claros, treinamento aplicável e execução acompanhada."
                 : "Conte o desafio da sua equipe e receba um diagnóstico orientado antes de qualquer proposta."}
@@ -170,9 +170,11 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
         <div className="ea-container grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div className="space-y-6 lg:sticky lg:top-24">
             <div className="space-y-4">
-              <p className="text-label font-bold uppercase tracking-[0.08em] text-prestige-gold">Diagnóstico personalizado</p>
-              <h2 className="text-deep-navy">Entenda o caminho antes de propor a solução.</h2>
-              <p className="max-w-2xl text-body-lg leading-8 text-text-muted">
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-accent">Diagnóstico personalizado</p>
+              <h2 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
+                Entenda o caminho antes de propor a solução.
+              </h2>
+              <p className="max-w-2xl font-tk-serif text-subheading leading-relaxed text-tk-ink-muted">
                 O atendimento começa pelo contexto da equipe para orientar o formato mais adequado, com foco em
                 {isConsultoriaJourney
                   ? " exigências legais, requisitos regulatórios e resultado prático."
@@ -191,8 +193,10 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="space-y-1">
-                        <h3 className="font-display text-xl font-bold text-deep-navy">{item.title}</h3>
-                        <p className="text-sm leading-6 text-text-muted">{item.description}</p>
+                        <h3 className="font-tk-display text-xl font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm leading-6 text-tk-ink-muted">{item.description}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -200,11 +204,11 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
               })}
             </div>
 
-            <Card className="overflow-hidden border-outline-variant bg-deep-navy text-white">
+            <Card className="overflow-hidden border-outline-variant bg-tk-brand-hover text-white">
               <CardContent className="space-y-4 p-6">
                 <div className="flex items-center gap-4">
-                  <Avatar className="h-14 w-14 border border-white/15 bg-[#0c6a83]">
-                    <AvatarFallback className="bg-[#0c6a83] font-display text-xl text-white">
+                  <Avatar className="h-14 w-14 border border-white/15 bg-tk-brand">
+                    <AvatarFallback className="bg-tk-brand font-tk-display text-xl text-white">
                       MS
                     </AvatarFallback>
                   </Avatar>
@@ -225,8 +229,10 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
             <CardContent className="grid gap-6 p-8 md:p-10">
               <div className="space-y-2">
                 <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">Formulário</p>
-                <h2 className="font-display text-h2-compact font-bold text-deep-navy">Solicite o contato</h2>
-                <p className="text-sm leading-7 text-text-muted">
+                <h2 className="font-tk-display text-h2-compact font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
+                  Solicite o contato
+                </h2>
+                <p className="text-sm leading-7 text-tk-ink-muted">
                   Preencha os dados e o tema; retornaremos com orientação objetiva.
                 </p>
               </div>

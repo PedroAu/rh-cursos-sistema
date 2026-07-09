@@ -33,53 +33,53 @@ export function ClassCard({
   return (
     <Card variant="elevated" interactive={false} size="md" className="overflow-hidden">
       <div className="grid lg:grid-cols-[172px_minmax(0,1fr)]">
-        <div className="flex min-h-[172px] flex-col items-center justify-center bg-[#0b4668] px-6 py-8 text-center text-white">
-          <span className="text-5xl font-extrabold leading-none">{day}</span>
-          <span className="mt-2 text-xl font-bold uppercase">{month}</span>
+        <div className="flex min-h-[172px] flex-col items-center justify-center bg-tk-brand-hover px-6 py-8 text-center text-white">
+          <span className="font-tk-display text-5xl font-bold leading-none tracking-[var(--tk-tracking-display)]">{day}</span>
+          <span className="mt-2 font-tk-display text-xl font-bold uppercase tracking-[var(--tk-tracking-display)]">{month}</span>
           <span className="mt-2 text-base text-white/80">
             {new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(new Date(trainingClass.startDate))}
           </span>
         </div>
 
         <CardContent className="space-y-5 p-5 pt-5 lg:p-6">
-          <div className="flex flex-col gap-4 border-b border-[#d7dee5] pb-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex flex-col gap-4 border-b border-outline-variant pb-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">
-                <span className="inline-flex rounded-full bg-[#cae6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#004364]">
+                <span className="inline-flex rounded-full bg-tk-accent-soft px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-tk-brand-hover">
                   {trainingClass.modality}
                 </span>
                 <StatusBadge status={trainingClass.status} />
               </div>
-              <h3 className="max-w-2xl text-[1.45rem] font-bold leading-tight text-[#11324a]">
+              <h3 className="max-w-2xl font-tk-display text-[1.45rem] font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
                 {course.title}
               </h3>
             </div>
 
-          <div className="flex items-center gap-2 text-right text-sm font-bold text-[#1f6f2e]">
+          <div className="flex items-center gap-2 text-right text-sm font-bold text-tk-success">
               {trainingClass.status === "Poucas vagas" ? (
-                <TriangleAlert className="h-4 w-4 text-[#e67e22]" />
+                <TriangleAlert className="h-4 w-4 text-warning" />
               ) : (
-                <span className="h-2.5 w-2.5 rounded-full bg-[#1f6f2e]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-tk-success" />
               )}
               <span>{urgencyLabel}</span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-base text-[#4c5560]">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-base text-tk-ink-muted">
             <div className="flex items-center gap-2">
-              <Clock3 className="h-4 w-4 text-[#004364]" />
+              <Clock3 className="h-4 w-4 text-tk-brand-hover" />
               <span>{trainingClass.time}</span>
             </div>
             <div className="flex items-center gap-2">
-              <UserRound className="h-4 w-4 text-[#004364]" />
+              <UserRound className="h-4 w-4 text-tk-brand-hover" />
               <span>{instructor?.name ?? "Instrutor a definir"}</span>
             </div>
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-[#004364]" />
+              <CalendarDays className="h-4 w-4 text-tk-brand-hover" />
               <span>{formatDate(trainingClass.startDate)}</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#004364]" />
+              <MapPin className="h-4 w-4 text-tk-brand-hover" />
               <span>{trainingClass.location}</span>
             </div>
           </div>
@@ -87,13 +87,13 @@ export function ClassCard({
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Link
               to={`/cursos/${course.slug}`}
-              className="inline-flex items-center text-sm font-semibold text-[#004364] transition hover:text-[#0d5b85]"
+              className="inline-flex items-center text-sm font-semibold text-tk-brand-hover transition hover:text-tk-brand"
             >
               Ver curso
             </Link>
             <Link
               to={`/cursos/${course.slug}?checkout=1`}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#f6be39] px-5 text-sm font-bold text-[#083b56] transition hover:bg-[#ffc641]"
+              className="inline-flex min-h-11 items-center justify-center rounded-md bg-tk-accent px-5 text-sm font-bold text-white transition hover:bg-tk-brand"
             >
               Inscrever-se
             </Link>

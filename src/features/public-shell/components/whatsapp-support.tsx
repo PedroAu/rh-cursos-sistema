@@ -76,7 +76,7 @@ export function WhatsAppSupport() {
         id="atendimento"
         onClick={open}
         aria-label="Abrir atendimento"
-        className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--m3-secondary-container)] text-[var(--ea-color-deep-navy)] shadow-[0_16px_36px_rgba(10,32,56,0.2)] transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
+        className="fixed bottom-5 right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-tk-accent-soft text-tk-brand-hover shadow-[0_16px_36px_rgba(10,32,56,0.2)] transition-transform duration-200 hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2"
         type="button"
       >
         <MessageCircle className="h-6 w-6" aria-hidden="true" />
