@@ -99,7 +99,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ### Current State Observed by @sm
 - `app/in-company/page.tsx` compoe `PublicPageShell` + `InCompanyPage`.
 - `src/features/public/in-company/in-company-page.tsx` re-exporta `InCompanyPage` de `src/views/public/InCompany.tsx`.
-- `src/views/public/InCompany.tsx` ja usa `useAppStore` e `createLead`.
+- `src/views/public/InCompany.tsx` ja usa `useAppStore` e `createLead`; o contrato corrigido volta para um unico campo de mensagem, remove o checkbox de consentimento e faz o CTA do hero rolar ate o formulario.
 - O smoke atual cobre submit in-company; se labels/copy forem ajustados para a spec, testes devem acompanhar o contrato atualizado.
 - Code intelligence e ClickUp indisponiveis nesta sessao.
 
@@ -138,8 +138,8 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/manifest.json`
 
 ## Dev Agent Record
-- 2026-07-05 - `src/views/public/InCompany.tsx` foi alinhado ao contrato da spec com área de interesse por select, tamanho da equipe por select, consentimento explícito e submit preservando `createLead`.
-- 2026-07-05 - `tests/epic14-mantine-removal.smoke.spec.ts` foi atualizado para o novo contrato do formulário e para a mensagem de sucesso inline atual.
+- 2026-07-09 - `src/views/public/InCompany.tsx` foi corrigido para voltar ao canvas: CTA hero agora rola até o formulário, o formulário usa um unico campo de mensagem e o checkbox de consentimento foi removido.
+- 2026-07-09 - `tests/epic14-mantine-removal.smoke.spec.ts` foi atualizado para o CTA-âncora do hero e para o novo contrato do campo de mensagem.
 - 2026-07-05 - `npm run typecheck` ✅
 - 2026-07-05 - `npm run lint` ✅
 - 2026-07-05 - `npm run test:unit` ✅

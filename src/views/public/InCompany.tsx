@@ -17,11 +17,9 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useQuoteModal } from "@/components/in-company/quote-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,10 +44,7 @@ const inCompanySchema = z.object({
     .trim()
     .min(1, "Selecione o tamanho da equipe."),
   modality: z.string().trim().min(1, "Selecione a área de interesse."),
-  trainingObjective: z.string().trim().min(1, "Informe o objetivo do treinamento."),
-  trainingTheme: z.string().trim().min(1, "Informe o tema a ser abordado."),
-  mainChallenges: z.string().trim().min(1, "Informe os desafios principais."),
-  consent: z.boolean().refine((value) => value, "Você precisa concordar com o contato da equipe.")
+  message: z.string().trim().max(1000, "A mensagem deve ter no máximo 1000 caracteres.")
 });
 
 type InCompanyFormValues = z.infer<typeof inCompanySchema>;
@@ -61,10 +56,7 @@ const defaultValues: InCompanyFormValues = {
   phone: "",
   groupSize: "",
   modality: "",
-  trainingObjective: "",
-  trainingTheme: "",
-  mainChallenges: "",
-  consent: false
+  message: ""
 };
 
 const interestAreaOptions = [
@@ -205,7 +197,6 @@ function SectionEyebrow({ children, tone = "accent" }: { children: string; tone?
 
 export function InCompanyPage() {
   const { createLead } = useAppStore();
-  const { openQuote } = useQuoteModal();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const {
@@ -231,17 +222,16 @@ export function InCompanyPage() {
       await createLead({
         courseInterest: "Treinamento In-Company",
         email: values.email,
-        mainChallenges: values.mainChallenges,
-        message: `Empresa: ${values.company}. Telefone/WhatsApp: ${values.phone}. Tamanho da equipe: ${values.groupSize} pessoa(s). Modalidade: ${values.modality}. Objetivo: ${values.trainingObjective}. Tema: ${values.trainingTheme}. Desafios principais: ${values.mainChallenges}`,
-        
+        message:
+          values.message.trim() ||
+          `Empresa: ${values.company}. Telefone/WhatsApp: ${values.phone}. Tamanho da equipe: ${values.groupSize} pessoa(s). Área de interesse: ${values.modality}.`,
         name: values.name,
         organization: values.company,
         origin: "Site",
         phone: values.phone,
         preferredModality: "In company",
         teamSize: teamSizeOptions.indexOf(values.groupSize as (typeof teamSizeOptions)[number]) + 1,
-        trainingObjective: values.trainingObjective,
-        trainingTheme: values.trainingTheme,
+        trainingTheme: values.modality,
         type: "InCompany"
       });
 
@@ -275,8 +265,9 @@ export function InCompanyPage() {
                   type="button"
                   size="lg"
                   className="min-w-[220px]"
-                  onClick={() => openQuote()}
-                  aria-label="Solicitar orçamento"
+                  onClick={() => {
+                    document.getElementById("formulario-in-company")?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
                 >
                   Solicitar proposta
                   <ArrowRight className="h-4 w-4" />
@@ -638,69 +629,18 @@ export function InCompanyPage() {
                       />
                     </div>
 
-                    <FormField error={errors.trainingObjective?.message} label="Objetivo do treinamento" required>
-                      {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
-                        <Input
-                          id={fieldId}
-                          placeholder="Conte o objetivo do treinamento e o contexto da sua equipe"
-                          aria-describedby={ariaDescribedBy}
-                          aria-invalid={ariaInvalid}
-                          {...register("trainingObjective", { onChange: clearFeedback })}
-                        />
-                      )}
-                    </FormField>
-
-                    <FormField error={errors.trainingTheme?.message} label="Tema a ser abordado" required>
-                      {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
-                        <Input
-                          id={fieldId}
-                          placeholder="Ex.: Licitações e Contratos"
-                          aria-describedby={ariaDescribedBy}
-                          aria-invalid={ariaInvalid}
-                          {...register("trainingTheme", { onChange: clearFeedback })}
-                        />
-                      )}
-                    </FormField>
-
-                    <FormField error={errors.mainChallenges?.message} label="Desafios principais" required>
+                    <FormField error={errors.message?.message} label="Mensagem">
                       {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
                         <Textarea
                           id={fieldId}
                           rows={5}
-                          placeholder="Descreva brevemente o seu desafio ou necessidade..."
+                          placeholder="Conte o objetivo do treinamento e o contexto da sua equipe"
                           aria-describedby={ariaDescribedBy}
                           aria-invalid={ariaInvalid}
-                          {...register("mainChallenges", { onChange: clearFeedback })}
+                          {...register("message", { onChange: clearFeedback })}
                         />
                       )}
                     </FormField>
-
-                    <Controller
-                      control={control}
-                      name="consent"
-                      render={({ field }) => (
-                        <div className="space-y-2">
-                          <label className="flex items-start gap-3 text-xs leading-5 text-rh-gray">
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={(checked) => {
-                                clearFeedback();
-                                field.onChange(checked);
-                              }}
-                              aria-label="Concordo em ser contatado pela equipe da RH Cursos"
-                              aria-invalid={errors.consent ? true : undefined}
-                              aria-describedby={errors.consent ? "in-company-consent-error" : undefined}
-                            />
-                            <span>Ao enviar, você concorda em ser contatado pela equipe da RH Cursos.</span>
-                          </label>
-                          {errors.consent?.message ? (
-                            <p id="in-company-consent-error" className="text-caption text-tk-error" role="alert">
-                              {errors.consent.message}
-                            </p>
-                          ) : null}
-                        </div>
-                      )}
-                    />
 
                     <Button
                       type="submit"
@@ -713,6 +653,9 @@ export function InCompanyPage() {
                       {isSubmitting ? "Enviando..." : "Solicitar proposta"}
                     </Button>
 
+                    <p className="text-caption text-tk-ink-muted">
+                      Ao enviar, você concorda em ser contatado pela equipe da RH Cursos.
+                    </p>
                     <p className="text-center text-xs text-rh-gray">Responderemos em até 24 horas úteis.</p>
                   </form>
                 )}
