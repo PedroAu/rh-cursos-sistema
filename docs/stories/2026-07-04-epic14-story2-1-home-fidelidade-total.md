@@ -186,6 +186,7 @@ Manual/visual checks:
 ### Completion Notes
 - Home `/` refatorada para usar `Badge`, `Button`, `Card`, `Chip`, `SectionHeading`, `FeatureListItem`, `StatBlock` e `Testimonial`, reduzindo markup bespoke e removendo cores hardcoded da view.
 - Card de "Próximas turmas" continua usando dados reais do `useAppStore`, ordenados por `startDate`, com fallback explícito para lista vazia.
+- Os chips do hero ficam no componente `Chip` com estado visual estático fiel ao canvas, e o CTA final ficou explicitamente on-brand via override de classe.
 - Footer do canvas foi adaptado no `PublicFooter` do shell para evitar duplicação de rodapé dentro da Home, preservando a arquitetura `PublicPageShell + HomePage`.
 - Os artefatos em `artifacts/epic14-fidelity/` foram atualizados para comparação visual desktop 1180px.
 - Correção de QA aplicada: os três benefícios da seção Consultoria voltaram a renderizar com texto visível; a regressão recebeu cobertura em `tests/epic14-mantine-removal.smoke.spec.ts`.
@@ -194,6 +195,7 @@ Manual/visual checks:
 - 2026-07-04 - @sm (River) - Story criada como Draft para iniciar Fase 2 com Home (`/`) conforme Epic 14 e specs de fidelidade.
 - 2026-07-04 - @dev (Dex) - Home pública refatorada para fidelidade Trust Keith com footer adaptado no shell, gates locais executados e artefatos de fidelidade regenerados.
 - 2026-07-05 - @dev (Dex) - Aplicado fix do QA para restaurar os textos da Consultoria, revalidado `npm run typecheck`, `npm run test:epic14:fidelity` e regeneradas capturas de fidelidade.
+- 2026-07-09 - @dev (Dex) - Ajuste pontual na Home: chips do hero permanecem no componente `Chip` e o CTA final recebeu override explícito para o botão on-brand.
 - 2026-07-05 - @sm (River) - Status administrativo normalizado para `Done` após QA PASS, PO GO e checklist documental READY.
 
 ## Story Checklist

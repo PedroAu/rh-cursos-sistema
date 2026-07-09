@@ -173,7 +173,7 @@ export function HomePage() {
 
             <div className="mt-7 flex flex-wrap gap-[10px]">
               {["80 cursos · 6 trilhas", "Presencial e online"].map((item) => (
-                <Chip key={item} variant="info" className="cursor-default" disabled>
+                <Chip key={item} variant="info" className="cursor-default disabled:opacity-100" disabled>
                   {item}
                 </Chip>
               ))}
@@ -374,11 +374,7 @@ export function HomePage() {
             <p className="mt-4 font-tk-serif text-subheading font-light leading-[1.5] text-tk-surface">
               Converse com um especialista e monte a trilha certa: curso aberto, in-company ou consultoria.
             </p>
-            <Button
-              asChild
-              size="lg"
-              className="mt-8 bg-tk-surface text-tk-brand shadow-tk-glass hover:bg-tk-cream"
-            >
+            <Button asChild variant="secondary" size="lg" className="mt-8 bg-white text-tk-brand hover:bg-white/90">
               <Link to="/falar-com-especialista">
                 Fale com um especialista
                 <ArrowRight className="h-4 w-4" />
