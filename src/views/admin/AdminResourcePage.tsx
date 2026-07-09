@@ -213,7 +213,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {config.stats.map((stat, index) => {
             const Icon = stat.icon;
-            const accentTone = index === 2 ? "#d17a00" : "#2f8b4f";
+            const accentToneClass = index === 2 ? "text-warning" : "text-success";
 
             return (
               <Panel key={stat.label} className="p-8">
@@ -226,7 +226,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                   ) : null}
                 </div>
                 <p className="mt-10 text-[2.2rem] font-extrabold text-tk-ink">{stat.value}</p>
-                <p className="mt-1.5 font-semibold" style={{ color: accentTone }}>
+                <p className={cn("mt-1.5 font-semibold", accentToneClass)}>
                   {stat.helper}
                 </p>
               </Panel>

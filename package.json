@@ -37,6 +37,7 @@
     "analyze": "ANALYZE=true npm run build",
     "bundle:check": "node scripts/check-bundle-size.mjs",
     "css:check": "node scripts/check-css-budget.mjs",
+    "validate-design-system": "node scripts/validate-design-system.mjs",
     "build:time-check": "node scripts/check-build-time.mjs",
     "purge:gate": "node scripts/purge-gate.mjs",
     "epic8:verify": "npm run purge:gate && npm run lint && npm run typecheck && npm run test:coverage && npm run storybook:build",

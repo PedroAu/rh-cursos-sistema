@@ -125,7 +125,7 @@ export function LoginPage() {
   return (
     <section className="min-h-[calc(100vh-4.5rem)]">
       <div className="grid min-h-[calc(100vh-4.5rem)] lg:grid-cols-2">
-        <div className="relative hidden overflow-hidden bg-[#072d48] lg:block">
+        <div className="relative hidden overflow-hidden bg-tk-brand-hover lg:block">
           <Image
             src="/images/in-company-hero-ai.png"
             alt="Ambiente corporativo moderno da RH Cursos"
@@ -133,21 +133,25 @@ export function LoginPage() {
             sizes="50vw"
             className="object-cover opacity-35"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#051d31] via-[#072d48]/85 to-[#072d48]/45" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--tk-brand-hover)_78%,black),color-mix(in_srgb,var(--tk-brand-hover)_85%,transparent),color-mix(in_srgb,var(--tk-brand-hover)_45%,transparent))]" />
 
           <div className="relative flex h-full flex-col justify-between p-12 text-white">
-            <p className="text-[4rem] font-extrabold leading-none">RH Cursos</p>
+            <p className="font-tk-display text-[4rem] font-bold leading-none tracking-[var(--tk-tracking-display)]">
+              RH Cursos
+            </p>
 
             <div className="space-y-8">
-              <p className="max-w-[480px] text-[2rem] font-bold leading-[1.15]">
+              <p className="max-w-[480px] font-tk-display text-[2rem] font-bold leading-[1.15] tracking-[var(--tk-tracking-display)]">
                 Capacitação estratégica para profissionais que transformam a gestão pública e empresarial.
               </p>
 
               <div className="max-w-[420px] rounded-xl border border-white/20 bg-white/10 p-6">
                 <div className="flex items-start gap-4">
-                  <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-[#f5c13a]" />
+                  <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-tk-accent" />
                   <div className="space-y-1">
-                    <p className="text-lg font-bold">Certificado Reconhecido</p>
+                    <p className="font-tk-display text-lg font-bold tracking-[var(--tk-tracking-display)]">
+                      Certificado Reconhecido
+                    </p>
                     <p className="text-sm leading-6 text-white/80">
                       Qualidade técnica com foco em resultados práticos.
                     </p>
@@ -162,12 +166,16 @@ export function LoginPage() {
           <Card className="w-full max-w-[560px] border-outline-variant bg-surface-container-lowest shadow-card" data-testid="ui-login-card">
             <CardContent className="grid gap-8 p-8 md:p-10">
               <div className="space-y-1.5">
-                <h1 className="text-deep-navy">Acesse sua conta</h1>
-                <p className="text-body-lg text-tk-ink-muted">Bem-vindo de volta. Entre com suas credenciais.</p>
+                <h1 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
+                  Acesse sua conta
+                </h1>
+                <p className="font-tk-serif text-subheading leading-relaxed text-tk-ink-muted">
+                  Bem-vindo de volta. Entre com suas credenciais.
+                </p>
               </div>
 
               {status === "required" ? (
-                <div className="rounded-lg border border-[#d6b24a]/35 bg-[#fff5d8] px-4 py-3 text-sm text-[#6f5200]">
+                <div className="rounded-lg border border-tk-accent/25 bg-tk-accent-soft px-4 py-3 text-sm text-tk-brand-hover">
                   Faça login para acessar {nextPath || getDefaultDashboardPath(selectedRole)}.
                 </div>
               ) : null}
@@ -185,12 +193,12 @@ export function LoginPage() {
                     className={[
                       "rounded-xl border p-4 text-left transition-colors",
                       selectedRole === item.role
-                        ? "border-[#0a4b72] bg-[#0a4b72] text-white"
-                        : "border-[#d9e1e8] bg-[#eef3f7] text-[#5b6b7b]"
+                        ? "border-tk-brand bg-tk-brand text-white"
+                        : "border-tk-line bg-tk-surface-2 text-tk-ink-muted"
                     ].join(" ")}
                   >
                     <p className="text-sm font-bold">{item.label}</p>
-                    <p className={["mt-2 text-sm leading-6", selectedRole === item.role ? "text-white/80" : "text-[#4f5f6f]"].join(" ")}>
+                    <p className={["mt-2 text-sm leading-6", selectedRole === item.role ? "text-white/80" : "text-tk-ink-muted"].join(" ")}>
                       {item.description}
                     </p>
                   </button>
@@ -261,7 +269,7 @@ export function LoginPage() {
                   )}
                 />
 
-                <Button type="submit" loading={isSubmitting} size="lg" className="w-full bg-deep-navy text-white hover:bg-deep-navy/92">
+                <Button type="submit" loading={isSubmitting} size="lg" className="w-full">
                   Entrar
                 </Button>
               </form>
@@ -278,7 +286,7 @@ export function LoginPage() {
                   Esqueci minha senha
                 </Button>
 
-                <Button type="button" variant="outline" className="border-outline-variant text-deep-navy hover:bg-surface-muted" onClick={() => navigate("/cursos")}>
+                <Button type="button" variant="outline" className="border-outline-variant text-tk-ink hover:bg-surface-muted" onClick={() => navigate("/cursos")}>
                   Voltar ao site
                 </Button>
               </div>

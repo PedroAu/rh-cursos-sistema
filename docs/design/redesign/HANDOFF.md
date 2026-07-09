@@ -1,5 +1,7 @@
 # Redesign Handoff
 
+> Hierarquia oficial: implementação real em `src/`; documentação operacional em `docs/design/redesign/`; material histórico em `docs/design/redesign/reference/`. Ver também `docs/design/README.md`.
+
 Este documento consolida o pacote de handoff do redesign para implementação no projeto.
 
 ## Escopo
@@ -12,7 +14,7 @@ O pacote cobre:
 - specs funcionais e visuais por página
 - ordem recomendada de implementação
 
-## Fontes de verdade
+## Fontes operacionais
 
 ### Índice operacional
 
@@ -41,6 +43,8 @@ O pacote cobre:
 - [spec-admin-configuracoes.md](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-admin-configuracoes.md)
 - [spec-portal-aluno.md](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-portal-aluno.md)
 - [spec-portal-instrutor.md](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-portal-instrutor.md)
+
+Se houver divergência com arquivos em `docs/design/redesign/reference/`, a fonte operacional acima prevalece.
 
 ## Cobertura atual
 

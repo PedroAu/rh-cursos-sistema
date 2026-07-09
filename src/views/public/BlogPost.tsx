@@ -82,11 +82,11 @@ export function BlogPostPage() {
             </Card>
             <Card className="bg-tk-brand text-white">
               <CardContent className="space-y-4 p-6">
-                <div className="text-sm uppercase tracking-[0.18em] text-blue-100/80">CTA relacionado</div>
+                <div className="text-sm uppercase tracking-[0.18em] text-white/72">CTA relacionado</div>
                 <h3 className="font-tk-display text-2xl font-bold text-white">
                   {relatedCourse?.title ?? "Curso relacionado indisponível no momento"}
                 </h3>
-                <p className="text-sm leading-6 text-blue-50/80">
+                <p className="text-sm leading-6 text-white/82">
                   Conecte o conteúdo do artigo à jornada comercial com um CTA direto para o curso relacionado.
                 </p>
                 {relatedCourse ? (

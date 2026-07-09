@@ -1,4 +1,6 @@
 ---
+> Documento legado de contexto. Para implementação e decisões ativas, priorize `docs/design/README.md`, `docs/design/redesign/` e `src/design-tokens/`.
+
 name: Trust Keith
 colors:
   primary: "#235875"

@@ -81,12 +81,12 @@ export function CalendarView({
 
   return (
     <div className="space-y-8" data-testid="calendar-view-container">
-      <Card className="overflow-hidden border-[#d7dee5] bg-white shadow-[0_10px_24px_rgba(0,67,100,0.08)]" data-label={selectedLabel || "Próximas turmas"}>
+      <Card variant="elevated" className="overflow-hidden border-outline-variant bg-tk-surface" data-label={selectedLabel || "Próximas turmas"}>
         <CardContent className="p-5 md:p-6">
           <div className="mb-5 space-y-4">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="mt-1 font-display text-[2rem] font-bold capitalize text-[#0b4668]">
+                <h3 className="mt-1 font-tk-display text-[2rem] font-bold capitalize tracking-[var(--tk-tracking-display)] text-tk-brand-hover">
                   {format(monthStart, "MMMM yyyy", { locale: ptBR })}
                 </h3>
               </div>
@@ -130,7 +130,7 @@ export function CalendarView({
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center text-[0.82rem] font-bold uppercase tracking-[0.08em] text-[#69737d]">
+          <div className="grid grid-cols-7 gap-1 text-center text-[0.82rem] font-bold uppercase tracking-[0.08em] text-rh-gray">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((label) => (
               <div key={label} className="py-2">{label}</div>
             ))}
@@ -157,24 +157,24 @@ export function CalendarView({
                     "flex min-h-[92px] flex-col justify-between border p-2 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     inMonth
                       ? hasClasses
-                        ? "bg-[#eaf5ff] hover:bg-[#dcebfa]"
-                        : "bg-white hover:border-[#9ebbd1] hover:bg-[#f8fbfe]"
-                      : "bg-[#f5f7fa] text-[#616971]",
-                    isToday(day) ? "border-[#0d5b85] shadow-soft" : "border-[#d7dee5]",
-                    isSelected && "border-[#0b4668] bg-[#0b4668] text-white hover:bg-[#0b4668]"
+                        ? "bg-tk-accent-soft hover:bg-tk-accent-soft/80"
+                        : "bg-white hover:border-rh-teal-lt hover:bg-tk-surface-2"
+                      : "bg-surface-muted text-rh-gray",
+                    isToday(day) ? "border-tk-brand shadow-soft" : "border-outline-variant",
+                    isSelected && "border-tk-brand-hover bg-tk-brand-hover text-white hover:bg-tk-brand-hover"
                   )}
                 >
                   <div className="self-end text-sm font-bold">{format(day, "d")}</div>
                   {hasClasses ? (
-                    <div className={cn("mt-1 h-1 w-full rounded-full", isSelected ? "bg-[#f6be39]" : "bg-[#004364]")} />
+                    <div className={cn("mt-1 h-1 w-full rounded-full", isSelected ? "bg-tk-accent" : "bg-tk-brand-hover")} />
                   ) : null}
                 </button>
               );
             })}
           </div>
 
-          <div className="mt-5 flex items-center gap-2 rounded-md bg-[#f2f4f7] px-3 py-2 text-sm font-semibold text-[#58616b]">
-            <CalendarDays className="h-4 w-4 text-[#004364]" />
+          <div className="mt-5 flex items-center gap-2 rounded-md bg-surface-muted px-3 py-2 text-sm font-semibold text-tk-ink-muted">
+            <CalendarDays className="h-4 w-4 text-tk-brand-hover" />
             Clique em uma data para filtrar os cards ao lado.
           </div>
         </CardContent>
@@ -183,10 +183,10 @@ export function CalendarView({
       <div className="space-y-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <span className="inline-flex rounded-full bg-[#cae6ff] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-[#004364]" data-testid="agenda-selected-label">
+            <span className="inline-flex rounded-full bg-tk-accent-soft px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-tk-brand-hover" data-testid="agenda-selected-label">
               {selectedLabel || "Próximas turmas"}
             </span>
-            <h2 className="mt-2 font-display text-[2rem] font-bold text-[#1a1c1e]">
+            <h2 className="mt-2 font-tk-display text-[2rem] font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
               {visibleClasses.length} turma{visibleClasses.length === 1 ? "" : "s"} encontrada{visibleClasses.length === 1 ? "" : "s"}
             </h2>
           </div>

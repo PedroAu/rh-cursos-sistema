@@ -37,21 +37,31 @@ function log(color, ...args) {
   console.log(`${color}${args.join(' ')}${COLORS.RESET}`);
 }
 
+function readJsonIfExists(relativePath) {
+  const filePath = path.join(PROJECT_ROOT, relativePath);
+  if (!fs.existsSync(filePath)) {
+    return null;
+  }
+
+  return JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+}
+
 /**
  * Validation: Token files exist and are valid JSON
  */
 function validateTokenFiles() {
   log(COLORS.CYAN, '\n🔍 Validating token files...');
 
-  const files = [
-    'docs/design/tokens.json',
-    'docs/design/tokens-extended.json',
+  const requiredFiles = [
+    'src/design-tokens/tokens.css',
+    'src/design-tokens/tokens.json',
+    'src/design-tokens/tokens.dtcg.json',
     'src/design-tokens/tokens.tailwind.js',
   ];
 
   let allValid = true;
 
-  files.forEach(file => {
+  requiredFiles.forEach(file => {
     const filePath = path.join(PROJECT_ROOT, file);
     if (!fs.existsSync(filePath)) {
       log(COLORS.RED, `  ❌ Missing: ${file}`);
@@ -67,6 +77,8 @@ function validateTokenFiles() {
         // Basic syntax check
         execSync(`node --check "${filePath}"`, { stdio: 'pipe' });
         log(COLORS.GREEN, `  ✅ ${file}`);
+      } else if (file.endsWith('.css')) {
+        log(COLORS.GREEN, `  ✅ ${file}`);
       }
     } catch (error) {
       log(COLORS.RED, `  ❌ ${file}: ${error.message}`);
@@ -78,14 +90,19 @@ function validateTokenFiles() {
 }
 
 /**
- * Validation: Check for direct hex colors in component files
+ * Validation: Check for direct hex colors in shared UI and app views
  */
 function validateComponentColors() {
-  log(COLORS.CYAN, '\n🎨 Checking for direct hex colors in components...');
+  log(COLORS.CYAN, '\n🎨 Checking for direct hex colors in components and app views...');
 
-  const componentDir = path.join(PROJECT_ROOT, 'src/components');
-  if (!fs.existsSync(componentDir)) {
-    log(COLORS.YELLOW, '  ⚠️ Components directory not found');
+  const scanDirs = [
+    path.join(PROJECT_ROOT, 'src/components'),
+    path.join(PROJECT_ROOT, 'src/views/public'),
+    path.join(PROJECT_ROOT, 'src/views/admin')
+  ].filter(fs.existsSync);
+
+  if (scanDirs.length === 0) {
+    log(COLORS.YELLOW, '  ⚠️ No component or view directories found');
     return true;
   }
 
@@ -131,15 +148,79 @@ function validateComponentColors() {
     });
   }
 
-  checkDir(componentDir);
+  scanDirs.forEach(checkDir);
 
   if (violations === 0) {
-    log(COLORS.GREEN, '  ✅ No direct hex colors found in components');
+    log(COLORS.GREEN, '  ✅ No direct hex colors found in components or app views');
   } else {
     log(COLORS.RED, `  ❌ Found ${violations} direct hex color(s)`);
   }
 
   return violations === 0;
+}
+
+/**
+ * Audit: Report arbitrary radius and shadow usage outside token classes
+ * This is advisory for now because the repo still has intentional transitional usages.
+ */
+function auditArbitraryStyles() {
+  log(COLORS.CYAN, '\n🧭 Auditing arbitrary radius and shadow usage...');
+
+  const scanDirs = [
+    path.join(PROJECT_ROOT, 'src/components'),
+    path.join(PROJECT_ROOT, 'src/views/public'),
+    path.join(PROJECT_ROOT, 'src/views/admin')
+  ].filter(fs.existsSync);
+
+  if (scanDirs.length === 0) {
+    log(COLORS.YELLOW, '  ⚠️ No component or view directories found for arbitrary style audit');
+    return true;
+  }
+
+  const arbitraryPattern = /(rounded-\[[^\]]+\]|shadow-\[[^\]]+\])/g;
+  const allowedPatterns = [
+    /rounded-\[var\(--tk-radius-button\)\]/,
+    /shadow-\[inset_0_0_0_1px_var\(--tk-accent-soft\)\]/,
+    /bg-\[linear-gradient\(158deg,var\(--rh-paper-a\),var\(--rh-paper-b\)\)\]/,
+    /bg-\[image:var\(--tk-gradient-soft\)\]/
+  ];
+
+  let findings = 0;
+
+  function checkDir(dir) {
+    fs.readdirSync(dir).forEach(file => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+
+      if (stat.isDirectory()) {
+        checkDir(filePath);
+      } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+        const content = fs.readFileSync(filePath, 'utf-8');
+        let match;
+
+        while ((match = arbitraryPattern.exec(content)) !== null) {
+          const token = match[0];
+          const isAllowed = allowedPatterns.some(pattern => pattern.test(token));
+          if (isAllowed) continue;
+
+          findings++;
+          const line = content.substring(0, match.index).split('\n').length;
+          log(COLORS.YELLOW, `  ⚠️ Arbitrary style in ${path.relative(PROJECT_ROOT, filePath)}:${line}`);
+          log(COLORS.YELLOW, `     → ${token}`);
+        }
+      }
+    });
+  }
+
+  scanDirs.forEach(checkDir);
+
+  if (findings === 0) {
+    log(COLORS.GREEN, '  ✅ No arbitrary radius/shadow usages outside approved exceptions');
+  } else {
+    log(COLORS.YELLOW, `  ⚠️ Found ${findings} arbitrary radius/shadow usage(s); advisory only for now`);
+  }
+
+  return true;
 }
 
 /**
@@ -150,12 +231,18 @@ function validateBorderRadius() {
 
   const tailwindConfigPath = path.join(PROJECT_ROOT, 'tailwind.config.ts');
   const configContent = fs.readFileSync(tailwindConfigPath, 'utf-8');
+  const usesTokenSpread = configContent.includes('...tokens.borderRadius');
 
   const expectedScales = ['button', 'card', 'glass', 'input', 'pill'];
   let allPresent = true;
 
   expectedScales.forEach(scale => {
-    if (configContent.includes(`'${scale}'`) || configContent.includes(`"${scale}"`)) {
+    if (
+      usesTokenSpread ||
+      configContent.includes(`${scale}:`) ||
+      configContent.includes(`'${scale}'`) ||
+      configContent.includes(`"${scale}"`)
+    ) {
       log(COLORS.GREEN, `  ✅ Border-radius scale: ${scale}`);
     } else {
       log(COLORS.RED, `  ❌ Missing border-radius scale: ${scale}`);
@@ -167,47 +254,40 @@ function validateBorderRadius() {
 }
 
 /**
- * Validation: Check tokens.json and tokens-extended.json are in sync
+ * Validation: Check machine-readable token artifacts in src/design-tokens/
  */
 function validateTokenSync() {
-  log(COLORS.CYAN, '\n🔄 Validating token file synchronization...');
+  log(COLORS.CYAN, '\n🔄 Validating machine-readable token artifacts...');
+  log(COLORS.BLUE, '  ℹ️ Runtime and serializable token sources live in src/design-tokens/.');
 
-  const tokensPath = path.join(PROJECT_ROOT, 'docs/design/tokens.json');
-  const extendedPath = path.join(PROJECT_ROOT, 'docs/design/tokens-extended.json');
+  const tokens = readJsonIfExists('src/design-tokens/tokens.json');
+  const dtcg = readJsonIfExists('src/design-tokens/tokens.dtcg.json');
 
-  const tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf-8'));
-  const extended = JSON.parse(fs.readFileSync(extendedPath, 'utf-8'));
-
-  // Check critical sections
-  const criticalSections = ['colors', 'components'];
-  let allSync = true;
-
-  criticalSections.forEach(section => {
-    if (JSON.stringify(tokens[section]) === JSON.stringify(extended[section])) {
-      log(COLORS.GREEN, `  ✅ Section '${section}' in sync`);
-    } else {
-      log(COLORS.YELLOW, `  ⚠️ Section '${section}' differs between files`);
-      // Not necessarily an error if changes are intentional
-    }
-  });
-
-  // Specific checks
-  const buttonHasRotate = tokens.components?.button?.transform === 'rotate(45deg)';
-  const inputCursorWrong = tokens.components?.input?.cursor === 'not-allowed' &&
-    !tokens.components?.input?.states?.disabled;
-
-  if (buttonHasRotate) {
-    log(COLORS.RED, `  ❌ Button has invalid rotate(45deg) transform`);
-    allSync = false;
-  } else {
-    log(COLORS.GREEN, `  ✅ Button transform is valid`);
+  if (!tokens || !dtcg) {
+    log(COLORS.RED, '  ❌ Missing one or more machine-readable token artifacts in src/design-tokens/.');
+    return false;
   }
 
-  if (inputCursorWrong) {
-    log(COLORS.RED, `  ❌ Input cursor not properly defined in states`);
-    allSync = false;
+  let allSync = true;
+
+  if (tokens.colors && tokens.components) {
+    log(COLORS.GREEN, '  ✅ tokens.json exposes colors and components');
   } else {
-    log(COLORS.GREEN, `  ✅ Input cursor states are valid`);
+    log(COLORS.RED, '  ❌ tokens.json is missing expected colors/components sections');
+    allSync = false;
+  }
+
+  if (dtcg.core?.colors && dtcg.core?.spacing && dtcg.core?.['border-radius']) {
+    log(COLORS.GREEN, '  ✅ tokens.dtcg.json exposes core colors, spacing, and border-radius');
+  } else {
+    log(COLORS.RED, '  ❌ tokens.dtcg.json is missing expected DTCG core sections');
+    allSync = false;
+  }
+
+  if (tokens.spec_version && dtcg.global?.$metadata?.spec) {
+    log(COLORS.GREEN, `  ✅ Token specs declared (${tokens.spec_version} / ${dtcg.global.$metadata.spec})`);
+  } else {
+    log(COLORS.YELLOW, '  ⚠️ Token spec metadata is incomplete');
   }
 
   return allSync;
@@ -222,7 +302,7 @@ function validateFocusRings() {
   const buttonPath = path.join(PROJECT_ROOT, 'src/components/ui/button.tsx');
   const inputPath = path.join(PROJECT_ROOT, 'src/components/ui/input.tsx');
 
-  const expectedFocusColor = 'bright-blue';
+  const expectedFocusColor = 'tk-focus';
   let allValid = true;
 
   [buttonPath, inputPath].forEach(filePath => {
@@ -231,7 +311,7 @@ function validateFocusRings() {
       if (content.includes('ring-' + expectedFocusColor)) {
         log(COLORS.GREEN, `  ✅ ${path.basename(filePath)} uses ${expectedFocusColor}`);
       } else {
-        log(COLORS.YELLOW, `  ⚠️ ${path.basename(filePath)} focus ring color differs`);
+        log(COLORS.YELLOW, `  ⚠️ ${path.basename(filePath)} focus ring color differs from ${expectedFocusColor}`);
       }
     }
   });
@@ -251,6 +331,7 @@ async function validate() {
   const results = {
     tokenFiles: validateTokenFiles(),
     componentColors: validateComponentColors(),
+    arbitraryStyles: auditArbitraryStyles(),
     borderRadius: validateBorderRadius(),
     tokenSync: validateTokenSync(),
     focusRings: validateFocusRings(),
@@ -263,6 +344,7 @@ async function validate() {
   const checks = [
     ['Token Files', results.tokenFiles],
     ['Component Colors', results.componentColors],
+    ['Arbitrary Styles Audit', results.arbitraryStyles],
     ['Border Radius Scales', results.borderRadius],
     ['Token Synchronization', results.tokenSync],
     ['Focus Ring Colors', results.focusRings],

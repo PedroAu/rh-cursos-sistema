@@ -26,12 +26,12 @@ type CatalogEntry = {
 };
 
 const CATEGORY_GRADIENTS = [
-  "linear-gradient(135deg,#235875,#2f7599)",
-  "linear-gradient(135deg,#5b8def,#70a4ff)",
-  "linear-gradient(135deg,#1b8b69,#27a57d)",
-  "linear-gradient(135deg,#6d4fd5,#8b68f0)",
-  "linear-gradient(135deg,#a86d18,#e0a342)",
-  "linear-gradient(135deg,#1d7f8f,#16967f)"
+  "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))",
+  "linear-gradient(135deg,var(--tk-accent),color-mix(in_srgb,var(--tk-accent) 72%,white))",
+  "linear-gradient(135deg,var(--tk-success),color-mix(in_srgb,var(--tk-success) 70%,var(--tk-accent)))",
+  "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
+  "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 34%,var(--tk-cream-dark)),color-mix(in_srgb,var(--tk-cream-dark) 82%,white))",
+  "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 68%,var(--tk-success)),var(--tk-success))"
 ] as const;
 
 const CATEGORY_ORDER = [
@@ -67,14 +67,14 @@ function createCategoryGradient(category: string) {
 
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
-    return { label: "Poucas vagas", colorClass: "text-[#8f1d2c]" };
+    return { label: "Poucas vagas", colorClass: "text-tk-error" };
   }
 
   if (trainingClass.status === "Em breve") {
-    return { label: "Turma nova", colorClass: "text-[#3048c4]" };
+    return { label: "Turma nova", colorClass: "text-tk-brand" };
   }
 
-  return { label: "Inscrições abertas", colorClass: "text-[#0b5c49]" };
+  return { label: "Inscrições abertas", colorClass: "text-tk-success" };
 }
 
 function formatCatalogDate(value: string) {
@@ -187,7 +187,7 @@ export function CoursesPage() {
 
   return (
     <div className="bg-[var(--tk-surface-2)]">
-      <section className="border-b border-[var(--rh-paper-line)] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)] py-16 md:py-14">
+      <section className="border-b border-[var(--rh-paper-line)] bg-[image:var(--tk-gradient-soft)] py-16 md:py-14">
         <div className="mx-auto max-w-[1100px] px-4 sm:px-6 xl:px-10">
           <div className="space-y-8">
             <div className="space-y-4">
@@ -315,7 +315,7 @@ function CatalogSessionCard({
   return (
     <Card variant="base" interactive className="flex flex-col overflow-hidden p-0 motion-reduce:transform-none">
       <div className="flex h-28 items-start justify-between p-[16px_18px]" style={{ background: entry.gradient }}>
-        <span className="rounded-full bg-[rgba(0,0,0,0.22)] px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
+        <span className="rounded-full bg-black/20 px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
           {entry.category}
         </span>
         <span className={cn("rounded-full bg-white px-[10px] py-[5px] text-[11px] font-semibold", entry.spotColorClass)}>

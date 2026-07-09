@@ -99,8 +99,8 @@ function formatPlace(trainingClass: TrainingClass) {
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
     return {
-      bgClass: "bg-[#fdeef0]",
-      colorClass: "text-[#8f1d2c]",
+      bgClass: "bg-tk-error/10",
+      colorClass: "text-tk-error",
       label: "Poucas vagas"
     };
   }
@@ -108,14 +108,14 @@ function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Em breve") {
     return {
       bgClass: "bg-[var(--tk-accent-soft)]",
-      colorClass: "text-[#3048c4]",
+      colorClass: "text-tk-brand",
       label: "Turma nova"
     };
   }
 
   return {
     bgClass: "bg-[color-mix(in_srgb,var(--tk-success)_12%,var(--tk-surface))]",
-    colorClass: "text-[#0b5c49]",
+    colorClass: "text-tk-success",
     label: "Inscrições abertas"
   };
 }
@@ -151,8 +151,8 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
         mode,
         modeClassName:
           mode === "Online"
-            ? "bg-[var(--tk-accent-soft)] text-[#3048c4]"
-            : "bg-[#fdeef0] text-[#8f1d2c]",
+            ? "bg-[var(--tk-accent-soft)] text-tk-brand"
+            : "bg-tk-error/10 text-tk-error",
         modeLabel: mode === "Online" ? "Online ao vivo" : "Presencial",
         place: formatPlace(trainingClass),
         price: trainingClass.price || course.price,
@@ -391,7 +391,7 @@ export function AgendaPage() {
 
   return (
     <div className="bg-tk-surface-2">
-      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)] py-16">
+      <section className="border-b border-tk-line bg-[image:var(--tk-gradient-soft)] py-16">
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 xl:px-10">
           <div className="space-y-8">
             <div className="space-y-4">
@@ -721,7 +721,7 @@ export function AgendaPage() {
                               <p className="font-tk-display text-[20px] font-bold text-tk-accent-strong">{currency(entry.price)}</p>
                             </div>
                             <Button asChild size="sm" className="min-w-[130px]">
-                              <Link to={`/cursos/${entry.course.slug}?checkout=1`}>Inscrever-se →</Link>
+                              <Link to={`/cursos/${entry.course.slug}`}>Inscrever-se →</Link>
                             </Button>
                           </div>
                         </Card>

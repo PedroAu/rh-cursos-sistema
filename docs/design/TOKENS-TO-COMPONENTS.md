@@ -1,5 +1,7 @@
 # Design System Mapping — Canonical Tokens → Components
 
+> Referência de apoio. Antes de aplicar qualquer token, valide a fonte ativa em `src/design-tokens/tokens.css` e nos componentes reais do projeto.
+
 **Status:** Active reference  
 **Last Updated:** 2026-07-03  
 **Primary source of truth:** [docs/design-system/trust-keith/INVENTORY.md](../design-system/trust-keith/INVENTORY.md)

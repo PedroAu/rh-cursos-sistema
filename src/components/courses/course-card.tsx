@@ -30,51 +30,51 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
         />
         {course.featured ? (
-          <div className="absolute left-4 top-4 rounded-full bg-[#004364] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-white">
+          <div className="absolute left-4 top-4 rounded-full bg-tk-brand px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-tk-surface">
             Novo
           </div>
         ) : null}
       </div>
-      <CardContent className="space-y-5 border-t-2 border-[#f6be39] p-5 pt-4">
-        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#004364]">
+      <CardContent className="space-y-5 border-t-2 border-warning p-5 pt-4">
+        <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.06em] text-tk-brand">
           <FolderOpen className="h-3.5 w-3.5" />
           <span>{course.pathName}</span>
         </div>
 
         <div className="space-y-3">
-          <h3 className="line-clamp-3 text-[1.05rem] font-bold leading-[1.2] text-[#1a1c1e] md:text-[1.2rem]">
+          <h3 className="line-clamp-3 text-[1.05rem] font-bold leading-[1.2] text-tk-ink md:text-[1.2rem]">
             {course.title}
           </h3>
-          <p className="line-clamp-4 text-sm leading-6 text-[#50565c]">
+          <p className="line-clamp-4 text-sm leading-6 text-tk-ink-muted">
             {course.shortDescription}
           </p>
         </div>
 
-        <div className="grid gap-2 border-t border-[#e1e8ed] pt-4 text-sm text-[#4d5560]">
+        <div className="grid gap-2 border-t border-tk-line pt-4 text-sm text-tk-ink-muted">
           <div className="flex items-center gap-2">
-            <Clock3 className="h-4 w-4 text-[#004364]" />
+            <Clock3 className="h-4 w-4 text-tk-brand" />
             <span>{course.durationLabel}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Star className="h-4 w-4 text-[#6b4f00]" />
+            <Star className="h-4 w-4 text-[var(--color-status-warning)]" />
             <span>{course.rating.toFixed(1)} de avaliação média</span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-[#004364]" />
+            <Users className="h-4 w-4 text-tk-brand" />
             <span>{course.studentsCount} alunos capacitados</span>
           </div>
           {nextClass ? (
-            <div className="rounded-md bg-[#eef6fd] px-3 py-2 text-xs font-semibold text-[#004364]">
+            <div className="rounded-md bg-tk-accent-soft px-3 py-2 text-xs font-semibold text-tk-brand">
               Próxima turma:{" "}
               {new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(nextClass.startDate))}
             </div>
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-[#e1e8ed] pt-4">
+        <div className="flex items-center justify-between gap-3 border-t border-tk-line pt-4">
           <Link
             to={`/cursos/${course.slug}`}
-            className="inline-flex items-center gap-2 text-sm font-bold text-[#004364] transition hover:text-[#0d5b85]"
+            className="inline-flex items-center gap-2 text-sm font-bold text-tk-brand transition hover:text-tk-brand-hover"
           >
             Saiba mais
             <ArrowRight className="h-4 w-4" />
@@ -83,7 +83,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           <button
             type="button"
             onClick={() => openQuote(course)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.04em] text-[#6b4f00] transition hover:text-[#4e3900]"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.04em] text-[var(--color-status-warning)] transition hover:opacity-80"
           >
             <Building2 className="h-4 w-4" />
             Orçamento In Company
@@ -94,7 +94,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           <StatusBadge status={course.status} />
           <Link
             to={`/cursos/${course.slug}?checkout=1`}
-            className="inline-flex min-h-10 items-center justify-center rounded-md bg-[#f6be39] px-4 text-sm font-bold text-[#083b56] transition hover:bg-[#ffc641]"
+            className="inline-flex min-h-10 items-center justify-center rounded-button bg-warning px-4 text-sm font-bold text-deep-navy transition hover:opacity-90"
           >
             Inscrever-se
           </Link>

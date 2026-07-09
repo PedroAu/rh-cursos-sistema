@@ -256,16 +256,16 @@ export function InCompanyPage() {
   });
 
   return (
-    <div className="bg-white text-[#222525]">
-      <section className="border-b border-[#e7ecef] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+    <div className="bg-white text-tk-ink">
+      <section className="border-b border-outline-variant bg-[image:var(--tk-gradient-soft)]">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-14">
             <div>
               <SectionEyebrow>Treinamento in-company · Para organizações</SectionEyebrow>
-              <h1 className="mt-5 max-w-[11ch] font-display text-[2.85rem] font-bold leading-[0.98] tracking-[-0.03em] text-[#2d3135] md:text-[3.75rem]">
+              <h1 className="mt-5 max-w-[11ch] font-tk-display text-[2.85rem] font-bold leading-[0.98] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3.75rem]">
                 A capacitação vai até a <em className="italic">sua</em> equipe
               </h1>
-              <p className="mt-5 max-w-[48ch] font-serif text-[1.22rem] font-light leading-[1.45] text-[#59646d]">
+              <p className="mt-5 max-w-[48ch] font-tk-serif text-[1.22rem] font-light leading-[1.45] text-tk-ink-muted">
                 Programas sob medida, no seu contexto operacional, com o seu calendário e os seus casos reais: do
                 curso pontual à trilha de formação contínua para o time inteiro.
               </p>
@@ -290,31 +290,31 @@ export function InCompanyPage() {
                 {["Conteúdo aplicado à sua realidade", "Presencial ou online ao vivo", "Certificação para toda a turma"].map((item) => (
                   <div
                     key={item}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#dde4e8] bg-white px-4 py-2 text-sm font-medium text-[#4f5963]"
+                    className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-white px-4 py-2 text-sm font-medium text-tk-ink-muted"
                   >
-                    <span className="h-2 w-2 rounded-full bg-[#3bb56a]" aria-hidden />
+                    <span className="h-2 w-2 rounded-full bg-tk-success" aria-hidden />
                     {item}
                   </div>
                 ))}
               </div>
             </div>
 
-            <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+            <Card variant="elevated" className="border-outline-variant bg-tk-surface">
               <CardContent className="p-8">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#5f6972]">Por que in-company</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rh-gray">Por que in-company</p>
                 <div className="mt-5 space-y-5">
                   {heroPoints.map((item, index) => {
                     const Icon = item.icon;
 
                     return (
-                      <div key={item.title} className={cn(index < heroPoints.length - 1 && "border-b border-[#edf1f4] pb-5")}>
+                      <div key={item.title} className={cn(index < heroPoints.length - 1 && "border-b border-tk-line pb-5")}>
                         <div className="flex items-start gap-4">
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-[#dff2f7] text-[#0c6a83]">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[10px] bg-tk-accent-soft text-tk-brand">
                             <Icon className="h-5 w-5" />
                           </div>
                           <div>
-                            <h2 className="text-base font-semibold text-[#2d3135]">{item.title}</h2>
-                            <p className="mt-1 text-sm leading-6 text-[#66727b]">{item.description}</p>
+                            <h2 className="font-tk-display text-base font-semibold tracking-[var(--tk-tracking-display)] text-tk-ink">{item.title}</h2>
+                            <p className="mt-1 text-sm leading-6 text-tk-ink-muted">{item.description}</p>
                           </div>
                         </div>
                       </div>
@@ -327,12 +327,12 @@ export function InCompanyPage() {
         </div>
       </section>
 
-      <section className="border-b border-[#e7ecef] bg-white">
-        <div className="mx-auto flex w-[min(var(--tk-container),calc(100%-24px))] flex-wrap items-center justify-between gap-5 py-9 text-sm text-[#6b7680] md:w-[min(var(--tk-container),calc(100%-40px))]">
+      <section className="border-b border-outline-variant bg-white">
+        <div className="mx-auto flex w-[min(var(--tk-container),calc(100%-24px))] flex-wrap items-center justify-between gap-5 py-9 text-sm text-rh-gray md:w-[min(var(--tk-container),calc(100%-40px))]">
           <p>Organizações que já treinaram com a RH Cursos</p>
           <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
             {clientWordmarks.map((wordmark) => (
-              <span key={wordmark} className="font-display text-[1.18rem] font-bold tracking-[-0.01em] text-[#7b8288]">
+              <span key={wordmark} className="font-tk-display text-[1.18rem] font-bold tracking-[var(--tk-tracking-display)] text-rh-gray">
                 {wordmark}
               </span>
             ))}
@@ -344,10 +344,10 @@ export function InCompanyPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <div className="max-w-[620px]">
             <SectionEyebrow>Feito para a sua operação</SectionEyebrow>
-            <h2 className="mt-5 max-w-[13ch] font-display text-[2.4rem] font-bold leading-[1.06] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+            <h2 className="mt-5 max-w-[13ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3rem]">
               Mais do que um curso: uma formação com contexto
             </h2>
-            <p className="mt-4 max-w-[40ch] font-serif text-[1.16rem] font-light leading-[1.45] text-[#59646d]">
+            <p className="mt-4 max-w-[40ch] font-tk-serif text-[1.16rem] font-light leading-[1.45] text-tk-ink-muted">
               Desenhamos cada programa a partir das exigências legais que se aplicam ao seu órgão ou empresa e da
               forma como a sua equipe trabalha.
             </p>
@@ -360,16 +360,17 @@ export function InCompanyPage() {
               return (
                 <Card
                   key={item.title}
-                  className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+                  variant="elevated"
+                  className="border-outline-variant bg-tk-surface"
                 >
                   <CardContent className="space-y-4 p-8">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-[#dff2f7] text-[#0c6a83]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-[12px] bg-tk-accent-soft text-tk-brand">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="font-display text-[1.55rem] font-bold leading-[1.18] tracking-[-0.02em] text-[#2d3135]">
+                    <h3 className="font-tk-display text-[1.55rem] font-bold leading-[1.18] tracking-[var(--tk-tracking-display)] text-tk-ink">
                       {item.title}
                     </h3>
-                    <p className="text-[15px] leading-7 text-[#66727b]">{item.description}</p>
+                    <p className="text-[15px] leading-7 text-tk-ink-muted">{item.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -380,63 +381,63 @@ export function InCompanyPage() {
 
       <section className="pb-20">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
-          <h2 className="font-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-[#2d3135]">
+          <h2 className="font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[var(--tk-tracking-display)] text-tk-ink">
             Como montamos o seu programa
           </h2>
           <div className="mt-10 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
             {steps.map((item) => (
               <div key={item.number} className="pt-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0c6a83] font-display text-lg font-bold text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tk-brand font-tk-display text-lg font-bold text-white">
                   {item.number}
                 </div>
-                <h3 className="mt-4 font-display text-[1.38rem] font-bold tracking-[-0.015em] text-[#2d3135]">{item.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#66727b]">{item.description}</p>
+                <h3 className="mt-4 font-tk-display text-[1.38rem] font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{item.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="temas-in-company" className="border-y border-[#ded8c9] bg-[#f4f1e9] py-20">
+      <section id="temas-in-company" className="border-y border-rh-paper-line bg-rh-paper-a py-20">
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-14 md:w-[min(var(--tk-container),calc(100%-40px))] lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <SectionEyebrow tone="brand">Temas mais pedidos</SectionEyebrow>
-            <h2 className="mt-5 max-w-[12ch] font-display text-[2.4rem] font-bold leading-[1.06] tracking-[-0.03em] text-[#2d3135] md:text-[3rem]">
+            <h2 className="mt-5 max-w-[12ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3rem]">
               Qualquer tema, levado para dentro da sua organização
             </h2>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {themes.map((theme) => (
                 <div
                   key={theme}
-                  className="flex items-center gap-3 rounded-[16px] border border-[#e0e6ea] bg-white px-4 py-3 text-[15px] text-[#2d3135]"
+                  className="flex items-center gap-3 rounded-[16px] border border-outline-variant bg-white px-4 py-3 text-[15px] text-tk-ink"
                 >
-                  <span className="h-2 w-2 rounded-full bg-[#0c6a83]" aria-hidden />
+                  <span className="h-2 w-2 rounded-full bg-tk-brand" aria-hidden />
                   <span>{theme}</span>
                 </div>
               ))}
             </div>
-            <p className="mt-5 text-sm text-[#59646d]">
+            <p className="mt-5 text-sm text-tk-ink-muted">
               Não encontrou o seu tema?{" "}
-              <Link to="/falar-com-especialista" className="font-semibold text-[#0c6a83]">
+              <Link to="/falar-com-especialista" className="font-semibold text-tk-brand">
                 Fale com um especialista →
               </Link>
             </p>
           </div>
 
-          <Card className="rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]">
+          <Card variant="elevated" className="border-outline-variant bg-tk-surface">
             <CardContent className="flex h-full flex-col justify-between p-8">
-              <blockquote className="font-display text-[2rem] font-bold leading-[1.06] tracking-[-0.025em] text-[#2d3135]">
+              <blockquote className="font-tk-display text-[2rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink">
                 “Treinaram nossa equipe de compras no nosso próprio fluxo de licitação. Saímos com processos prontos,
                 não só teoria.”
               </blockquote>
               <div className="mt-8">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#dff2f7] text-sm font-semibold text-[#0c6a83]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-tk-accent-soft text-sm font-semibold text-tk-brand">
                     RM
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#2d3135]">Ricardo Menezes</p>
-                    <p className="text-xs text-[#69747e]">Diretor Administrativo, Secretaria de Saúde</p>
+                    <p className="text-sm font-semibold text-tk-ink">Ricardo Menezes</p>
+                    <p className="text-xs text-rh-gray">Diretor Administrativo, Secretaria de Saúde</p>
                   </div>
                 </div>
               </div>
@@ -449,8 +450,8 @@ export function InCompanyPage() {
         <div className="mx-auto grid w-[min(var(--tk-container),calc(100%-24px))] gap-8 md:w-[min(var(--tk-container),calc(100%-40px))] md:grid-cols-2 xl:grid-cols-4">
           {stats.map((item) => (
             <div key={item.value} className="text-center">
-              <p className="font-display text-[3rem] font-bold leading-none tracking-[-0.03em] text-[#0c6a83]">{item.value}</p>
-              <p className="mx-auto mt-3 max-w-[22ch] text-sm leading-6 text-[#66727b]">{item.label}</p>
+              <p className="font-tk-display text-[3rem] font-bold leading-none tracking-[var(--tk-tracking-display)] text-tk-brand">{item.value}</p>
+              <p className="mx-auto mt-3 max-w-[22ch] text-sm leading-6 text-tk-ink-muted">{item.label}</p>
             </div>
           ))}
         </div>
@@ -460,15 +461,16 @@ export function InCompanyPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <Card
             id="formulario-in-company"
-            className="overflow-hidden rounded-[24px] border-[#e0e6ea] bg-white shadow-[0_2px_0_rgba(17,24,39,0.03),0_18px_40px_rgba(17,24,39,0.08)]"
+            variant="elevated"
+            className="overflow-hidden border-outline-variant bg-tk-surface"
             data-testid="ui-incompany-form"
           >
             <CardContent className="grid p-0 lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="bg-[#0c6a83] p-8 text-white md:p-10">
-                <h2 className="max-w-[10ch] font-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.025em] text-white">
+              <div className="bg-tk-brand p-8 text-white md:p-10">
+                <h2 className="max-w-[10ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[var(--tk-tracking-display)] text-white">
                   Vamos montar o programa da sua equipe
                 </h2>
-                <p className="mt-4 max-w-[26ch] font-serif text-[1.08rem] font-light leading-[1.55] text-white/86">
+                <p className="mt-4 max-w-[26ch] font-tk-serif text-[1.08rem] font-light leading-[1.55] text-white/86">
                   Conte um pouco sobre a sua organização. Um especialista retorna com uma proposta em até 2 dias úteis.
                 </p>
                 <div className="mt-8 space-y-4">
@@ -678,7 +680,7 @@ export function InCompanyPage() {
                       name="consent"
                       render={({ field }) => (
                         <div className="space-y-2">
-                          <label className="flex items-start gap-3 text-xs leading-5 text-[#69747e]">
+                          <label className="flex items-start gap-3 text-xs leading-5 text-rh-gray">
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={(checked) => {
@@ -711,7 +713,7 @@ export function InCompanyPage() {
                       {isSubmitting ? "Enviando..." : "Solicitar proposta"}
                     </Button>
 
-                    <p className="text-center text-xs text-[#69747e]">Responderemos em até 24 horas úteis.</p>
+                    <p className="text-center text-xs text-rh-gray">Responderemos em até 24 horas úteis.</p>
                   </form>
                 )}
               </div>

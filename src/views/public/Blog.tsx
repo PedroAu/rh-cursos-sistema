@@ -59,14 +59,38 @@ const trendingEditorial = [
 ] as const;
 
 const categoryPresentation: Record<string, { glyph: string; tint: string }> = {
-  Compliance: { glyph: "✓", tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)" },
-  "Departamento Pessoal": { glyph: "•", tint: "linear-gradient(135deg,#5b6a74,#8a97a3)" },
-  eSocial: { glyph: "•", tint: "linear-gradient(135deg,#5b6a74,#8a97a3)" },
-  "Gestão Pública": { glyph: "◇", tint: "linear-gradient(135deg,#2f7599,#3a897c)" },
-  LGPD: { glyph: "◆", tint: "linear-gradient(135deg,#4285f4,#6aa2ff)" },
-  Liderança: { glyph: "✦", tint: "linear-gradient(135deg,#c98a3a,#e0a94f)" },
-  Licitações: { glyph: "§", tint: "linear-gradient(135deg,#235875,#2f7599)" },
-  Tecnologia: { glyph: "◈", tint: "linear-gradient(135deg,#4c7dd8,#5f90ea)" }
+  Compliance: {
+    glyph: "✓",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))"
+  },
+  "Departamento Pessoal": {
+    glyph: "•",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--rh-gray) 88%,var(--tk-brand)),color-mix(in_srgb,var(--rh-gray) 62%,white))"
+  },
+  eSocial: {
+    glyph: "•",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--rh-gray) 88%,var(--tk-brand)),color-mix(in_srgb,var(--rh-gray) 62%,white))"
+  },
+  "Gestão Pública": {
+    glyph: "◇",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 72%,var(--tk-accent)),var(--tk-success))"
+  },
+  LGPD: {
+    glyph: "◆",
+    tint: "linear-gradient(135deg,var(--tk-accent),color-mix(in_srgb,var(--tk-accent) 72%,white))"
+  },
+  Liderança: {
+    glyph: "✦",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 34%,var(--tk-cream-dark)),color-mix(in_srgb,var(--tk-cream-dark) 82%,white))"
+  },
+  Licitações: {
+    glyph: "§",
+    tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))"
+  },
+  Tecnologia: {
+    glyph: "◈",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-accent) 58%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 72%,white))"
+  }
 };
 
 function normalizeBlogCategory(category: BlogPost["category"]) {
@@ -88,7 +112,7 @@ function normalizeBlogCategory(category: BlogPost["category"]) {
 function getPresentation(post: BlogPost) {
   return categoryPresentation[post.category] ?? {
     glyph: "•",
-    tint: "linear-gradient(135deg,#235875,#2f7599)"
+    tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))"
   };
 }
 
@@ -192,7 +216,7 @@ export function BlogPage() {
 
   return (
     <div className="bg-tk-surface text-tk-ink">
-      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+      <section className="border-b border-tk-line bg-[image:var(--tk-gradient-soft)]">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <SectionEyebrow>Conteúdo · Análises · Prática</SectionEyebrow>
           <h1 className="mt-5 max-w-[12ch] font-tk-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
@@ -218,7 +242,7 @@ export function BlogPage() {
                     <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
                     Em destaque · {featuredPost.category}
                   </span>
-                  <span className="absolute bottom-3 right-4 font-display text-[96px] font-bold leading-none text-white/25">
+                  <span className="absolute bottom-3 right-4 font-tk-display text-[96px] font-bold leading-none tracking-[var(--tk-tracking-display)] text-white/25">
                     14.133
                   </span>
                 </div>
@@ -344,7 +368,7 @@ export function BlogPage() {
                         <span className="inline-flex rounded-full bg-white/18 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
                           {post.category}
                         </span>
-                        <span className="absolute bottom-2 right-4 font-display text-[56px] font-bold leading-none text-white/30">
+                        <span className="absolute bottom-2 right-4 font-tk-display text-[56px] font-bold leading-none tracking-[var(--tk-tracking-display)] text-white/30">
                           {presentation.glyph}
                         </span>
                       </div>

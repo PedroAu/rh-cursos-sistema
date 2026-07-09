@@ -1,5 +1,7 @@
 # Wireframes Index
 
+> Este diretório faz parte da documentação operacional ativa do redesign. Para a hierarquia completa, ver `docs/design/README.md`. Arquivos em `../reference/` são históricos e não competem com este índice.
+
 Este diretório concentra os wireframes HTML do redesign e funciona como ponte entre design e implementação.
 
 ## Objetivo
@@ -118,6 +120,8 @@ Este diretório concentra os wireframes HTML do redesign e funciona como ponte e
 1. Home
 2. Cursos
 3. Detalhe do Curso
+
+Arquivos preservados em `../reference/` não substituem este diretório nem os `spec-*.md`.
 4. Agenda
 5. Contato
 6. In Company

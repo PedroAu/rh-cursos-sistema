@@ -1,4 +1,6 @@
 # 🎨 Plano de Refatoração de Design — Trust Keith System
+> Plano de transição legado. Use como histórico de decisão, não como contrato atual de implementação.
+
 **Objetivo:** Implementar completamente o design system Trust Keith com máxima economia de tokens
 
 ---

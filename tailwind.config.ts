@@ -99,6 +99,11 @@ const config: Config = {
       spacing: tokens.spacing,
       borderRadius: {
         DEFAULT: "var(--ea-radius-default)",
+        input: "var(--tk-radius-input)",
+        button: "var(--tk-radius-button)",
+        card: "var(--tk-radius-card)",
+        glass: "var(--tk-radius-glass)",
+        pill: "var(--tk-radius-pill)",
         lg: "var(--ea-radius-lg)",
         xl: "var(--ea-radius-xl)",
         "2xl": "var(--ea-radius-2xl)",

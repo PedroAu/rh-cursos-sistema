@@ -26,21 +26,21 @@ const solutions = [
     description:
       "Presenciais e online, com temas atualizados para as áreas pública e privada, focados em qualificação técnica e atualização profissional.",
     icon: Section,
-    tint: "linear-gradient(135deg,#235875,#2f7599)",
+    tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))",
     title: "Cursos abertos"
   },
   {
     description:
       "Programas personalizados conforme as necessidades de cada instituição, com adequação de horário, agenda e conteúdo e redução de custos para o cliente.",
     icon: Diamond,
-    tint: "linear-gradient(135deg,#4285f4,#6aa2ff)",
+    tint: "linear-gradient(135deg,var(--tk-accent),color-mix(in_srgb,var(--tk-accent) 72%,white))",
     title: "Treinamentos in company"
   },
   {
     description:
       "Apoio especializado a órgãos públicos e empresas na estruturação de processos, conformidade legal e desenvolvimento de pessoas.",
     icon: Gem,
-    tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
     title: "Consultoria empresarial"
   }
 ];
@@ -52,7 +52,7 @@ const trackDefinitions = [
     fallbackCount: 14,
     icon: Section,
     matchCategories: ["Departamento Pessoal", "eSocial"],
-    tint: "linear-gradient(135deg,#235875,#2f7599)",
+    tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))",
     title: "Departamento Pessoal, Folha & eSocial"
   },
   {
@@ -61,7 +61,7 @@ const trackDefinitions = [
     fallbackCount: 12,
     icon: Scale,
     matchCategories: ["Licitações e Contratos", "Licitações"],
-    tint: "linear-gradient(135deg,#2f7599,#068466)",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 72%,var(--tk-accent)),var(--tk-success))",
     title: "Licitações, Compras & Contratos"
   },
   {
@@ -70,7 +70,7 @@ const trackDefinitions = [
     fallbackCount: 14,
     icon: Gem,
     matchCategories: ["Gestão de Pessoas", "Liderança"],
-    tint: "linear-gradient(135deg,#235875,#3a7d5f)",
+    tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-success) 58%,var(--tk-brand)))",
     title: "Gestão de Pessoas & Liderança"
   },
   {
@@ -79,7 +79,7 @@ const trackDefinitions = [
     fallbackCount: 10,
     icon: SquareDashedMousePointer,
     matchCategories: ["Comunicação"],
-    tint: "linear-gradient(135deg,#c98a3a,#e0a94f)",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 34%,var(--tk-cream-dark)),color-mix(in_srgb,var(--tk-cream-dark) 82%,white))",
     title: "Comunicação, Redação & Atendimento"
   },
   {
@@ -88,7 +88,7 @@ const trackDefinitions = [
     fallbackCount: 19,
     icon: Diamond,
     matchCategories: ["Compliance", "Auditoria", "Contabilidade", "Tributos"],
-    tint: "linear-gradient(135deg,#4285f4,#235875)",
+    tint: "linear-gradient(135deg,var(--tk-accent),var(--tk-brand))",
     title: "Auditoria, Contabilidade & Tributos"
   },
   {
@@ -97,7 +97,7 @@ const trackDefinitions = [
     fallbackCount: 11,
     icon: Gem,
     matchCategories: ["Tecnologia"],
-    tint: "linear-gradient(135deg,#7a4fd6,#9a74e6)",
+    tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
     title: "Tecnologia, Dados & Inovação"
   }
 ];
@@ -132,7 +132,7 @@ export function AboutPage() {
 
   return (
     <div className="bg-tk-surface text-tk-ink">
-      <section className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)]">
+      <section className="border-b border-tk-line bg-[image:var(--tk-gradient-soft)]">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <Badge tone="accent" dot className="w-fit px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.08em]">
             Documento institucional · Desde 2007

@@ -15,7 +15,7 @@ touchesAdmin: true
 frontmatter:
   metadata:
     source: "Goal: refatorar design seguindo design.md até implementar em todo o projeto, crie um plano para fazer economia de tokens"
-    objective: "Consolidar o design system Trust Keith do arquivo docs/design/DESIGN.md em todo o projeto, maximizando reutilização de tokens e reduzindo complexidade"
+    objective: "Consolidar o design system Trust Keith no projeto usando `src/design-tokens/` como fonte ativa e `docs/design/DESIGN.md` como contexto legado, maximizando reutilização de tokens e reduzindo complexidade"
     
   acceptance-criteria:
     - "Novos tokens consolidados: 150 → 80 (-47%)"
@@ -114,7 +114,7 @@ Para que toda a interface seja visual e funcionalmente consistente, melhorando a
 
 ## 🎯 Objetivo
 
-Consolidar o design system **Trust Keith** definido em `docs/design/DESIGN.md` em todo o projeto, com foco em:
+Consolidar o design system **Trust Keith** em todo o projeto, usando `src/design-tokens/` como fonte ativa e `docs/design/DESIGN.md` como referência histórica, com foco em:
 
 1. **Economia de Tokens** — Reduzir duplicação de estilos de 150+ para 80 tokens (-47%)
 2. **Componentização Reutilizável** — Criar 10+ componentes base para substituir 40+ componentes duplicados
@@ -132,10 +132,11 @@ Consolidar o design system **Trust Keith** definido em `docs/design/DESIGN.md` e
 
 ### Artefatos de Referência
 
-- **Design System:** `docs/design/DESIGN.md` (Trust Keith — 483 linhas, especificação completa)
-- **Tokens Atuais:** `src/design-tokens/tokens.tailwind.js` (genéricos, não refletem Trust Keith)
-- **Config Tailwind:** `tailwind.config.ts` (mistura de EA e novos tokens)
-- **Plan Detalhado:** `DESIGN_REFACTOR_PLAN.md` (4 fases, 20 dias, timeline)
+- **Mapa Oficial:** `docs/design/README.md` (hierarquia entre runtime, redesign ativo e legado)
+- **Tokens Ativos:** `src/design-tokens/` (`tokens.css`, `tokens.json`, `tokens.dtcg.json`, `tokens.tailwind.js`)
+- **Design Contextual Legado:** `docs/design/DESIGN.md`
+- **Config Tailwind:** `tailwind.config.ts`
+- **Plan Detalhado Legado:** `docs/design/DESIGN_REFACTOR_PLAN.md`
 
 ### Trust Keith Design System (resumo)
 
@@ -362,12 +363,11 @@ Story é considerada **DONE** quando:
 ### State of Current Design System
 
 **What's Already Done:**
-- Design System doc exists (`docs/design/DESIGN.md`) — well-documented, comprehensive
-- Basic tokens file exists (`src/design-tokens/tokens.tailwind.js`) — generic, not Trust Keith-aligned
-- Tailwind configured to load tokens
+- Runtime token source exists in `src/design-tokens/`
+- Tailwind is configured to load the active token set
+- `docs/design/DESIGN.md` remains available as historical/contextual design reference
 
 **What's Missing:**
-- Tokens don't reflect Trust Keith (colors, typography, shadows)
 - Components are duplicated across pages (40+ Button variants, Card styles, etc)
 - Some hardcoded colors/spacing in JSX
 - No unified FormField component
@@ -459,9 +459,11 @@ Must be available in project:
 
 ## 📎 Attachments
 
-- [`DESIGN_REFACTOR_PLAN.md`](../design/DESIGN_REFACTOR_PLAN.md) — Plano detalhado em 4 fases
-- [`docs/design/DESIGN.md`](../../docs/design/DESIGN.md) — Trust Keith Design System spec
-- [`src/design-tokens/tokens.tailwind.js`](../../src/design-tokens/tokens.tailwind.js) — Current tokens (to be refactored)
+- [`README.md`](/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/README.md) — Hierarquia oficial dos artefatos de design
+- [`DESIGN_REFACTOR_PLAN.md`](../../docs/design/DESIGN_REFACTOR_PLAN.md) — Plano detalhado legado
+- [`DESIGN.md`](../../docs/design/DESIGN.md) — Contexto histórico do design system Trust Keith
+- [`tokens.css`](../../src/design-tokens/tokens.css) — Fonte runtime dos tokens
+- [`tokens.tailwind.js`](../../src/design-tokens/tokens.tailwind.js) — Exposição Tailwind dos tokens ativos
 
 ---
 
