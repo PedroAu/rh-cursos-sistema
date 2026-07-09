@@ -1,12 +1,9 @@
 import { loadEnvFile } from "node:process";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
+import { ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
 
-// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET real via
-// .env.local, mas este processo Node/Playwright não — sem isto, encodeSession()
-// assina com o fallback inseguro, o servidor rejeita a assinatura e a sessão
-// cai silenciosamente para /login (ver tests/smoke-crawl.spec.ts para a
-// mesma correção e o diagnóstico completo).
+// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET/SUPABASE_*
+// reais via .env.local, mas este processo Node/Playwright não por padrão.
 try {
   loadEnvFile(".env.local");
 } catch {
@@ -18,29 +15,34 @@ try {
 // declarado em admin-resource-configs.tsx) e confere que a criação some com
 // sucesso — sem cair no painel "Erros encontrados".
 //
+// A escrita passa pela Edge Function `admin-resources`, que exige uma sessão
+// real do Supabase Auth (não basta o cookie de demo-session que autentica só
+// a visualização SSR) — por isso o login aqui é feito de verdade pela UI,
+// com um usuário criado/garantido via service role (ensureAuthUser).
+//
 // Escopo: apenas recursos com ciclo criar→excluir seguro pela própria UI
 // (store.deleteX já existe). Não há banco de teste isolado — .env.local
 // aponta para o Supabase de produção — então cada execução cria um registro
-// real marcado com [E2E] no nome e apaga em seguida via afterEach. `leads`,
-// `students` e `enrollments` ficam de fora aqui (sem delete/create seguro
-// pela UI); ver handoff .aiox/handoffs/handoff-aiox-master-to-sm-*.yaml para
-// a story que fecha esse gap de produto antes de testá-los.
+// real marcado com [E2E] no nome e apaga em seguida. `leads`, `students` e
+// `enrollments` ficam de fora aqui (sem delete/create seguro pela UI); ver
+// handoff .aiox/handoffs/handoff-aiox-master-to-sm-*.yaml para a story que
+// fecha esse gap de produto antes de testá-los.
 
 const MARKER = `[E2E] ${Date.now()}`;
+const ADMIN_EMAIL = "e2e-admin-crud@rhcursos.test";
+const ADMIN_PASSWORD = "SenhaForte#E2E2026";
 
-async function issueAdminCookie(context: Awaited<ReturnType<Page["context"]>>) {
-  const token = await encodeSession({
-    role: "admin",
-    email: "admin@rhcursos.com.br",
-    name: "Perfil admin"
-  });
-  await context.addCookies([
-    {
-      name: SESSION_COOKIE,
-      value: token,
-      url: test.info().project.use.baseURL as string
-    }
-  ]);
+test.skip(!hasRealIntegrationEnv(), "admin-crud.spec.ts precisa de SUPABASE_SERVICE_ROLE_KEY real para logar de verdade.");
+
+async function loginAsAdmin(page: Page) {
+  await ensureAuthUser({ email: ADMIN_EMAIL, name: "E2E Admin CRUD", password: ADMIN_PASSWORD, role: "admin" });
+
+  await page.goto("/login");
+  await page.getByRole("button", { name: /^Administração/ }).click();
+  await page.getByLabel(/E-mail/).fill(ADMIN_EMAIL);
+  await page.getByLabel(/Senha/).fill(ADMIN_PASSWORD);
+  await page.getByRole("button", { name: "Entrar" }).click();
+  await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
 }
 
 async function fillText(dialog: Locator, label: string, value: string) {
@@ -65,8 +67,15 @@ async function saveAndExpectSuccess(page: Page, dialog: Locator) {
   await expect(dialog).toBeHidden({ timeout: 15_000 });
 }
 
+// A página tem 2 campos de busca: o global do topbar admin ("Buscar no
+// painel...") e o específico da listagem ("Buscar curso...", "Filtrar por
+// nome..." etc.). O segundo é sempre o que aparece por último no DOM.
+function pageSearchField(page: Page) {
+  return page.getByPlaceholder(/Buscar|Filtrar/).last();
+}
+
 async function deleteRowByName(page: Page, name: string) {
-  await page.getByPlaceholder(/Buscar|Filtrar/).fill(name);
+  await pageSearchField(page).fill(name);
   const row = page.getByRole("row", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
   await expect(row).toBeVisible();
   await row.getByRole("button", { name: /^Excluir item/ }).click();
@@ -74,8 +83,8 @@ async function deleteRowByName(page: Page, name: string) {
 }
 
 test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () => {
-  test.beforeEach(async ({ context }) => {
-    await issueAdminCookie(context);
+  test.beforeEach(async ({ page }) => {
+    await loginAsAdmin(page);
   });
 
   test("cursos: cria com todos os campos obrigatórios preenchidos e exclui", async ({ page }) => {
@@ -128,7 +137,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
 
     await saveAndExpectSuccess(page, dialog);
 
-    await page.getByPlaceholder(/Buscar|Filtrar/).fill(courseTitle);
+    await pageSearchField(page).fill(courseTitle);
     const row = page.getByRole("row", { name: new RegExp(startDateLabel) });
     await expect(row).toBeVisible();
     await row.getByRole("button", { name: /^Excluir item/ }).click();
