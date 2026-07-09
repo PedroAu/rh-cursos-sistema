@@ -6,11 +6,7 @@ args = [
 ]
 
 [mcp_servers.context7]
-command = "npx"
-args = [
-    "-y",
-    "@upstash/context7-mcp@latest",
-]
+url = "https://mcp.context7.com/sse"
 
 [mcp_servers.nano-banana-pro]
 command = "npx"
@@ -21,4 +17,4 @@ args = [
 env_vars = ["GEMINI_API_KEY"]
 
 [mcp_servers.supabase]
-url = "https://hwpsrujkxjhmmwphqdlz.supabase.co"
+url = "https://mcp.supabase.com/mcp"

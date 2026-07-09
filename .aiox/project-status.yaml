@@ -2,20 +2,17 @@ status:
   branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
-    - src/__tests__/lib/app-store.test.ts
-    - src/features/public-shell/components/public-header.tsx
-    - src/features/public-shell/components/public-mobile-navigation.tsx
-    - src/lib/app-store.tsx
-  modifiedFilesTotalCount: 9
+    - .codex/config.toml
+    - .mcp.json
+    - src/features/admin-shell/components/admin-sidebar.tsx
+  modifiedFilesTotalCount: 4
   recentCommits:
-    - >-
-      feat(custom-1.2): land auth-session hardening, rate-limit fix and QA gate
-      (#7)
-    - 'ci(perf): gate CSS gzip + build-time budgets in Performance lane (#6)'
+    - 'feat: refine public trust-keith experience'
+    - 'refactor: consolidate design system sources and validation'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-08T17:23:18.766Z'
+  lastUpdate: '2026-07-09T01:22:25.571Z'
   isGitRepo: true
-timestamp: 1783531398767
+timestamp: 1783560145572
 ttl: 60
-gitFingerprint: 1783527338283.8445:1783527509299.3784
+gitFingerprint: 1783527338283.8445:1783560140321.031

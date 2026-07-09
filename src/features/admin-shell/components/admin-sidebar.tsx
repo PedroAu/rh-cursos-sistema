@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, LogOut, Settings, Sparkles } from "lucide-react";
+import { BookOpen, LogOut, Sparkles } from "lucide-react";
 
 import type { DashboardRole } from "@/lib/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -85,12 +85,6 @@ export function AdminSidebar({ role }: { role: DashboardRole }) {
             <Link to="/cursos">
               <BookOpen size={16} />
               Catálogo de cursos
-            </Link>
-          </Button>
-          <Button asChild variant="ghost" className="justify-start bg-white/8 text-white hover:bg-white/16">
-            <Link to="/sobre">
-              <Settings size={16} />
-              Informações institucionais
             </Link>
           </Button>
           <Button variant="ghost" className="justify-start text-white/85 hover:bg-white/10" onClick={logout}>
