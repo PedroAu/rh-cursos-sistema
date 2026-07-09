@@ -61,7 +61,7 @@ export function PublicFooter() {
                 className="h-12 w-auto"
               />
             </NextLink>
-            <p className="mt-5 max-w-[34ch] text-sm leading-[1.55] text-tk-ink-muted">
+            <p className="mt-5 max-w-[34ch] text-[16px] leading-[1.6] text-tk-ink-muted">
               {isAboutPage
                 ? "Transformando vidas por meio do conhecimento desde 2007. Brasília – Distrito Federal · www.rhcursos.com.br"
                 : "Cursos, treinamento in-company e consultoria para organizações públicas e privadas."}
@@ -70,7 +70,7 @@ export function PublicFooter() {
 
           {footerColumns.map((column) => (
             <div key={column.title}>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
+              <p className="mb-3 text-[13px] font-semibold uppercase tracking-[0.12em] text-tk-ink-muted">
                 {column.title}
               </p>
               <div className="space-y-2.5">
@@ -82,7 +82,7 @@ export function PublicFooter() {
                       key={item.to + item.label}
                       href={item.to}
                       className={cn(
-                        "block text-sm text-tk-ink transition hover:text-tk-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2",
+                        "block text-[16px] leading-[1.55] text-tk-ink transition hover:text-tk-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-focus focus-visible:ring-offset-2",
                         active && "font-semibold text-tk-brand"
                       )}
                     >
@@ -95,7 +95,7 @@ export function PublicFooter() {
           ))}
         </div>
 
-        <p className="pt-6 text-xs text-tk-ink-muted">
+        <p className="pt-6 text-[12px] leading-[1.4] text-tk-ink-muted">
           {isAboutPage
             ? "© 2026 RH Cursos & Soluções. Todos os direitos reservados."
             : "© 2026 RH Cursos. Todos os direitos reservados."}

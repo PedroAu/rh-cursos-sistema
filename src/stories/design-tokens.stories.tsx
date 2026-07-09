@@ -74,7 +74,7 @@ export const Typography: StoryObj = {
       </div>
       <div>
         <p className="font-tk-serif text-subheading-large font-light text-tk-ink">
-          Merriweather subheading with a calm editorial rhythm.
+          Helvetica Neue subheading with a calm editorial rhythm.
         </p>
         <p className="font-mono text-caption text-tk-ink-muted">tk-serif / 1.5rem / weight 300</p>
       </div>

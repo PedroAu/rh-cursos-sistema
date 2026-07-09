@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter, Merriweather } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import type { ReactNode } from "react";
 
@@ -22,14 +22,6 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-fraunces",
   weight: ["700"],
-  style: ["normal", "italic"]
-});
-
-const merriweather = Merriweather({
-  display: "swap",
-  subsets: ["latin"],
-  variable: "--font-merriweather",
-  weight: ["300", "400"],
   style: ["normal", "italic"]
 });
 
@@ -56,7 +48,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
-      <body className={`${inter.variable} ${fraunces.variable} ${merriweather.variable}`}>
+      <body className={`${inter.variable} ${fraunces.variable}`}>
         <ErrorBoundary>{children}</ErrorBoundary>
         <AppToaster />
         {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}

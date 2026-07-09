@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
-import { ArrowRight, Menu, UserRound } from "lucide-react";
+import { Menu, UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -64,7 +64,7 @@ export function PublicMobileNavigation() {
               key={item.to}
               href={item.to}
               onClick={close}
-              className="rounded-lg border border-rh-paper-line bg-white px-4 py-3 text-sm font-semibold text-tk-ink transition hover:border-tk-brand hover:text-tk-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent focus-visible:ring-offset-2"
+              className="rounded-lg border border-rh-paper-line bg-white px-4 py-3 text-[15px] font-medium leading-[1.4] text-tk-ink transition hover:border-tk-brand hover:text-tk-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent focus-visible:ring-offset-2"
             >
               {item.label}
             </NextLink>
@@ -75,7 +75,6 @@ export function PublicMobileNavigation() {
           <Button asChild onClick={close}>
             <NextLink href="/falar-com-especialista">
               Fale com um especialista
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </NextLink>
           </Button>
 
