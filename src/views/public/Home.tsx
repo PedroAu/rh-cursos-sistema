@@ -39,7 +39,7 @@ const journeyCards: JourneyCard[] = [
     badge: "Para profissionais",
     badgeTone: "neutral",
     description:
-      "Turmas com agenda pública, presenciais e online ao vivo, com certificação e conteúdo atualizado.",
+      "Turmas para profissionais que precisam dominar temas críticos com clareza, segurança e aplicação prática desde o primeiro encontro.",
     href: "/agenda",
     icon: BookOpen,
     linkLabel: "Ver agenda de cursos →",
@@ -49,18 +49,18 @@ const journeyCards: JourneyCard[] = [
     badge: "Para organizações",
     badgeTone: "neutral",
     description:
-      "Programas sob medida para a sua equipe, no seu contexto operacional, com o seu calendário e os seus casos reais.",
+      "Programas desenhados para a realidade da sua equipe, com foco em contexto, rotina, casos reais e aplicação consistente.",
     href: "/in-company",
     icon: BriefcaseBusiness,
     linkLabel: "Levar para minha equipe →",
     title: "Cursos in-company"
   },
   {
-    badge: "Novo",
+    badge: "Apoio especializado",
     badgeTone: "accent",
     bordered: true,
     description:
-      "Apoio especializado para aplicar normas e requisitos regulatórios à realidade do seu órgão ou empresa do diagnóstico à execução.",
+      "Apoio técnico para transformar normas, exigências e requisitos regulatórios em decisões mais claras e execução mais segura.",
     href: "/falar-com-especialista",
     icon: Star,
     iconSolid: true,
@@ -71,24 +71,24 @@ const journeyCards: JourneyCard[] = [
 
 const consultingSteps: ConsultingStep[] = [
   {
-    description: "Entendemos o seu cenário, as normas aplicáveis e as prioridades.",
-    title: "Conversa de diagnóstico"
+    description: "Entendemos o contexto, as exigências aplicáveis e os pontos em que a equipe mais precisa de clareza.",
+    title: "Diagnóstico do cenário"
   },
   {
-    description: "Uma proposta com escopo, etapas e resultados esperados.",
+    description: "Estruturamos um caminho com escopo, etapas e ganhos práticos esperados.",
     title: "Plano sob medida"
   },
   {
-    description: "Aplicamos junto com a sua equipe, ajustando ao longo do caminho.",
+    description: "Apoiamos a execução junto com a equipe para transformar entendimento em prática segura.",
     solid: true,
-    title: "Execução acompanhada"
+    title: "Aplicação acompanhada"
   }
 ] as const;
 
 const consultingBullets = [
   "Diagnóstico do seu contexto normativo e operacional",
-  "Plano de adequação aplicável, com passos priorizados",
-  "Acompanhamento por especialistas com experiência de campo"
+  "Plano de adequação aplicável, com prioridades claras e foco em execução",
+  "Acompanhamento especializado para consolidar autonomia na prática."
 ] as const;
 
 const stats = [
@@ -238,9 +238,9 @@ export function HomePage() {
       <section className="bg-tk-surface py-16 lg:py-[88px]">
         <div className={`${sectionContainerClass} grid gap-10`}>
           <SectionHeading
-            eyebrow="Três caminhos, um só objetivo"
+            eyebrow="Três caminhos, uma mesma transformação"
             title="Escolha como quer avançar"
-            subtitle="Conteúdo aplicável à legislação vigente e à realidade de organizações públicas e privadas."
+            subtitle="Formações e apoio especializado para transformar conhecimento técnico em segurança prática, com aderência à legislação vigente e à realidade operacional da sua organização."
             className="mb-11 max-w-[640px]"
           />
 
@@ -290,22 +290,22 @@ export function HomePage() {
             <Badge tone="accent" className="w-fit bg-tk-brand text-tk-surface">
               Consultoria
             </Badge>
-            <h2 className="mt-[18px] max-w-[14ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
-              A norma aplicada ao <span className="italic">seu</span> contexto
+            <h2 className="mt-[18px] max-w-[18ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink sm:max-w-[20ch]">
+              O conhecimento técnico aplicado ao <span className="italic">seu</span> contexto
             </h2>
-            <p className="mt-4 max-w-[50ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
-              Cada norma pesa de um jeito na sua operação. Nossa consultoria traduz requisitos legais em processos claros,
-              que a sua equipe aplica no dia a dia.
+            <p className="mt-4 max-w-[56ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
+              Cada exigência normativa impacta a operação de um jeito. Nossa consultoria transforma complexidade regulatória
+              em clareza, direcionamento e prática para a sua equipe atuar com segurança.
             </p>
 
-            <div className="mt-7 grid gap-[14px]">
+            <div className="mt-7 grid gap-[12px]">
               {consultingBullets.map((item) => (
                 <FeatureListItem
                   key={item}
                   icon={CheckCircle2}
                   title={item}
                   description=""
-                  className="[&>span:first-child]:bg-tk-brand [&>span:first-child]:text-tk-surface [&_strong]:leading-6"
+                  className="gap-3 [&>span:first-child]:h-8 [&>span:first-child]:w-8 [&>span:first-child]:bg-[color-mix(in_srgb,var(--tk-brand)_14%,var(--tk-surface))] [&>span:first-child]:text-tk-brand [&>span:first-child>svg]:h-4 [&>span:first-child>svg]:w-4 [&_strong]:text-[15px] [&_strong]:leading-6 [&_span:last-child]:text-[14px] [&_span:last-child]:leading-[1.45]"
                 />
               ))}
             </div>
@@ -318,25 +318,25 @@ export function HomePage() {
             </Button>
           </div>
 
-          <Card variant="base" className="p-5 sm:p-8">
-            <p className="mb-5 text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
-              Como funciona
+          <Card variant="base" className="h-fit self-center p-4 sm:p-5">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
+              Como transformamos conhecimento em aplicação
             </p>
-            <div className="grid gap-5">
+            <div className="grid gap-3">
               {consultingSteps.map((step, index) => (
-                <div key={step.title} className={cn("grid gap-5", index < consultingSteps.length - 1 ? "border-b border-tk-line pb-5" : "")}>
-                  <div className="flex gap-4">
+                <div key={step.title} className={cn("grid gap-3", index < consultingSteps.length - 1 ? "border-b border-tk-line pb-3" : "")}>
+                  <div className="flex items-center gap-2.5">
                     <span
                       className={cn(
-                        "flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold",
                         step.solid ? "bg-tk-brand text-tk-surface" : "bg-tk-accent-soft text-tk-brand"
                       )}
                     >
                       {index + 1}
                     </span>
                     <div>
-                      <h3 className="font-tk-display text-[1.25rem] font-bold leading-tight text-tk-ink">{step.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{step.description}</p>
+                      <h3 className="font-tk-display text-[1.05rem] font-bold leading-tight text-tk-ink">{step.title}</h3>
+                      <p className="mt-1 text-[14px] leading-[1.5] text-tk-ink-muted">{step.description}</p>
                     </div>
                   </div>
                 </div>
