@@ -144,14 +144,16 @@ export function HomePage() {
         >
           <div>
             <Badge tone="accent" dot className="w-fit">
-              Educação corporativa · Desde 2007
+              Educação corporativa desde 2007
             </Badge>
-            <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink sm:text-[2.75rem] lg:max-w-none lg:text-display-hero">
-              Conhecimento técnico que sua equipe <span className="italic text-tk-brand">aplica no mesmo dia</span>.
+            <h1 className="mt-5 max-w-[16ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[-0.02em] text-tk-ink sm:max-w-[18ch] sm:text-[2.75rem] lg:max-w-[16ch] lg:text-display-hero">
+              Conhecimento que <span className="italic text-[var(--rh-teal-deep)]">liberta da dependência</span> para
+              decidir e agir com segurança.
             </h1>
-            <p className="mt-5 max-w-[48ch] font-tk-serif text-base font-light leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
-              Cursos abertos, treinamentos in company e consultoria para o setor público e privado. São quase 80 cursos em
-              6 trilhas de conhecimento, do básico ao avançado, presenciais ou online.
+            <p className="mt-5 max-w-[56ch] font-tk-serif text-base font-light leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
+              Cursos, treinamentos in company e consultoria para transformar conhecimento técnico em autonomia, clareza e
+              aplicação no mundo real. Para organizações dos setores público e privado que precisam formar equipes
+              capazes de entender, decidir e executar com confiança.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -172,7 +174,7 @@ export function HomePage() {
             </div>
 
             <div className="mt-7 flex flex-wrap gap-[10px]">
-              {["80 cursos · 6 trilhas", "Presencial e online"].map((item) => (
+              {["Quase 80 cursos em 6 trilhas", "Presencial, online e in company"].map((item) => (
                 <Chip key={item} variant="info" className="cursor-default disabled:opacity-100" disabled>
                   {item}
                 </Chip>
