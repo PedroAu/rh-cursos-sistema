@@ -179,18 +179,30 @@ function upsertCollection<T extends { id: string }>(
     : [nextItem, ...collection];
 }
 
-function persistAdminMutation(mutation: AdminMutation): Promise<void> {
-  if (!isFunctionsConfigured) return Promise.resolve();
+/**
+ * Persiste a mutação via Edge Function e só reporta sucesso quando a escrita
+ * de fato aconteceu. Rejeita em caso de falha — quem chama decide o que fazer
+ * (ex.: manter o modal do admin aberto e mostrar o erro) em vez de a UI
+ * declarar sucesso otimista sobre uma escrita que não aconteceu.
+ */
+function persistAdminMutation(mutation: AdminMutation, successMessage?: string): Promise<void> {
+  if (!isFunctionsConfigured) {
+    if (successMessage) toast.success(successMessage);
+    return Promise.resolve();
+  }
 
   return invokeFunction("admin-resources", {
     body: mutation,
     sessionToken: getSessionToken() ?? undefined
-  }).then((response) => {
+  }).then(async (response) => {
     if (!response.ok) {
-      toast.error("Alteração aplicada na sessão atual, mas não foi sincronizada com o Supabase.");
+      const message = await getFunctionErrorMessage(
+        response,
+        "Não foi possível sincronizar a alteração com o Supabase."
+      );
+      throw new Error(message);
     }
-  }).catch(() => {
-    toast.error("Alteração aplicada na sessão atual, mas não foi sincronizada com o Supabase.");
+    if (successMessage) toast.success(successMessage);
   });
 }
 
@@ -701,8 +713,7 @@ export function AppStoreProvider({
       ...current,
       leads: current.leads.map((lead) => (lead.id === id ? { ...lead, status } : lead))
     }));
-    toast.success("Status do lead atualizado.");
-    return persistAdminMutation({ resource: "leads", action: "update-status", id, status });
+    return persistAdminMutation({ resource: "leads", action: "update-status", id, status }, "Status do lead atualizado.");
   }, []);
 
   const updateLead = useCallback<AppStoreValue["updateLead"]>((payload) => {
@@ -710,8 +721,7 @@ export function AppStoreProvider({
       ...current,
       leads: current.leads.map((lead) => (lead.id === payload.id ? { ...lead, ...payload } : lead))
     }));
-    toast.success("Lead atualizado.");
-    return persistAdminMutation({ resource: "leads", action: "upsert", payload });
+    return persistAdminMutation({ resource: "leads", action: "upsert", payload }, "Lead atualizado.");
   }, []);
 
   const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>((course) => {
@@ -765,8 +775,10 @@ export function AppStoreProvider({
       ...current,
       courses: upsertCollection(current.courses, Boolean(exists), nextCourse)
     }));
-    toast.success(course.id ? "Curso editado." : "Curso criado no admin.");
-    return persistAdminMutation({ resource: "courses", action: "upsert", payload: nextCourse });
+    return persistAdminMutation(
+      { resource: "courses", action: "upsert", payload: nextCourse },
+      course.id ? "Curso editado." : "Curso criado no admin."
+    );
   }, []);
 
   const deleteCourse = useCallback<AppStoreValue["deleteCourse"]>((id) => {
@@ -774,8 +786,7 @@ export function AppStoreProvider({
       ...current,
       courses: current.courses.filter((item) => item.id !== id)
     }));
-    toast.success("Curso excluído.");
-    return persistAdminMutation({ resource: "courses", action: "delete", id });
+    return persistAdminMutation({ resource: "courses", action: "delete", id }, "Curso excluído.");
   }, []);
 
   const duplicateCourse = useCallback<AppStoreValue["duplicateCourse"]>((id) => {
@@ -828,8 +839,10 @@ export function AppStoreProvider({
       ...current,
       classes: upsertCollection(current.classes, Boolean(exists), nextClass)
     }));
-    toast.success(trainingClass.id ? "Turma editada." : "Turma criada.");
-    return persistAdminMutation({ resource: "classes", action: "upsert", payload: nextClass });
+    return persistAdminMutation(
+      { resource: "classes", action: "upsert", payload: nextClass },
+      trainingClass.id ? "Turma editada." : "Turma criada."
+    );
   }, []);
 
   const deleteClass = useCallback<AppStoreValue["deleteClass"]>((id) => {
@@ -837,8 +850,7 @@ export function AppStoreProvider({
       ...current,
       classes: current.classes.filter((item) => item.id !== id)
     }));
-    toast.success("Turma excluída.");
-    return persistAdminMutation({ resource: "classes", action: "delete", id });
+    return persistAdminMutation({ resource: "classes", action: "delete", id }, "Turma excluída.");
   }, []);
 
   const upsertInstructor = useCallback<AppStoreValue["upsertInstructor"]>((instructor) => {
@@ -876,8 +888,10 @@ export function AppStoreProvider({
       ...current,
       instructors: upsertCollection(current.instructors, Boolean(exists), nextInstructor)
     }));
-    toast.success(instructor.id ? "Instrutor editado." : "Instrutor criado.");
-    return persistAdminMutation({ resource: "instructors", action: "upsert", payload: nextInstructor });
+    return persistAdminMutation(
+      { resource: "instructors", action: "upsert", payload: nextInstructor },
+      instructor.id ? "Instrutor editado." : "Instrutor criado."
+    );
   }, []);
 
   const deleteInstructor = useCallback<AppStoreValue["deleteInstructor"]>((id) => {
@@ -885,8 +899,7 @@ export function AppStoreProvider({
       ...current,
       instructors: current.instructors.filter((item) => item.id !== id)
     }));
-    toast.success("Instrutor excluído.");
-    return persistAdminMutation({ resource: "instructors", action: "delete", id });
+    return persistAdminMutation({ resource: "instructors", action: "delete", id }, "Instrutor excluído.");
   }, []);
 
   const updateStudent = useCallback<AppStoreValue["updateStudent"]>((student) => {
@@ -894,8 +907,7 @@ export function AppStoreProvider({
       ...current,
       students: current.students.map((item) => (item.id === student.id ? { ...item, ...student } : item))
     }));
-    toast.success("Aluno atualizado.");
-    return persistAdminMutation({ resource: "students", action: "upsert", payload: student });
+    return persistAdminMutation({ resource: "students", action: "upsert", payload: student }, "Aluno atualizado.");
   }, []);
 
   const updateEnrollmentStatus = useCallback<AppStoreValue["updateEnrollmentStatus"]>((id, status) => {
@@ -911,8 +923,10 @@ export function AppStoreProvider({
         }))
       };
     });
-    toast.success("Status da inscrição atualizado.");
-    return persistAdminMutation({ resource: "enrollments", action: "update-status", id, status });
+    return persistAdminMutation(
+      { resource: "enrollments", action: "update-status", id, status },
+      "Status da inscrição atualizado."
+    );
   }, []);
 
   const upsertBlogPost = useCallback<AppStoreValue["upsertBlogPost"]>((post) => {
@@ -940,8 +954,10 @@ export function AppStoreProvider({
       ...current,
       blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
     }));
-    toast.success(post.id ? "Post atualizado." : "Post publicado.");
-    return persistAdminMutation({ resource: "blog", action: "upsert", payload: nextPost });
+    return persistAdminMutation(
+      { resource: "blog", action: "upsert", payload: nextPost },
+      post.id ? "Post atualizado." : "Post publicado."
+    );
   }, []);
 
   const deleteBlogPost = useCallback<AppStoreValue["deleteBlogPost"]>((id) => {
@@ -949,8 +965,7 @@ export function AppStoreProvider({
       ...current,
       blogPosts: current.blogPosts.filter((item) => item.id !== id)
     }));
-    toast.success("Post excluído.");
-    return persistAdminMutation({ resource: "blog", action: "delete", id });
+    return persistAdminMutation({ resource: "blog", action: "delete", id }, "Post excluído.");
   }, []);
 
   const resetStore = useCallback<AppStoreValue["resetStore"]>(() => {

@@ -1,5 +1,16 @@
+import { loadEnvFile } from "node:process";
 import { expect, test, type Page } from "@playwright/test";
 import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
+
+// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET real via
+// .env.local, mas este processo Node/Playwright não — sem isto, encodeSession()
+// assina com o fallback inseguro, o servidor rejeita a assinatura e todo
+// cookie de sessão cai silenciosamente para /login sem erro visível.
+try {
+  loadEnvFile(".env.local");
+} catch {
+  // Arquivo pode não existir em alguns ambientes (ex.: CI com secrets via env vars).
+}
 
 // Crawl de fumaça: visita cada rota conhecida do app (pública, portal e admin)
 // e falha se a página cair no error boundary ("Algo deu errado") ou disparar
@@ -56,7 +67,7 @@ async function issueSessionToken(role: "admin" | "instructor" | "student") {
   });
 }
 
-async function crawl(page: Page, path: string) {
+async function crawl(page: Page, path: string, options: { expectAuthenticated?: boolean } = {}) {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
 
@@ -81,6 +92,14 @@ async function crawl(page: Page, path: string) {
   // Dá tempo para os fetches client-side (catálogo, dashboard) dispararem e,
   // se algo quebrar, para o error boundary/console.error aparecerem.
   await page.waitForTimeout(1500);
+
+  if (options.expectAuthenticated) {
+    // Sessão inválida/expirada redireciona silenciosamente para /login — sem
+    // esta checagem, o crawl "passa" mesmo tendo caído na tela errada.
+    expect(page.url(), `${path} redirecionou para /login — sessão não autenticou`).not.toContain(
+      "/login"
+    );
+  }
 
   expect(pageErrors, `${path} disparou pageerror: ${pageErrors.join(" | ")}`).toEqual([]);
   expect(consoleErrors, `${path} logou console.error: ${consoleErrors.join(" | ")}`).toEqual([]);
@@ -108,7 +127,7 @@ test.describe("smoke crawl — admin", () => {
 
   for (const path of adminPaths) {
     test(`${path} carrega sem erro`, async ({ page }) => {
-      await crawl(page, path);
+      await crawl(page, path, { expectAuthenticated: true });
     });
   }
 });
@@ -125,7 +144,7 @@ test.describe("smoke crawl — portais aluno/instrutor", () => {
         }
       ]);
 
-      await crawl(page, path);
+      await crawl(page, path, { expectAuthenticated: true });
     });
   }
 });
