@@ -42,8 +42,8 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Acceptance Criteria
 1. A rota `/blog` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-blog.md`, preservando navegacao shell, header, destaque, em alta, filtros/busca, grade, empty state, newsletter e footer.
 2. A rota `/blog/[slug]` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-blog-post.md` como pagina mid-fi, com conteudo principal, sidebar editorial, CTA de curso relacionado, taxonomia e posts relacionados.
-3. Blog list usa dados reais do store/fonte atual (`blogPosts` e, quando necessario, `courses`), com post em destaque, trending por regra documentada/fallback, categorias distintas e grade de posts publicados.
-4. Busca local em `/blog?q=` continua funcional, expõe `role=search`, resumo/limpar busca do blog e nao reintroduz busca global no header.
+3. Blog list usa dados reais do store/fonte atual (`blogPosts` e, quando necessario, `courses`), com post em destaque e trending por curadoria editorial fixa por slug, categorias distintas e grade de posts publicados.
+4. Busca local em `/blog?q=` continua funcional, usa `Input` do DS com `role=search`, resumo/limpar busca do blog e nao reintroduz busca global no header.
 5. Newsletter renderiza card com nome/email, valida email, cria lead/assinatura conforme fonte atual ou documenta fallback se provedor externo nao existir.
 6. Post individual trata estados: post inexistente, sem curso relacionado e sem relacionados, sem quebrar layout.
 7. Tokens/components Trust Keith, gradientes decorativos permitidos pela spec, anti-Mantine, zero raw `<img>` e reduced motion sao respeitados.
@@ -101,7 +101,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ### Current State Observed by @sm
 - `/blog` usa `PublicPageShell` + `BlogPage`.
 - `/blog/[slug]` e uma rota server que carrega posts/catalogo e passa dados para `BlogPostClient`.
-- `src/views/public/Blog.tsx` ja usa `useAppStore`, `blogPosts` e `createLead`.
+- `src/views/public/Blog.tsx` ja usa `useAppStore`, `blogPosts`, `createLead`, `Input` do DS para a busca e slugs editoriais fixos para destaque/em alta.
 - `src/views/public/BlogPost.tsx` usa `blogPosts` e `courses`.
 - A spec de blog lista gap original para post individual, resolvido parcialmente por `spec-blog-post.md` com fidelidade mid-fi.
 - Code intelligence e ClickUp indisponiveis nesta sessao.
@@ -144,6 +144,7 @@ Manual/visual checks:
 
 ## Dev Agent Record
 - 2026-07-06 - `src/views/public/Blog.tsx` recebeu reskin Trust Keith com destaque editorial, trending, busca local `?q=`, chips de categoria, grid de cards e CTA de newsletter usando o design system atual.
+- 2026-07-09 - `src/views/public/Blog.tsx` e a spec correspondente foram alinhados para deixar explicito que a busca usa `Input` do DS e que destaque/em alta seguem curadoria editorial fixa por slug.
 - 2026-07-06 - `src/views/public/BlogPost.tsx` foi elevado para o mid-fi da story com sidebar editorial, CTA relacionado resiliente e fallback explícito para ausência de posts relacionados.
 - 2026-07-06 - `npm run typecheck` ✅
 - 2026-07-06 - `npm run lint` ✅

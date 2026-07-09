@@ -17,6 +17,7 @@ import { cn, formatDate } from "@/lib/utils";
 
 const canvasCategories = ["Todos", "Licitações", "LGPD", "Compliance", "Gestão Pública"] as const;
 
+// Curadoria editorial fixa por slug: esta listagem não depende de ranking analítico.
 const curatedFeaturedSlug = "nova-lei-licitacoes-7-erros-pregoes-2026";
 
 const curatedGridSlugs = [

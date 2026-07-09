@@ -25,7 +25,7 @@
   - **4 itens do mock:** "Lei 14.133: o que muda no rito de contratação direta" (Licitações, 5 min); "Compartilhamento de dados entre órgãos: o que a lei permite" (LGPD, 7 min); "Conflito de interesses: como declarar e como fiscalizar" (Compliance, 4 min); "Indicadores que a alta gestão realmente acompanha" (Gestão Pública, 6 min).
 
 ### 4. Filtros + busca
-- **Estrutura/grid:** `padding:44px 0 0`; cabeçalho flex `align-items:flex-end justify-content:space-between gap:24px flex-wrap:wrap margin-bottom:26px`: H2 "Últimos artigos" (`--tk-font-display` 700 `--tk-text-section` `letter-spacing:-0.02em` `margin:0 0 4px`) + "{{ count }} publicações · atualizado toda semana" (`--tk-text-body-sm`, cor `--tk-ink-muted`) à esquerda; campo de busca à direita (`width:300px`, `.rh-search` **customizado**, mesmo padrão visual do Catálogo — não é o componente `Input` do DS — ícone lupa absoluto, placeholder "Buscar por tema ou palavra-chave").
+- **Estrutura/grid:** `padding:44px 0 0`; cabeçalho flex `align-items:flex-end justify-content:space-between gap:24px flex-wrap:wrap margin-bottom:26px`: H2 "Últimos artigos" (`--tk-font-display` 700 `--tk-text-section` `letter-spacing:-0.02em` `margin:0 0 4px`) + "{{ count }} publicações · atualizado toda semana" (`--tk-text-body-sm`, cor `--tk-ink-muted`) à esquerda; campo de busca à direita (`width:300px`, `Input` do DS com `type="search"`/`aria-label`, ícone lupa absoluto e placeholder "Buscar por tema ou palavra-chave"). **Nota:** a inconsistência entre canvases foi resolvida a favor do componente `Input` do DS, e não do markup customizado do Catálogo.
 - **Chips de categoria (`.rh-fchip`):** `sc-for list="{{ categories }}"` (placeholder 5), mesmo padrão visual do Catálogo (`data-on="1"` → fundo `--tk-brand`).
 
 ### 5. Grade de posts
@@ -51,7 +51,7 @@
 | `category` | string | `post.categoria` | — | — |
 | `title` | string | `post.titulo` | — | — |
 | `read` | string | `post.tempo_leitura` (calculado por contagem de palavras ou campo manual) | — | — |
-| **Ranking/critério** | — | Não definido no canvas (mock estático) | Propor: mais visualizados nos últimos 7 dias (analytics) ou curadoria manual (campo `destaque_trending`) | Se não houver dados suficientes, ocultar o card "Em alta esta semana" ou preencher com os posts mais recentes |
+| **Ranking/critério** | — | Seleção editorial fixa por slugs curados na implementação (`curatedFeaturedSlug`/`curatedGridSlugs`) | Não é ranking dinâmico; a ordem segue a curadoria manual do time de conteúdo | Se algum slug não existir, usar os posts publicados mais recentes como fallback local |
 | **Lista vazia** | — | — | — | Ocultar aside inteiro se não houver ao menos 1 item |
 
 ### `visible` (grade de posts) e post em destaque
@@ -65,7 +65,7 @@
 | `author` | string | `post.autor.nome` | — | — |
 | `date` | string | `post.publicado_em` formatada "DD Mês AAAA" | — | — |
 | `read` | string | `post.tempo_leitura` | — | — |
-| Post em destaque | objeto | `post` com flag `destaque=true` (o mais recente marcado como destaque, ou o mais recente por padrão) | Apenas 1 post em destaque por vez | Se nenhum marcado, usar o post mais recente |
+| Post em destaque | objeto | `post` selecionado por slug editorial fixo (`curatedFeaturedSlug`) | Apenas 1 post em destaque por vez; a seleção não depende de analytics | Se o slug não existir, usar o primeiro post publicado disponível |
 | **Lista vazia** | — | — | — | `sc-if empty` cobre a grade; página deve continuar funcional mesmo sem posts (ex.: recém-lançada) |
 
 ### `categories` (chips de filtro)
@@ -89,9 +89,9 @@
 
 ## Adaptações deliberadas
 
-1. **Critério de "em alta esta semana":** o canvas não define a regra de negócio (dados mock estáticos) — propor ranking por visualizações recentes ou curadoria manual; validar com produto.
-2. **Post em destaque:** definir mecanismo real de seleção (flag manual vs. "mais recente automaticamente").
-3. **Campo de busca customizado (`.rh-search`):** mesma observação do Catálogo — avaliar padronização para o componente `Input` do DS.
+1. **Critério de "em alta esta semana":** o canvas não define a regra de negócio (dados mock estáticos), e a implementação fecha a decisão com curadoria editorial fixa por slug. Se o produto quiser ranking dinâmico no futuro, isso deve virar nova história/ADR.
+2. **Post em destaque:** a implementação seleciona o destaque por slug editorial fixo. Se o produto quiser trocar essa regra por um critério dinâmico, isso deve virar nova história/ADR.
+3. **Campo de busca:** padronização resolvida em favor do componente `Input` do DS, em contraste com o markup customizado do Catálogo.
 4. **Token `--tk-text-display`** usado no H2 do post em destaque — mesmo gap already sinalizado em `spec-quem-somos.md`, confirmar valor exato na story 14.0.3/14.0.4.
 5. **Gradiente do post em destaque (`#235875,#2f7599`)** é decorativo fixo, não remapeado para `.rh2` — mesma observação de `spec-quem-somos.md` (não é cor de marca/CTA, é aceitável manter literal).
 6. **Newsletter → provedor de envio:** integração real de e-mail marketing (dupla confirmação, unsubscribe, etc.) é adaptação de implementação não coberta pelo canvas.
