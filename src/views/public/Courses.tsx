@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Building2, CalendarDays, Clock3, Search } from "lucide-react";
+import { CalendarDays, Clock3, Search } from "lucide-react";
 
-import { useQuoteModal } from "@/components/in-company/quote-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
@@ -32,13 +32,6 @@ const CATEGORY_GRADIENTS = [
   "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
   "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 34%,var(--tk-cream-dark)),color-mix(in_srgb,var(--tk-cream-dark) 82%,white))",
   "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 68%,var(--tk-success)),var(--tk-success))"
-] as const;
-
-const CATEGORY_ORDER = [
-  "Licitações e Contratos",
-  "LGPD e Privacidade",
-  "Gestão Pública",
-  "Compliance"
 ] as const;
 
 const CATEGORY_ALIASES: Record<string, string> = {
@@ -113,7 +106,6 @@ function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
 
 export function CoursesPage() {
   const { courses, classes } = useAppStore();
-  const { openQuote } = useQuoteModal();
   const [params, setParams] = useSearchParams();
   const [query, setQuery] = useState(params.get("q") ?? "");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -134,17 +126,7 @@ export function CoursesPage() {
 
   const catalogEntries = useMemo(() => buildCatalogEntries(courses, classes), [classes, courses]);
   const categories = useMemo(
-    () =>
-      [...new Set(catalogEntries.map((entry) => entry.category))].sort((left, right) => {
-        const leftIndex = CATEGORY_ORDER.indexOf(left as (typeof CATEGORY_ORDER)[number]);
-        const rightIndex = CATEGORY_ORDER.indexOf(right as (typeof CATEGORY_ORDER)[number]);
-
-        if (leftIndex !== -1 || rightIndex !== -1) {
-          return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) - (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
-        }
-
-        return left.localeCompare(right);
-      }),
+    () => [...new Set(catalogEntries.map((entry) => entry.category))].sort((left, right) => left.localeCompare(right)),
     [catalogEntries]
   );
 
@@ -206,7 +188,7 @@ export function CoursesPage() {
             <div className="flex flex-wrap items-center gap-4" data-testid="ui-courses-filters">
               <div role="search" className="relative w-full max-w-[360px]">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
-                <input
+                <Input
                   ref={searchRef}
                   type="search"
                   value={query}
@@ -217,7 +199,7 @@ export function CoursesPage() {
                   }}
                   aria-label="Buscar no catálogo"
                   placeholder="Buscar por tema, área ou palavra-chave"
-                  className="h-12 w-full rounded-[var(--tk-radius-button)] border border-[var(--rh-paper-line)] bg-tk-surface px-11 pr-12 text-sm text-tk-ink shadow-sm outline-none transition focus:border-tk-accent focus:ring-4 focus:ring-tk-accent-soft"
+                  className="h-12 px-11 pr-12"
                 />
                 {query ? (
                   <button
@@ -260,7 +242,7 @@ export function CoursesPage() {
           ) : filteredEntries.length ? (
             <div className="grid gap-[22px] md:grid-cols-2 xl:grid-cols-3">
               {filteredEntries.map((entry) => (
-                <CatalogSessionCard key={entry.trainingClass.id} entry={entry} onOpenQuote={openQuote} />
+                <CatalogSessionCard key={entry.trainingClass.id} entry={entry} />
               ))}
             </div>
           ) : (
@@ -305,13 +287,7 @@ export function CoursesPage() {
   );
 }
 
-function CatalogSessionCard({
-  entry,
-  onOpenQuote
-}: {
-  entry: CatalogEntry;
-  onOpenQuote: (course: Course) => void;
-}) {
+function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
   return (
     <Card variant="base" interactive className="flex flex-col overflow-hidden p-0 motion-reduce:transform-none">
       <div className="flex h-28 items-start justify-between p-[16px_18px]" style={{ background: entry.gradient }}>
@@ -344,22 +320,12 @@ function CatalogSessionCard({
             <div className="text-[0.82rem] text-tk-ink-muted">a partir de</div>
             <div className="font-tk-display text-xl font-bold text-tk-accent-strong">{currency(entry.price)}</div>
           </div>
-          <div className="flex flex-col items-end gap-3">
-            <Link
-              to={`/cursos/${entry.course.slug}`}
-              className="text-sm font-semibold text-tk-accent-strong transition hover:text-tk-brand-hover"
-            >
-              Ver turma →
-            </Link>
-            <button
-              type="button"
-              onClick={() => onOpenQuote(entry.course)}
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.04em] text-[var(--color-status-warning)] transition hover:opacity-80"
-            >
-              <Building2 className="h-3.5 w-3.5" />
-              Orçamento In Company
-            </button>
-          </div>
+          <Link
+            to={`/cursos/${entry.course.slug}`}
+            className="text-sm font-semibold text-tk-accent-strong transition hover:text-tk-brand-hover"
+          >
+            Ver turma →
+          </Link>
         </div>
       </div>
     </Card>
