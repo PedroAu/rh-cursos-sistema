@@ -67,14 +67,14 @@ function createCategoryGradient(category: string) {
 
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
-    return { label: "Poucas vagas", colorClass: "text-tk-error" };
+    return { label: "Poucas vagas", colorClass: "bg-tk-error text-white" };
   }
 
   if (trainingClass.status === "Em breve") {
-    return { label: "Turma nova", colorClass: "text-tk-brand" };
+    return { label: "Turma nova", colorClass: "bg-tk-brand text-white" };
   }
 
-  return { label: "Inscrições abertas", colorClass: "text-tk-success" };
+  return { label: "Inscrições abertas", colorClass: "bg-tk-success text-white" };
 }
 
 function formatCatalogDate(value: string) {
@@ -315,10 +315,10 @@ function CatalogSessionCard({
   return (
     <Card variant="base" interactive className="flex flex-col overflow-hidden p-0 motion-reduce:transform-none">
       <div className="flex h-28 items-start justify-between p-[16px_18px]" style={{ background: entry.gradient }}>
-        <span className="rounded-full bg-black/20 px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.04em] text-white">
+        <span className="rounded-full bg-white px-[10px] py-[5px] text-[11px] font-semibold uppercase tracking-[0.04em] text-tk-brand-hover">
           {entry.category}
         </span>
-        <span className={cn("rounded-full bg-white px-[10px] py-[5px] text-[11px] font-semibold", entry.spotColorClass)}>
+        <span className={cn("rounded-full px-[10px] py-[5px] text-[11px] font-semibold", entry.spotColorClass)}>
           {entry.spotLabel}
         </span>
       </div>
