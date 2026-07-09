@@ -36,11 +36,11 @@ Cada story 14.2.x valida com screenshot Playwright a 1180px comparado ao canvas 
 | Inter (body/UI) | Google Fonts | `next/font/google` — self-host no build, zero CDN em runtime |
 | Merriweather (serif) | Google Fonts | `next/font/google` |
 | Caveat (hand, uso raro) | Google Fonts | `next/font/google`, carregar só onde usada |
-| **Quincy CF (display)** | **Comercial** (Connary Fagen) | Ver abaixo |
+| **Fraunces (display)** | **Comercial** (Connary Fagen) | Ver abaixo |
 
-**Quincy CF — decisão em duas trilhas (não bloqueia implementação):**
+**Fraunces — decisão em duas trilhas (não bloqueia implementação):**
 1. **Trilha padrão (imediata):** implementar com a stack de fallback já embutida no token `--tk-font-display` (`Iowan Old Style, Palatino Linotype, Georgia, serif`). Todas as stories 14.x prosseguem.
-2. **⚠️ DECISÃO DO USUÁRIO (antes do Gate final 14.3.1):** (a) comprar licença webfont da Quincy CF e servir via `next/font/local` — fidelidade máxima; ou (b) adotar alternativa gratuita de anatomia próxima (candidata: **Fraunces**, Google Fonts, serif display com peso 700 e tracking apertado) — exige aprovação visual do usuário; ou (c) manter fallback do sistema.
+2. **⚠️ DECISÃO DO USUÁRIO (antes do Gate final 14.3.1):** (a) comprar licença webfont da Fraunces e servir via `next/font/local` — fidelidade máxima; ou (b) adotar alternativa gratuita de anatomia próxima (candidata: **Fraunces**, Google Fonts, serif display com peso 700 e tracking apertado) — exige aprovação visual do usuário; ou (c) manter fallback do sistema.
 
 A troca é um ajuste de 1 ponto (`next/font` + token), sem retrabalho nas páginas.
 
@@ -61,7 +61,7 @@ O admin (14.1.3/14.1.4) recebe **paridade funcional** com tokens novos, sem rede
 ## Consequências
 
 - **Positivas:** bundle menor (Mantine+Emotion fora), 1 sistema de estilo único, tokens idênticos aos canvases (pré-requisito de fidelidade), stories Codex sem ambiguidade de estrutura.
-- **Negativas/riscos:** migração de forms toca fluxos críticos (inscrição, login) — coberta por e2e existentes (14.1.6); Quincy CF pendente de decisão do usuário (mitigada pela trilha de fallback); admin fica visualmente "básico" até epic futuro.
+- **Negativas/riscos:** migração de forms toca fluxos críticos (inscrição, login) — coberta por e2e existentes (14.1.6); Fraunces pendente de decisão do usuário (mitigada pela trilha de fallback); admin fica visualmente "básico" até epic futuro.
 
 ## Alternativas rejeitadas
 

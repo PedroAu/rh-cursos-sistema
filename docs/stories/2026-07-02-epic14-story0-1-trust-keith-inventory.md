@@ -30,7 +30,7 @@ Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 3. O inventario cobre as familias de tokens relevantes para implementacao: cores, tipografia, espacamento, raios, sombras, foco, motion/durations e containers, com referencias aos arquivos CSS de origem.
 4. O inventario mapeia os canvases de referencia em `public/*.dc.html` para as rotas Next.js e views atuais listadas na epic, incluindo Home Sections como complemento da home.
 5. O inventario registra assets definitivos e temporarios: `public/images/brand/logo-horizontal.png` como logo final, `public/uploads/logoHorizontal_800X600.png` e, historicamente, `_ds/`, `support.js` e `.dc.html` como apoio de renderizacao de referencia; apos a 14.3.3, esses artefatos de canvas foram preservados em `docs/design/redesign/reference/canvases/` e `docs/design/redesign/wireframes/`.
-6. O inventario identifica os gaps que precisam de decisao posterior sem resolve-los nesta story: licenca/self-host de Quincy CF, destino final dos canvases/bundles fora de deploy e eventual divergencia entre placeholders dos canvases e dados reais.
+6. O inventario identifica os gaps que precisam de decisao posterior sem resolve-los nesta story: licenca/self-host de Fraunces, destino final dos canvases/bundles fora de deploy e eventual divergencia entre placeholders dos canvases e dados reais.
 7. O conteudo e autossuficiente para alimentar as stories 14.0.3, 14.0.4 e 14.0.5, com uma secao "Handoff para proximas stories" contendo entradas objetivas para arquitetura, tokens e componentes.
 
 ## Scope
@@ -48,7 +48,7 @@ Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 - Criar ou alterar componentes React.
 - Remover Mantine.
 - Mover, deletar ou editar canvases/bundles de `public/`.
-- Tomar decisao arquitetural sobre fonte Quincy CF; isso pertence a 14.0.3.
+- Tomar decisao arquitetural sobre fonte Fraunces; isso pertence a 14.0.3.
 
 ## Tasks / Subtasks
 
@@ -190,11 +190,11 @@ Quality gate executado inline (ver QA Results).
 | 1 | Título claro e objetivo | PASS | Identifica story, épico e entregável |
 | 2 | Descrição completa | PASS | User story com problema/necessidade explícitos |
 | 3 | ACs testáveis | PASS | 7 ACs com verificação documental + comandos `rg` |
-| 4 | Escopo IN/OUT definido | PASS | Out of Scope protege `src/`, `public/` e decisão Quincy CF |
+| 4 | Escopo IN/OUT definido | PASS | Out of Scope protege `src/`, `public/` e decisão Fraunces |
 | 5 | Dependências mapeadas | PASS | 17 paths conferidos — todos existem no repo |
 | 6 | Estimativa de complexidade | PASS | XS/1 ponto (adicionada nesta validação) |
 | 7 | Valor de negócio | PASS | Evita reabrir bundles a cada story de implementação |
-| 8 | Riscos documentados | PASS | AC6: Quincy CF, destino dos canvases, placeholders vs dados reais |
+| 8 | Riscos documentados | PASS | AC6: Fraunces, destino dos canvases, placeholders vs dados reais |
 | 9 | Criteria of Done | PASS | Seção Testing + quality gate com comandos objetivos |
 | 10 | Alinhamento com PRD/Épico | PASS | Remap `.rh2`, 13 componentes e mapa rota/view idênticos à Epic 14 |
 

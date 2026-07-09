@@ -143,7 +143,7 @@ Consolidar o design system **Trust Keith** em todo o projeto, usando `src/design
 | Aspecto | Valor |
 |---------|-------|
 | **Cores** | Teal-Navy (#235875) + Bright Blue (#4285f4) + 7-step neutrals |
-| **Typography** | Quincy CF (display) + Merriweather (serif) + Inter (body) |
+| **Typography** | Fraunces (display) + Merriweather (serif) + Inter (body) |
 | **Border Radius** | Input (0px), Button (6px), Glass (16px), Card (24px), Pill (100rem) |
 | **Shadows** | Dual-layer glass effect (2px sharp + 16px diffuse) |
 | **Spacing** | 4px base unit (xs, sm, md, lg, xl, 2xl, 3xl) |
@@ -418,7 +418,7 @@ Error: #ea384c (red)
 ### Fonts Required
 
 Must be available in project:
-- **Quincy CF** (display headlines) — 700 weight
+- **Fraunces** (display headlines) — 700 weight
 - **Merriweather** (subheadings) — 300, 400 weights
 - **Inter** (body text) — 400, 500, 600 weights
 
@@ -513,7 +513,7 @@ None. This was a review-only pass; no production code was changed.
 - [ ] Produce full `npm test`, accessibility, visual regression, and CSS-size evidence
 - [ ] Reconcile token-count target: current `tokens.css` has 205 CSS variables, including 87 `--tk-*` variables and 110 legacy alias variables
 - [ ] Resolve story checklist mismatch: `Typography.tsx` and `Link.tsx` files exist, but earlier Phase 2 checklist items remain unchecked
-- [ ] Decide whether Iowan Old Style is an approved substitute for required Quincy CF, or add/load Quincy CF
+- [ ] Decide whether Iowan Old Style is an approved substitute for required Fraunces, or add/load Fraunces
 
 ### Security Review
 

@@ -51,7 +51,7 @@ Projeto Next.js 16 (App Router em `app/`, código em `src/`) em `/Users/pedroaug
    - Manter os tokens de spacing/radius `--spacing-*`/`--radius-*` existentes APENAS como aliases dos `--tk-space-*`/`--tk-radius-*` equivalentes.
 2. **`src/styles/globals.css`:** no bloco `--ea-*`, re-apontar as cores de marca (`--ea-*` que hoje valem azul/dourado/navy) para os tokens `--tk-*`/`--rh-*` equivalentes. Não alterar a estrutura do restante.
 3. **`src/design-tokens/tokens.tailwind.js`:** adicionar namespace novo mapeando CSS vars (sem hex duplicado): cores `tk-brand`, `tk-brand-hover`, `tk-cta`, `tk-accent`, `tk-accent-strong`, `tk-accent-soft`, `tk-ink`, `tk-ink-muted`, `tk-surface`, `tk-surface-2`, `tk-line`, `tk-cream`, `tk-cream-dark`, `tk-success`, `tk-error`, `tk-focus`, `rh-teal-deep`, `rh-teal`, `rh-teal-lt`, `rh-gray`, `rh-paper-a`, `rh-paper-b`, `rh-paper-line`, `rh-hero-bg`; borderRadius `tk-input/tk-button/tk-md/tk-glass/tk-card/tk-pill`; boxShadow `tk-hairline/tk-glass/tk-card/tk-pop`; fontFamily `tk-display/tk-serif/tk-body/tk-hand` (referenciando as vars de fonte); maxWidth `tk-container: 1200px` / `tk-container-wide: 1400px`. Atualizar valor existente `trust-keith-teal` de `#235875` para `var(--tk-brand)`.
-4. **Fontes (ADR D7):** em `app/layout.tsx` (ou onde o root layout carrega fontes hoje — verificar), configurar via `next/font/google`: Inter (400/500/600/700), Merriweather (300/400 + itálicos). Expor como CSS vars e apontar `--tk-font-body`/`--tk-font-serif` para elas. `--tk-font-display` usa a stack de fallback `"Iowan Old Style", "Palatino Linotype", Georgia, serif` (Quincy CF pendente de licença — NÃO tentar carregar Quincy CF). Caveat NÃO carregar agora (uso raro, entra na página que precisar).
+4. **Fontes (ADR D7):** em `app/layout.tsx` (ou onde o root layout carrega fontes hoje — verificar), configurar via `next/font/google`: Inter (400/500/600/700), Merriweather (300/400 + itálicos). Expor como CSS vars e apontar `--tk-font-body`/`--tk-font-serif` para elas. `--tk-font-display` usa a stack de fallback `"Iowan Old Style", "Palatino Linotype", Georgia, serif` (Fraunces pendente de licença — NÃO tentar carregar Fraunces). Caveat NÃO carregar agora (uso raro, entra na página que precisar).
 5. **Storybook:** atualizar `src/stories/design-tokens.stories.tsx` para exibir a nova paleta/escala (swatches de cores tk/rh, raios, sombras, tipografia).
 
 ### Proibições
@@ -125,7 +125,7 @@ Codex GPT-5 (@dev/Dex), 2026-07-02.
 - `tokens.css` reescrito como fonte única TK/RH no `:root`, com remap RH aplicado diretamente e aliases legados temporários para `--color-*`, spacing, radius, sombras e componentes.
 - `tokens.tailwind.js` agora expõe namespaces `tk-*`/`rh-*` referenciando CSS vars, incluindo fontes, raios, sombras e containers.
 - `globals.css` mantém a estrutura legada/M3/EA, mas re-aponta marca, CTA, foco, chips, cards e footer para tokens TK/RH.
-- `app/layout.tsx` carrega Inter e Merriweather via `next/font/google`; Quincy CF não é carregada e `--tk-font-display` usa fallback serif aprovado no ADR.
+- `app/layout.tsx` carrega Inter e Merriweather via `next/font/google`; Fraunces não é carregada e `--tk-font-display` usa fallback serif aprovado no ADR.
 - Storybook `Design System / Tokens` atualizado para paleta TK/RH, tipografia, espaçamentos, raios, sombras e exemplos básicos.
 
 ## PO Validation

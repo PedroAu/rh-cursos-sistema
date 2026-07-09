@@ -37,7 +37,7 @@
 ---
 
 ### Decision 3: Typography Font Stack
-**Decision:** Use literal font names in tokens (Quincy CF, Merriweather, Inter) with system fallback  
+**Decision:** Use literal font names in tokens (Fraunces, Merriweather, Inter) with system fallback  
 **Timestamp:** 2026-06-28 14:40:00  
 **Reason:** Design system specifies exact fonts; assume fonts are available via Google Fonts or @font-face  
 **Assumption:** Fonts are already loaded in the project (check later in Phase 2)  

@@ -31,7 +31,7 @@ Observação: os canvases acima são agora referências históricas removidas do
 O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos V2` e copiado para o repo:
 
 - `docs/design-system/trust-keith/ds-package/` — `_ds_manifest.json` (todos os tokens `--tk-*` com valores), `tokens/{colors,typography,spacing,effects,fonts}.css`, `_ds_bundle.js` (componentes JSX: Avatar, Badge, Button, Card, Checkbox, Input, Logo, Switch, FeatureListItem, ProgressBar, StatBlock, Testimonial, NavBar), `readme.md`
-- `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Quincy CF / Merriweather / Inter / Caveat, espaçamento, raios, sombras)
+- `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Fraunces / Merriweather / Inter / Caveat, espaçamento, raios, sombras)
 - `docs/design/redesign/reference/screenshots/` — screenshots de referência (agenda, overview)
 - `docs/design/redesign/reference/canvases/`, `docs/design/redesign/wireframes/*.dc.html`, `public/uploads/logoHorizontal_800X600.png` — artefatos históricos de renderização dos canvases preservados fora do deploy; `_ds/`, `support.js` e os HTMLs finais já foram removidos de `public/` na 14.3.3
 - `public/images/brand/logo-horizontal.png` — logo horizontal oficial (asset definitivo do site)
@@ -187,7 +187,7 @@ Toda story de @dev deve ser gerada por @sm (`sonnet`) e validada por @po (`haiku
 |---|---|
 | ~~DS não extraível~~ | ✅ Resolvido — pacote completo em `docs/design-system/trust-keith/ds-package/` |
 | ~~Logo horizontal ausente~~ | ✅ Resolvido — `public/images/brand/logo-horizontal.png` |
-| Fonte **Quincy CF** é comercial (carregada via remote no DS) | @architect decide na 14.0.3: licenciar/self-host ou fallback `Iowan Old Style/Georgia` já previsto no token `--tk-font-display` |
+| Fonte **Fraunces** é comercial (carregada via remote no DS) | @architect decide na 14.0.3: licenciar/self-host ou fallback `Iowan Old Style/Georgia` já previsto no token `--tk-font-display` |
 | Aplicar tokens base sem o remap `.rh2` (site sairia azul `#235875` em vez do teal RH) | Story 14.0.4 usa explicitamente tokens finais = base + remap; QA 14.0.6 valida cor de CTA |
 | Bundle > 3 MiB no meio da migração (Mantine + componentes novos coexistindo) | Ordenar: fase 1 (remoção) antes da fase 2; `bundle:check` em todo QA gate |
 | Canvases são desktop-only (1180px) | Spec 14.0.2 define breakpoints mobile por página antes da implementação |

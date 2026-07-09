@@ -45,7 +45,7 @@ notes:
 
 ## Veredito da Fase 0
 
-**GATE F0: APROVADO.** Tokens, componentes, specs, ADR e inventário concluídos. Pendência não-bloqueante: decisão do usuário sobre Quincy CF (ADR D7 — trilha de fallback ativa).
+**GATE F0: APROVADO.** Tokens, componentes, specs, ADR e inventário concluídos. Pendência não-bloqueante: decisão do usuário sobre Fraunces (ADR D7 — trilha de fallback ativa).
 
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Gate executado com verificação independente (greps + lint + typecheck + test:unit). Fase 0 concluída.
