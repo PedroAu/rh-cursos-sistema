@@ -125,6 +125,7 @@ function formatHeroMode(modality: string, location: string) {
 
 export function HomePage() {
   const { classes, courses } = useAppStore();
+  const sectionContainerClass = "mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]";
 
   const upcomingClasses = [...classes]
     .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime())
@@ -137,11 +138,8 @@ export function HomePage() {
 
   return (
     <div className="bg-tk-surface-2 pb-16 md:pb-24">
-      <div className="mx-auto w-full max-w-[1180px] bg-tk-surface">
-        <section
-          data-testid="ui-hero-home"
-          className="grid gap-10 bg-tk-cream px-5 py-10 sm:px-8 sm:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:px-10 lg:py-[72px]"
-        >
+      <section data-testid="ui-hero-home" className="bg-tk-cream py-10 sm:py-12 lg:py-[72px]">
+        <div className={`${sectionContainerClass} grid gap-10 lg:grid-cols-[1.05fr_0.95fr]`}>
           <div>
             <Badge tone="accent" dot className="w-fit">
               Educação corporativa desde 2007
@@ -234,9 +232,11 @@ export function HomePage() {
               </div>
             </div>
           </Card>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-5 py-16 sm:px-8 lg:px-10 lg:py-[88px]">
+      <section className="bg-tk-surface py-16 lg:py-[88px]">
+        <div className={`${sectionContainerClass} grid gap-10`}>
           <SectionHeading
             eyebrow="Três caminhos, um só objetivo"
             title="Escolha como quer avançar"
@@ -281,71 +281,73 @@ export function HomePage() {
               );
             })}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="border-y border-tk-cream-dark bg-tk-cream px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
-          <div className="grid gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            <div>
-              <Badge tone="accent" className="w-fit bg-tk-brand text-tk-surface">
-                Consultoria
-              </Badge>
-              <h2 className="mt-[18px] max-w-[14ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
-                A norma aplicada ao <span className="italic">seu</span> contexto
-              </h2>
-              <p className="mt-4 max-w-[50ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
-                Cada norma pesa de um jeito na sua operação. Nossa consultoria traduz requisitos legais em processos claros,
-                que a sua equipe aplica no dia a dia.
-              </p>
+      <section className="border-y border-tk-cream-dark bg-tk-cream py-16 lg:py-20">
+        <div className={`${sectionContainerClass} grid gap-9 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14`}>
+          <div>
+            <Badge tone="accent" className="w-fit bg-tk-brand text-tk-surface">
+              Consultoria
+            </Badge>
+            <h2 className="mt-[18px] max-w-[14ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
+              A norma aplicada ao <span className="italic">seu</span> contexto
+            </h2>
+            <p className="mt-4 max-w-[50ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
+              Cada norma pesa de um jeito na sua operação. Nossa consultoria traduz requisitos legais em processos claros,
+              que a sua equipe aplica no dia a dia.
+            </p>
 
-              <div className="mt-7 grid gap-[14px]">
-                {consultingBullets.map((item) => (
-                  <FeatureListItem
-                    key={item}
-                    icon={CheckCircle2}
-                    title={item}
-                    description=""
-                    className="[&>span:first-child]:bg-tk-brand [&>span:first-child]:text-tk-surface [&_strong]:leading-6"
-                  />
-                ))}
-              </div>
-
-              <Button asChild size="lg" className="mt-8">
-                <Link to="/falar-com-especialista">
-                  Solicitar proposta
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="mt-7 grid gap-[14px]">
+              {consultingBullets.map((item) => (
+                <FeatureListItem
+                  key={item}
+                  icon={CheckCircle2}
+                  title={item}
+                  description=""
+                  className="[&>span:first-child]:bg-tk-brand [&>span:first-child]:text-tk-surface [&_strong]:leading-6"
+                />
+              ))}
             </div>
 
-            <Card variant="base" className="p-5 sm:p-8">
-              <p className="mb-5 text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
-                Como funciona
-              </p>
-              <div className="grid gap-5">
-                {consultingSteps.map((step, index) => (
-                  <div key={step.title} className={cn("grid gap-5", index < consultingSteps.length - 1 ? "border-b border-tk-line pb-5" : "")}>
-                    <div className="flex gap-4">
-                      <span
-                        className={cn(
-                          "flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-semibold",
-                          step.solid ? "bg-tk-brand text-tk-surface" : "bg-tk-accent-soft text-tk-brand"
-                        )}
-                      >
-                        {index + 1}
-                      </span>
-                      <div>
-                        <h3 className="font-tk-display text-[1.25rem] font-bold leading-tight text-tk-ink">{step.title}</h3>
-                        <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{step.description}</p>
-                      </div>
+            <Button asChild size="lg" className="mt-8">
+              <Link to="/falar-com-especialista">
+                Solicitar proposta
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <Card variant="base" className="p-5 sm:p-8">
+            <p className="mb-5 text-caption font-semibold uppercase tracking-[var(--tk-tracking-eyebrow)] text-tk-ink-muted">
+              Como funciona
+            </p>
+            <div className="grid gap-5">
+              {consultingSteps.map((step, index) => (
+                <div key={step.title} className={cn("grid gap-5", index < consultingSteps.length - 1 ? "border-b border-tk-line pb-5" : "")}>
+                  <div className="flex gap-4">
+                    <span
+                      className={cn(
+                        "flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full text-sm font-semibold",
+                        step.solid ? "bg-tk-brand text-tk-surface" : "bg-tk-accent-soft text-tk-brand"
+                      )}
+                    >
+                      {index + 1}
+                    </span>
+                    <div>
+                      <h3 className="font-tk-display text-[1.25rem] font-bold leading-tight text-tk-ink">{step.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-tk-ink-muted">{step.description}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-        </section>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </section>
 
-        <section className="px-5 py-16 sm:px-8 lg:px-10 lg:py-20">
+      <section className="bg-tk-surface py-16 lg:py-20">
+        <div className={sectionContainerClass}>
           <h2 className="mb-11 text-center font-tk-display text-section-heading font-bold tracking-[var(--tk-tracking-display)] text-tk-ink md:text-section">
             A RH Cursos em números
           </h2>
@@ -354,9 +356,11 @@ export function HomePage() {
               <StatBlock key={stat.value} value={stat.value} label={stat.label} className="text-center" />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="px-5 pb-16 sm:px-8 lg:px-10 lg:pb-[88px]">
+      <section className="bg-tk-surface pb-16 lg:pb-[88px]">
+        <div className={sectionContainerClass}>
           <div className="mx-auto max-w-[840px] lg:mx-0">
             <Testimonial
               quote="A RH Cursos traduziu exigências legais complexas em processos que a nossa equipe realmente consegue executar no dia a dia."
@@ -366,10 +370,12 @@ export function HomePage() {
               initials="MA"
             />
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="bg-tk-brand px-5 py-16 text-center sm:px-8 lg:px-10 lg:py-20">
-          <div className="mx-auto max-w-[760px]">
+      <section className="bg-tk-brand py-16 text-center lg:py-20">
+        <div className={`${sectionContainerClass} grid max-w-[760px] gap-10`}>
+          <div>
             <h2 className="font-tk-display text-display-large font-bold leading-[1.12] tracking-[var(--tk-tracking-display)] text-tk-surface">
               Pronto para capacitar a sua equipe?
             </h2>
@@ -383,8 +389,8 @@ export function HomePage() {
               </Link>
             </Button>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
