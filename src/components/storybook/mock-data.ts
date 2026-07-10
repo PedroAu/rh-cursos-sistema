@@ -123,6 +123,7 @@ export const mockStoreInitialData = {
   courses: [mockCourse],
   classes: [mockClass, mockClassLowSeats],
   instructors: [mockInstructor],
+  coursePublicContents: [],
   blogPosts: [mockBlogPost],
   testimonials: [mockTestimonial],
 };

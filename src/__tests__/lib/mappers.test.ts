@@ -4,10 +4,12 @@ import {
   mapAssessmentToTestimonial,
   mapBlogPost,
   mapCourse,
+  mapCoursePublicContent,
   type AssessmentWithCourseRow,
   type BlogPostRow,
   type ClassRow,
   type CourseInstructorRow,
+  type CoursePublicContentRow,
   type CourseRow
 } from "@/lib/supabase/mappers";
 
@@ -73,6 +75,36 @@ const courseInstructorRow: CourseInstructorRow = {
   created_at: "2026-06-01T10:00:00Z"
 };
 
+const coursePublicContentRow: CoursePublicContentRow = {
+  id: "content-1",
+  curso_id: "course-1",
+  hero_subtitle: "Subtitulo do curso",
+  highlights: [
+    { title: "Destaque 1", description: "Descricao 1" },
+    { titulo: "Destaque 2", descricao: "Descricao 2" }
+  ],
+  faq_items: [{ question: "Pergunta?", answer: "Resposta." }],
+  sidebar: {
+    investmentLabel: "Investimento",
+    supportTitle: "Suporte",
+    supportText: "Fale conosco"
+  },
+  corporate_cta: {
+    title: "CTA corporativo",
+    primaryLabel: "Primario",
+    primaryHref: "/in-company"
+  },
+  testimonial_override: {
+    name: "Cliente",
+    text: "Muito bom",
+    rating: 4
+  },
+  published: true,
+  created_at: "2026-06-01T10:00:00Z",
+  updated_at: "2026-06-01T10:00:00Z",
+  deleted_at: null
+};
+
 describe("Supabase mappers", () => {
   it("maps courses without depending on mock data fallbacks", () => {
     const course = mapCourse(courseRow, [courseInstructorRow], [classRow]);
@@ -119,6 +151,37 @@ describe("Supabase mappers", () => {
       status: "Publicado",
       image: "",
       relatedCourseId: "course-1"
+    });
+  });
+
+  it("maps public course content rows to editorial content", () => {
+    expect(mapCoursePublicContent(coursePublicContentRow)).toEqual({
+      id: "content-1",
+      courseId: "course-1",
+      heroSubtitle: "Subtitulo do curso",
+      highlights: [
+        { title: "Destaque 1", description: "Descricao 1" },
+        { title: "Destaque 2", description: "Descricao 2" }
+      ],
+      faqItems: [{ question: "Pergunta?", answer: "Resposta." }],
+      sidebar: {
+        investmentLabel: "Investimento",
+        supportTitle: "Suporte",
+        supportText: "Fale conosco"
+      },
+      corporateCta: {
+        title: "CTA corporativo",
+        primaryLabel: "Primario",
+        primaryHref: "/in-company"
+      },
+      testimonialOverride: {
+        name: "Cliente",
+        role: undefined,
+        organization: undefined,
+        text: "Muito bom",
+        rating: 4
+      },
+      published: true
     });
   });
 

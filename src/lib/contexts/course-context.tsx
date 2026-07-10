@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from "react";
 
-import type { Course, Instructor, Testimonial, TrainingClass, TrainingPath } from "@/types";
+import type { Course, CoursePublicContent, Instructor, Testimonial, TrainingClass, TrainingPath } from "@/types";
 
 /**
  * Domínio de catálogo: cursos, trilhas, turmas, instrutores e depoimentos —
@@ -14,6 +14,7 @@ export type CourseStoreValue = {
   classes: TrainingClass[];
   instructors: Instructor[];
   trainingPaths: TrainingPath[];
+  coursePublicContents: CoursePublicContent[];
   testimonials: Testimonial[];
   upsertCourse: (course: Partial<Course>) => Promise<void>;
   deleteCourse: (id: string) => Promise<void>;

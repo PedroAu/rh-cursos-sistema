@@ -43,6 +43,60 @@ export type CourseModule = {
   duration: string;
 };
 
+export type CoursePublicHighlight = {
+  title: string;
+  description: string;
+};
+
+export type CoursePublicFaqItem = {
+  question: string;
+  answer: string;
+};
+
+export type CoursePublicSidebar = {
+  investmentLabel?: string;
+  installmentText?: string;
+  nextClassesLabel?: string;
+  nextClassesEmptyLabel?: string;
+  guaranteeTitle?: string;
+  guaranteeText?: string;
+  supportTitle?: string;
+  supportText?: string;
+  supportCtaLabel?: string;
+  programPdfLabel?: string;
+  preEnrollmentLabel?: string;
+};
+
+export type CoursePublicCorporateCta = {
+  badge?: string;
+  title?: string;
+  description?: string;
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+};
+
+export type CoursePublicTestimonialOverride = {
+  name?: string;
+  role?: string;
+  organization?: string;
+  text?: string;
+  rating?: number;
+};
+
+export type CoursePublicContent = {
+  id: string;
+  courseId: string;
+  heroSubtitle?: string | null;
+  highlights: CoursePublicHighlight[];
+  faqItems: CoursePublicFaqItem[];
+  sidebar: CoursePublicSidebar;
+  corporateCta: CoursePublicCorporateCta;
+  testimonialOverride?: CoursePublicTestimonialOverride | null;
+  published: boolean;
+};
+
 export type Course = {
   id: string;
   slug: string;

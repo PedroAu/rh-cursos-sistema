@@ -111,6 +111,7 @@ vi.mock("@/lib/app-store", () => ({
         status: "Ativo"
       }
     ],
+    coursePublicContents: [],
     testimonials: [],
     createEnrollment: vi.fn()
   })
@@ -123,6 +124,7 @@ vi.mock("@/components/checkout/checkout-modal", () => ({
   }: {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    initialClassId?: string;
   }) =>
     open ? (
       <div>
@@ -160,14 +162,14 @@ describe("CourseDetailPage", () => {
 
     expect(await screen.findByText("Checkout aberto")).toBeInTheDocument();
 
+    await user.click(screen.getByRole("button", { name: /fechar checkout/i }));
+
     await waitFor(() => {
       expect(mocks.setSearchParams).toHaveBeenCalledTimes(1);
     });
 
     const nextParams = mocks.setSearchParams.mock.calls[0][0] as URLSearchParams;
     expect(nextParams.get("checkout")).toBeNull();
-
-    await user.click(screen.getByRole("button", { name: /fechar checkout/i }));
 
     await waitFor(() => {
       expect(screen.queryByText("Checkout aberto")).not.toBeInTheDocument();

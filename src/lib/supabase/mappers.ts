@@ -6,6 +6,12 @@ import type {
   ClassStatus,
   Course,
   CourseModule,
+  CoursePublicContent,
+  CoursePublicCorporateCta,
+  CoursePublicFaqItem,
+  CoursePublicHighlight,
+  CoursePublicSidebar,
+  CoursePublicTestimonialOverride,
   CourseStatus,
   Enrollment,
   EnrollmentStatus,
@@ -20,6 +26,7 @@ type Tables = Database["public"]["Tables"];
 export type CourseRow = Tables["curso"]["Row"];
 export type InstructorRow = Tables["instrutor"]["Row"];
 export type CourseInstructorRow = Tables["curso_instrutor"]["Row"];
+export type CoursePublicContentRow = Tables["curso_public_content"]["Row"];
 export type ClassRow = Tables["turma"]["Row"];
 export type LeadRow = Tables["lead"]["Row"];
 export type BlogPostRow = Tables["post_blog"]["Row"];
@@ -81,6 +88,95 @@ function asModules(value: Json): CourseModule[] {
           : [],
       duration: String(item.duration ?? item.duracao ?? "")
     }));
+}
+
+function asObjectArray(value: Json): Record<string, unknown>[] {
+  const items: unknown[] = Array.isArray(value) ? value : [];
+
+  return items.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object" && !Array.isArray(item));
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function asPositiveRating(value: unknown): number | undefined {
+  const rating = Number(value);
+  return Number.isFinite(rating) ? Math.min(Math.max(rating, 1), 5) : undefined;
+}
+
+function mapCoursePublicHighlights(value: Json): CoursePublicHighlight[] {
+  return asObjectArray(value).map((item) => ({
+    title: String(item.title ?? item.titulo ?? ""),
+    description: String(item.description ?? item.descricao ?? "")
+  }));
+}
+
+function mapCoursePublicFaqItems(value: Json): CoursePublicFaqItem[] {
+  return asObjectArray(value).map((item) => ({
+    question: String(item.question ?? item.pergunta ?? ""),
+    answer: String(item.answer ?? item.resposta ?? "")
+  }));
+}
+
+function mapCoursePublicSidebar(value: Json): CoursePublicSidebar {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    investmentLabel: asString(record.investmentLabel ?? record.investment_label),
+    installmentText: asString(record.installmentText ?? record.installment_text),
+    nextClassesLabel: asString(record.nextClassesLabel ?? record.next_classes_label),
+    nextClassesEmptyLabel: asString(record.nextClassesEmptyLabel ?? record.next_classes_empty_label),
+    guaranteeTitle: asString(record.guaranteeTitle ?? record.guarantee_title),
+    guaranteeText: asString(record.guaranteeText ?? record.guarantee_text),
+    supportTitle: asString(record.supportTitle ?? record.support_title),
+    supportText: asString(record.supportText ?? record.support_text),
+    supportCtaLabel: asString(record.supportCtaLabel ?? record.support_cta_label),
+    programPdfLabel: asString(record.programPdfLabel ?? record.program_pdf_label),
+    preEnrollmentLabel: asString(record.preEnrollmentLabel ?? record.pre_enrollment_label)
+  };
+}
+
+function mapCoursePublicCorporateCta(value: Json): CoursePublicCorporateCta {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return {
+    badge: asString(record.badge),
+    title: asString(record.title),
+    description: asString(record.description),
+    primaryLabel: asString(record.primaryLabel ?? record.primary_label),
+    primaryHref: asString(record.primaryHref ?? record.primary_href),
+    secondaryLabel: asString(record.secondaryLabel ?? record.secondary_label),
+    secondaryHref: asString(record.secondaryHref ?? record.secondary_href)
+  };
+}
+
+function mapCoursePublicTestimonialOverride(value: Json): CoursePublicTestimonialOverride | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return null;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  if (!asString(record.text ?? record.comentario)) {
+    return null;
+  }
+
+  return {
+    name: asString(record.name ?? record.nome),
+    role: asString(record.role ?? record.cargo),
+    organization: asString(record.organization ?? record.orgao),
+    text: asString(record.text ?? record.comentario),
+    rating: asPositiveRating(record.rating ?? record.nota)
+  };
 }
 
 export function toDbModality(value: Course["modality"]): ClassRow["modalidade"] {
@@ -262,6 +358,20 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     featured: row.destaque || row.status === "Destaque",
     featuredCourseIds: [],
     nextClassId: nextClass?.id ?? ""
+  };
+}
+
+export function mapCoursePublicContent(row: CoursePublicContentRow): CoursePublicContent {
+  return {
+    id: row.id,
+    courseId: row.curso_id,
+    heroSubtitle: row.hero_subtitle,
+    highlights: mapCoursePublicHighlights(row.highlights),
+    faqItems: mapCoursePublicFaqItems(row.faq_items),
+    sidebar: mapCoursePublicSidebar(row.sidebar),
+    corporateCta: mapCoursePublicCorporateCta(row.corporate_cta),
+    testimonialOverride: mapCoursePublicTestimonialOverride(row.testimonial_override),
+    published: row.published
   };
 }
 

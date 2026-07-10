@@ -42,6 +42,7 @@ import type {
   Enrollment,
   Instructor,
   Lead,
+  Student,
   TrainingClass
 } from "@/types";
 
@@ -49,7 +50,12 @@ import { AdminStoreContext, type AdminStoreValue } from "@/lib/contexts/admin-co
 import { CourseStoreContext, type CourseStoreValue } from "@/lib/contexts/course-context";
 import { SessionStoreContext, type SessionStoreValue } from "@/lib/contexts/session-context";
 import { StudentStoreContext, type StudentStoreValue } from "@/lib/contexts/student-context";
-import type { AppState, AppStoreInitialData } from "@/lib/contexts/store-types";
+import type {
+  AdminEnrollmentPayload,
+  AppState,
+  AppStoreInitialData,
+  StudentPayload
+} from "@/lib/contexts/store-types";
 
 export type { AppStoreInitialData } from "@/lib/contexts/store-types";
 
@@ -62,8 +68,17 @@ export type AppStoreValue = SessionStoreValue & CourseStoreValue & StudentStoreV
 const STORAGE_KEY = "rhcursos-demo-store-v4";
 
 type AdminMutation =
-  | { resource: "courses" | "classes" | "students" | "instructors" | "blog" | "leads"; action: "upsert"; payload: unknown }
-  | { resource: "courses" | "classes" | "instructors" | "blog"; action: "delete"; id: string }
+  | {
+      resource: "courses" | "classes" | "students" | "instructors" | "blog" | "leads" | "enrollments";
+      action: "upsert";
+      payload: unknown;
+    }
+  | {
+      resource: "students" | "enrollments";
+      action: "create";
+      payload: unknown;
+    }
+  | { resource: "courses" | "classes" | "students" | "instructors" | "blog" | "leads" | "enrollments"; action: "delete"; id: string }
   | { resource: "leads" | "enrollments"; action: "update-status"; id: string; status: string };
 
 const initialState: AppState = {
@@ -71,6 +86,7 @@ const initialState: AppState = {
   classes: mockCatalog.classes,
   students: [],
   instructors: mockCatalog.instructors,
+  coursePublicContents: [],
   leads: [],
   enrollments: [],
   blogPosts: mockBlogPosts,
@@ -85,6 +101,7 @@ const ARRAY_STATE_KEYS = [
   "classes",
   "students",
   "instructors",
+  "coursePublicContents",
   "leads",
   "enrollments",
   "blogPosts",
@@ -177,6 +194,69 @@ function upsertCollection<T extends { id: string }>(
   return exists
     ? collection.map((item) => (item.id === nextItem.id ? nextItem : item))
     : [nextItem, ...collection];
+}
+
+function leadNaturalKey(lead: Lead) {
+  return `${lead.name.trim().toLowerCase()}|${lead.email.trim().toLowerCase()}`;
+}
+
+function mergeLeads(current: Lead[], incoming: Lead[]) {
+  const byKey = new Map<string, Lead>();
+
+  for (const lead of current) {
+    byKey.set(leadNaturalKey(lead), lead);
+  }
+
+  for (const lead of incoming) {
+    byKey.set(leadNaturalKey(lead), lead);
+  }
+
+  return Array.from(byKey.values()).sort(
+    (left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime()
+  );
+}
+
+function buildStudentRecord(
+  payload: StudentPayload,
+  fallback?: Partial<Student>
+): Student {
+  return {
+    id: fallback?.id ?? `student-${Date.now()}`,
+    name: payload.name,
+    email: payload.email,
+    phone: payload.phone ?? fallback?.phone ?? "",
+    cpf: payload.cpf ?? fallback?.cpf ?? "",
+    organization: payload.organization,
+    jobTitle: payload.jobTitle ?? fallback?.jobTitle ?? "",
+    courseId: payload.courseId ?? fallback?.courseId ?? "",
+    classId: payload.classId ?? fallback?.classId ?? "",
+    enrollmentStatus: payload.enrollmentStatus ?? fallback?.enrollmentStatus ?? "Pendente",
+    certificateIssued: fallback?.certificateIssued ?? false,
+    enrolledAt: fallback?.enrolledAt ?? new Date().toISOString(),
+    paymentMethod: payload.paymentMethod ?? fallback?.paymentMethod ?? "Pix",
+  };
+}
+
+function buildEnrollmentRecord(
+  payload: AdminEnrollmentPayload,
+  fallbackStatus: Enrollment["status"] = "Confirmada"
+): Enrollment {
+  return {
+    id: `enrollment-${Date.now()}`,
+    studentName: payload.studentName,
+    email: payload.email,
+    phone: payload.phone,
+    cpf: payload.cpf,
+    organization: payload.organization,
+    jobTitle: payload.jobTitle,
+    enrollmentType: payload.enrollmentType,
+    paymentMethod: payload.paymentMethod,
+    courseId: payload.courseId,
+    classId: payload.classId,
+    status: payload.status ?? fallbackStatus,
+    createdAt: new Date().toISOString(),
+    notes: payload.notes ?? "",
+  };
 }
 
 /**
@@ -396,7 +476,8 @@ export function AppStoreProvider({
             courses: updated.courses,
             classes: updated.classes,
             instructors: updated.instructors,
-            trainingPaths: updated.trainingPaths
+            trainingPaths: updated.trainingPaths,
+            coursePublicContents: updated.coursePublicContents
           }));
         })
         .catch(() => undefined);
@@ -417,7 +498,7 @@ export function AppStoreProvider({
       fetchLeadsFromSupabase()
         .then((updated) => {
           if (!active || !updated) return;
-          setState((current) => ({ ...current, leads: updated }));
+          setState((current) => ({ ...current, leads: mergeLeads(current.leads, updated) }));
         })
         .catch(() => undefined);
     }, 300);
@@ -435,6 +516,7 @@ export function AppStoreProvider({
           classes: catalog?.classes?.length ? catalog.classes : (current.classes.length ? current.classes : mockCatalog.classes),
           instructors: catalog?.instructors?.length ? catalog.instructors : (current.instructors.length ? current.instructors : mockCatalog.instructors),
           trainingPaths: catalog?.trainingPaths?.length ? catalog.trainingPaths : (current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths),
+          coursePublicContents: catalog?.coursePublicContents?.length ? catalog.coursePublicContents : current.coursePublicContents,
           blogPosts: blogPosts?.length ? blogPosts : (current.blogPosts.length ? current.blogPosts : mockBlogPosts)
         }));
 
@@ -467,7 +549,15 @@ export function AppStoreProvider({
             scheduleCatalogRefetch
           );
 
-          subscriptions.push(courseSub, blogSub, instructorSub);
+          const courseContentSub = createRealtimeSubscription(
+            supabase,
+            "curso_public_content_changes",
+            "curso_public_content",
+            () => active,
+            scheduleCatalogRefetch
+          );
+
+          subscriptions.push(courseSub, blogSub, instructorSub, courseContentSub);
         }
       })
       .catch(() => {
@@ -479,6 +569,7 @@ export function AppStoreProvider({
           classes: current.classes.length ? current.classes : mockCatalog.classes,
           instructors: current.instructors.length ? current.instructors : mockCatalog.instructors,
           trainingPaths: current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths,
+          coursePublicContents: current.coursePublicContents,
           blogPosts: current.blogPosts.length ? current.blogPosts : mockBlogPosts
         }));
       });
@@ -495,7 +586,7 @@ export function AppStoreProvider({
           if (!active || error) return;
           return fetchLeadsFromSupabase().then((leads) => {
             if (!active || !leads) return;
-            setState((current) => ({ ...current, leads }));
+            setState((current) => ({ ...current, leads: mergeLeads(current.leads, leads) }));
 
             // Real-time subscriptions para leads (admin only)
             if (supabase) {
@@ -671,6 +762,178 @@ export function AppStoreProvider({
     );
   }, []);
 
+  const createStudent = useCallback<AppStoreValue["createStudent"]>(async (payload) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "students",
+          action: "create",
+          payload,
+        },
+        sessionToken: getSessionToken() ?? undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível criar o aluno."));
+      }
+    }
+
+    setState((current) => ({
+      ...current,
+      students: [
+        buildStudentRecord(payload, {
+          courseId: payload.courseId ?? current.courses[0]?.id ?? "",
+          classId: payload.classId ?? current.classes[0]?.id ?? "",
+        }),
+        ...current.students,
+      ],
+    }));
+    toast.success(isFunctionsConfigured ? "Aluno criado." : "Aluno registrado apenas nesta sessão de desenvolvimento.");
+  }, []);
+
+  const deleteStudent = useCallback<AppStoreValue["deleteStudent"]>(async (id) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "students",
+          action: "delete",
+          id,
+        },
+        sessionToken: getSessionToken() ?? undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir o aluno."));
+      }
+    }
+
+    setState((current) => ({
+      ...current,
+      students: current.students.filter((item) => item.id !== id),
+    }));
+    toast.success("Aluno excluído.");
+  }, []);
+
+  const createEnrollmentAdmin = useCallback<AppStoreValue["createEnrollmentAdmin"]>(async (payload) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "enrollments",
+          action: "create",
+          payload,
+        },
+        sessionToken: getSessionToken() ?? undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível criar a inscrição."));
+      }
+    }
+
+    setState((current) => {
+      const student = buildStudentRecord(
+        {
+          name: payload.studentName,
+          email: payload.email,
+          phone: payload.phone,
+          cpf: payload.cpf,
+          organization: payload.organization,
+          jobTitle: payload.jobTitle,
+          enrollmentStatus: payload.status ?? "Confirmada",
+          courseId: payload.courseId,
+          classId: payload.classId,
+          paymentMethod: payload.paymentMethod,
+        },
+        {
+          courseId: payload.courseId,
+          classId: payload.classId,
+          enrolledAt: new Date().toISOString(),
+        }
+      );
+      const enrollment = buildEnrollmentRecord(payload);
+      const nextEnrollments = [enrollment, ...current.enrollments];
+
+      return {
+        ...current,
+        enrollments: nextEnrollments,
+        students: [student, ...current.students],
+        classes: current.classes.map((item) => {
+          if (item.id !== payload.classId) return item;
+          const capacity = deriveClassCapacity(item, nextEnrollments);
+          return {
+            ...item,
+            ...capacity,
+            status: capacity.availableSeats <= 5 ? "Poucas vagas" : item.status,
+          };
+        }),
+      };
+    });
+
+    toast.success(isFunctionsConfigured ? "Inscrição criada." : "Inscrição criada apenas nesta sessão de desenvolvimento.");
+  }, []);
+
+  const deleteEnrollment = useCallback<AppStoreValue["deleteEnrollment"]>(async (id) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "enrollments",
+          action: "delete",
+          id,
+        },
+        sessionToken: getSessionToken() ?? undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir a inscrição."));
+      }
+    }
+
+    setState((current) => {
+      const enrollment = current.enrollments.find((item) => item.id === id);
+      const nextEnrollments = current.enrollments.filter((item) => item.id !== id);
+
+      return {
+        ...current,
+        enrollments: nextEnrollments,
+        classes: enrollment
+          ? current.classes.map((item) => {
+              if (item.id !== enrollment.classId) return item;
+              const capacity = deriveClassCapacity(item, nextEnrollments);
+              return {
+                ...item,
+                ...capacity,
+                status: capacity.availableSeats <= 5 ? "Poucas vagas" : item.status,
+              };
+            })
+          : current.classes,
+      };
+    });
+    toast.success("Inscrição excluída.");
+  }, []);
+
+  const deleteLead = useCallback<AppStoreValue["deleteLead"]>(async (id) => {
+    if (isFunctionsConfigured) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "leads",
+          action: "delete",
+          id,
+        },
+        sessionToken: getSessionToken() ?? undefined,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir o lead."));
+      }
+    }
+
+    setState((current) => ({
+      ...current,
+      leads: current.leads.filter((item) => item.id !== id),
+    }));
+    toast.success("Lead excluído.");
+  }, []);
+
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
     if (isFunctionsConfigured) {
       try {
@@ -691,15 +954,14 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      leads: [
+      leads: mergeLeads(current.leads, [
         {
           id: `lead-${Date.now()}`,
           createdAt: new Date().toISOString(),
           status: "Novo",
           ...payload
-        },
-        ...current.leads
-      ]
+        }
+      ])
     }));
     toast.success(
       isFunctionsConfigured
@@ -993,6 +1255,7 @@ export function AppStoreProvider({
       classes: state.classes,
       instructors: state.instructors,
       trainingPaths: state.trainingPaths,
+      coursePublicContents: state.coursePublicContents,
       testimonials: state.testimonials,
       upsertCourse,
       deleteCourse,
@@ -1007,6 +1270,7 @@ export function AppStoreProvider({
       state.classes,
       state.instructors,
       state.trainingPaths,
+      state.coursePublicContents,
       state.testimonials,
       upsertCourse,
       deleteCourse,
@@ -1023,15 +1287,23 @@ export function AppStoreProvider({
       students: state.students,
       enrollments: state.enrollments,
       createEnrollment,
+      createEnrollmentAdmin,
+      createStudent,
       updateStudent,
-      updateEnrollmentStatus
+      deleteStudent,
+      updateEnrollmentStatus,
+      deleteEnrollment
     }),
     [
       state.students,
       state.enrollments,
       createEnrollment,
+      createEnrollmentAdmin,
+      createStudent,
       updateStudent,
-      updateEnrollmentStatus
+      deleteStudent,
+      updateEnrollmentStatus,
+      deleteEnrollment
     ]
   );
 
@@ -1042,6 +1314,11 @@ export function AppStoreProvider({
       createLead,
       updateLeadStatus,
       updateLead,
+      deleteLead,
+      createStudent,
+      deleteStudent,
+      createEnrollmentAdmin,
+      deleteEnrollment,
       upsertBlogPost,
       deleteBlogPost,
       resetStore
@@ -1052,6 +1329,11 @@ export function AppStoreProvider({
       createLead,
       updateLeadStatus,
       updateLead,
+      deleteLead,
+      createStudent,
+      deleteStudent,
+      createEnrollmentAdmin,
+      deleteEnrollment,
       upsertBlogPost,
       deleteBlogPost,
       resetStore

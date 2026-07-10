@@ -9,6 +9,7 @@ import {
   mapBlogPost,
   mapClass,
   mapCourse,
+  mapCoursePublicContent,
   mapInstructor,
   mapLead,
   mapTrainingPath,
@@ -18,6 +19,7 @@ import {
   type BlogPostRow,
   type ClassRow,
   type CourseInstructorRow,
+  type CoursePublicContentRow,
   type CourseRow,
   type InstructorRow,
   type LeadRow,
@@ -31,6 +33,7 @@ import {
   enrollmentIdSchema,
   leadListSchema,
   leadSchema,
+  publicCourseContentListSchema,
   publicClassListSchema,
   publicCourseListSchema,
   publicInstructorListSchema,
@@ -42,7 +45,7 @@ type RhCursosClient = SupabaseClient<Database>;
 async function fetchPublicCatalog(client: RhCursosClient | null) {
   if (!client) return null;
 
-  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult, trainingPathsResult] =
+  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult, trainingPathsResult, coursePublicContentResult] =
     await Promise.all([
       withRetry(
         () =>
@@ -79,6 +82,15 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
             .eq("ativa", true)
             .order("ordem"),
         { label: "fetchPublicCatalog:trilha" }
+      ),
+      withRetry(
+        () =>
+          client
+            .from("curso_public_content")
+            .select("id,curso_id,hero_subtitle,highlights,faq_items,sidebar,corporate_cta,testimonial_override,published,created_at,updated_at,deleted_at")
+            .eq("published", true)
+            .order("created_at"),
+        { label: "fetchPublicCatalog:curso_public_content" }
       )
     ]);
 
@@ -113,6 +125,13 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
     resource: "trilha",
     schema: "trainingPathListSchema"
   }) as TrilhaRow[];
+  const coursePublicContentRows = coursePublicContentResult.error
+    ? []
+    : (validateResponse(coursePublicContentResult.data, publicCourseContentListSchema, {
+        endpoint: "fetchPublicCatalog",
+        resource: "curso_public_content",
+        schema: "publicCourseContentListSchema"
+      }) as CoursePublicContentRow[]);
 
   // Contagem de cursos por trilha derivada dos dados reais do catálogo, evitando
   // o `courseCount` hardcoded (e propenso a drift) do antigo mock estático.
@@ -127,7 +146,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
     courses: courseRows.map((course) => mapCourse(course, courseInstructorRows, classRows)),
     classes: classRows.map(mapClass),
     instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows)),
-    trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0))
+    trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0)),
+    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent)
   };
 }
 
@@ -192,6 +212,32 @@ export async function fetchPublicTestimonialsFromSupabase() {
 
   const rows = validateResponse(result.data, assessmentWithCourseListSchema, {
     endpoint: "fetchPublicTestimonials",
+    resource: "avaliacao",
+    schema: "assessmentWithCourseListSchema"
+  }) as AssessmentWithCourseRow[];
+
+  return rows.map(mapAssessmentToTestimonial);
+}
+
+export async function fetchPublicTestimonialsFromSupabaseServer() {
+  const client = createSupabaseServerClient();
+  if (!client) return null;
+
+  const result = await withRetry(
+    () =>
+      client
+        .from("avaliacao")
+        .select("id,inscricao_id,turma_id,nota,comentario,publicar,created_at,updated_at,deleted_at,turma(curso(titulo))")
+        .eq("publicar", true)
+        .not("comentario", "is", null)
+        .order("created_at", { ascending: false }),
+    { label: "fetchPublicTestimonialsServer:avaliacao" }
+  );
+
+  if (result.error) throw result.error;
+
+  const rows = validateResponse(result.data, assessmentWithCourseListSchema, {
+    endpoint: "fetchPublicTestimonialsServer",
     resource: "avaliacao",
     schema: "assessmentWithCourseListSchema"
   }) as AssessmentWithCourseRow[];

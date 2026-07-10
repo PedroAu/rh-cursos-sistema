@@ -142,6 +142,34 @@ export type Database = {
         };
         Update: Partial<Database["public"]["Tables"]["curso"]["Insert"]>;
       };
+      curso_public_content: {
+        Row: {
+          id: string;
+          curso_id: string;
+          hero_subtitle: string | null;
+          highlights: Json;
+          faq_items: Json;
+          sidebar: Json;
+          corporate_cta: Json;
+          testimonial_override: Json;
+          published: boolean;
+          created_at: string;
+          updated_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          curso_id: string;
+          hero_subtitle?: string | null;
+          highlights?: Json;
+          faq_items?: Json;
+          sidebar?: Json;
+          corporate_cta?: Json;
+          testimonial_override?: Json;
+          published?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["curso_public_content"]["Insert"]>;
+      };
       curso_instrutor: {
         Row: {
           id: string;

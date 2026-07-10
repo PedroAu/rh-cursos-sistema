@@ -1,6 +1,7 @@
 import type {
   BlogPost,
   Course,
+  CoursePublicContent,
   CurrentSession,
   Enrollment,
   Instructor,
@@ -22,6 +23,7 @@ export type AppState = {
   classes: TrainingClass[];
   students: Student[];
   instructors: Instructor[];
+  coursePublicContents: CoursePublicContent[];
   leads: Lead[];
   enrollments: Enrollment[];
   blogPosts: BlogPost[];
@@ -34,3 +36,11 @@ export type AppStoreInitialData = Partial<Omit<AppState, "currentSession">>;
 
 export type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
 export type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
+export type StudentPayload = Pick<Student, "name" | "email" | "organization" | "enrollmentStatus"> &
+  Partial<Pick<Student, "phone" | "cpf" | "jobTitle" | "courseId" | "classId" | "paymentMethod">>;
+export type AdminEnrollmentPayload = Pick<
+  Enrollment,
+  "studentName" | "email" | "phone" | "cpf" | "organization" | "jobTitle" | "enrollmentType" | "paymentMethod" | "courseId" | "classId" | "notes"
+> & {
+  status?: Enrollment["status"];
+};

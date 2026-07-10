@@ -39,6 +39,21 @@ export const publicCourseSchema = z.object({
   total_alunos: dbNumber
 });
 
+export const publicCourseContentSchema = z.object({
+  id: z.string(),
+  curso_id: z.string(),
+  hero_subtitle: z.string().nullable(),
+  highlights: z.unknown(),
+  faq_items: z.unknown(),
+  sidebar: z.unknown(),
+  corporate_cta: z.unknown(),
+  testimonial_override: z.unknown(),
+  published: z.boolean(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  deleted_at: z.string().nullable()
+});
+
 export const publicClassSchema = z.object({
   id: z.string(),
   curso_id: z.string(),
@@ -89,6 +104,7 @@ export const trainingPathSchema = z.object({
 });
 
 export const publicCourseListSchema = z.array(publicCourseSchema);
+export const publicCourseContentListSchema = z.array(publicCourseContentSchema);
 export const publicClassListSchema = z.array(publicClassSchema);
 export const publicInstructorListSchema = z.array(publicInstructorSchema);
 export const courseInstructorListSchema = z.array(courseInstructorSchema);

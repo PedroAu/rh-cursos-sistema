@@ -32,6 +32,7 @@ type CheckoutModalProps = {
   course: Course;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialClassId?: string;
 };
 
 const initialForm = {
@@ -127,7 +128,7 @@ function PaymentSelector({
   );
 }
 
-export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps) {
+export function CheckoutModal({ course, open, onOpenChange, initialClassId }: CheckoutModalProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { classes, createEnrollment } = useAppStore();
@@ -147,6 +148,13 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
     if (open) {
       // Capture active element as trigger for focus restoration on close
       triggerRef.current = document.activeElement as HTMLElement;
+      const selectedClassId =
+        initialClassId && courseClasses.some((item) => item.id === initialClassId) ? initialClassId : courseClasses[0]?.id ?? "";
+
+      setForm({
+        ...initialForm,
+        classId: selectedClassId
+      });
     } else {
       setStep(1);
       setForm(initialForm);
@@ -154,7 +162,7 @@ export function CheckoutModal({ course, open, onOpenChange }: CheckoutModalProps
       setSubmitError(null);
       setIsSaving(false);
     }
-  }, [open]);
+  }, [courseClasses, initialClassId, open]);
 
   const nextStep = () => {
     const nextErrors: Record<string, string> = {};
