@@ -144,8 +144,10 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Courses.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Agenda.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/InCompany.tsx`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/checkout/checkout-modal.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/lib/rate-limit.ts`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/agenda-runtime.spec.ts`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/checkout.e2e.spec.ts`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/public-journeys.spec.ts`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/ui-governance.spec.ts-snapshots/courses-filters-governance-functional-darwin.png`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity/`
@@ -163,6 +165,11 @@ Manual/visual checks:
 - 2026-07-06 - `npm run test:e2e:smoke` ✅
 - 2026-07-06 - `npm run test:epic14:fidelity` ✅
 - 2026-07-06 - `npm run test:epic14:fidelity:capture` ✅ via servidor local persistente (`node scripts/start-test-server.mjs`)
+- 2026-07-10 - `src/components/checkout/checkout-modal.tsx` foi refeito para seguir o wireframe exportado de checkout: header seguro, stepper de 3 estados, seleção de turma integrada ao primeiro passo, segmentação PF/PJ, resumo lateral com cupom, métodos de pagamento em cards e bloqueio por aceite de termos antes do submit real.
+- 2026-07-10 - `tests/checkout.e2e.spec.ts` e `tests/public-journeys.spec.ts` foram alinhados ao novo contrato visual/funcional do checkout, preservando o redirect real para `/inscricao-confirmada`.
+- 2026-07-10 - `npm run typecheck` ✅
+- 2026-07-10 - `npx eslint src/components/checkout/checkout-modal.tsx tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts` ✅
+- 2026-07-10 - `node ./node_modules/@playwright/test/cli.js test tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts --project=functional --grep checkout` ⚠️ bloqueado por conflito local em `http://127.0.0.1:3100` antes da execução dos cenários.
 - Completion Notes:
 - `Programa PDF`: o CTA do detalhe do curso agora registra analytics e encaminha explicitamente para `/falar-com-especialista` quando o material precisa ser solicitado ao atendimento.
 - `Falar com atendimento` no sucesso da inscrição: a rota final mantida é `/falar-com-especialista`, coerente com a jornada consultiva já usada no shell público.
@@ -183,3 +190,4 @@ Manual/visual checks:
 - 2026-07-05 - @po (Pax) - Validação de draft concluída com GO. Story liberada para execução por @dev. Status: Draft → Ready.
 - 2026-07-06 - @dev (Dex) - Story 14.2.7 entrou em implementação documental com fechamento do detalhe de curso, fallback operacional de `Programa PDF`, smoke agregado da Fase 2 restabelecido e artefatos de fidelity regenerados. Status: Ready → In Progress.
 - 2026-07-06 - @dev (Dex) - PASS formal de QA incorporado à story e lifecycle encerrado. Status: In Progress → Done.
+- 2026-07-10 - @dev (Dex) - Checkout do detalhe de curso realinhado ao novo wireframe/spec exportado, com atualização dos testes focados e validação estática limpa; execução Playwright focada ficou bloqueada por conflito local da porta `3100`.

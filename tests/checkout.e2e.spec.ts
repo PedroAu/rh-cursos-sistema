@@ -29,16 +29,12 @@ async function fillPersonalStep(
 ) {
   await page.getByLabel("Nome completo").fill("Carlos Pereira");
   await page.getByLabel("E-mail").fill(email);
-  await page.getByLabel("Telefone / WhatsApp").fill("61999990000");
+  await page.getByLabel("Telefone").fill("61999990000");
   await page.getByLabel("CPF").fill(cpf);
 }
 
-function buildClassSelectionLabel(startDate: string, time: string) {
-  return `Selecionar turma de ${new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(startDate))} às ${time}`;
-}
-
 test.describe("checkout — baseline de receita", () => {
-  test("bloqueia avanço da etapa de turma sem seleção e conclui com o backend real", async ({ page }, testInfo) => {
+  test("valida os dados, exige aceite dos termos e conclui com o backend real", async ({ page }, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     test.setTimeout(60_000);
     annotateCanonicalDoc(testInfo, getCanonicalDocs().edgeFunctions);
@@ -55,24 +51,18 @@ test.describe("checkout — baseline de receita", () => {
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
       await expect(page.getByRole("dialog")).toBeVisible();
 
-      // Etapa 1 → 2
       await fillPersonalStep(page, enrollmentEmail, enrollmentCpf);
-      await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
-      // Etapa 2 → 3 (pessoa física: empresa/cargo opcionais)
-      await page.getByRole("button", { name: "Avançar" }).click();
-
-      // Etapa 3: avançar sem turma deve bloquear com erro inline
-      await page.getByRole("button", { name: "Avançar" }).click();
-      await expect(page.getByText("Escolha uma turma antes de avançar.")).toBeVisible();
-      await expect(page.getByText("Resumo do pedido")).toBeHidden();
-
-      // Seleciona turma e avança até confirmação
-      await page.getByRole("button", { name: buildClassSelectionLabel(checkoutTarget.startDate, checkoutTarget.time) }).click();
-      await page.getByRole("button", { name: "Avançar" }).click();
+      await expect(page.getByText("Forma de pagamento")).toBeVisible();
       await expect(page.getByText("Resumo do pedido")).toBeVisible();
 
-      await page.getByRole("button", { name: "Confirmar inscrição" }).click();
+      await page.getByRole("button", { name: "Finalizar compra →" }).click();
+      await expect(page.getByText("Você precisa aceitar os termos para finalizar a compra.")).toBeVisible();
+
+      await page.getByText("Li e aceito os termos de uso e a política de cancelamento").click();
+      await page.getByRole("button", { name: "Pix" }).click();
+      await page.getByRole("button", { name: "Finalizar compra →" }).click();
       await expect(page).toHaveURL(/\/inscricao-confirmada/);
 
       let studentId: string | null = null;
@@ -108,30 +98,28 @@ test.describe("checkout — baseline de receita", () => {
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
     await fillPersonalStep(page);
-    await page.getByRole("button", { name: "Avançar" }).click();
+    await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
-    // Etapa 2 visível → volta para etapa 1
-    await page.getByRole("button", { name: "Voltar" }).click();
+    await page.getByRole("button", { name: "← Voltar" }).click();
     await expect(page.getByLabel("Nome completo")).toHaveValue("Carlos Pereira");
     await expect(page.getByLabel("E-mail")).toHaveValue("carlos@empresa.com.br");
   });
 
-  test("inscrição corporativa exige empresa e cargo", async ({ page }) => {
+  test("inscrição corporativa exige razão social, CNPJ e responsável", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
 
-    await fillPersonalStep(page);
-    await page.getByRole("button", { name: "Avançar" }).click();
+    await page.getByRole("button", { name: "Pessoa jurídica (nota fiscal)" }).click();
+    await page.getByLabel("Telefone").fill("61999990000");
+    await page.getByLabel("E-mail").fill("compras@empresa.com.br");
+    await page.getByLabel("CPF do responsável").fill("98765432100");
+    await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
-    // Troca tipo de inscrição para Empresa → campos passam a ser obrigatórios
-    await page.getByRole("combobox").first().click();
-    await page.getByRole("option", { name: "Empresa" }).click();
-    await page.getByRole("button", { name: "Avançar" }).click();
-
-    await expect(page.getByText("Informe a empresa ou órgão responsável pela inscrição.")).toBeVisible();
-    await expect(page.getByText("Informe o cargo ou área de atuação.")).toBeVisible();
+    await expect(page.getByText("Informe a razão social.")).toBeVisible();
+    await expect(page.getByText("CNPJ deve ter 14 dígitos.")).toBeVisible();
+    await expect(page.getByText("Informe o nome do responsável.")).toBeVisible();
   });
 
   test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
@@ -139,17 +127,17 @@ test.describe("checkout — baseline de receita", () => {
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(`${checkoutTarget.coursePath}?checkout=1`);
     await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.getByText("Inscrição guiada")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Finalizar inscrição" })).toBeVisible();
   });
 
-  test("fechar o modal com Cancelar mantém o usuário na página do curso", async ({ page }) => {
+  test("fechar o modal mantém o usuário na página do curso", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(checkoutTarget.coursePath);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page.getByRole("dialog")).toBeVisible();
 
-    await page.getByRole("button", { name: "Cancelar" }).click();
+    await page.getByRole("button", { name: "Fechar" }).click();
     await expect(page.getByRole("dialog")).toBeHidden();
     await expect(page).toHaveURL(new RegExp(checkoutTarget.coursePath.replace(/[/-]/g, "\\$&")));
   });

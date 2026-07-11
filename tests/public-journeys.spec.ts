@@ -12,10 +12,6 @@ function createUniqueCpf() {
   return Date.now().toString().slice(-11).padStart(11, "0");
 }
 
-function buildClassSelectionLabel(startDate: string, time: string) {
-  return `Selecionar turma de ${new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(startDate))} às ${time}`;
-}
-
 test.describe("epica 4 — jornadas publicas", () => {
   test("home e navegacao deixam as tres jornadas claras sem ocultar descoberta", async ({ page }) => {
     await page.goto("/");
@@ -62,24 +58,22 @@ test.describe("epica 4 — jornadas publicas", () => {
       await page.goto(checkoutTarget.coursePath);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
-      await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
       await expect(page.getByText("Nome deve ter no mínimo 3 caracteres.")).toBeVisible();
       await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
 
       await page.getByLabel("Nome completo").fill("Maria Oliveira");
       await page.getByLabel("E-mail").fill(enrollmentEmail);
-      await page.getByLabel("Telefone / WhatsApp").fill("61999998888");
+      await page.getByLabel("Telefone").fill("61999998888");
       await page.getByLabel("CPF").fill(enrollmentCpf);
-      await page.getByRole("button", { name: "Avançar" }).click();
+      await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
-      await page.getByRole("button", { name: "Avançar" }).click();
-
-      await page.getByRole("button", { name: buildClassSelectionLabel(checkoutTarget.startDate, checkoutTarget.time) }).click();
-      await page.getByRole("button", { name: "Avançar" }).click();
-
+      await expect(page.getByText("Forma de pagamento")).toBeVisible();
       await expect(page.getByText("Resumo do pedido")).toBeVisible();
-      await page.getByRole("button", { name: "Confirmar inscrição" }).click();
+      await page.getByText("Li e aceito os termos de uso e a política de cancelamento").click();
+      await page.getByRole("button", { name: "Pix" }).click();
+      await page.getByRole("button", { name: "Finalizar compra →" }).click();
 
       await expect(page).toHaveURL(/\/inscricao-confirmada/);
       await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
@@ -133,6 +127,10 @@ test.describe("epica 4 — jornadas publicas", () => {
     await page.goto("/sobre");
     await expect(page.getByText("Nossa história")).toBeVisible();
     await expect(page.getByText("Missão, visão e filosofia")).toBeVisible();
+    const whatWeDoSection = page.locator("section").filter({ has: page.getByRole("heading", { name: "Soluções educacionais integradas" }) });
+    await expect(whatWeDoSection.getByText("§", { exact: true })).toBeVisible();
+    await expect(whatWeDoSection.getByText("◆", { exact: true })).toBeVisible();
+    await expect(whatWeDoSection.getByText("◈", { exact: true })).toBeVisible();
 
     await page.goto(blogArticlePath);
     await expect(page.getByText("Leitura guiada")).toBeVisible();
