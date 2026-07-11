@@ -1,6 +1,7 @@
 import { loadEnvFile } from "node:process";
+import { createHmac } from "node:crypto";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
+import { hasRealIntegrationEnv } from "./helpers/integration-env";
 
 // O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET/SUPABASE_*
 // reais via .env.local, mas este processo Node/Playwright não por padrão.
@@ -20,28 +21,76 @@ try {
 // a visualização SSR) — por isso o login aqui é feito de verdade pela UI,
 // com um usuário criado/garantido via service role (ensureAuthUser).
 //
-// Escopo: apenas recursos com ciclo criar→excluir seguro pela própria UI
-// (store.deleteX já existe). Não há banco de teste isolado — .env.local
-// aponta para o Supabase de produção — então cada execução cria um registro
-// real marcado com [E2E] no nome e apaga em seguida. `leads`, `students` e
-// `enrollments` ficam de fora aqui (sem delete/create seguro pela UI); ver
-// handoff .aiox/handoffs/handoff-aiox-master-to-sm-*.yaml para a story que
-// fecha esse gap de produto antes de testá-los.
+// Escopo: ciclo criar → excluir seguro pela própria UI. Não há banco de teste
+// isolado — .env.local aponta para o Supabase de produção — então cada
+// execução cria um registro real marcado com [E2E] no nome e apaga em seguida.
 
 const MARKER = `[E2E] ${Date.now()}`;
-const ADMIN_EMAIL = "e2e-admin-crud@rhcursos.test";
-const ADMIN_PASSWORD = "SenhaForte#E2E2026";
+const SESSION_COOKIE = "rh_cursos_demo_session";
+const SESSION_SECRET = process.env.AUTH_SESSION_SECRET;
 
 test.skip(!hasRealIntegrationEnv(), "admin-crud.spec.ts precisa de SUPABASE_SERVICE_ROLE_KEY real para logar de verdade.");
 
-async function loginAsAdmin(page: Page) {
-  await ensureAuthUser({ email: ADMIN_EMAIL, name: "E2E Admin CRUD", password: ADMIN_PASSWORD, role: "admin" });
+function slugifyForEmail(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+}
 
-  await page.goto("/login");
-  await page.getByRole("button", { name: /^Administração/ }).click();
-  await page.getByLabel(/E-mail/).fill(ADMIN_EMAIL);
-  await page.getByLabel(/Senha/).fill(ADMIN_PASSWORD);
-  await page.getByRole("button", { name: "Entrar" }).click();
+function buildAdminSessionToken(email: string) {
+  if (!SESSION_SECRET) {
+    throw new Error("AUTH_SESSION_SECRET não está configurado para os testes admin-crud.");
+  }
+
+  const payload = Buffer.from(
+    JSON.stringify({
+      role: "admin",
+      email,
+      name: "E2E Admin CRUD",
+      exp: Date.now() + 60 * 60 * 1000,
+    })
+  ).toString("base64url");
+  const signature = createHmac("sha256", SESSION_SECRET).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+
+function buildUniqueEmail(label: string) {
+  return `${slugifyForEmail(`${MARKER}-${label}`)}@example.com`;
+}
+
+function buildUniqueCpf(seed: string) {
+  const digits = `${Date.now()}${seed}`
+    .replace(/\D/g, "")
+    .padEnd(11, "0")
+    .slice(0, 11);
+
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+}
+
+async function loginAsAdmin(page: Page, email: string) {
+  const token = buildAdminSessionToken(email);
+
+  await page.context().addCookies([
+    {
+      name: SESSION_COOKIE,
+      value: token,
+      domain: "127.0.0.1",
+      path: "/",
+    },
+  ]);
+
+  await page.addInitScript(
+    (storedToken) => {
+      window.localStorage.setItem("rh_cursos_admin_token", storedToken);
+      window.localStorage.removeItem("rh_cursos_supabase_session");
+    },
+    token
+  );
+
+  await page.goto("/admin");
   await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
 }
 
@@ -83,8 +132,9 @@ async function deleteRowByName(page: Page, name: string) {
 }
 
 test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () => {
-  test.beforeEach(async ({ page }) => {
-    await loginAsAdmin(page);
+  test.beforeEach(async ({ page }, testInfo) => {
+    const email = `e2e-admin-crud+${slugifyForEmail(testInfo.title)}@rhcursos.test`;
+    await loginAsAdmin(page, email);
   });
 
   test("cursos: cria com todos os campos obrigatórios preenchidos e exclui", async ({ page }) => {
@@ -175,5 +225,58 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
 
     await saveAndExpectSuccess(page, dialog);
     await deleteRowByName(page, title);
+  });
+
+  test("leads: cria manualmente no admin e exclui", async ({ page }) => {
+    const name = `${MARKER} lead`;
+    await page.goto("/admin/leads");
+
+    const dialog = await openCreateDialog(page);
+    await fillText(dialog, "Nome", name);
+    await fillText(dialog, "E-mail", buildUniqueEmail("lead"));
+    await fillText(dialog, "Telefone", "(61) 98888-7777");
+    await fillSelectByIndex(dialog, "Jornada comercial");
+    await fillText(dialog, "Interesse principal", "Consultoria de RH");
+    await fillSelectByIndex(dialog, "Origem");
+    await fillSelectByIndex(dialog, "Status");
+    await fillText(dialog, "Empresa/Órgão", "Empresa E2E");
+    await fillText(dialog, "Tamanho da equipe", "12");
+
+    await saveAndExpectSuccess(page, dialog);
+    await deleteRowByName(page, name);
+  });
+
+  test("students: cria cadastro manual e exclui", async ({ page }) => {
+    const name = `${MARKER} aluno`;
+    await page.goto("/admin/alunos");
+
+    const dialog = await openCreateDialog(page);
+    await fillText(dialog, "Nome", name);
+    await fillText(dialog, "E-mail", buildUniqueEmail("aluno"));
+    await fillText(dialog, "Empresa / órgão", "Órgão E2E");
+    await fillSelectByIndex(dialog, "Status");
+
+    await saveAndExpectSuccess(page, dialog);
+    await deleteRowByName(page, name);
+  });
+
+  test("inscrições: cria inscrição administrativa e exclui", async ({ page }) => {
+    const name = `${MARKER} inscricao`;
+    await page.goto("/admin/inscricoes");
+
+    const dialog = await openCreateDialog(page);
+    await fillText(dialog, "Aluno", name);
+    await fillText(dialog, "E-mail", buildUniqueEmail("inscricao"));
+    await fillText(dialog, "Telefone", "(61) 97777-6666");
+    await fillText(dialog, "CPF", buildUniqueCpf("01"));
+    await fillText(dialog, "Empresa/Órgão", "Instituição E2E");
+    await fillText(dialog, "Cargo", "Coordenador");
+    await fillSelectByIndex(dialog, "Tipo de inscrição");
+    await fillSelectByIndex(dialog, "Pagamento");
+    await fillSelectByIndex(dialog, "Curso");
+    await fillSelectByIndex(dialog, "Turma");
+
+    await saveAndExpectSuccess(page, dialog);
+    await deleteRowByName(page, name);
   });
 });

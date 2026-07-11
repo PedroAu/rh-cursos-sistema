@@ -31,6 +31,7 @@ import {
   fetchPublicBlogPostsFromSupabase,
   fetchPublicCatalogFromSupabase
 } from "@/lib/supabase/rh-cursos-api";
+import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
 import {
   mockBlogPosts,
   mockCatalog
@@ -54,6 +55,7 @@ import type {
   AdminEnrollmentPayload,
   AppState,
   AppStoreInitialData,
+  LeadPayload,
   StudentPayload
 } from "@/lib/contexts/store-types";
 
@@ -66,6 +68,7 @@ export type { AppStoreInitialData } from "@/lib/contexts/store-types";
 export type AppStoreValue = SessionStoreValue & CourseStoreValue & StudentStoreValue & AdminStoreValue;
 
 const STORAGE_KEY = "rhcursos-demo-store-v4";
+const ADMIN_SESSION_COOKIE = "rh_cursos_demo_session";
 
 type AdminMutation =
   | {
@@ -137,6 +140,15 @@ function clearLegacyStoredState() {
   }
 
   window.localStorage.removeItem(STORAGE_KEY);
+}
+
+function getAdminSessionTokenValue() {
+  const stored = getSessionToken();
+  if (stored) return stored;
+  if (typeof document === "undefined") return null;
+
+  const match = document.cookie.match(new RegExp(`(?:^|; )${ADMIN_SESSION_COOKIE}=([^;]+)`));
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 function countConfirmedEnrollments(enrollments: Enrollment[], classId: string) {
@@ -216,6 +228,15 @@ function mergeLeads(current: Lead[], incoming: Lead[]) {
   );
 }
 
+function buildLeadRecord(payload: LeadPayload, fallback?: Partial<Lead>): Lead {
+  return {
+    id: fallback?.id ?? `lead-${Date.now()}`,
+    createdAt: fallback?.createdAt ?? new Date().toISOString(),
+    status: fallback?.status ?? "Novo",
+    ...payload,
+  };
+}
+
 function buildStudentRecord(
   payload: StudentPayload,
   fallback?: Partial<Student>
@@ -239,10 +260,11 @@ function buildStudentRecord(
 
 function buildEnrollmentRecord(
   payload: AdminEnrollmentPayload,
+  fallbackId?: string,
   fallbackStatus: Enrollment["status"] = "Confirmada"
 ): Enrollment {
   return {
-    id: `enrollment-${Date.now()}`,
+    id: fallbackId ?? `enrollment-${Date.now()}`,
     studentName: payload.studentName,
     email: payload.email,
     phone: payload.phone,
@@ -273,7 +295,7 @@ function persistAdminMutation(mutation: AdminMutation, successMessage?: string):
 
   return invokeFunction("admin-resources", {
     body: mutation,
-    sessionToken: getSessionToken() ?? undefined
+    sessionToken: getAdminSessionTokenValue() ?? undefined
   }).then(async (response) => {
     if (!response.ok) {
       const message = await getFunctionErrorMessage(
@@ -295,6 +317,28 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   }
 
   return fallback;
+}
+
+async function fetchAdminLeads(sessionToken: string): Promise<Lead[]> {
+  const response = await invokeFunction("admin-resources", {
+    body: {
+      resource: "leads",
+      action: "list",
+    },
+    sessionToken,
+  });
+
+  if (!response.ok) {
+    throw new Error(await getFunctionErrorMessage(response, "Não foi possível carregar os leads."));
+  }
+
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        data?: LeadRow[];
+      }
+    | null;
+
+  return Array.isArray(payload?.data) ? payload.data.map(mapLead) : [];
 }
 
 function shouldUseLocalEnrollmentProxy() {
@@ -575,6 +619,17 @@ export function AppStoreProvider({
       });
 
     // Lazy load admin data apenas quando há sessão ativa
+    const adminSessionToken = getAdminSessionTokenValue();
+
+    if (adminSessionToken) {
+      fetchAdminLeads(adminSessionToken)
+        .then((leads) => {
+          if (!active || !leads.length) return;
+          setState((current) => ({ ...current, leads: mergeLeads(current.leads, leads) }));
+        })
+        .catch(() => undefined);
+    }
+
     const stored = getSupabaseSession();
     if (stored && supabase) {
       supabase.auth
@@ -770,7 +825,7 @@ export function AppStoreProvider({
           action: "create",
           payload,
         },
-        sessionToken: getSessionToken() ?? undefined,
+        sessionToken: getAdminSessionTokenValue() ?? undefined,
       });
 
       if (!response.ok) {
@@ -799,7 +854,7 @@ export function AppStoreProvider({
           action: "delete",
           id,
         },
-        sessionToken: getSessionToken() ?? undefined,
+        sessionToken: getAdminSessionTokenValue() ?? undefined,
       });
 
       if (!response.ok) {
@@ -815,6 +870,7 @@ export function AppStoreProvider({
   }, []);
 
   const createEnrollmentAdmin = useCallback<AppStoreValue["createEnrollmentAdmin"]>(async (payload) => {
+    let persistedEnrollmentId: string | undefined;
     if (isFunctionsConfigured) {
       const response = await invokeFunction("admin-resources", {
         body: {
@@ -822,12 +878,21 @@ export function AppStoreProvider({
           action: "create",
           payload,
         },
-        sessionToken: getSessionToken() ?? undefined,
+        sessionToken: getAdminSessionTokenValue() ?? undefined,
       });
 
       if (!response.ok) {
         throw new Error(await getFunctionErrorMessage(response, "Não foi possível criar a inscrição."));
       }
+
+      const result = (await response.json().catch(() => null)) as
+        | {
+            data?: {
+              id?: string;
+            };
+          }
+        | null;
+      persistedEnrollmentId = result?.data?.id;
     }
 
     setState((current) => {
@@ -850,7 +915,7 @@ export function AppStoreProvider({
           enrolledAt: new Date().toISOString(),
         }
       );
-      const enrollment = buildEnrollmentRecord(payload);
+      const enrollment = buildEnrollmentRecord(payload, persistedEnrollmentId);
       const nextEnrollments = [enrollment, ...current.enrollments];
 
       return {
@@ -880,7 +945,7 @@ export function AppStoreProvider({
           action: "delete",
           id,
         },
-        sessionToken: getSessionToken() ?? undefined,
+        sessionToken: getAdminSessionTokenValue() ?? undefined,
       });
 
       if (!response.ok) {
@@ -919,7 +984,7 @@ export function AppStoreProvider({
           action: "delete",
           id,
         },
-        sessionToken: getSessionToken() ?? undefined,
+        sessionToken: getAdminSessionTokenValue() ?? undefined,
       });
 
       if (!response.ok) {
@@ -935,6 +1000,37 @@ export function AppStoreProvider({
   }, []);
 
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
+    const adminSessionToken = getAdminSessionTokenValue() ?? undefined;
+
+    if (isFunctionsConfigured && adminSessionToken) {
+      const response = await invokeFunction("admin-resources", {
+        body: {
+          resource: "leads",
+          action: "create",
+          payload: {
+            ...payload,
+            status: "Novo",
+          },
+        },
+        sessionToken: adminSessionToken,
+      });
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível cadastrar o lead."));
+      }
+
+      const persistedLeads = await fetchAdminLeads(adminSessionToken).catch(() => null);
+
+      setState((current) => ({
+        ...current,
+        leads: persistedLeads?.length
+          ? mergeLeads(current.leads, persistedLeads)
+          : mergeLeads(current.leads, [buildLeadRecord(payload)])
+      }));
+      toast.success("Lead cadastrado.");
+      return;
+    }
+
     if (isFunctionsConfigured) {
       try {
         const response = await invokeFunction("leads", { body: payload });
@@ -954,14 +1050,7 @@ export function AppStoreProvider({
 
     setState((current) => ({
       ...current,
-      leads: mergeLeads(current.leads, [
-        {
-          id: `lead-${Date.now()}`,
-          createdAt: new Date().toISOString(),
-          status: "Novo",
-          ...payload
-        }
-      ])
+      leads: mergeLeads(current.leads, [buildLeadRecord(payload)])
     }));
     toast.success(
       isFunctionsConfigured

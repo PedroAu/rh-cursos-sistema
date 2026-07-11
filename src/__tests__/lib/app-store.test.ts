@@ -121,6 +121,8 @@ const mocks = vi.hoisted(() => {
   ];
 
   return {
+    functionsConfigured: false,
+    invokeFunction: vi.fn(),
     toastSuccess: vi.fn(),
     toastError: vi.fn(),
     fetchMock: vi.fn(),
@@ -178,8 +180,10 @@ vi.mock("@/lib/supabase/client", () => ({
 }));
 
 vi.mock("@/lib/supabase/functions-client", () => ({
-  isFunctionsConfigured: false,
-  invokeFunction: vi.fn(),
+  get isFunctionsConfigured() {
+    return mocks.functionsConfigured;
+  },
+  invokeFunction: mocks.invokeFunction,
 }));
 
 vi.mock("@/lib/supabase/rh-cursos-api", () => ({
@@ -346,6 +350,8 @@ describe("AppStoreProvider and hooks", () => {
     global.fetch = mocks.fetchMock as unknown as typeof fetch;
     mocks.toastSuccess.mockClear();
     mocks.toastError.mockClear();
+    mocks.invokeFunction.mockClear();
+    mocks.functionsConfigured = false;
     mocks.clearSessionToken.mockClear();
     mocks.setSessionToken.mockClear();
     mocks.getSessionToken.mockClear();
@@ -525,6 +531,89 @@ describe("AppStoreProvider and hooks", () => {
       createdAt: "2026-06-22T12:00:00.000Z",
     });
     expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead registrado apenas nesta sessão de desenvolvimento.");
+  });
+
+  it("creates admin leads through admin-resources and keeps the persisted id", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            ok: true,
+            data: {
+              id: "lead-db-1",
+              created_at: "2026-06-22T12:30:00.000Z",
+              status_crm: "Novo",
+            },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            ok: true,
+            data: [
+              {
+                id: "lead-db-1",
+                nome: payload.name,
+                email: payload.email,
+                telefone: payload.phone,
+                tipo: "Curso",
+                tema_interesse: payload.courseInterest,
+                curso_id: null,
+                orgao: payload.organization,
+                num_participantes: payload.teamSize,
+                modalidade_preferida: payload.preferredModality,
+                objetivo_treinamento: payload.trainingObjective,
+                tema_treinamento: null,
+                desafios_principais: payload.mainChallenges,
+                origem: payload.origin,
+                status_crm: "Novo",
+                mensagem: payload.message,
+                created_at: "2026-06-22T12:30:00.000Z",
+              },
+            ],
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }
+        )
+      );
+
+    await act(async () => {
+      await harness.store.createLead(payload);
+    });
+
+    expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
+      body: {
+        resource: "leads",
+        action: "create",
+        payload: {
+          ...payload,
+          status: "Novo",
+        },
+      },
+      sessionToken: "payload.signature",
+    });
+    expect(harness.store.leads[0]).toMatchObject({
+      ...payload,
+      id: "lead-db-1",
+      createdAt: "2026-06-22T12:30:00.000Z",
+      status: "Novo",
+    });
+    expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead cadastrado.");
   });
 
   it("creates enrollments and updates the related class capacity from provider state", async () => {
