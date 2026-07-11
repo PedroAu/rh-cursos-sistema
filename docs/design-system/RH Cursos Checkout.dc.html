@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    :focus-visible{outline:2px solid #4d65ff;outline-offset:2px;border-radius:4px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0.001ms !important;animation-duration:0.001ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important}}
+    body{margin:0;background:#eef0f2}
+    a{color:#1791a9}a:hover{color:#0c6a83}
+    .rh-page{width:1180px;margin:0 auto;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:#fff;border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-page.rh2{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+    .rh-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-pill);padding:8px 14px}
+    .rh-turma{width:100%;text-align:left;display:flex;align-items:center;gap:12px;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:12px;padding:12px 14px;cursor:pointer;font-family:var(--tk-font-body);transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-turma:hover{border-color:var(--tk-accent)}
+    .rh-turma[data-on="1"]{border-color:var(--tk-brand);background:var(--tk-accent-soft);box-shadow:inset 0 0 0 1px var(--tk-brand)}
+    .rh-check{flex:none;width:20px;height:20px;border-radius:50%;background:var(--tk-accent-soft);color:var(--tk-brand);display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
+    .rh-seg{display:flex;background:var(--tk-surface-2,#f4f5f6);border:1px solid var(--tk-border);border-radius:10px;padding:4px;gap:4px}
+    .rh-segbtn{flex:1;text-align:center;border:none;background:transparent;border-radius:7px;padding:10px 14px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink-muted);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-segbtn[data-on="1"]{background:var(--tk-surface);color:var(--tk-brand);box-shadow:0 1px 4px rgba(0,0,0,0.1)}
+    .rh-select{width:100%;padding:12px 14px;border:1px solid var(--tk-border);border-radius:var(--tk-radius-input,8px);font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink);background:#fff;appearance:none}
+    .rh-field{display:grid;gap:6px}
+    .rh-field label{font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink)}
+    .rh-stepcircle{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--tk-font-display);font-weight:700;font-size:15px;transition:all .2s cubic-bezier(.25,.46,.45,.94);border:none}
+    .rh-stepcircle[data-status="done"]{background:var(--tk-brand);color:#fff;cursor:pointer}
+    .rh-stepcircle[data-status="active"]{background:var(--tk-brand);color:#fff;box-shadow:0 0 0 4px var(--tk-accent-soft);cursor:default}
+    .rh-stepcircle[data-status="todo"]{background:#fff;color:var(--tk-ink-muted);border:1.5px solid var(--tk-border);cursor:default}
+    .rh-steplabel{font-size:var(--tk-text-caption);font-weight:600;color:var(--tk-ink-muted)}
+    .rh-steplabel[data-status="active"],.rh-steplabel[data-status="done"]{color:var(--tk-ink)}
+    .rh-stepline{flex:1;height:2px;background:var(--tk-border);margin-top:19px;transition:background .2s}
+    .rh-stepline[data-done="1"]{background:var(--tk-brand)}
+    .rh-cardbox{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass);padding:32px}
+  </style>
+</helmet>
+
+<div class="rh-page rh2" data-screen-label="Checkout">
+  <nav class="rh-nav" aria-label="Navegação principal">
+    <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+    <div style="display:flex;align-items:center;gap:10px;font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted)">
+      <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6"/></svg>
+      Ambiente de compra seguro
+      <a class="link" href="RH Cursos Login.dc.html" style="margin-left:6px">Entrar</a>
+    </div>
+  </nav>
+
+  <!-- ===== Header: breadcrumb + stepper ===== -->
+  <header style="background:radial-gradient(circle at 50% -20%, #f7f9fc 30%, #ebf3ff 130%);border-bottom:1px solid var(--tk-border);padding:28px 0 32px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-bottom:20px">
+        <a href="RH Cursos Home.dc.html" style="color:var(--tk-ink-muted);text-decoration:none">Home</a><span aria-hidden="true">/</span>
+        <a href="RH Cursos Catálogo.dc.html" style="color:var(--tk-ink-muted);text-decoration:none">Cursos</a><span aria-hidden="true">/</span>
+        <span style="color:var(--tk-ink)">Finalizar inscrição</span>
+      </div>
+      <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:0 0 26px">Finalizar inscrição</h1>
+      <div style="display:flex;align-items:flex-start;justify-content:center;max-width:520px;margin:0 auto">
+        <sc-for list="{{ stepperItems }}" as="it" hint-placeholder-count="5">
+          <sc-if value="{{ it.isStep }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:120px;flex:none">
+              <button type="button" class="rh-stepcircle" data-status="{{ it.status }}" onclick="{{ it.onClick }}" aria-label="{{ it.label }}" aria-current="{{ it.current }}">
+                <sc-if value="{{ it.done }}" hint-placeholder-val="{{ false }}">
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </sc-if>
+                <sc-if value="{{ it.notDone }}" hint-placeholder-val="{{ true }}">
+                  <span>{{ it.n }}</span>
+                </sc-if>
+              </button>
+              <span class="rh-steplabel" data-status="{{ it.status }}">{{ it.label }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ it.isLine }}" hint-placeholder-val="{{ false }}">
+            <div class="rh-stepline" data-done="{{ it.lineDone }}"></div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main content ===== -->
+  <div class="rh-wrap" style="display:{{ layout.display }};grid-template-columns:{{ layout.cols }};gap:44px;padding-top:44px;padding-bottom:80px;font-family:var(--tk-font-body);align-items:start;max-width:{{ layout.maxWidth }};margin:0 auto">
+
+    <main style="display:grid;gap:24px;min-width:0;width:100%">
+
+      <!-- ===== Passo 1: Dados ===== -->
+      <sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+        <section aria-labelledby="turma-h" data-screen-label="Turma" class="rh-cardbox">
+          <h2 id="turma-h" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 4px">Escolha a turma</h2>
+          <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin:0 0 18px">{{ cursoTitulo }}</p>
+          <div style="display:grid;gap:8px" role="radiogroup" aria-label="Escolha a turma">
+            <sc-for list="{{ turmas }}" as="t" hint-placeholder-count="3">
+              <button type="button" class="rh-turma" data-on="{{ t.on }}" role="radio" aria-checked="{{ t.checked }}" onclick="{{ pickTurma }}" data-i="{{ $index }}">
+                <span style="flex:none;width:16px;height:16px;border-radius:50%;border:2px solid {{ t.dotBorder }};background:{{ t.dotFill }};box-shadow:inset 0 0 0 2.5px #fff"></span>
+                <span style="min-width:0;flex:1">
+                  <span style="display:block;font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink)">{{ t.data }}</span>
+                  <span style="display:block;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:1px">{{ t.detalhe }}</span>
+                </span>
+                <span style="flex:none;font-size:11px;font-weight:600;color:{{ t.spotColor }};background:{{ t.spotBg }};padding:4px 9px;border-radius:var(--tk-radius-pill)">{{ t.vagas }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </section>
+
+        <section aria-labelledby="dados-h" data-screen-label="Dados do comprador" class="rh-cardbox">
+          <h2 id="dados-h" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 16px">Dados do comprador</h2>
+
+          <div class="rh-seg" role="radiogroup" aria-label="Tipo de comprador" style="margin-bottom:20px">
+            <button type="button" class="rh-segbtn" data-on="{{ pf.on }}" onclick="{{ selecionarPF }}">Pessoa física</button>
+            <button type="button" class="rh-segbtn" data-on="{{ pj.on }}" onclick="{{ selecionarPJ }}">Pessoa jurídica (nota fiscal)</button>
+          </div>
+
+          <sc-if value="{{ isPF }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div style="grid-column:1 / -1">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Nome completo" placeholder="Seu nome completo" auto-complete="name" hint-size="100%,68px"></x-import>
+              </div>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="CPF" placeholder="000.000.000-00" hint-size="100%,68px"></x-import>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Telefone" type="tel" placeholder="(00) 00000-0000" hint-size="100%,68px"></x-import>
+              <div style="grid-column:1 / -1">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="E-mail" type="email" placeholder="voce@email.com.br" auto-complete="email" hint-size="100%,68px"></x-import>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ isPJ }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+              <div style="grid-column:1 / -1">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Razão social" placeholder="Nome da empresa" hint-size="100%,68px"></x-import>
+              </div>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="CNPJ" placeholder="00.000.000/0000-00" hint-size="100%,68px"></x-import>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Nome do responsável" placeholder="Quem vai participar" hint-size="100%,68px"></x-import>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Telefone" type="tel" placeholder="(00) 00000-0000" hint-size="100%,68px"></x-import>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="E-mail" type="email" placeholder="financeiro@empresa.com.br" hint-size="100%,68px"></x-import>
+            </div>
+          </sc-if>
+
+          <div style="border-top:1px solid var(--tk-line);margin:8px 0 18px"></div>
+          <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:14px">Endereço de cobrança</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="CEP" placeholder="00000-000" hint-size="100%,68px"></x-import>
+            <div style="grid-column:2 / -1">
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Endereço" placeholder="Rua, avenida…" hint-size="100%,68px"></x-import>
+            </div>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Número" placeholder="123" hint-size="100%,68px"></x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Complemento" placeholder="Sala, bloco…" hint-size="100%,68px"></x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Bairro" placeholder="Bairro" hint-size="100%,68px"></x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Cidade" placeholder="Cidade" hint-size="100%,68px"></x-import>
+            <div class="rh-field">
+              <label for="uf-select">Estado</label>
+              <select id="uf-select" class="rh-select" defaultValue="">
+                <option value="" disabled>UF</option>
+                <option>SP</option><option>RJ</option><option>MG</option><option>DF</option><option>PR</option><option>RS</option><option>BA</option><option>Outro</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;margin-top:28px">
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" onClick="{{ irParaPagamento }}" hint-size="220px,52px">Continuar para pagamento →</x-import>
+          </div>
+        </section>
+      </sc-if>
+
+      <!-- ===== Passo 2: Pagamento ===== -->
+      <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+        <section aria-labelledby="pag-h" data-screen-label="Forma de pagamento" class="rh-cardbox">
+          <h2 id="pag-h" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 16px">Forma de pagamento</h2>
+
+          <div style="display:grid;gap:8px;margin-bottom:20px" role="radiogroup" aria-label="Forma de pagamento">
+            <sc-for list="{{ pagamentos }}" as="p" hint-placeholder-count="3">
+              <button type="button" class="rh-turma" data-on="{{ p.on }}" role="radio" aria-checked="{{ p.checked }}" onclick="{{ selecionarPagamento }}" data-i="{{ $index }}" style="padding:16px">
+                <span style="flex:none;width:16px;height:16px;border-radius:50%;border:2px solid {{ p.dotBorder }};background:{{ p.dotFill }};box-shadow:inset 0 0 0 2.5px #fff"></span>
+                <span style="min-width:0;flex:1">
+                  <span style="display:block;font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink)">{{ p.titulo }}</span>
+                  <span style="display:block;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:1px">{{ p.detalhe }}</span>
+                </span>
+              </button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isCartao }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:14px;padding:20px;margin-bottom:8px">
+              <div style="grid-column:1 / -1">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Nome impresso no cartão" placeholder="Como está no cartão" hint-size="100%,68px"></x-import>
+              </div>
+              <div style="grid-column:1 / -1">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Número do cartão" placeholder="0000 0000 0000 0000" hint-size="100%,68px"></x-import>
+              </div>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Validade" placeholder="MM/AA" hint-size="100%,68px"></x-import>
+              <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="CVV" placeholder="123" hint-size="100%,68px"></x-import>
+              <div style="grid-column:1 / -1" class="rh-field">
+                <label for="parcelas-select">Parcelamento</label>
+                <select id="parcelas-select" class="rh-select" onchange="{{ setParcelas }}" value="{{ parcelas }}">
+                  <sc-for list="{{ parcelasOpcoes }}" as="op" hint-placeholder-count="6">
+                    <option value="{{ op.n }}">{{ op.label }}</option>
+                  </sc-for>
+                </select>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBoletoPix }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:12px;align-items:flex-start;background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:14px;padding:18px 20px">
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--tk-brand);margin-top:2px"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M7 9h.01M11 9h4M7 13h.01M11 13h4M7 17h.01M11 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5">O boleto ou código Pix é gerado assim que você finalizar a compra, com vencimento em 3 dias úteis. A vaga é confirmada após a identificação do pagamento.</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isEmpenho }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;gap:16px;background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:14px;padding:20px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--tk-brand);margin-top:2px"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+                <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5">Para órgãos públicos, a vaga é reservada mediante nota de empenho. Não há pagamento online — nossa equipe envia a documentação para o setor de compras após a finalização.</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="grid-column:1 / -1">
+                  <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Órgão / entidade" placeholder="Nome do órgão" hint-size="100%,68px"></x-import>
+                </div>
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" label="Código UASG (opcional)" placeholder="000000" hint-size="100%,68px"></x-import>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="border-top:1px solid var(--tk-line);margin:24px 0 18px"></div>
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Checkbox" checked="{{ aceite }}" onChange="{{ toggleAceite }}" label="Li e aceito os termos de uso e a política de cancelamento" hint-size="auto,20px"></x-import>
+          <sc-if value="{{ mostrarErroTermos }}" hint-placeholder-val="{{ false }}">
+            <div role="alert" style="display:flex;align-items:center;gap:9px;font-size:var(--tk-text-body-sm);color:#ea384c;background:#fdeef0;border:1px solid #f7ccd2;border-radius:8px;padding:10px 13px;margin-top:12px">Você precisa aceitar os termos para finalizar a compra.</div>
+          </sc-if>
+
+          <div style="display:flex;justify-content:space-between;margin-top:26px">
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" onClick="{{ voltarParaDados }}" hint-size="140px,52px">← Voltar</x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" onClick="{{ finalizarCompra }}" hint-size="220px,52px">Finalizar compra →</x-import>
+          </div>
+        </section>
+      </sc-if>
+
+      <!-- ===== Passo 3: Confirmação ===== -->
+      <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <section aria-labelledby="conf-h" data-screen-label="Confirmação" class="rh-cardbox" style="text-align:center;max-width:640px;margin:0 auto">
+          <div style="width:64px;height:64px;border-radius:50%;background:#e6f4ef;color:#068466;display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+            <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h2 id="conf-h" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 8px">Pedido confirmado!</h2>
+          <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin:0 0 24px">Pedido <strong style="color:var(--tk-ink)">#{{ pedidoId }}</strong> — enviamos os detalhes para o e-mail informado.</p>
+
+          <div style="text-align:left;background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:14px;padding:22px 24px;display:grid;gap:10px;margin-bottom:20px">
+            <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm)"><span style="color:var(--tk-ink-muted)">Curso</span><span style="font-weight:600;color:var(--tk-ink);text-align:right">{{ cursoTitulo }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm)"><span style="color:var(--tk-ink-muted)">Turma</span><span style="font-weight:600;color:var(--tk-ink);text-align:right">{{ turmaEscolhidaData }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm)"><span style="color:var(--tk-ink-muted)">Pagamento</span><span style="font-weight:600;color:var(--tk-ink);text-align:right">{{ pagamentoLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm);border-top:1px solid var(--tk-cream-dark);padding-top:10px"><span style="color:var(--tk-ink-muted)">Total</span><span style="font-weight:700;color:var(--tk-brand)">{{ totalFmt }}</span></div>
+          </div>
+
+          <div style="display:flex;gap:10px;align-items:flex-start;text-align:left;background:var(--tk-accent-soft);border:1px solid #bfe0e9;border-radius:14px;padding:16px 18px;margin-bottom:28px">
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--tk-brand);margin-top:2px"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5">{{ proximosPassos }}</div>
+          </div>
+
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" hint-size="200px,52px">Baixar comprovante</x-import>
+            <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" hint-size="200px,52px">Ir para meus cursos →</x-import>
+          </div>
+        </section>
+      </sc-if>
+    </main>
+
+    <!-- ===== Resumo do pedido ===== -->
+    <sc-if value="{{ mostrarResumo }}" hint-placeholder-val="{{ true }}">
+      <aside style="position:sticky;top:24px;display:grid;gap:16px" data-screen-label="Resumo do pedido">
+        <div style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);overflow:hidden">
+          <div style="height:140px">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="imagem-curso-checkout" shape="rect" placeholder="Imagem do curso" hint-size="100%,140px"></x-import>
+          </div>
+          <div style="padding:22px 24px 26px">
+            <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:6px">Você está comprando</div>
+            <div style="font-family:var(--tk-font-display);font-weight:700;font-size:18px;letter-spacing:-0.01em;color:var(--tk-ink);margin-bottom:4px">{{ cursoTitulo }}</div>
+            <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin-bottom:20px">{{ turmaEscolhidaData }} · {{ turmaEscolhidaDetalhe }}</div>
+
+            <div style="border-top:1px solid var(--tk-line);padding-top:16px;display:grid;gap:8px;margin-bottom:16px">
+              <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted)"><span>Subtotal</span><span>{{ subtotalFmt }}</span></div>
+              <sc-if value="{{ temDesconto }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;justify-content:space-between;font-size:var(--tk-text-body-sm);color:#068466"><span>Desconto (cupom {{ cupomAplicadoLabel }})</span><span>-{{ descontoFmt }}</span></div>
+              </sc-if>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:8px;border-top:1px solid var(--tk-line)"><span style="font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink)">Total</span><span style="font-family:var(--tk-font-display);font-weight:700;font-size:24px;color:var(--tk-brand)">{{ totalFmt }}</span></div>
+              <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">{{ parcelamentoHint }}</div>
+            </div>
+
+            <sc-if value="{{ mostrarCupom }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:8px;margin-bottom:6px">
+                <input class="rh-select" style="flex:1" placeholder="Cupom de desconto" value="{{ cupomInput }}" oninput="{{ handleCupomChange }}">
+                <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="sm" onClick="{{ aplicarCupom }}" hint-size="88px,40px">Aplicar</x-import>
+              </div>
+              <sc-if value="{{ cupomInvalido }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:var(--tk-text-caption);color:#ea384c">Cupom inválido ou expirado.</div>
+              </sc-if>
+              <sc-if value="{{ cupomValido }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:var(--tk-text-caption);color:#068466">Cupom aplicado com sucesso!</div>
+              </sc-if>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:16px;padding:16px 20px;display:flex;gap:12px;align-items:flex-start">
+          <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--tk-brand);margin-top:2px"><rect x="4.5" y="10.5" width="15" height="9.5" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.6"/></svg>
+          <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5"><strong style="color:var(--tk-ink)">Compra 100% segura.</strong> Seus dados são protegidos e o pagamento é processado com criptografia de ponta a ponta.</div>
+        </div>
+      </aside>
+    </sc-if>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:40px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:34px;width:auto;display:block">
+      <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos. Todos os direitos reservados.</div>
+    </div>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;cursoTitulo&quot;: { &quot;editor&quot;: &quot;text&quot;, &quot;default&quot;: &quot;Comunicação Assertiva e Gestão de Conflitos no Trabalho&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Pedido&quot; },
+  &quot;precoBase&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 890, &quot;min&quot;: 100, &quot;max&quot;: 5000, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Pedido&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    step: 0,
+    tipoPessoa: "pf",
+    turma: 0,
+    pagamento: "cartao",
+    parcelas: 3,
+    cupomInput: "",
+    cupomStatus: "idle",
+    aceite: false,
+    tentouFinalizar: false,
+    pedidoId: null
+  };
+
+  turmasDados() {
+    return [
+      { data: "12–15 Ago 2026", detalhe: "Online ao vivo · 19h–23h", vagas: "Últimas vagas", spotColor: "#ea384c", spotBg: "#fdecee" },
+      { data: "14–17 Set 2026", detalhe: "Online ao vivo · 19h–23h", vagas: "Abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { data: "19–22 Out 2026", detalhe: "Presencial · Brasília/DF", vagas: "Abertas", spotColor: "#068466", spotBg: "#e6f4ef" }
+    ];
+  }
+
+  fmtBRL(n) {
+    return "R$ " + n.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d)(?=,))/g, ".");
+  }
+
+  renderVals() {
+    const s = this.state;
+    const precoBase = this.props.precoBase ?? 890;
+    const cursoTitulo = this.props.cursoTitulo ?? "Comunicação Assertiva e Gestão de Conflitos no Trabalho";
+
+    const turmasBase = this.turmasDados();
+    const turmas = turmasBase.map((t, i) => {
+      const on = i === s.turma;
+      return { ...t, on: on ? "1" : "0", checked: on ? "true" : "false",
+        dotBorder: on ? "var(--tk-brand)" : "var(--tk-border)", dotFill: on ? "var(--tk-brand)" : "#fff" };
+    });
+    const turmaAtual = turmasBase[s.turma];
+
+    // Steps / stepper
+    const stepMeta = [
+      { n: "1", label: "Dados" },
+      { n: "2", label: "Pagamento" },
+      { n: "3", label: "Confirmação" }
+    ];
+    const stepperItems = [];
+    stepMeta.forEach((m, i) => {
+      const status = i < s.step ? "done" : i === s.step ? "active" : "todo";
+      const done = status === "done";
+      stepperItems.push({
+        isStep: true, isLine: false, n: m.n, label: m.label, status,
+        done, notDone: !done, current: i === s.step ? "true" : "false",
+        onClick: done ? () => this.setState({ step: i }) : () => {}
+      });
+      if (i < stepMeta.length - 1) {
+        stepperItems.push({ isStep: false, isLine: true, lineDone: i < s.step ? "1" : "0" });
+      }
+    });
+
+    // Layout: two columns until confirmation, then single centered column
+    const layout = s.step < 2
+      ? { display: "grid", cols: "1fr 372px", maxWidth: "none" }
+      : { display: "flex", cols: "none", maxWidth: "760px" };
+
+    // Payment methods
+    const pagamentosBase = [
+      { key: "cartao", titulo: "Cartão de crédito", detalhe: "Em até 6x sem juros" },
+      { key: "boleto", titulo: "Boleto ou Pix", detalhe: "Vencimento em 3 dias úteis" },
+      { key: "empenho", titulo: "Nota de empenho", detalhe: "Para órgãos públicos, sem pagamento online" }
+    ];
+    const pagamentos = pagamentosBase.map((p, i) => {
+      const on = p.key === s.pagamento;
+      return { ...p, on: on ? "1" : "0", checked: on ? "true" : "false",
+        dotBorder: on ? "var(--tk-brand)" : "var(--tk-border)", dotFill: on ? "var(--tk-brand)" : "#fff" };
+    });
+    const pagamentoLabelMap = { cartao: "Cartão de crédito", boleto: "Boleto/Pix", empenho: "Nota de empenho" };
+
+    const parcelasOpcoes = [1, 2, 3, 4, 5, 6].map(n => ({ n, label: n === 1 ? "1x sem juros" : `${n}x sem juros` }));
+
+    // Pricing
+    const descontoPct = s.cupomStatus === "valid" ? 0.10 : 0;
+    const desconto = Math.round(precoBase * descontoPct * 100) / 100;
+    const total = precoBase - desconto;
+    const parcelas = s.pagamento === "cartao" ? s.parcelas : 1;
+    const parcelaValor = total / parcelas;
+    const parcelamentoHint = s.pagamento === "cartao"
+      ? `em ${parcelas}x de ${this.fmtBRL(parcelaValor)} sem juros`
+      : s.pagamento === "boleto" ? "pagamento à vista via boleto ou Pix" : "sem pagamento online — aguarda empenho";
+
+    if (!s.pedidoId && s.step === 2) {
+      // generated once when reaching confirmation
+      setTimeout(() => { if (!this.state.pedidoId) this.setState({ pedidoId: "RH" + Math.floor(100000 + Math.random() * 900000) }); }, 0);
+    }
+
+    const proximosPassosMap = {
+      cartao: "Enviamos o comprovante de pagamento e o acesso à área do aluno para o seu e-mail.",
+      boleto: "O boleto/Pix foi enviado para o seu e-mail. A vaga é confirmada após a identificação do pagamento, em até 2 dias úteis.",
+      empenho: "Nossa equipe entrará em contato em até 1 dia útil com a documentação necessária para a emissão da nota de empenho."
+    };
+
+    return {
+      cursoTitulo,
+      turmas,
+      turmaEscolhidaData: turmaAtual.data,
+      turmaEscolhidaDetalhe: turmaAtual.detalhe,
+      pickTurma: (e) => this.setState({ turma: Number(e.currentTarget.getAttribute("data-i")) }),
+
+      isPF: s.tipoPessoa === "pf",
+      isPJ: s.tipoPessoa === "pj",
+      pf: { on: s.tipoPessoa === "pf" ? "1" : "0" },
+      pj: { on: s.tipoPessoa === "pj" ? "1" : "0" },
+      selecionarPF: () => this.setState({ tipoPessoa: "pf" }),
+      selecionarPJ: () => this.setState({ tipoPessoa: "pj" }),
+
+      isStep0: s.step === 0,
+      isStep1: s.step === 1,
+      isStep2: s.step === 2,
+      stepperItems,
+      layout,
+      mostrarResumo: s.step < 2,
+
+      irParaPagamento: () => this.setState({ step: 1 }),
+      voltarParaDados: () => this.setState({ step: 0 }),
+
+      pagamentos,
+      selecionarPagamento: (e) => this.setState({ pagamento: pagamentosBase[Number(e.currentTarget.getAttribute("data-i"))].key }),
+      isCartao: s.pagamento === "cartao",
+      isBoletoPix: s.pagamento === "boleto",
+      isEmpenho: s.pagamento === "empenho",
+      parcelas: s.parcelas,
+      parcelasOpcoes,
+      setParcelas: (e) => this.setState({ parcelas: Number(e.currentTarget.value) }),
+
+      aceite: s.aceite,
+      toggleAceite: () => this.setState(st => ({ aceite: !st.aceite })),
+      mostrarErroTermos: s.tentouFinalizar && !s.aceite,
+      finalizarCompra: () => {
+        if (!this.state.aceite) { this.setState({ tentouFinalizar: true }); return; }
+        this.setState({ step: 2, pedidoId: "RH" + Math.floor(100000 + Math.random() * 900000) });
+      },
+
+      subtotalFmt: this.fmtBRL(precoBase),
+      descontoFmt: this.fmtBRL(desconto),
+      totalFmt: this.fmtBRL(total),
+      temDesconto: descontoPct > 0,
+      parcelamentoHint,
+      mostrarCupom: s.step < 2,
+      cupomInput: s.cupomInput,
+      cupomInvalido: s.cupomStatus === "invalid",
+      cupomValido: s.cupomStatus === "valid",
+      cupomAplicadoLabel: s.cupomInput.toUpperCase(),
+      handleCupomChange: (e) => this.setState({ cupomInput: e.currentTarget.value, cupomStatus: "idle" }),
+      aplicarCupom: () => {
+        const code = this.state.cupomInput.trim().toUpperCase();
+        this.setState({ cupomStatus: code === "RHCURSOS10" ? "valid" : "invalid" });
+      },
+
+      pedidoId: s.pedidoId ?? "——",
+      pagamentoLabel: pagamentoLabelMap[s.pagamento],
+      proximosPassos: proximosPassosMap[s.pagamento]
+    };
+  }
+}
+
+</script>
+</body>
+</html>

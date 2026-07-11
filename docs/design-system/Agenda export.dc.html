@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#eef0f2">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#eef0f2"/>
+    <rect x="330" y="200" width="540" height="400" rx="32" fill="#ffffff" stroke="#ebebeb" stroke-width="3"/>
+    <rect x="380" y="250" width="200" height="34" rx="17" fill="#235875"/>
+    <rect x="380" y="320" width="440" height="1" fill="#ebebeb"/>
+    <g fill="#4285f4" opacity="0.18">
+      <rect x="380" y="350" width="56" height="56" rx="10"/>
+      <rect x="444" y="350" width="56" height="56" rx="10"/>
+      <rect x="508" y="350" width="56" height="56" rx="10"/>
+      <rect x="572" y="350" width="56" height="56" rx="10"/>
+      <rect x="636" y="350" width="56" height="56" rx="10"/>
+      <rect x="380" y="414" width="56" height="56" rx="10"/>
+      <rect x="508" y="414" width="56" height="56" rx="10"/>
+      <rect x="636" y="414" width="56" height="56" rx="10"/>
+      <rect x="444" y="478" width="56" height="56" rx="10"/>
+      <rect x="572" y="478" width="56" height="56" rx="10"/>
+    </g>
+    <rect x="444" y="414" width="56" height="56" rx="10" fill="#4285f4"/>
+    <rect x="700" y="414" width="120" height="56" rx="10" fill="#235875"/>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#eef0f2}
+    .rh-page{width:1180px;margin:0 auto;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:var(--tk-line);border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-nav a.link[data-cur="1"]{opacity:1;color:var(--tk-brand);font-weight:600}
+    .rh-wm{font-family:var(--tk-font-display);font-weight:700;color:var(--tk-brand);font-size:22px;letter-spacing:-0.02em;display:inline-flex;align-items:center;gap:.5rem}
+    .rh-wm span{width:27px;height:27px;border-radius:30%;background:var(--tk-brand);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+    /* ---- RH brand merge: real logo palette over Trust Keith tokens ---- */
+    .rh-page.rh2{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--rh-paper-line:#ded8c9;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .rh-page.rh2 .rh-nav{background:#ffffff}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+    .rh-fchip{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;padding:9px 16px;border-radius:var(--tk-radius-pill);border:1px solid var(--tk-border);background:var(--tk-surface);color:var(--tk-ink);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-fchip:hover{border-color:var(--tk-accent)}
+    .rh-fchip[data-on="1"]{background:var(--tk-brand);color:#fff;border-color:var(--tk-brand)}
+    .rh-jlink{color:var(--tk-accent);font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:600;text-decoration:none;white-space:nowrap}
+    .rh-jlink:hover{color:var(--tk-accent-strong)}
+    .rh-monthhead{display:flex;align-items:baseline;gap:14px;margin:0 0 18px;padding-bottom:12px;border-bottom:1px solid var(--tk-border)}
+    .rh-row{display:grid;grid-template-columns:96px 1fr auto;gap:26px;align-items:center;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass);padding:20px 26px;transition:transform .25s cubic-bezier(.25,.46,.45,.94),box-shadow .25s}
+    .rh-row:hover{transform:translateY(-2px);box-shadow:var(--tk-shadow-card)}
+    .rh-datebox{text-align:center;border-right:1px solid var(--tk-line);padding-right:22px}
+    .rh-dnum{font-family:var(--tk-font-display);font-weight:700;font-size:34px;line-height:1;color:var(--tk-brand);letter-spacing:-0.02em}
+    .rh-dmon{font-family:var(--tk-font-body);font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--tk-ink-muted);margin-top:4px}
+    .rh-dwk{font-family:var(--tk-font-body);font-size:11px;color:var(--tk-ink-muted);margin-top:2px}
+    .rh-meta{display:flex;align-items:center;gap:7px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)}
+    .rh-modetag{display:inline-flex;align-items:center;gap:6px;font-family:var(--tk-font-body);font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--tk-radius-pill)}
+    .rh-mode-online{background:var(--tk-accent-soft);color:var(--tk-accent-strong)}
+    .rh-mode-presencial{background:#fdeef0;color:#c0293b}
+    .rh-price{font-family:var(--tk-font-display);font-weight:700;font-size:20px;color:var(--tk-brand);line-height:1}
+    .rh-viewtoggle{display:inline-flex;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-button);padding:4px;height:44px;box-sizing:border-box}
+    .rh-vbtn{display:inline-flex;align-items:center;gap:7px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink-muted);background:transparent;border:none;padding:0 15px;border-radius:var(--tk-radius-input);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-vbtn:hover{color:var(--tk-ink)}
+    .rh-vbtn[data-on="1"]{background:var(--tk-brand);color:#fff}
+    .rh-caldow{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:8px}
+    .rh-caldow span{font-family:var(--tk-font-body);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);text-align:center;padding:2px 0}
+    .rh-calweek{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .rh-cell{min-height:104px;border:1px solid var(--tk-line);border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:6px}
+    .rh-cell-empty{background:var(--tk-surface-2);border-style:dashed;border-color:var(--tk-line)}
+    .rh-cell-has{border-color:var(--tk-accent);box-shadow:0 0 0 1px var(--tk-accent-soft) inset}
+    .rh-cellnum{font-family:var(--tk-font-body);font-size:13px;font-weight:600;color:var(--tk-ink-muted)}
+    .rh-cell-has .rh-cellnum{color:var(--tk-brand)}
+    .rh-celltitle{font-family:var(--tk-font-body);font-size:11.5px;font-weight:600;line-height:1.25;color:var(--tk-ink);cursor:pointer}
+    .rh-celltitle:hover{color:var(--tk-accent)}
+    .rh-navbtn{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--tk-border);border-radius:var(--tk-radius-button);background:var(--tk-surface);color:var(--tk-ink);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-navbtn:hover{border-color:var(--tk-accent);color:var(--tk-accent)}
+    .rh-todaybtn{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;padding:9px 16px;border:1px solid var(--tk-border);border-radius:var(--tk-radius-button);background:var(--tk-surface);color:var(--tk-ink);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-todaybtn:hover{border-color:var(--tk-accent);color:var(--tk-accent)}
+    /* filter bar */
+    .rh-search{display:flex;align-items:center;gap:10px;flex:1 1 320px;min-width:240px;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-pill);padding:0 16px;height:46px;transition:border-color .2s cubic-bezier(.25,.46,.45,.94),box-shadow .2s}
+    .rh-search:focus-within{border-color:var(--tk-accent);box-shadow:0 0 0 3px var(--tk-accent-soft)}
+    .rh-search svg{color:var(--tk-ink-muted);flex-shrink:0}
+    .rh-search input{border:none;outline:none;background:transparent;font-family:var(--tk-font-body);font-size:var(--tk-text-body);color:var(--tk-ink);width:100%}
+    .rh-search input::placeholder{color:var(--tk-ink-muted)}
+    .rh-seg{display:inline-flex;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-button);padding:4px;height:44px;box-sizing:border-box}
+    .rh-segbtn{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink-muted);background:transparent;border:none;padding:0 16px;border-radius:var(--tk-radius-input);cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-segbtn:hover{color:var(--tk-ink)}
+    .rh-segbtn[data-on="1"]{background:var(--tk-brand);color:#fff;font-weight:600}
+    .rh-fsel{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-input);padding:0 36px 0 14px;height:44px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f5057' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center;transition:border-color .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-fsel:hover{border-color:var(--tk-accent)}
+    .rh-fsel:focus-visible{outline:var(--tk-focus-ring);outline-offset:var(--tk-focus-offset);border-color:var(--tk-focus)}
+    .rh-fsel[data-on="1"]{border-color:var(--tk-brand);color:var(--tk-brand);font-weight:600;background-color:var(--tk-accent-soft)}
+    .rh-sort{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-input);padding:0 36px 0 14px;height:44px;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234f5057' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 12px center}
+    .rh-sort:hover{border-color:var(--tk-accent)}
+    .rh-fpanel{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass);padding:24px 26px;display:flex;flex-direction:column;gap:20px}
+    .rh-fgroup{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+    .rh-flabel{font-family:var(--tk-font-body);font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);width:110px;flex-shrink:0}
+    .rh-activebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .rh-apill{display:inline-flex;align-items:center;gap:7px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);background:var(--tk-line);border:1px solid var(--tk-border);border-radius:var(--tk-radius-pill);padding:6px 8px 6px 14px}
+    .rh-apill button{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:none;background:rgba(0,0,0,0.06);color:var(--tk-ink-muted);border-radius:50%;cursor:pointer;padding:0}
+    .rh-apill button:hover{background:var(--tk-brand);color:#fff}
+    .rh-clearbtn{font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-accent);background:none;border:none;cursor:pointer;padding:4px}
+    .rh-clearbtn:hover{color:var(--tk-accent-strong)}
+  </style>
+</helmet>
+
+<div class="rh-page rh2">
+  <nav class="rh-nav">
+    <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="link" href="#">Cursos</a><a class="link" data-cur="1" href="#">Agenda</a><a class="link" href="#">In-company</a><a class="link" href="#">Consultoria</a><a class="link" href="#">Blog</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a class="link" href="#">Entrar</a>
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="180px,32px">Fale com um especialista →</x-import>
+    </div>
+  </nav>
+
+  <!-- ===== Header ===== -->
+  <header style="background:radial-gradient(circle at 50% -10%, #f7f9fc 30%, #ebf3ff 130%);border-bottom:1px solid var(--tk-border);padding:64px 0 48px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="accent" dot="true" hint-size="auto,26px">Agenda</x-import>
+      <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-large);line-height:1.08;letter-spacing:-0.02em;color:var(--tk-ink);margin:18px 0 14px;max-width:20ch;text-wrap:balance">Próximas turmas, em <span style="font-style:italic">ordem</span> de data</h1>
+      <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0 0 32px;max-width:58ch;text-wrap:pretty">Todas as turmas presenciais e online ao vivo confirmadas no calendário. Busque pelo nome do curso ou refine por modalidade, área e local.</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <!-- filter bar: search + inline filters + sort + view -->
+        <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Input" dc-props="{{ searchProps }}" hint-size="320px,44px" style="flex:1 1 320px;min-width:240px"></x-import>
+          <div class="rh-seg" role="group" aria-label="Modalidade">
+            <sc-for list="{{ modes }}" as="m" hint-placeholder-count="3">
+              <button class="rh-segbtn" data-on="{{ m.on }}" onclick="{{ pickMode }}" data-val="{{ m.name }}">{{ m.name }}</button>
+            </sc-for>
+          </div>
+          <select class="rh-fsel" data-on="{{ areaOn }}" onchange="{{ onAreaSel }}" value="{{ areaVal }}" aria-label="Área">
+            <sc-for list="{{ areas }}" as="a" hint-placeholder-count="5">
+              <option value="{{ a.name }}" selected="{{ a.on }}">{{ a.label }}</option>
+            </sc-for>
+          </select>
+          <select class="rh-fsel" data-on="{{ cityOn }}" onchange="{{ onCitySel }}" value="{{ cityVal }}" aria-label="Local">
+            <sc-for list="{{ cities }}" as="ct" hint-placeholder-count="4">
+              <option value="{{ ct.name }}" selected="{{ ct.on }}">{{ ct.label }}</option>
+            </sc-for>
+          </select>
+          <div style="flex:1"></div>
+          <select class="rh-sort" onchange="{{ onSort }}" value="{{ sort }}" aria-label="Ordenar">
+            <sc-for list="{{ sortOptions }}" as="s" hint-placeholder-count="3">
+              <option value="{{ s.val }}" selected="{{ s.on }}">{{ s.label }}</option>
+            </sc-for>
+          </select>
+          <div class="rh-viewtoggle">
+            <button class="rh-vbtn" data-on="{{ isList }}" onclick="{{ setList }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>Lista</button>
+            <button class="rh-vbtn" data-on="{{ isCal }}" onclick="{{ setCal }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"></rect><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Calendário</button>
+          </div>
+        </div>
+
+        <!-- active filters summary -->
+        <sc-if value="{{ hasActive }}" hint-placeholder-val="{{ false }}">
+          <div class="rh-activebar">
+            <span style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);font-weight:500">Filtrando por:</span>
+            <sc-for list="{{ activeChips }}" as="chip" hint-placeholder-count="2">
+              <span class="rh-apill">{{ chip.label }}<button onclick="{{ chip.remove }}" aria-label="Remover filtro">×</button></span>
+            </sc-for>
+            <button class="rh-clearbtn" onclick="{{ clearAll }}">Limpar tudo</button>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Agenda timeline ===== -->
+  <section style="padding:44px 0 80px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px">
+        <div class="rh-meta" style="font-size:var(--tk-text-body-sm)"><strong style="color:var(--tk-ink);font-weight:600">{{ count }}</strong>&nbsp;turmas encontradas</div>
+        <a href="#" class="rh-jlink">Ver catálogo completo →</a>
+      </div>
+
+      <sc-if value="{{ isCal }}" hint-placeholder-val="{{ false }}">
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div style="display:flex;align-items:baseline;gap:14px">
+            <span style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink)">{{ calLabel }}</span>
+            <span style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">{{ calCount }} turmas</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="rh-navbtn" onclick="{{ prevMonth }}" aria-label="Mês anterior"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+            <button class="rh-todaybtn" onclick="{{ goToday }}">Hoje</button>
+            <button class="rh-navbtn" onclick="{{ nextMonth }}" aria-label="Próximo mês"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+          </div>
+        </div>
+        <div class="rh-caldow"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ calWeeks }}" as="wk" hint-placeholder-count="5">
+            <div class="rh-calweek">
+              <sc-for list="{{ wk }}" as="cell" hint-placeholder-count="7">
+                <div class="rh-cell {{ cell.cls }}">
+                  <sc-if value="{{ cell.day }}" hint-placeholder-val="{{ true }}">
+                    <div class="rh-cellnum">{{ cell.day }}</div>
+                  </sc-if>
+                  <sc-if value="{{ cell.course }}" hint-placeholder-val="{{ false }}">
+                    <span class="rh-modetag {{ cell.modeClass }}" style="align-self:flex-start">{{ cell.modeLabel }}</span>
+                    <div class="rh-celltitle">{{ cell.shortTitle }}</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:44px">
+        <sc-for list="{{ months }}" as="mo" hint-placeholder-count="3">
+          <div>
+            <div class="rh-monthhead">
+              <span style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink)">{{ mo.label }}</span>
+              <span style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">{{ mo.count }} turmas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{ mo.items }}" as="c" hint-placeholder-count="3">
+                <article class="rh-row">
+                  <div class="rh-datebox">
+                    <div class="rh-dnum">{{ c.day }}</div>
+                    <div class="rh-dmon">{{ c.monShort }}</div>
+                    <div class="rh-dwk">{{ c.weekday }}</div>
+                  </div>
+                  <div style="min-width:0">
+                    <div style="display:flex;align-items:center;gap:10px;margin-bottom:7px">
+                      <span class="rh-modetag {{ c.modeClass }}">{{ c.modeLabel }}</span>
+                      <span style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">{{ c.category }}</span>
+                    </div>
+                    <h3 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead);letter-spacing:-0.01em;line-height:1.25;color:var(--tk-ink);margin:0 0 8px;text-wrap:pretty">{{ c.title }}</h3>
+                    <div style="display:flex;gap:20px;flex-wrap:wrap">
+                      <div class="rh-meta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ c.duration }}</div>
+                      <div class="rh-meta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.6"></circle></svg>{{ c.place }}</div>
+                      <div class="rh-meta"><svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>{{ c.instructor }}</div>
+                    </div>
+                  </div>
+                  <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:12px;min-width:150px">
+                    <span style="font-family:var(--tk-font-body);font-size:11px;font-weight:600;color:{{ c.spotColor }};background:{{ c.spotBg }};padding:4px 11px;border-radius:var(--tk-radius-pill);white-space:nowrap">{{ c.spots }}</span>
+                    <div>
+                      <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-bottom:1px">a partir de</div>
+                      <div class="rh-price">{{ c.price }}</div>
+                    </div>
+                    <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="130px,36px">Inscrever-se →</x-import>
+                  </div>
+                </article>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center;padding:64px 20px;color:var(--tk-ink-muted)">
+          <div style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);color:var(--tk-ink);margin-bottom:8px">Nenhuma turma nesse filtro</div>
+          <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-body);margin:0 0 20px">Ajuste os filtros ou fale com um especialista para uma turma sob medida.</p>
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="md" hint-size="200px,44px">Falar com especialista →</x-import>
+        </div>
+      </sc-if>
+    </div>
+  </section>
+
+  <!-- ===== In-company cross-sell band ===== -->
+  <section style="background:var(--tk-cream);border-top:1px solid var(--tk-cream-dark);border-bottom:1px solid var(--tk-cream-dark);padding:56px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap">
+      <div style="max-width:56ch">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="brand" hint-size="auto,26px">Para equipes</x-import>
+        <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;line-height:1.15;color:var(--tk-ink);margin:14px 0 8px;text-wrap:balance">Nenhuma data serve para a sua equipe?</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0">Montamos uma turma fechada com o seu tema, no seu calendário e com o contexto da sua organização.</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" hint-size="200px,52px">Conhecer in-company →</x-import>
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" hint-size="180px,52px">Solicitar proposta</x-import>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:56px 0 40px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:48px;width:auto;display:block;margin-bottom:2px">
+        <p style="font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.55;margin:16px 0 0;max-width:34ch">Cursos, treinamento in-company e consultoria para organizações públicas e privadas.</p>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Ofertas</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Cursos abertos</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Agenda</a><a href="#" style="color:var(--tk-ink);text-decoration:none">In-company</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Consultoria</a></div>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Empresa</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Sobre</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Blog</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Instrutores</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Contato</a></div>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Acesso</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do aluno</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do instrutor</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Entrar</a></div>
+      </div>
+    </div>
+    <div class="rh-wrap" style="border-top:1px solid var(--tk-border);margin-top:40px;padding-top:24px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos. Todos os direitos reservados.</div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: "Todas", area: "Todas", city: "Todos", search: "", sort: "data", filtersOpen: false, view: "lista", calY: 2026, calM: 7 };
+
+  priceNum(p) { return parseInt(p.replace(/\D/g, ""), 10) || 0; }
+  dateKey(c) { return parseInt(c.monKey.split(" ")[1], 10) * 100 + this.monthIndex(c.monShort) + parseInt(c.day, 10) / 100; }
+
+  monthIndex(short) {
+    return { Jan:0, Fev:1, Mar:2, Abr:3, Mai:4, Jun:5, Jul:6, Ago:7, Set:8, Out:9, Nov:10, Dez:11 }[short];
+  }
+
+  monthName(mi) {
+    return ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"][mi];
+  }
+
+  buildCalendar(year, mi, items) {
+    const first = new Date(year, mi, 1).getDay();
+    const daysIn = new Date(year, mi + 1, 0).getDate();
+    const byDay = {};
+    items.forEach(c => { byDay[parseInt(c.day, 10)] = c; });
+
+    const cells = [];
+    for (let i = 0; i < first; i++) cells.push({ cls: "rh-cell-empty" });
+    for (let d = 1; d <= daysIn; d++) {
+      const c = byDay[d];
+      cells.push(c
+        ? { day: d, course: c, cls: "rh-cell-has", modeClass: c.modeClass, modeLabel: c.modeLabel, shortTitle: c.title.split(":")[0].split("(")[0].trim() }
+        : { day: d, cls: "" });
+    }
+    while (cells.length % 7 !== 0) cells.push({ cls: "rh-cell-empty" });
+    const weeks = [];
+    for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7));
+    return weeks;
+  }
+
+  shiftMonth(delta) {
+    let m = this.state.calM + delta;
+    let y = this.state.calY;
+    while (m < 0) { m += 12; y -= 1; }
+    while (m > 11) { m -= 12; y += 1; }
+    this.setState({ calY: y, calM: m });
+  }
+
+  allCourses() {
+    return [
+      { day: "12", monShort: "Ago", monKey: "Agosto 2026", weekday: "Qua", mode: "Online", category: "Licitações e Contratos", title: "Nova Lei de Licitações na prática (Lei 14.133/21)", duration: "16h · 4 encontros", place: "Online ao vivo", instructor: "Dra. Helena Prado", price: "R$ 1.290", spots: "Poucas vagas", spotColor: "#c0293b", spotBg: "#fdeef0" },
+      { day: "26", monShort: "Ago", monKey: "Agosto 2026", weekday: "Qua", mode: "Presencial", category: "LGPD e Privacidade", title: "LGPD para o setor público: da teoria à rotina", duration: "20h · 3 dias", place: "Brasília · DF", instructor: "Marcos Vinícius", price: "R$ 1.690", spots: "Inscrições abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { day: "09", monShort: "Set", monKey: "Setembro 2026", weekday: "Qua", mode: "Online", category: "Licitações e Contratos", title: "Gestão e fiscalização de contratos administrativos", duration: "12h · 3 encontros", place: "Online ao vivo", instructor: "Dra. Helena Prado", price: "R$ 990", spots: "Turma nova", spotColor: "#4285f4", spotBg: "#eaf1fe" },
+      { day: "23", monShort: "Set", monKey: "Setembro 2026", weekday: "Qua", mode: "Online", category: "Compliance", title: "Programa de integridade e compliance público", duration: "16h · 4 encontros", place: "Online ao vivo", instructor: "Fernanda Lopes", price: "R$ 1.190", spots: "Inscrições abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { day: "07", monShort: "Out", monKey: "Outubro 2026", weekday: "Qua", mode: "Presencial", category: "Gestão Pública", title: "Planejamento e execução orçamentária na prática", duration: "24h · 3 dias", place: "São Paulo · SP", instructor: "Roberto Aguiar", price: "R$ 1.890", spots: "Poucas vagas", spotColor: "#c0293b", spotBg: "#fdeef0" },
+      { day: "21", monShort: "Out", monKey: "Outubro 2026", weekday: "Qua", mode: "Online", category: "LGPD e Privacidade", title: "Encarregado de dados (DPO): função e responsabilidades", duration: "12h · 3 encontros", place: "Online ao vivo", instructor: "Marcos Vinícius", price: "R$ 1.090", spots: "Inscrições abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { day: "04", monShort: "Nov", monKey: "Novembro 2026", weekday: "Qua", mode: "Online", category: "Gestão Pública", title: "Governança e gestão de riscos no setor público", duration: "16h · 4 encontros", place: "Online ao vivo", instructor: "Roberto Aguiar", price: "R$ 1.290", spots: "Turma nova", spotColor: "#4285f4", spotBg: "#eaf1fe" },
+      { day: "18", monShort: "Nov", monKey: "Novembro 2026", weekday: "Qua", mode: "Presencial", category: "Compliance", title: "Prevenção à fraude e corrupção em compras", duration: "16h · 2 dias", place: "Brasília · DF", instructor: "Fernanda Lopes", price: "R$ 1.490", spots: "Inscrições abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { day: "02", monShort: "Dez", monKey: "Dezembro 2026", weekday: "Qua", mode: "Online", category: "Licitações e Contratos", title: "Pregão eletrônico: condução e julgamento", duration: "12h · 3 encontros", place: "Online ao vivo", instructor: "Dra. Helena Prado", price: "R$ 990", spots: "Poucas vagas", spotColor: "#c0293b", spotBg: "#fdeef0" }
+    ];
+  }
+
+  renderVals() {
+    const modeNames = ["Todas", "Online", "Presencial"];
+    const areaNames = ["Todas", "Licitações e Contratos", "LGPD e Privacidade", "Gestão Pública", "Compliance"];
+    const cityNames = ["Todos", "Online ao vivo", "Brasília · DF", "São Paulo · SP"];
+    const sortOpts = [
+      { val: "data", label: "Data · mais próxima" },
+      { val: "preco-asc", label: "Preço · menor primeiro" },
+      { val: "preco-desc", label: "Preço · maior primeiro" }
+    ];
+    const q = this.state.search.trim().toLowerCase();
+    const all = this.allCourses().map(c => ({
+      ...c,
+      modeLabel: c.mode === "Online" ? "Online ao vivo" : "Presencial",
+      modeClass: c.mode === "Online" ? "rh-mode-online" : "rh-mode-presencial"
+    }));
+    let visible = all.filter(c =>
+      (this.state.mode === "Todas" || c.mode === this.state.mode) &&
+      (this.state.area === "Todas" || c.category === this.state.area) &&
+      (this.state.city === "Todos" || c.place === this.state.city) &&
+      (q === "" || (c.title + " " + c.category + " " + c.instructor).toLowerCase().includes(q))
+    );
+
+    // sort
+    if (this.state.sort === "preco-asc") visible = visible.slice().sort((a, b) => this.priceNum(a.price) - this.priceNum(b.price));
+    else if (this.state.sort === "preco-desc") visible = visible.slice().sort((a, b) => this.priceNum(b.price) - this.priceNum(a.price));
+    else visible = visible.slice().sort((a, b) => this.dateKey(a) - this.dateKey(b));
+
+    // group by month preserving current order
+    const order = [];
+    const map = {};
+    visible.forEach(c => {
+      if (!map[c.monKey]) { map[c.monKey] = []; order.push(c.monKey); }
+      map[c.monKey].push(c);
+    });
+    const months = order.map(k => ({ label: k, count: map[k].length, items: map[k] }));
+
+    // single calendar month driven by cursor
+    const curItems = visible.filter(c => parseInt(c.monKey.split(" ")[1], 10) === this.state.calY && this.monthIndex(c.monShort) === this.state.calM);
+    const calWeeks = this.buildCalendar(this.state.calY, this.state.calM, curItems);
+    const calLabel = this.monthName(this.state.calM) + " " + this.state.calY;
+
+    // active filter chips summary
+    const activeChips = [];
+    if (this.state.mode !== "Todas") activeChips.push({ label: this.state.mode, remove: () => this.setState({ mode: "Todas" }) });
+    if (this.state.area !== "Todas") activeChips.push({ label: this.state.area, remove: () => this.setState({ area: "Todas" }) });
+    if (this.state.city !== "Todos") activeChips.push({ label: this.state.city, remove: () => this.setState({ city: "Todos" }) });
+    if (q !== "") activeChips.push({ label: '"' + this.state.search.trim() + '"', remove: () => this.setState({ search: "" }) });
+    const activeCount = activeChips.length;
+
+    return {
+      calWeeks,
+      calLabel,
+      calCount: curItems.length,
+      prevMonth: () => this.shiftMonth(-1),
+      nextMonth: () => this.shiftMonth(1),
+      goToday: () => this.setState({ calY: 2026, calM: 7 }),
+      modes: modeNames.map(name => ({ name, on: name === this.state.mode ? "1" : "0" })),
+      areas: areaNames.map(name => ({ name, label: name === "Todas" ? "Todas as áreas" : name, on: name === this.state.area ? "1" : "" })),
+      cities: cityNames.map(name => ({ name, label: name === "Todos" ? "Todos os locais" : name, on: name === this.state.city ? "1" : "" })),
+      areaVal: this.state.area,
+      cityVal: this.state.city,
+      areaOn: this.state.area !== "Todas" ? "1" : "",
+      cityOn: this.state.city !== "Todos" ? "1" : "",
+      onAreaSel: (e) => this.setState({ area: e.currentTarget.value }),
+      onCitySel: (e) => this.setState({ city: e.currentTarget.value }),
+      sortOptions: sortOpts.map(s => ({ ...s, on: s.val === this.state.sort ? "1" : "" })),
+      sort: this.state.sort,
+      search: this.state.search,
+      months,
+      count: visible.length,
+      empty: visible.length === 0,
+      activeChips,
+      activeCount: activeCount || "",
+      hasActive: activeCount > 0 ? "1" : "",
+      filtersOn: this.state.filtersOpen ? "1" : "",
+      isList: this.state.view === "lista" ? "1" : "",
+      isCal: this.state.view === "calendario" ? "1" : "",
+      onSearch: (e) => this.setState({ search: e.currentTarget.value }),
+      searchProps: {
+        type: "search",
+        placeholder: "Buscar por curso, tema ou instrutor…",
+        value: this.state.search,
+        onInput: (e) => this.setState({ search: e.currentTarget.value }),
+        "aria-label": "Buscar",
+        leadingIcon: React.createElement("svg", { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none" },
+          React.createElement("circle", { cx: 11, cy: 11, r: 7, stroke: "currentColor", strokeWidth: 1.8 }),
+          React.createElement("path", { d: "m20 20-3.2-3.2", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" })
+        )
+      },
+      onSort: (e) => this.setState({ sort: e.currentTarget.value }),
+      toggleFilters: () => this.setState(s => ({ filtersOpen: !s.filtersOpen })),
+      clearAll: () => this.setState({ mode: "Todas", area: "Todas", city: "Todos", search: "" }),
+      pickMode: (e) => this.setState({ mode: e.currentTarget.getAttribute("data-val") }),
+      pickArea: (e) => this.setState({ area: e.currentTarget.getAttribute("data-val") }),
+      pickCity: (e) => this.setState({ city: e.currentTarget.getAttribute("data-val") }),
+      setList: () => this.setState({ view: "lista" }),
+      setCal: () => this.setState({ view: "calendario" })
+    };
+  }
+}
+</script>
+</body>
+</html>

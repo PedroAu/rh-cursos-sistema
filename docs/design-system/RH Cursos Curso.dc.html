@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/styles.css">
+  <script src="_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/_ds_bundle.js"></script>
+  <style>
+    *{box-sizing:border-box}
+    :focus-visible{outline:2px solid #4d65ff;outline-offset:2px;border-radius:4px}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:0.001ms !important;animation-duration:0.001ms !important;animation-iteration-count:1 !important;scroll-behavior:auto !important}}
+    body{margin:0;background:#eef0f2}
+    a{color:#1791a9}a:hover{color:#0c6a83}
+    .rh-page{width:1180px;margin:0 auto;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25)}
+    .rh-nav{display:flex;align-items:center;justify-content:space-between;gap:32px;background:#fff;border-bottom:1px solid var(--tk-black-8);padding:16px 40px;font-family:var(--tk-font-body)}
+    .rh-nav a.link{color:var(--tk-ink);text-decoration:none;font-size:var(--tk-text-body-sm);font-weight:500;opacity:.82;padding:6px 10px;border-radius:6px}
+    .rh-nav a.link:hover{opacity:1;background:rgba(0,0,0,0.04)}
+    .rh-nav a.link[data-cur="1"]{opacity:1;color:var(--tk-brand);font-weight:600}
+    .rh-page.rh2{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--rh-gray:#7f8c94;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .rh-wrap{max-width:1100px;margin:0 auto;padding:0 40px}
+    .rh-meta{display:inline-flex;align-items:center;gap:7px;font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted)}
+    .rh-chip{display:inline-flex;align-items:center;gap:7px;font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-pill);padding:8px 14px}
+    .rh-turma{width:100%;text-align:left;display:flex;align-items:center;gap:12px;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:12px;padding:12px 14px;cursor:pointer;font-family:var(--tk-font-body);transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .rh-turma:hover{border-color:var(--tk-accent)}
+    .rh-turma[data-on="1"]{border-color:var(--tk-brand);background:var(--tk-accent-soft);box-shadow:inset 0 0 0 1px var(--tk-brand)}
+    .rh-acc{border:1px solid var(--tk-border);border-radius:14px;background:var(--tk-surface);overflow:hidden}
+    .rh-accbtn{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;background:transparent;border:none;cursor:pointer;padding:18px 22px;text-align:left;font-family:var(--tk-font-body)}
+    .rh-accbtn:hover{background:rgba(0,0,0,0.02)}
+    .rh-caret{flex:none;transition:transform .25s cubic-bezier(.25,.46,.45,.94);color:var(--tk-ink-muted)}
+    .rh-caret[data-open="1"]{transform:rotate(180deg)}
+    .rh-check{flex:none;width:20px;height:20px;border-radius:50%;background:var(--tk-accent-soft);color:var(--tk-brand);display:inline-flex;align-items:center;justify-content:center;margin-top:2px}
+  </style>
+</helmet>
+
+<div class="rh-page rh2">
+  <nav class="rh-nav" aria-label="Navegação principal">
+    <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:42px;width:auto;display:block">
+    <div style="display:flex;align-items:center;gap:2px">
+      <a class="link" data-cur="1" href="RH Cursos Catálogo.dc.html">Cursos</a><a class="link" href="RH Cursos Agenda.dc.html">Agenda</a><a class="link" href="RH Cursos In-company.dc.html">In-company</a><a class="link" href="#">Consultoria</a><a class="link" href="RH Cursos Blog.dc.html">Blog</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a class="link" href="RH Cursos Login.dc.html">Entrar</a>
+      <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="sm" hint-size="180px,32px">Fale com um especialista →</x-import>
+    </div>
+  </nav>
+
+  <!-- ===== Hero ===== -->
+  <header style="background:radial-gradient(circle at 50% -10%, #f7f9fc 30%, #ebf3ff 130%);border-bottom:1px solid var(--tk-border);padding:36px 0 44px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap">
+      <div style="display:flex;align-items:center;gap:8px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-bottom:22px">
+        <a href="RH Cursos Home.dc.html" style="color:var(--tk-ink-muted);text-decoration:none">Home</a><span aria-hidden="true">/</span>
+        <a href="RH Cursos Catálogo.dc.html" style="color:var(--tk-ink-muted);text-decoration:none">Cursos</a><span aria-hidden="true">/</span>
+        <span style="color:var(--tk-ink)">Licitações e Contratos</span>
+      </div>
+      <div style="max-width:660px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="accent" dot="true" hint-size="auto,26px">Licitações e Contratos</x-import>
+          <sc-if value="{{ mostrarUrgencia }}" hint-placeholder-val="{{ true }}">
+            <span style="display:inline-flex;align-items:center;gap:6px;font-size:var(--tk-text-caption);font-weight:600;color:#ea384c;background:#fdecee;border-radius:var(--tk-radius-pill);padding:5px 12px"><span style="width:6px;height:6px;border-radius:50%;background:#ea384c"></span>Últimas {{ vagasRestantes }} vagas na próxima turma</span>
+          </sc-if>
+        </div>
+        <h1 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-display-large);line-height:1.1;letter-spacing:-0.02em;color:var(--tk-ink);margin:18px 0 14px;text-wrap:balance">Nova Lei de Licitações na prática (Lei 14.133/21)</h1>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0 0 24px;max-width:56ch;text-wrap:pretty">Do planejamento da contratação à gestão do contrato: aplique a Lei 14.133/21 com segurança jurídica, com casos reais e modelos prontos para usar na sua rotina.</p>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <span class="rh-chip"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>16 horas · 4 encontros</span>
+          <span class="rh-chip"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5" width="19" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Online ao vivo + gravações</span>
+          <span class="rh-chip"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9.5 11.8 1.8 1.8 3.4-3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Certificado de 16h</span>
+          <span class="rh-chip"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.4" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 19c.8-3 2.9-4.5 5.5-4.5S13.7 16 14.5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="17" cy="9" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 14.6c2.2.2 3.6 1.5 4.1 3.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Turmas reduzidas</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main: content + sticky enrollment aside ===== -->
+  <div class="rh-wrap" style="display:grid;grid-template-columns:1fr 372px;gap:44px;padding-top:44px;padding-bottom:72px;font-family:var(--tk-font-body);align-items:start">
+
+    <!-- --- Main column --- -->
+    <main style="display:grid;gap:52px;min-width:0">
+
+      <!-- O que você vai dominar -->
+      <section aria-labelledby="beneficios" data-screen-label="Benefícios">
+        <h2 id="beneficios" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:0 0 8px">O que você vai dominar</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);color:var(--tk-ink-muted);margin:0 0 24px;text-wrap:pretty">Competências práticas para aplicar no dia seguinte ao curso.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <sc-for list="{{ beneficios }}" as="b" hint-placeholder-count="6">
+            <div style="display:flex;gap:12px;align-items:flex-start;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:14px;padding:18px 20px">
+              <span class="rh-check"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div>
+                <div style="font-size:var(--tk-text-body);font-weight:600;color:var(--tk-ink);margin-bottom:3px">{{ b.t }}</div>
+                <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5">{{ b.d }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- Para quem é -->
+      <section aria-labelledby="publico" data-screen-label="Para quem é" style="background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:var(--tk-radius-card);padding:32px">
+        <h2 id="publico" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 16px">Para quem é este curso</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px">
+          <sc-for list="{{ publico }}" as="p" hint-placeholder-count="4">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:var(--tk-text-body-sm);color:var(--tk-ink);line-height:1.5"><span class="rh-check" style="background:#fff"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ p }}</div>
+          </sc-for>
+        </div>
+        <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin:18px 0 0;line-height:1.5">Não é necessário conhecimento prévio da Lei 14.133/21 — partimos do essencial e avançamos até os pontos mais controversos.</p>
+      </section>
+
+      <!-- Conteúdo programático -->
+      <section aria-labelledby="programa" data-screen-label="Conteúdo programático">
+        <h2 id="programa" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:0 0 8px">Conteúdo programático</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);color:var(--tk-ink-muted);margin:0 0 24px">4 módulos · 16 horas · material de apoio e modelos incluídos</p>
+        <div style="display:grid;gap:12px">
+          <sc-for list="{{ modulos }}" as="m" hint-placeholder-count="4">
+            <div class="rh-acc">
+              <button type="button" class="rh-accbtn" onclick="{{ toggleModulo }}" data-i="{{ $index }}" aria-expanded="{{ m.expanded }}">
+                <span style="display:flex;align-items:center;gap:16px">
+                  <span style="flex:none;font-family:var(--tk-font-display);font-weight:700;font-size:15px;color:var(--tk-brand);background:var(--tk-accent-soft);width:36px;height:36px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center">{{ m.num }}</span>
+                  <span>
+                    <span style="display:block;font-size:var(--tk-text-body);font-weight:600;color:var(--tk-ink)">{{ m.title }}</span>
+                    <span style="display:block;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:2px">{{ m.carga }}</span>
+                  </span>
+                </span>
+                <svg class="rh-caret" data-open="{{ m.open }}" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <sc-if value="{{ m.isOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:0 22px 20px 74px;display:grid;gap:9px">
+                  <sc-for list="{{ m.topicos }}" as="t" hint-placeholder-count="4">
+                    <div style="display:flex;gap:10px;align-items:flex-start;font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5"><span style="flex:none;width:5px;height:5px;border-radius:50%;background:var(--tk-accent);margin-top:8px"></span>{{ t }}</div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <!-- Instrutor -->
+      <section aria-labelledby="instrutor" data-screen-label="Instrutor" style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass);padding:32px">
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:20px">Seu instrutor</div>
+        <div style="display:flex;gap:24px;align-items:flex-start">
+          <div style="flex:none;width:104px;height:104px">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="foto-instrutor" shape="circle" placeholder="Foto do instrutor" hint-size="104px,104px"></x-import>
+          </div>
+          <div style="min-width:0">
+            <h2 id="instrutor" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-subhead-lg);letter-spacing:-0.01em;color:var(--tk-ink);margin:0 0 4px">Prof. Ricardo Almeida</h2>
+            <div style="font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-accent);margin-bottom:12px">Especialista em Licitações e Contratos Administrativos</div>
+            <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.6;margin:0 0 16px;text-wrap:pretty">Mestre em Direito Administrativo, com mais de 18 anos de atuação em órgãos de controle e assessoria a comissões de contratação. Conduziu a implantação da Lei 14.133/21 em dezenas de órgãos públicos e é autor de manuais práticos adotados por equipes de compras em todo o país.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span class="rh-chip" style="padding:6px 12px;font-size:var(--tk-text-caption)">+120 turmas ministradas</span>
+              <span class="rh-chip" style="padding:6px 12px;font-size:var(--tk-text-caption)">+4.800 alunos</span>
+              <span class="rh-chip" style="padding:6px 12px;font-size:var(--tk-text-caption)">Avaliação média 4,9/5</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Depoimento -->
+      <section data-screen-label="Depoimento" style="position:relative;background:var(--tk-cream);border:1px solid var(--tk-cream-dark);border-radius:var(--tk-radius-card);padding:36px 40px;overflow:hidden">
+        <svg aria-hidden="true" width="76" height="76" viewBox="0 0 24 24" fill="none" style="position:absolute;top:-8px;right:6px;color:var(--tk-brand);opacity:0.08"><path d="M4 15c0-4.5 2.5-8 7-10l1 1.8C9.4 8.2 8.2 9.8 8 11.5c.3-.1.7-.2 1.1-.2 1.9 0 3.2 1.4 3.2 3.3 0 2-1.5 3.4-3.5 3.4C6.3 18 4 16.9 4 15zm10.5 0c0-4.5 2.5-8 7-10l1 1.8c-2.6 1.4-3.8 3-4 4.7.3-.1.7-.2 1.1-.2 1.9 0 3.2 1.4 3.2 3.3 0 2-1.5 3.4-3.5 3.4-2.5 0-4.8-1.1-4.8-3z" fill="currentColor"/></svg>
+        <div style="position:relative;display:grid;grid-template-columns:auto 1fr;gap:28px;align-items:center">
+          <div style="flex:none;width:88px;height:88px;border-radius:50%;box-shadow:0 0 0 4px #fff, 0 8px 20px -6px rgba(0,0,0,0.18)">
+            <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="foto-depoimento" shape="circle" placeholder="Foto" hint-size="88px,88px"></x-import>
+          </div>
+          <div style="min-width:0">
+            <div style="display:flex;gap:2px;margin-bottom:12px" aria-label="Avaliação 5 de 5">
+              <sc-for list="{{ estrelas }}" as="s" hint-placeholder-count="5">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#e8a33d"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6-4.5-4.2 6.1-.7z"/></svg>
+              </sc-for>
+            </div>
+            <blockquote style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.5;color:var(--tk-ink);margin:0 0 18px;text-wrap:pretty">"Saí do curso com o checklist pronto para revisar nossos editais. Na semana seguinte já estávamos aplicando o novo fluxo de planejamento da contratação — sem retrabalho e com respaldo jurídico."</blockquote>
+            <div style="font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink)">Mariana Ferreira</div>
+            <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:1px">Pregoeira · Prefeitura de Campinas</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section aria-labelledby="faq" data-screen-label="FAQ" style="text-align:center">
+        <h2 id="faq" style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;color:var(--tk-ink);margin:0 0 8px">Perguntas frequentes</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);color:var(--tk-ink-muted);margin:0 auto 24px;max-width:46ch">Tudo o que você precisa saber antes de se inscrever.</p>
+        <div style="display:grid;gap:10px;text-align:left;max-width:640px;margin:0 auto">
+          <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="6">
+            <div class="rh-acc" style="border-radius:12px">
+              <button type="button" class="rh-accbtn" onclick="{{ toggleFaq }}" data-i="{{ $index }}" aria-expanded="{{ f.expanded }}" style="padding:16px 20px">
+                <span style="font-size:var(--tk-text-body);font-weight:600;color:var(--tk-ink)">{{ f.q }}</span>
+                <svg class="rh-caret" data-open="{{ f.open }}" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <sc-if value="{{ f.isOpen }}" hint-placeholder-val="{{ false }}">
+                <p style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.6;margin:0;padding:0 20px 18px">{{ f.a }}</p>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </main>
+
+    <!-- --- Sticky enrollment aside --- -->
+    <aside style="position:sticky;top:24px;display:grid;gap:16px" data-screen-label="Card de inscrição">
+      <div style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-card);overflow:hidden">
+        <div style="height:180px">
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="imagem-curso" shape="rect" placeholder="Imagem do curso" hint-size="100%,180px"></x-import>
+        </div>
+        <div style="padding:26px 26px 28px">
+          <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-bottom:2px">Investimento por participante</div>
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px">
+            <span style="font-family:var(--tk-font-display);font-weight:700;font-size:34px;color:var(--tk-brand);letter-spacing:-0.01em">R$ 1.290</span>
+            <span style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);text-decoration:line-through">R$ 1.590</span>
+          </div>
+          <div style="font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-bottom:20px">até 6x de R$ 215 sem juros · ou empenho para órgãos públicos</div>
+
+          <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:10px">Próximas turmas</div>
+          <div style="display:grid;gap:8px;margin-bottom:20px" role="radiogroup" aria-label="Escolha a turma">
+            <sc-for list="{{ turmas }}" as="t" hint-placeholder-count="3">
+              <button type="button" class="rh-turma" data-on="{{ t.on }}" role="radio" aria-checked="{{ t.checked }}" onclick="{{ pickTurma }}" data-i="{{ $index }}">
+                <span style="flex:none;width:16px;height:16px;border-radius:50%;border:2px solid {{ t.dotBorder }};background:{{ t.dotFill }};box-shadow:inset 0 0 0 2.5px #fff"></span>
+                <span style="min-width:0;flex:1">
+                  <span style="display:block;font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink)">{{ t.data }}</span>
+                  <span style="display:block;font-size:var(--tk-text-caption);color:var(--tk-ink-muted);margin-top:1px">{{ t.detalhe }}</span>
+                </span>
+                <span style="flex:none;font-size:11px;font-weight:600;color:{{ t.spotColor }};background:{{ t.spotBg }};padding:4px 9px;border-radius:var(--tk-radius-pill)">{{ t.vagas }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ inscrito }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#e6f4ef;border:1px solid #bfe3d5;border-radius:12px;padding:14px 16px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start">
+              <span class="rh-check" style="background:#068466;color:#fff"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              <div style="font-size:var(--tk-text-body-sm);color:#0a5c48;line-height:1.5"><strong>Pré-inscrição registrada!</strong> Nossa equipe entra em contato em até 1 dia útil com o link de pagamento para a turma de {{ turmaEscolhida }}.</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ naoInscrito }}" hint-placeholder-val="{{ true }}">
+            <button type="button" onclick="{{ inscrever }}" style="width:100%;background:var(--tk-brand);color:#fff;border:none;border-radius:8px;padding:16px 20px;font-family:var(--tk-font-body);font-size:15px;font-weight:600;cursor:pointer;transition:background .2s" style-hover="background:var(--tk-brand-hover)">Garantir minha vaga →</button>
+          </sc-if>
+          <div style="display:flex;justify-content:center;margin-top:10px">
+            <a href="#" style="font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-accent);text-decoration:none">Inscrever um grupo (3+ pessoas) →</a>
+          </div>
+
+          <div style="border-top:1px solid var(--tk-line);margin-top:20px;padding-top:20px;display:grid;gap:10px">
+            <sc-for list="{{ incluso }}" as="i" hint-placeholder-count="5">
+              <div style="display:flex;gap:10px;align-items:flex-start;font-size:var(--tk-text-body-sm);color:var(--tk-ink);line-height:1.45"><span class="rh-check"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>{{ i }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ mostrarGarantia }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:16px;padding:18px 20px;display:flex;gap:12px;align-items:flex-start">
+          <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" style="flex:none;color:var(--tk-brand);margin-top:2px"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m9.5 11.8 1.8 1.8 3.4-3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5"><strong style="color:var(--tk-ink)">Garantia de satisfação.</strong> Cancele até 7 dias antes do início e receba 100% do valor de volta, sem burocracia.</div>
+        </div>
+      </sc-if>
+
+      <div style="background:var(--tk-accent-soft);border:1px solid #bfe0e9;border-radius:16px;padding:18px 20px">
+        <div style="font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-ink);margin-bottom:4px">Dúvidas sobre a inscrição?</div>
+        <div style="font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.5;margin-bottom:12px">Fale com nossa equipe comercial — respondemos em horário comercial.</div>
+        <a href="#" style="font-size:var(--tk-text-body-sm);font-weight:600;color:var(--tk-brand);text-decoration:none">Chamar no WhatsApp →</a>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===== In-company cross-sell ===== -->
+  <section style="background:var(--tk-cream);border-top:1px solid var(--tk-cream-dark);padding:56px 0;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:flex;align-items:center;justify-content:space-between;gap:40px;flex-wrap:wrap">
+      <div style="max-width:56ch">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Badge" tone="brand" hint-size="auto,26px">Para equipes</x-import>
+        <h2 style="font-family:var(--tk-font-display);font-weight:700;font-size:var(--tk-text-section);letter-spacing:-0.02em;line-height:1.15;color:var(--tk-ink);margin:14px 0 8px;text-wrap:balance">Quer este curso dentro da sua organização?</h2>
+        <p style="font-family:var(--tk-font-serif);font-weight:300;font-size:var(--tk-text-subhead);line-height:1.45;color:var(--tk-ink-muted);margin:0">Levamos este conteúdo para o seu time, adaptado ao seu contexto e ao seu calendário — presencial ou online.</p>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="primary" size="lg" hint-size="200px,52px">Conhecer in-company →</x-import>
+        <x-import component-from-global-scope="TrustKeithDesignSystem_e3aaec.Button" variant="secondary" size="lg" hint-size="180px,52px">Solicitar proposta</x-import>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer style="background:var(--tk-surface-2);border-top:1px solid var(--tk-border);padding:56px 0 40px;font-family:var(--tk-font-body)">
+    <div class="rh-wrap" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px">
+      <div>
+        <img src="uploads/logoHorizontal_800X600.png" alt="RH Cursos e Treinamento Empresarial" style="height:48px;width:auto;display:block;margin-bottom:2px">
+        <p style="font-family:var(--tk-font-body);font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);line-height:1.55;margin:16px 0 0;max-width:34ch">Cursos, treinamento in-company e consultoria para organizações públicas e privadas.</p>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Ofertas</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="RH Cursos Catálogo.dc.html" style="color:var(--tk-ink);text-decoration:none">Cursos abertos</a><a href="RH Cursos Agenda.dc.html" style="color:var(--tk-ink);text-decoration:none">Agenda</a><a href="RH Cursos In-company.dc.html" style="color:var(--tk-ink);text-decoration:none">In-company</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Consultoria</a></div>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Empresa</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="RH Cursos Quem Somos.dc.html" style="color:var(--tk-ink);text-decoration:none">Sobre</a><a href="RH Cursos Blog.dc.html" style="color:var(--tk-ink);text-decoration:none">Blog</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Instrutores</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Contato</a></div>
+      </div>
+      <div>
+        <div style="font-size:var(--tk-text-caption);font-weight:600;letter-spacing:var(--tk-tracking-eyebrow);text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:16px">Acesso</div>
+        <div style="display:grid;gap:10px;font-size:var(--tk-text-body-sm)"><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do aluno</a><a href="#" style="color:var(--tk-ink);text-decoration:none">Área do instrutor</a><a href="RH Cursos Login.dc.html" style="color:var(--tk-ink);text-decoration:none">Entrar</a></div>
+      </div>
+    </div>
+    <div class="rh-wrap" style="border-top:1px solid var(--tk-border);margin-top:40px;padding-top:24px;font-size:var(--tk-text-caption);color:var(--tk-ink-muted)">© 2026 RH Cursos. Todos os direitos reservados.</div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;mostrarUrgencia&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Inscrição&quot; },
+  &quot;vagasRestantes&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 8, &quot;min&quot;: 0, &quot;max&quot;: 40, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Inscrição&quot; },
+  &quot;mostrarGarantia&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Inscrição&quot; }
+}">
+class Component extends DCLogic {
+  state = { turma: 0, moduloAberto: 0, faqAberto: -1, inscrito: false };
+
+  dadosTurmas() {
+    return [
+      { data: "12–15 Ago 2026", detalhe: "Online ao vivo · 19h–23h", vagas: "Últimas vagas", spotColor: "#ea384c", spotBg: "#fdecee" },
+      { data: "14–17 Set 2026", detalhe: "Online ao vivo · 19h–23h", vagas: "Abertas", spotColor: "#068466", spotBg: "#e6f4ef" },
+      { data: "19–22 Out 2026", detalhe: "Presencial · Brasília/DF", vagas: "Abertas", spotColor: "#068466", spotBg: "#e6f4ef" }
+    ];
+  }
+
+  renderVals() {
+    const turmas = this.dadosTurmas().map((t, i) => {
+      const on = i === this.state.turma;
+      return { ...t, on: on ? "1" : "0", checked: on ? "true" : "false",
+        dotBorder: on ? "var(--tk-brand)" : "var(--tk-border)",
+        dotFill: on ? "var(--tk-brand)" : "#fff" };
+    });
+
+    const modulosBase = [
+      { num: "01", title: "Fundamentos e planejamento da contratação", carga: "4h · ETP, TR e mapa de riscos", topicos: [
+        "Estrutura e princípios da Lei 14.133/21: o que muda de verdade em relação à 8.666/93",
+        "Estudo Técnico Preliminar (ETP): roteiro passo a passo com modelo editável",
+        "Termo de Referência e projeto básico: erros que travam a contratação",
+        "Matriz de riscos: quando é obrigatória e como preenchê-la" ] },
+      { num: "02", title: "Modalidades, procedimento e julgamento", carga: "4h · pregão, concorrência e diálogo competitivo", topicos: [
+        "Escolha da modalidade e dos critérios de julgamento caso a caso",
+        "Pregão e concorrência no rito da nova lei: fases, prazos e inversões",
+        "Diálogo competitivo: quando faz sentido e como conduzir",
+        "Modos de disputa aberto, fechado e combinado na prática" ] },
+      { num: "03", title: "Contratação direta e instrumentos auxiliares", carga: "4h · dispensa, inexigibilidade e SRP", topicos: [
+        "Novos limites de dispensa e o processo eletrônico de contratação direta",
+        "Inexigibilidade: credenciamento e os requisitos de justificativa",
+        "Sistema de Registro de Preços: adesões, caronas e limites",
+        "Pré-qualificação e procedimento de manifestação de interesse (PMI)" ] },
+      { num: "04", title: "Gestão, fiscalização e sanções contratuais", carga: "4h · execução, aditivos e penalidades", topicos: [
+        "Papéis do gestor e do fiscal de contrato: designação e responsabilização",
+        "Alterações contratuais, reajuste, repactuação e reequilíbrio",
+        "Recebimento provisório e definitivo: fluxo documental completo",
+        "Sanções e o processo de responsabilização de fornecedores" ] }
+    ];
+    const modulos = modulosBase.map((m, i) => {
+      const open = i === this.state.moduloAberto;
+      return { ...m, isOpen: open, open: open ? "1" : "0", expanded: open ? "true" : "false" };
+    });
+
+    const faqsBase = [
+      { q: "Como funciona o pagamento para órgãos públicos?", a: "Aceitamos empenho ou nota de empenho. Após a pré-inscrição, enviamos a documentação completa da empresa (certidões, dados bancários e proposta) para o setor de compras do seu órgão. A vaga fica reservada durante o trâmite." },
+      { q: "O certificado é reconhecido?", a: "Sim. Você recebe certificado digital de 16 horas com conteúdo programático detalhado, válido para progressão funcional e comprovação de capacitação, emitido em até 5 dias úteis após a conclusão." },
+      { q: "E se eu perder um encontro ao vivo?", a: "Todos os encontros são gravados e ficam disponíveis por 90 dias na área do aluno, junto com o material de apoio, os modelos e as respostas às perguntas do chat." },
+      { q: "Que material recebo com o curso?", a: "Apostila atualizada, slides das aulas, e um pacote de modelos editáveis: ETP, Termo de Referência, matriz de riscos, checklist de edital e fluxos de fiscalização de contratos." },
+      { q: "Posso transferir minha inscrição para outra turma ou pessoa?", a: "Sim. Até 3 dias antes do início você pode transferir a inscrição para outra turma do mesmo curso ou indicar outra pessoa da sua organização, sem custo." },
+      { q: "Há desconto para grupos?", a: "Sim. A partir de 3 inscrições da mesma organização o desconto é de 10%; a partir de 5, 15%. Para times maiores, o formato in-company costuma ser mais vantajoso — fale com nossa equipe." }
+    ];
+    const faqs = faqsBase.map((f, i) => {
+      const open = i === this.state.faqAberto;
+      return { ...f, isOpen: open, open: open ? "1" : "0", expanded: open ? "true" : "false" };
+    });
+
+    return {
+      mostrarUrgencia: (this.props.mostrarUrgencia ?? true) && (this.props.vagasRestantes ?? 8) > 0,
+      vagasRestantes: this.props.vagasRestantes ?? 8,
+      mostrarGarantia: this.props.mostrarGarantia ?? true,
+      estrelas: [1, 2, 3, 4, 5],
+      beneficios: [
+        { t: "Aplicar a Lei 14.133/21 com segurança", d: "Entenda a lógica da nova lei e saiba fundamentar cada decisão do processo de contratação." },
+        { t: "Elaborar ETP e Termo de Referência", d: "Documentos de planejamento completos, usando os modelos editáveis entregues no curso." },
+        { t: "Escolher a modalidade certa", d: "Critérios objetivos para definir modalidade, rito e forma de julgamento em cada contratação." },
+        { t: "Conduzir contratações diretas", d: "Dispensa e inexigibilidade nos novos limites, com processo eletrônico documentado." },
+        { t: "Gerir e fiscalizar contratos", d: "Papéis de gestor e fiscal, aditivos, recebimento e sanções sem risco de responsabilização." },
+        { t: "Evitar apontamentos de controle", d: "Os erros mais autuados por tribunais de contas e como blindar seus processos." }
+      ],
+      publico: [
+        "Agentes de contratação, pregoeiros e comissões",
+        "Gestores e fiscais de contratos",
+        "Assessorias jurídicas e controle interno",
+        "Fornecedores que vendem para o setor público"
+      ],
+      modulos, faqs, turmas,
+      incluso: [
+        "16h de aulas ao vivo + gravações por 90 dias",
+        "Apostila e slides atualizados",
+        "Modelos editáveis (ETP, TR, matriz de riscos)",
+        "Certificado digital de 16 horas",
+        "Canal de dúvidas com o instrutor por 30 dias"
+      ],
+      inscrito: this.state.inscrito,
+      naoInscrito: !this.state.inscrito,
+      turmaEscolhida: this.dadosTurmas()[this.state.turma].data,
+      pickTurma: (e) => this.setState({ turma: Number(e.currentTarget.getAttribute("data-i")), inscrito: false }),
+      toggleModulo: (e) => { const i = Number(e.currentTarget.getAttribute("data-i")); this.setState(s => ({ moduloAberto: s.moduloAberto === i ? -1 : i })); },
+      toggleFaq: (e) => { const i = Number(e.currentTarget.getAttribute("data-i")); this.setState(s => ({ faqAberto: s.faqAberto === i ? -1 : i })); },
+      inscrever: () => this.setState({ inscrito: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

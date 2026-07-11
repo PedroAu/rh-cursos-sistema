@@ -1,0 +1,43 @@
+/* Trust Keith — Color tokens
+ * Brand teal anchors trust/authority (CTAs only); bright blue is the high-frequency
+ * UI accent (links, secondary actions). Grays never go true-black. Shadows are
+ * always dark-tinted, never colored. Cream accents humanize the technical product.
+ */
+
+:root {
+  /* ---- Brand & accent ---- */
+  --tk-brand: #235875;          /* Trust Keith teal — primary CTAs, logo, authority */
+  --tk-brand-hover: #194359;    /* darker teal — primary button hover */
+  --tk-accent: #4285f4;         /* bright blue — links, secondary CTAs, highlights */
+  --tk-accent-strong: #2459b3;  /* darker blue — secondary action hover */
+  --tk-accent-soft: #e0eeff;    /* light blue — hover bg for blue-accented elements */
+  --tk-focus: #4d65ff;          /* focus ring blue */
+
+  /* ---- Neutral scale (no true black) ---- */
+  --tk-ink: #222525;            /* default heading & body text */
+  --tk-ink-muted: #4f5057;      /* secondary / muted text */
+  --tk-line: #ebebeb;           /* borders, dividers, nav surface */
+  --tk-surface-2: #fafafa;      /* subtle background tint / alt rows */
+  --tk-surface: #ffffff;        /* primary surface, cards */
+  --tk-black-8: rgba(0,0,0,0.08); /* universal shadow overlay / hairline */
+  --tk-black-5: rgba(0,0,0,0.05); /* secondary button fill */
+
+  /* ---- Warm cream accents ---- */
+  --tk-cream: #fffaf4;          /* warm featured/testimonial backgrounds */
+  --tk-cream-dark: #c3b6aa;     /* cream-context dividers/accents */
+
+  /* ---- Semantic ---- */
+  --tk-success: #068466;        /* confirmation, positive states */
+  --tk-error: #ea384c;          /* alerts, destructive actions */
+
+  /* ---- Semantic aliases ---- */
+  --tk-text: var(--tk-ink);
+  --tk-text-muted: var(--tk-ink-muted);
+  --tk-border: var(--tk-line);
+  --tk-bg: var(--tk-surface);
+  --tk-bg-alt: var(--tk-surface-2);
+  --tk-bg-warm: var(--tk-cream);
+  --tk-cta: var(--tk-brand);
+  --tk-cta-hover: var(--tk-brand-hover);
+  --tk-link: var(--tk-accent);
+}
