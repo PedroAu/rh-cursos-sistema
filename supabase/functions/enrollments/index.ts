@@ -4,6 +4,7 @@
 // (SECURITY DEFINER — valida turma, vagas e cria aluno + inscrição atomicamente).
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
+import { getEnrollmentErrorMessage } from "../_shared/enrollment-errors.ts";
 import { anonClient } from "../_shared/supabase.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
 import { enrollmentSchema, type EnrollmentInput } from "../_shared/validation.ts";
@@ -77,6 +78,10 @@ Deno.serve(async (request) => {
     });
   } catch (error) {
     console.error("enrollments.create error:", error instanceof Error ? error.message : error);
-    return jsonResponse({ ok: false, error: "Erro ao registrar inscrição." }, 500, request);
+    return jsonResponse(
+      { ok: false, error: getEnrollmentErrorMessage(error) ?? "Erro ao registrar inscrição." },
+      500,
+      request
+    );
   }
 });

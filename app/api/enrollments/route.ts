@@ -4,6 +4,7 @@ import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { enrollmentSchema, type EnrollmentInput } from "@/lib/validation";
+import { getEnrollmentErrorMessage } from "../../../supabase/functions/_shared/enrollment-errors";
 
 function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Servidor" {
   if (type === "Empresa") return "PJ";
@@ -76,6 +77,9 @@ export async function POST(request: Request) {
     );
   } catch (error) {
     logger.error("api/enrollments.create error", { err: error, route: "api/enrollments" });
-    return NextResponse.json({ ok: false, error: "Erro ao registrar inscrição." }, { status: 500 });
+    return NextResponse.json(
+      { ok: false, error: getEnrollmentErrorMessage(error) ?? "Erro ao registrar inscrição." },
+      { status: 500 }
+    );
   }
 }

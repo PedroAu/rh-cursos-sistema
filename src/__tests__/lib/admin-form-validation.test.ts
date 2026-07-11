@@ -163,6 +163,7 @@ describe('validateStudent', () => {
       name: 'Ana',
       email: 'ana@example.com',
       organization: 'ACME',
+      enrollmentStatus: 'active',
     });
     expect(result.valid).toBe(true);
   });
@@ -172,12 +173,18 @@ describe('validateStudent', () => {
       name: 'Ana',
       email: 'ana-at-example',
       organization: 'ACME',
+      enrollmentStatus: 'active',
     });
     expect(getErrorMessage(result.errors, 'email')).toBe('Email inválido');
   });
 
   it('flags a missing organization', () => {
-    const result = validateStudent({ name: 'Ana', email: 'ana@example.com', organization: '' });
+    const result = validateStudent({
+      name: 'Ana',
+      email: 'ana@example.com',
+      organization: '',
+      enrollmentStatus: 'active',
+    });
     expect(getErrorMessage(result.errors, 'organization')).toBeDefined();
   });
 });

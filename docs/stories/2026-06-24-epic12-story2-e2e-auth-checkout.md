@@ -141,6 +141,7 @@ GPT-5 Codex
 - `node scripts/run-playwright.mjs tests/api-contract.spec.ts tests/checkout.e2e.spec.ts tests/login-errors.spec.ts --project=functional` — 17 passed
 - `node scripts/run-playwright.mjs tests/public-journeys.spec.ts tests/api-contract.spec.ts tests/checkout.e2e.spec.ts tests/login-errors.spec.ts --project=functional` — 21 passed
 - `npm test` — 124 passed
+- 2026-07-11 - `app/api/enrollments/route.ts`, `supabase/functions/enrollments/index.ts` e `supabase/functions/_shared/enrollment-errors.ts` passaram a traduzir erros conhecidos da RPC para mensagens operacionais de checkout, evitando o fallback genérico para falhas de turma/vagas/duplicidade.
 
 ### Completion Notes List
 
