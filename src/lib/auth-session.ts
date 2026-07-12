@@ -1,4 +1,5 @@
 export const SESSION_TTL_MS = 30 * 60 * 1000;
+export const REMEMBER_SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 export const SESSION_REFRESH_THRESHOLD_MS = 5 * 60 * 1000;
 
 type ExpiringSession = {

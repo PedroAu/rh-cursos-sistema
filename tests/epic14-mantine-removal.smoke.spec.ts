@@ -28,14 +28,15 @@ test.describe("epic 14 smoke — mantine removal", () => {
     await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
   });
 
-  test("login renderiza e alterna papel sem erro de runtime", async ({ page }) => {
+  test("login renderiza o card centralizado sem erro de runtime", async ({ page }) => {
     const runtimeErrors = attachRuntimeErrorProbe(page);
     await page.goto("/login?next=/admin");
 
-    await expect(page.getByRole("heading", { name: "Acesse sua conta" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Administração" })).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("button", { name: /Aluno Acompanhe inscrições/i }).click();
-    await expect(page.getByRole("button", { name: /Aluno Acompanhe inscrições/i })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("heading", { name: "Bem-vindo de volta" })).toBeVisible();
+    await expect(page.getByLabel("E-mail")).toBeVisible();
+    await expect(page.getByLabel("Manter conectado")).toBeChecked();
+    await page.getByText("Manter conectado").click();
+    await expect(page.getByLabel("Manter conectado")).not.toBeChecked();
     expect(runtimeErrors).toEqual([]);
   });
 

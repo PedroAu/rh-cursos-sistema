@@ -9,7 +9,7 @@ import {
   normalizeDashboardRole,
   SESSION_COOKIE
 } from "@/lib/auth";
-import { SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
+import { REMEMBER_SESSION_TTL_MS, SESSION_TTL_MS, shouldRotateSession } from "@/lib/auth-session";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
@@ -32,22 +32,23 @@ function toSessionPayload(session: {
 }
 
 async function buildSessionResponse(
-  session: { role: DashboardRole; email: string; name: string },
+  session: { role: DashboardRole; email: string; name: string; remember?: boolean },
   options?: {
     supabaseSession?: { access_token: string; refresh_token: string } | null;
     rotated?: boolean;
   }
 ) {
-  const token = await encodeSession(session, SESSION_TTL_MS);
+  const ttlMs = session.remember ? REMEMBER_SESSION_TTL_MS : SESSION_TTL_MS;
+  const token = await encodeSession(session, ttlMs);
   const response = NextResponse.json({
     ok: true,
-    session,
+    session: toSessionPayload(session),
     token,
     rotated: options?.rotated ?? false,
     supabaseSession: options?.supabaseSession ?? null
   });
 
-  response.cookies.set(SESSION_COOKIE, token, getCookieOptions());
+  response.cookies.set(SESSION_COOKIE, token, getCookieOptions(ttlMs));
   return response;
 }
 
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
   }
 
   if (shouldRotateSession(session)) {
-    return buildSessionResponse(toSessionPayload(session), { rotated: true });
+    return buildSessionResponse({ ...toSessionPayload(session), remember: session.remember }, { rotated: true });
   }
 
   return NextResponse.json({
@@ -94,14 +95,14 @@ export async function POST(request: Request) {
   }
 
   const body = (await request.json().catch(() => null)) as
-    | { role?: string; email?: string; password?: string }
+    | { email?: string; password?: string; remember?: boolean }
     | null;
 
-  const role = normalizeDashboardRole(body?.role);
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
+  const remember = body?.remember === true;
 
-  if (!role || !email || !password) {
+  if (!email || !password) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
   }
 
@@ -130,7 +131,7 @@ export async function POST(request: Request) {
   }
 
   const metadataRole = normalizeDashboardRole(result.data.user.app_metadata?.role);
-  if (!metadataRole || metadataRole !== role) {
+  if (!metadataRole) {
     return NextResponse.json({ ok: false, error: "Acesso nao autorizado." }, { status: 403 });
   }
 
@@ -140,7 +141,8 @@ export async function POST(request: Request) {
     name:
       typeof result.data.user.user_metadata?.name === "string"
         ? result.data.user.user_metadata.name
-        : email.split("@")[0]
+        : email.split("@")[0],
+    remember
   } as const;
 
   const response = await buildSessionResponse(session, {

@@ -112,14 +112,14 @@ test.describe("epica 4 — jornadas publicas", () => {
     await expect(page.getByText(/Recebemos os seus dados\./)).toBeVisible();
   });
 
-  test("login deixa a escolha de papel previsível", async ({ page }) => {
+  test("login exibe o card centralizado sem seleção manual de papel", async ({ page }) => {
     await page.goto("/login?status=required&next=/admin");
 
-    await expect(page.getByRole("button", { name: /Administração/ })).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("button", { name: /Aluno/ }).click();
-    await expect(page.getByRole("button", { name: /Aluno/ })).toHaveAttribute("aria-pressed", "true");
-    await page.getByRole("button", { name: /Instrutor/ }).click();
-    await expect(page.getByRole("button", { name: /Instrutor/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("heading", { name: "Bem-vindo de volta" })).toBeVisible();
+    await expect(page.getByLabel("E-mail")).toBeVisible();
+    await expect(page.getByLabel("Senha")).toBeVisible();
+    await expect(page.getByLabel("Manter conectado")).toBeChecked();
+    await expect(page.getByRole("banner")).toHaveCount(0);
   });
 
   test("sobre e artigo reforçam leitura institucional e taxonomia", async ({ page }) => {

@@ -1,0 +1,41 @@
+schema: 1
+story: 'LOGIN-RD.1'
+gate: PASS
+status_reason: 'Todos os 7 AC atendidos e verificados; D1 (papel via app_metadata.role, sem role na request) e D2 (persistência real via remember) corretamente implementados, sem regressão de auth. Apenas 1 nota cosmética de baixa severidade.'
+reviewer: 'Quinn'
+updated: '2026-07-12T14:45:00Z'
+
+evidence:
+  lint: '0 erros (19 warnings pré-existentes, nenhum nos arquivos do login)'
+  typecheck: '0 erros (tsc --noEmit)'
+  unit_tests: 'vitest 426/426 passed (35 arquivos)'
+  e2e_tests: 'playwright route-auth + login-errors + epic14 smoke: 34/34 passed'
+  visual: 'baseline desktop/mobile + snapshot de governança confirmam card centralizado, badge de portal, H1 Fraunces e CTA teal; visual-verdict 92/100 (dev)'
+
+acceptance_criteria:
+  AC1_layout_centralizado: PASS   # card único 400px, fundo radial, sem shell público (BarePageShell)
+  AC2_branding_tokens: PASS       # logo horizontal + badge, radius/sombra/Fraunces, CTA --tk-cta
+  AC3_papel_backend_D1: PASS      # role derivado de app_metadata.role; role da UI sequer lido; 403 sem papel
+  AC4_formulario_estados: PASS    # validação Zod, alerta inline role="alert", botão loading
+  AC5_acoes_manter_conectado_D2: PASS  # remember → TTL 30d vs 30min, persistido no token e na rotação
+  AC6_responsivo_acessivel: PASS  # baseline mobile ok, focus/labels/aria preservados
+  AC7_sem_regressao_auth: PASS    # route-auth/login-errors verdes com novo contrato sem role
+
+top_issues:
+  - id: 'DOC-001'
+    severity: low
+    finding: 'O subtítulo genérico do card repete o texto do H1 ("Bem-vindo de volta. Entre com suas credenciais." sob o H1 "Bem-vindo de volta").'
+    suggested_action: 'Ajustar a cópia do subtítulo fallback para não repetir a headline (ex.: "Entre com suas credenciais para acessar o portal"). Não bloqueante.'
+
+waiver: { active: false }
+
+notes: |
+  Observações informativas (fora do escopo desta story, sem impacto no gate):
+  - AUTH_SESSION_SECRET usa fallback dev-insecure com warning quando ausente; garantir que esteja
+    setado no ambiente de produção (Cloudflare) antes do go-live de 02/07/2026.
+  - Cookie de sessão: httpOnly + sameSite=lax + secure em produção — adequado.
+
+handoff:
+  next_agent: '@devops'
+  next_command: '*push'
+  condition: 'Gate PASS — pronto para commit/push (após ajuste opcional de DOC-001)'

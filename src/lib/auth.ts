@@ -9,6 +9,8 @@ export type DemoSession = {
   name: string;
   /** Epoch ms de expiração da sessão assinada. */
   exp?: number;
+  /** Se true, a sessão foi emitida com TTL longo ("Manter conectado"). */
+  remember?: boolean;
 };
 
 export const SESSION_COOKIE = "rh_cursos_demo_session";
@@ -117,7 +119,8 @@ export async function decodeSession(value?: string): Promise<DemoSession | null>
       role: parsed.role,
       email: parsed.email,
       name: parsed.name,
-      exp: parsed.exp
+      exp: parsed.exp,
+      ...(parsed.remember ? { remember: true } : {})
     };
   } catch {
     return null;

@@ -179,7 +179,6 @@ test.describe("contrato da rota /api/auth/session", () => {
     });
     const loginResponse = await page.request.post("/api/auth/session", {
       data: {
-        role: "student",
         email: credentials.email,
         password: credentials.password
       }

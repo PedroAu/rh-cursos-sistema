@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { AlertCircle, ShieldCheck } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,14 +11,15 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
-import type { DashboardRole } from "@/lib/auth";
 import { useNavigate } from "@/lib/router-compat";
 import { useAppStore } from "@/lib/app-store";
 import { getDefaultDashboardPath, isRolePathAllowed } from "@/lib/session-routing";
 import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
 import { supabase } from "@/lib/supabase/client";
+import type { DashboardRole } from "@/lib/auth";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -33,37 +34,38 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const roleOptions: Array<{
-  role: DashboardRole;
-  label: string;
-  description: string;
-}> = [
-  {
-    role: "admin",
-    label: "Administração",
-    description: "Acesso ao painel operacional e cadastro."
+const portalCopy: Record<string, { badge: string; subtitle: string }> = {
+  "/login/aluno": {
+    badge: "Portal do aluno",
+    subtitle: "Acesse seus cursos, certificados e materiais."
   },
-  {
-    role: "student",
-    label: "Aluno",
-    description: "Acompanhe inscrições e contexto das suas turmas."
-  },
-  {
-    role: "instructor",
-    label: "Instrutor",
-    description: "Visualize turmas atribuídas e alunos vinculados."
+  "/login/instrutor": {
+    badge: "Portal do instrutor",
+    subtitle: "Acesse suas turmas, agendas e avaliações."
   }
-];
+};
+
+const defaultPortalCopy = {
+  badge: "Portal RH Cursos",
+  subtitle: "Entre com suas credenciais para acessar o portal."
+};
+
+function getPortalCopy(pathname: string | null) {
+  if (!pathname) return defaultPortalCopy;
+  return portalCopy[pathname] ?? defaultPortalCopy;
+}
 
 export function LoginPage() {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { setSession } = useAppStore();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<DashboardRole>("admin");
+  const [remember, setRemember] = useState(true);
   const status = searchParams.get("status");
   const nextPath = searchParams.get("next");
+  const { badge: badgeLabel, subtitle } = getPortalCopy(pathname);
   const {
     control,
     formState: { errors },
@@ -86,7 +88,7 @@ export function LoginPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ role: selectedRole, email: values.email, password: values.password })
+        body: JSON.stringify({ email: values.email, password: values.password, remember })
       });
 
       if (!response.ok) {
@@ -123,176 +125,142 @@ export function LoginPage() {
   };
 
   return (
-    <section className="min-h-[calc(100vh-4.5rem)]">
-      <div className="grid min-h-[calc(100vh-4.5rem)] lg:grid-cols-2">
-        <div className="relative hidden overflow-hidden bg-tk-brand-hover lg:block">
-          <Image
-            src="/images/in-company-hero-ai.png"
-            alt="Ambiente corporativo moderno da RH Cursos"
-            fill
-            sizes="50vw"
-            className="object-cover opacity-35"
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--tk-brand-hover)_78%,black),color-mix(in_srgb,var(--tk-brand-hover)_85%,transparent),color-mix(in_srgb,var(--tk-brand-hover)_45%,transparent))]" />
+    <section
+      className="flex min-h-screen flex-col items-center justify-center gap-7 px-6 py-12"
+      style={{ background: "radial-gradient(circle at 50% 20%, var(--tk-surface-2) 30%, var(--tk-surface) 100%)" }}
+    >
+      <div className="flex flex-col items-center gap-3.5">
+        <Image
+          src="/uploads/logoHorizontal_800X600.png"
+          alt="RH Cursos"
+          width={200}
+          height={52}
+          className="h-[52px] w-auto"
+          priority
+        />
+        <span className="rounded-tk-pill bg-tk-accent-soft px-3 py-1 text-[10px] font-bold uppercase tracking-[0.08em] text-tk-brand">
+          {badgeLabel}
+        </span>
+      </div>
 
-          <div className="relative flex h-full flex-col justify-between p-12 text-white">
-            <p className="font-tk-display text-[4rem] font-bold leading-none tracking-[var(--tk-tracking-display)]">
-              RH Cursos
-            </p>
+      <Card
+        className="w-[400px] max-w-full rounded-tk-card border-tk-line bg-tk-surface shadow-tk-card"
+        data-testid="ui-login-card"
+      >
+        <CardContent className="p-9 pb-8">
+          <h1 className="mb-1.5 text-center font-tk-display text-[25px] font-bold leading-[1.15] tracking-[var(--tk-tracking-display)] text-tk-ink">
+            Bem-vindo de volta
+          </h1>
+          <p className="mb-6 text-center text-body-small text-tk-ink-muted">{subtitle}</p>
 
-            <div className="space-y-8">
-              <p className="max-w-[480px] font-tk-display text-[2rem] font-bold leading-[1.15] tracking-[var(--tk-tracking-display)]">
-                Capacitação estratégica para profissionais que transformam a gestão pública e empresarial.
-              </p>
-
-              <div className="max-w-[420px] rounded-xl border border-white/20 bg-white/10 p-6">
-                <div className="flex items-start gap-4">
-                  <ShieldCheck className="mt-0.5 h-6 w-6 shrink-0 text-tk-accent" />
-                  <div className="space-y-1">
-                    <p className="font-tk-display text-lg font-bold tracking-[var(--tk-tracking-display)]">
-                      Certificado Reconhecido
-                    </p>
-                    <p className="text-sm leading-6 text-white/80">
-                      Qualidade técnica com foco em resultados práticos.
-                    </p>
-                  </div>
-                </div>
-              </div>
+          {status === "required" ? (
+            <div className="mb-5 rounded-lg border border-tk-accent/25 bg-tk-accent-soft px-4 py-3 text-sm text-tk-brand-hover">
+              Faça login para acessar {nextPath ?? "a área restrita"}.
             </div>
-          </div>
-        </div>
+          ) : null}
 
-        <div className="flex items-center justify-center px-6 py-12">
-          <Card className="w-full max-w-[560px] border-outline-variant bg-surface-container-lowest shadow-card" data-testid="ui-login-card">
-            <CardContent className="grid gap-8 p-8 md:p-10">
-              <div className="space-y-1.5">
-                <h1 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
-                  Acesse sua conta
-                </h1>
-                <p className="font-tk-serif text-subheading leading-relaxed text-tk-ink-muted">
-                  Bem-vindo de volta. Entre com suas credenciais.
-                </p>
+          <form
+            noValidate
+            className="grid grid-cols-1 gap-[18px]"
+            onSubmit={handleSubmit(handleValidSubmit, () => setError("Preencha e-mail e senha para continuar."))}
+          >
+            <Controller
+              control={control}
+              name="email"
+              render={({ field }) => (
+                <FormField error={errors.email?.message} label="E-mail" required>
+                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                    <Input
+                      id={fieldId}
+                      type="email"
+                      autoComplete="email"
+                      placeholder="voce@empresa.com.br"
+                      value={field.value}
+                      aria-describedby={ariaDescribedBy}
+                      aria-invalid={ariaInvalid}
+                      onFocus={() => setError(null)}
+                      onChange={field.onChange}
+                    />
+                  )}
+                </FormField>
+              )}
+            />
+
+            <Controller
+              control={control}
+              name="password"
+              render={({ field }) => (
+                <FormField error={errors.password?.message} label="Senha" required>
+                  {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
+                    <Input
+                      id={fieldId}
+                      type="password"
+                      autoComplete="current-password"
+                      placeholder="••••••••"
+                      value={field.value}
+                      aria-describedby={ariaDescribedBy}
+                      aria-invalid={ariaInvalid}
+                      onFocus={() => setError(null)}
+                      onChange={field.onChange}
+                    />
+                  )}
+                </FormField>
+              )}
+            />
+
+            <div className="-mt-0.5 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Checkbox id="login-remember" checked={remember} onCheckedChange={setRemember} />
+                <label htmlFor="login-remember" className="cursor-pointer text-body-small text-tk-ink-muted">
+                  Manter conectado
+                </label>
               </div>
-
-              {status === "required" ? (
-                <div className="rounded-lg border border-tk-accent/25 bg-tk-accent-soft px-4 py-3 text-sm text-tk-brand-hover">
-                  Faça login para acessar {nextPath || getDefaultDashboardPath(selectedRole)}.
-                </div>
-              ) : null}
-
-              <div className="grid gap-4 md:grid-cols-3">
-                {roleOptions.map((item) => (
-                  <button
-                    key={item.role}
-                    type="button"
-                    aria-pressed={selectedRole === item.role}
-                    onClick={() => {
-                      setSelectedRole(item.role);
-                      setError(null);
-                    }}
-                    className={[
-                      "rounded-xl border p-4 text-left transition-colors",
-                      selectedRole === item.role
-                        ? "border-tk-brand bg-tk-brand text-white"
-                        : "border-tk-line bg-tk-surface-2 text-tk-ink-muted"
-                    ].join(" ")}
-                  >
-                    <p className="text-sm font-bold">{item.label}</p>
-                    <p className={["mt-2 text-sm leading-6", selectedRole === item.role ? "text-white/80" : "text-tk-ink-muted"].join(" ")}>
-                      {item.description}
-                    </p>
-                  </button>
-                ))}
-              </div>
-
-              {error ? (
-                <div role="alert" className="rounded-lg border border-tk-error/25 bg-tk-error/10 px-4 py-3 text-sm text-tk-error">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                    <div>
-                      <p className="font-semibold">Falha ao entrar</p>
-                      <p className="mt-1">{error}</p>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
-
-              <form
-                noValidate
-                className="grid gap-5"
-                onSubmit={handleSubmit(handleValidSubmit, () => setError("Preencha e-mail e senha para continuar."))}
+              <Button
+                type="button"
+                variant="tertiary"
+                className="ml-auto"
+                onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}
               >
-                <Controller
-                  control={control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormField error={errors.email?.message} hint="Conta autorizada para o papel selecionado." label="E-mail" required>
-                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                        <Input
-                          id={fieldId}
-                          type="email"
-                          placeholder="voce@empresa.com.br"
-                          value={field.value}
-                          aria-describedby={ariaDescribedBy}
-                          aria-invalid={ariaInvalid}
-                          onFocus={() => setError(null)}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    </FormField>
-                  )}
-                />
+                Esqueci minha senha
+              </Button>
+            </div>
 
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormField
-                      error={errors.password?.message}
-                      hint={`Perfil atual: ${roleOptions.find((item) => item.role === selectedRole)?.label ?? selectedRole}.`}
-                      label="Senha"
-                      required
-                    >
-                      {({ fieldId, ariaDescribedBy, ariaInvalid }) => (
-                        <Input
-                          id={fieldId}
-                          type="password"
-                          placeholder="Sua senha de acesso"
-                          value={field.value}
-                          aria-describedby={ariaDescribedBy}
-                          aria-invalid={ariaInvalid}
-                          onFocus={() => setError(null)}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    </FormField>
-                  )}
-                />
-
-                <Button type="submit" loading={isSubmitting} size="lg" className="w-full">
-                  Entrar
-                </Button>
-              </form>
-
-              <div className="h-px w-full bg-outline-variant" />
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="justify-start px-0 text-tk-brand hover:bg-transparent hover:text-tk-brand/85"
-                  onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}
-                >
-                  Esqueci minha senha
-                </Button>
-
-                <Button type="button" variant="outline" className="border-outline-variant text-tk-ink hover:bg-surface-muted" onClick={() => navigate("/cursos")}>
-                  Voltar ao site
-                </Button>
+            {error ? (
+              <div
+                role="alert"
+                className="flex items-center gap-2.5 rounded-lg border border-tk-error/25 bg-tk-error/10 px-3.5 py-2.5 text-body-small text-tk-error"
+              >
+                <AlertCircle className="h-[15px] w-[15px] shrink-0" aria-hidden="true" />
+                {error}
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            ) : null}
+
+            <Button type="submit" loading={isSubmitting} size="lg" className="w-full">
+              Entrar
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center gap-4 text-body-small text-tk-ink-muted">
+        <button
+          type="button"
+          className="font-medium text-tk-ink-muted hover:text-tk-accent-strong"
+          onClick={() => navigate("/cursos")}
+        >
+          ← Voltar ao site
+        </button>
+        <span aria-hidden="true" className="h-[3px] w-[3px] rounded-full bg-tk-ink-muted" />
+        <span>
+          Precisa de acesso?{" "}
+          <button
+            type="button"
+            className="font-semibold text-tk-accent hover:text-tk-accent-strong"
+            onClick={() => navigate("/contato")}
+          >
+            Fale com a coordenação
+          </button>
+        </span>
       </div>
     </section>
   );
