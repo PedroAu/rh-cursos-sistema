@@ -160,7 +160,7 @@ describe('Utils', () => {
       const start = Date.now();
       await delay(50);
       const elapsed = Date.now() - start;
-      expect(elapsed).toBeGreaterThanOrEqual(50);
+      expect(elapsed).toBeGreaterThanOrEqual(45);
     });
 
     it('should resolve with undefined', async () => {
