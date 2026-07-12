@@ -33,6 +33,13 @@ describe("checkout class resolution", () => {
     expect(isEnrollmentClassOpen(closedClass)).toBe(false);
   });
 
+  it("ignores an open-status class that has no remaining seats", () => {
+    const fullClass = { ...openClass, id: "class-full", availableSeats: 0 };
+
+    expect(isEnrollmentClassOpen(fullClass)).toBe(false);
+    expect(getOpenEnrollmentClasses([fullClass, openClass], "course-1")).toEqual([openClass]);
+  });
+
   it("replaces a requested closed class with the first open class", () => {
     expect(
       resolveOpenEnrollmentClassId({

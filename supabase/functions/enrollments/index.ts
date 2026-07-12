@@ -5,6 +5,7 @@
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
 import { getEnrollmentErrorMessage } from "../_shared/enrollment-errors.ts";
+import { resolveEnrollmentClassIdOrThrow } from "../_shared/enrollment-class-resolution.ts";
 import { anonClient } from "../_shared/supabase.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
 import { enrollmentSchema, type EnrollmentInput } from "../_shared/validation.ts";
@@ -57,6 +58,35 @@ Deno.serve(async (request) => {
 
   try {
     const supabase = anonClient();
+    const { data: directClassRows, error: directClassError } = await supabase
+      .from("turma")
+      .select("id,curso_id,status,vagas_restantes")
+      .eq("id", data.classId)
+      .eq("curso_id", data.courseId)
+      .limit(1);
+    if (directClassError) throw directClassError;
+
+    const directClass = directClassRows?.[0];
+    const { data: courseClasses, error: courseClassesError } = await supabase
+      .from("turma")
+      .select("id,status")
+      .eq("curso_id", data.courseId)
+      .in("status", ["Aberta", "PoucasVagas"])
+      .gt("vagas_restantes", 0)
+      .order("data_inicio")
+      .limit(10);
+    if (courseClassesError) throw courseClassesError;
+
+    const resolvedClassId = resolveEnrollmentClassIdOrThrow({
+      directClass:
+        directClass && directClass.vagas_restantes > 0
+          ? directClass
+          : directClass
+            ? { id: directClass.id, status: "Encerrada" }
+            : null,
+      courseClasses: courseClasses ?? [],
+    });
+
     const { data: enrollmentId, error } = await supabase.rpc("registrar_inscricao_publica", {
       p_nome_completo: data.studentName,
       p_email: data.email,
@@ -65,7 +95,7 @@ Deno.serve(async (request) => {
       p_cargo: data.jobTitle,
       p_orgao: data.organization,
       p_tipo_aluno: toTipoAluno(data.enrollmentType),
-      p_turma_id: data.classId,
+      p_turma_id: resolvedClassId,
       p_tipo_inscricao: data.enrollmentType,
       p_forma_pagamento: data.paymentMethod === "Cartão" ? "Cartao" : data.paymentMethod,
       p_observacoes: data.notes,
@@ -73,7 +103,7 @@ Deno.serve(async (request) => {
 
     if (error) throw error;
 
-    return jsonResponse({ ok: true, enrollmentId }, 201, request, {
+    return jsonResponse({ ok: true, enrollmentId, classId: resolvedClassId }, 201, request, {
       "X-RateLimit-Remaining": rate.remaining.toString(),
     });
   } catch (error) {

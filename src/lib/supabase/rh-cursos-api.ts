@@ -151,6 +151,30 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
   };
 }
 
+export async function fetchPublicClassesFromSupabase() {
+  if (!supabase) return null;
+  const client = supabase;
+
+  const result = await withRetry(
+    () =>
+      client
+        .from("turma")
+        .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
+        .order("data_inicio"),
+    { label: "fetchPublicClasses:turma" }
+  );
+
+  if (result.error) throw result.error;
+
+  const rows = validateResponse(result.data, publicClassListSchema, {
+    endpoint: "fetchPublicClasses",
+    resource: "turma",
+    schema: "publicClassListSchema"
+  }) as ClassRow[];
+
+  return rows.map(mapClass);
+}
+
 async function fetchPublicBlogPosts(client: RhCursosClient | null) {
   if (!client) return null;
 

@@ -5,8 +5,8 @@ const OPEN_CLASS_STATUSES = new Set<TrainingClass["status"]>([
   "Poucas vagas",
 ]);
 
-export function isEnrollmentClassOpen(trainingClass: Pick<TrainingClass, "status">) {
-  return OPEN_CLASS_STATUSES.has(trainingClass.status);
+export function isEnrollmentClassOpen(trainingClass: Pick<TrainingClass, "status" | "availableSeats">) {
+  return OPEN_CLASS_STATUSES.has(trainingClass.status) && trainingClass.availableSeats > 0;
 }
 
 export function getOpenEnrollmentClasses(classes: TrainingClass[], courseId: string) {

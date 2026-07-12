@@ -756,6 +756,8 @@ export function AppStoreProvider({
   }, []);
 
   const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
+    let resolvedClassId = payload.classId;
+
     if (shouldUseLocalEnrollmentProxy()) {
       const response = await fetch("/api/enrollments", {
         method: "POST",
@@ -766,12 +768,18 @@ export function AppStoreProvider({
       if (!response.ok) {
         throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
       }
+
+      const responsePayload = (await response.json().catch(() => null)) as { classId?: string } | null;
+      resolvedClassId = responsePayload?.classId ?? resolvedClassId;
     } else if (isFunctionsConfigured) {
       const response = await invokeFunction("enrollments", { body: payload });
 
       if (!response.ok) {
         throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
       }
+
+      const responsePayload = (await response.json().catch(() => null)) as { classId?: string } | null;
+      resolvedClassId = responsePayload?.classId ?? resolvedClassId;
     }
 
     const enrollmentId = `enrollment-${Date.now()}`;
@@ -783,7 +791,8 @@ export function AppStoreProvider({
           id: enrollmentId,
           createdAt: new Date().toISOString(),
           status: "Confirmada" as const,
-          ...payload
+          ...payload,
+          classId: resolvedClassId
         },
         ...current.enrollments
       ];
@@ -801,7 +810,7 @@ export function AppStoreProvider({
             organization: payload.organization,
             jobTitle: payload.jobTitle,
             courseId: payload.courseId,
-            classId: payload.classId,
+            classId: resolvedClassId,
             enrollmentStatus: "Confirmada",
             certificateIssued: false,
             enrolledAt: new Date().toISOString(),
@@ -810,7 +819,7 @@ export function AppStoreProvider({
           ...current.students
         ],
         classes: current.classes.map((item) => {
-          if (item.id !== payload.classId) return item;
+          if (item.id !== resolvedClassId) return item;
           const capacity = deriveClassCapacity(item, enrollments);
           return {
             ...item,

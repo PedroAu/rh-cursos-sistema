@@ -21,6 +21,7 @@ import { useAppStore } from "@/lib/app-store";
 import { getOpenEnrollmentClasses, resolveOpenEnrollmentClassId } from "@/lib/enrollment-class-resolution";
 import { formatCPF, formatPhone } from "@/lib/format";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
+import { fetchPublicClassesFromSupabase } from "@/lib/supabase/rh-cursos-api";
 import { cn } from "@/lib/utils";
 import type { TrainingClass } from "@/types";
 
@@ -249,15 +250,32 @@ export function CourseCheckoutPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [couponStatus, setCouponStatus] = useState<"idle" | "valid" | "invalid">("idle");
   const [isSaving, setIsSaving] = useState(false);
+  const [catalogClasses, setCatalogClasses] = useState<TrainingClass[] | null>(null);
 
   const courseSlug = Array.isArray(slug) ? slug[0] : slug;
   const course = courses.find((item) => item.slug === courseSlug);
   const paramsString = params.toString();
   const queryClassId = params.get("classId") ?? "";
+  const availableClasses = catalogClasses ?? classes;
+
+  useEffect(() => {
+    let active = true;
+
+    void fetchPublicClassesFromSupabase()
+      .then((freshClasses) => {
+        if (active && freshClasses) setCatalogClasses(freshClasses);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const courseClasses = useMemo(() => {
     if (!course) return [];
-    return getOpenEnrollmentClasses(classes, course.id);
-  }, [classes, course]);
+    return getOpenEnrollmentClasses(availableClasses, course.id);
+  }, [availableClasses, course]);
 
   useEffect(() => {
     if (!courseClasses.length) return;
@@ -370,6 +388,20 @@ export function CourseCheckoutPage() {
     setSubmitError(null);
 
     try {
+      const liveClasses = await fetchPublicClassesFromSupabase().catch(() => null);
+      const liveCourseClasses = liveClasses
+        ? getOpenEnrollmentClasses(liveClasses, course.id)
+        : courseClasses;
+      const enrollmentClassId = resolveOpenEnrollmentClassId({
+        classes: liveCourseClasses,
+        requestedClassId: effectiveClassId,
+        preferredClassId: course.nextClassId,
+      });
+
+      if (!enrollmentClassId) {
+        throw new Error("Nenhuma turma aberta para este curso.");
+      }
+
       await createEnrollment({
         studentName: buyerName,
         email: form.email,
@@ -380,7 +412,7 @@ export function CourseCheckoutPage() {
         enrollmentType,
         paymentMethod: form.paymentMethod,
         courseId: course.id,
-        classId: effectiveClassId,
+        classId: enrollmentClassId,
         notes: "Inscrição gerada pela rota dedicada de checkout.",
       });
 
@@ -389,7 +421,7 @@ export function CourseCheckoutPage() {
           ENROLLMENT_SUCCESS_STORAGE_KEY,
           JSON.stringify({
             courseId: course.id,
-            classId: effectiveClassId,
+            classId: enrollmentClassId,
             studentName: buyerName,
             paymentMethod: form.paymentMethod,
           }),
@@ -398,14 +430,14 @@ export function CourseCheckoutPage() {
 
       const successParams = new URLSearchParams({
         courseId: course.id,
-        classId: effectiveClassId,
+        classId: enrollmentClassId,
         studentName: buyerName,
         paymentMethod: form.paymentMethod,
       });
       navigate(`/inscricao-confirmada?${successParams.toString()}`, {
         state: {
           courseId: course.id,
-          classId: effectiveClassId,
+          classId: enrollmentClassId,
           studentName: buyerName,
           paymentMethod: form.paymentMethod,
           redirectFrom: location.pathname,
