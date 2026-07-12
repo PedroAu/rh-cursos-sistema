@@ -31,7 +31,7 @@ Observação: os canvases acima são agora referências históricas removidas do
 O pacote completo do Trust Keith foi obtido da pasta `~/Downloads/Site RH Cursos V2` e copiado para o repo:
 
 - `docs/design-system/trust-keith/ds-package/` — `_ds_manifest.json` (todos os tokens `--tk-*` com valores), `tokens/{colors,typography,spacing,effects,fonts}.css`, `_ds_bundle.js` (componentes JSX: Avatar, Badge, Button, Card, Checkbox, Input, Logo, Switch, FeatureListItem, ProgressBar, StatBlock, Testimonial, NavBar), `readme.md`
-- `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Fraunces / Merriweather / Inter / Caveat, espaçamento, raios, sombras)
+- `docs/design-system/trust-keith/DESIGN.md` — spec completa (cores, tipografia Fraunces / Helvetica Neue / Inter / Caveat, espaçamento, raios, sombras)
 - `docs/design/redesign/reference/screenshots/` — screenshots de referência (agenda, overview)
 - `docs/design/redesign/reference/canvases/`, `docs/design/redesign/wireframes/*.dc.html`, `public/uploads/logoHorizontal_800X600.png` — artefatos históricos de renderização dos canvases preservados fora do deploy; `_ds/`, `support.js` e os HTMLs finais já foram removidos de `public/` na 14.3.3
 - `public/images/brand/logo-horizontal.png` — logo horizontal oficial (asset definitivo do site)

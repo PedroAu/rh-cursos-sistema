@@ -62,3 +62,6 @@ outputs/
 
 # Storybook build output
 storybook-static/
+
+# Design-system exports gerados
+docs/design-system/*.html

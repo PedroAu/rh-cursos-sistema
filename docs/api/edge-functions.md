@@ -37,7 +37,7 @@ Allowlist base (hardcoded):
 Origens adicionais via variáveis de ambiente:
 - `PUBLIC_APP_URL` — adiciona URL da aplicação
 - `EXTRA_ALLOWED_ORIGINS` — lista separada por vírgulas
-- `ALLOW_LOCALHOST=true` — adiciona `http://localhost:3000` e `http://127.0.0.1:3000`
+- `ALLOW_LOCALHOST=true` — adiciona `http://localhost:3000`, `http://127.0.0.1:3000` e `http://[::1]:3000` apenas em dev/test
 
 Headers CORS retornados:
 - `Access-Control-Allow-Methods: POST, DELETE, OPTIONS`
@@ -45,6 +45,8 @@ Headers CORS retornados:
 - `Access-Control-Allow-Credentials: true`
 - `Access-Control-Max-Age: 3600`
 - `Vary: Origin`
+
+Nota: quando a origem não está na allowlist, a função ainda devolve um `Access-Control-Allow-Origin` de fallback estável junto com `Allow-Credentials: true`. Isso é intencional; o browser bloqueia o acesso porque a origem da resposta não casa com a origem chamadora.
 
 Preflight (`OPTIONS`) retorna `204 No Content` com headers CORS.
 Origin não listada: `403 Origin not allowed`.

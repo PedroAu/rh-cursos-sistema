@@ -19,10 +19,10 @@ import { EmptyState } from "@/components/common/empty-state";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckoutModal } from "@/components/checkout/checkout-modal";
 import { trackEvent } from "@/lib/analytics";
 import { useAppStore } from "@/lib/app-store";
-import { Link, useParams, useSearchParams } from "@/lib/router-compat";
+import { getOpenEnrollmentClasses } from "@/lib/enrollment-class-resolution";
+import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
 import type { Course, Instructor, Testimonial, TrainingClass } from "@/types";
 
@@ -227,9 +227,9 @@ function buildTestimonial(course: Course, testimonials: Testimonial[], content?:
 
 export function CourseDetailPage() {
   const { slug } = useParams();
-  const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
   const { courses, classes, instructors, coursePublicContents, testimonials } = useAppStore();
-  const [openCheckout, setOpenCheckout] = useState(() => params.get("checkout") === "1");
   const [selectedClassId, setSelectedClassId] = useState("");
 
   const slugParam = Array.isArray(slug) ? slug[0] : slug;
@@ -241,9 +241,7 @@ export function CourseDetailPage() {
       return [];
     }
 
-    return classes
-      .filter((item) => item.courseId === course.id && item.status !== "Encerrada")
-      .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
+    return getOpenEnrollmentClasses(classes, course.id);
   }, [classes, course]);
 
   const instructor = instructors.find((item) => item.id === course?.instructorId);
@@ -273,12 +271,16 @@ export function CourseDetailPage() {
     });
   }, [course?.nextClassId, courseClasses]);
 
+  const startCheckoutHref = selectedClass?.id
+    ? `/cursos/${course?.slug}/checkout?classId=${selectedClass.id}`
+    : `/cursos/${course?.slug}/checkout`;
+
   const startCheckout = () => {
     trackEvent("inscricao_cta", {
       course: course?.slug ?? "",
       origin: "hero_cta"
     });
-    setOpenCheckout(true);
+    navigate(startCheckoutHref);
   };
 
   const handleProgramPdfRequest = () => {
@@ -290,15 +292,19 @@ export function CourseDetailPage() {
     window.location.assign("/falar-com-especialista");
   };
 
-  const clearCheckoutParam = () => {
-    if (params.get("checkout") !== "1") {
+  useEffect(() => {
+    if (params.get("checkout") !== "1" || !course) {
       return;
     }
 
-    const nextParams = new URLSearchParams(params.toString());
-    nextParams.delete("checkout");
-    setParams(nextParams);
-  };
+    const nextParams = new URLSearchParams();
+    if (selectedClass?.id) {
+      nextParams.set("classId", selectedClass.id);
+    }
+    navigate(`/cursos/${course.slug}/checkout${nextParams.toString() ? `?${nextParams.toString()}` : ""}`, {
+      replace: true,
+    });
+  }, [course, navigate, params, selectedClass?.id]);
 
   if (!course) {
     return (
@@ -814,18 +820,6 @@ export function CourseDetailPage() {
         </div>
       </section>
 
-      <CheckoutModal
-        course={course}
-        open={openCheckout}
-        onOpenChange={(nextOpen) => {
-          setOpenCheckout(nextOpen);
-
-          if (!nextOpen) {
-            clearCheckoutParam();
-          }
-        }}
-        initialClassId={selectedClass?.id}
-      />
     </>
   );
 }

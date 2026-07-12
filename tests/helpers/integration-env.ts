@@ -2,7 +2,7 @@ import { loadEnvFile } from "node:process";
 import { randomBytes } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
-import type { TestInfo } from "@playwright/test";
+import type { Page, TestInfo } from "@playwright/test";
 
 type IntegrationEnv = {
   adminEmail: string;
@@ -26,6 +26,18 @@ const CANONICAL_DOCS = {
 
 let envCache: IntegrationEnv | null = null;
 let serviceClientCache: ReturnType<typeof createClient> | null = null;
+let publishableClientCache: ReturnType<typeof createClient> | null = null;
+
+export type CheckoutTarget = {
+  classId: string;
+  courseId: string;
+  courseTitle: string;
+  coursePath: string;
+  location: string | null;
+  modality: string;
+  startDate: string;
+  time: string;
+};
 
 function isPlaceholderValue(value: string) {
   return (
@@ -126,6 +138,20 @@ export function createServiceRoleClient() {
   return serviceClientCache;
 }
 
+export function createPublishableClient() {
+  if (publishableClientCache) return publishableClientCache;
+
+  const { publishableKey, supabaseUrl } = getIntegrationEnv();
+  publishableClientCache = createClient(supabaseUrl, publishableKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+
+  return publishableClientCache;
+}
+
 async function findUserByEmail(email: string) {
   const supabase = createServiceRoleClient();
   let page = 1;
@@ -214,53 +240,99 @@ export async function resolveAvailableCheckoutCoursePath() {
   return target.coursePath;
 }
 
-export async function resolveAvailableCheckoutTarget() {
-  const supabase = createServiceRoleClient();
+export async function resolveAvailableCheckoutTargets(limit = 10): Promise<CheckoutTarget[]> {
+  const supabase = createPublishableClient();
 
   const { data: classes, error: classesError } = await supabase
     .from("turma")
     .select("id,curso_id,data_inicio,horario,modalidade,local,status,vagas_restantes")
-    .in("status", ["Aberta", "PoucasVagas"])
-    .gt("vagas_restantes", 0)
-    .is("deleted_at", null)
-    .order("vagas_restantes", { ascending: false })
-    .order("data_inicio", { ascending: true })
-    .limit(20);
+    .order("data_inicio", { ascending: true });
 
   if (classesError) throw classesError;
-  if (!classes || classes.length === 0) {
-    throw new Error("Nenhuma turma disponível para checkout foi encontrada no ambiente de integração.");
+  const visibleOpenClasses = (classes ?? [])
+    .filter((item) => ["Aberta", "PoucasVagas"].includes(item.status) && item.vagas_restantes > 0)
+    .sort((left, right) => left.data_inicio.localeCompare(right.data_inicio));
+
+  if (visibleOpenClasses.length === 0) {
+    throw new Error("Nenhuma turma pública disponível para checkout foi encontrada no ambiente de integração.");
   }
 
-  const courseIds = [...new Set(classes.map((item) => item.curso_id))];
+  const courseIds = [...new Set(visibleOpenClasses.map((item) => item.curso_id))];
   const { data: courses, error: coursesError } = await supabase
     .from("curso")
-    .select("id,slug")
+    .select("id,slug,titulo")
     .in("id", courseIds)
-    .in("status", ["Ativo", "Destaque"])
-    .is("deleted_at", null);
+    .in("status", ["Ativo", "Destaque"]);
 
   if (coursesError) throw coursesError;
 
-  const selectedClass = classes.find((item) =>
-    courses?.some((course) => course.id === item.curso_id && Boolean(course.slug))
+  const availableCourses = new Map(
+    (courses ?? [])
+      .filter((course) => Boolean(course.slug))
+      .map((course) => [course.id, course])
   );
-  const course = selectedClass
-    ? courses?.find((item) => item.id === selectedClass.curso_id && Boolean(item.slug))
-    : null;
 
-  if (!selectedClass || !course) {
-    throw new Error("Nenhum curso ativo com turma disponível foi encontrado no ambiente de integração.");
+  const targets = visibleOpenClasses
+    .map((trainingClass) => {
+      const course = availableCourses.get(trainingClass.curso_id);
+      if (!course?.slug) return null;
+
+      return {
+        classId: trainingClass.id,
+        courseId: trainingClass.curso_id,
+        courseTitle: course.titulo,
+        coursePath: `/cursos/${course.slug}`,
+        location: trainingClass.local,
+        modality: trainingClass.modalidade,
+        startDate: trainingClass.data_inicio,
+        time: trainingClass.horario
+      } satisfies CheckoutTarget;
+    })
+    .filter((target): target is CheckoutTarget => Boolean(target));
+
+  const uniqueTargets = targets.filter(
+    (target, index, collection) => collection.findIndex((item) => item.courseId === target.courseId) === index
+  );
+
+  if (uniqueTargets.length === 0) {
+    throw new Error("Nenhum curso público com turma disponível foi encontrado no ambiente de integração.");
   }
 
-  return {
-    classId: selectedClass.id,
-    coursePath: `/cursos/${course.slug}`,
-    location: selectedClass.local,
-    modality: selectedClass.modalidade,
-    startDate: selectedClass.data_inicio,
-    time: selectedClass.horario
-  };
+  return uniqueTargets.slice(0, limit);
+}
+
+export async function resolveAvailableCheckoutTarget() {
+  const [target] = await resolveAvailableCheckoutTargets(1);
+  return target;
+}
+
+export async function resolveUsableCheckoutTarget(page: Page, limit = 10) {
+  const targets = await resolveAvailableCheckoutTargets(limit);
+  const attempts: string[] = [];
+
+  for (const target of targets) {
+    await page.goto(target.coursePath, { waitUntil: "networkidle" });
+
+    const button = page.getByRole("button", { name: "Inscrever-se agora" }).first();
+    if ((await button.count()) === 0) {
+      attempts.push(`${target.coursePath} (CTA ausente)`);
+      continue;
+    }
+
+    const openClassesLabel = await page
+      .locator("text=/turmas abertas no calendário/")
+      .first()
+      .textContent()
+      .catch(() => null);
+
+    if (await button.isEnabled()) {
+      return target;
+    }
+
+    attempts.push(`${target.coursePath} (${openClassesLabel ?? "CTA desabilitado"})`);
+  }
+
+  throw new Error(`Nenhum curso com checkout utilizável foi encontrado no frontend. Tentativas: ${attempts.join("; ")}`);
 }
 
 export function createUniqueEmail(prefix: string) {

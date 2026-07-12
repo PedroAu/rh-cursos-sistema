@@ -54,7 +54,7 @@ quality_gate_tools:
 ## Dev Notes
 - Validação final concluída em 2026-07-11 com `npm run test:unit -- src/__tests__/lib/app-store.test.ts src/__tests__/lib/admin-resource-configs.test.ts`, `npm run typecheck`, `npm run build` e `node scripts/run-playwright.mjs tests/admin-crud.spec.ts --project=functional --reporter=line`.
 - `npm run lint` permanece verde com warnings preexistentes fora do escopo do CRUD em `docs/design-system/_ds_bundle.js`, `src/views/public/CourseCheckout.tsx` e `src/views/public/CourseDetail.tsx`.
-- A Edge Function `admin-resources` foi redeployada no projeto Supabase `hwpsrujkxjhmmwphqdlz` para alinhar o create de inscrições com resolução de turma real/placeholder e mensagens de erro mais úteis.
+- A Edge Function `admin-resources` foi redeployada no projeto Supabase `hwpsrujkxjhmmwphqdlz` para alinhar o create de inscrições com resolução de turma real e erro explícito quando não houver turma aberta para o curso.
 
 ## Change Log
 - 2026-07-09 - @dev - Story criada para formalizar o CRUD administrativo de leads, students e enrollments.

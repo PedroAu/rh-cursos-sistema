@@ -170,7 +170,7 @@ export function SpecialistContactPage({ leadOrigin = "Especialista" }: Specialis
         <div className="ea-container grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
           <div className="space-y-6 lg:sticky lg:top-24">
             <div className="space-y-4">
-              <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-accent">Diagnóstico personalizado</p>
+              <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">Diagnóstico personalizado</p>
               <h2 className="font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
                 Entenda o caminho antes de propor a solução.
               </h2>

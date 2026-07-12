@@ -21,7 +21,7 @@ EPIC 14 — Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md
 ## Acceptance Criteria
 
 1. ADR criado em `docs/architecture/` ratificando (ou revisando com justificativa) D1–D6 do épico.
-2. Estratégia de fontes decidida: Fraunces (G1) e Merriweather/Inter/Caveat (G4), com implementação via `next/font` especificada.
+2. Estratégia de fontes decidida: Fraunces (G1) e Helvetica Neue/Inter/Caveat (G4), com implementação via `next/font` especificada.
 3. Estrutura de componentes definida: onde vivem primitivas e padrões compostos (`rh-chip`, `rh-coursecard`, `rh-paper`, `rh-nav`).
 4. Estratégia de tokens confirmada: valores finais RH no `:root` (sem classe `.rh2`), mapeamento Tailwind.
 5. Decisões que dependem do usuário (ex.: compra de licença) explicitamente sinalizadas com caminho de fallback que não bloqueia implementação.

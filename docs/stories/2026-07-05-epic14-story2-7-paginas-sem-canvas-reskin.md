@@ -43,7 +43,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Acceptance Criteria
 1. `/login` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-login.md`, preservando painel visual desktop, card de login, seletor de perfil, status `required`, erros e redirect seguro.
 2. `/contato` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-contato.md`, com hero, canais diretos, mapa ilustrativo, formulario validado, sucesso/erro inline e lead `type/origin` corretos.
-3. `/cursos/[slug]` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-course-detail.md`, com breadcrumb, hero comercial, objetivos, decisao rapida, publico-alvo, conteudo programatico, sidebar, proximas turmas, instrutor/FAQ, depoimentos e checkout modal.
+3. `/cursos/[slug]` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-course-detail.md`, com breadcrumb, hero comercial, objetivos, decisao rapida, publico-alvo, conteudo programatico, sidebar, proximas turmas, instrutor/FAQ, depoimentos e CTA para checkout dedicado.
 4. `/inscricao-confirmada` renderiza conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-enrollment-success.md`, usando prioridade de estado query string -> navigation state -> session storage -> ultimo enrollment do store e fallback generico.
 5. `/consultoria` e `/falar-com-especialista` renderizam conforme `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-consultoria-especialista.md`, preservando variacao `leadOrigin = "Consultoria"` vs `"Especialista"` sem duplicar estrutura visual.
 6. Todos os formularios mantem validacao, mensagens acessiveis, submit sem perda indevida de dados, feedback inline/toast quando ja existente e criacao de leads/sessao conforme contratos atuais.
@@ -61,7 +61,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 ## Story Type Analysis
 **Primary Type**: Frontend/UI  
 **Secondary Type(s)**: Forms, Auth, Checkout, Routing, Accessibility, Regression Safety  
-**Complexity**: H - multiplas rotas auxiliares, formularios, auth, checkout modal e estados de fallback.
+**Complexity**: H - multiplas rotas auxiliares, formularios, auth, checkout dedicado e estados de fallback.
 
 ## Specialized Agent Assignment
 **Primary Agents**:
@@ -70,7 +70,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 
 **Supporting Agents**:
 - @ux-design-expert: consultar quando uma pagina mid-fi precisar decisao visual.
-- @architect: consultar para auth, checkout modal, data loading ou rotas.
+- @architect: consultar para auth, checkout dedicado, data loading ou rotas.
 
 ## Quality Gate Tasks
 - [x] Pre-Commit (@dev): lint, typecheck, unit, build, purge gate, fidelity regression, capture e bundle check.
@@ -81,7 +81,7 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 - [x] Confirmar rotas: `/login`, `/contato`, `/cursos/[slug]`, `/inscricao-confirmada`, `/consultoria`, `/falar-com-especialista`.
 - [x] Re-skin `/login` preservando `POST /api/auth/session`, perfil selecionado, `next` permitido e store session.
 - [x] Re-skin `/contato` preservando validacao zod/react-hook-form, lead `Contato`, toast e feedback inline.
-- [x] Re-skin `/cursos/[slug]` preservando dados server/client, checkout modal, turmas, instrutor e depoimentos.
+- [x] Re-skin `/cursos/[slug]` preservando dados server/client, CTA para checkout dedicado, turmas, instrutor e depoimentos.
 - [x] Re-skin `/inscricao-confirmada` preservando prioridade de origem de estado e fallbacks.
 - [x] Re-skin `/consultoria` e `/falar-com-especialista` preservando `leadOrigin`, copy variavel e lead `Consultoria`.
 - [x] Atualizar testes quando labels/copy mudarem, sem enfraquecer cobertura.
@@ -97,8 +97,8 @@ Source: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-1
 - Spec Enrollment Success: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-enrollment-success.md`
 - Spec Consultoria/Especialista: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/design/redesign/spec-consultoria-especialista.md`
 - Epic: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md#fase-2-paginas-publicas-com-fidelidade-total`
-- Route files: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/login/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/contato/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/cursos/[slug]/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/inscricao-confirmada/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/consultoria/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/falar-com-especialista/page.tsx`
-- Current views: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Login.tsx`, `Contact.tsx`, `CourseDetail.tsx`, `EnrollmentSuccess.tsx`, `SpecialistContact.tsx`
+- Route files: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/login/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/contato/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/cursos/[slug]/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/cursos/[slug]/checkout/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/inscricao-confirmada/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/consultoria/page.tsx`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/falar-com-especialista/page.tsx`
+- Current views: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Login.tsx`, `Contact.tsx`, `CourseDetail.tsx`, `CourseCheckout.tsx`, `EnrollmentSuccess.tsx`, `SpecialistContact.tsx`
 - Tests: `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/login-errors.spec.ts`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/checkout.e2e.spec.ts`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/public-journeys.spec.ts`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/quote-modal.e2e.spec.ts`, `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/epic14-mantine-removal.smoke.spec.ts`
 
 ### Current State Observed by @sm
@@ -134,7 +134,7 @@ npm run bundle:check
 Manual/visual checks:
 - `/login?next=/admin`, troca de perfil e erro de credencial.
 - `/contato`, validacao de email/mensagem, sucesso e erro.
-- `/cursos/[slug]`, modal checkout via CTA e `?checkout=1`.
+- `/cursos/[slug]`, CTA para `/cursos/[slug]/checkout` e compatibilidade do deeplink legado `?checkout=1`.
 - `/inscricao-confirmada` com e sem dados suficientes.
 - `/consultoria` e `/falar-com-especialista` com copy variavel por origem.
 
@@ -144,7 +144,9 @@ Manual/visual checks:
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Courses.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/Agenda.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/InCompany.tsx`
-- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/checkout/checkout-modal.tsx`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/app/cursos/[slug]/checkout/page.tsx`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/components/page-clients/course-checkout-client.tsx`
+- `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/views/public/CourseCheckout.tsx`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/src/lib/rate-limit.ts`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/agenda-runtime.spec.ts`
 - `/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/tests/checkout.e2e.spec.ts`
@@ -165,11 +167,13 @@ Manual/visual checks:
 - 2026-07-06 - `npm run test:e2e:smoke` ✅
 - 2026-07-06 - `npm run test:epic14:fidelity` ✅
 - 2026-07-06 - `npm run test:epic14:fidelity:capture` ✅ via servidor local persistente (`node scripts/start-test-server.mjs`)
-- 2026-07-10 - `src/components/checkout/checkout-modal.tsx` foi refeito para seguir o wireframe exportado de checkout: header seguro, stepper de 3 estados, seleção de turma integrada ao primeiro passo, segmentação PF/PJ, resumo lateral com cupom, métodos de pagamento em cards e bloqueio por aceite de termos antes do submit real.
+- 2026-07-10 - o fluxo de inscrição saiu do modal e foi migrado para a rota dedicada `app/cursos/[slug]/checkout/page.tsx`, com shell público real, stepper, seleção de turma integrada ao primeiro passo, segmentação PF/PJ, resumo lateral com cupom, métodos de pagamento em cards e bloqueio por aceite de termos antes do submit real.
 - 2026-07-10 - `tests/checkout.e2e.spec.ts` e `tests/public-journeys.spec.ts` foram alinhados ao novo contrato visual/funcional do checkout, preservando o redirect real para `/inscricao-confirmada`.
 - 2026-07-10 - `npm run typecheck` ✅
-- 2026-07-10 - `npx eslint src/components/checkout/checkout-modal.tsx tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts` ✅
+- 2026-07-10 - `npx eslint app/cursos/[slug]/checkout/page.tsx src/views/public/CourseCheckout.tsx src/views/public/CourseDetail.tsx tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts src/__tests__/views/public/course-detail.test.tsx` ✅
 - 2026-07-10 - `node ./node_modules/@playwright/test/cli.js test tests/checkout.e2e.spec.ts tests/public-journeys.spec.ts --project=functional --grep checkout` ⚠️ bloqueado por conflito local em `http://127.0.0.1:3100` antes da execução dos cenários.
+- 2026-07-11 - o CTA de inscrição saiu do modal e passou a navegar para `/cursos/[slug]/checkout`, com compatibilidade do deeplink legado `?checkout=1`, atualização dos links de agenda/catálogo e remoção do componente `CheckoutModal`.
+- 2026-07-11 - `npm run test:unit -- src/__tests__/views/public/course-detail.test.tsx` ✅
 - Completion Notes:
 - `Programa PDF`: o CTA do detalhe do curso agora registra analytics e encaminha explicitamente para `/falar-com-especialista` quando o material precisa ser solicitado ao atendimento.
 - `Falar com atendimento` no sucesso da inscrição: a rota final mantida é `/falar-com-especialista`, coerente com a jornada consultiva já usada no shell público.

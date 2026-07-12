@@ -92,7 +92,7 @@ export function ClassCard({
               Ver curso
             </Link>
             <Link
-              to={`/cursos/${course.slug}?checkout=1`}
+              to={`/cursos/${course.slug}/checkout?classId=${trainingClass.id}`}
               className="inline-flex min-h-11 items-center justify-center rounded-md bg-tk-accent px-5 text-sm font-bold text-white transition hover:bg-tk-brand"
             >
               Inscrever-se

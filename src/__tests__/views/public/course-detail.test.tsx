@@ -7,6 +7,7 @@ import { CourseDetailPage } from "@/views/public/CourseDetail";
 const mocks = vi.hoisted(() => ({
   params: new URLSearchParams("checkout=1"),
   setSearchParams: vi.fn(),
+  navigate: vi.fn(),
   trackEvent: vi.fn(),
   toastMessage: vi.fn()
 }));
@@ -14,7 +15,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@/lib/router-compat", () => ({
   Link: ({ to, children }: { to: string; children: React.ReactNode }) => <a href={to}>{children}</a>,
   useLocation: () => ({ pathname: "/cursos/curso-teste", search: "?checkout=1", state: null }),
-  useNavigate: () => vi.fn(),
+  useNavigate: () => mocks.navigate,
   useParams: () => ({ slug: "curso-teste" }),
   useSearchParams: () => [mocks.params, mocks.setSearchParams]
 }));
@@ -117,25 +118,6 @@ vi.mock("@/lib/app-store", () => ({
   })
 }));
 
-vi.mock("@/components/checkout/checkout-modal", () => ({
-  CheckoutModal: ({
-    open,
-    onOpenChange
-  }: {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    initialClassId?: string;
-  }) =>
-    open ? (
-      <div>
-        <span>Checkout aberto</span>
-        <button type="button" onClick={() => onOpenChange(false)}>
-          Fechar checkout
-        </button>
-      </div>
-    ) : null
-}));
-
 vi.mock("@/components/agenda/class-card", () => ({
   ClassCard: ({ course }: { course: { title: string } }) => <div>Turma de {course.title}</div>
 }));
@@ -151,28 +133,29 @@ describe("CourseDetailPage", () => {
     mocks.setSearchParams.mockImplementation((next: URLSearchParams | Record<string, string>) => {
       mocks.params = next instanceof URLSearchParams ? next : new URLSearchParams(next);
     });
+    mocks.navigate.mockReset();
     mocks.trackEvent.mockReset();
     mocks.toastMessage.mockReset();
   });
 
-  it("abre o checkout via query string e limpa o parâmetro para evitar reabertura ao fechar", async () => {
+  it("redireciona o deeplink legado ?checkout=1 para a rota dedicada de checkout", async () => {
+    render(<CourseDetailPage />);
+
+    await waitFor(() => {
+      expect(mocks.navigate).toHaveBeenCalledWith("/cursos/curso-teste/checkout?classId=class-1", {
+        replace: true,
+      });
+    });
+  });
+
+  it("envia o usuario para a rota dedicada ao clicar no CTA de inscrição", async () => {
     const user = userEvent.setup();
+    mocks.params = new URLSearchParams("");
 
     render(<CourseDetailPage />);
 
-    expect(await screen.findByText("Checkout aberto")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /inscrever-se agora/i }));
 
-    await user.click(screen.getByRole("button", { name: /fechar checkout/i }));
-
-    await waitFor(() => {
-      expect(mocks.setSearchParams).toHaveBeenCalledTimes(1);
-    });
-
-    const nextParams = mocks.setSearchParams.mock.calls[0][0] as URLSearchParams;
-    expect(nextParams.get("checkout")).toBeNull();
-
-    await waitFor(() => {
-      expect(screen.queryByText("Checkout aberto")).not.toBeInTheDocument();
-    });
+    expect(mocks.navigate).toHaveBeenCalledWith("/cursos/curso-teste/checkout?classId=class-1");
   });
 });

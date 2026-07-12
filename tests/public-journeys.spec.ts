@@ -3,7 +3,7 @@ import {
   cleanupEnrollmentArtifacts,
   createUniqueEmail,
   hasRealIntegrationEnv,
-  resolveAvailableCheckoutTarget,
+  resolveUsableCheckoutTarget,
 } from "./helpers/integration-env";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
@@ -50,14 +50,13 @@ test.describe("epica 4 — jornadas publicas", () => {
     test.skip(!hasRealIntegrationEnv(), "Jornada pública com checkout real requer Supabase real.");
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
-    const checkoutTarget = await resolveAvailableCheckoutTarget();
+    const checkoutTarget = await resolveUsableCheckoutTarget(page);
 
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      await page.goto(checkoutTarget.coursePath);
-
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+      await expect(page).toHaveURL(/\/checkout/);
       await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
 
       await expect(page.getByText("Nome deve ter no mínimo 3 caracteres.")).toBeVisible();
@@ -72,7 +71,7 @@ test.describe("epica 4 — jornadas publicas", () => {
       await expect(page.getByText("Forma de pagamento")).toBeVisible();
       await expect(page.getByText("Resumo do pedido")).toBeVisible();
       await page.getByText("Li e aceito os termos de uso e a política de cancelamento").click();
-      await page.getByRole("button", { name: "Pix" }).click();
+      await page.getByRole("radio", { name: "Pix" }).click();
       await page.getByRole("button", { name: "Finalizar compra →" }).click();
 
       await expect(page).toHaveURL(/\/inscricao-confirmada/);

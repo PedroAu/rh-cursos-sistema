@@ -14,7 +14,6 @@ import type {
   CoursePublicTestimonialOverride,
   CourseStatus,
   Enrollment,
-  EnrollmentStatus,
   Instructor,
   Lead,
   Testimonial,
@@ -31,8 +30,6 @@ export type ClassRow = Tables["turma"]["Row"];
 export type LeadRow = Tables["lead"]["Row"];
 export type BlogPostRow = Tables["post_blog"]["Row"];
 export type AssessmentRow = Tables["avaliacao"]["Row"];
-export type StudentRow = Tables["aluno"]["Row"];
-export type EnrollmentRow = Tables["inscricao"]["Row"];
 export type StudentInsert = Tables["aluno"]["Insert"];
 export type EnrollmentInsert = Tables["inscricao"]["Insert"];
 export type LeadInsert = Tables["lead"]["Insert"];
@@ -240,23 +237,11 @@ function fromDbClassStatus(value: ClassRow["status"]): ClassStatus {
   return map[value];
 }
 
-function toDbEnrollmentStatus(value: EnrollmentStatus): EnrollmentRow["status_inscricao"] {
-  const map: Record<EnrollmentStatus, EnrollmentRow["status_inscricao"]> = {
-    Pendente: "Pendente",
-    "Aguardando pagamento": "AguardandoPagamento",
-    Confirmada: "Confirmada",
-    Cancelada: "Cancelada",
-    Concluída: "Concluida"
-  };
-
-  return map[value];
-}
-
-export function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentRow["forma_pagamento"] {
+export function toDbPaymentMethod(value: Enrollment["paymentMethod"]): EnrollmentInsert["forma_pagamento"] {
   return value === "Cartão" ? "Cartao" : value;
 }
 
-export function toDbStudentType(value: Enrollment["enrollmentType"]): StudentRow["tipo_aluno"] {
+export function toDbStudentType(value: Enrollment["enrollmentType"]): StudentInsert["tipo_aluno"] {
   if (value === "Empresa") return "PJ";
   if (value === "Órgão público") return "Servidor";
   return "PF";
@@ -461,34 +446,6 @@ export function mapAssessmentToTestimonial(row: AssessmentWithCourseRow): Testim
     course: row.turma?.curso?.titulo ?? "",
     text: row.comentario ?? "",
     rating: Math.min(Math.max(row.nota, 1), 5)
-  };
-}
-
-export function enrollmentToStudentInsert(payload: Omit<Enrollment, "id" | "createdAt" | "status">): StudentInsert {
-  return {
-    nome_completo: payload.studentName,
-    email: payload.email,
-    cpf: payload.cpf,
-    telefone: payload.phone,
-    cargo: payload.jobTitle,
-    orgao: payload.organization,
-    tipo_aluno: toDbStudentType(payload.enrollmentType)
-  };
-}
-
-export function enrollmentToInsert(
-  payload: Omit<Enrollment, "id" | "createdAt" | "status">,
-  alunoId: string
-): EnrollmentInsert {
-  return {
-    aluno_id: alunoId,
-    turma_id: payload.classId,
-    status_inscricao: toDbEnrollmentStatus("Confirmada"),
-    status_pagamento: "Pendente",
-    valor_pago: 0,
-    forma_pagamento: toDbPaymentMethod(payload.paymentMethod),
-    tipo_inscricao: payload.enrollmentType,
-    observacoes: payload.notes
   };
 }
 

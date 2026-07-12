@@ -7,6 +7,7 @@ import {
   hasRealIntegrationEnv,
   getCanonicalDocs,
   resolveAvailableCheckoutTarget,
+  resolveUsableCheckoutTarget,
 } from "./helpers/integration-env";
 
 /**
@@ -15,7 +16,7 @@ import {
  *
  * Complementa `public-journeys.spec.ts` (caminho feliz) cobrindo os caminhos de
  * risco que o reskin não pode regredir: validação por etapa, navegação para trás,
- * turma obrigatória, deeplink `?checkout=1` e seleção de pagamento.
+ * preservação da turma, deeplink legado `?checkout=1` e seleção de pagamento.
  */
 
 function createUniqueCpf() {
@@ -45,11 +46,11 @@ test.describe("checkout — baseline de receita", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      const checkoutTarget = await resolveAvailableCheckoutTarget();
-      await page.goto(checkoutTarget.coursePath);
+      const checkoutTarget = await resolveUsableCheckoutTarget(page);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
-      await expect(page.getByRole("dialog")).toBeVisible();
+      await expect(page).toHaveURL(/\/checkout/);
+      await expect(page.getByRole("heading", { name: "Finalizar inscrição" })).toBeVisible();
 
       await fillPersonalStep(page, enrollmentEmail, enrollmentCpf);
       await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
@@ -61,7 +62,7 @@ test.describe("checkout — baseline de receita", () => {
       await expect(page.getByText("Você precisa aceitar os termos para finalizar a compra.")).toBeVisible();
 
       await page.getByText("Li e aceito os termos de uso e a política de cancelamento").click();
-      await page.getByRole("button", { name: "Pix" }).click();
+      await page.getByRole("radio", { name: "Pix" }).click();
       await page.getByRole("button", { name: "Finalizar compra →" }).click();
       await expect(page).toHaveURL(/\/inscricao-confirmada/);
 
@@ -93,9 +94,9 @@ test.describe("checkout — baseline de receita", () => {
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
-    const checkoutTarget = await resolveAvailableCheckoutTarget();
-    await page.goto(checkoutTarget.coursePath);
+    const checkoutTarget = await resolveUsableCheckoutTarget(page);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+    await expect(page).toHaveURL(/\/checkout/);
 
     await fillPersonalStep(page);
     await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
@@ -107,9 +108,9 @@ test.describe("checkout — baseline de receita", () => {
 
   test("inscrição corporativa exige razão social, CNPJ e responsável", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
-    const checkoutTarget = await resolveAvailableCheckoutTarget();
-    await page.goto(checkoutTarget.coursePath);
+    const checkoutTarget = await resolveUsableCheckoutTarget(page);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+    await expect(page).toHaveURL(/\/checkout/);
 
     await page.getByRole("button", { name: "Pessoa jurídica (nota fiscal)" }).click();
     await page.getByLabel("Telefone").fill("61999990000");
@@ -122,23 +123,21 @@ test.describe("checkout — baseline de receita", () => {
     await expect(page.getByText("Informe o nome do responsável.")).toBeVisible();
   });
 
-  test("deeplink ?checkout=1 abre o modal automaticamente", async ({ page }) => {
+  test("deeplink legado ?checkout=1 redireciona para a rota dedicada de checkout", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
     await page.goto(`${checkoutTarget.coursePath}?checkout=1`);
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page).toHaveURL(/\/checkout/);
     await expect(page.getByRole("heading", { name: "Finalizar inscrição" })).toBeVisible();
   });
 
-  test("fechar o modal mantém o usuário na página do curso", async ({ page }) => {
+  test("voltar ao curso a partir do checkout mantém o usuário no detalhe do curso", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
     const checkoutTarget = await resolveAvailableCheckoutTarget();
-    await page.goto(checkoutTarget.coursePath);
-    await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.goto(`${checkoutTarget.coursePath}/checkout`);
+    await expect(page.getByRole("heading", { name: "Finalizar inscrição" })).toBeVisible();
 
-    await page.getByRole("button", { name: "Fechar" }).click();
-    await expect(page.getByRole("dialog")).toBeHidden();
+    await page.getByRole("link", { name: "← Voltar ao curso" }).click();
     await expect(page).toHaveURL(new RegExp(checkoutTarget.coursePath.replace(/[/-]/g, "\\$&")));
   });
 });

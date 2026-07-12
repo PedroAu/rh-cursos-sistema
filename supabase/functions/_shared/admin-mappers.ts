@@ -56,6 +56,16 @@ export function toDbLeadStatus(value: string): string {
   return map[value] ?? "Novo";
 }
 
+export function toDbPaymentMethod(value: string): string {
+  return value === "Cartão" ? "Cartao" : value;
+}
+
+export function toDbStudentType(value: string): string {
+  if (value === "Empresa") return "PJ";
+  if (value === "Órgão público") return "Servidor";
+  return "PF";
+}
+
 export function toDbEnrollmentStatus(value: string): string {
   const map: Record<string, string> = {
     Pendente: "Pendente",

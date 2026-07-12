@@ -34,7 +34,7 @@ Cada story 14.2.x valida com screenshot Playwright a 1180px comparado ao canvas 
 | Família | Fonte | Implementação |
 |---|---|---|
 | Inter (body/UI) | Google Fonts | `next/font/google` — self-host no build, zero CDN em runtime |
-| Merriweather (serif) | Google Fonts | `next/font/google` |
+| Helvetica Neue (serif) | Google Fonts | `next/font/google` |
 | Caveat (hand, uso raro) | Google Fonts | `next/font/google`, carregar só onde usada |
 | **Fraunces (display)** | **Comercial** (Connary Fagen) | Ver abaixo |
 

@@ -26,9 +26,9 @@ O **admin já tem** ArrayInput, ModulesBuilder, SelectField, MultiSelect e valid
 - **Aceite:** formulários reportam erros junto aos campos (S3).
 
 ### Story 2.2 — Aplicar `FormField` a Input, Textarea, Select (público)
-- Substituir placeholder-como-label por label persistente em `Contact.tsx`, `InCompany.tsx`, `Login.tsx`, `checkout-modal.tsx`.
+- Substituir placeholder-como-label por label persistente em `Contact.tsx`, `InCompany.tsx`, `Login.tsx`, `CourseCheckout.tsx`.
 - Placeholder permanece só como exemplo de preenchimento.
-- **Arquivos:** `src/views/public/*`, `src/components/checkout/checkout-modal.tsx`.
+- **Arquivos:** `src/views/public/*`.
 - **Aceite:** nenhum form público usa placeholder como rótulo único.
 
 ### Story 2.3 — Estados padronizados de Button

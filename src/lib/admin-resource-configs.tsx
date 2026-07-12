@@ -22,6 +22,7 @@ import {
   validateBlogPost,
   validateClass,
   validateCourse,
+  validateEnrollmentCreate,
   validateEnrollment,
   validateInstructor,
   validateLead,
@@ -636,19 +637,27 @@ export function buildResourceConfig(
           setValidationErrors([]);
           setOpen(true);
         },
-        onDelete: undefined,
+        onDelete: (row: Student) => store.deleteStudent(row.id),
         onSave: async () => {
-          if (!editingId) return;
           const validation = validateStudent(form);
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
-            await store.updateStudent({
-              id: editingId,
-              name: str(form.name),
-              email: str(form.email),
-              organization: str(form.organization),
-              enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
-            });
+            if (editingId) {
+              await store.updateStudent({
+                id: editingId,
+                name: str(form.name),
+                email: str(form.email),
+                organization: str(form.organization),
+                enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
+              });
+            } else {
+              await store.createStudent({
+                name: str(form.name),
+                email: str(form.email),
+                organization: str(form.organization),
+                enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
+              });
+            }
             setOpen(false);
             setValidationErrors([]);
           } catch (error) {
@@ -767,7 +776,7 @@ export function buildResourceConfig(
           setValidationErrors([]);
           setOpen(true);
         },
-        onDelete: undefined,
+        onDelete: (row: Lead) => store.deleteLead(row.id),
         onSave: async () => {
           const validation = validateLead(form);
           if (!validation.valid) { setValidationErrors(validation.errors); return; }
@@ -836,6 +845,47 @@ export function buildResourceConfig(
       const rows = store.enrollments.filter((item) =>
         item.studentName.toLowerCase().includes(search.toLowerCase())
       );
+      const isEligibleEnrollmentClass = (status: string) =>
+        status === "Inscrições abertas" ||
+        status === "Poucas vagas" ||
+        status === "Aberta" ||
+        status === "PoucasVagas";
+      const eligibleClasses = store.classes.filter(
+        (item) => isEligibleEnrollmentClass(String(item.status))
+      );
+      const courseIdsWithClasses = new Set(eligibleClasses.map((item) => item.courseId));
+      const courseOptions = store.courses
+        .filter((course) => courseIdsWithClasses.has(course.id))
+        .map((course) => ({ value: course.id, label: course.title }));
+      const selectedCourseReference = str(form.courseId);
+      const selectedCourse = store.courses.find(
+        (course) =>
+          course.id === selectedCourseReference ||
+          course.slug === selectedCourseReference ||
+          course.title === selectedCourseReference
+      );
+      const classOptions = store.classes
+        .filter(
+          (item) =>
+            Boolean(selectedCourse?.id) &&
+            item.courseId === selectedCourse?.id &&
+            isEligibleEnrollmentClass(String(item.status))
+        )
+        .map((item) => ({
+          value: item.id,
+          label: `${store.courses.find((course) => course.id === item.courseId)?.title ?? "Curso"} • ${new Intl.DateTimeFormat("pt-BR").format(new Date(item.startDate))}`,
+        }));
+      const enrollmentTypeOptions = [
+        { value: "Pessoa física", label: "Pessoa física" },
+        { value: "Empresa", label: "Empresa" },
+        { value: "Órgão público", label: "Órgão público" },
+      ];
+      const paymentMethodOptions = [
+        { value: "Pix", label: "Pix" },
+        { value: "Cartão", label: "Cartão" },
+        { value: "Boleto", label: "Boleto" },
+        { value: "Empenho", label: "Empenho" },
+      ];
       const enrollmentStatusOptions = [
         { value: "Pendente", label: "Pendente" },
         { value: "Aguardando pagamento", label: "Aguardando pagamento" },
@@ -908,7 +958,11 @@ export function buildResourceConfig(
           setEditingId(row.id);
           setForm({
             studentName: row.studentName,
-            studentEmail: row.email,
+            email: row.email,
+            phone: row.phone,
+            cpf: row.cpf,
+            organization: row.organization,
+            jobTitle: row.jobTitle,
             courseTitle: selectedCourse?.title ?? "Curso não localizado",
             classLabel: selectedClass
               ? `${formatAdminDate(selectedClass.startDate)} • ${selectedClass.modality}`
@@ -918,41 +972,75 @@ export function buildResourceConfig(
             enrollmentType: row.enrollmentType,
             derivedStatus: deriveEnrollmentOperationalStatus(row, selectedClass),
             status: row.status,
+            courseId: row.courseId,
+            classId: row.classId,
+            notes: row.notes,
           });
           setValidationErrors([]);
           setOpen(true);
         },
-        onDelete: undefined,
+        onDelete: (row: Enrollment) => store.deleteEnrollment(row.id),
         onSave: async () => {
-          if (!editingId) return;
-          const validation = validateEnrollment(form);
-          if (!validation.valid) { setValidationErrors(validation.errors); return; }
           try {
-            await store.updateEnrollmentStatus(editingId, str(form.status) as Enrollment["status"]);
+            if (editingId) {
+              const validation = validateEnrollment(form);
+              if (!validation.valid) { setValidationErrors(validation.errors); return; }
+              await store.updateEnrollmentStatus(editingId, str(form.status) as Enrollment["status"]);
+            } else {
+              const validation = validateEnrollmentCreate(form);
+              if (!validation.valid) { setValidationErrors(validation.errors); return; }
+              await store.createEnrollmentAdmin({
+                studentName: str(form.studentName),
+                email: str(form.email),
+                phone: str(form.phone),
+                cpf: str(form.cpf),
+                organization: str(form.organization),
+                jobTitle: str(form.jobTitle),
+                enrollmentType: str(form.enrollmentType) as Enrollment["enrollmentType"],
+                paymentMethod: str(form.paymentMethod) as Enrollment["paymentMethod"],
+                courseId: str(form.courseId),
+                classId: str(form.classId),
+                notes: str(form.notes),
+              });
+            }
             setOpen(false);
             setValidationErrors([]);
           } catch (error) {
             toast.error(`Erro ao salvar: ${error instanceof Error ? error.message : "Tente novamente"}`);
           }
         },
-        fields: [
-          { key: "studentName", label: "Aluno", type: "readonly", section: "Contexto da inscrição" },
-          { key: "studentEmail", label: "E-mail", type: "readonly", section: "Contexto da inscrição" },
-          { key: "courseTitle", label: "Curso", type: "readonly", section: "Contexto da inscrição" },
-          { key: "classLabel", label: "Turma", type: "readonly", section: "Contexto da inscrição" },
-          { key: "createdAtLabel", label: "Data da inscrição", type: "readonly", section: "Contexto da inscrição" },
-          { key: "paymentMethod", label: "Pagamento", type: "readonly", section: "Contexto da inscrição" },
-          { key: "enrollmentType", label: "Tipo de inscrição", type: "readonly", section: "Contexto da inscrição" },
-          { key: "derivedStatus", label: "Status derivado", type: "readonly", section: "Contexto da inscrição" },
-          {
-            key: "status",
-            label: "Atualizar status",
-            type: "select",
-            options: enrollmentStatusOptions,
-            required: true,
-            section: "Ação operacional",
-          },
-        ],
+        fields: editingId
+          ? [
+              { key: "studentName", label: "Aluno", type: "readonly", section: "Contexto da inscrição" },
+              { key: "email", label: "E-mail", type: "readonly", section: "Contexto da inscrição" },
+              { key: "courseTitle", label: "Curso", type: "readonly", section: "Contexto da inscrição" },
+              { key: "classLabel", label: "Turma", type: "readonly", section: "Contexto da inscrição" },
+              { key: "createdAtLabel", label: "Data da inscrição", type: "readonly", section: "Contexto da inscrição" },
+              { key: "paymentMethod", label: "Pagamento", type: "readonly", section: "Contexto da inscrição" },
+              { key: "enrollmentType", label: "Tipo de inscrição", type: "readonly", section: "Contexto da inscrição" },
+              { key: "derivedStatus", label: "Status derivado", type: "readonly", section: "Contexto da inscrição" },
+              {
+                key: "status",
+                label: "Atualizar status",
+                type: "select",
+                options: enrollmentStatusOptions,
+                required: true,
+                section: "Ação operacional",
+              },
+            ]
+          : [
+              { key: "studentName", label: "Aluno", type: "text", required: true },
+              { key: "email", label: "E-mail", type: "text", required: true },
+              { key: "phone", label: "Telefone", type: "text", required: true },
+              { key: "cpf", label: "CPF", type: "text", required: true },
+              { key: "organization", label: "Empresa/Órgão", type: "text" },
+              { key: "jobTitle", label: "Cargo", type: "text" },
+              { key: "enrollmentType", label: "Tipo de inscrição", type: "select", options: enrollmentTypeOptions, required: true },
+              { key: "paymentMethod", label: "Pagamento", type: "select", options: paymentMethodOptions, required: true },
+              { key: "courseId", label: "Curso", type: "select", options: courseOptions, required: true },
+              { key: "classId", label: "Turma", type: "select", options: classOptions, required: true },
+              { key: "notes", label: "Observações", type: "textarea" },
+            ],
       };
     }
 
@@ -960,6 +1048,7 @@ export function buildResourceConfig(
       const rows = store.instructors.filter((item) =>
         item.name.toLowerCase().includes(search.toLowerCase())
       );
+      const courseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const instructorStatusOptions = [
         { value: "Ativo", label: "Ativo" },
         { value: "Inativo", label: "Inativo" },
@@ -1058,6 +1147,7 @@ export function buildResourceConfig(
           { key: "education", label: "Formação", type: "textarea" },
           { key: "photoUrl", label: "Foto do professor", type: "file" },
           { key: "bio", label: "Biografia", type: "textarea" },
+          { key: "courseIds", label: "Cursos vinculados", type: "multiselect", options: courseOptions },
           { key: "status", label: "Status", type: "select", options: instructorStatusOptions, required: true },
         ],
       };

@@ -48,7 +48,10 @@ test.describe("epica 5 - busca, loading, motion e imagens", () => {
   });
 
   test("runtime nao reintroduz apple-material em conteudo nem raw img tags", async () => {
-    const sourceFiles = readProjectFiles(join(process.cwd(), "src"), (filePath) => /\.(ts|tsx)$/.test(filePath));
+    const sourceFiles = readProjectFiles(
+      join(process.cwd(), "src"),
+      (filePath) => /\.(ts|tsx)$/.test(filePath) && !filePath.includes(join("src", "__tests__"))
+    );
 
     const rawImgOffenders = sourceFiles.filter((filePath) => /<img\b/i.test(readFileSync(filePath, "utf8")));
     expect(rawImgOffenders).toEqual([]);

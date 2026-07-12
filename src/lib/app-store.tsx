@@ -68,7 +68,6 @@ export type { AppStoreInitialData } from "@/lib/contexts/store-types";
 export type AppStoreValue = SessionStoreValue & CourseStoreValue & StudentStoreValue & AdminStoreValue;
 
 const STORAGE_KEY = "rhcursos-demo-store-v4";
-const ADMIN_SESSION_COOKIE = "rh_cursos_demo_session";
 
 type AdminMutation =
   | {
@@ -112,6 +111,8 @@ const ARRAY_STATE_KEYS = [
   "trainingPaths"
 ] as const satisfies readonly (keyof AppStoreInitialData)[];
 
+type PublicCatalogSnapshot = Awaited<ReturnType<typeof fetchPublicCatalogFromSupabase>>;
+
 function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitialData | undefined {
   if (!initialData) return initialData;
 
@@ -124,6 +125,27 @@ function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitial
   }
 
   return sanitized;
+}
+
+function resolveCatalogBootstrapState(current: AppState, catalog: PublicCatalogSnapshot) {
+  // Fallback é feito por coleção (não all-or-nothing): uma coleção real vazia
+  // (ex.: zero trilhas ativas) não deve descartar as demais coleções reais do
+  // catálogo e substituir tudo pelo mock.
+  return {
+    courses: catalog?.courses.length ? catalog.courses : current.courses.length ? current.courses : mockCatalog.courses,
+    classes: catalog?.classes.length ? catalog.classes : current.classes.length ? current.classes : mockCatalog.classes,
+    instructors: catalog?.instructors.length
+      ? catalog.instructors
+      : current.instructors.length
+        ? current.instructors
+        : mockCatalog.instructors,
+    trainingPaths: catalog?.trainingPaths.length
+      ? catalog.trainingPaths
+      : current.trainingPaths.length
+        ? current.trainingPaths
+        : mockCatalog.trainingPaths,
+    coursePublicContents: catalog?.coursePublicContents.length ? catalog.coursePublicContents : current.coursePublicContents
+  };
 }
 
 function readInitialState(initialSession?: CurrentSession | null, initialData?: AppStoreInitialData) {
@@ -145,10 +167,7 @@ function clearLegacyStoredState() {
 function getAdminSessionTokenValue() {
   const stored = getSessionToken();
   if (stored) return stored;
-  if (typeof document === "undefined") return null;
-
-  const match = document.cookie.match(new RegExp(`(?:^|; )${ADMIN_SESSION_COOKIE}=([^;]+)`));
-  return match ? decodeURIComponent(match[1]) : null;
+  return null;
 }
 
 function countConfirmedEnrollments(enrollments: Enrollment[], classId: string) {
@@ -556,11 +575,7 @@ export function AppStoreProvider({
 
         setState((current) => ({
           ...current,
-          courses: catalog?.courses?.length ? catalog.courses : (current.courses.length ? current.courses : mockCatalog.courses),
-          classes: catalog?.classes?.length ? catalog.classes : (current.classes.length ? current.classes : mockCatalog.classes),
-          instructors: catalog?.instructors?.length ? catalog.instructors : (current.instructors.length ? current.instructors : mockCatalog.instructors),
-          trainingPaths: catalog?.trainingPaths?.length ? catalog.trainingPaths : (current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths),
-          coursePublicContents: catalog?.coursePublicContents?.length ? catalog.coursePublicContents : current.coursePublicContents,
+          ...resolveCatalogBootstrapState(current, catalog),
           blogPosts: blogPosts?.length ? blogPosts : (current.blogPosts.length ? current.blogPosts : mockBlogPosts)
         }));
 
@@ -609,11 +624,7 @@ export function AppStoreProvider({
         // Fallback silencioso para dados de mock quando Supabase falha
         setState((current) => ({
           ...current,
-          courses: current.courses.length ? current.courses : mockCatalog.courses,
-          classes: current.classes.length ? current.classes : mockCatalog.classes,
-          instructors: current.instructors.length ? current.instructors : mockCatalog.instructors,
-          trainingPaths: current.trainingPaths.length ? current.trainingPaths : mockCatalog.trainingPaths,
-          coursePublicContents: current.coursePublicContents,
+          ...resolveCatalogBootstrapState(current, null),
           blogPosts: current.blogPosts.length ? current.blogPosts : mockBlogPosts
         }));
       });
@@ -1164,7 +1175,7 @@ export function AppStoreProvider({
     const exists = trainingClass.id && snapshot.classes.some((item) => item.id === trainingClass.id);
     const baseClass: TrainingClass = exists
       ? ({ ...snapshot.classes.find((item) => item.id === trainingClass.id)!, ...trainingClass } as TrainingClass)
-      : ({
+        : ({
           id: `class-${Date.now()}`,
           courseId: trainingClass.courseId ?? snapshot.courses[0]?.id ?? "",
           startDate: trainingClass.startDate ?? new Date().toISOString(),
@@ -1172,7 +1183,7 @@ export function AppStoreProvider({
           time: trainingClass.time ?? "09:00 às 17:00",
           modality: trainingClass.modality ?? "Ao vivo online",
           location: trainingClass.location ?? "Online",
-          instructorId: trainingClass.instructorId ?? snapshot.instructors[0]?.id ?? "",
+          instructorId: trainingClass.instructorId ?? "",
           totalSeats: trainingClass.totalSeats ?? 30,
           manualFilledSeats: trainingClass.manualFilledSeats ?? trainingClass.filledSeats ?? 0,
           filledSeats: trainingClass.filledSeats ?? 0,

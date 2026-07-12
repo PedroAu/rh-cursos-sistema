@@ -99,7 +99,7 @@ function formatPlace(trainingClass: TrainingClass) {
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
     return {
-      bgClass: "bg-tk-error",
+      bgClass: "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)]",
       colorClass: "text-white",
       label: "Poucas vagas"
     };
@@ -152,7 +152,7 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
         modeClassName:
           mode === "Online"
             ? "bg-tk-brand text-white"
-            : "bg-tk-error text-white",
+            : "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)] text-white",
         modeLabel: mode === "Online" ? "Online ao vivo" : "Presencial",
         place: formatPlace(trainingClass),
         price: trainingClass.price || course.price,

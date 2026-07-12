@@ -143,7 +143,7 @@ Consolidar o design system **Trust Keith** em todo o projeto, usando `src/design
 | Aspecto | Valor |
 |---------|-------|
 | **Cores** | Teal-Navy (#235875) + Bright Blue (#4285f4) + 7-step neutrals |
-| **Typography** | Fraunces (display) + Merriweather (serif) + Inter (body) |
+| **Typography** | Fraunces (display) + Helvetica Neue (serif) + Inter (body) |
 | **Border Radius** | Input (0px), Button (6px), Glass (16px), Card (24px), Pill (100rem) |
 | **Shadows** | Dual-layer glass effect (2px sharp + 16px diffuse) |
 | **Spacing** | 4px base unit (xs, sm, md, lg, xl, 2xl, 3xl) |
@@ -419,7 +419,7 @@ Error: #ea384c (red)
 
 Must be available in project:
 - **Fraunces** (display headlines) — 700 weight
-- **Merriweather** (subheadings) — 300, 400 weights
+- **Helvetica Neue** (subheadings) — 300, 400 weights
 - **Inter** (body text) — 400, 500, 600 weights
 
 **Action:** Verify `public/fonts/` or import from Google Fonts

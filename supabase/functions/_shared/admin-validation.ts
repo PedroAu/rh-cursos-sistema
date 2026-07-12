@@ -5,6 +5,26 @@ import { z } from "https://esm.sh/zod@4.4.3";
 
 const emailSchema = z.string().min(1, "Email é obrigatório").email("Email inválido");
 
+const cpfSchema = z
+  .string()
+  .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF deve estar no formato XXX.XXX.XXX-XX")
+  .transform((val) => val.replace(/\D/g, ""));
+
+const phoneSchema = z
+  .string()
+  .regex(
+    /^\(\d{2}\)\s\d{4,5}-\d{4}$/,
+    "Telefone deve estar no formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX"
+  )
+  .transform((val) => val.replace(/\D/g, ""));
+
+const resourceIdSchema = z
+  .string()
+  .trim()
+  .min(1, "ID é obrigatório")
+  .max(80, "ID excede o tamanho permitido")
+  .regex(/^[A-Za-z0-9_-]+$/, "ID inválido");
+
 const modalityEnum = z.enum([
   "Ao vivo online",
   "Presencial",
@@ -100,6 +120,20 @@ export const enrollmentStatusSchema = z.object({
   status: enrollmentStatusEnum,
 });
 
+export const enrollmentCreateSchema = z.object({
+  studentName: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(100, "Nome não pode ter mais de 100 caracteres"),
+  email: emailSchema,
+  cpf: cpfSchema,
+  phone: phoneSchema,
+  courseId: z.string().min(1, "Curso é obrigatório"),
+  classId: z.string().min(1, "Turma é obrigatória"),
+  organization: z.string().max(100, "Organização não pode ter mais de 100 caracteres").default(""),
+  jobTitle: z.string().max(100, "Cargo não pode ter mais de 100 caracteres").default(""),
+  enrollmentType: z.enum(["Pessoa física", "Empresa", "Órgão público"]).default("Pessoa física"),
+  paymentMethod: z.enum(["Pix", "Cartão", "Boleto", "Empenho"]).default("Pix"),
+  notes: z.string().max(500, "Notas não podem ter mais de 500 caracteres").default(""),
+});
+
 export const instructorSchema = z.object({
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.union([z.literal(""), emailSchema]).optional(),
@@ -115,6 +149,9 @@ export const instructorSchema = z.object({
 export const blogPostSchema = z.object({
   title: z.string().min(1, "Título é obrigatório"),
   category: z.enum([
+    "Licitações",
+    "LGPD",
+    "Compliance",
     "Departamento Pessoal",
     "eSocial",
     "Gestão Pública",

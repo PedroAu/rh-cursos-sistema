@@ -25,21 +25,21 @@ const solutions = [
   {
     description:
       "Presenciais e online, com temas atualizados para as áreas pública e privada, focados em qualificação técnica e atualização profissional.",
-    icon: Section,
+    glyph: "§",
     tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))",
     title: "Cursos abertos"
   },
   {
     description:
       "Programas personalizados conforme as necessidades de cada instituição, com adequação de horário, agenda e conteúdo e redução de custos para o cliente.",
-    icon: Diamond,
+    glyph: "◆",
     tint: "linear-gradient(135deg,var(--tk-accent),color-mix(in_srgb,var(--tk-accent) 72%,white))",
     title: "Treinamentos in company"
   },
   {
     description:
       "Apoio especializado a órgãos públicos e empresas na estruturação de processos, conformidade legal e desenvolvimento de pessoas.",
-    icon: Gem,
+    glyph: "◈",
     tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
     title: "Consultoria empresarial"
   }
@@ -251,8 +251,6 @@ export function AboutPage() {
 
           <div className="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {solutions.map((item) => {
-              const Icon = item.icon;
-
               return (
                 <Card
                   key={item.title}
@@ -263,7 +261,9 @@ export function AboutPage() {
                       className="flex h-11 w-11 items-center justify-center rounded-[12px] text-white"
                       style={{ background: item.tint }}
                     >
-                      <Icon className="h-5 w-5" />
+                      <span aria-hidden="true" className="font-tk-display text-[20px] font-bold leading-none">
+                        {item.glyph}
+                      </span>
                     </div>
                     <h3 className="mt-4 font-tk-display text-[1.5rem] font-bold tracking-[-0.02em] text-tk-ink">{item.title}</h3>
                     <p className="mt-3 text-sm leading-7 text-tk-ink-muted">{item.description}</p>

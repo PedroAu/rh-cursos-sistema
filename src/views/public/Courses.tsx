@@ -60,7 +60,10 @@ function createCategoryGradient(category: string) {
 
 function createSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
-    return { label: "Poucas vagas", colorClass: "bg-tk-error text-white" };
+    return {
+      label: "Poucas vagas",
+      colorClass: "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)] text-white"
+    };
   }
 
   if (trainingClass.status === "Em breve") {

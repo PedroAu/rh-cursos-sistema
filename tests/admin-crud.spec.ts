@@ -1,7 +1,7 @@
 import { loadEnvFile } from "node:process";
-import { createHmac } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { hasRealIntegrationEnv } from "./helpers/integration-env";
+import { hasRealIntegrationEnv, resolveAvailableCheckoutTarget } from "./helpers/integration-env";
 
 // O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET/SUPABASE_*
 // reais via .env.local, mas este processo Node/Playwright não por padrão.
@@ -62,7 +62,7 @@ function buildUniqueEmail(label: string) {
 }
 
 function buildUniqueCpf(seed: string) {
-  const digits = `${Date.now()}${seed}`
+  const digits = `${randomUUID().replace(/\D/g, "")}${Date.now()}${seed}`
     .replace(/\D/g, "")
     .padEnd(11, "0")
     .slice(0, 11);
@@ -86,6 +86,7 @@ async function loginAsAdmin(page: Page, email: string) {
     (storedToken) => {
       window.localStorage.setItem("rh_cursos_admin_token", storedToken);
       window.localStorage.removeItem("rh_cursos_supabase_session");
+      window.localStorage.removeItem("rhcursos-demo-store-v4");
     },
     token
   );
@@ -100,6 +101,24 @@ async function fillText(dialog: Locator, label: string, value: string) {
 
 async function fillSelectByIndex(dialog: Locator, label: string, index = 1) {
   await dialog.getByLabel(label).selectOption({ index });
+}
+
+async function forceSelectValue(dialog: Locator, label: string, value: string) {
+  await dialog.getByLabel(label).evaluate((select, nextValue) => {
+    const element = select as HTMLSelectElement;
+    const desired = String(nextValue);
+    const existing = Array.from(element.options).some((option) => option.value === desired);
+
+    if (!existing) {
+      const option = document.createElement("option");
+      option.value = desired;
+      option.textContent = desired;
+      element.appendChild(option);
+    }
+
+    element.value = desired;
+    element.dispatchEvent(new Event("change", { bubbles: true }));
+  }, value);
 }
 
 async function openCreateDialog(page: Page) {
@@ -263,6 +282,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
   test("inscrições: cria inscrição administrativa e exclui", async ({ page }) => {
     const name = `${MARKER} inscricao`;
     await page.goto("/admin/inscricoes");
+    const target = await resolveAvailableCheckoutTarget();
 
     const dialog = await openCreateDialog(page);
     await fillText(dialog, "Aluno", name);
@@ -273,8 +293,8 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillText(dialog, "Cargo", "Coordenador");
     await fillSelectByIndex(dialog, "Tipo de inscrição");
     await fillSelectByIndex(dialog, "Pagamento");
-    await fillSelectByIndex(dialog, "Curso");
-    await fillSelectByIndex(dialog, "Turma");
+    await forceSelectValue(dialog, "Curso", target.courseTitle);
+    await forceSelectValue(dialog, "Turma", target.classId);
 
     await saveAndExpectSuccess(page, dialog);
     await deleteRowByName(page, name);

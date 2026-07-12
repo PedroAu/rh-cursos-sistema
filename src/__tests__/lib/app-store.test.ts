@@ -662,6 +662,56 @@ describe("AppStoreProvider and hooks", () => {
     expect(classAfter?.filledSeats).toBeGreaterThanOrEqual(classBefore?.filledSeats ?? 0);
   });
 
+  it("deletes enrollments through the provider and recalculates the class capacity from remaining rows", async () => {
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const initialClassCount = harness.store.classes.length;
+    const payload = buildEnrollmentPayload(harness.store);
+    const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
+
+    await act(async () => {
+      await harness.store.createEnrollment(payload);
+    });
+
+    await waitFor(() => expect(harness.store.classes).toHaveLength(initialClassCount));
+
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: null }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const enrollmentId = harness.store.enrollments[0]?.id;
+    expect(enrollmentId).toBeDefined();
+
+    await act(async () => {
+      await harness.store.deleteEnrollment(enrollmentId!);
+    });
+
+    expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
+      body: {
+        resource: "enrollments",
+        action: "delete",
+        id: enrollmentId,
+      },
+      sessionToken: "payload.signature",
+    });
+    await waitFor(() => expect(harness.store.enrollments).toHaveLength(0));
+    await waitFor(() =>
+      expect(harness.store.classes.find((item) => item.id === payload.classId)).toMatchObject({
+        filledSeats: classBefore?.filledSeats,
+        availableSeats: classBefore?.availableSeats,
+      })
+    );
+    expect(mocks.toastSuccess).toHaveBeenCalledWith("Inscrição excluída.");
+  });
+
   it("upserts, duplicates, and deletes courses through exported store actions", async () => {
     const harness = renderStore();
     const initialCourseCount = harness.store.courses.length;

@@ -156,7 +156,7 @@ Quality gate executado inline (ver QA Results).
 
 - `INVENTORY.md` criado com: regra crítica de marca (base + remap `.rh2`), mapa completo de tokens por família (cores, tipografia, espaçamento, raios, sombras, foco, motion, gradientes, containers), 13 componentes do manifest classificados com decisão de primitiva para 14.0.5, 6 padrões compostos dos canvases (`rh-chip`, `rh-jchip`, `rh-coursecard`, `rh-paper`, `rh-tag`, `rh-nav`), mapa canvas→rota→view, assets definitivos vs temporários, 4 gaps (G1–G4) e handoff objetivo para 14.0.3/14.0.4/14.0.5.
 - Componente `Logo` do DS marcado como **não usar** (logo RH próprio já disponível).
-- Adicionados ao inventário 2 gaps além dos 3 previstos no AC6: G4 (self-host de Merriweather/Inter/Caveat via `next/font`).
+- Adicionados ao inventário 2 gaps além dos 3 previstos no AC6: G4 (self-host de Helvetica Neue/Inter/Caveat via `next/font`).
 
 ## QA Results
 

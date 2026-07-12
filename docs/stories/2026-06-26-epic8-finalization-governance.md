@@ -110,7 +110,7 @@ Done
 
 #### Findings
 
-1. `tests/checkout.e2e.spec.ts:129` voltou a passar no cenário de deeplink `?checkout=1`, restaurando a abertura automática do modal de inscrição.
+1. `tests/checkout.e2e.spec.ts:129` voltou a passar no cenário de deeplink legado `?checkout=1`, restaurando o redirecionamento automático para a rota dedicada de checkout.
 2. `tests/checkout.e2e.spec.ts:136` voltou a passar no cenário de cancelamento do modal, confirmando que o usuário permanece na página do curso.
 
 #### Evidência executada

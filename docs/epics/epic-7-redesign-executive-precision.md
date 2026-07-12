@@ -36,8 +36,8 @@ Scope 5 · Integration 2 · Infrastructure 3 · Knowledge 2 · Risk 4 = **16 →
 
 ### Inventário de componentes
 - **Só token (baixo risco):** `input`, `form-field` (label acima já existe), `select`, `textarea`, `separator`, `accordion`, `badge`/chips, `table`.
-- **Variante/refactor:** `button` (variante gold `#ffc641`/texto navy + text-button), `card` (variante top-accent), `tabs` (existe sem uso), `admin-sidebar` (cinza → navy `#083B56`), `checkout-modal` (Select → seletor visual de pagamento), `calendar-view` (refactor visual — **já existe**, 216 linhas).
-- **Novo (confirmado em 2026-06-10):** rota `admin/configuracoes` (decisão #7), rota `/falar-com-especialista` (decisão #5), **modal de Orçamento In Company** com contexto do curso clicado (decisão #6 — reutiliza padrão do `checkout-modal`), Login split-screen (estrutura), **Google Analytics 4** (decisão #4 — story EP-1.3).
+- **Variante/refactor:** `button` (variante gold `#ffc641`/texto navy + text-button), `card` (variante top-accent), `tabs` (existe sem uso), `admin-sidebar` (cinza → navy `#083B56`), **rota de checkout dedicada** (Select → seletor visual de pagamento), `calendar-view` (refactor visual — **já existe**, 216 linhas).
+- **Novo (confirmado em 2026-06-10):** rota `admin/configuracoes` (decisão #7), rota `/falar-com-especialista` (decisão #5), **modal de Orçamento In Company** com contexto do curso clicado (decisão #6 — reutiliza o padrão de formulário do checkout dedicado), Login split-screen (estrutura), **Google Analytics 4** (decisão #4 — story EP-1.3).
 
 ### Detalhes recorrentes das telas (fonte: `screens/*.html`)
 
@@ -57,7 +57,7 @@ Scope 5 · Integration 2 · Infrastructure 3 · Knowledge 2 · Risk 4 = **16 →
 | `cursos-catalogo.html` | `app/cursos/page.tsx` | 2 | **prioridade da fase (PO)** |
 | `agenda.html` | `app/agenda/page.tsx` + `calendar-view.tsx` | 2→paralela | fora do caminho crítico (PO) |
 | `curso-detalhe.html` | `app/cursos/[slug]/page.tsx` | 3 | |
-| `checkout-inscricao.html` | `src/components/checkout/checkout-modal.tsx` | 3 | é modal, não rota |
+| `checkout-inscricao.html` | `app/cursos/[slug]/checkout/page.tsx` | 3 | rota dedicada por curso |
 | `contato.html` | `app/contato/page.tsx` | 4 | |
 | `in-company.html` | `app/in-company/page.tsx` | 4 | |
 | `sobre.html` | `app/sobre/page.tsx` | 4 | |
@@ -105,7 +105,7 @@ Sequência ajustada pelo @po (valor de conversão antecipado):
 | Story | Escopo |
 |---|---|
 | EP-3.1 Detalhe de curso | Hero badges, accordions, sidebar sticky de investimento, CTA gold, relacionados |
-| EP-3.2 Checkout/Inscrição | Reskin modal + Select→seletor visual de pagamento (cartão/PIX/boleto/empenho); erro inline; sem regressão de submissão |
+| EP-3.2 Checkout/Inscrição | Rota dedicada `/cursos/[slug]/checkout` + seletor visual de pagamento (cartão/PIX/boleto/empenho); erro inline; sem regressão de submissão |
 
 ### FASE 4 — B2B & Acesso (paralelizável após F0+F1)
 | Story | Escopo |
@@ -115,7 +115,7 @@ Sequência ajustada pelo @po (valor de conversão antecipado):
 | EP-4.2 In Company | Hero, bento benefícios, processo + form orçamento embutido, CTA gold |
 | EP-4.3 Sobre | Bento missão/visão/valores, timeline, liderança |
 | EP-4.5 Falar c/ Especialista | **Confirmada** (decisão #5): criar `app/falar-com-especialista/page.tsx` conforme `screens/falar-com-especialista.html`; ligar CTAs hoje quebrados/inexistentes; lead cai no mesmo backend de contato |
-| EP-4.6 Modal Orçamento In Company | **Confirmada** (decisão #6): modal global (padrão `checkout-modal`) com form de `screens/orcamento-in-company.html` (Dados da Organização / Data e Formato / Responsável), **pré-preenchido com o curso clicado** (ex.: botão de orçamento no card do curso); acionável de `/in-company` e dos cards |
+| EP-4.6 Modal Orçamento In Company | **Confirmada** (decisão #6): modal global com form de `screens/orcamento-in-company.html` (Dados da Organização / Data e Formato / Responsável), **pré-preenchido com o curso clicado** (ex.: botão de orçamento no card do curso); acionável de `/in-company` e dos cards |
 
 ### FASE 5 — Admin
 | Story | Escopo |

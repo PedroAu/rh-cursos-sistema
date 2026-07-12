@@ -37,8 +37,8 @@
         "message": "Raw px value — use a design-system spacing token via var()."
       },
       {
-        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Fraunces|Inter|Merriweather|Caveat))/i]",
-        "message": "Font not provided by the design system. Available: Fraunces, Inter, Merriweather, Caveat."
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Fraunces|Inter|Helvetica Neue|Caveat))/i]",
+        "message": "Font not provided by the design system. Available: Fraunces, Inter, Helvetica Neue, Caveat."
       },
       {
         "selector": "JSXOpeningElement[name.name='Avatar'] > JSXAttribute > JSXIdentifier[name!=/^(?:src|name|size|status|ring|style|key|ref|className|style|children)$/]",
@@ -363,7 +363,7 @@
     "fontFamilies": [
       "Caveat",
       "Inter",
-      "Merriweather",
+      "Helvetica Neue",
       "Fraunces"
     ]
   }

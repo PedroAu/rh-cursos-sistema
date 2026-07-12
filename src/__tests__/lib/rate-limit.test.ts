@@ -13,6 +13,11 @@ vi.mock('@/lib/supabase/admin', () => ({
 
 import { checkRateLimit, rateLimitConfigs, clientIp } from '@/lib/rate-limit';
 
+async function loadRateLimitModule() {
+  vi.resetModules();
+  return import('@/lib/rate-limit');
+}
+
 function rpcBuilder(resultFactory: (signal: AbortSignal) => Promise<unknown>) {
   return {
     abortSignal: vi.fn().mockImplementation(resultFactory),
@@ -22,6 +27,7 @@ function rpcBuilder(resultFactory: (signal: AbortSignal) => Promise<unknown>) {
 describe('rate-limit', () => {
   beforeEach(() => {
     mocks.rpc.mockReset();
+    vi.unstubAllEnvs();
   });
 
   describe('checkRateLimit — Postgres RPC success', () => {
@@ -189,6 +195,27 @@ describe('rate-limit', () => {
         windowMs: 60 * 1000,
         maxRequests: 30,
       });
+    });
+
+    it('keeps the Playwright external server override out of production', async () => {
+      vi.stubEnv('NODE_ENV', 'production');
+      vi.stubEnv('PLAYWRIGHT_EXTERNAL_SERVER', '1');
+
+      const rateLimitModule = await loadRateLimitModule();
+
+      expect(rateLimitModule.rateLimitConfigs.auth).toEqual({
+        windowMs: 15 * 60 * 1000,
+        maxRequests: 5,
+      });
+    });
+
+    it('allows the Playwright external server override in non-production test runs', async () => {
+      vi.stubEnv('NODE_ENV', 'test');
+      vi.stubEnv('PLAYWRIGHT_EXTERNAL_SERVER', '1');
+
+      const rateLimitModule = await loadRateLimitModule();
+
+      expect(rateLimitModule.rateLimitConfigs.auth.maxRequests).toBe(30);
     });
   });
 

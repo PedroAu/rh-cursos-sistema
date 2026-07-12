@@ -71,7 +71,7 @@ Evidência: `src/views/admin/AdminResourcePage.tsx`, `src/components/admin/form-
 
 | Prioridade | Lacuna | Arquivos | Diretriz |
 |-----------|--------|----------|----------|
-| Alta | Placeholder usado como label persistente | `Contact.tsx`, `InCompany.tsx`, `Login.tsx`, `checkout-modal.tsx` | Text fields, Writing |
+| Alta | Placeholder usado como label persistente | `Contact.tsx`, `InCompany.tsx`, `Login.tsx`, `CourseCheckout.tsx` | Text fields, Writing |
 | Alta | Icon buttons sem nome acessível | `data-table.tsx` | Accessibility, Buttons |
 | Alta | Texto funcional em 10-12px | `badge.tsx`, cards, agenda | Typography |
 | Alta | Sem matriz de contraste WCAG AA; só `color-scheme: light` | `globals.css`, `tailwind.config.ts` | Color |

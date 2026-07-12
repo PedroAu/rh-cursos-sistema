@@ -79,6 +79,9 @@ Atualizar esta story: checkboxes, File List, status → InReview, Change Log.
 - `src/components/admin/form-fields.tsx`
 - `src/components/ui/form-field.stories.tsx`
 - `src/components/ui/form-field.tsx`
+- `src/lib/admin-resource-configs.tsx`
+- `src/__tests__/lib/admin-resource-configs.test.ts`
+- `tests/admin-polish.spec.ts`
 - `src/views/admin/AdminResourcePage.tsx`
 - `src/views/admin/AdminSettingsPage.tsx`
 - `src/views/public/Contact.tsx`
@@ -91,3 +94,4 @@ Atualizar esta story: checkboxes, File List, status → InReview, Change Log.
 ## Change Log
 - 2026-07-02 - @aiox-master (Orion) - Story criada como prompt Codex (Epic 14 §4).
 - 2026-07-02 - @dev (Codex) - Instalados `react-hook-form` e `@hookform/resolvers`; base de forms e consumidores público/admin migrados para primitives locais + zod; teste de validação do Contact adicionado; `lint`, `typecheck`, `test:unit` e `build` aprovados. Tentativa de smoke browser em `next dev` bloqueada por ausência do binário do Playwright no ambiente local.
+- 2026-07-09 - @dev (Codex) - Auditoria granular de `AdminResourcePage` reforçada em `tests/admin-polish.spec.ts`: os 7 recursos agora têm contrato de campos validado campo a campo, e `instructors` passou a expor `courseIds` como multiselect para não manter vínculo de curso apenas no save.

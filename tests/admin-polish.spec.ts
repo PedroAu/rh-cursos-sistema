@@ -20,6 +20,22 @@ function createStoreSnapshot() {
   return createAdminStoreFixture();
 }
 
+function expectFieldKeys(
+  config: { fields: Array<{ key: string; type?: string; section?: string; label: string }> },
+  expectedKeys: string[]
+) {
+  expect(config.fields.map((field) => field.key)).toEqual(expectedKeys);
+}
+
+function expectFieldTypes(
+  config: { fields: Array<{ key: string; type?: string; section?: string; label: string }> },
+  expectedTypes: Record<string, string>
+) {
+  for (const [key, type] of Object.entries(expectedTypes)) {
+    expect(config.fields.find((field) => field.key === key)?.type).toBe(type);
+  }
+}
+
 test.describe("epica 3 — admin polish", () => {
   test("guard de regressao mantém campos estruturados e relações por seleção", async () => {
     const store = createStoreSnapshot();
@@ -50,13 +66,236 @@ test.describe("epica 3 — admin polish", () => {
     expect(leadConfig.fields.find((field) => field.key === "courseInterest")?.type).toBe("text");
   });
 
+  test("admin resources expõem o contrato de campos dos 7 recursos", async () => {
+    const store = createStoreSnapshot();
+    const noop = () => undefined;
+    const deps = {
+      search: "",
+      editingId: null,
+      form: {},
+      setForm: noop,
+      setEditingId: noop,
+      setValidationErrors: noop,
+      setOpen: noop,
+    };
+
+    const configs = {
+      courses: buildResourceConfig("courses", store as never, deps as never),
+      classes: buildResourceConfig("classes", store as never, deps as never),
+      students: buildResourceConfig("students", store as never, deps as never),
+      leads: buildResourceConfig("leads", store as never, deps as never),
+      enrollments: buildResourceConfig("enrollments", store as never, deps as never),
+      enrollmentsEdit: buildResourceConfig(
+        "enrollments",
+        store as never,
+        {
+          ...deps,
+          editingId: store.enrollments[0]?.id ?? "enrollment-edit",
+          form: {
+            studentName: store.enrollments[0]?.studentName ?? "",
+            email: store.enrollments[0]?.email ?? "",
+            courseTitle: "Curso",
+            classLabel: "Turma",
+            createdAtLabel: "Data",
+            paymentMethod: store.enrollments[0]?.paymentMethod ?? "Pix",
+            enrollmentType: store.enrollments[0]?.enrollmentType ?? "Pessoa física",
+            derivedStatus: "Confirmada em turma futura.",
+            status: store.enrollments[0]?.status ?? "Confirmada",
+          },
+        } as never
+      ),
+      instructors: buildResourceConfig("instructors", store as never, deps as never),
+      blog: buildResourceConfig("blog", store as never, deps as never),
+    };
+
+    expectFieldKeys(configs.courses, [
+      "title",
+      "pathId",
+      "modalities",
+      "level",
+      "status",
+      "featured",
+      "durationLabel",
+      "price",
+      "image",
+      "targetAudience",
+      "categories",
+      "featuredCourseIds",
+      "shortDescription",
+      "fullDescription",
+      "objectives",
+      "benefits",
+      "modules",
+    ]);
+    expectFieldTypes(configs.courses, {
+      pathId: "select",
+      modalities: "multiselect",
+      featured: "select",
+      price: "number",
+      targetAudience: "array",
+      categories: "array",
+      featuredCourseIds: "multiselect",
+      shortDescription: "textarea",
+      fullDescription: "textarea",
+      objectives: "array",
+      benefits: "array",
+      modules: "modules",
+    });
+
+    expectFieldKeys(configs.classes, [
+      "courseId",
+      "startDate",
+      "endDate",
+      "time",
+      "modality",
+      "totalSeats",
+      "manualFilledSeats",
+      "status",
+      "instructorId",
+      "location",
+    ]);
+    expectFieldTypes(configs.classes, {
+      courseId: "select",
+      startDate: "date",
+      endDate: "date",
+      modality: "select",
+      totalSeats: "number",
+      manualFilledSeats: "number",
+      status: "select",
+      instructorId: "select",
+    });
+
+    expectFieldKeys(configs.students, ["name", "email", "organization", "enrollmentStatus"]);
+    expectFieldTypes(configs.students, {
+      name: "text",
+      email: "text",
+      organization: "text",
+      enrollmentStatus: "select",
+    });
+
+    expectFieldKeys(configs.leads, [
+      "name",
+      "email",
+      "phone",
+      "type",
+      "courseInterest",
+      "origin",
+      "status",
+      "organization",
+      "teamSize",
+      "preferredModality",
+      "trainingObjective",
+      "trainingTheme",
+      "mainChallenges",
+    ]);
+    expectFieldTypes(configs.leads, {
+      type: "select",
+      origin: "select",
+      status: "select",
+      teamSize: "number",
+      trainingObjective: "textarea",
+      trainingTheme: "textarea",
+      mainChallenges: "textarea",
+    });
+
+    expectFieldKeys(configs.enrollments, [
+      "studentName",
+      "email",
+      "phone",
+      "cpf",
+      "organization",
+      "jobTitle",
+      "enrollmentType",
+      "paymentMethod",
+      "courseId",
+      "classId",
+      "notes",
+    ]);
+    expectFieldTypes(configs.enrollments, {
+      studentName: "text",
+      email: "text",
+      phone: "text",
+      cpf: "text",
+      organization: "text",
+      jobTitle: "text",
+      enrollmentType: "select",
+      paymentMethod: "select",
+      courseId: "select",
+      classId: "select",
+      notes: "textarea",
+    });
+    expectFieldKeys(configs.enrollmentsEdit, [
+      "studentName",
+      "email",
+      "courseTitle",
+      "classLabel",
+      "createdAtLabel",
+      "paymentMethod",
+      "enrollmentType",
+      "derivedStatus",
+      "status",
+    ]);
+    expectFieldTypes(configs.enrollmentsEdit, {
+      studentName: "readonly",
+      email: "readonly",
+      courseTitle: "readonly",
+      classLabel: "readonly",
+      createdAtLabel: "readonly",
+      paymentMethod: "readonly",
+      enrollmentType: "readonly",
+      derivedStatus: "readonly",
+      status: "select",
+    });
+
+    expectFieldKeys(configs.instructors, [
+      "name",
+      "email",
+      "phone",
+      "specialty",
+      "education",
+      "photoUrl",
+      "bio",
+      "courseIds",
+      "status",
+    ]);
+    expectFieldTypes(configs.instructors, {
+      name: "text",
+      education: "textarea",
+      photoUrl: "file",
+      bio: "textarea",
+      courseIds: "multiselect",
+      status: "select",
+    });
+
+    expectFieldKeys(configs.blog, [
+      "title",
+      "category",
+      "author",
+      "status",
+      "summary",
+      "content",
+      "image",
+      "tags",
+      "readingTime",
+      "relatedCourseId",
+    ]);
+    expectFieldTypes(configs.blog, {
+      category: "select",
+      status: "select",
+      summary: "textarea",
+      content: "textarea",
+      tags: "array",
+      relatedCourseId: "select",
+    });
+  });
+
   test("inscrições derivam contexto read-only antes da atualização de status", async () => {
     const store = createStoreSnapshot();
     let capturedForm: Record<string, unknown> = {};
 
     const deps = {
       search: "",
-      editingId: null,
+      editingId: store.enrollments[0]?.id ?? "enrollment-edit",
       form: {},
       setForm: (value: unknown) => {
         capturedForm = value as Record<string, unknown>;

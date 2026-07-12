@@ -14,7 +14,7 @@
 | S-CAT | `cursos-catalogo.html` | `app/cursos/page.tsx` |
 | S-AGE | `agenda.html` | `app/agenda/page.tsx` |
 | S-DET | `curso-detalhe.html` | `app/cursos/[slug]/page.tsx` |
-| S-CHK | `checkout-inscricao.html` | `checkout-modal.tsx` |
+| S-CHK | `checkout-inscricao.html` | `app/cursos/[slug]/checkout/page.tsx` |
 | S-CON | `contato.html` | `app/contato/page.tsx` |
 | S-INC | `in-company.html` | `app/in-company/page.tsx` |
 | S-SOB | `sobre.html` | `app/sobre/page.tsx` |
@@ -42,7 +42,7 @@
 | FR-10 | Home: hero gradient navy, trust bar, trilhas de capacitação, depoimentos, processo em 3 passos, FAQ accordion, CTA final | S-HOME | EP-2.1 |
 | FR-11 | Agenda: refactor visual do `calendar-view.tsx` (mês navegável), destaques e filtros; navegação por teclado | S-AGE | EP-2.3 |
 | FR-12 | Detalhe de curso: hero com badges, bloco vídeo/play, accordions de conteúdo, card sticky de investimento com CTA gold, instrutor, cursos recomendados, newsletter | S-DET | EP-3.1 |
-| FR-13 | Checkout: stepper de etapas, seções Dados do Aluno/Dados da Empresa/Opções de Pagamento com seletor visual (substitui `Select`), erros inline; submissão sem regressão. **Pré-requisito (correção critique #2):** criar teste E2E `tests/checkout.e2e.spec.ts` cobrindo a submissão completa **antes** do reskin, como baseline — esse teste **não existe hoje** | S-CHK · `checkout-modal.tsx:287,423-430` | EP-3.2 |
+| FR-13 | Checkout: rota dedicada por curso (`/cursos/[slug]/checkout`), stepper de etapas, seções Dados do Aluno/Dados da Empresa/Opções de Pagamento com seletor visual (substitui `Select`), erros inline; submissão sem regressão. **Pré-requisito (correção critique #2):** criar teste E2E `tests/checkout.e2e.spec.ts` cobrindo a submissão completa **antes** do reskin, como baseline — esse teste **não existe hoje** | S-CHK · `app/cursos/[slug]/checkout/page.tsx` | EP-3.2 |
 | FR-14 | Login split-screen (painel institucional navy + form), abas Acesse/Crie sua conta | S-LOG | EP-4.4 |
 | FR-15 | Contato: cards de telefone/endereço, mapa embed, form com FormField | S-CON | EP-4.1 |
 | FR-16 | In Company: hero, bento de vantagens, processo de implementação, CTA de orçamento (abre modal FR-18) | S-INC | EP-4.2 |

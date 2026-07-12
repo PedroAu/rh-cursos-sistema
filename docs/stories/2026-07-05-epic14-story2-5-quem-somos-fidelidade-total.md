@@ -148,6 +148,8 @@ Manual/visual checks:
 - 2026-07-06 - `npm run test:epic14:fidelity:capture` ✅ via servidor local persistente (`node scripts/start-test-server.mjs`)
 - 2026-07-06 - `npm run bundle:check` ✅
 - Pendente para fechamento da story: validação visual/QA final desktop 1180px e mobile, com revisão da adaptação de fallback nas trilhas sem representação completa no catálogo atual.
+- 2026-07-09 - `src/views/public/About.tsx` ajustado para usar glifos tipográficos `§`, `◆` e `◈` na seção "O que fazemos", alinhando o canvas ao contrato da spec sem depender de ícones Lucide nessa área.
+- 2026-07-09 - `tests/public-journeys.spec.ts` ganhou asserções explícitas para os glifos da seção "O que fazemos", prevenindo regressão para iconografia Lucide.
 
 ## PO Validation
 2026-07-05 · @po (Pax) via Codex · **GO** — checklist 10/10; conteúdo institucional, dependências, rota real e adaptação do token `--tk-text-display` estão documentados; ACs delimitam claramente o que deve ser estático versus derivado do catálogo. Status: Draft → Ready.
@@ -165,3 +167,4 @@ Manual/visual checks:
 - 2026-07-06 - @dev (Dex) - Página `/sobre` entrou em implementação com trilhas dinâmicas/fallback institucional e footer específico da rota. Status: Ready → In Progress.
 - 2026-07-06 - @dev (Dex) - Gates técnicos concluídos (`lint`, `typecheck`, `unit`, `build`, `purge:gate`, `test:epic14:fidelity`, `test:epic14:fidelity:capture`, `bundle:check`) e artefatos de fidelidade de `/sobre` regenerados.
 - 2026-07-06 - @dev (Dex) - PASS formal de QA incorporado à story e lifecycle encerrado. Status: In Progress → Done.
+- 2026-07-09 - @dev (Dex) - Correção pontual pós-entrega: seção "O que fazemos" passou a usar os glifos tipográficos do canvas em vez de Lucide, com proteção de teste adicionada na jornada pública.

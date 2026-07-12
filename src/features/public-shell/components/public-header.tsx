@@ -20,7 +20,7 @@ function isItemActive(pathname: string, to: string) {
 export function PublicHeader() {
   const location = useLocation();
   const { currentSession } = useAppStore();
-  const navOrder = ["/cursos", "/agenda", "/in-company", "/consultoria", "/sobre", "/blog"];
+  const navOrder = ["/cursos", "/consultoria", "/agenda", "/in-company", "/sobre", "/blog"];
   const primaryNavItems = navOrder
     .map((to) => publicNavItems.find((item) => item.to === to))
     .filter((item): item is (typeof publicNavItems)[number] => Boolean(item));
@@ -67,7 +67,7 @@ export function PublicHeader() {
           </NextLink>
 
           <Button asChild size="sm">
-            <NextLink href="/falar-com-especialista">Fale com um especialista</NextLink>
+            <NextLink href="/falar-com-especialista">Fale com um especialista -&gt;</NextLink>
           </Button>
         </div>
 

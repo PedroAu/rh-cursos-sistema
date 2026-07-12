@@ -36,7 +36,7 @@
 - `src/styles/globals.css:56` — comentário "Dark mode futuro (D4)" contradiz decisão #9.
 - `docs/design/executive-precision/screens/admin-dashboard.html` — zero svg/canvas/chart (FR-20).
 - `tests/` — existe `public-journeys.spec.ts`; **não existe** spec E2E de checkout.
-- Referências precisas confirmadas: `checkout-modal.tsx:287/423-430`, `globals.css:54-68`, `calendar-view.tsx` (216 linhas), `ui-governance.spec.ts` (5 snapshots), `Contact.tsx:102` (`createLead`).
+- Referências precisas confirmadas: `app/cursos/[slug]/checkout/page.tsx`, `globals.css:54-68`, `calendar-view.tsx` (216 linhas), `ui-governance.spec.ts` (5 snapshots), `Contact.tsx:102` (`createLead`).
 
 ## Open Questions
 

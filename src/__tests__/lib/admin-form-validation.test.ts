@@ -5,6 +5,7 @@ import {
   validateStudent,
   validateLead,
   validateEnrollment,
+  validateEnrollmentCreate,
   validateInstructor,
   validateBlogPost,
   getErrorMessage,
@@ -213,6 +214,40 @@ describe('validateEnrollment', () => {
   it('requires a status', () => {
     expect(validateEnrollment({ status: '' }).valid).toBe(false);
     expect(validateEnrollment({ status: 'active' }).valid).toBe(true);
+  });
+});
+
+describe('validateEnrollmentCreate', () => {
+  const baseEnrollment = {
+    studentName: 'Maria Souza',
+    email: 'maria@example.com',
+    cpf: '111.222.333-44',
+    phone: '(61) 99999-1111',
+    courseId: 'course-123',
+    classId: 'class-456',
+    enrollmentType: 'Pessoa física',
+    paymentMethod: 'Pix',
+  };
+
+  it('requires CPF and phone to match the server-side strict schema', () => {
+    const result = validateEnrollmentCreate({
+      ...baseEnrollment,
+      cpf: '11122233344',
+      phone: '61999991111',
+    });
+
+    expect(result.valid).toBe(false);
+    expect(getErrorMessage(result.errors, 'cpf')).toBe('CPF deve estar no formato XXX.XXX.XXX-XX');
+    expect(getErrorMessage(result.errors, 'phone')).toBe(
+      'Telefone deve estar no formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX'
+    );
+  });
+
+  it('accepts enrollment data already normalized to the strict schema format', () => {
+    const result = validateEnrollmentCreate(baseEnrollment);
+
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
   });
 });
 

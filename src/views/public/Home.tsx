@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CheckCircle2, Star } from "lucide-react";
 
 import { FeatureListItem } from "@/components/patterns/feature-list-item";
@@ -87,15 +88,35 @@ const consultingSteps: ConsultingStep[] = [
 
 const consultingBullets = [
   "Diagnóstico do seu contexto normativo e operacional",
-  "Plano de adequação aplicável, com prioridades claras e foco em execução",
-  "Acompanhamento especializado para consolidar autonomia na prática."
+  "Plano de adequação aplicável, com passos priorizados",
+  "Acompanhamento por especialistas com experiência de campo"
 ] as const;
 
 const stats = [
-  { label: "formando servidores e profissionais de organizações públicas e privadas", value: "+15 anos" },
-  { label: "turmas realizadas entre cursos abertos e programas in-company", value: "+320" },
-  { label: "de recomendação média nas avaliações de turmas concluídas", value: "96%" },
-  { label: "organizações atendidas em treinamento e consultoria", value: "+80" }
+  { label: "formando equipes de organizações públicas e privadas com foco em aplicação prática", value: "+18 anos" },
+  { label: "turmas realizadas entre cursos abertos e programas in company", value: "+320" },
+  { label: "de recomendação média nas avaliações de turmas concluídas", value: "96%" }
+] as const;
+
+const testimonials = [
+  {
+    company: "CIAMA",
+    initials: "CI",
+    quote:
+      "A RH Cursos transformou conteúdo técnico em entendimento claro e aplicação prática. Saí do curso com mais segurança para revisar procedimentos e atuar no dia a dia."
+  },
+  {
+    company: "TRF1",
+    initials: "TR",
+    quote:
+      "A forma prática como os conteúdos foram apresentados facilitou a compreensão, a visualização dos procedimentos e a resolução de dúvidas reais da rotina profissional."
+  },
+  {
+    company: "CBTU",
+    initials: "CB",
+    quote:
+      "Didática clara, abordagem objetiva e conhecimento aplicável. O curso trouxe mais segurança para entender o tema e colocar o aprendizado em prática."
+  }
 ] as const;
 
 function getClassDateParts(value: string) {
@@ -125,6 +146,7 @@ function formatHeroMode(modality: string, location: string) {
 
 export function HomePage() {
   const { classes, courses } = useAppStore();
+  const reduceMotion = useReducedMotion();
   const sectionContainerClass = "mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]";
 
   const upcomingClasses = [...classes]
@@ -240,7 +262,7 @@ export function HomePage() {
           <SectionHeading
             eyebrow="Três caminhos, uma mesma transformação"
             title="Escolha como quer avançar"
-            subtitle="Formações e apoio especializado para transformar conhecimento técnico em segurança prática, com aderência à legislação vigente e à realidade operacional da sua organização."
+            subtitle="Conteúdo aplicável à legislação vigente e à realidade de organizações públicas e privadas."
             className="mb-11 max-w-[640px]"
           />
 
@@ -291,7 +313,7 @@ export function HomePage() {
               Consultoria
             </Badge>
             <h2 className="mt-[18px] max-w-[18ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink sm:max-w-[20ch]">
-              O conhecimento técnico aplicado ao <span className="italic">seu</span> contexto
+              A norma aplicada ao seu contexto
             </h2>
             <p className="mt-4 max-w-[56ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
               Cada exigência normativa impacta a operação de um jeito. Nossa consultoria transforma complexidade regulatória
@@ -349,9 +371,9 @@ export function HomePage() {
       <section className="bg-tk-surface py-16 lg:py-20">
         <div className={sectionContainerClass}>
           <h2 className="mb-11 text-center font-tk-display text-section-heading font-bold tracking-[var(--tk-tracking-display)] text-tk-ink md:text-section">
-            A RH Cursos em números
+            Conhecimento aplicado
           </h2>
-          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-x-6 gap-y-8 sm:grid-cols-2 xl:grid-cols-3">
             {stats.map((stat) => (
               <StatBlock key={stat.value} value={stat.value} label={stat.label} className="text-center" />
             ))}
@@ -361,14 +383,24 @@ export function HomePage() {
 
       <section className="bg-tk-surface pb-16 lg:pb-[88px]">
         <div className={sectionContainerClass}>
-          <div className="mx-auto max-w-[840px] lg:mx-0">
-            <Testimonial
-              quote="A RH Cursos traduziu exigências legais complexas em processos que a nossa equipe realmente consegue executar no dia a dia."
-              name="Mariana Alves"
-              role="Coordenadora de Compras"
-              company="Prefeitura Municipal"
-              initials="MA"
-            />
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.company}
+                initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 18 }}
+                whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.45 }}
+                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
+              >
+                <Testimonial
+                  quote={testimonial.quote}
+                  name="Participante"
+                  role="Avaliação anônima"
+                  company={testimonial.company}
+                  initials={testimonial.initials}
+                />
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

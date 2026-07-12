@@ -7,6 +7,11 @@ import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts
 import { adminClient } from "../_shared/supabase.ts";
 import { requireAdmin } from "../_shared/auth.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
+import { AdminResourceError, isAdminResourceError } from "../_shared/admin-resource-errors.ts";
+import {
+  isEnrollmentClassOpen,
+  resolveEnrollmentClassIdOrThrow,
+} from "../_shared/enrollment-class-resolution.ts";
 import {
   blogPostToUpsert,
   classToUpsert,
@@ -29,6 +34,7 @@ import {
   leadStatusUpdateSchema,
   studentSchema,
 } from "../_shared/admin-validation.ts";
+import { normalizeSearchText, resolveUniqueId } from "../_shared/reference-resolution.ts";
 
 type ResourceKey =
   | "courses"
@@ -47,56 +53,35 @@ type AdminMutation =
   | { resource: ResourceKey; action: "update-status"; id: string; status: string };
 
 async function resolveCourseId(supabase: ReturnType<typeof adminClient>, courseReference: string) {
-  const reference = courseReference.trim();
-  const normalizedReference = reference
-    .replace(/^course-/, "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-  const referenceTokens = normalizedReference.split(/\s+/).filter(Boolean);
-
-  const { data, error } = await supabase
-    .from("curso")
-    .select("id,slug,titulo");
-
+  const { data, error } = await supabase.from("curso").select("id,slug,titulo");
   if (error) throw error;
 
-  const resolved = data?.find((row) => {
-    const haystack = `${row.slug ?? ""} ${row.titulo ?? ""}`
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, " ");
-
-    if (referenceTokens.length === 0) {
-      return row.id === reference;
-    }
-
-    return referenceTokens.every((token) => haystack.includes(token));
-  });
-
-  return resolved?.id as string | undefined;
+  return resolveUniqueId(
+    data,
+    courseReference,
+    "Curso",
+    [
+      (row, rawReference) => row.id === rawReference,
+      (row, rawReference) => row.slug === rawReference,
+      (row, _rawReference, normalizedReference) =>
+        normalizeSearchText(String(row.slug ?? "")) === normalizedReference ||
+        normalizeSearchText(String(row.titulo ?? "")) === normalizedReference,
+    ],
+    (row) => normalizeSearchText(`${row.slug ?? ""} ${row.titulo ?? ""}`)
+  );
 }
 
 async function resolveCourseIdOrThrow(
   supabase: ReturnType<typeof adminClient>,
   courseReference: string
 ) {
-  const resolved = await resolveCourseId(supabase, courseReference);
-  if (!resolved) {
-    throw new Error("Curso não encontrado.");
-  }
-
-  return resolved;
+  return resolveCourseId(supabase, courseReference);
 }
 
 async function resolveEnrollmentClassId(
   supabase: ReturnType<typeof adminClient>,
   classReference: string,
-  courseReference: string,
-  organization?: string | null
+  courseReference: string
 ) {
   const { data: directClassRows, error: directClassError } = await supabase
     .from("turma")
@@ -106,7 +91,7 @@ async function resolveEnrollmentClassId(
   if (directClassError) throw directClassError;
 
   const directClass = directClassRows?.[0];
-  if (directClass?.id && directClass.status !== "Encerrada") {
+  if (directClass?.id && isEnrollmentClassOpen(directClass)) {
     return directClass.id as string;
   }
 
@@ -120,66 +105,29 @@ async function resolveEnrollmentClassId(
     .limit(1);
   if (courseClassesError) throw courseClassesError;
 
-  const existingClassId = courseClasses?.[0]?.id as string | undefined;
-  if (existingClassId) {
-    return existingClassId;
-  }
-
-  const { data: placeholderClass, error: placeholderError } = await supabase
-    .from("turma")
-    .insert({
-      curso_id: resolvedCourseId,
-      instrutor_id: null,
-      data_inicio: new Date().toISOString().slice(0, 10),
-      data_fim: new Date().toISOString().slice(0, 10),
-      horario: "09:00 - 18:00",
-      local: organization ?? null,
-      vagas_total: 30,
-      vagas_preenchidas: 0,
-      preco_turma: 0,
-      modalidade: "Online",
-      status: "Aberta",
-      observacoes: null,
-    })
-    .select("id")
-    .single();
-  if (placeholderError) throw placeholderError;
-
-  return placeholderClass.id as string;
+  return resolveEnrollmentClassIdOrThrow({
+    directClass: directClass as { id: string; status: string } | null,
+    courseClasses: (courseClasses ?? []) as Array<{ id: string; status: string }>,
+  });
 }
 
 async function resolveInstructorId(
   supabase: ReturnType<typeof adminClient>,
   instructorReference: string
 ) {
-  const reference = instructorReference.trim();
-  const normalizedReference = reference
-    .replace(/^instructor-/, "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-  const referenceTokens = normalizedReference.split(/\s+/).filter(Boolean);
-
   const { data, error } = await supabase.from("instrutor").select("id,nome");
   if (error) throw error;
 
-  const resolved = data?.find((row) => {
-    const haystack = `${row.nome ?? ""}`
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, " ");
-
-    if (referenceTokens.length === 0) {
-      return row.id === reference;
-    }
-
-    return referenceTokens.every((token) => haystack.includes(token));
-  });
-
-  return resolved?.id as string | undefined;
+  return resolveUniqueId(
+    data,
+    instructorReference,
+    "Instrutor",
+    [
+      (row, rawReference) => row.id === rawReference,
+      (row, _rawReference, normalizedReference) => normalizeSearchText(String(row.nome ?? "")) === normalizedReference,
+    ],
+    (row) => normalizeSearchText(String(row.nome ?? ""))
+  );
 }
 
 function validateMutation(mutation: AdminMutation): string | null {
@@ -261,7 +209,7 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
         telefone: payload.phone ?? null,
         cargo: payload.jobTitle ?? null,
         orgao: payload.organization ?? null,
-        tipo_aluno: payload.enrollmentType === "Empresa" ? "PJ" : payload.enrollmentType === "Órgão público" ? "Servidor" : "PF",
+        tipo_aluno: toDbStudentType(payload.enrollmentType ?? "Pessoa física"),
       };
 
       if (existingId) {
@@ -280,8 +228,7 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
       const resolvedClassId = await resolveEnrollmentClassId(
         supabase,
         String(payload.classId ?? ""),
-        String(payload.courseId ?? ""),
-        typeof payload.organization === "string" ? payload.organization : null
+        String(payload.courseId ?? "")
       );
       const { data: enrollmentId, error } = await supabase.rpc("registrar_inscricao_publica", {
         p_nome_completo: payload.studentName,
@@ -338,60 +285,15 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
       blog: "post_blog",
     };
     if (mutation.resource === "leads") {
-      const { error } = await supabase.from("lead").delete().eq("id", mutation.id);
+      const { error } = await supabase
+        .from("lead")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", mutation.id);
       if (error) throw error;
       return { skipped: false };
     }
 
     if (mutation.resource === "enrollments") {
-      const { data: enrollmentRows, error: enrollmentLookupError } = await supabase
-        .from("inscricao")
-        .select("id,turma_id,status_inscricao")
-        .eq("id", mutation.id)
-        .limit(1);
-      if (enrollmentLookupError) throw enrollmentLookupError;
-      const enrollment = enrollmentRows?.[0];
-      if (!enrollment) return { skipped: false };
-
-      const occupiesSeat =
-        enrollment.status_inscricao === "Confirmada" ||
-        enrollment.status_inscricao === "AguardandoPagamento" ||
-        enrollment.status_inscricao === "Concluida";
-      const countsAsStudent =
-        enrollment.status_inscricao === "Confirmada" || enrollment.status_inscricao === "Concluida";
-
-      if (occupiesSeat) {
-        const { data: classRows, error: classLookupError } = await supabase
-          .from("turma")
-          .select("id,curso_id,vagas_preenchidas")
-          .eq("id", enrollment.turma_id)
-          .limit(1);
-        if (classLookupError) throw classLookupError;
-        const selectedClass = classRows?.[0];
-        if (selectedClass) {
-          const { error: classUpdateError } = await supabase
-            .from("turma")
-            .update({ vagas_preenchidas: Math.max(0, selectedClass.vagas_preenchidas - 1) })
-            .eq("id", selectedClass.id);
-          if (classUpdateError) throw classUpdateError;
-
-          if (countsAsStudent) {
-            const { data: courseRows, error: courseLookupError } = await supabase
-              .from("curso")
-              .select("id,total_alunos")
-              .eq("id", selectedClass.curso_id)
-              .limit(1);
-            if (courseLookupError) throw courseLookupError;
-            const currentTotal = courseRows?.[0]?.total_alunos ?? 0;
-            const { error: courseUpdateError } = await supabase
-              .from("curso")
-              .update({ total_alunos: Math.max(0, currentTotal - 1) })
-              .eq("id", selectedClass.curso_id);
-            if (courseUpdateError) throw courseUpdateError;
-          }
-        }
-      }
-
       const { error: deleteError } = await supabase.from("inscricao").delete().eq("id", mutation.id);
       if (deleteError) throw deleteError;
       return { skipped: false };
@@ -401,12 +303,19 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
     if (!table) return { skipped: true };
 
     if (mutation.resource === "students") {
-      const { error } = await supabase
-        .from(table)
-        .update({ deleted_at: new Date().toISOString() })
-        .eq("id", mutation.id);
-      if (error) throw error;
-      return { skipped: false };
+      const { data: activeEnrollments, error: activeEnrollmentsError } = await supabase
+        .from("inscricao")
+        .select("id")
+        .eq("aluno_id", mutation.id)
+        .not("status_inscricao", "in", "(Cancelada,Concluida)")
+        .limit(1);
+      if (activeEnrollmentsError) throw activeEnrollmentsError;
+      if (activeEnrollments?.length) {
+        throw new AdminResourceError(
+          "Não é possível excluir um aluno com inscrições ativas. Cancele ou conclua as inscrições primeiro.",
+          409
+        );
+      }
     }
 
     const { error } = await supabase
@@ -581,12 +490,11 @@ Deno.serve(async (request) => {
 
     return jsonResponse({ ok: true, ...result }, 200, request);
   } catch (error) {
-    const message = error instanceof Error
-      ? error.message
-      : (error && typeof error === "object" && "message" in error && typeof error.message === "string")
-        ? error.message
-        : "Erro ao persistir recurso.";
-    console.error("admin-resources error:", message);
-    return jsonResponse({ ok: false, error: message }, 500, request);
+    if (isAdminResourceError(error)) {
+      return jsonResponse({ ok: false, error: error.message }, error.status, request);
+    }
+
+    console.error("admin-resources error:", error);
+    return jsonResponse({ ok: false, error: "Erro ao persistir recurso." }, 500, request);
   }
 });

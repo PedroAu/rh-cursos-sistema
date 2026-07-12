@@ -93,7 +93,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
         <div className="flex items-center justify-between gap-2">
           <StatusBadge status={course.status} />
           <Link
-            to={`/cursos/${course.slug}?checkout=1`}
+            to={nextClass ? `/cursos/${course.slug}/checkout?classId=${nextClass.id}` : `/cursos/${course.slug}/checkout`}
             className="inline-flex min-h-10 items-center justify-center rounded-button bg-warning px-4 text-sm font-bold text-deep-navy transition hover:opacity-90"
           >
             Inscrever-se

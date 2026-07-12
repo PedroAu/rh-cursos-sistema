@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import type { Resolver } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -27,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/lib/router-compat";
 import { useAppStore } from "@/lib/app-store";
 import { cn } from "@/lib/utils";
+import { useQuoteModal } from "@/components/in-company/quote-modal";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -44,6 +46,9 @@ const inCompanySchema = z.object({
     .trim()
     .min(1, "Selecione o tamanho da equipe."),
   modality: z.string().trim().min(1, "Selecione a área de interesse."),
+  trainingObjective: z.string().trim(),
+  trainingTheme: z.string().trim(),
+  mainChallenges: z.string().trim(),
   message: z.string().trim().max(1000, "A mensagem deve ter no máximo 1000 caracteres.")
 });
 
@@ -56,6 +61,9 @@ const defaultValues: InCompanyFormValues = {
   phone: "",
   groupSize: "",
   modality: "",
+  trainingObjective: "",
+  trainingTheme: "",
+  mainChallenges: "",
   message: ""
 };
 
@@ -197,6 +205,7 @@ function SectionEyebrow({ children, tone = "accent" }: { children: string; tone?
 
 export function InCompanyPage() {
   const { createLead } = useAppStore();
+  const { openQuote } = useQuoteModal();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
   const {
@@ -207,7 +216,7 @@ export function InCompanyPage() {
     reset
   } = useForm<InCompanyFormValues>({
     defaultValues,
-    resolver: zodResolver(inCompanySchema)
+    resolver: zodResolver(inCompanySchema) as Resolver<InCompanyFormValues>
   });
 
   const clearFeedback = () => {
@@ -223,7 +232,20 @@ export function InCompanyPage() {
         courseInterest: "Treinamento In-Company",
         email: values.email,
         message:
-          values.message.trim() ||
+          [
+            values.trainingObjective.trim() ? `Objetivo do treinamento: ${values.trainingObjective.trim()}.` : "",
+            values.trainingTheme.trim() ? `Tema a ser abordado: ${values.trainingTheme.trim()}.` : "",
+            values.mainChallenges.trim() ? `Desafios principais: ${values.mainChallenges.trim()}.` : "",
+            values.message.trim(),
+            !values.message.trim() &&
+            !values.trainingObjective.trim() &&
+            !values.trainingTheme.trim() &&
+            !values.mainChallenges.trim()
+              ? `Empresa: ${values.company}. Telefone/WhatsApp: ${values.phone}. Tamanho da equipe: ${values.groupSize} pessoa(s). Área de interesse: ${values.modality}.`
+              : ""
+          ]
+            .filter(Boolean)
+            .join(" ") ||
           `Empresa: ${values.company}. Telefone/WhatsApp: ${values.phone}. Tamanho da equipe: ${values.groupSize} pessoa(s). Área de interesse: ${values.modality}.`,
         name: values.name,
         organization: values.company,
@@ -274,6 +296,9 @@ export function InCompanyPage() {
                 </Button>
                 <Button asChild variant="outline" size="lg" className="min-w-[220px]">
                   <a href="#temas-in-company">Baixar catálogo de temas</a>
+                </Button>
+                <Button type="button" variant="secondary" size="lg" className="min-w-[220px]" onClick={() => openQuote()}>
+                  Solicitar orçamento
                 </Button>
               </div>
 
@@ -638,6 +663,45 @@ export function InCompanyPage() {
                           aria-describedby={ariaDescribedBy}
                           aria-invalid={ariaInvalid}
                           {...register("message", { onChange: clearFeedback })}
+                        />
+                      )}
+                    </FormField>
+
+                    <FormField label="Objetivo do treinamento">
+                      {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
+                        <Textarea
+                          id={fieldId}
+                          rows={3}
+                          placeholder="Ex.: atualizar a equipe para nova legislação."
+                          aria-describedby={ariaDescribedBy}
+                          aria-invalid={ariaInvalid}
+                          {...register("trainingObjective", { onChange: clearFeedback })}
+                        />
+                      )}
+                    </FormField>
+
+                    <FormField label="Tema a ser abordado">
+                      {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
+                        <Textarea
+                          id={fieldId}
+                          rows={3}
+                          placeholder="Ex.: eSocial e departamento pessoal."
+                          aria-describedby={ariaDescribedBy}
+                          aria-invalid={ariaInvalid}
+                          {...register("trainingTheme", { onChange: clearFeedback })}
+                        />
+                      )}
+                    </FormField>
+
+                    <FormField label="Desafios principais">
+                      {({ ariaDescribedBy, ariaInvalid, fieldId }) => (
+                        <Textarea
+                          id={fieldId}
+                          rows={3}
+                          placeholder="Ex.: reduzir retrabalho e padronizar execução."
+                          aria-describedby={ariaDescribedBy}
+                          aria-invalid={ariaInvalid}
+                          {...register("mainChallenges", { onChange: clearFeedback })}
                         />
                       )}
                     </FormField>

@@ -184,6 +184,39 @@ values (
   'PF'
 );
 
+create temporary table ep12_delete_ctx as
+select
+  t.vagas_preenchidas::int as vagas_antes,
+  c.total_alunos::int as total_alunos_antes
+from public.turma t
+join public.curso c on c.id = t.curso_id
+where t.id = 'class-1-1';
+
+delete from public.inscricao
+where id = 'ep12-rls-enrollment';
+
+select is(
+  (select count(*)::int from public.inscricao where id = 'ep12-rls-enrollment'),
+  0,
+  'delete da inscricao remove a linha'
+);
+
+select is(
+  (select vagas_preenchidas::int from public.turma where id = 'class-1-1'),
+  (select vagas_antes - 1 from ep12_delete_ctx),
+  'delete da inscricao libera exatamente uma vaga'
+);
+
+select is(
+  (
+    select total_alunos::int
+    from public.curso
+    where id = (select curso_id from public.turma where id = 'class-1-1')
+  ),
+  (select total_alunos_antes - 1 from ep12_delete_ctx),
+  'delete da inscricao reduz total_alunos apenas uma vez'
+);
+
 insert into public.lead (id, nome, email, origem)
 values ('ep12-rls-lead', 'Lead RLS EP12', 'ep12-rls-lead@rhcursos.test', 'Teste');
 

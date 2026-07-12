@@ -20,6 +20,14 @@ function addError(errors: ValidationError[], field: string, message: string) {
   errors.push({ field, message });
 }
 
+function hasSelectedValue(value: unknown): boolean {
+  if (Array.isArray(value)) {
+    return value.some((item) => String(item).trim().length > 0);
+  }
+
+  return str(value).trim().length > 0;
+}
+
 export function validateCourse(
   form: Record<string, unknown>,
   modules?: Array<{ title: string; description: string; topics: string[]; duration: string }>
@@ -34,7 +42,7 @@ export function validateCourse(
     addError(errors, "pathId", "Selecione uma trilha");
   }
 
-  if (!str(form.modality).trim() && !str(form.modalities).trim()) {
+  if (!hasSelectedValue(form.modality) && !hasSelectedValue(form.modalities)) {
     addError(errors, "modalities", "Selecione pelo menos uma modalidade");
   }
 
@@ -207,6 +215,10 @@ export function validateStudent(form: Record<string, unknown>): ValidationResult
     addError(errors, "organization", "Empresa/órgão é obrigatório");
   }
 
+  if (!str(form.enrollmentStatus).trim()) {
+    addError(errors, "enrollmentStatus", "Status é obrigatório");
+  }
+
   return {
     valid: errors.length === 0,
     errors
@@ -253,6 +265,56 @@ export function validateEnrollment(form: Record<string, unknown>): ValidationRes
 
   if (!str(form.status).trim()) {
     addError(errors, "status", "Status é obrigatório");
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors
+  };
+}
+
+export function validateEnrollmentCreate(form: Record<string, unknown>): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  if (!str(form.studentName).trim()) {
+    addError(errors, "studentName", "Nome do aluno é obrigatório");
+  }
+
+  if (!str(form.email).trim()) {
+    addError(errors, "email", "Email é obrigatório");
+  } else if (!isValidEmail(str(form.email))) {
+    addError(errors, "email", "Email inválido");
+  }
+
+  const phoneValue = str(form.phone).trim();
+  const cpfValue = str(form.cpf).trim();
+
+  if (!phoneValue) {
+    addError(errors, "phone", "Telefone é obrigatório");
+  } else if (!/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(phoneValue)) {
+    addError(errors, "phone", "Telefone deve estar no formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX");
+  }
+
+  if (!cpfValue) {
+    addError(errors, "cpf", "CPF é obrigatório");
+  } else if (!/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpfValue)) {
+    addError(errors, "cpf", "CPF deve estar no formato XXX.XXX.XXX-XX");
+  }
+
+  if (!str(form.courseId).trim()) {
+    addError(errors, "courseId", "Selecione um curso");
+  }
+
+  if (!str(form.classId).trim()) {
+    addError(errors, "classId", "Selecione uma turma");
+  }
+
+  if (!str(form.enrollmentType).trim()) {
+    addError(errors, "enrollmentType", "Selecione o tipo de inscrição");
+  }
+
+  if (!str(form.paymentMethod).trim()) {
+    addError(errors, "paymentMethod", "Selecione a forma de pagamento");
   }
 
   return {

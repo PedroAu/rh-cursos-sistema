@@ -21,6 +21,7 @@ import { useHotkey } from "@/hooks/use-hotkey";
 import type { ValidationError } from "@/lib/admin-form-validation";
 import { buildResourceConfig, type FieldConfig, type ResourceKey } from "@/lib/admin-resource-configs";
 import { useAppStore } from "@/lib/app-store";
+import { formatCPF, formatPhone } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type CsvColumn = {
@@ -138,7 +139,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   );
 
   const rows = config.rows as Array<{ id: string }>;
-  const canCreate = resource !== "students" && resource !== "enrollments";
+  const canCreate = true;
   const pageTitle = getPageTitle(resource, config.title);
   const pageDescription = getPageDescription(resource, config.description);
 
@@ -383,6 +384,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                         <RenderField
                           field={field}
                           form={form}
+                          resource={resource}
                           setForm={setForm}
                           error={errorsByField[field.key]}
                         />
@@ -473,14 +475,26 @@ function SearchField({
 function RenderField({
   field,
   form,
+  resource,
   setForm,
   error
 }: {
   field: FieldConfig;
   form: Record<string, unknown>;
+  resource: ResourceKey;
   setForm: React.Dispatch<React.SetStateAction<Record<string, unknown>>>;
   error?: string;
 }) {
+  const updateField = (value: unknown) => {
+    setForm((current) => {
+      if (resource === "enrollments" && field.key === "courseId") {
+        return { ...current, courseId: value, classId: "" };
+      }
+
+      return { ...current, [field.key]: value };
+    });
+  };
+
   if (field.type === "readonly") {
     return (
       <div className="rounded-2xl border border-tk-line bg-tk-surface-2 p-4">
@@ -495,7 +509,7 @@ function RenderField({
       <ModulesBuilderLite
         label={field.label}
         value={(form[field.key] as ModuleValue[]) || []}
-        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        onChange={updateField}
         error={error}
       />
     );
@@ -506,7 +520,7 @@ function RenderField({
       <ArrayInputLite
         label={field.label}
         value={(form[field.key] as string[]) || []}
-        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        onChange={updateField}
         error={error}
       />
     );
@@ -519,7 +533,7 @@ function RenderField({
         required={field.required}
         options={field.options}
         value={(form[field.key] as string[]) || []}
-        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        onChange={updateField}
         error={error}
       />
     );
@@ -532,7 +546,7 @@ function RenderField({
         required={field.required}
         options={field.options}
         value={String(form[field.key] ?? "")}
-        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        onChange={updateField}
         error={error}
       />
     );
@@ -544,7 +558,7 @@ function RenderField({
         label={field.label}
         value={String(form[field.key] ?? "")}
         placeholder={`Ex.: ${field.label}`}
-        onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+        onChange={(event) => updateField(event.currentTarget.value)}
         error={error}
         aria-required={field.required || undefined}
       />
@@ -559,7 +573,7 @@ function RenderField({
         value={String(form[field.key] ?? "")}
         onChange={(event) => {
           const nextValue = event.currentTarget.value;
-          setForm((current) => ({ ...current, [field.key]: nextValue === "" ? "" : Number(nextValue) }));
+          updateField(nextValue === "" ? "" : Number(nextValue));
         }}
         error={error}
         aria-required={field.required || undefined}
@@ -573,7 +587,37 @@ function RenderField({
         label={field.label}
         type="date"
         value={String(form[field.key] ?? "")}
-        onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+        onChange={(event) => updateField(event.currentTarget.value)}
+        error={error}
+        aria-required={field.required || undefined}
+      />
+    );
+  }
+
+  if (field.key === "cpf") {
+    return (
+      <Input
+        label={field.label}
+        value={String(form[field.key] ?? "")}
+        placeholder="000.000.000-00"
+        inputMode="numeric"
+        onChange={(event) => updateField(formatCPF(event.currentTarget.value))}
+        error={error}
+        aria-required={field.required || undefined}
+      />
+    );
+  }
+
+  if (field.key === "phone") {
+    return (
+      <Input
+        label={field.label}
+        type="tel"
+        value={String(form[field.key] ?? "")}
+        placeholder="(00) 00000-0000"
+        inputMode="tel"
+        autoComplete="tel"
+        onChange={(event) => updateField(formatPhone(event.currentTarget.value))}
         error={error}
         aria-required={field.required || undefined}
       />
@@ -586,7 +630,7 @@ function RenderField({
         label={field.label}
         required={field.required}
         value={typeof form[field.key] === "string" ? (form[field.key] as string) : ""}
-        onChange={(value) => setForm((current) => ({ ...current, [field.key]: value }))}
+        onChange={updateField}
         error={error}
       />
     );
@@ -597,7 +641,7 @@ function RenderField({
       label={field.label}
       value={String(form[field.key] ?? "")}
       placeholder={`Ex.: ${field.label}`}
-      onChange={(event) => setForm((current) => ({ ...current, [field.key]: event.currentTarget.value }))}
+      onChange={(event) => updateField(event.currentTarget.value)}
       error={error}
       aria-required={field.required || undefined}
     />

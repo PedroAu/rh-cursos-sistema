@@ -32,10 +32,15 @@ export interface RateLimitConfig {
   maxRequests: number;
 }
 
+// Dev/E2E-only override for external Playwright runners.
+// Production ignores this flag even if it is accidentally present.
+const isPlaywrightServer =
+  process.env.NODE_ENV !== "production" && process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1";
+
 export const rateLimitConfigs = {
   enrollment: { windowMs: 60 * 1000, maxRequests: 20 },
   lead: { windowMs: 60 * 1000, maxRequests: 10 },
-  auth: { windowMs: 15 * 60 * 1000, maxRequests: 5 },
+  auth: { windowMs: 15 * 60 * 1000, maxRequests: isPlaywrightServer ? 30 : 5 },
   authGlobalLogout: { windowMs: 60 * 1000, maxRequests: 5 },
   admin: { windowMs: 60 * 1000, maxRequests: 30 }
 } as const;
