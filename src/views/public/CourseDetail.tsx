@@ -384,7 +384,7 @@ export function CourseDetailPage() {
                     {course.title}
                   </h1>
 
-                  <p className="mt-4 max-w-[58ch] font-tk-serif text-[1.05rem] font-light leading-[1.45] text-tk-ink-muted sm:text-[1.15rem] lg:text-[1.2rem]">
+                  <p className="mt-4 max-w-[58ch] font-tk-serif text-[1.05rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.15rem] lg:text-[1.2rem]">
                     {courseContent?.heroSubtitle ?? course.fullDescription}
                   </p>
 
@@ -415,7 +415,7 @@ export function CourseDetailPage() {
                     <h2 id="beneficios" className="font-tk-display text-[2rem] font-bold tracking-[-0.02em] text-tk-ink">
                       O que você vai dominar
                     </h2>
-                    <p className="mt-2 max-w-[46ch] font-tk-serif text-[1.05rem] font-light leading-[1.45] text-tk-ink-muted">
+                    <p className="mt-2 max-w-[46ch] font-tk-serif text-[1.05rem] font-normal leading-[1.45] text-tk-ink-muted">
                       Competências práticas para aplicar no dia seguinte ao curso.
                     </p>
                   </div>
@@ -467,7 +467,7 @@ export function CourseDetailPage() {
                     <h2 id="programa" className="font-tk-display text-[2rem] font-bold tracking-[-0.02em] text-tk-ink">
                       Conteúdo programático
                     </h2>
-                    <p className="mt-2 font-tk-serif text-[1.05rem] font-light leading-[1.45] text-tk-ink-muted">
+                    <p className="mt-2 font-tk-serif text-[1.05rem] font-normal leading-[1.45] text-tk-ink-muted">
                       {course.modules.length} módulos · {course.durationLabel} · material de apoio e modelos incluídos
                     </p>
                   </div>
@@ -592,7 +592,7 @@ export function CourseDetailPage() {
                           <Star key={`star-${index}`} aria-hidden="true" className="h-4 w-4 fill-[#e8a33d] text-[#e8a33d]" />
                         ))}
                       </div>
-                      <blockquote id="depoimento" className="font-tk-serif text-[1.05rem] font-light leading-7 text-tk-ink">
+                      <blockquote id="depoimento" className="font-tk-serif text-[1.05rem] font-normal leading-7 text-tk-ink">
                         &ldquo;{testimonial.text}&rdquo;
                       </blockquote>
                       <div className="mt-4 text-sm font-semibold text-tk-ink">{testimonial.name}</div>
@@ -607,7 +607,7 @@ export function CourseDetailPage() {
                   <h2 id="faq" className="font-tk-display text-[2rem] font-bold tracking-[-0.02em] text-tk-ink">
                     Perguntas frequentes
                   </h2>
-                  <p className="mx-auto mt-2 max-w-[46ch] font-tk-serif text-[1.05rem] font-light leading-[1.45] text-tk-ink-muted">
+                  <p className="mx-auto mt-2 max-w-[46ch] font-tk-serif text-[1.05rem] font-normal leading-[1.45] text-tk-ink-muted">
                     Tudo o que você precisa saber antes de se inscrever.
                   </p>
                   <div className="mx-auto mt-6 grid max-w-[640px] gap-3 text-left">
@@ -804,7 +804,7 @@ export function CourseDetailPage() {
             <h2 className="mt-4 max-w-[18ch] font-tk-display text-[2rem] font-bold leading-[1.15] tracking-[-0.02em] text-tk-ink">
               {corporateCta.title}
             </h2>
-            <p className="mt-3 font-tk-serif text-[1.15rem] font-light leading-[1.45] text-tk-ink-muted">
+            <p className="mt-3 font-tk-serif text-[1.15rem] font-normal leading-[1.45] text-tk-ink-muted">
               {corporateCta.description}
             </p>
           </div>

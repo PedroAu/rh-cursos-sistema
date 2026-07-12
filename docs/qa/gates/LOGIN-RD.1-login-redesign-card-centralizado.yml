@@ -1,9 +1,9 @@
 schema: 1
 story: 'LOGIN-RD.1'
 gate: PASS
-status_reason: 'Todos os 7 AC atendidos e verificados; D1 (papel via app_metadata.role, sem role na request) e D2 (persistência real via remember) corretamente implementados, sem regressão de auth. Apenas 1 nota cosmética de baixa severidade.'
+status_reason: 'Re-review: DOC-001 resolvido (subtítulo fallback não repete mais o H1); baselines regeneradas e verificadas contra build de produção fresco. Todos os 7 AC atendidos, sem regressão. Nenhum issue em aberto.'
 reviewer: 'Quinn'
-updated: '2026-07-12T14:45:00Z'
+updated: '2026-07-12T15:05:00Z'
 
 evidence:
   lint: '0 erros (19 warnings pré-existentes, nenhum nos arquivos do login)'
@@ -21,11 +21,14 @@ acceptance_criteria:
   AC6_responsivo_acessivel: PASS  # baseline mobile ok, focus/labels/aria preservados
   AC7_sem_regressao_auth: PASS    # route-auth/login-errors verdes com novo contrato sem role
 
-top_issues:
+top_issues: []
+
+resolved_issues:
   - id: 'DOC-001'
     severity: low
-    finding: 'O subtítulo genérico do card repete o texto do H1 ("Bem-vindo de volta. Entre com suas credenciais." sob o H1 "Bem-vindo de volta").'
-    suggested_action: 'Ajustar a cópia do subtítulo fallback para não repetir a headline (ex.: "Entre com suas credenciais para acessar o portal"). Não bloqueante.'
+    finding: 'O subtítulo genérico do card repetia o texto do H1.'
+    resolution: 'Subtítulo fallback alterado para "Entre com suas credenciais para acessar o portal." (Login.tsx:50). Baselines visuais regeneradas; verificado contra build de produção fresco (`npm run build`).'
+    verified: true
 
 waiver: { active: false }
 

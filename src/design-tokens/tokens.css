@@ -44,7 +44,7 @@
 
   /* Trust Keith typography */
   --tk-font-display: var(--font-fraunces), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --tk-font-serif: "Helvetica Neue", Arial, sans-serif;
+  --tk-font-serif: var(--font-merriweather), Georgia, "Times New Roman", serif;
   --tk-font-body: var(--font-inter), "Helvetica Neue", Arial, sans-serif;
   --tk-font-hand: "Caveat", "Segoe Script", cursive;
   --tk-text-display-hero: 3.75rem;
@@ -54,7 +54,7 @@
   --tk-text-section: 2rem;
   --tk-text-subhead-lg: 1.5rem;
   --tk-text-subhead: 1.25rem;
-  --tk-text-body-lg: 1.0625rem;
+  --tk-text-body-lg: 1.125rem;
   --tk-text-body: 1rem;
   --tk-text-body-sm: 0.875rem;
   --tk-text-caption: 0.75rem;

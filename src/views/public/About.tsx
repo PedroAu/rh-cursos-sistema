@@ -140,7 +140,7 @@ export function AboutPage() {
           <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.75rem] font-bold leading-[1.03] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
             Transformando vidas por meio do <em className="italic">conhecimento</em>
           </h1>
-          <p className="mt-4 max-w-[62ch] font-tk-serif text-[1.14rem] font-light leading-[1.45] text-tk-ink-muted">
+          <p className="mt-4 max-w-[62ch] font-tk-serif text-[1.14rem] font-normal leading-[1.45] text-tk-ink-muted">
             A RH Cursos &amp; Soluções é uma empresa brasileira de educação corporativa, consultoria e treinamento
             empresarial, sediada em Brasília – DF, especializada na capacitação de servidores públicos e profissionais
             do setor privado.
@@ -350,7 +350,7 @@ export function AboutPage() {
       <section className="bg-tk-brand py-16 text-center text-tk-surface">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
           <h2 className="mt-3 font-tk-display text-[var(--tk-text-display)] font-bold tracking-[-0.03em]">Pronto para capacitar sua equipe?</h2>
-          <p className="mx-auto mt-4 max-w-[52ch] font-tk-serif text-[1.14rem] font-light leading-[1.5] text-white/82">
+          <p className="mx-auto mt-4 max-w-[52ch] font-tk-serif text-[1.14rem] font-normal leading-[1.5] text-white/82">
             Fale com um especialista sobre cursos abertos, treinamentos in company e consultoria para o setor público e privado.
           </p>
           <div className="mt-8">

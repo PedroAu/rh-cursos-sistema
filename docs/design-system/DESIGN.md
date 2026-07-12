@@ -32,20 +32,20 @@ typography:
     fontWeight: 700
     lineHeight: 1.25
   subheading-large:
-    fontFamily: "Helvetica Neue"
+    fontFamily: "Merriweather"
     fontSize: 1.5rem
-    fontWeight: 300
+    fontWeight: 400
     lineHeight: 1.35
   subheading:
-    fontFamily: "Helvetica Neue"
+    fontFamily: "Merriweather"
     fontSize: 1.25rem
     fontWeight: 400
     lineHeight: 1.4
   body-large:
     fontFamily: "Inter"
-    fontSize: 1.0625rem
+    fontSize: 1.125rem
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.5
   body:
     fontFamily: "Inter"
     fontSize: "1rem"
@@ -224,7 +224,7 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 
 ### Font Family
 - **Primary**: Inter (400, 500, 600 weights) — clean, neutral, optimized for UI and body text readability.
-- **Serif Accent**: Helvetica Neue (300 weight) — elegant, warm, used for subheadings to add personality and visual hierarchy.
+- **Serif Accent**: Merriweather (400 weight) — elegant, warm serif used for subheadings to add personality and visual hierarchy.
 - **Display**: Fraunces (700 weight) — bold, distinctive, anchors hero sections and major headings.
 - **Handwriting**: Caveat (700 weight) — optional, accent use only (e.g. testimonial signatures or decorative moments).
 
@@ -235,9 +235,9 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 | Display Hero | Fraunces | 60px (3.75rem) | 700 | 1.1 | -0.02em | — | Hero headlines, maximum impact |
 | Display Large | Fraunces | 44px (2.75rem) | 700 | 1.2 | -0.02em | — | Section headers, feature callouts |
 | Section Heading | Fraunces | 32px (2rem) | 700 | 1.25 | normal | — | Page section breaks |
-| Subheading Large | Helvetica Neue | 24px (1.5rem) | 300 | 1.35 | normal | — | Feature descriptions, elegant contrast |
-| Subheading | Helvetica Neue | 20px (1.25rem) | 400 | 1.4 | normal | — | Subsection breaks |
-| Body Large | Inter | 17px (1.0625rem) | 400 | 1.45 | normal | — | Product descriptions, feature copy |
+| Subheading Large | Merriweather | 24px (1.5rem) | 400 | 1.35 | normal | — | Feature descriptions, elegant contrast |
+| Subheading | Merriweather | 20px (1.25rem) | 400 | 1.4 | normal | — | Subsection breaks |
+| Body Large | Inter | 18px (1.125rem) | 400 | 1.5 | normal | — | Product descriptions, feature copy |
 | Body | Inter | 16px (1rem) | 400 | 1.5 | normal | — | Default body text, standard legibility |
 | Body Small | Inter | 14px (0.875rem) | 400 | 1.4 | normal | — | Secondary text, reduced emphasis |
 | Button | Inter | 14px (0.875rem) | 500 | 1.2 | normal | — | CTA text, clear affordance |
@@ -250,7 +250,7 @@ The palette deliberately separates **brand identity** (teal navy, used sparingly
 
 ### Principles
 - **Weight is hierarchy, not emphasis.** Inter 300 is lighter than Inter 400, which is lighter than 500 and 600. Use weight progression to guide the eye, not bolding or italics.
-- **Serif headings slow the reader down intentionally.** Helvetica Neue at 300 weight creates an elegant pause before product descriptions; it signals "this matters, read this carefully."
+- **Serif headings slow the reader down intentionally.** Merriweather at 400 weight creates an elegant pause before product descriptions; it signals "this matters, read this carefully."
 - **Letter spacing stays tight at display sizes.** Fraunces headlines are tracked normally to -0.02em, keeping them compact and impactful.
 - **Line height increases with size reduction.** Body text (16px) gets 1.5, small text (12px) gets 1.2. This counterintuitive spacing improves legibility at small sizes.
 - **No all-caps headings.** Trust Keith headings use sentence case (capital first letter only), which is more approachable and readable than shouting.
@@ -450,9 +450,9 @@ Trust Keith's shadow system is **always dark-tinted**, never colored. The logic 
 
 ### Example Component Prompts
 
-> Create a hero section with white background. Hero headline at 60px Fraunces weight 700, line-height 1.1, color #222525, tracking -0.02em. Subtitle at 20px Helvetica Neue weight 300, line-height 1.4, color #4f5057. Two CTAs below: primary button with teal background (#235875), white text, 20px padding, 6px radius; secondary button with transparent background, dark gray text (#222525), light gray border (#ebebeb), 6px radius, 20px padding. Both buttons Inter 14px weight 500. Hero imagery on the right (desktop) or below (mobile) with 16:9 aspect ratio.
+> Create a hero section with white background. Hero headline at 60px Fraunces weight 700, line-height 1.1, color #222525, tracking -0.02em. Subtitle at 20px Merriweather weight 400, line-height 1.4, color #4f5057. Two CTAs below: primary button with teal background (#235875), white text, 20px padding, 6px radius; secondary button with transparent background, dark gray text (#222525), light gray border (#ebebeb), 6px radius, 20px padding. Both buttons Inter 14px weight 500. Hero imagery on the right (desktop) or below (mobile) with 16:9 aspect ratio.
 
-> Build a feature card with white background (#ffffff), 1px border #ebebeb, 24px border-radius, 32px padding. Card title: 20px Helvetica Neue weight 400, color #222525. Card description: 16px Inter weight 400, color #4f5057, line-height 1.5. Include an optional icon in 40×40px size. Apply shadow: `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)`. On hover, translate the card up 2px and reduce opacity to .92.
+> Build a feature card with white background (#ffffff), 1px border #ebebeb, 24px border-radius, 32px padding. Card title: 20px Merriweather weight 400, color #222525. Card description: 16px Inter weight 400, color #4f5057, line-height 1.5. Include an optional icon in 40×40px size. Apply shadow: `0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.5)`. On hover, translate the card up 2px and reduce opacity to .92.
 
 > Design a navigation bar with light gray background (#ebebeb), dark gray text (#222525). Nav height auto, padding 16px vertical 20px horizontal. Nav items: 14px Inter weight 500. Active/hover state: text color stays #222525, add bottom border 2px teal (#235875). On mobile, transform to hamburger menu; menu items stack vertically with 8px gap. Navigation dropdown menus appear on hover (desktop) or on click (mobile) with 200ms ease transition.
 

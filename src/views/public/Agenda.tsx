@@ -401,7 +401,7 @@ export function AgendaPage() {
               <h1 className="max-w-[20ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.5rem] lg:text-[2.75rem]">
                 Próximas turmas, em <em className="italic text-tk-accent-strong">ordem</em> de data
               </h1>
-              <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-light leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
+              <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
                 Todas as turmas presenciais e online ao vivo confirmadas no calendário. Busque pelo nome do curso ou refine
                 por modalidade, área e local.
               </p>
@@ -752,7 +752,7 @@ export function AgendaPage() {
               <h2 className="font-tk-display text-[2rem] font-bold leading-tight text-tk-ink">
                 Nenhuma data serve para a sua equipe?
               </h2>
-              <p className="mt-3 font-tk-serif text-xl font-light leading-[1.45] text-tk-ink-muted">
+              <p className="mt-3 font-tk-serif text-xl font-normal leading-[1.45] text-tk-ink-muted">
                 Montamos uma turma fechada com o seu tema, no seu calendário e com o contexto da sua organização.
               </p>
             </div>

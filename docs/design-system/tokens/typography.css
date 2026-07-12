@@ -1,13 +1,13 @@
 /* Trust Keith — Typography tokens
  * Three families, weight-as-hierarchy. Fraunces (700) for display headlines,
- * Helvetica Neue (300/400) for elegant serif subheadings, Inter for body/UI.
+ * Merriweather (400/700) for elegant serif subheadings, Inter for body/UI.
  * Caveat reserved for decorative/handwritten accent moments only.
  */
 
 :root {
   /* ---- Families ---- */
   --tk-font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-  --tk-font-serif: "Helvetica Neue", Georgia, "Times New Roman", serif;
+  --tk-font-serif: "Merriweather", Georgia, "Times New Roman", serif;
   --tk-font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
   --tk-font-hand: "Caveat", "Segoe Script", cursive;
 
@@ -17,7 +17,7 @@
   --tk-text-section: 2rem;           /* 32px — page section breaks */
   --tk-text-subhead-lg: 1.5rem;      /* 24px — feature descriptions (serif) */
   --tk-text-subhead: 1.25rem;        /* 20px — subsection (serif) */
-  --tk-text-body-lg: 1.0625rem;      /* 17px — product/feature copy */
+  --tk-text-body-lg: 1.125rem;       /* 18px — product/feature copy */
   --tk-text-body: 1rem;              /* 16px — default body */
   --tk-text-body-sm: 0.875rem;       /* 14px — secondary text, buttons, links */
   --tk-text-caption: 0.75rem;        /* 12px — helper text, metadata */

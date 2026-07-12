@@ -3295,13 +3295,13 @@
     "semantic_hash": ""
   },
   "app/api/auth/session/route.ts": {
-    "mtime": 1783527338.3997862,
-    "ast_hash": "ad2a5207732e4108e063dc893b016b6c",
+    "mtime": 1783866104.6924534,
+    "ast_hash": "ba042ab9286d9a0584b52ced5658a535",
     "semantic_hash": ""
   },
   "app/api/enrollments/route.ts": {
-    "mtime": 1783746417.9062977,
-    "ast_hash": "63afd5fd1c2d90631d2979b68916af26",
+    "mtime": 1783856726.4593916,
+    "ast_hash": "78e649539a9ef5abe9ef2f0b9e795196",
     "semantic_hash": ""
   },
   "app/blog/[slug]/page.tsx": {
@@ -3375,13 +3375,13 @@
     "semantic_hash": ""
   },
   "app/layout.tsx": {
-    "mtime": 1783606026.8368158,
-    "ast_hash": "9d688644ab8a23bda2ede52968271684",
+    "mtime": 1783888047.2675896,
+    "ast_hash": "8f637a327f57c38c3e8c5e4797393f2c",
     "semantic_hash": ""
   },
   "app/login/page.tsx": {
-    "mtime": 1782438375.4922812,
-    "ast_hash": "2e795b3b86a2dcecbd4b3f64980d0d97",
+    "mtime": 1783866161.2703834,
+    "ast_hash": "f6f328189c17f91b34b17fe449abfda6",
     "semantic_hash": ""
   },
   "app/page.tsx": {
@@ -3455,7 +3455,7 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1783801976.786499,
+    "mtime": 1783868097.3220942,
     "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
@@ -3795,8 +3795,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/utils.test.ts": {
-    "mtime": 1782438375.539895,
-    "ast_hash": "4208afde1009691a2ade55efd7b520ca",
+    "mtime": 1783864573.2902367,
+    "ast_hash": "c57966f40658d7f100fa582917f87fa0",
     "semantic_hash": ""
   },
   "src/__tests__/lib/validation.test.ts": {
@@ -4025,8 +4025,8 @@
     "semantic_hash": ""
   },
   "src/components/next-page-shell.tsx": {
-    "mtime": 1782905406.7989674,
-    "ast_hash": "8a14f1ace809c392b336c48ca2f70b7d",
+    "mtime": 1783866157.3843555,
+    "ast_hash": "7fb607b276336d4e54c3f10f6e559853",
     "semantic_hash": ""
   },
   "src/components/page-clients/blog-post-client.tsx": {
@@ -4320,8 +4320,8 @@
     "semantic_hash": ""
   },
   "src/components/ui/typography.tsx": {
-    "mtime": 1783557432.214275,
-    "ast_hash": "638c690d6c6e2f1b905d6cc6e39ffa58",
+    "mtime": 1783867895.2429407,
+    "ast_hash": "49e69d671be7740df165f7f7c561722b",
     "semantic_hash": ""
   },
   "src/design-tokens/tokens.tailwind.d.ts": {
@@ -4500,18 +4500,18 @@
     "semantic_hash": ""
   },
   "src/lib/app-store.tsx": {
-    "mtime": 1783822606.8204918,
-    "ast_hash": "e3c41daa643b2ee319fc724079d71ae5",
+    "mtime": 1783856506.3653414,
+    "ast_hash": "d709f56cef4795b89f31eea35732e137",
     "semantic_hash": ""
   },
   "src/lib/auth-session.ts": {
-    "mtime": 1782438375.551206,
-    "ast_hash": "3df7dce1ff694fc04d0dba39a1f8801e",
+    "mtime": 1783866058.5902321,
+    "ast_hash": "c2ecaa274c0ffd5b112dd6574a9bcc2c",
     "semantic_hash": ""
   },
   "src/lib/auth.ts": {
-    "mtime": 1782438375.5515113,
-    "ast_hash": "4a0b560e57d21f98295e32be297344c8",
+    "mtime": 1783866067.6275058,
+    "ast_hash": "e758c80556d24ae38b34d76ce42aa67c",
     "semantic_hash": ""
   },
   "src/lib/authorize.ts": {
@@ -4720,8 +4720,8 @@
     "semantic_hash": ""
   },
   "src/stories/design-tokens.stories.tsx": {
-    "mtime": 1783605993.5176866,
-    "ast_hash": "bf5acbd64af4bdefbadbe17d50b5d6ec",
+    "mtime": 1783868506.4869082,
+    "ast_hash": "966a23d1d44c064327c8200514e9ca71",
     "semantic_hash": ""
   },
   "src/stories/trust-keith-patterns.stories.tsx": {
@@ -4820,8 +4820,8 @@
     "semantic_hash": ""
   },
   "src/views/public/Login.tsx": {
-    "mtime": 1783559357.3648078,
-    "ast_hash": "6d19ecac1fd77d1d2b96bfa670bc0b98",
+    "mtime": 1783868309.6790774,
+    "ast_hash": "683bc1271d878ec3eed2b72f2672f164",
     "semantic_hash": ""
   },
   "src/views/public/SpecialistContact.tsx": {
@@ -4900,8 +4900,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/enrollments/index.ts": {
-    "mtime": 1783746422.2345624,
-    "ast_hash": "a07f208bd1b6ca5bb1c8deddd6e0104f",
+    "mtime": 1783856726.4596355,
+    "ast_hash": "7fc313448a2e62264ec86bbf0ba3b9b9",
     "semantic_hash": ""
   },
   "supabase/functions/leads/index.ts": {
@@ -5015,8 +5015,8 @@
     "semantic_hash": ""
   },
   "supabase/tests/database/ep12-transactions-rls.test.sql": {
-    "mtime": 1783772701.8609743,
-    "ast_hash": "4e49125ba683bc2b0b51f40392a6a20b",
+    "mtime": 1783859783.4250994,
+    "ast_hash": "3427ca8669ca586baa2783802af1d508",
     "semantic_hash": ""
   },
   "supabase/tests/database/ep14-instructor-portal-rls.test.sql": {
@@ -5075,8 +5075,8 @@
     "semantic_hash": ""
   },
   "tests/epic14-mantine-removal.smoke.spec.ts": {
-    "mtime": 1783601909.9592721,
-    "ast_hash": "069119277b87335e077daa8f212f4e0b",
+    "mtime": 1783866455.4013774,
+    "ast_hash": "7088a8640a1b33c078d125c33fef637d",
     "semantic_hash": ""
   },
   "tests/epic5-search-motion.spec.ts": {
@@ -5110,8 +5110,8 @@
     "semantic_hash": ""
   },
   "tests/public-journeys.spec.ts": {
-    "mtime": 1783855263.5206058,
-    "ast_hash": "fae8b76abc189ce84db59e9f63b5c125",
+    "mtime": 1783866213.1744485,
+    "ast_hash": "d471bec5067f3560b1c18ac7efcd4cf5",
     "semantic_hash": ""
   },
   "tests/quote-modal.e2e.spec.ts": {
@@ -5120,8 +5120,8 @@
     "semantic_hash": ""
   },
   "tests/route-auth.spec.ts": {
-    "mtime": 1783527338.5699174,
-    "ast_hash": "61add9b85b06fed3e7a620d774aea317",
+    "mtime": 1783866188.1725786,
+    "ast_hash": "06ceddf66dab3782fdece3963df915a9",
     "semantic_hash": ""
   },
   "tests/smoke-crawl.spec.ts": {
@@ -5305,8 +5305,8 @@
     "semantic_hash": ""
   },
   ".aiox-core/data/entity-registry.yaml": {
-    "mtime": 1777055338.896617,
-    "ast_hash": "f76c80428cdb8a5edd0b735b944ea26a",
+    "mtime": 1783856463.5824862,
+    "ast_hash": "436019bc392df6dc0ebe37f708fb4531",
     "semantic_hash": ""
   },
   ".aiox-core/data/learned-patterns.yaml": {
@@ -9195,8 +9195,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1783527338.3993335,
-    "ast_hash": "c64eadedf40f207f33de87fd0a0b3ff5",
+    "mtime": 1783862337.432384,
+    "ast_hash": "eee4c78c1bb9ff513009585c1ed15825",
     "semantic_hash": ""
   },
   ".github/workflows/deploy-frontend.yml": {
@@ -9320,8 +9320,8 @@
     "semantic_hash": ""
   },
   "docs/architecture/adr-014-redesign-trust-keith.md": {
-    "mtime": 1783605993.5180624,
-    "ast_hash": "98848bd2cfdf879384f5454c78e93f9d",
+    "mtime": 1783868499.388782,
+    "ast_hash": "b92f327da215a721f6379556fdf1dc5b",
     "semantic_hash": ""
   },
   "docs/architecture/app-context-refactor-plan.md": {
@@ -9390,12 +9390,12 @@
     "semantic_hash": ""
   },
   "docs/design-system/DESIGN.md": {
-    "mtime": 1783605993.5186465,
-    "ast_hash": "71090891b6b88a659fdd876efaf93525",
+    "mtime": 1783868479.0403981,
+    "ast_hash": "2c126f61a65c113f5ff47e144546b570",
     "semantic_hash": ""
   },
   "docs/diagnosis/contrast-baseline-2026-06-09.md": {
-    "mtime": 1783823584.4564087,
+    "mtime": 1783866544.4799745,
     "ast_hash": "c3fa3395cfec179234346427b7c48f6c",
     "semantic_hash": ""
   },
@@ -10185,13 +10185,13 @@
     "semantic_hash": ""
   },
   "tests/baseline/login-baseline-desktop.png": {
-    "mtime": 1783823562.3562644,
-    "ast_hash": "b03002895ca03e296cbdf1d97b896a8d",
+    "mtime": 1783868390.5661764,
+    "ast_hash": "7d71dcfebd6b90411ccf0747043d3ca2",
     "semantic_hash": ""
   },
   "tests/baseline/login-baseline-mobile.png": {
-    "mtime": 1783823607.0740426,
-    "ast_hash": "e7c2091d471aa7ab6f73852b9e332ae2",
+    "mtime": 1783868390.6002507,
+    "ast_hash": "c1a3906d9cbaeeaf5b210f51799dfec8",
     "semantic_hash": ""
   },
   "tests/baseline/sobre-baseline-desktop.png": {
@@ -10235,8 +10235,18 @@
     "semantic_hash": ""
   },
   "tests/ui-governance.spec.ts-snapshots/login-card-governance-functional-darwin.png": {
-    "mtime": 1783818956.7048721,
-    "ast_hash": "045ed15036e3b955c7b56d123bfaa41d",
+    "mtime": 1783868379.5605466,
+    "ast_hash": "94f61152937dbe3bea9e1f068ea1bc95",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-12-login-redesign-card-centralizado.md": {
+    "mtime": 1783887738.1339521,
+    "ast_hash": "039582bc20738e455a5dc879c9f9c8d7",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/LOGIN-RD.1-login-redesign-card-centralizado.yml": {
+    "mtime": 1783887724.2530754,
+    "ast_hash": "2e2ed21e60d2fd9d0dbc15f02e7a66aa",
     "semantic_hash": ""
   }
 }

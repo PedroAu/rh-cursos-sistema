@@ -34,7 +34,7 @@ Cada story 14.2.x valida com screenshot Playwright a 1180px comparado ao canvas 
 | Família | Fonte | Implementação |
 |---|---|---|
 | Inter (body/UI) | Google Fonts | `next/font/google` — self-host no build, zero CDN em runtime |
-| Helvetica Neue (serif) | Google Fonts | `next/font/google` |
+| Merriweather (serif) | Google Fonts | `next/font/google` — self-host no build, zero CDN em runtime |
 | Caveat (hand, uso raro) | Google Fonts | `next/font/google`, carregar só onde usada |
 | **Fraunces (display)** | **Comercial** (Connary Fagen) | Ver abaixo |
 
@@ -43,6 +43,10 @@ Cada story 14.2.x valida com screenshot Playwright a 1180px comparado ao canvas 
 2. **⚠️ DECISÃO DO USUÁRIO (antes do Gate final 14.3.1):** (a) comprar licença webfont da Fraunces e servir via `next/font/local` — fidelidade máxima; ou (b) adotar alternativa gratuita de anatomia próxima (candidata: **Fraunces**, Google Fonts, serif display com peso 700 e tracking apertado) — exige aprovação visual do usuário; ou (c) manter fallback do sistema.
 
 A troca é um ajuste de 1 ponto (`next/font` + token), sem retrabalho nas páginas.
+
+**Emenda 2026-07-12 (@architect):** o token serif `--tk-font-serif`, que originalmente apontava para Helvetica Neue (uma sans, apesar do nome), foi trocado por **Merriweather** (serif real, `next/font/google`, pesos 300/400/700). Ajustes de legibilidade decididos com o usuário:
+- Subtítulos serif migraram de peso **300 → 400** (hairlines finas da Merriweather a 300 prejudicavam a leitura).
+- **Reescala mínima:** `--tk-text-body-lg` de 17px (1.0625rem) → **18px (1.125rem)**, eliminando o degrau redundante colado ao body de 16px. As demais âncoras (60/44/32/24/20/16/14/12/11px) foram preservadas para não quebrar o gate de fidelidade visual (D6).
 
 ### D8 — Estrutura de componentes (NOVA)
 

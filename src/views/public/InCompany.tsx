@@ -277,7 +277,7 @@ export function InCompanyPage() {
               <h1 className="mt-5 max-w-[11ch] font-tk-display text-[2.85rem] font-bold leading-[0.98] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3.75rem]">
                 A capacitação vai até a <em className="italic">sua</em> equipe
               </h1>
-              <p className="mt-5 max-w-[48ch] font-tk-serif text-[1.22rem] font-light leading-[1.45] text-tk-ink-muted">
+              <p className="mt-5 max-w-[48ch] font-tk-serif text-[1.22rem] font-normal leading-[1.45] text-tk-ink-muted">
                 Programas sob medida, no seu contexto operacional, com o seu calendário e os seus casos reais: do
                 curso pontual à trilha de formação contínua para o time inteiro.
               </p>
@@ -363,7 +363,7 @@ export function InCompanyPage() {
             <h2 className="mt-5 max-w-[13ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3rem]">
               Mais do que um curso: uma formação com contexto
             </h2>
-            <p className="mt-4 max-w-[40ch] font-tk-serif text-[1.16rem] font-light leading-[1.45] text-tk-ink-muted">
+            <p className="mt-4 max-w-[40ch] font-tk-serif text-[1.16rem] font-normal leading-[1.45] text-tk-ink-muted">
               Desenhamos cada programa a partir das exigências legais que se aplicam ao seu órgão ou empresa e da
               forma como a sua equipe trabalha.
             </p>
@@ -486,7 +486,7 @@ export function InCompanyPage() {
                 <h2 className="max-w-[10ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[var(--tk-tracking-display)] text-white">
                   Vamos montar o programa da sua equipe
                 </h2>
-                <p className="mt-4 max-w-[26ch] font-tk-serif text-[1.08rem] font-light leading-[1.55] text-white/86">
+                <p className="mt-4 max-w-[26ch] font-tk-serif text-[1.08rem] font-normal leading-[1.55] text-white/86">
                   Conte um pouco sobre a sua organização. Um especialista retorna com uma proposta em até 2 dias úteis.
                 </p>
                 <div className="mt-8 space-y-4">

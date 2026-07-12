@@ -1,12 +1,12 @@
 /* Trust Keith — Webfonts
- * Inter and Caveat: loaded from Google Fonts (1:1 with brand sources).
- * Helvetica Neue: system font used by the supporting text token.
+ * Inter, Merriweather and Caveat: loaded from Google Fonts (1:1 with brand sources).
+ * Merriweather: serif supporting text token (subheadings), weights 400/700.
  * Fraunces: brand-owned display serif. Loaded from the brand's own Webflow CDN
  *   (the only public source). If you self-host, drop the .woff files in
  *   assets/fonts/ and repoint the src below.
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Caveat:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Caveat:wght@700&display=swap');
 
 @font-face {
   font-family: "Fraunces";

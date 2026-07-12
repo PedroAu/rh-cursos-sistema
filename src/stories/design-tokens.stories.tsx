@@ -73,16 +73,16 @@ export const Typography: StoryObj = {
         <p className="font-mono text-caption text-tk-ink-muted">tk-display / 2.75rem</p>
       </div>
       <div>
-        <p className="font-tk-serif text-subheading-large font-light text-tk-ink">
-          Helvetica Neue subheading with a calm editorial rhythm.
+        <p className="font-tk-serif text-subheading-large font-normal text-tk-ink">
+          Merriweather subheading with a calm editorial rhythm.
         </p>
-        <p className="font-mono text-caption text-tk-ink-muted">tk-serif / 1.5rem / weight 300</p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-serif / 1.5rem / weight 400</p>
       </div>
       <div>
         <p className="font-tk-body text-body-large text-tk-ink">
           Inter body copy is used for product content, forms, navigation, and repeated operational UI.
         </p>
-        <p className="font-mono text-caption text-tk-ink-muted">tk-body / 1.0625rem</p>
+        <p className="font-mono text-caption text-tk-ink-muted">tk-body / 1.125rem</p>
       </div>
     </div>
   ),

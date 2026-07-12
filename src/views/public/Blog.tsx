@@ -223,7 +223,7 @@ export function BlogPage() {
           <h1 className="mt-5 max-w-[12ch] font-tk-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
             A norma explicada de um jeito que você <em className="italic">usa</em>
           </h1>
-          <p className="mt-4 max-w-[60ch] font-tk-serif text-[1.16rem] font-light leading-[1.45] text-tk-ink-muted">
+          <p className="mt-4 max-w-[60ch] font-tk-serif text-[1.16rem] font-normal leading-[1.45] text-tk-ink-muted">
             Análises práticas de licitações, LGPD, compliance e gestão pública: escritas por quem aplica essas normas
             no dia a dia de organizações públicas e privadas.
           </p>
@@ -254,7 +254,7 @@ export function BlogPage() {
                   <h2 className="max-w-[18ch] font-tk-display text-[var(--tk-text-display)] font-bold leading-[1.12] tracking-[-0.025em] text-tk-ink">
                     {featuredPost.title}
                   </h2>
-                  <p className="max-w-[44ch] font-tk-serif text-[1.08rem] font-light leading-[1.5] text-tk-ink-muted">
+                  <p className="max-w-[44ch] font-tk-serif text-[1.08rem] font-normal leading-[1.5] text-tk-ink-muted">
                     {featuredPost.summary}
                   </p>
                   <Link to={`/blog/${featuredPost.slug}`} className="mt-auto font-semibold text-tk-accent-strong">
@@ -407,7 +407,7 @@ export function BlogPage() {
             <h2 className="mt-5 max-w-[12ch] font-tk-display text-[2.5rem] font-bold leading-[1.05] tracking-[-0.03em] text-tk-ink">
               Receba a leitura certa antes da <em className="italic">próxima</em> mudança
             </h2>
-            <p className="mt-4 max-w-[36ch] font-tk-serif text-[1.12rem] font-light leading-[1.5] text-tk-ink-muted">
+            <p className="mt-4 max-w-[36ch] font-tk-serif text-[1.12rem] font-normal leading-[1.5] text-tk-ink-muted">
               Uma edição a cada duas semanas com o que mudou nas normas, o que fazer a respeito e os artigos que valem
               o seu tempo. Sem spam.
             </p>

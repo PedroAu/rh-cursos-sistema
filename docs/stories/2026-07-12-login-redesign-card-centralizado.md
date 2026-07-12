@@ -1,7 +1,7 @@
 # Story LOGIN-RD.1: Redesign da página de login para card centralizado (design system Trust Keith)
 
 ## Status
-InReview
+Done
 
 > Rascunho gerado por @qa (Quinn) a partir do veredito visual comparando o login atual (`src/views/public/Login.tsx`, split-screen) com o novo design (`docs/design-system/RH Cursos Login.dc.html`, card centralizado). Validado por @po (Pax) em 2026-07-12 — Decisões D1 e D2 travadas (ver **Decisões Travadas**). GO para implementação.
 
@@ -121,6 +121,8 @@ O maior descasamento é arquitetural (D1): o novo design resolve o **portal por 
 - 2026-07-12 — @dev (Dex) — Implementação completa (AC1-AC7). Login.tsx reescrito para card centralizado; shell público isolado via `BarePageShell`; `route.ts` ajustado para D1=A (papel via `app_metadata.role`, sem `role` na request) e D2 (sessão longa/curta via `remember`); baselines visuais regenerados; testes de UI/auth atualizados ao novo contrato. Status **Ready → InReview**.
 - 2026-07-12 — @dev (Dex) — Fix `DOC-001` (achado de @qa, severidade low): subtítulo fallback do card não repete mais o H1 ("Entre com suas credenciais para acessar o portal."). Lint/typecheck seguem em 0 erros.
 - 2026-07-12 — @dev (Dex) — Fix de layout (achado em revisão manual, não catalogado pelo @qa): no formulário do card, o `<form>` usava `grid` sem `grid-template-columns` explícito. Sem coluna fixa (`minmax(0,1fr)`), o item de grid (wrapper do campo) ignorava a largura do container e "vazava" para fora do card no mobile (input de e-mail ultrapassava a borda direita do card em ~5px em viewport 375px). Corrigido com `grid-cols-1` em `Login.tsx`. Baselines visuais regenerados novamente; suíte completa (lint, typecheck, vitest, playwright login/auth/a11y/keyboard) revalidada — 68/68 nos specs afetados.
+- 2026-07-12 — @qa (Quinn) — Re-review pós-fix: DOC-001 resolvido, baselines verificadas contra build de produção fresco. Gate **PASS**, todos os 7 AC atendidos, sem regressão.
+- 2026-07-12 — @devops (Gage) — Quality gate completo (lint/typecheck/vitest 426/426/build) PASSOU. Push para `origin/main` executado. Status **InReview → Done**.
 
 ## Dev Agent Record
 
@@ -165,6 +167,18 @@ O maior descasamento é arquitetural (D1): o novo design resolve o **portal por 
 
 - `DOC-001` (low): o subtítulo genérico do card repete o texto do H1 ("Bem-vindo de volta. Entre com suas credenciais." sob o H1 "Bem-vindo de volta"). Sugestão: ajustar a cópia do fallback. Não bloqueante.
 
+### Re-Review Date: 2026-07-12 (pós-fix DOC-001)
+
+**Contexto:** @dev aplicou o fix de `DOC-001`. Como a mudança altera o texto renderizado, a verificação exigiu **rebuild de produção** — o harness de teste (`harnessMode: production-build + local webServer`) serve o bundle `.next` pré-gerado, então testes contra um build antigo dariam falso-verde. Verificação refeita contra build fresco:
+
+- `Login.tsx:50` — subtítulo fallback agora é "Entre com suas credenciais para acessar o portal." (não repete mais o H1) ✅
+- `npm run build` (exit 0) — bundle de produção contém o texto novo (confirmado em `.next/server/chunks` e `.next/static/chunks`) ✅
+- Baseline `login-card-governance-functional-darwin.png` regenerada com o texto novo, batendo com o render (tolerância zero de pixel) ✅
+- `npx playwright test` (ui-governance card de login + epic14 smoke + a11y) contra build fresco — **verde** ✅
+- `npm run lint` (0 erros) · `npx tsc --noEmit` (0 erros) · `npx vitest run` (426/426) ✅
+
+**Resultado:** `DOC-001` **resolvido e verificado**. Nenhum issue em aberto. Código, baselines e build de produção consistentes.
+
 ### Gate Status
 
-Gate: PASS → docs/qa/gates/LOGIN-RD.1-login-redesign-card-centralizado.yml
+Gate: PASS (re-review) → docs/qa/gates/LOGIN-RD.1-login-redesign-card-centralizado.yml

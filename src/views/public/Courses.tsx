@@ -182,7 +182,7 @@ export function CoursesPage() {
               <h1 className="max-w-[20ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.5rem] lg:text-[2.75rem]">
                 Cursos para aplicar a norma <em className="italic text-tk-accent-strong">na prática</em>
               </h1>
-              <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-light leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
+              <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
                 Turmas presenciais e online ao vivo, com certificação e conteúdo atualizado às exigências legais e regulatórias{" "}
                 para profissionais de organizações públicas e privadas.
               </p>
@@ -251,7 +251,7 @@ export function CoursesPage() {
           ) : (
             <Card variant="base" className="px-8 py-16 text-center">
               <h2 className="font-tk-display text-2xl font-bold text-tk-ink">Nenhuma turma encontrada</h2>
-              <p className="mx-auto mt-3 max-w-[44ch] font-tk-serif text-lg font-light leading-8 text-tk-ink-muted">
+              <p className="mx-auto mt-3 max-w-[44ch] font-tk-serif text-lg font-normal leading-8 text-tk-ink-muted">
                 Ajuste a busca ou fale com um especialista para uma turma sob medida.
               </p>
               <Button asChild variant="outline" className="mt-6">
@@ -271,7 +271,7 @@ export function CoursesPage() {
             <h2 className="mt-4 max-w-[18ch] font-tk-display text-[2rem] font-bold leading-[1.15] tracking-[-0.02em] text-tk-ink">
               Não achou a turma ideal para o seu time?
             </h2>
-            <p className="mt-3 font-tk-serif text-[1.3rem] font-light leading-[1.45] text-tk-ink-muted">
+            <p className="mt-3 font-tk-serif text-[1.3rem] font-normal leading-[1.45] text-tk-ink-muted">
               Levamos qualquer tema para dentro da sua organização, com o seu contexto e o seu calendário.
             </p>
           </div>

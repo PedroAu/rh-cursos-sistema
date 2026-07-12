@@ -170,7 +170,7 @@ export function HomePage() {
               Conhecimento que <span className="italic text-[var(--rh-teal-deep)]">liberta da dependência</span> para
               decidir e agir com segurança.
             </h1>
-            <p className="mt-5 max-w-[56ch] font-tk-serif text-base font-light leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
+            <p className="mt-5 max-w-[56ch] font-tk-serif text-base font-normal leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
               Cursos, treinamentos in company e consultoria para transformar conhecimento técnico em autonomia, clareza e
               aplicação no mundo real. Para organizações dos setores público e privado que precisam formar equipes
               capazes de entender, decidir e executar com confiança.
@@ -315,7 +315,7 @@ export function HomePage() {
             <h2 className="mt-[18px] max-w-[18ch] font-tk-display text-display-large font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink sm:max-w-[20ch]">
               A norma aplicada ao seu contexto
             </h2>
-            <p className="mt-4 max-w-[56ch] font-tk-serif text-subheading font-light leading-[1.5] text-tk-ink-muted">
+            <p className="mt-4 max-w-[56ch] font-tk-serif text-subheading font-normal leading-[1.5] text-tk-ink-muted">
               Cada exigência normativa impacta a operação de um jeito. Nossa consultoria transforma complexidade regulatória
               em clareza, direcionamento e prática para a sua equipe atuar com segurança.
             </p>
@@ -411,7 +411,7 @@ export function HomePage() {
             <h2 className="font-tk-display text-display-large font-bold leading-[1.12] tracking-[var(--tk-tracking-display)] text-tk-surface">
               Pronto para capacitar a sua equipe?
             </h2>
-            <p className="mt-4 font-tk-serif text-subheading font-light leading-[1.5] text-tk-surface">
+            <p className="mt-4 font-tk-serif text-subheading font-normal leading-[1.5] text-tk-surface">
               Converse com um especialista e monte a trilha certa: curso aberto, in-company ou consultoria.
             </p>
             <Button asChild variant="secondary" size="lg" className="mt-8 bg-white text-tk-brand hover:bg-white/90">

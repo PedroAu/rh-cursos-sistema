@@ -8,7 +8,7 @@ const typographyVariants = cva("", {
       "display-hero": "font-tk-display text-display-hero font-bold leading-tight text-tk-ink",
       "display-large": "font-tk-display text-display-large font-bold leading-tight text-tk-ink",
       "section-heading": "font-tk-display text-section-heading font-bold leading-snug text-tk-ink",
-      "subheading-large": "font-tk-serif text-subheading-large font-light leading-relaxed text-tk-ink",
+      "subheading-large": "font-tk-serif text-subheading-large font-normal leading-relaxed text-tk-ink",
       "subheading": "font-tk-serif text-subheading font-normal leading-relaxed text-tk-ink",
       "body-large": "font-sans text-body-large font-normal leading-relaxed text-tk-ink",
       "body": "font-sans text-body font-normal leading-relaxed text-tk-ink",
@@ -58,7 +58,7 @@ export function H3({ className, ...props }: React.HTMLAttributes<HTMLHeadingElem
 }
 
 export function H4({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h4 className={cn("font-tk-serif text-subheading-large font-light leading-relaxed text-tk-ink", className)} {...props} />;
+  return <h4 className={cn("font-tk-serif text-subheading-large font-normal leading-relaxed text-tk-ink", className)} {...props} />;
 }
 
 export function P({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {

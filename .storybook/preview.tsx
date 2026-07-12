@@ -1,24 +1,21 @@
 import type { Decorator, Preview } from "@storybook/nextjs";
 
-import "@mantine/core/styles.css";
 import "../src/styles/globals.css";
 
-import { AppMantineProvider } from "../src/components/providers/mantine-provider";
 import { MotionProvider } from "../src/components/providers/motion-provider";
 
 /**
- * Decorator global: todo componente do design system renderiza dentro dos
- * mesmos providers da aplicação (Mantine + framer-motion), garantindo que
- * tokens de tema e animações reflitam o produto real.
+ * Decorator global: todo componente do design system renderiza dentro do
+ * mesmo provider de animação da aplicação (framer-motion), garantindo que
+ * tokens de tema e animações reflitam o produto real. (Mantine foi removido
+ * no Epic 14 — o design system agora usa Tailwind + tokens `--tk-*`.)
  */
 const withProviders: Decorator = (Story) => (
-  <AppMantineProvider>
-    <MotionProvider>
-      <div style={{ padding: "1.5rem" }}>
-        <Story />
-      </div>
-    </MotionProvider>
-  </AppMantineProvider>
+  <MotionProvider>
+    <div style={{ padding: "1.5rem" }}>
+      <Story />
+    </div>
+  </MotionProvider>
 );
 
 const preview: Preview = {
