@@ -32,10 +32,6 @@ import {
   fetchPublicCatalogFromSupabase
 } from "@/lib/supabase/rh-cursos-api";
 import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
-import {
-  mockBlogPosts,
-  mockCatalog
-} from "@/lib/mock-public-data";
 import type {
   BlogPost,
   Course,
@@ -96,18 +92,21 @@ type AdminMutation =
   | { resource: "courses" | "classes" | "students" | "instructors" | "blog" | "leads" | "enrollments"; action: "delete"; id: string }
   | { resource: "leads" | "enrollments"; action: "update-status"; id: string; status: string };
 
+// Nasce vazio (sem mockCatalog/mockBlogPosts) até o bootstrap real completar
+// (Story 16.1, AC4) — o catálogo público nunca deve exibir dado fictício
+// como estado inicial de produção.
 const initialState: AppState = {
-  courses: mockCatalog.courses,
-  classes: mockCatalog.classes,
+  courses: [],
+  classes: [],
   students: [],
-  instructors: mockCatalog.instructors,
+  instructors: [],
   coursePublicContents: [],
   leads: [],
   enrollments: [],
-  blogPosts: mockBlogPosts,
+  blogPosts: [],
   testimonials: [],
-  trainingPaths: mockCatalog.trainingPaths,
-  courseCategories: deriveCourseCategoriesFromCourses(mockCatalog.courses),
+  trainingPaths: [],
+  courseCategories: [],
   currentSession: null
 };
 
@@ -142,29 +141,36 @@ function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitial
   return sanitized;
 }
 
+/**
+ * Sem fallback para mockCatalog (Story 16.1, AC5): uma busca bem-sucedida é
+ * sempre a fonte da verdade, mesmo com 0 linhas — catálogo real vazio deve
+ * aparecer vazio na UI, não ser mascarado por dado fictício. `catalog: null`
+ * sinaliza falha de busca (rede/RLS/timeout): nesse caso preserva-se o que já
+ * está em `current` (não regride para vazio nem substitui por mock); quem
+ * chama é responsável por propagar o estado de erro visível (ver bootstrap
+ * effect abaixo).
+ */
 function resolveCatalogBootstrapState(current: AppState, catalog: PublicCatalogSnapshot) {
-  // Fallback é feito por coleção (não all-or-nothing): uma coleção real vazia
-  // (ex.: zero trilhas ativas) não deve descartar as demais coleções reais do
-  // catálogo e substituir tudo pelo mock.
+  if (!catalog) {
+    return {
+      courses: current.courses,
+      classes: current.classes,
+      instructors: current.instructors,
+      trainingPaths: current.trainingPaths,
+      coursePublicContents: current.coursePublicContents,
+      courseCategories: current.courseCategories
+    };
+  }
+
   return {
-    courses: catalog?.courses.length ? catalog.courses : current.courses.length ? current.courses : mockCatalog.courses,
-    classes: catalog?.classes.length ? catalog.classes : current.classes.length ? current.classes : mockCatalog.classes,
-    instructors: catalog?.instructors.length
-      ? catalog.instructors
-      : current.instructors.length
-        ? current.instructors
-        : mockCatalog.instructors,
-    trainingPaths: catalog?.trainingPaths.length
-      ? catalog.trainingPaths
-      : current.trainingPaths.length
-        ? current.trainingPaths
-        : mockCatalog.trainingPaths,
-    coursePublicContents: catalog?.coursePublicContents.length ? catalog.coursePublicContents : current.coursePublicContents,
-    courseCategories: catalog?.courseCategories.length
+    courses: catalog.courses,
+    classes: catalog.classes,
+    instructors: catalog.instructors,
+    trainingPaths: catalog.trainingPaths,
+    coursePublicContents: catalog.coursePublicContents,
+    courseCategories: catalog.courseCategories.length
       ? catalog.courseCategories
-      : current.courseCategories.length
-        ? current.courseCategories
-        : deriveCourseCategoriesFromCourses(current.courses.length ? current.courses : mockCatalog.courses)
+      : deriveCourseCategoriesFromCourses(catalog.courses)
   };
 }
 
@@ -597,7 +603,7 @@ export function AppStoreProvider({
         setState((current) => ({
           ...current,
           ...resolveCatalogBootstrapState(current, catalog),
-          blogPosts: blogPosts?.length ? blogPosts : (current.blogPosts.length ? current.blogPosts : mockBlogPosts)
+          blogPosts: blogPosts ?? []
         }));
 
         // Real-time subscriptions para cursos após dados iniciais carregarem
@@ -640,13 +646,16 @@ export function AppStoreProvider({
           subscriptions.push(courseSub, blogSub, instructorSub, courseContentSub);
         }
       })
-      .catch(() => {
+      .catch((error) => {
         if (!active) return;
-        // Fallback silencioso para dados de mock quando Supabase falha
+        // Erro de rede/RLS/timeout: propaga um estado de erro visível (log +
+        // toast) em vez de mascarar com dado mock (Story 16.1, AC5).
+        // Preserva o catálogo/blog atual em memória — não regride para vazio.
+        console.error("Falha ao carregar catálogo público do Supabase:", error);
+        toast.error("Não foi possível atualizar o catálogo de cursos. Tente novamente em instantes.");
         setState((current) => ({
           ...current,
-          ...resolveCatalogBootstrapState(current, null),
-          blogPosts: current.blogPosts.length ? current.blogPosts : mockBlogPosts
+          ...resolveCatalogBootstrapState(current, null)
         }));
       });
 

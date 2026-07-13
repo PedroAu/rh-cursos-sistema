@@ -3325,13 +3325,13 @@
     "semantic_hash": ""
   },
   "app/cursos/[slug]/checkout/page.tsx": {
-    "mtime": 1783745220.9022305,
-    "ast_hash": "e157b70c073ee0021ea2ad739fc71425",
+    "mtime": 1783986641.3691995,
+    "ast_hash": "98ff37281c6508df11748567e5f8fdc5",
     "semantic_hash": ""
   },
   "app/cursos/[slug]/page.tsx": {
-    "mtime": 1783721798.2049918,
-    "ast_hash": "dddaa896f1914c963427f5a82fa5caf4",
+    "mtime": 1783986500.3471,
+    "ast_hash": "7147969562ff8f25fa267af77a312568",
     "semantic_hash": ""
   },
   "app/cursos/page.tsx": {
@@ -3455,7 +3455,7 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1783963298.4345746,
+    "mtime": 1783984715.2328744,
     "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
@@ -3470,8 +3470,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1783558983.7426624,
-    "ast_hash": "9d56fd6699af5e6db43215c1a7319579",
+    "mtime": 1783964154.6793776,
+    "ast_hash": "9831b9ab463bbdf659b7a93b5f26cd62",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -3690,8 +3690,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/app-store.test.ts": {
-    "mtime": 1783963494.004631,
-    "ast_hash": "3ebd5e8ed10ba8e158d4e65fcb44bdde",
+    "mtime": 1783986884.0167193,
+    "ast_hash": "1e35418544dfac57b3bdc5b396eb7236",
     "semantic_hash": ""
   },
   "src/__tests__/lib/auth.test.ts": {
@@ -4340,8 +4340,8 @@
     "semantic_hash": ""
   },
   "src/features/admin-shell/components/admin-sidebar.tsx": {
-    "mtime": 1783559228.299895,
-    "ast_hash": "dbbc616105854f6c59614bc384bd60e0",
+    "mtime": 1783964102.5159354,
+    "ast_hash": "b512538c31365fc6b41cdbdba6f6b693",
     "semantic_hash": ""
   },
   "src/features/admin-shell/components/admin-topbar.tsx": {
@@ -4360,8 +4360,8 @@
     "semantic_hash": ""
   },
   "src/features/admin/dashboard/admin-dashboard-page.tsx": {
-    "mtime": 1783016226.8673122,
-    "ast_hash": "a858e4d7e09bf14c71387582c923cf2a",
+    "mtime": 1783964117.1365917,
+    "ast_hash": "c41d4d83b9ffe669e571b2a63294252c",
     "semantic_hash": ""
   },
   "src/features/admin/dashboard/model/dashboard-activity.ts": {
@@ -4500,8 +4500,8 @@
     "semantic_hash": ""
   },
   "src/lib/app-store.tsx": {
-    "mtime": 1783963249.7404163,
-    "ast_hash": "1916f96883e6cba5a136c8d7f278c3f5",
+    "mtime": 1783986692.5386786,
+    "ast_hash": "60afd255d45ceeac234773558a353f0d",
     "semantic_hash": ""
   },
   "src/lib/auth-session.ts": {
@@ -4910,58 +4910,58 @@
     "semantic_hash": ""
   },
   "supabase/migrations/20260512193000_initial_rh_cursos_schema.sql": {
-    "mtime": 1783953942.138621,
-    "ast_hash": "5285f75a04512f64ee77e7255135b10b",
+    "mtime": 1783964388.110477,
+    "ast_hash": "0cb9f23fb174e7f0e94e7098236b8385",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513100000_sprint1_security.sql": {
-    "mtime": 1783953942.1394098,
-    "ast_hash": "2a5e5d6bea06d78006e5993dd3d29b1b",
+    "mtime": 1783964388.1111596,
+    "ast_hash": "70d262e4819e4403efa2a2580122d1d1",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513200000_sprint2_integrity.sql": {
-    "mtime": 1783953942.1402254,
-    "ast_hash": "5c1ddf7eaeb3d534528923537b0affba",
+    "mtime": 1783964388.1113665,
+    "ast_hash": "c5863776d88c52334a865f4cb27ad8a2",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513300000_sprint3_performance.sql": {
-    "mtime": 1783953942.1405299,
-    "ast_hash": "31a1d420def18a205313afed16323cb5",
+    "mtime": 1783964388.1118102,
+    "ast_hash": "d16dca926dadb20144fd17be5f2a6b01",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513400000_sprint4_evolution.sql": {
-    "mtime": 1783953942.1408095,
-    "ast_hash": "7ef3b86e785f6beb8b4fef846ec2cf7e",
+    "mtime": 1783964388.1120014,
+    "ast_hash": "56e03f6b55f6ef26c3eaf664cca7da2c",
     "semantic_hash": ""
   },
   "supabase/migrations/20260604164120_content_access_alignment.sql": {
-    "mtime": 1783953942.141217,
-    "ast_hash": "3ab087b8d6b51ef4ce141a39d8d5036e",
+    "mtime": 1783964388.1123266,
+    "ast_hash": "e17b1b8731124f83f452d3388af63986",
     "semantic_hash": ""
   },
   "supabase/migrations/20260605000000_seed_initial_data.sql": {
-    "mtime": 1783953942.1419556,
-    "ast_hash": "a47669ea3fdb319d39fbc61b34e3d3f3",
+    "mtime": 1783964388.1126187,
+    "ast_hash": "ccc055ba55c225fbc37076c1a3df200d",
     "semantic_hash": ""
   },
   "supabase/migrations/20260608000000_seed_admin_user.sql": {
-    "mtime": 1783953942.1424565,
-    "ast_hash": "f588214ec6e0b9381ecc7ad8c566a267",
+    "mtime": 1783964388.1127923,
+    "ast_hash": "6de7f6a1482b1938b955a313c07dcefd",
     "semantic_hash": ""
   },
   "supabase/migrations/20260608100000_admin_audit_log.sql": {
-    "mtime": 1783953942.1431782,
-    "ast_hash": "1caeda21914074e6e756572134b65886",
+    "mtime": 1783964388.1131732,
+    "ast_hash": "2adee257dc79297b79fdd7cd82ddf7bd",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609100000_global_rate_limit.sql": {
-    "mtime": 1783953942.1442435,
-    "ast_hash": "6d894d1aac438b4580a4afbfb1078850",
+    "mtime": 1783964388.113369,
+    "ast_hash": "1cf8b4f2ecfd6d9a9d553896d6b070dd",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609120000_remove_legacy_course_instructor_fields.sql": {
-    "mtime": 1783953942.1443927,
-    "ast_hash": "2b94de997ac7495fa61c90f555a1fd48",
+    "mtime": 1783964388.1134758,
+    "ast_hash": "774b1cf0af9083375d9b0f24d6149b90",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609120001_enable_realtime_publication.sql": {
@@ -4970,28 +4970,28 @@
     "semantic_hash": ""
   },
   "supabase/migrations/20260623144035_rbac_authorization_helpers.sql": {
-    "mtime": 1783953942.144713,
-    "ast_hash": "b608c7f21da794de5ffb23257a6b32db",
+    "mtime": 1783964388.114695,
+    "ast_hash": "6c39eaf7ff58a4bdd1ee82e0d20f26e2",
     "semantic_hash": ""
   },
   "supabase/migrations/20260701090000_instructor_portal_rls.sql": {
-    "mtime": 1783953942.1454196,
-    "ast_hash": "14e9b4ae6847cf7f1b8a49cb0a83c4c6",
+    "mtime": 1783964388.1151145,
+    "ast_hash": "a9c4c58f6b8a9e030d4dcc0dedd75a29",
     "semantic_hash": ""
   },
   "supabase/migrations/20260707144500_fix_aluno_rls_recursion.sql": {
-    "mtime": 1783953942.1458664,
-    "ast_hash": "21f9cc71f94f7c1fffb356a42ddcac10",
+    "mtime": 1783964388.115687,
+    "ast_hash": "f72037fb1ad47292275be839169f81f0",
     "semantic_hash": ""
   },
   "supabase/migrations/20260710000000_course_public_content.sql": {
-    "mtime": 1783953942.144017,
-    "ast_hash": "89d1a54b5379f8fcb0849da32f741af2",
+    "mtime": 1783964388.1160057,
+    "ast_hash": "265079afa4e4768877119efa029ccab6",
     "semantic_hash": ""
   },
   "supabase/migrations/20260711000001_inscricao_delete_counters.sql": {
-    "mtime": 1783953942.1464753,
-    "ast_hash": "b024d52b91c13616f7bd2f974d957946",
+    "mtime": 1783964388.1161633,
+    "ast_hash": "7823e90a9b36a8e6da075c22e36e061a",
     "semantic_hash": ""
   },
   "supabase/migrations/20260711000002_grant_course_public_content_select.sql": {
@@ -10300,8 +10300,43 @@
     "semantic_hash": ""
   },
   "docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md": {
-    "mtime": 1783963600.6860964,
-    "ast_hash": "c1a9c5549151dc4ea514df3f49ae7ebd",
+    "mtime": 1783973865.0121896,
+    "ast_hash": "670a76a5f6102217c9756586ee1058a8",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/dashboard-overview.test.ts": {
+    "mtime": 1783973812.2629242,
+    "ast_hash": "2bd60a88f6cdc65df3af5148a9cbc31e",
+    "semantic_hash": ""
+  },
+  "src/features/admin/dashboard/model/dashboard-overview.ts": {
+    "mtime": 1783964037.1344826,
+    "ast_hash": "3f5e68aa0cba8bccad50977c5fcdb593",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260713150000_remove_e2e_leftover_courses.sql": {
+    "mtime": 1783964157.8154023,
+    "ast_hash": "91c4bedbf4291b728acd9f8f375c3b91",
+    "semantic_hash": ""
+  },
+  "tests/epic15-admin-dashboard-fidelity.spec.ts": {
+    "mtime": 1783971994.749027,
+    "ast_hash": "f41bf9a936744e12ffa4ed81d542ec88",
+    "semantic_hash": ""
+  },
+  "docs/epics/epic-16-integridade-catalogo-producao.md": {
+    "mtime": 1783973865.8964686,
+    "ast_hash": "2ba1cda04f3ee90e955530c49536db89",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/epic15.1-admin-dashboard-fidelidade.yml": {
+    "mtime": 1783971213.2288742,
+    "ast_hash": "43b3e450600f2a8885f20a362a7f4303",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md": {
+    "mtime": 1783986971.8538244,
+    "ast_hash": "0ec50d6987b76e60f2c3b473582ebd06",
     "semantic_hash": ""
   }
 }

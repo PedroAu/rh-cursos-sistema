@@ -59,7 +59,7 @@ const mocks = vi.hoisted(() => {
       location: "Online",
       instructorId: "inst-1",
       totalSeats: 30,
-      manualFilledSeats: 4,
+      manualFilledSeats: 5,
       filledSeats: 5,
       availableSeats: 25,
       status: "Inscrições abertas",
@@ -663,11 +663,19 @@ describe("AppStoreProvider and hooks", () => {
   });
 
   it("deletes enrollments through the provider and recalculates the class capacity from remaining rows", async () => {
-    const harness = renderStore({
-      role: "admin",
-      email: "admin@example.com",
-      name: "Admin",
-    });
+    const harness = renderStore(
+      {
+        role: "admin",
+        email: "admin@example.com",
+        name: "Admin",
+      },
+      {
+        courses: mockCourses,
+        classes: mockClasses,
+        instructors: mocks.data.mockInstructors,
+        trainingPaths: mocks.data.trainingPaths,
+      } as Parameters<typeof AppStoreProvider>[0]["initialData"]
+    );
     const initialClassCount = harness.store.classes.length;
     const payload = buildEnrollmentPayload(harness.store);
     const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
@@ -837,12 +845,26 @@ describe("AppStoreProvider and hooks", () => {
     expect(harness.store.currentSession).toEqual(initialSession);
   });
 
-  it("falls back to categories derived from the mock course catalog when no initial data is provided", async () => {
+  it("starts with an empty catalog (no mock fallback) when no initial data is provided", async () => {
     const harness = renderStore();
 
-    expect(harness.store.courseCategories.length).toBeGreaterThan(0);
-    expect(harness.store.courseCategories).toEqual([...harness.store.courseCategories].sort((a, b) => a.localeCompare(b, "pt-BR")));
-    expect(new Set(harness.store.courseCategories).size).toBe(harness.store.courseCategories.length);
+    expect(harness.store.courses).toEqual([]);
+    expect(harness.store.classes).toEqual([]);
+    expect(harness.store.instructors).toEqual([]);
+    expect(harness.store.blogPosts).toEqual([]);
+    expect(harness.store.courseCategories).toEqual([]);
+  });
+
+  it("never surfaces known mock-public-data course slugs when the catalog bootstraps empty (Story 16.1, AC9)", async () => {
+    const { mockCatalog } = await import("@/lib/mock-public-data");
+    const knownMockSlugs = mockCatalog.courses.map((course) => course.slug);
+    expect(knownMockSlugs).toContain("nova-lei-de-licitacoes-na-pratica-lei-14133-21");
+
+    const harness = renderStore();
+    const renderedSlugs = harness.store.courses.map((course) => course.slug);
+
+    expect(renderedSlugs).toEqual([]);
+    expect(renderedSlugs.some((slug) => knownMockSlugs.includes(slug))).toBe(false);
   });
 
   it("uses courseCategories from the initial catalog data when provided", async () => {
