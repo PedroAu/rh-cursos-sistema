@@ -53,6 +53,21 @@ observations:
       ("Básico / Avançado", "Intermediário / Avançado"). Lacuna pré-existente, sem regressão.
 
 pre_push_checklist:
-  - Segregar artefatos da Fase 3 da working tree
-  - Redeploy da Edge Function admin-resources (@devops)
-  - Executar test:e2e:smoke pós-deploy
+  - Segregar artefatos da Fase 3 da working tree # feito por @devops em 2026-07-13
+  - Redeploy da Edge Function admin-resources (@devops) # feito por @devops em 2026-07-13
+  - Executar test:e2e:smoke pós-deploy # NAO CONCLUIDO: ver devops_execution abaixo
+
+devops_execution:
+  date: 2026-07-13
+  segregacao_fase3: DONE # stash@{0} "ADR015-F3 artifacts segregated from F1 push"
+  commit_push: DONE # 870b5dc pushed to origin/main
+  redeploy_edge_function: DONE # admin-resources redeployed on hwpsrujkxjhmmwphqdlz
+  test_e2e_smoke: BLOCKED
+  test_e2e_smoke_note: >-
+    Tentado 2x (~50min cada). O processo (scripts/run-playwright.mjs --project=functional,
+    via workerd local webServer) ficou preso em 0% CPU sem produzir output, sem travar
+    de forma detectável nos primeiros minutos — indício de deadlock no boot do
+    webServer/browser ou timeout não respeitado, não reproduzido a tempo dentro desta
+    sessão. Processos órfãos finalizados manualmente (kill workerd). Requer investigação
+    separada antes de re-executar (não é regressão de código da F1 — gates
+    typecheck/lint/test:unit/build já confirmados PASS antes do push).
