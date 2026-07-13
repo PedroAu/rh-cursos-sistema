@@ -20,7 +20,7 @@ const validCourse: Record<string, string> = {
   durationLabel: '8h',
   price: '1000',
   level: 'Básico',
-  status: 'published',
+  status: 'Ativo',
   shortDescription: 'Resumo',
   fullDescription: 'Descrição completa do curso',
 };

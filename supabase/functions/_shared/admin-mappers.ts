@@ -32,7 +32,15 @@ export function toDbLevel(value: string): string {
 }
 
 export function toDbCourseStatus(value: string): string {
-  return value === "Em breve" ? "EmBreve" : value;
+  const map: Record<string, string> = {
+    Ativo: "Ativo",
+    Inativo: "Inativo",
+    Destaque: "Destaque",
+    "Em breve": "EmBreve",
+    Rascunho: "Rascunho",
+    Arquivado: "Arquivado",
+  };
+  return map[value] ?? value;
 }
 
 export function toDbClassStatus(value: string): string {

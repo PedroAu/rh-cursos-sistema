@@ -1,0 +1,58 @@
+storyId: ADR015-F1
+story: docs/stories/2026-07-13-adr015-fase1-course-enums-fonte-unica.md
+reviewer: Quinn (@qa)
+date: 2026-07-13
+verdict: CONCERNS
+
+gates:
+  typecheck: PASS
+  lint: PASS # 0 errors, 19 warnings pré-existentes
+  test_unit: PASS # 433/433
+  build: PASS
+  test_e2e_smoke: NOT_RUN # depende do redeploy da Edge Function (issue #2)
+
+acceptance_criteria:
+  AC1: PASS
+  AC2: PASS
+  AC3: PASS
+  AC4: PASS
+  AC5: PASS
+  AC6: PASS
+  AC7: PASS
+  AC8: PASS
+  AC9: PASS # código correto; persistência real requer redeploy (issue #2)
+
+issues:
+  - id: 1
+    severity: medium
+    category: scope
+    description: >-
+      Working tree contém artefatos da Fase 3 (fora de escopo, ausentes do File List):
+      supabase/migrations/20260713100000_curso_modalidades_array.sql (novo) e alterações
+      em supabase/sql/create_all_rh_cursos_schema.sql (coluna modalidades, trigger, constraints).
+    recommendation: >-
+      Segregar/stash esses arquivos antes de commitar a F1; mover para a story da Fase 3.
+  - id: 2
+    severity: medium
+    category: deploy
+    description: >-
+      AC9 correto no código, mas salvar Rascunho/Arquivado falhará em produção até a
+      Edge Function admin-resources ser redeployada no Supabase hwpsrujkxjhmmwphqdlz.
+    recommendation: Handoff para @devops — redeploy da Edge Function antes de considerar F1 concluída em produção.
+  - id: 3
+    severity: low
+    category: tests
+    description: test:e2e:smoke não executado; smoke de save falharia antes do redeploy (issue #2).
+    recommendation: Rodar test:e2e:smoke após o redeploy da Edge Function.
+
+observations:
+  - severity: low
+    category: tech-debt
+    description: >-
+      levelLabelToDb retorna undefined para labels de Course["level"] fora de COURSE_LEVELS
+      ("Básico / Avançado", "Intermediário / Avançado"). Lacuna pré-existente, sem regressão.
+
+pre_push_checklist:
+  - Segregar artefatos da Fase 3 da working tree
+  - Redeploy da Edge Function admin-resources (@devops)
+  - Executar test:e2e:smoke pós-deploy

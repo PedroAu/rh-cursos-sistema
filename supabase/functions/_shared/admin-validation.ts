@@ -46,7 +46,7 @@ export const courseSchema = z.object({
   modality: modalityEnum.optional(),
   modalities: z.array(modalityEnum).min(1, "Selecione pelo menos uma modalidade"),
   level: courseLevelEnum,
-  status: z.enum(["Ativo", "Inativo", "Destaque", "Em breve"]),
+  status: z.enum(["Ativo", "Inativo", "Destaque", "Em breve", "Rascunho", "Arquivado"]),
   featured: z.boolean().optional(),
   featuredCourseIds: z.array(z.string()).optional(),
   durationLabel: z.string().min(1, "Carga horária é obrigatória"),

@@ -1,4 +1,5 @@
 import { courseCoverByPath, defaultCourseCover } from "@/lib/course-covers";
+import { modalityDbToLabel, levelDbToLabel, statusDbToLabel } from "@/lib/domain/course-enums";
 import { getInitials } from "@/lib/get-initials";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import type {
@@ -189,39 +190,15 @@ export function toDbModality(value: Course["modality"]): ClassRow["modalidade"] 
 }
 
 export function fromDbModality(value: CourseRow["modalidade"]): Course["modality"] {
-  const map: Record<CourseRow["modalidade"], Course["modality"]> = {
-    Online: "Ao vivo online",
-    Presencial: "Presencial",
-    InCompany: "In company",
-    Hibrido: "Híbrido",
-    Gravado: "Gravado"
-  };
-
-  return map[value];
+  return modalityDbToLabel(value);
 }
 
 function fromDbLevel(value: CourseRow["nivel"]): Course["level"] {
-  const map: Record<CourseRow["nivel"], Course["level"]> = {
-    Basico: "Básico",
-    Intermediario: "Intermediário",
-    Avancado: "Avançado",
-    Misto: "Básico / Intermediário"
-  };
-
-  return map[value];
+  return levelDbToLabel(value);
 }
 
 function fromDbCourseStatus(value: CourseRow["status"]): CourseStatus {
-  const map: Record<CourseRow["status"], CourseStatus> = {
-    Ativo: "Ativo",
-    Inativo: "Inativo",
-    Destaque: "Destaque",
-    EmBreve: "Em breve",
-    Rascunho: "Inativo",
-    Arquivado: "Inativo"
-  };
-
-  return map[value];
+  return statusDbToLabel(value);
 }
 
 function fromDbClassStatus(value: ClassRow["status"]): ClassStatus {

@@ -12,6 +12,7 @@ import {
   type CoursePublicContentRow,
   type CourseRow
 } from "@/lib/supabase/mappers";
+import { COURSE_STATUSES, statusLabelToDb } from "@/lib/domain/course-enums";
 
 const courseRow: CourseRow = {
   id: "course-1",
@@ -115,6 +116,24 @@ describe("Supabase mappers", () => {
     expect(course.featured).toBe(true);
     expect(course.instructorId).toBe("inst-1");
     expect(course.nextClassId).toBe("class-1");
+  });
+
+  it.each(COURSE_STATUSES)(
+    "round-trips status_curso %o without losing information (DB -> UI -> DB)",
+    ({ dbValue, label }) => {
+      const course = mapCourse({ ...courseRow, status: dbValue }, [courseInstructorRow], [classRow]);
+
+      expect(course.status).toBe(label);
+      expect(statusLabelToDb(course.status)).toBe(dbValue);
+    }
+  );
+
+  it("preserves Rascunho and Arquivado instead of collapsing to Inativo", () => {
+    const rascunho = mapCourse({ ...courseRow, status: "Rascunho" }, [courseInstructorRow], [classRow]);
+    const arquivado = mapCourse({ ...courseRow, status: "Arquivado" }, [courseInstructorRow], [classRow]);
+
+    expect(rascunho.status).toBe("Rascunho");
+    expect(arquivado.status).toBe("Arquivado");
   });
 
   it("maps published blog rows to public blog posts", () => {

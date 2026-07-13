@@ -1,3 +1,9 @@
+import { COURSE_LEVEL_OPTIONS, COURSE_MODALITY_OPTIONS, COURSE_STATUS_OPTIONS } from "@/lib/domain/course-enums";
+
+const VALID_COURSE_STATUSES = new Set<string>(COURSE_STATUS_OPTIONS.map((option) => option.value));
+const VALID_COURSE_MODALITIES = new Set<string>(COURSE_MODALITY_OPTIONS.map((option) => option.value));
+const VALID_COURSE_LEVELS = new Set<string>(COURSE_LEVEL_OPTIONS.map((option) => option.value));
+
 export type ValidationError = {
   field: string;
   message: string;
@@ -14,6 +20,10 @@ function str(value: unknown): string {
   if (typeof value === "string") return value;
   if (typeof value === "number") return String(value);
   return "";
+}
+
+function strArr(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((item) => String(item)) : [];
 }
 
 function addError(errors: ValidationError[], field: string, message: string) {
@@ -44,6 +54,11 @@ export function validateCourse(
 
   if (!hasSelectedValue(form.modality) && !hasSelectedValue(form.modalities)) {
     addError(errors, "modalities", "Selecione pelo menos uma modalidade");
+  } else {
+    const selectedModalities = strArr(form.modalities).length > 0 ? strArr(form.modalities) : [str(form.modality)];
+    if (selectedModalities.some((value) => value.trim() && !VALID_COURSE_MODALITIES.has(value))) {
+      addError(errors, "modalities", "Modalidade selecionada é inválida");
+    }
   }
 
   if (!str(form.durationLabel).trim()) {
@@ -58,6 +73,8 @@ export function validateCourse(
 
   if (!str(form.level).trim()) {
     addError(errors, "level", "Nível é obrigatório");
+  } else if (!VALID_COURSE_LEVELS.has(str(form.level))) {
+    addError(errors, "level", "Nível selecionado é inválido");
   }
 
   if (form.categories && form.categories !== "[]") {
@@ -84,6 +101,8 @@ export function validateCourse(
 
   if (!str(form.status).trim()) {
     addError(errors, "status", "Status é obrigatório");
+  } else if (!VALID_COURSE_STATUSES.has(str(form.status))) {
+    addError(errors, "status", "Status selecionado é inválido");
   }
 
   if (!str(form.shortDescription).trim()) {

@@ -2,7 +2,13 @@ import type { DashboardRole } from "@/lib/auth";
 
 export type UserRole = "lead" | DashboardRole;
 
-export type CourseStatus = "Ativo" | "Inativo" | "Destaque" | "Em breve";
+export type CourseStatus =
+  | "Ativo"
+  | "Inativo"
+  | "Destaque"
+  | "Em breve"
+  | "Rascunho"
+  | "Arquivado";
 export type ClassStatus = "Inscrições abertas" | "Poucas vagas" | "Encerrada" | "Em breve";
 export type EnrollmentStatus =
   | "Pendente"

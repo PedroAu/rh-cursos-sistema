@@ -19,6 +19,11 @@ import { SeatProgress } from "@/components/admin/seat-progress";
 import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
 import {
+  COURSE_LEVEL_OPTIONS,
+  COURSE_MODALITY_OPTIONS,
+  COURSE_STATUS_OPTIONS,
+} from "@/lib/domain/course-enums";
+import {
   validateBlogPost,
   validateClass,
   validateCourse,
@@ -237,20 +242,9 @@ export function buildResourceConfig(
       );
       const pathOptions =
         store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
-      const modalityOptions = [
-        { value: "Ao vivo online", label: "Ao vivo online" },
-        { value: "Presencial", label: "Presencial" },
-        { value: "In company", label: "In company" },
-        { value: "Híbrido", label: "Híbrido" },
-        { value: "Gravado", label: "Gravado" },
-      ];
+      const modalityOptions = COURSE_MODALITY_OPTIONS;
       const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
-      const statusOptions = [
-        { value: "Ativo", label: "Ativo" },
-        { value: "Inativo", label: "Inativo" },
-        { value: "Destaque", label: "Destaque" },
-        { value: "Em breve", label: "Em breve" },
-      ];
+      const statusOptions = COURSE_STATUS_OPTIONS;
 
       const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
       const enrolledStudents = store.students.length;
@@ -380,12 +374,7 @@ export function buildResourceConfig(
           { key: "modalities", label: "Modalidades", type: "multiselect", options: modalityOptions, required: true },
           {
             key: "level", label: "Nível", type: "select", required: true,
-            options: [
-              { value: "Básico", label: "Básico" },
-              { value: "Intermediário", label: "Intermediário" },
-              { value: "Avançado", label: "Avançado" },
-              { value: "Básico / Intermediário", label: "Básico / Intermediário" },
-            ],
+            options: COURSE_LEVEL_OPTIONS,
           },
           { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
           {
