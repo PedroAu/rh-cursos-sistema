@@ -1,0 +1,54 @@
+storyId: EPIC15-1
+title: "Admin Dashboard com Fidelidade Total Trust Keith"
+storyPath: docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md
+reviewer: "@qa (Quinn)"
+date: 2026-07-13
+verdict: CONCERNS
+
+objectiveGates:
+  typecheck: PASS
+  lint: PASS            # 0 errors, 19 warnings (arquivos alheios à story)
+  test:unit: PASS       # 440 testes / 36 arquivos
+  build: PASS
+  purge:gate: PASS      # zero @mantine/@emotion
+  bundle:check: PASS    # 576.3 KB / 1000 KB
+
+acceptanceCriteria:
+  AC1: met
+  AC2: met
+  AC3: met              # Gerenciar Cursos preservado em AdminResourcePage (busca + export CSV)
+  AC4: met
+  AC5: met              # únicos hex são do banner pré-existente (protegido por AC8)
+  AC6: met
+  AC7: met
+  AC8: met
+  AC9: met
+  AC10: partial         # spec criado + script registrado; não executado ao vivo
+  AC11: not_met         # story não atualizada (File List/checkboxes/Dev Agent Record/Status)
+
+issues:
+  - severity: medium
+    category: requirements
+    ac: AC11
+    owner: "@dev"
+    description: "Artefato da story não atualizado: File List vazia, checkboxes desmarcados, Dev Agent Record vazio, Status ainda 'Ready'."
+    recommendation: "Preencher File List (incl. model/dashboard-overview.ts), marcar tasks/quality gates, preencher Dev Agent Record com evidências dos gates e Change Log; ajustar Status ao fluxo real."
+  - severity: low
+    category: tests
+    ac: AC10
+    owner: "@qa/@dev"
+    description: "Playwright test:epic15:fidelity validado estruturalmente, não executado contra servidor vivo (:3100)."
+    recommendation: "Rodar npm run test:epic15:fidelity em ambiente e2e e anexar resultado."
+  - severity: low
+    category: tests
+    owner: "@dev"
+    description: "model/dashboard-overview.ts (lógica pura de datas/agregações) sem teste unitário."
+    recommendation: "Adicionar testes de corte 30 dias, ordenação por proximidade, fallback de origem vazia e ocupação com totalSeats=0. Não bloqueante (módulos-irmãos também não têm)."
+
+nfr:
+  security: pass        # sem novas superfícies de dados/auth
+  performance: pass     # useMemo correto; bundle dentro do budget
+  reliability: pass     # fallbacks de lista vazia + guardas de NaN/divisão por zero
+  maintainability: pass # lógica de dados isolada em model/ puro
+
+nextAction: "Devolver ao @dev para cumprir AC11 (issue medium) e, idealmente, executar o e2e de fidelidade. Após re-revisão leve, liberar para @devops. NÃO promover para Done com story não rastreada."
