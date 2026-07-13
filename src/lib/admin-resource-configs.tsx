@@ -95,6 +95,8 @@ export type FieldConfig = {
     | "file"
     | "readonly";
   options?: Array<{ value: string; label: string }>;
+  /** Sugestões (datalist) para campos `type: "array"` — não restringe, só orienta. */
+  suggestions?: string[];
   required?: boolean;
   section?: string;
 };
@@ -242,6 +244,7 @@ export function buildResourceConfig(
       );
       const pathOptions =
         store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
+      const categoryOptions = store.courseCategories ?? [];
       const modalityOptions = COURSE_MODALITY_OPTIONS;
       const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = COURSE_STATUS_OPTIONS;
@@ -391,7 +394,7 @@ export function buildResourceConfig(
           { key: "price", label: "Preço (R$)", type: "number", required: true },
           { key: "image", label: "URL da imagem", type: "text" },
           { key: "targetAudience", label: "Público-alvo", type: "array" },
-          { key: "categories", label: "Categorias", type: "array" },
+          { key: "categories", label: "Categorias", type: "array", suggestions: categoryOptions },
           { key: "featuredCourseIds", label: "Cursos destaque relacionados", type: "multiselect", options: featuredCourseOptions },
           { key: "shortDescription", label: "Descrição curta", type: "textarea", required: true },
           { key: "fullDescription", label: "Descrição completa", type: "textarea", required: true },

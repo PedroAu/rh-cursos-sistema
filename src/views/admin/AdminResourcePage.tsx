@@ -522,6 +522,7 @@ function RenderField({
         value={(form[field.key] as string[]) || []}
         onChange={updateField}
         error={error}
+        suggestions={field.suggestions}
       />
     );
   }
@@ -772,15 +773,19 @@ function ArrayInputLite({
   value = [],
   onChange,
   placeholder = "Digite um item e clique em adicionar",
-  error
+  error,
+  suggestions
 }: {
   label: string;
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
   error?: string;
+  suggestions?: string[];
 }) {
   const [inputValue, setInputValue] = useState("");
+  const datalistId = useId();
+  const hasSuggestions = Boolean(suggestions?.length);
 
   return (
     <FieldShell label={label} error={error}>
@@ -789,6 +794,7 @@ function ArrayInputLite({
           <div key={`${item}-${index}`} className="flex items-center gap-2">
             <Input
               value={item}
+              list={hasSuggestions ? datalistId : undefined}
               onChange={(event) => {
                 const next = [...value];
                 next[index] = event.currentTarget.value;
@@ -808,6 +814,7 @@ function ArrayInputLite({
           <Input
             value={inputValue}
             placeholder={placeholder}
+            list={hasSuggestions ? datalistId : undefined}
             onChange={(event) => setInputValue(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key !== "Enter") return;
@@ -829,6 +836,15 @@ function ArrayInputLite({
             <Plus className="h-4 w-4" />
           </Button>
         </div>
+        {hasSuggestions ? (
+          <datalist id={datalistId}>
+            {suggestions!.map((suggestion) => (
+              <option key={suggestion} value={suggestion}>
+                {suggestion}
+              </option>
+            ))}
+          </datalist>
+        ) : null}
       </div>
     </FieldShell>
   );

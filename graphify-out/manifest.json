@@ -3225,8 +3225,8 @@
     "semantic_hash": ""
   },
   ".storybook/preview.tsx": {
-    "mtime": 1782612202.634118,
-    "ast_hash": "64410574e853cdc627b7f63881f9cb2d",
+    "mtime": 1783888367.3516471,
+    "ast_hash": "729bb46347f8013101a29741de545829",
     "semantic_hash": ""
   },
   "app/admin/alunos/page.tsx": {
@@ -3455,7 +3455,7 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1783868097.3220942,
+    "mtime": 1783963298.4345746,
     "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
@@ -3675,8 +3675,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/admin-form-validation.test.ts": {
-    "mtime": 1783772653.3303857,
-    "ast_hash": "d0d93cb74c205cd6fd979fe1693c2b7c",
+    "mtime": 1783947545.5648122,
+    "ast_hash": "afcfaba4addc9a8526b90d5ab7a31034",
     "semantic_hash": ""
   },
   "src/__tests__/lib/admin-resource-configs.test.ts": {
@@ -3690,8 +3690,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/app-store.test.ts": {
-    "mtime": 1783772817.4304254,
-    "ast_hash": "5efa0c390ce12bbf252660bb077e626c",
+    "mtime": 1783963494.004631,
+    "ast_hash": "3ebd5e8ed10ba8e158d4e65fcb44bdde",
     "semantic_hash": ""
   },
   "src/__tests__/lib/auth.test.ts": {
@@ -3760,8 +3760,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/mappers.test.ts": {
-    "mtime": 1783722079.999551,
-    "ast_hash": "f9ffdc6ecddb927b770d3ee399939ad7",
+    "mtime": 1783947500.6646955,
+    "ast_hash": "c02c7933af19a3a12f085df0e550a23f",
     "semantic_hash": ""
   },
   "src/__tests__/lib/rate-limit.test.ts": {
@@ -4485,13 +4485,13 @@
     "semantic_hash": ""
   },
   "src/lib/admin-form-validation.ts": {
-    "mtime": 1783772609.6634955,
-    "ast_hash": "6de5552ea4f695a76df36381221582d1",
+    "mtime": 1783947517.1790237,
+    "ast_hash": "19a678b6e9e16c6d02b7d9820c4f35ac",
     "semantic_hash": ""
   },
   "src/lib/admin-resource-configs.tsx": {
-    "mtime": 1783822499.3035743,
-    "ast_hash": "fde8221a0834117ebf59c6ff4b3a78cc",
+    "mtime": 1783963269.7496011,
+    "ast_hash": "0a2b307b76c9d41c8c66de0c0832728c",
     "semantic_hash": ""
   },
   "src/lib/analytics.ts": {
@@ -4500,8 +4500,8 @@
     "semantic_hash": ""
   },
   "src/lib/app-store.tsx": {
-    "mtime": 1783856506.3653414,
-    "ast_hash": "d709f56cef4795b89f31eea35732e137",
+    "mtime": 1783963249.7404163,
+    "ast_hash": "1916f96883e6cba5a136c8d7f278c3f5",
     "semantic_hash": ""
   },
   "src/lib/auth-session.ts": {
@@ -4530,8 +4530,8 @@
     "semantic_hash": ""
   },
   "src/lib/contexts/course-context.tsx": {
-    "mtime": 1783721699.2392368,
-    "ast_hash": "4294da0746231f09c1a2e9bfe986fbbb",
+    "mtime": 1783963198.2663696,
+    "ast_hash": "d60bf25b33f2bbeb416f481d1cdd21fc",
     "semantic_hash": ""
   },
   "src/lib/contexts/session-context.tsx": {
@@ -4540,8 +4540,8 @@
     "semantic_hash": ""
   },
   "src/lib/contexts/store-types.ts": {
-    "mtime": 1783721692.199915,
-    "ast_hash": "a968101e833805b4e4085e51aa44f294",
+    "mtime": 1783963195.0363946,
+    "ast_hash": "530293264edf1075fe5cc338bfe05c5e",
     "semantic_hash": ""
   },
   "src/lib/contexts/student-context.tsx": {
@@ -4665,8 +4665,8 @@
     "semantic_hash": ""
   },
   "src/lib/supabase/mappers.ts": {
-    "mtime": 1783773537.1166637,
-    "ast_hash": "2bffe4876951d591ecd38e3e0756c312",
+    "mtime": 1783947323.8704977,
+    "ast_hash": "b25cb9d471c5196a4717f32facd44289",
     "semantic_hash": ""
   },
   "src/lib/supabase/portal-data.ts": {
@@ -4680,13 +4680,13 @@
     "semantic_hash": ""
   },
   "src/lib/supabase/rh-cursos-api.ts": {
-    "mtime": 1783856408.6570284,
-    "ast_hash": "fba3cff842fdb0cec32da59ebfd10717",
+    "mtime": 1783963191.2017248,
+    "ast_hash": "820298f56c9c80f3e0dc08929f01f862",
     "semantic_hash": ""
   },
   "src/lib/supabase/schemas.ts": {
-    "mtime": 1783721710.9448223,
-    "ast_hash": "e7f917b140e5046f82b0653401b31da4",
+    "mtime": 1783963156.6697414,
+    "ast_hash": "39a56cf43f1d3b36b5984bbdb55bab84",
     "semantic_hash": ""
   },
   "src/lib/supabase/server.ts": {
@@ -4735,8 +4735,8 @@
     "semantic_hash": ""
   },
   "src/types/index.ts": {
-    "mtime": 1783721689.6854675,
-    "ast_hash": "278cf6f4f32f02ef3b5a5381fa137943",
+    "mtime": 1783947311.764938,
+    "ast_hash": "96c3feda8e9db8a9ea57fa27537bf9df",
     "semantic_hash": ""
   },
   "src/views/admin/AdminDashboard.tsx": {
@@ -4745,8 +4745,8 @@
     "semantic_hash": ""
   },
   "src/views/admin/AdminResourcePage.tsx": {
-    "mtime": 1783822559.1134052,
-    "ast_hash": "8b2250c32fca2bc65f7a16453339f70e",
+    "mtime": 1783963540.6621044,
+    "ast_hash": "ba514659bcc3bc0952b6a71971ecaa75",
     "semantic_hash": ""
   },
   "src/views/admin/AdminSettingsPage.tsx": {
@@ -4765,18 +4765,18 @@
     "semantic_hash": ""
   },
   "src/views/public/About.tsx": {
-    "mtime": 1783602599.2486684,
-    "ast_hash": "d8d61fd55db6106268f294cba69668bc",
+    "mtime": 1783888333.3518023,
+    "ast_hash": "401856517ce76a38b6832710564ee8bd",
     "semantic_hash": ""
   },
   "src/views/public/Agenda.tsx": {
-    "mtime": 1783646243.9095979,
-    "ast_hash": "7d70e8be8212f0b235b7dc47f07dc012",
+    "mtime": 1783888333.3498042,
+    "ast_hash": "d997b4897f46c6f9939f02ede5304232",
     "semantic_hash": ""
   },
   "src/views/public/Blog.tsx": {
-    "mtime": 1783600357.6426237,
-    "ast_hash": "4d809f5b6c96c65fdf9694a9c98d9a9c",
+    "mtime": 1783888333.350846,
+    "ast_hash": "b1b374703059dcc28fa871f67e1831a7",
     "semantic_hash": ""
   },
   "src/views/public/BlogPost.tsx": {
@@ -4795,13 +4795,13 @@
     "semantic_hash": ""
   },
   "src/views/public/CourseDetail.tsx": {
-    "mtime": 1783855998.2604053,
-    "ast_hash": "88bc83b2ddd12d2c493b8f47c7acf7d6",
+    "mtime": 1783888333.3531218,
+    "ast_hash": "eb1ca309bebea156f906fabfacbb0a90",
     "semantic_hash": ""
   },
   "src/views/public/Courses.tsx": {
-    "mtime": 1783646243.766235,
-    "ast_hash": "1a01a14a0c4981e19568f10b25720b44",
+    "mtime": 1783888333.3487785,
+    "ast_hash": "77003d189a8ea18f3724bc9e8b053377",
     "semantic_hash": ""
   },
   "src/views/public/EnrollmentSuccess.tsx": {
@@ -4810,13 +4810,13 @@
     "semantic_hash": ""
   },
   "src/views/public/Home.tsx": {
-    "mtime": 1783646244.0549448,
-    "ast_hash": "ce21968e58c3a0d771236983d4605634",
+    "mtime": 1783888333.3461037,
+    "ast_hash": "8307ecace1f31529d3d4ccc38f65b657",
     "semantic_hash": ""
   },
   "src/views/public/InCompany.tsx": {
-    "mtime": 1783646190.3130045,
-    "ast_hash": "67b54c88122041300955e8799e9bbfeb",
+    "mtime": 1783888333.3475678,
+    "ast_hash": "0a38ee598e44fd204cafaddd6707f2c2",
     "semantic_hash": ""
   },
   "src/views/public/Login.tsx": {
@@ -4835,8 +4835,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/_shared/admin-mappers.ts": {
-    "mtime": 1783773331.5218701,
-    "ast_hash": "fcc7a437dfec076ca4bdc3e7faa95d50",
+    "mtime": 1783947335.553091,
+    "ast_hash": "1793b411aa0a79add819e4eceffda9a9",
     "semantic_hash": ""
   },
   "supabase/functions/_shared/admin-resource-errors.ts": {
@@ -4845,8 +4845,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/_shared/admin-validation.ts": {
-    "mtime": 1783805323.9750543,
-    "ast_hash": "1df08fe6656b9f7c202274595e07fdcd",
+    "mtime": 1783947333.787363,
+    "ast_hash": "bec064a7f730aace8ae4b7ddacf94ab8",
     "semantic_hash": ""
   },
   "supabase/functions/_shared/auth.ts": {
@@ -4910,102 +4910,102 @@
     "semantic_hash": ""
   },
   "supabase/migrations/20260512193000_initial_rh_cursos_schema.sql": {
-    "mtime": 1780601865.7023268,
-    "ast_hash": "0cb9f23fb174e7f0e94e7098236b8385",
+    "mtime": 1783953942.138621,
+    "ast_hash": "5285f75a04512f64ee77e7255135b10b",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513100000_sprint1_security.sql": {
-    "mtime": 1780603548.369687,
-    "ast_hash": "70d262e4819e4403efa2a2580122d1d1",
+    "mtime": 1783953942.1394098,
+    "ast_hash": "2a5e5d6bea06d78006e5993dd3d29b1b",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513200000_sprint2_integrity.sql": {
-    "mtime": 1780601842.8455281,
-    "ast_hash": "c5863776d88c52334a865f4cb27ad8a2",
+    "mtime": 1783953942.1402254,
+    "ast_hash": "5c1ddf7eaeb3d534528923537b0affba",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513300000_sprint3_performance.sql": {
-    "mtime": 1780601795.6124768,
-    "ast_hash": "d16dca926dadb20144fd17be5f2a6b01",
+    "mtime": 1783953942.1405299,
+    "ast_hash": "31a1d420def18a205313afed16323cb5",
     "semantic_hash": ""
   },
   "supabase/migrations/20260513400000_sprint4_evolution.sql": {
-    "mtime": 1780601842.846325,
-    "ast_hash": "56e03f6b55f6ef26c3eaf664cca7da2c",
+    "mtime": 1783953942.1408095,
+    "ast_hash": "7ef3b86e785f6beb8b4fef846ec2cf7e",
     "semantic_hash": ""
   },
   "supabase/migrations/20260604164120_content_access_alignment.sql": {
-    "mtime": 1780603461.0892804,
-    "ast_hash": "e17b1b8731124f83f452d3388af63986",
+    "mtime": 1783953942.141217,
+    "ast_hash": "3ab087b8d6b51ef4ce141a39d8d5036e",
     "semantic_hash": ""
   },
   "supabase/migrations/20260605000000_seed_initial_data.sql": {
-    "mtime": 1782438375.5647378,
-    "ast_hash": "ccc055ba55c225fbc37076c1a3df200d",
+    "mtime": 1783953942.1419556,
+    "ast_hash": "a47669ea3fdb319d39fbc61b34e3d3f3",
     "semantic_hash": ""
   },
   "supabase/migrations/20260608000000_seed_admin_user.sql": {
-    "mtime": 1782438375.5649326,
-    "ast_hash": "6de7f6a1482b1938b955a313c07dcefd",
+    "mtime": 1783953942.1424565,
+    "ast_hash": "f588214ec6e0b9381ecc7ad8c566a267",
     "semantic_hash": ""
   },
   "supabase/migrations/20260608100000_admin_audit_log.sql": {
-    "mtime": 1780942192.4234896,
-    "ast_hash": "2adee257dc79297b79fdd7cd82ddf7bd",
+    "mtime": 1783953942.1431782,
+    "ast_hash": "1caeda21914074e6e756572134b65886",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609100000_global_rate_limit.sql": {
-    "mtime": 1782438375.5650322,
-    "ast_hash": "1cf8b4f2ecfd6d9a9d553896d6b070dd",
+    "mtime": 1783953942.1442435,
+    "ast_hash": "6d894d1aac438b4580a4afbfb1078850",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609120000_remove_legacy_course_instructor_fields.sql": {
-    "mtime": 1782438375.565146,
-    "ast_hash": "774b1cf0af9083375d9b0f24d6149b90",
+    "mtime": 1783953942.1443927,
+    "ast_hash": "2b94de997ac7495fa61c90f555a1fd48",
     "semantic_hash": ""
   },
   "supabase/migrations/20260609120001_enable_realtime_publication.sql": {
-    "mtime": 1782438375.5654197,
+    "mtime": 1783953942.1445494,
     "ast_hash": "879b00dfb7d4a31a83bdc7a886296992",
     "semantic_hash": ""
   },
   "supabase/migrations/20260623144035_rbac_authorization_helpers.sql": {
-    "mtime": 1782438375.565856,
-    "ast_hash": "6c39eaf7ff58a4bdd1ee82e0d20f26e2",
+    "mtime": 1783953942.144713,
+    "ast_hash": "b608c7f21da794de5ffb23257a6b32db",
     "semantic_hash": ""
   },
   "supabase/migrations/20260701090000_instructor_portal_rls.sql": {
-    "mtime": 1782905795.6914163,
-    "ast_hash": "a9c4c58f6b8a9e030d4dcc0dedd75a29",
+    "mtime": 1783953942.1454196,
+    "ast_hash": "14e9b4ae6847cf7f1b8a49cb0a83c4c6",
     "semantic_hash": ""
   },
   "supabase/migrations/20260707144500_fix_aluno_rls_recursion.sql": {
-    "mtime": 1783527338.426483,
-    "ast_hash": "f72037fb1ad47292275be839169f81f0",
+    "mtime": 1783953942.1458664,
+    "ast_hash": "21f9cc71f94f7c1fffb356a42ddcac10",
     "semantic_hash": ""
   },
   "supabase/migrations/20260710000000_course_public_content.sql": {
-    "mtime": 1783722022.9210353,
-    "ast_hash": "265079afa4e4768877119efa029ccab6",
+    "mtime": 1783953942.144017,
+    "ast_hash": "89d1a54b5379f8fcb0849da32f741af2",
     "semantic_hash": ""
   },
   "supabase/migrations/20260711000001_inscricao_delete_counters.sql": {
-    "mtime": 1783772693.7542088,
-    "ast_hash": "7823e90a9b36a8e6da075c22e36e061a",
+    "mtime": 1783953942.1464753,
+    "ast_hash": "b024d52b91c13616f7bd2f974d957946",
     "semantic_hash": ""
   },
   "supabase/migrations/20260711000002_grant_course_public_content_select.sql": {
-    "mtime": 1783824379.1678524,
+    "mtime": 1783953942.1469972,
     "ast_hash": "ef22b479b308d88f6b42ce8be0ba7654",
     "semantic_hash": ""
   },
   "supabase/migrations/20260711000003_grant_course_public_content_service_role.sql": {
-    "mtime": 1783825003.1397872,
+    "mtime": 1783953942.1472619,
     "ast_hash": "3a5466c6f4f10a89a917e08150e81825",
     "semantic_hash": ""
   },
   "supabase/sql/create_all_rh_cursos_schema.sql": {
-    "mtime": 1782438375.5661066,
+    "mtime": 1783948522.5896406,
     "ast_hash": "7ba4bfe05dc32cbda0b59bcf6a69bb7b",
     "semantic_hash": ""
   },
@@ -10240,13 +10240,68 @@
     "semantic_hash": ""
   },
   "docs/stories/2026-07-12-login-redesign-card-centralizado.md": {
-    "mtime": 1783887738.1339521,
-    "ast_hash": "039582bc20738e455a5dc879c9f9c8d7",
+    "mtime": 1783888442.6617973,
+    "ast_hash": "51fdfb93ad63ed6932d71d8cdaee9d33",
     "semantic_hash": ""
   },
   "docs/qa/gates/LOGIN-RD.1-login-redesign-card-centralizado.yml": {
     "mtime": 1783887724.2530754,
     "ast_hash": "2e2ed21e60d2fd9d0dbc15f02e7a66aa",
+    "semantic_hash": ""
+  },
+  "docs/architecture/adr-015-course-form-dynamic-fields.md": {
+    "mtime": 1783944932.2987058,
+    "ast_hash": "e8b4f62b8181e420125b41e02be26fdf",
+    "semantic_hash": ""
+  },
+  "src/lib/domain/course-enums.ts": {
+    "mtime": 1783947305.059627,
+    "ast_hash": "8f6606e1dc1b6b4b4875262192d2cff6",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260713100000_curso_modalidades_array.sql": {
+    "mtime": 1783953942.1474378,
+    "ast_hash": "d873d42f0140a6a969bc9d3cc8304fd1",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-13-adr015-fase1-course-enums-fonte-unica.md": {
+    "mtime": 1783948186.8812268,
+    "ast_hash": "40c2cf2d587234fbbef757e9735dfb81",
+    "semantic_hash": ""
+  },
+  "docs/design/redesign/spec-admin-dashboard.md": {
+    "mtime": 1783963171.428754,
+    "ast_hash": "ca2a42ae2f71d39e94332593e86f22a8",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/adr015-f1-course-enums-fonte-unica.yml": {
+    "mtime": 1783954881.8040903,
+    "ast_hash": "1762c8c436bc38d3e912cc2aa71f904d",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-13-adr015-fase2-categorias-dinamicas.md": {
+    "mtime": 1783963634.763351,
+    "ast_hash": "4f48e6d548312a5b75e7b1853531010f",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/rh-cursos-api.test.ts": {
+    "mtime": 1783963520.5667665,
+    "ast_hash": "b2f2962bbe1e67ead4a7cabd95e9f8cc",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260713120000_remove_demo_seed_data.sql": {
+    "mtime": 1783963310.580105,
+    "ast_hash": "c77d92166b63b81058840a5748d3e5e3",
+    "semantic_hash": ""
+  },
+  "docs/epics/epic-15-admin-dashboard-fidelidade-total.md": {
+    "mtime": 1783963355.3691509,
+    "ast_hash": "1351443365002d00cced9c5c0f2bad04",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md": {
+    "mtime": 1783963600.6860964,
+    "ast_hash": "c1a9c5549151dc4ea514df3f49ae7ebd",
     "semantic_hash": ""
   }
 }

@@ -14,6 +14,7 @@ export type CourseStoreValue = {
   classes: TrainingClass[];
   instructors: Instructor[];
   trainingPaths: TrainingPath[];
+  courseCategories: string[];
   coursePublicContents: CoursePublicContent[];
   testimonials: Testimonial[];
   upsertCourse: (course: Partial<Course>) => Promise<void>;

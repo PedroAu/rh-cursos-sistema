@@ -69,6 +69,19 @@ export type AppStoreValue = SessionStoreValue & CourseStoreValue & StudentStoreV
 
 const STORAGE_KEY = "rhcursos-demo-store-v4";
 
+/**
+ * Fallback de `courseCategories` quando não há catálogo real nem estado
+ * atual: deriva das categorias do mock de cursos (não há mock dedicado).
+ */
+function deriveCourseCategoriesFromCourses(courses: Course[]): string[] {
+  const categories = new Set<string>();
+  for (const course of courses) {
+    const values = course.categories?.length ? course.categories : course.category ? [course.category] : [];
+    for (const value of values) categories.add(value);
+  }
+  return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
 type AdminMutation =
   | {
       resource: "courses" | "classes" | "students" | "instructors" | "blog" | "leads" | "enrollments";
@@ -94,6 +107,7 @@ const initialState: AppState = {
   blogPosts: mockBlogPosts,
   testimonials: [],
   trainingPaths: mockCatalog.trainingPaths,
+  courseCategories: deriveCourseCategoriesFromCourses(mockCatalog.courses),
   currentSession: null
 };
 
@@ -108,7 +122,8 @@ const ARRAY_STATE_KEYS = [
   "enrollments",
   "blogPosts",
   "testimonials",
-  "trainingPaths"
+  "trainingPaths",
+  "courseCategories"
 ] as const satisfies readonly (keyof AppStoreInitialData)[];
 
 type PublicCatalogSnapshot = Awaited<ReturnType<typeof fetchPublicCatalogFromSupabase>>;
@@ -144,7 +159,12 @@ function resolveCatalogBootstrapState(current: AppState, catalog: PublicCatalogS
       : current.trainingPaths.length
         ? current.trainingPaths
         : mockCatalog.trainingPaths,
-    coursePublicContents: catalog?.coursePublicContents.length ? catalog.coursePublicContents : current.coursePublicContents
+    coursePublicContents: catalog?.coursePublicContents.length ? catalog.coursePublicContents : current.coursePublicContents,
+    courseCategories: catalog?.courseCategories.length
+      ? catalog.courseCategories
+      : current.courseCategories.length
+        ? current.courseCategories
+        : deriveCourseCategoriesFromCourses(current.courses.length ? current.courses : mockCatalog.courses)
   };
 }
 
@@ -540,7 +560,8 @@ export function AppStoreProvider({
             classes: updated.classes,
             instructors: updated.instructors,
             trainingPaths: updated.trainingPaths,
-            coursePublicContents: updated.coursePublicContents
+            coursePublicContents: updated.coursePublicContents,
+            courseCategories: updated.courseCategories.length ? updated.courseCategories : current.courseCategories
           }));
         })
         .catch(() => undefined);
@@ -1364,6 +1385,7 @@ export function AppStoreProvider({
       classes: state.classes,
       instructors: state.instructors,
       trainingPaths: state.trainingPaths,
+      courseCategories: state.courseCategories,
       coursePublicContents: state.coursePublicContents,
       testimonials: state.testimonials,
       upsertCourse,
@@ -1379,6 +1401,7 @@ export function AppStoreProvider({
       state.classes,
       state.instructors,
       state.trainingPaths,
+      state.courseCategories,
       state.coursePublicContents,
       state.testimonials,
       upsertCourse,

@@ -29,6 +29,7 @@ import { validateResponse, withRetry } from "@/lib/supabase/api-validation";
 import {
   assessmentWithCourseListSchema,
   blogPostListSchema,
+  courseCategoryListSchema,
   courseInstructorListSchema,
   enrollmentIdSchema,
   leadListSchema,
@@ -42,11 +43,47 @@ import {
 
 type RhCursosClient = SupabaseClient<Database>;
 
+/**
+ * Categorias distintas já cadastradas em `curso`, para alimentar as
+ * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
+ * A query é coberta pelo índice parcial `curso_categoria_idx`; o filtro
+ * `deleted_at is null` é aplicado pela RLS `catalogo_publico_curso_select`
+ * (mesmo padrão das demais queries de `curso` neste arquivo).
+ */
+export async function fetchCourseCategories(client: RhCursosClient): Promise<string[]> {
+  const result = await withRetry(
+    () => client.from("curso").select("categoria").not("categoria", "is", null).order("categoria"),
+    { label: "fetchPublicCatalog:curso_categoria" }
+  );
+
+  if (result.error) throw result.error;
+
+  const rows = validateResponse(result.data, courseCategoryListSchema, {
+    endpoint: "fetchPublicCatalog",
+    resource: "curso_categoria",
+    schema: "courseCategoryListSchema"
+  });
+
+  const categories = new Set<string>();
+  for (const row of rows) {
+    if (row.categoria) categories.add(row.categoria);
+  }
+
+  return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
 async function fetchPublicCatalog(client: RhCursosClient | null) {
   if (!client) return null;
 
-  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult, trainingPathsResult, coursePublicContentResult] =
-    await Promise.all([
+  const [
+    coursesResult,
+    classesResult,
+    instructorsResult,
+    courseInstructorsResult,
+    trainingPathsResult,
+    coursePublicContentResult,
+    courseCategories
+  ] = await Promise.all([
       withRetry(
         () =>
           client
@@ -91,7 +128,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
             .eq("published", true)
             .order("created_at"),
         { label: "fetchPublicCatalog:curso_public_content" }
-      )
+      ),
+      fetchCourseCategories(client)
     ]);
 
   if (coursesResult.error) throw coursesResult.error;
@@ -147,7 +185,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
     classes: classRows.map(mapClass),
     instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows)),
     trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0)),
-    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent)
+    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent),
+    courseCategories
   };
 }
 

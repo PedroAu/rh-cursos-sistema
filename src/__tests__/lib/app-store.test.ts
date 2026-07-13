@@ -252,13 +252,13 @@ function BrokenConsumer() {
   return null;
 }
 
-function renderStore(initialSession?: CurrentSession | null) {
+function renderStore(initialSession?: CurrentSession | null, initialData?: Parameters<typeof AppStoreProvider>[0]["initialData"]) {
   let latestStore: Store | undefined;
   const onStore = vi.fn((store: Store) => {
     latestStore = store;
   });
 
-  render(h(AppStoreProvider, { initialSession }, h(StoreProbe, { onStore })));
+  render(h(AppStoreProvider, { initialSession, initialData }, h(StoreProbe, { onStore })));
 
   return {
     onStore,
@@ -835,5 +835,28 @@ describe("AppStoreProvider and hooks", () => {
     const harness = renderStore(initialSession);
 
     expect(harness.store.currentSession).toEqual(initialSession);
+  });
+
+  it("falls back to categories derived from the mock course catalog when no initial data is provided", async () => {
+    const harness = renderStore();
+
+    expect(harness.store.courseCategories.length).toBeGreaterThan(0);
+    expect(harness.store.courseCategories).toEqual([...harness.store.courseCategories].sort((a, b) => a.localeCompare(b, "pt-BR")));
+    expect(new Set(harness.store.courseCategories).size).toBe(harness.store.courseCategories.length);
+  });
+
+  it("uses courseCategories from the initial catalog data when provided", async () => {
+    const harness = renderStore(undefined, { courseCategories: ["Auditoria", "Compliance"] });
+
+    expect(harness.store.courseCategories).toEqual(["Auditoria", "Compliance"]);
+  });
+
+  it("ignores a non-array courseCategories value in the initial catalog data", async () => {
+    const fallback = renderStore().store.courseCategories;
+    const harness = renderStore(undefined, {
+      courseCategories: "not-an-array" as unknown as string[],
+    });
+
+    expect(harness.store.courseCategories).toEqual(fallback);
   });
 });
