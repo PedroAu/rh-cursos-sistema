@@ -48,15 +48,21 @@ export function DashboardPageShell({
   role,
   initialSession,
   initialData,
+  bootstrapPublicData = true,
   children
 }: {
   role: DashboardRole;
   initialSession: CurrentSession;
   initialData?: AppStoreInitialData;
+  bootstrapPublicData?: boolean;
   children: ReactNode;
 }) {
   return (
-    <AppStoreProvider initialSession={initialSession} initialData={initialData}>
+    <AppStoreProvider
+      initialSession={initialSession}
+      initialData={initialData}
+      bootstrapPublicData={bootstrapPublicData}
+    >
       <Suspense fallback={null}>
         <DashboardShell role={role}>{children}</DashboardShell>
       </Suspense>

@@ -273,6 +273,7 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 | 2026-07-14 | 1.3 | Hardening pós-revisão QA: mutações E2E agora falham fechado sem opt-in e project refs de teste/produção distintos; o skip global de `admin-crud` foi removido; o bundle determinístico foi isolado em `.next-playwright`; readiness valida separadamente `Ver turma` e `Ver detalhes`. | @dev (Dex) |
 | 2026-07-14 | 1.4 | Isolamento SSR do baseline visual concluído com cookie restrito ao bundle Playwright; `/cursos`, detalhe de curso e artigo usam fixtures sem consultar o catálogo real, enquanto build normal e contextos sem cookie permanecem reais. | @dev (Dex) |
 | 2026-07-14 | 1.5 | Supabase isolado local criado após indisponibilidade de cota remota; 24 migrations reaplicadas do zero, escrita E2E limitada a loopback com opt-in explícito, CSP local restrito à origem configurada e Edge Functions com secrets ignorados. O CRUD administrativo passou 10/10 e o agregado passou 174/174. A investigação adicional eliminou hidratação intermitente ao filtrar soft-deletes explicitamente no SSR service-role e hidratar o admin com catálogo inicial consistente. | @dev (Dex) |
+| 2026-07-14 | 1.6 | Follow-up do veredito QA FAIL: leitura SSR pública passou a reproduzir status e relações das políticas RLS, depoimentos excluídos são filtrados explicitamente e o admin recebeu modelo próprio com cursos/posts não publicados e instrutores inativos. O bootstrap público do navegador não pode mais reduzir a visão administrativa. Story permanece In Progress até o gate do commit candidato e novo veredito independente. | @dev (Dex) |
 
 ## File List
 
@@ -341,6 +342,10 @@ GPT-5 Codex (`@dev` / Dex).
 - Diagnóstico CSP/toast: chamadas do navegador ao Supabase local eram bloqueadas pelo `connect-src`; a política agora adiciona somente a origem loopback configurada e seu WebSocket. O `AppToaster` raiz tornou-se o único mount global, eliminando notificações duplicadas.
 - Diagnóstico de hidratação: uma primeira execução agregada passou 172/174 e revelou React #418 em `/cursos` e `/admin/instrutores`. Trace confirmou SSR service-role incluindo soft-deletes enquanto o cliente anon aplicava RLS; queries públicas receberam filtros explícitos e o admin passou a receber catálogo inicial no SSR. Repetição direcionada passou 10/10.
 - Prova final em banco resetado: lint PASS; typecheck PASS; unit 46 arquivos/518 testes PASS; build PASS; Playwright 174/174 PASS em aproximadamente 2,9 minutos; CRUD administrativo 10/10 dentro do agregado; nenhum snapshot foi atualizado como correção.
+- Revisão independente posterior emitiu FAIL para o commit `d061801`: o service role ainda não reproduzia status/relações da RLS, depoimentos SSR não filtravam soft-delete e o admin recebia a visão pública, omitindo instrutores inativos.
+- Gate executado em worktree limpo no commit `d061801`: lint/typecheck/unit PASS; Playwright 162/173 PASS e 11 FAIL. A divergência em relação ao worktree principal foi rastreada a mudanças paralelas não commitadas em autenticação e snapshots; o resultado verde anterior não é aceito como prova constitucional do commit.
+- Follow-up causal: seleção pública agora restringe cursos a `Ativo`, `Destaque` e `EmBreve`, remove turmas/vínculos/conteúdos relacionados a cursos ocultos ou instrutores inativos e aplica o mesmo filtro em memória após a query. A visão admin preserva registros não publicados/inativos e desativa o refetch público que os sobrescrevia.
+- Regressões do follow-up: 48/48 testes focados PASS; suíte unitária 46 arquivos/522 testes PASS; lint, typecheck e build PASS; CRUD administrativo no Supabase local isolado 10/10 PASS. O gate agregado do novo commit candidato permanece pendente.
 
 ### Completion Notes
 
@@ -352,8 +357,8 @@ GPT-5 Codex (`@dev` / Dex).
 - Inserção de curso, conclusão de checkout, envio de leads e cleanups públicos exercitados pelo agregado recebem a mesma guarda antes da primeira escrita.
 - O bundle com capacidade de fixture vive em `.next-playwright`, ignorado por Git/ESLint; preview/deploy normal continua usando `.next`.
 - O cookie de baseline SSR só é aceito quando `PLAYWRIGHT_TEST_BUILD=1` e `NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE=1`; cookie isolado não ativa fixture em build normal.
-- Próximo passo seguro: revisão independente de `@qa`, amostragem dos gates e veredito PASS/CONCERNS/FAIL; a alternativa remota continua bloqueada apenas pela cota do plano, não pela execução local.
-- Merge continua bloqueado até o veredito independente de `@qa`, embora os gates técnicos tenham passado no ambiente isolado local sem aceitar deltas de baseline.
+- O primeiro veredito independente foi FAIL; os achados P1 foram corrigidos em follow-up com testes de regressão. É obrigatória uma nova revisão de `@qa` após o gate do commit candidato.
+- Merge continua bloqueado: o verde obtido no worktree sujo não comprova o mesmo commit e a execução limpa expôs dependências em mudanças paralelas de autenticação/snapshots.
 
 ## QA Results
 

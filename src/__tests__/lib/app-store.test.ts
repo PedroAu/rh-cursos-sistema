@@ -121,6 +121,17 @@ const mocks = vi.hoisted(() => {
   ];
 
   return {
+    supabaseConfigured: false,
+    supabaseClient: {
+      channel: vi.fn(),
+      removeChannel: vi.fn(),
+      auth: {
+        setSession: vi.fn(),
+        signOut: vi.fn(() => Promise.resolve()),
+      },
+    },
+    fetchPublicCatalog: vi.fn(),
+    fetchPublicBlogPosts: vi.fn(),
     functionsConfigured: false,
     invokeFunction: vi.fn(),
     toastSuccess: vi.fn(),
@@ -175,8 +186,12 @@ vi.mock("sonner", () => ({
 }));
 
 vi.mock("@/lib/supabase/client", () => ({
-  isSupabaseConfigured: false,
-  supabase: null,
+  get isSupabaseConfigured() {
+    return mocks.supabaseConfigured;
+  },
+  get supabase() {
+    return mocks.supabaseConfigured ? mocks.supabaseClient : null;
+  },
 }));
 
 vi.mock("@/lib/supabase/functions-client", () => ({
@@ -188,9 +203,10 @@ vi.mock("@/lib/supabase/functions-client", () => ({
 }));
 
 vi.mock("@/lib/supabase/rh-cursos-api", () => ({
-  fetchPublicCatalogFromSupabase: vi.fn(),
-  fetchPublicBlogPostsFromSupabase: vi.fn(),
+  fetchPublicCatalogFromSupabase: mocks.fetchPublicCatalog,
+  fetchPublicBlogPostsFromSupabase: mocks.fetchPublicBlogPosts,
   fetchLeadsFromSupabase: vi.fn(),
+  isExplicitPublicTestBaselineEnabled: vi.fn(() => false),
 }));
 
 vi.mock("@/lib/supabase/session-token", () => ({
@@ -254,13 +270,19 @@ function BrokenConsumer() {
   return null;
 }
 
-function renderStore(initialSession?: CurrentSession | null, initialData?: Parameters<typeof AppStoreProvider>[0]["initialData"]) {
+function renderStore(
+  initialSession?: CurrentSession | null,
+  initialData?: Parameters<typeof AppStoreProvider>[0]["initialData"],
+  bootstrapPublicData?: boolean
+) {
   let latestStore: Store | undefined;
   const onStore = vi.fn((store: Store) => {
     latestStore = store;
   });
 
-  render(h(AppStoreProvider, { initialSession, initialData }, h(StoreProbe, { onStore })));
+  render(
+    h(AppStoreProvider, { initialSession, initialData, bootstrapPublicData }, h(StoreProbe, { onStore }))
+  );
 
   return {
     onStore,
@@ -374,6 +396,9 @@ describe("AppStoreProvider and hooks", () => {
     mocks.getSessionToken.mockClear();
     mocks.decodeSessionToken.mockClear();
     mocks.getSupabaseSession.mockClear();
+    mocks.supabaseConfigured = false;
+    mocks.fetchPublicCatalog.mockReset();
+    mocks.fetchPublicBlogPosts.mockReset();
   });
 
   afterEach(() => {
@@ -918,6 +943,43 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.invokeFunction).not.toHaveBeenCalled();
     expect(mocks.toastError).not.toHaveBeenCalled();
     expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("preserves the complete admin model without starting the public bootstrap", async () => {
+    mocks.supabaseConfigured = true;
+    mocks.getSupabaseSession.mockReturnValue(null);
+    mocks.fetchPublicCatalog.mockResolvedValue({
+      courses: [],
+      classes: [],
+      instructors: [],
+      trainingPaths: [],
+      coursePublicContents: [],
+      courseCategories: [],
+    });
+    mocks.fetchPublicBlogPosts.mockResolvedValue([]);
+    const inactiveInstructor = {
+      ...mocks.data.mockInstructors[0],
+      id: "inst-inactive",
+      status: "Inativo" as const,
+    };
+    const harness = renderStore(
+      { role: "admin", email: "admin@example.com", name: "Admin" },
+      {
+        courses: mockCourses,
+        classes: mockClasses,
+        instructors: [inactiveInstructor],
+        trainingPaths: mocks.data.trainingPaths,
+        blogPosts: mocks.data.mockBlogPosts,
+      } as Parameters<typeof AppStoreProvider>[0]["initialData"],
+      false
+    );
+
+    await act(async () => Promise.resolve());
+
+    expect(harness.store.instructors).toEqual([inactiveInstructor]);
+    expect(harness.store.blogPosts).toEqual(mocks.data.mockBlogPosts);
+    expect(mocks.fetchPublicCatalog).not.toHaveBeenCalled();
+    expect(mocks.fetchPublicBlogPosts).not.toHaveBeenCalled();
   });
 
   it("creates enrollments and updates the related class capacity from provider state", async () => {

@@ -52,6 +52,17 @@ import {
 } from "@/lib/supabase/schemas";
 
 type RhCursosClient = SupabaseClient<Database>;
+type CatalogVisibility = "public" | "admin";
+
+type CatalogRows = {
+  courses: CourseRow[];
+  classes: ClassRow[];
+  instructors: InstructorRow[];
+  courseInstructors: CourseInstructorRow[];
+  coursePublicContents: CoursePublicContentRow[];
+};
+
+const PUBLIC_COURSE_STATUSES = new Set(["Ativo", "Destaque", "EmBreve"]);
 
 export class PublicCatalogUnavailableError extends Error {
   constructor(message: string, options?: ErrorOptions) {
@@ -65,6 +76,39 @@ type PublicCatalogResult = NonNullable<Awaited<ReturnType<typeof fetchPublicCata
 export type PublicCatalogServerState =
   | { status: "ok"; catalog: PublicCatalogResult }
   | { status: "unavailable"; error: PublicCatalogUnavailableError };
+
+/**
+ * Replica no processo SSR as relações protegidas pelas políticas RLS públicas.
+ * O cliente server usa service role e não recebe essa proteção automaticamente.
+ */
+export function selectCatalogRowsForVisibility(
+  rows: CatalogRows,
+  visibility: CatalogVisibility
+): CatalogRows {
+  if (visibility === "admin") return rows;
+
+  const courses = rows.courses.filter((course) => PUBLIC_COURSE_STATUSES.has(course.status));
+  const instructors = rows.instructors.filter((instructor) => instructor.status === "Ativo");
+  const visibleCourseIds = new Set(courses.map((course) => course.id));
+  const visibleInstructorIds = new Set(instructors.map((instructor) => instructor.id));
+
+  return {
+    courses,
+    instructors,
+    classes: rows.classes.filter(
+      (trainingClass) =>
+        visibleCourseIds.has(trainingClass.curso_id) &&
+        (!trainingClass.instrutor_id || visibleInstructorIds.has(trainingClass.instrutor_id))
+    ),
+    courseInstructors: rows.courseInstructors.filter(
+      (relation) =>
+        visibleCourseIds.has(relation.curso_id) && visibleInstructorIds.has(relation.instrutor_id)
+    ),
+    coursePublicContents: rows.coursePublicContents.filter(
+      (content) => content.published && visibleCourseIds.has(content.curso_id)
+    )
+  };
+}
 
 function isPlaceholderValue(value: string | undefined) {
   return !value || value.includes("example.supabase.co") || value.includes("placeholder");
@@ -109,8 +153,8 @@ function shouldUsePublicTestBaseline() {
 /**
  * Categorias distintas já cadastradas em `curso`, para alimentar as
  * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
- * A query é coberta pelo índice parcial `curso_categoria_idx`; o filtro
- * O filtro `deleted_at is null` é explícito porque o cliente SSR usa service
+ * A query é coberta pelo índice parcial `curso_categoria_idx`. O filtro
+ * `deleted_at is null` é explícito porque o cliente SSR usa service
  * role e, portanto, não passa pelas políticas RLS aplicadas ao navegador.
  */
 export async function fetchCourseCategories(client: RhCursosClient): Promise<string[]> {
@@ -141,8 +185,12 @@ export async function fetchCourseCategories(client: RhCursosClient): Promise<str
   return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTestBaseline = false) {
-  if (forcePublicTestBaseline || shouldUsePublicTestBaseline()) {
+async function fetchCatalog(
+  client: RhCursosClient | null,
+  visibility: CatalogVisibility,
+  forcePublicTestBaseline = false
+) {
+  if (visibility === "public" && (forcePublicTestBaseline || shouldUsePublicTestBaseline())) {
     return {
       courses: publicTestBaselineCourses,
       classes: publicTestBaselineClasses,
@@ -165,12 +213,17 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
     courseCategories
   ] = await Promise.all([
       withRetry(
-        () =>
-          client
+        () => {
+          const query = client
             .from("curso")
             .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
-            .is("deleted_at", null)
-            .order("titulo"),
+            .is("deleted_at", null);
+
+          return (visibility === "public"
+            ? query.in("status", ["Ativo", "Destaque", "EmBreve"])
+            : query
+          ).order("titulo");
+        },
         { label: "fetchPublicCatalog:curso" }
       ),
       withRetry(
@@ -183,38 +236,41 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
         { label: "fetchPublicCatalog:turma" }
       ),
       withRetry(
-        () =>
-          client
+        () => {
+          const query = client
             .from("instrutor")
             .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
-            .is("deleted_at", null)
-            .eq("status", "Ativo")
-            .order("nome"),
+            .is("deleted_at", null);
+
+          return (visibility === "public" ? query.eq("status", "Ativo") : query).order("nome");
+        },
         { label: "fetchPublicCatalog:instrutor" }
       ),
       withRetry(() => client.from("curso_instrutor").select("id,curso_id,instrutor_id,principal"), {
         label: "fetchPublicCatalog:curso_instrutor"
       }),
       withRetry(
-        () =>
-          client
+        () => {
+          const query = client
             .from("trilha")
-            .select("id,codigo,nome,nome_curto,slug,descricao,icone,ordem,ativa")
-            .eq("ativa", true)
-            .order("ordem"),
+            .select("id,codigo,nome,nome_curto,slug,descricao,icone,ordem,ativa");
+
+          return (visibility === "public" ? query.eq("ativa", true) : query).order("ordem");
+        },
         { label: "fetchPublicCatalog:trilha" }
       ),
       withRetry(
-        () =>
-          client
+        () => {
+          const query = client
             .from("curso_public_content")
             .select("id,curso_id,hero_subtitle,highlights,faq_items,sidebar,corporate_cta,testimonial_override,published,created_at,updated_at,deleted_at")
-            .is("deleted_at", null)
-            .eq("published", true)
-            .order("created_at"),
+            .is("deleted_at", null);
+
+          return (visibility === "public" ? query.eq("published", true) : query).order("created_at");
+        },
         { label: "fetchPublicCatalog:curso_public_content" }
       ),
-      fetchCourseCategories(client)
+      visibility === "admin" ? fetchCourseCategories(client) : Promise.resolve([])
     ]);
 
   if (coursesResult.error) throw coursesResult.error;
@@ -256,9 +312,25 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
         schema: "publicCourseContentListSchema"
       }) as CoursePublicContentRow[]);
 
+  const visibleRows = selectCatalogRowsForVisibility(
+    {
+      courses: courseRows,
+      classes: classRows,
+      instructors: instructorRows,
+      courseInstructors: courseInstructorRows,
+      coursePublicContents: coursePublicContentRows
+    },
+    visibility
+  );
+  const resolvedCategories = visibility === "public"
+    ? Array.from(
+        new Set(visibleRows.courses.flatMap((course) => course.categoria ? [course.categoria] : []))
+      ).sort((a, b) => a.localeCompare(b, "pt-BR"))
+    : courseCategories;
+
   // Contagem de cursos por trilha derivada dos dados reais do catálogo, evitando
   // o `courseCount` hardcoded (e propenso a drift) do antigo mock estático.
-  const courseCountByPath = courseRows.reduce<Record<string, number>>((acc, course) => {
+  const courseCountByPath = visibleRows.courses.reduce<Record<string, number>>((acc, course) => {
     if (course.trilha_id) {
       acc[course.trilha_id] = (acc[course.trilha_id] ?? 0) + 1;
     }
@@ -266,13 +338,21 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
   }, {});
 
   return {
-    courses: courseRows.map((course) => mapCourse(course, courseInstructorRows, classRows)),
-    classes: classRows.map(mapClass),
-    instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows)),
+    courses: visibleRows.courses.map((course) =>
+      mapCourse(course, visibleRows.courseInstructors, visibleRows.classes)
+    ),
+    classes: visibleRows.classes.map(mapClass),
+    instructors: visibleRows.instructors.map((instructor) =>
+      mapInstructor(instructor, visibleRows.courseInstructors)
+    ),
     trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0)),
-    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent),
-    courseCategories
+    coursePublicContents: visibleRows.coursePublicContents.map(mapCoursePublicContent),
+    courseCategories: resolvedCategories
   };
+}
+
+async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTestBaseline = false) {
+  return fetchCatalog(client, "public", forcePublicTestBaseline);
 }
 
 export async function fetchPublicClassesFromSupabase() {
@@ -343,6 +423,10 @@ export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCa
   return fetchPublicCatalog(createSupabaseServerClient(), usePublicTestBaseline);
 });
 
+export const fetchAdminCatalogFromSupabaseServer = cache(function fetchAdminCatalogFromSupabaseServer() {
+  return fetchCatalog(createSupabaseServerClient(), "admin");
+});
+
 export const fetchPublicCatalogServerState = cache(async function fetchPublicCatalogServerState(
   usePublicTestBaseline = false
 ): Promise<PublicCatalogServerState> {
@@ -370,17 +454,40 @@ export function fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline = f
   return fetchPublicBlogPosts(createSupabaseServerClient(), usePublicTestBaseline);
 }
 
-export async function fetchPublicTestimonialsFromSupabase() {
-  if (!supabase) return null;
+export async function fetchAdminBlogPostsFromSupabaseServer() {
+  const client = createSupabaseServerClient();
+  if (!client) return null;
 
+  const result = await withRetry(
+    () =>
+      client
+        .from("post_blog")
+        .select("id,titulo,slug,resumo,conteudo,categoria,tags,autor,publicado_em,tempo_leitura,status,imagem_url,curso_id,created_at")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false }),
+    { label: "fetchAdminBlogPosts:post_blog" }
+  );
+
+  if (result.error) throw result.error;
+
+  const rows = validateResponse(result.data, blogPostListSchema, {
+    endpoint: "fetchAdminBlogPosts",
+    resource: "post_blog",
+    schema: "blogPostListSchema"
+  }) as BlogPostRow[];
+
+  return rows.map(mapBlogPost);
+}
+
+export async function fetchPublicTestimonialsWithClient(client: RhCursosClient) {
   // `avaliacao` has public RLS for published rows, but current migrations do not
   // grant explicit anon Data API access. Keep this isolated from catalog loading.
-  const client = supabase;
   const result = await withRetry(
     () =>
       client
         .from("avaliacao")
         .select("id,inscricao_id,turma_id,nota,comentario,publicar,created_at,updated_at,deleted_at,turma(curso(titulo))")
+        .is("deleted_at", null)
         .eq("publicar", true)
         .not("comentario", "is", null)
         .order("created_at", { ascending: false }),
@@ -398,30 +505,15 @@ export async function fetchPublicTestimonialsFromSupabase() {
   return rows.map(mapAssessmentToTestimonial);
 }
 
+export async function fetchPublicTestimonialsFromSupabase() {
+  if (!supabase) return null;
+  return fetchPublicTestimonialsWithClient(supabase);
+}
+
 export async function fetchPublicTestimonialsFromSupabaseServer() {
   const client = createSupabaseServerClient();
   if (!client) return null;
-
-  const result = await withRetry(
-    () =>
-      client
-        .from("avaliacao")
-        .select("id,inscricao_id,turma_id,nota,comentario,publicar,created_at,updated_at,deleted_at,turma(curso(titulo))")
-        .eq("publicar", true)
-        .not("comentario", "is", null)
-        .order("created_at", { ascending: false }),
-    { label: "fetchPublicTestimonialsServer:avaliacao" }
-  );
-
-  if (result.error) throw result.error;
-
-  const rows = validateResponse(result.data, assessmentWithCourseListSchema, {
-    endpoint: "fetchPublicTestimonialsServer",
-    resource: "avaliacao",
-    schema: "assessmentWithCourseListSchema"
-  }) as AssessmentWithCourseRow[];
-
-  return rows.map(mapAssessmentToTestimonial);
+  return fetchPublicTestimonialsWithClient(client);
 }
 
 export async function fetchLeadsFromSupabase() {

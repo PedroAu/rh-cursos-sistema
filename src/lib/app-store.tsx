@@ -455,8 +455,13 @@ function shouldUseLocalEnrollmentProxy() {
 export function AppStoreProvider({
   children,
   initialSession = null,
-  initialData
-}: PropsWithChildren<{ initialSession?: CurrentSession | null; initialData?: AppStoreInitialData }>) {
+  initialData,
+  bootstrapPublicData = true
+}: PropsWithChildren<{
+  initialSession?: CurrentSession | null;
+  initialData?: AppStoreInitialData;
+  bootstrapPublicData?: boolean;
+}>) {
   const [state, setState] = useState<AppState>(() => readInitialState(initialSession, initialData));
 
   // Ref espelhando o state para callbacks estáveis lerem o valor atual sem
@@ -654,71 +659,73 @@ export function AppStoreProvider({
         .catch(() => undefined);
     }, 300);
 
-    Promise.all([
-      fetchPublicCatalogFromSupabase(),
-      fetchPublicBlogPostsFromSupabase()
-    ])
-      .then(([catalog, blogPosts]) => {
-        if (!active) return;
+    if (bootstrapPublicData) {
+      Promise.all([
+        fetchPublicCatalogFromSupabase(),
+        fetchPublicBlogPostsFromSupabase()
+      ])
+        .then(([catalog, blogPosts]) => {
+          if (!active) return;
 
-        setState((current) => ({
-          ...current,
-          ...resolveCatalogBootstrapState(current, catalog),
-          blogPosts: blogPosts ?? []
-        }));
+          setState((current) => ({
+            ...current,
+            ...resolveCatalogBootstrapState(current, catalog),
+            blogPosts: blogPosts ?? []
+          }));
 
-        // Real-time subscriptions para cursos após dados iniciais carregarem
-        if (active && supabase && !publicTestBaselineEnabled) {
-          const courseSub = createRealtimeSubscription(
-            supabase,
-            "curso_changes",
-            "curso",
-            () => active,
-            scheduleCatalogRefetch
-          );
+          // Real-time subscriptions para cursos após dados iniciais carregarem
+          if (active && supabase && !publicTestBaselineEnabled) {
+            const courseSub = createRealtimeSubscription(
+              supabase,
+              "curso_changes",
+              "curso",
+              () => active,
+              scheduleCatalogRefetch
+            );
 
-          // Real-time subscriptions para blog posts
-          const blogSub = createRealtimeSubscription(
-            supabase,
-            "blog_changes",
-            "post_blog",
-            () => active,
-            scheduleBlogRefetch
-          );
+            // Real-time subscriptions para blog posts
+            const blogSub = createRealtimeSubscription(
+              supabase,
+              "blog_changes",
+              "post_blog",
+              () => active,
+              scheduleBlogRefetch
+            );
 
-          // Real-time para instrutores (dado público do catálogo). Refetch do
-          // catálogo completo mantém cursos/turmas/instrutores consistentes.
-          const instructorSub = createRealtimeSubscription(
-            supabase,
-            "instrutor_changes",
-            "instrutor",
-            () => active,
-            scheduleCatalogRefetch
-          );
+            // Real-time para instrutores (dado público do catálogo). Refetch do
+            // catálogo completo mantém cursos/turmas/instrutores consistentes.
+            const instructorSub = createRealtimeSubscription(
+              supabase,
+              "instrutor_changes",
+              "instrutor",
+              () => active,
+              scheduleCatalogRefetch
+            );
 
-          const courseContentSub = createRealtimeSubscription(
-            supabase,
-            "curso_public_content_changes",
-            "curso_public_content",
-            () => active,
-            scheduleCatalogRefetch
-          );
+            const courseContentSub = createRealtimeSubscription(
+              supabase,
+              "curso_public_content_changes",
+              "curso_public_content",
+              () => active,
+              scheduleCatalogRefetch
+            );
 
-          subscriptions.push(courseSub, blogSub, instructorSub, courseContentSub);
-        }
-      })
-      .catch((error) => {
-        if (!active) return;
-        // Erro de rede/RLS/timeout: propaga um estado de erro visível (log +
-        // toast) em vez de mascarar com dado mock (Story 16.1, AC5).
-        // Preserva o catálogo/blog atual em memória — não regride para vazio.
-        console.error("Falha ao carregar catálogo público do Supabase:", error);
-        toast.error("Não foi possível atualizar o catálogo de cursos. Tente novamente em instantes.");
-        setState((current) => ({
-          ...current,
-          ...resolveCatalogBootstrapState(current, null)
-        }));
-      });
+            subscriptions.push(courseSub, blogSub, instructorSub, courseContentSub);
+          }
+        })
+        .catch((error) => {
+          if (!active) return;
+          // Erro de rede/RLS/timeout: propaga um estado de erro visível (log +
+          // toast) em vez de mascarar com dado mock (Story 16.1, AC5).
+          // Preserva o catálogo/blog atual em memória — não regride para vazio.
+          console.error("Falha ao carregar catálogo público do Supabase:", error);
+          toast.error("Não foi possível atualizar o catálogo de cursos. Tente novamente em instantes.");
+          setState((current) => ({
+            ...current,
+            ...resolveCatalogBootstrapState(current, null)
+          }));
+        });
+    }
 
     // Lazy load admin data apenas quando há sessão ativa
     const adminSessionToken = getAdminSessionTokenValue();
@@ -758,25 +765,32 @@ export function AppStoreProvider({
               // Real-time para inscrições (admin only). Mudanças em inscrição
               // afetam a capacidade das turmas (vagas), por isso refetch do
               // catálogo para reconciliar as contagens de vagas.
-              const enrollmentSub = createRealtimeSubscription(
-                supabase,
-                "inscricao_changes",
-                "inscricao",
-                () => active,
-                scheduleCatalogRefetch
-              );
+              subscriptions.push(leadSub);
 
-              // Real-time para alunos (admin only). Alterações em aluno podem
-              // refletir nas estatísticas do catálogo (total de alunos por curso).
-              const studentSub = createRealtimeSubscription(
-                supabase,
-                "aluno_changes",
-                "aluno",
-                () => active,
-                scheduleCatalogRefetch
-              );
+              // O bootstrap administrativo contém também registros inativos.
+              // Um refetch público não pode substituir esse conjunto por uma
+              // visão RLS reduzida após eventos de inscrição/aluno.
+              if (bootstrapPublicData) {
+                const enrollmentSub = createRealtimeSubscription(
+                  supabase,
+                  "inscricao_changes",
+                  "inscricao",
+                  () => active,
+                  scheduleCatalogRefetch
+                );
 
-              subscriptions.push(leadSub, enrollmentSub, studentSub);
+                // Real-time para alunos (admin only). Alterações em aluno podem
+                // refletir nas estatísticas do catálogo (total de alunos por curso).
+                const studentSub = createRealtimeSubscription(
+                  supabase,
+                  "aluno_changes",
+                  "aluno",
+                  () => active,
+                  scheduleCatalogRefetch
+                );
+
+                subscriptions.push(enrollmentSub, studentSub);
+              }
             }
           });
         })
@@ -790,7 +804,7 @@ export function AppStoreProvider({
         client.removeChannel(channel);
       });
     };
-  }, []);
+  }, [bootstrapPublicData]);
 
   const setSession = useCallback<AppStoreValue["setSession"]>((session) => {
     logoutInProgressRef.current = false;

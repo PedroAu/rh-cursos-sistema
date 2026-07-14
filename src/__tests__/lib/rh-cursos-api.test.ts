@@ -2,10 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   fetchCourseCategories,
+  fetchPublicTestimonialsWithClient,
   isExplicitPublicTestBaselineEnabled,
   isPublicTestBaselineBuildEnabled,
   isServerPublicTestBaselineEnabled,
   PUBLIC_TEST_BASELINE_STORAGE_KEY,
+  selectCatalogRowsForVisibility,
 } from "@/lib/supabase/rh-cursos-api";
 
 beforeEach(() => {
@@ -108,5 +110,71 @@ describe("fetchCourseCategories", () => {
     const { client } = buildClient([], queryError);
 
     await expect(fetchCourseCategories(client)).rejects.toThrow("boom");
+  });
+});
+
+describe("catalog visibility", () => {
+  const rows = {
+    courses: [
+      { id: "course-public", status: "Ativo", categoria: "Público" },
+      { id: "course-draft", status: "Rascunho", categoria: "Interno" },
+    ],
+    instructors: [
+      { id: "instructor-active", status: "Ativo" },
+      { id: "instructor-inactive", status: "Inativo" },
+    ],
+    classes: [
+      { id: "class-public", curso_id: "course-public", instrutor_id: "instructor-active" },
+      { id: "class-draft", curso_id: "course-draft", instrutor_id: "instructor-active" },
+      { id: "class-inactive", curso_id: "course-public", instrutor_id: "instructor-inactive" },
+      { id: "class-no-instructor", curso_id: "course-public", instrutor_id: null },
+    ],
+    courseInstructors: [
+      { id: "relation-public", curso_id: "course-public", instrutor_id: "instructor-active" },
+      { id: "relation-draft", curso_id: "course-draft", instrutor_id: "instructor-active" },
+      { id: "relation-inactive", curso_id: "course-public", instrutor_id: "instructor-inactive" },
+    ],
+    coursePublicContents: [
+      { id: "content-public", curso_id: "course-public", published: true },
+      { id: "content-draft-course", curso_id: "course-draft", published: true },
+      { id: "content-unpublished", curso_id: "course-public", published: false },
+    ],
+  } as unknown as Parameters<typeof selectCatalogRowsForVisibility>[0];
+
+  it("reproduces public course, class, instructor and content RLS relationships", () => {
+    const selected = selectCatalogRowsForVisibility(rows, "public");
+
+    expect(selected.courses.map(({ id }) => id)).toEqual(["course-public"]);
+    expect(selected.instructors.map(({ id }) => id)).toEqual(["instructor-active"]);
+    expect(selected.classes.map(({ id }) => id)).toEqual(["class-public", "class-no-instructor"]);
+    expect(selected.courseInstructors.map(({ id }) => id)).toEqual(["relation-public"]);
+    expect(selected.coursePublicContents.map(({ id }) => id)).toEqual(["content-public"]);
+  });
+
+  it("preserves draft courses and inactive instructors in the admin read model", () => {
+    const selected = selectCatalogRowsForVisibility(rows, "admin");
+
+    expect(selected).toBe(rows);
+    expect(selected.courses).toHaveLength(2);
+    expect(selected.instructors).toHaveLength(2);
+  });
+});
+
+describe("public testimonials", () => {
+  it("filters soft-deleted assessments explicitly before publication filters", async () => {
+    const order = vi.fn(async () => ({ data: [], error: null }));
+    const not = vi.fn(() => ({ order }));
+    const eq = vi.fn(() => ({ not }));
+    const is = vi.fn(() => ({ eq }));
+    const select = vi.fn(() => ({ is }));
+    const from = vi.fn(() => ({ select }));
+    const client = { from } as unknown as Parameters<typeof fetchPublicTestimonialsWithClient>[0];
+
+    await fetchPublicTestimonialsWithClient(client);
+
+    expect(from).toHaveBeenCalledWith("avaliacao");
+    expect(is).toHaveBeenCalledWith("deleted_at", null);
+    expect(eq).toHaveBeenCalledWith("publicar", true);
+    expect(not).toHaveBeenCalledWith("comentario", "is", null);
   });
 });
