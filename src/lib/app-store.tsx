@@ -30,7 +30,8 @@ import {
 import {
   fetchLeadsFromSupabase,
   fetchPublicBlogPostsFromSupabase,
-  fetchPublicCatalogFromSupabase
+  fetchPublicCatalogFromSupabase,
+  isExplicitPublicTestBaselineEnabled
 } from "@/lib/supabase/rh-cursos-api";
 import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
 import type {
@@ -577,6 +578,7 @@ export function AppStoreProvider({
     let active = true;
     const subscriptions: ReturnType<typeof supabase.channel>[] = [];
     const client = supabase;
+    const publicTestBaselineEnabled = isExplicitPublicTestBaselineEnabled();
 
     const scheduleCatalogRefetch = debounce(() => {
       if (!active) return;
@@ -633,7 +635,7 @@ export function AppStoreProvider({
         }));
 
         // Real-time subscriptions para cursos após dados iniciais carregarem
-        if (active && supabase) {
+        if (active && supabase && !publicTestBaselineEnabled) {
           const courseSub = createRealtimeSubscription(
             supabase,
             "curso_changes",
@@ -900,14 +902,21 @@ export function AppStoreProvider({
   }, []);
 
   const createStudent = useCallback<AppStoreValue["createStudent"]>(async (payload) => {
-    await persistAdminMutation(
+    const persisted = await persistAdminMutation(
       { resource: "students", action: "create", payload },
       undefined
     );
+    const persistedId = typeof persisted?.id === "string" ? persisted.id.trim() : "";
+
+    if (isFunctionsConfigured && !persistedId) {
+      throw new Error("Resposta inválida ao criar o aluno.");
+    }
+
     setState((current) => ({
       ...current,
       students: [
         buildStudentRecord(payload, {
+          id: persistedId || undefined,
           courseId: payload.courseId ?? current.courses[0]?.id ?? "",
           classId: payload.classId ?? current.classes[0]?.id ?? "",
         }),

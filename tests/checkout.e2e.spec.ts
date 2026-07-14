@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
+  assertSafeWritableIntegrationEnv,
   annotateCanonicalDoc,
   cleanupEnrollmentArtifacts,
   createServiceRoleClient,
@@ -37,6 +38,7 @@ async function fillPersonalStep(
 test.describe("checkout — baseline de receita", () => {
   test("valida os dados, exige aceite dos termos e conclui com o backend real", async ({ page }, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
+    assertSafeWritableIntegrationEnv();
     test.setTimeout(60_000);
     annotateCanonicalDoc(testInfo, getCanonicalDocs().edgeFunctions);
     const enrollmentEmail = createUniqueEmail("checkout-e2e");

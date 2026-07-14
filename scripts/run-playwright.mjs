@@ -1,9 +1,20 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import net from "node:net";
 
 const env = { ...process.env };
 delete env.NO_COLOR;
 const extraArgs = process.argv.slice(2);
+const deterministicPublicSpecRequested = extraArgs.some(
+  (argument) => argument.includes("ui-governance.spec.ts") || argument.includes("visual.baseline.spec.ts")
+);
+const useTestBuild = process.env.PLAYWRIGHT_TEST_BUILD === "1" || deterministicPublicSpecRequested;
+
+if (useTestBuild && !existsSync(".next-playwright/BUILD_ID")) {
+  throw new Error(
+    "Bundle Playwright dedicado ausente. Execute `node scripts/build-playwright-app.mjs` antes deste gate."
+  );
+}
 
 function onceExit(child) {
   return new Promise((resolve) => {
@@ -64,6 +75,9 @@ async function main() {
   const baseURL = `http://127.0.0.1:${port}`;
   const sharedEnv = {
     ...env,
+    ...(useTestBuild
+      ? { NEXT_DIST_DIR: ".next-playwright", PLAYWRIGHT_TEST_BUILD: "1" }
+      : {}),
     PLAYWRIGHT_BASE_URL: baseURL,
     PLAYWRIGHT_EXTERNAL_SERVER: "1",
     PLAYWRIGHT_PORT: String(port)

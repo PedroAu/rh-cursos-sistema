@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { CurrentSession, Enrollment, Lead } from "@/types";
+import type { CurrentSession, Enrollment, Lead, Student } from "@/types";
 
 const mocks = vi.hoisted(() => {
   const trainingPaths = [
@@ -228,6 +228,7 @@ function StoreProbe({ onStore }: { onStore: (store: Store) => void }) {
     h("span", { "data-testid": "session-email" }, store.currentSession?.email ?? "none"),
     h("span", { "data-testid": "course-count" }, store.courses.length),
     h("span", { "data-testid": "lead-count" }, store.leads.length),
+    h("span", { "data-testid": "student-count" }, store.students.length),
     h("span", { "data-testid": "enrollment-count" }, store.enrollments.length)
   );
 }
@@ -306,6 +307,15 @@ function buildLeadPayload(store: Store): Omit<Lead, "id" | "createdAt" | "status
     origin: "Site",
     message: "Quero detalhes do treinamento.",
   };
+}
+
+function buildStudentPayload(): Parameters<Store["createStudent"]>[0] {
+  return {
+    name: "Aluno Teste",
+    email: "aluno.teste@example.com",
+    organization: "Órgão Teste",
+    enrollmentStatus: "Pendente",
+  } satisfies Pick<Student, "name" | "email" | "organization" | "enrollmentStatus">;
 }
 
 function findDeleteSessionCall() {
@@ -545,6 +555,54 @@ describe("AppStoreProvider and hooks", () => {
       createdAt: "2026-06-22T12:00:00.000Z",
     });
     expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead registrado apenas nesta sessão de desenvolvimento.");
+  });
+
+  it("creates admin students with the canonical id returned by admin-resources", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, data: { id: "student-db-1" } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    const harness = renderStore({ role: "admin", email: "admin@example.com", name: "Admin" });
+
+    await act(async () => {
+      await harness.store.createStudent(buildStudentPayload());
+    });
+
+    expect(screen.getByTestId("student-count")).toHaveTextContent("1");
+    expect(harness.store.students[0]).toMatchObject({
+      id: "student-db-1",
+      name: "Aluno Teste",
+      email: "aluno.teste@example.com",
+      enrollmentStatus: "Pendente",
+    });
+    expect(mocks.toastSuccess).toHaveBeenCalledWith("Aluno criado.");
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it("rejects admin student success without a canonical id", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, data: {} }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    const harness = renderStore({ role: "admin", email: "admin@example.com", name: "Admin" });
+
+    await act(async () => {
+      await expect(harness.store.createStudent(buildStudentPayload())).rejects.toThrow(
+        "Resposta inválida ao criar o aluno."
+      );
+    });
+
+    expect(harness.store.students).toHaveLength(0);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
   });
 
   it("creates admin leads optimistically while syncing through admin-resources", async () => {

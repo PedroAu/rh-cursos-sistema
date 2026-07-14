@@ -1,6 +1,46 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { fetchCourseCategories } from "@/lib/supabase/rh-cursos-api";
+import {
+  fetchCourseCategories,
+  isExplicitPublicTestBaselineEnabled,
+  PUBLIC_TEST_BASELINE_STORAGE_KEY,
+} from "@/lib/supabase/rh-cursos-api";
+
+beforeEach(() => {
+  const values = new Map<string, string>();
+  Object.defineProperty(window, "localStorage", {
+    configurable: true,
+    value: {
+      clear: vi.fn(() => values.clear()),
+      getItem: vi.fn((key: string) => values.get(key) ?? null),
+      removeItem: vi.fn((key: string) => values.delete(key)),
+      setItem: vi.fn((key: string, value: string) => values.set(key, value)),
+    },
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+describe("explicit public test baseline", () => {
+  it("requires both the Playwright build flag and browser opt-in", () => {
+    vi.stubEnv("NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE", "1");
+
+    expect(isExplicitPublicTestBaselineEnabled()).toBe(false);
+
+    window.localStorage.setItem(PUBLIC_TEST_BASELINE_STORAGE_KEY, "1");
+
+    expect(isExplicitPublicTestBaselineEnabled()).toBe(true);
+  });
+
+  it("cannot be enabled by browser storage in a normal production build", () => {
+    vi.stubEnv("NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE", "0");
+    window.localStorage.setItem(PUBLIC_TEST_BASELINE_STORAGE_KEY, "1");
+
+    expect(isExplicitPublicTestBaselineEnabled()).toBe(false);
+  });
+});
 
 function buildClient(data: Array<{ categoria: string | null }>, error: unknown = null) {
   const order = vi.fn(async () => ({ data, error }));

@@ -23,7 +23,7 @@
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "eslint .",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "npm run typecheck && npm run build && node scripts/run-playwright.mjs",
+    "test": "npm run typecheck && node scripts/build-playwright-app.mjs && node scripts/run-playwright-test-build.mjs",
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e:smoke": "node scripts/run-playwright.mjs --project=functional",

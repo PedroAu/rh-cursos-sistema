@@ -3,6 +3,7 @@ import { randomBytes } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
 import type { Page, TestInfo } from "@playwright/test";
+import { assertSafeWritableIntegrationEnv as assertSafeWritableIntegrationEnvValues } from "./safe-writable-env";
 
 type IntegrationEnv = {
   adminEmail: string;
@@ -82,6 +83,11 @@ export function hasRealIntegrationEnv() {
     publishableKey,
     serviceRoleKey,
   ].some(isPlaceholderValue);
+}
+
+export function assertSafeWritableIntegrationEnv() {
+  ensureEnvLoaded();
+  assertSafeWritableIntegrationEnvValues(process.env);
 }
 
 export function annotateCanonicalDoc(testInfo: TestInfo, docPath: string) {
@@ -180,6 +186,7 @@ export async function ensureAuthUser(options: {
   password?: string;
   role: AuthRole;
 }) {
+  assertSafeWritableIntegrationEnv();
   const supabase = createServiceRoleClient();
   const password =
     options.password ?? (options.role === "admin" ? getIntegrationEnv().adminPassword : FALLBACK_STUDENT_PASSWORD);
@@ -212,6 +219,7 @@ export async function ensureAuthUser(options: {
 }
 
 export async function cleanupEnrollmentArtifacts(email: string) {
+  assertSafeWritableIntegrationEnv();
   const supabase = createServiceRoleClient();
   const normalizedEmail = email.toLowerCase();
 

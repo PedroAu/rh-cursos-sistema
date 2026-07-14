@@ -10,6 +10,7 @@ const eslintConfig = [
   {
     ignores: [
       ".next/**",
+      ".next-playwright/**",
       ".open-next/**",
       ".aiox/**",
       ".aiox-core/**",

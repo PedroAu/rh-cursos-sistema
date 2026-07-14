@@ -20,6 +20,7 @@ const isSentryEnabled = Boolean(
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  distDir: process.env.NEXT_DIST_DIR ?? ".next",
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
   turbopack: {

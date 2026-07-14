@@ -1,8 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
+import { publicTestBaselineCourses } from "../src/lib/public-test-baseline";
 
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const shouldSkipVisualBaselines = !!process.env.CI || process.platform !== "darwin";
+const publicTestBaselineStorageKey = "rh_cursos_public_test_baseline";
 
 const a11yRoutes = [
   "/",
@@ -50,6 +52,16 @@ async function gotoStable(page: import("@playwright/test").Page, route: string) 
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(route, { waitUntil: "domcontentloaded" });
   await waitForStableUi(page);
+
+  if (route === "/") {
+    await expect(page.getByText(publicTestBaselineCourses[0]!.title, { exact: true }).first()).toBeVisible();
+  }
+  if (route.startsWith("/cursos")) {
+    await expect(
+      page.getByText(`${publicTestBaselineCourses.length} cursos no catálogo`, { exact: true })
+    ).toBeVisible();
+  }
+
   await waitForMotionSettle(page);
 }
 
@@ -67,6 +79,12 @@ async function normalizeScreenshotHeight(locator: import("@playwright/test").Loc
 
 test.describe("epica 6 — governanca de design", () => {
   test.use({ reducedMotion: "reduce" });
+
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript((storageKey) => {
+      window.localStorage.setItem(storageKey, "1");
+    }, publicTestBaselineStorageKey);
+  });
 
   test("rotas críticas passam no gate de acessibilidade WCAG A/AA", async ({ page }) => {
     for (const route of a11yRoutes) {

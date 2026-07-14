@@ -16,7 +16,7 @@ export const publicTestBaselineTrainingPaths: TrainingPath[] = [
     slug: "licitacoes-e-contratos-administrativos",
     description: "Formação aplicada para compras públicas, contratação e fiscalização contratual.",
     icon: "Scale",
-    courseCount: 1
+    courseCount: 2
   },
   {
     id: "path-public-esocial",
@@ -166,6 +166,35 @@ export const publicTestBaselineCourses: Course[] = [
     featured: false,
     featuredCourseIds: [],
     nextClassId: "class-public-esocial-1"
+  },
+  {
+    id: "course-public-gestao-contratos-1",
+    slug: "gestao-e-fiscalizacao-de-contratos-administrativos",
+    title: "Gestão e fiscalização de contratos administrativos",
+    pathId: "path-public-licitacoes",
+    pathName: "Licitações e Contratos Administrativos",
+    category: "Licitações e Contratos",
+    categories: ["Licitações e Contratos"],
+    modality: "Ao vivo online",
+    modalities: ["Ao vivo online"],
+    durationLabel: "12h",
+    durationHours: 12,
+    level: "Intermediário",
+    price: 990,
+    shortDescription: "Fiscalização, indicadores e gestão operacional de contratos administrativos.",
+    fullDescription: "Curso focado na governança diária e na fiscalização de contratos administrativos.",
+    targetAudience: ["Gestores de contratos", "Fiscalização", "Controle interno"],
+    objectives: ["Fortalecer fiscalização", "Organizar execução contratual"],
+    benefits: ["Roteiros de fiscalização", "Checklists práticos"],
+    modules: [],
+    instructorId: "inst-public-licitacoes",
+    image: "/images/courses/pessoas-lideranca.jpg",
+    rating: 4.7,
+    studentsCount: 112,
+    status: "Ativo",
+    featured: false,
+    featuredCourseIds: [],
+    nextClassId: ""
   }
 ];
 

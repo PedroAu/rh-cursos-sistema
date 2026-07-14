@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { publicTestBaselineCourses } from "../src/lib/public-test-baseline";
 
 /**
  * Baseline visual (Story 1.1 — Épica 1).
@@ -29,22 +30,27 @@ const routes = [
   { path: "/login", name: "login" },
   { path: "/inscricao-confirmada", name: "inscricao-confirmada" }
 ];
+const publicTestBaselineStorageKey = "rh_cursos_public_test_baseline";
 
 async function prepareStableCapture(routeName: string, page: import("@playwright/test").Page) {
-  await page.addInitScript(() => {
+  await page.addInitScript((storageKey) => {
     window.localStorage.clear();
     window.sessionStorage.clear();
-  });
+    window.localStorage.setItem(storageKey, "1");
+  }, publicTestBaselineStorageKey);
 
   await page.goto(routes.find((route) => route.name === routeName)?.path ?? "/", { waitUntil: "domcontentloaded" });
   await page.locator("body").waitFor({ state: "visible" });
 
   if (routeName === "cursos") {
-    await page
-      .getByText(/turmas na agenda/i)
-      .waitFor({ state: "visible" });
-    await expect(page.getByText("Nenhuma turma encontrada", { exact: true })).toHaveCount(0);
+    await page.getByText(
+      `${publicTestBaselineCourses.length} cursos no catálogo`,
+      { exact: true }
+    ).waitFor({ state: "visible" });
+    await expect(page.getByText("Atualizando catálogo...", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("Nenhum curso encontrado", { exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Ver turma →" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver detalhes →" }).first()).toBeVisible();
   }
 
   if (routeName === "agenda") {

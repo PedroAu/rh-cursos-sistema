@@ -5,10 +5,10 @@ import { dirname } from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
+  assertSafeWritableIntegrationEnv,
   createUniqueIp,
   ensureAuthUser,
   getIntegrationEnv,
-  hasRealIntegrationEnv,
   resolveAvailableCheckoutTarget,
   resolveAvailableTrainingPath,
 } from "./helpers/integration-env";
@@ -31,9 +31,9 @@ try {
 // a visualização SSR) — por isso o login aqui é feito de verdade pela UI,
 // com um usuário criado/garantido via service role (ensureAuthUser).
 //
-// Escopo: ciclo criar → excluir seguro pela própria UI. Não há banco de teste
-// isolado — .env.local aponta para o Supabase de produção — então cada
-// execução cria um registro real marcado com [E2E] no nome e apaga em seguida.
+// Escopo: ciclo criar → excluir pela própria UI somente em projeto Supabase
+// explicitamente identificado como isolado. A guarda abaixo falha fechado;
+// produção nunca é aceita como fallback, ainda que o teste tenha cleanup.
 
 const MARKER = `[E2E] ${Date.now()}`;
 const SESSION_COOKIE = "rh_cursos_demo_session";
@@ -42,7 +42,9 @@ const ADMIN_EMAIL = "e2e-admin-crud@rhcursos.test";
 const ADMIN_SESSION_CACHE_FILE = ".test-cache/admin-crud-session.json";
 const ADMIN_SESSION_CACHE_TTL_MS = 20 * 60 * 1000;
 
-test.skip(!hasRealIntegrationEnv(), "admin-crud.spec.ts precisa de SUPABASE_SERVICE_ROLE_KEY real para logar de verdade.");
+test.beforeAll(() => {
+  assertSafeWritableIntegrationEnv();
+});
 
 function slugifyForEmail(value: string) {
   return value
@@ -238,8 +240,56 @@ async function openEditDialogForRow(page: Page, name: string) {
   return dialog;
 }
 
-async function saveAndExpectSuccess(page: Page, dialog: Locator) {
+type ExpectedAdminMutation = {
+  resource?: string;
+  action?: string;
+  requireId?: boolean;
+};
+
+async function saveAndExpectSuccess(
+  page: Page,
+  dialog: Locator,
+  expected: ExpectedAdminMutation = {}
+) {
+  const mutationResponsePromise = page.waitForResponse(
+    (response) => {
+      const request = response.request();
+      if (request.method() !== "POST" || !response.url().includes("/api/functions/admin-resources")) {
+        return false;
+      }
+
+      try {
+        const body = request.postDataJSON() as { resource?: string; action?: string };
+        if (expected.resource && body.resource !== expected.resource) return false;
+        if (expected.action && body.action !== expected.action) return false;
+        return body.action !== "list";
+      } catch {
+        return false;
+      }
+    },
+    { timeout: 30_000 }
+  );
+
   await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
+  const mutationResponse = await mutationResponsePromise;
+  const body = (await mutationResponse.json().catch(() => null)) as {
+    ok?: unknown;
+    data?: { id?: unknown };
+  } | null;
+
+  if (!mutationResponse.ok() || body?.ok !== true) {
+    const failureKind = mutationResponse.ok() ? "application" : "http";
+    await expect(page.getByText(/Erro ao salvar:/).first()).toBeVisible({ timeout: 5_000 });
+    throw new Error(
+      `admin-resources falhou (${failureKind}) em ${expected.resource ?? "recurso"}:${expected.action ?? "mutação"}; HTTP ${mutationResponse.status()}; ok=${String(body?.ok === true)}`
+    );
+  }
+
+  const id = typeof body.data?.id === "string" ? body.data.id.trim() : "";
+  if (expected.requireId && !id) {
+    throw new Error(`${expected.resource ?? "recurso"}:${expected.action ?? "mutação"} retornou sucesso sem ID.`);
+  }
+
   const validationBox = dialog.getByText("Erros encontrados");
   const saveErrorToast = page.getByText(/Erro ao salvar:/);
 
@@ -257,6 +307,8 @@ async function saveAndExpectSuccess(page: Page, dialog: Locator) {
       }
     )
     .toBe("closed");
+
+  return { id };
 }
 
 async function addArrayItem(dialog: Locator, label: string, value: string) {
@@ -781,31 +833,52 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await deleteLeadById(created!.id);
   });
 
-  test("students: cria cadastro manual e exclui", async ({ page }) => {
+  test("students: cria cadastro manual e exclui", async ({ page }, testInfo) => {
     const name = `${MARKER} aluno`;
     const email = buildUniqueEmail("aluno");
+    let createdStudentId: string | undefined;
+    let primaryError: unknown;
     await page.goto("/admin/alunos");
 
-    const dialog = await openCreateDialog(page);
-    await fillText(dialog, "Nome", name);
-    await fillText(dialog, "E-mail", email);
-    await fillText(dialog, "Empresa / órgão", "Órgão E2E");
-    await forceSelectValue(dialog, "Status", "Pendente");
+    try {
+      const dialog = await openCreateDialog(page);
+      await fillText(dialog, "Nome", name);
+      await fillText(dialog, "E-mail", email);
+      await fillText(dialog, "Empresa / órgão", "Órgão E2E");
+      await forceSelectValue(dialog, "Status", "Pendente");
 
-    await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
-    await expect
-      .poll(
-        async () => {
-          const created = await findStudentByEmail(email);
-          return created ?? null;
-        },
-        { timeout: 30_000, intervals: [250, 500, 1_000] }
-      )
-      .not.toBeNull();
+      const result = await saveAndExpectSuccess(page, dialog, {
+        resource: "students",
+        action: "create",
+        requireId: true,
+      });
+      createdStudentId = result.id;
+      await expect(page.getByText("Aluno criado.", { exact: true })).toBeVisible();
 
-    const created = await findStudentByEmail(email);
-    expect(created?.id).toBeTruthy();
-    await deleteStudentById(created!.id);
+      const created = await findStudentByEmail(email);
+      expect(created?.id).toBe(createdStudentId);
+    } catch (error) {
+      primaryError = error;
+      throw error;
+    } finally {
+      try {
+        const cleanupId = createdStudentId ?? (await findStudentByEmail(email))?.id;
+        if (cleanupId) {
+          await deleteStudentById(cleanupId);
+        }
+      } catch (cleanupError) {
+        const message = cleanupError instanceof Error
+          ? cleanupError.message
+          : "Falha desconhecida no cleanup do aluno E2E.";
+        await testInfo.attach("student-cleanup-error", {
+          body: Buffer.from(message),
+          contentType: "text/plain",
+        });
+        if (!primaryError) {
+          throw cleanupError;
+        }
+      }
+    }
   });
 
   test("inscrições: cria inscrição administrativa e exclui", async ({ page }) => {

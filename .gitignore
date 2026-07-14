@@ -16,6 +16,7 @@ node_modules
 dist/
 build/
 .next/
+.next-playwright/
 .open-next/
 out/
 *.tsbuildinfo

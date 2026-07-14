@@ -70,8 +70,23 @@ function isPlaceholderValue(value: string | undefined) {
   return !value || value.includes("example.supabase.co") || value.includes("placeholder");
 }
 
+export const PUBLIC_TEST_BASELINE_STORAGE_KEY = "rh_cursos_public_test_baseline";
+
+export function isExplicitPublicTestBaselineEnabled() {
+  if (process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE !== "1" || typeof window === "undefined") {
+    return false;
+  }
+
+  try {
+    return window.localStorage.getItem(PUBLIC_TEST_BASELINE_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function shouldUsePublicTestBaseline() {
   return (
+    isExplicitPublicTestBaselineEnabled() ||
     isPlaceholderValue(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
     isPlaceholderValue(
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

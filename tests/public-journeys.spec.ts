@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import {
+  assertSafeWritableIntegrationEnv,
   cleanupEnrollmentArtifacts,
   createUniqueEmail,
   hasRealIntegrationEnv,
@@ -48,6 +49,7 @@ test.describe("epica 4 — jornadas publicas", () => {
 
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Jornada pública com checkout real requer Supabase real.");
+    assertSafeWritableIntegrationEnv();
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
     await resolveUsableCheckoutTarget(page);
@@ -84,6 +86,7 @@ test.describe("epica 4 — jornadas publicas", () => {
   });
 
   test("contato e in-company exibem confirmação inline após envio", async ({ page }) => {
+    assertSafeWritableIntegrationEnv();
     await page.goto("/contato");
     await page.getByLabel("Nome completo").fill("Patricia Lima");
     await page.getByLabel("E-mail").fill("patricia@empresa.com.br");
