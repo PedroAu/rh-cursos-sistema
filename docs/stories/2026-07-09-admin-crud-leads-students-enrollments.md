@@ -14,8 +14,8 @@ quality_gate_tools:
   - npm run test:e2e:smoke
 
 ## Story
-**As a** operador de admin da RH Cursos,  
-**I want** criar, editar e excluir leads, students e enrollments no painel administrativo,  
+**As a** operador de admin da RH Cursos,
+**I want** criar, editar e excluir leads, students e enrollments no painel administrativo,
 **so that** eu consiga administrar a base operacional sem sair do fluxo do dashboard.
 
 ## Acceptance Criteria
@@ -43,11 +43,13 @@ quality_gate_tools:
 - `src/lib/contexts/store-types.ts`
 - `src/lib/admin-form-validation.ts`
 - `src/lib/admin-resource-configs.tsx`
+- `src/lib/supabase/rh-cursos-api.ts`
 - `src/views/admin/AdminResourcePage.tsx`
 - `supabase/functions/_shared/admin-mappers.ts`
 - `supabase/functions/_shared/admin-validation.ts`
 - `supabase/functions/admin-resources/index.ts`
 - `src/__tests__/lib/admin-resource-configs.test.ts`
+- `src/__tests__/lib/rh-cursos-api.test.ts`
 - `src/__tests__/lib/app-store.test.ts`
 - `tests/admin-crud.spec.ts`
 
@@ -59,3 +61,4 @@ quality_gate_tools:
 ## Change Log
 - 2026-07-09 - @dev - Story criada para formalizar o CRUD administrativo de leads, students e enrollments.
 - 2026-07-11 - @dev - CRUD de leads/students/enrollments validado ponta a ponta; handoff preparado para @devops.
+- 2026-07-14 - @dev - Leitura administrativa de leads passou a filtrar soft-deletes explicitamente, com regressão unitária do contrato de query.

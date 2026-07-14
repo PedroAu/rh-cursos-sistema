@@ -516,12 +516,14 @@ export async function fetchPublicTestimonialsFromSupabaseServer() {
   return fetchPublicTestimonialsWithClient(client);
 }
 
-export async function fetchLeadsFromSupabase() {
-  if (!supabase) return null;
-
-  const client = supabase;
+export async function fetchLeadsWithClient(client: RhCursosClient) {
   const result = await withRetry(
-    () => client.from("lead").select("*").order("created_at", { ascending: false }),
+    () =>
+      client
+        .from("lead")
+        .select("*")
+        .is("deleted_at", null)
+        .order("created_at", { ascending: false }),
     { label: "fetchLeads:lead" }
   );
   if (result.error) throw result.error;
@@ -533,6 +535,11 @@ export async function fetchLeadsFromSupabase() {
   }) as LeadRow[];
 
   return rows.map(mapLead);
+}
+
+export async function fetchLeadsFromSupabase() {
+  if (!supabase) return null;
+  return fetchLeadsWithClient(supabase);
 }
 
 export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt" | "status">) {

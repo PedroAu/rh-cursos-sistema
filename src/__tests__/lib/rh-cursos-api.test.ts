@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   fetchCourseCategories,
+  fetchLeadsWithClient,
   fetchPublicTestimonialsWithClient,
   isExplicitPublicTestBaselineEnabled,
   isPublicTestBaselineBuildEnabled,
@@ -176,5 +177,21 @@ describe("public testimonials", () => {
     expect(is).toHaveBeenCalledWith("deleted_at", null);
     expect(eq).toHaveBeenCalledWith("publicar", true);
     expect(not).toHaveBeenCalledWith("comentario", "is", null);
+  });
+});
+
+describe("admin leads", () => {
+  it("filters soft-deleted leads explicitly before ordering", async () => {
+    const order = vi.fn(async () => ({ data: [], error: null }));
+    const is = vi.fn(() => ({ order }));
+    const select = vi.fn(() => ({ is }));
+    const from = vi.fn(() => ({ select }));
+    const client = { from } as unknown as Parameters<typeof fetchLeadsWithClient>[0];
+
+    await fetchLeadsWithClient(client);
+
+    expect(from).toHaveBeenCalledWith("lead");
+    expect(is).toHaveBeenCalledWith("deleted_at", null);
+    expect(order).toHaveBeenCalledWith("created_at", { ascending: false });
   });
 });
