@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { Enrollment, Lead } from "@/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
@@ -242,9 +243,13 @@ export function fetchPublicCatalogFromSupabase() {
   return fetchPublicCatalog(supabase);
 }
 
-export function fetchPublicCatalogFromSupabaseServer() {
+// Memoizado por request (React cache()): com dynamic = "force-dynamic" nas
+// páginas públicas, generateMetadata e o componente de página chamam esta
+// função independentemente — sem cache() isso vira 2 round-trips completos
+// ao Supabase por view.
+export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer() {
   return fetchPublicCatalog(createSupabaseServerClient());
-}
+});
 
 export function fetchPublicBlogPostsFromSupabase() {
   return fetchPublicBlogPosts(supabase);

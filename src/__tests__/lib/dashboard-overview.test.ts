@@ -128,15 +128,15 @@ describe("buildOverviewKpis — corte de 30/45 dias e divisão por zero", () => 
     expect(turmasKpi?.helper).toContain("1 inicia em até 45 dias");
   });
 
-  it("não divide por zero quando totalSeats é 0 e ainda calcula a ocupação das demais turmas", () => {
+  it("exclui turmas com totalSeats=0 do cálculo, sem diluir a ocupação das demais", () => {
     const classes = [
       makeClass({ id: "c-zero", totalSeats: 0, filledSeats: 0 }),
       makeClass({ id: "c-half", totalSeats: 10, filledSeats: 5 })
     ];
     const kpis = buildOverviewKpis({ classes, enrollments: [], leads: [] }, NOW);
     const ocupacaoKpi = kpis.find((kpi) => kpi.key === "ocupacao");
-    expect(ocupacaoKpi?.value).toBe("25%");
-    expect(ocupacaoKpi?.barPct).toBe(25);
+    expect(ocupacaoKpi?.value).toBe("50%");
+    expect(ocupacaoKpi?.barPct).toBe(50);
   });
 
   it("retorna ocupação 0% quando não há turmas com vagas", () => {

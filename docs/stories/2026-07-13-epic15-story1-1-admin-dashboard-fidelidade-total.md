@@ -138,6 +138,7 @@ Verificações manuais/visuais:
 
 ### Completion Notes
 - KPIs recalculados a partir de `classes`/`enrollments`/`leads` já carregados por `useRealTimeMetrics` — nenhuma infraestrutura de dados nova, apenas os novos modelos em `dashboard-overview.ts` (AC2, adaptação §8.3 da spec).
+- Ajuste fino do cálculo de ocupação: turmas com `totalSeats=0` foram excluídas do denominador, para não diluir a média das turmas que efetivamente têm vagas; o teste unitário foi alinhado para refletir `50%` no caso `0/0 + 5/10`.
 - "Gerenciar Cursos" foi removido desta tela sem necessidade de "mover" nada: a funcionalidade (busca + CRUD + export CSV) já existe em `AdminResourcePage.tsx`/`admin-resource-configs.tsx` ("Gestão de cursos"), conforme confirmado pelo @po na validação da story (AC3).
 - Paleta de badges/chips por origem de lead simplificada para o conjunto de tokens `--tk-*` disponível (brand/accent/success/error/ink-muted) em vez de uma cor distinta por origem como no canvas — não há tokens de cor adicionais em `tokens.css` para isso e AC5 proíbe hex novo fora de `tokens.css`. Desvio documentado aqui para ciência de @qa/@ux-design-expert; não bloqueante.
 - Banner "Relatório de Performance" mantido integralmente (markup e cores hex pré-existentes) conforme AC8 — nenhuma alteração nesse bloco.
@@ -158,6 +159,7 @@ Verificações manuais/visuais:
 - 2026-07-13 - @dev (Dex) - Resposta ao gate CONCERNS: confirmado AC11 já atualizado, `test:epic15:fidelity` executado ao vivo (3/3) e criado `dashboard-overview.test.ts` (14 testes) para a lacuna de cobertura unitária. `test:unit` 454/454. Devolvida para nova revisão de @qa.
 - 2026-07-14 - @qa (Quinn) - Re-gate: veredito CONCERNS mantido. AC11 e cobertura do model resolvidos, mas `test:epic15:fidelity` executado ao vivo pela primeira vez falhou 1/3 — não por defeito da 15.1, e sim por um bug HIGH pré-existente em `query-logging-middleware.ts` (REL-001), exposto pela Story 16.1 (commit `65ef021`) ao remover o fallback de mock que o mascarava. Bloqueado até o fix do middleware. Ver adendo em `docs/qa/gates/epic15.1-admin-dashboard-fidelidade.yml` (reReview).
 - 2026-07-13 - @dev (Dex) - REL-001 corrigido em `src/lib/supabase/query-logging-middleware.ts` (fix registrado na Story 16.1, `docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md`). `test:epic15:fidelity` re-executado contra `next start` real: 3/3 passed. Nenhum arquivo desta story (15.1) precisou de alteração — confirmado que o defeito era inteiramente do middleware. Gate atualizado para PASS (`reReview.fixVerified`).
+- 2026-07-14 - @dev (Dex) - Ajuste corretivo no model `dashboard-overview.ts`: ocupação média agora ignora turmas com `totalSeats=0` no denominador, evitando diluição da média quando há turmas sem vagas; teste correspondente alinhado em `src/__tests__/lib/dashboard-overview.test.ts`.
 
 ## Story Checklist
 _(preenchido por @po via `*validate-story-draft` em 2026-07-13)_

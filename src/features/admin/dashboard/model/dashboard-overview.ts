@@ -68,10 +68,13 @@ export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiIn
     return !Number.isNaN(t) && t >= now && t - now <= 45 * DAY_MS;
   }).length;
 
-  const ocupacaoBase = turmasAbertas.length > 0 ? turmasAbertas : classes.filter((item) => item.totalSeats > 0);
+  // Turmas com totalSeats=0 são excluídas do denominador: incluí-las
+  // contribuiria 0 na soma e diluiria a média (ex.: 30/30 + turma sem vagas
+  // -> 50% em vez de 100%).
+  const ocupacaoBase = (turmasAbertas.length > 0 ? turmasAbertas : classes).filter((item) => item.totalSeats > 0);
   const ocupacaoMedia = ocupacaoBase.length > 0
     ? Math.round(
-        (ocupacaoBase.reduce((sum, item) => sum + (item.totalSeats > 0 ? item.filledSeats / item.totalSeats : 0), 0) /
+        (ocupacaoBase.reduce((sum, item) => sum + item.filledSeats / item.totalSeats, 0) /
           ocupacaoBase.length) *
           100
       )
