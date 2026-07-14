@@ -2,8 +2,10 @@ import { expect, test } from "@playwright/test";
 import {
   assertSafeWritableIntegrationEnv,
   cleanupEnrollmentArtifacts,
+  createServiceRoleClient,
   createUniqueEmail,
   hasRealIntegrationEnv,
+  resolveAvailableTrainingPath,
   resolveUsableCheckoutTarget,
 } from "./helpers/integration-env";
 
@@ -11,6 +13,15 @@ const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do
 
 function createUniqueCpf() {
   return Date.now().toString().slice(-11).padStart(11, "0");
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
 }
 
 test.describe("epica 4 — jornadas publicas", () => {
@@ -45,6 +56,64 @@ test.describe("epica 4 — jornadas publicas", () => {
     await page.goto("/consultoria");
     await expect(page.getByText("Consultoria para aplicar norma com clareza operacional.")).toBeVisible();
     await expect(page.getByText("A RH Cursos apoia equipes públicas e privadas a traduzirem exigências legais e regulatórias em processos claros, treinamento aplicável e execução acompanhada.")).toBeVisible();
+  });
+
+  test("catalogo publica curso elegivel sem turma e agenda continua restrita a turmas", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Smoke real do catalogo requer ambiente Supabase real.");
+    assertSafeWritableIntegrationEnv();
+    const supabase = createServiceRoleClient();
+    const trainingPath = await resolveAvailableTrainingPath();
+    const title = `[E2E] ${Date.now()} curso sem turma publica`;
+    const slug = `${slugify(title)}-${Date.now()}`;
+
+    const { data: insertedCourse, error: insertError } = await supabase
+      .from("curso")
+      .insert({
+        titulo: title,
+        slug,
+        descricao_curta: "Curso elegivel sem turma aberto pelo smoke E2E.",
+        descricao: "Curso elegivel sem turma para validar publicacao no catalogo sem aparecer na agenda.",
+        ementa: [],
+        objetivos: [],
+        beneficios: [],
+        publico_alvo: [],
+        carga_horaria: 12,
+        modalidade: "Online",
+        modalidades: ["Online"],
+        nivel: "Basico",
+        categoria: trainingPath.name,
+        trilha_id: trainingPath.id,
+        trilha_nome: trainingPath.name,
+        preco_base: 890,
+        status: "Ativo",
+        destaque: false,
+        rating: 0,
+        total_alunos: 0,
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    try {
+      await page.goto("/cursos");
+      const detailsLink = page.locator(`a[href="/cursos/${slug}"]`).first();
+      await expect(page.getByText(title, { exact: true })).toBeVisible();
+      await expect(page.getByText("Sem turma aberta").first()).toBeVisible();
+      await expect(detailsLink).toHaveText("Ver detalhes →");
+
+      await page.goto("/agenda");
+      await expect(page.getByText(title)).toHaveCount(0);
+    } finally {
+      if (insertedCourse?.id) {
+        const { error: deleteError } = await supabase.from("curso").delete().eq("id", insertedCourse.id);
+        if (deleteError) {
+          throw deleteError;
+        }
+      }
+    }
   });
 
   test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {

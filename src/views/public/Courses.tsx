@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
+import { getOpenEnrollmentClasses } from "@/lib/enrollment-class-resolution";
+import { PUBLIC_COURSE_STATUSES } from "@/lib/domain/course-enums";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
@@ -22,7 +24,7 @@ type CatalogEntry = {
   price: number;
   spotColorClass: string;
   spotLabel: string;
-  trainingClass: TrainingClass;
+  trainingClass?: TrainingClass;
 };
 
 const CATEGORY_GRADIENTS = [
@@ -58,7 +60,14 @@ function createCategoryGradient(category: string) {
   return CATEGORY_GRADIENTS[hash % CATEGORY_GRADIENTS.length];
 }
 
-function createSpotMeta(trainingClass: TrainingClass) {
+function createSpotMeta(trainingClass?: TrainingClass) {
+  if (!trainingClass) {
+    return {
+      label: "Sem turma aberta",
+      colorClass: "bg-[color:color-mix(in_srgb,var(--tk-brand)_12%,white)] text-tk-brand"
+    };
+  }
+
   if (trainingClass.status === "Poucas vagas") {
     return {
       label: "Poucas vagas",
@@ -82,33 +91,42 @@ function formatCatalogDate(value: string) {
 }
 
 function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
-  const coursesById = new Map(courses.map((course) => [course.id, course]));
-
-  return classes
-    .filter((trainingClass) => {
-      const course = coursesById.get(trainingClass.courseId);
-      return course && trainingClass.status !== "Encerrada";
-    })
-    .map((trainingClass) => {
-      const course = coursesById.get(trainingClass.courseId)!;
+  return courses
+    .filter((course) => PUBLIC_COURSE_STATUSES.includes(course.status))
+    .map((course) => {
       const category = normalizeCategory(course);
+      const openClasses = getOpenEnrollmentClasses(classes, course.id);
+      const trainingClass = openClasses[0];
       const spot = createSpotMeta(trainingClass);
 
       return {
         category,
         course,
         gradient: createCategoryGradient(category),
-        price: trainingClass.price || course.price,
+        price: trainingClass?.price ?? course.price,
         spotColorClass: spot.colorClass,
         spotLabel: spot.label,
         trainingClass
       } satisfies CatalogEntry;
     })
-    .sort((left, right) => left.trainingClass.startDate.localeCompare(right.trainingClass.startDate));
+    .sort((left, right) => {
+      const leftDate = left.trainingClass ? new Date(left.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
+      const rightDate = right.trainingClass ? new Date(right.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
+
+      if (leftDate !== rightDate) {
+        return leftDate - rightDate;
+      }
+
+      return left.course.title.localeCompare(right.course.title);
+    });
 }
 
 function getCourseModalities(course: Course) {
   return course.modalities?.length ? course.modalities : [course.modality];
+}
+
+function formatCourseModalities(course: Course) {
+  return getCourseModalities(course).join(" · ");
 }
 
 export function CoursesPage() {
@@ -228,7 +246,7 @@ export function CoursesPage() {
               <p className="text-sm text-tk-ink-muted">
                 <strong className="font-semibold text-tk-ink">{catalogEntries.length}</strong>
                 {" "}
-                turmas na agenda
+                cursos no catálogo
               </p>
             </div>
           </div>
@@ -255,12 +273,12 @@ export function CoursesPage() {
           ) : filteredEntries.length ? (
             <div className="grid gap-[22px] md:grid-cols-2 xl:grid-cols-3">
               {filteredEntries.map((entry) => (
-                <CatalogSessionCard key={entry.trainingClass.id} entry={entry} />
+                <CatalogSessionCard key={`${entry.course.id}-${entry.trainingClass?.id ?? "sem-turma"}`} entry={entry} />
               ))}
             </div>
           ) : (
             <Card variant="base" className="px-8 py-16 text-center">
-              <h2 className="font-tk-display text-2xl font-bold text-tk-ink">Nenhuma turma encontrada</h2>
+              <h2 className="font-tk-display text-2xl font-bold text-tk-ink">Nenhum curso encontrado</h2>
               <p className="mx-auto mt-3 max-w-[44ch] font-tk-serif text-lg font-normal leading-8 text-tk-ink-muted">
                 Ajuste a busca ou fale com um especialista para uma turma sob medida.
               </p>
@@ -301,6 +319,7 @@ export function CoursesPage() {
 }
 
 function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
+  const isOpenClass = Boolean(entry.trainingClass);
   return (
     <Card variant="base" interactive className="flex flex-col overflow-hidden p-0 motion-reduce:transform-none">
       <div className="flex h-28 items-start justify-between p-[16px_18px]" style={{ background: entry.gradient }}>
@@ -318,13 +337,20 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
         </h3>
 
         <div className="space-y-2 text-[0.82rem] text-tk-ink-muted">
-          <div className="flex items-center gap-2">
-            <CalendarDays className="h-[15px] w-[15px]" />
-            <span>{formatCatalogDate(entry.trainingClass.startDate)}</span>
-          </div>
+          {isOpenClass ? (
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-[15px] w-[15px]" />
+              <span>{formatCatalogDate(entry.trainingClass!.startDate)}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-[15px] w-[15px]" />
+              <span>Sem turma aberta · {formatCourseModalities(entry.course)}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2">
             <Clock3 className="h-[15px] w-[15px]" />
-            <span>{entry.trainingClass.modality} · {entry.course.durationLabel}</span>
+            <span>{isOpenClass ? `${entry.trainingClass!.modality} · ${entry.course.durationLabel}` : `${formatCourseModalities(entry.course)} · ${entry.course.durationLabel}`}</span>
           </div>
         </div>
 
@@ -337,7 +363,7 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
             to={`/cursos/${entry.course.slug}`}
             className="text-sm font-semibold text-tk-accent-strong transition hover:text-tk-brand-hover"
           >
-            Ver turma →
+            {isOpenClass ? "Ver turma →" : "Ver detalhes →"}
           </Link>
         </div>
       </div>
