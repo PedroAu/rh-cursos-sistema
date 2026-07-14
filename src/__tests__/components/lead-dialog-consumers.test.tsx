@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { render, screen, waitFor } from "@/__tests__/utils";
+import { fireEvent, render, screen, waitFor } from "@/__tests__/utils";
 import {
   QuoteModalProvider,
   useQuoteModal,
@@ -133,21 +133,37 @@ describe("consumidores de createLead em diálogo", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "Abrir orçamento" }));
-    await user.type(await screen.findByPlaceholderText("Ex.: Prefeitura de..."), "Prefeitura Exemplo");
-    await user.type(screen.getByPlaceholderText("00.000.000/0000-00"), "12.345.678/0001-90");
+    fireEvent.change(await screen.findByPlaceholderText("Ex.: Prefeitura de..."), {
+      target: { value: "Prefeitura Exemplo" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("00.000.000/0000-00"), {
+      target: { value: "12.345.678/0001-90" },
+    });
     const selects = screen.getAllByRole("combobox");
     await user.selectOptions(selects[0], "30");
-    await user.type(screen.getByPlaceholderText("Ex.: Brasília - DF"), "Brasília - DF");
-    await user.type(screen.getByPlaceholderText("Ex.: Próximo trimestre"), "Próximo trimestre");
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Brasília - DF"), {
+      target: { value: "Brasília - DF" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Próximo trimestre"), {
+      target: { value: "Próximo trimestre" },
+    });
     await user.selectOptions(selects[1], "Ao vivo (online)");
-    await user.type(
+    fireEvent.change(
       screen.getByPlaceholderText("Descreva conteúdos, normas ou condições especiais."),
-      "Incluir casos práticos da organização."
+      { target: { value: "Incluir casos práticos da organização." } }
     );
-    await user.type(screen.getByPlaceholderText("Ex.: Ana Souza"), "Ana Souza");
-    await user.type(screen.getByPlaceholderText("Ex.: Gestor de RH"), "Gestora de RH");
-    await user.type(screen.getByPlaceholderText("voce@empresa.com.br"), "ana@example.com");
-    await user.type(screen.getByPlaceholderText("(61) 99999-9999"), "61999998888");
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Ana Souza"), {
+      target: { value: "Ana Souza" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Gestor de RH"), {
+      target: { value: "Gestora de RH" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("voce@empresa.com.br"), {
+      target: { value: "ana@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("(61) 99999-9999"), {
+      target: { value: "61999998888" },
+    });
 
     await user.click(screen.getByRole("button", { name: "Enviar solicitação" }));
 

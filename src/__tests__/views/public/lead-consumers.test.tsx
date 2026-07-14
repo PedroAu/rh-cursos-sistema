@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { render, screen, waitFor } from "@/__tests__/utils";
+import { fireEvent, render, screen, waitFor } from "@/__tests__/utils";
 import { BlogPage } from "@/views/public/Blog";
 import { InCompanyPage } from "@/views/public/InCompany";
 import { SpecialistContactPage } from "@/views/public/SpecialistContact";
@@ -104,8 +104,10 @@ describe("consumidores públicos de createLead", () => {
 
     render(<BlogPage />);
 
-    await user.type(screen.getByLabelText("Seu nome"), "Maria Newsletter");
-    await user.type(screen.getByLabelText("Seu melhor e-mail"), "maria@example.com");
+    fireEvent.change(screen.getByLabelText("Seu nome"), { target: { value: "Maria Newsletter" } });
+    fireEvent.change(screen.getByLabelText("Seu melhor e-mail"), {
+      target: { value: "maria@example.com" },
+    });
     await user.click(screen.getByRole("button", { name: /quero receber/i }));
 
     expect(screen.getByLabelText("Seu nome")).toHaveValue("Maria Newsletter");
@@ -127,8 +129,10 @@ describe("consumidores públicos de createLead", () => {
 
     render(<BlogPage />);
 
-    await user.type(screen.getByLabelText("Seu nome"), "Maria Newsletter");
-    await user.type(screen.getByLabelText("Seu melhor e-mail"), "maria@example.com");
+    fireEvent.change(screen.getByLabelText("Seu nome"), { target: { value: "Maria Newsletter" } });
+    fireEvent.change(screen.getByLabelText("Seu melhor e-mail"), {
+      target: { value: "maria@example.com" },
+    });
     await user.click(screen.getByRole("button", { name: /quero receber/i }));
 
     await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith("Newsletter indisponível."));
@@ -146,28 +150,32 @@ describe("consumidores públicos de createLead", () => {
 
     render(<InCompanyPage />);
 
-    await user.type(screen.getByPlaceholderText("Seu nome"), "Ana Souza");
-    await user.type(screen.getByPlaceholderText("voce@organizacao.gov.br"), "ana@example.com");
-    await user.type(screen.getByPlaceholderText("Nome da organização"), "Secretaria de Gestão");
-    await user.type(screen.getByPlaceholderText("(00) 00000-0000"), "61999998888");
+    fireEvent.change(screen.getByPlaceholderText("Seu nome"), { target: { value: "Ana Souza" } });
+    fireEvent.change(screen.getByPlaceholderText("voce@organizacao.gov.br"), {
+      target: { value: "ana@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Nome da organização"), {
+      target: { value: "Secretaria de Gestão" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("(00) 00000-0000"), {
+      target: { value: "61999998888" },
+    });
     const inCompanySelects = screen.getAllByRole("combobox");
     await user.selectOptions(inCompanySelects[0], "Gestão pública");
     await user.selectOptions(inCompanySelects[1], "16 a 40 pessoas");
-    await user.type(
-      screen.getByPlaceholderText("Ex.: atualizar a equipe para nova legislação."),
-      "Atualizar a equipe para a nova legislação."
-    );
-    await user.type(
-      screen.getByPlaceholderText("Ex.: eSocial e departamento pessoal."),
-      "eSocial aplicado ao setor público."
-    );
-    await user.type(
+    fireEvent.change(screen.getByPlaceholderText("Ex.: atualizar a equipe para nova legislação."), {
+      target: { value: "Atualizar a equipe para a nova legislação." },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Ex.: eSocial e departamento pessoal."), {
+      target: { value: "eSocial aplicado ao setor público." },
+    });
+    fireEvent.change(
       screen.getByPlaceholderText("Ex.: reduzir retrabalho e padronizar execução."),
-      "Reduzir retrabalho e padronizar a execução."
+      { target: { value: "Reduzir retrabalho e padronizar a execução." } }
     );
-    await user.type(
+    fireEvent.change(
       screen.getByPlaceholderText("Conte o objetivo do treinamento e o contexto da sua equipe"),
-      "Precisamos capacitar a equipe pública."
+      { target: { value: "Precisamos capacitar a equipe pública." } }
     );
 
     await user.click(screen.getByRole("button", { name: "Enviar solicitação de proposta" }));
@@ -213,14 +221,22 @@ describe("consumidores públicos de createLead", () => {
 
     render(<SpecialistContactPage leadOrigin={leadOrigin} />);
 
-    await user.type(screen.getByPlaceholderText("Ex.: Maria Oliveira"), "Joana Lima");
-    await user.type(screen.getByPlaceholderText("voce@empresa.com.br"), "joana@example.com");
-    await user.type(screen.getByPlaceholderText("(61) 99999-9999"), "61999998888");
-    await user.type(screen.getByPlaceholderText("Ex.: Secretaria de Gestão"), "Órgão Exemplo");
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Maria Oliveira"), {
+      target: { value: "Joana Lima" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("voce@empresa.com.br"), {
+      target: { value: "joana@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("(61) 99999-9999"), {
+      target: { value: "61999998888" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Ex.: Secretaria de Gestão"), {
+      target: { value: "Órgão Exemplo" },
+    });
     await user.selectOptions(screen.getByRole("combobox"), "Gestão Pública");
-    await user.type(
+    fireEvent.change(
       screen.getByPlaceholderText("Descreva o desafio, o contexto da equipe e o tipo de apoio desejado."),
-      "Precisamos de um diagnóstico completo."
+      { target: { value: "Precisamos de um diagnóstico completo." } }
     );
     await user.click(screen.getByRole("button", { name: "Solicitar contato" }));
 

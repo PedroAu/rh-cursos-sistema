@@ -1,0 +1,69 @@
+schema: 1
+story: REC-302
+gate: PASS
+status_reason: >-
+  Os 11 critérios de aceite estão rastreados por testes de contrato, consumidores e
+  Playwright administrativo isolado. Lint, typecheck, 527/527 testes unitários,
+  build de produção e 174/174 cenários Playwright passaram sem findings bloqueantes.
+reviewer: Quinn
+updated: '2026-07-14T21:55:49Z'
+top_issues: []
+waiver:
+  active: false
+evidence:
+  acceptance_criteria:
+    AC1_AC5:
+      status: PASS
+      tests:
+        - src/__tests__/lib/app-store.test.ts
+      notes: >-
+        Network, respostas 400/403/409/429/500, body não JSON, request pendente,
+        sucesso confirmado e produção sem Functions estão cobertos sem mutação
+        antecipada nem toast no store.
+    AC6_AC8:
+      status: PASS
+      tests:
+        - src/__tests__/views/public/contact.test.tsx
+        - src/__tests__/views/public/lead-consumers.test.tsx
+        - src/__tests__/components/lead-dialog-consumers.test.tsx
+      notes: >-
+        Os seis consumidores públicos preservam campos/contexto em falha, limpam ou
+        fecham somente após sucesso e mantêm uma única autoridade de toast.
+    AC9:
+      status: PASS
+      tests:
+        - src/__tests__/lib/admin-resource-configs.test.ts
+        - tests/admin-crud.spec.ts
+      notes: >-
+        A criação manual usa admin-resources, valida identidade canônica, fecha o
+        modal apenas após persistência e passou no Supabase local isolado com cleanup.
+    AC10_AC11:
+      status: PASS
+      tests:
+        - npm run test:unit
+        - npm test
+      notes: >-
+        Inventário reconciliado em sete consumidores; 527/527 unitários e 174/174
+        Playwright passaram no gate agregado.
+  quality_gates:
+    lint: PASS
+    typecheck: PASS
+    unit: 527/527 PASS
+    build: PASS
+    playwright_admin_lead: 1/1 PASS
+    playwright_aggregate: 174/174 PASS
+  security:
+    result: PASS
+    notes: >-
+      O fluxo falha fechado em produção, não registra payload/PII e o delta não
+      introduz execução dinâmica, DOM XSS, segredo hardcoded ou CORS permissivo.
+  false_positive_check:
+    result: PASS
+    confidence: 0.95
+    notes: >-
+      O bug antigo foi reproduzido por testes test-first; casos negativos e pending
+      provam causalidade, e a prova E2E usa persistência real em banco isolado.
+  automated_review:
+    tool: CodeRabbit
+    scope: uncommitted REC-302 test stabilization
+    result: No findings

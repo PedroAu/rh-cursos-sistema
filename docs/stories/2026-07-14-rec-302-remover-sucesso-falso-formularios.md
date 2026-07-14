@@ -2,7 +2,7 @@
 
 ## Status
 
-In Progress
+Ready for Review
 
 ## Executor Assignment
 
@@ -167,17 +167,17 @@ Busca final por `createLead` deve confirmar que não existe consumidor adicional
   - [x] Fechar, limpar e enviar tracking somente em sucesso.
   - [x] Criar teste direcionado.
 
-- [ ] **Task 7 — Corrigir criação manual do admin** (AC: 6–10)
+- [x] **Task 7 — Corrigir criação manual do admin** (AC: 6–10)
   - [x] Manter modal e dados em network/non-2xx.
   - [x] Fechar somente após confirmação.
   - [x] Garantir exatamente um toast de sucesso/erro no caller.
   - [x] Atualizar teste unitário de `admin-resource-configs`.
-  - [ ] Atualizar e executar Playwright de lead admin em ambiente de teste isolado.
+  - [x] Atualizar e executar Playwright de lead admin em ambiente de teste isolado.
 
-- [ ] **Task 8 — Revalidar inventário e gates** (AC: 10, 11)
+- [x] **Task 8 — Revalidar inventário e gates** (AC: 10, 11)
   - [x] Reexecutar busca por `createLead` e reconciliar todos os consumidores reais.
   - [x] Executar testes direcionados de store/componentes.
-  - [ ] Executar gates constitucionais no mesmo commit após REC-403 estar verde.
+  - [x] Executar gates constitucionais no mesmo commit após REC-403 estar verde.
   - [x] Atualizar File List e solicitar veredito de `@qa`.
 
 ## Dev Notes
@@ -316,6 +316,7 @@ Para cada consumidor:
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** PASS em objetivo/valor, rastreabilidade FND-06 → FR-06/NFR-04/05/09 → AC-17.10/11, inventário dos sete consumidores confirmado por busca no código, escopo IN/OUT, contrato de erro testável, preservação de estado, autoridade única de toast, fail-closed produtivo, tarefas por consumidor, estratégia de testes, segurança e rollback. O recibo opaco definitivo permanece corretamente em REC-107 e não foi inventado nesta story. `@qa` foi mantido como quality gate constitucional, distinto de `@dev`. Bloqueadores documentais: 0. Condições de execução: REC-001 com freeze ativo; implementação local pode começar, mas merge exige REC-403 Done/verde e publicação exige os controles aplicáveis de REC-401/402. | @po (Pax) |
 | 2026-07-14 | 1.1 | Implementação local corrigiu rejection, fail-closed, autoridade de toast e identidade canônica do lead administrativo. Revisão independente encontrou que o primeiro patch descartava `data.id`; o contrato passou a validar `id`, `created_at` e `status_crm`, rejeitar envelope inválido e reutilizar o ID real em update/delete. Story permanece In Progress por bloqueio Playwright/REC-403. | @dev (Dex) + @qa (Quinn) |
 | 2026-07-14 | 1.2 | Revalidação após a estabilização local da REC-403: 51/51 testes direcionados, 511/511 unitários, lint, typecheck e build de produção verdes. O Playwright administrativo e o `npm test` agregado continuam bloqueados até existir um Supabase de teste isolado com autorização explícita de escrita. | @dev (Dex) |
+| 2026-07-14 | 1.3 | Ambiente Supabase local isolado reativado com guarda fail-closed; Playwright de lead admin passou 1/1 com persistência e cleanup. Flakes de preenchimento dos consumidores foram removidos sem ampliar timeout. Gates finais: lint, typecheck, 527/527 unitários, build e Playwright agregado 174/174 verdes. Tasks 7–8 concluídas; story movida para Ready for Review. | @dev (Dex) |
 
 ## File List
 
@@ -330,11 +331,12 @@ Para cada consumidor:
 - `src/__tests__/lib/app-store.test.ts`
 - `src/__tests__/lib/admin-resource-configs.test.ts`
 - `src/__tests__/views/public/contact.test.tsx`
+- `src/__tests__/views/public/lead-consumers.test.tsx`
+- `src/__tests__/components/lead-dialog-consumers.test.tsx`
 
 ### Criado nesta implementação parcial
 
-- `src/__tests__/views/public/lead-consumers.test.tsx`
-- `src/__tests__/components/lead-dialog-consumers.test.tsx`
+- Nenhum arquivo adicional nesta etapa final.
 
 ### Referências somente leitura
 
@@ -362,6 +364,8 @@ GPT-5 (Codex)
 - `npm run lint` passou.
 - `npm run typecheck` passou.
 - `npm run build` passou após a correção.
+- Playwright direcionado do lead administrativo passou 1/1 no Supabase local isolado, com confirmação de persistência e cleanup.
+- O gate final passou com lint, typecheck, 527/527 testes unitários, build de produção e `npm test` agregado com 174/174 cenários Playwright.
 - O baseline agregado anterior à correção concluiu typecheck/build e terminou Playwright com 168 PASS/6 FAIL. Ele não foi reexecutado porque a triagem REC-403 confirmou dependência de dados externos mutáveis, escrita de snapshots versionados e risco de escrita administrativa no ambiente apontado por `.env.local`.
 
 ### Completion Notes
@@ -371,9 +375,10 @@ GPT-5 (Codex)
 - A criação administrativa exige `ok === true`, valida `data.id`/`created_at`/`status_crm`, usa a identidade canônica no estado e rejeita resposta 2xx incompleta ou contraditória; update/delete subsequentes foram testados com o ID real.
 - Os sete consumidores foram reconciliados. Os callers já preservavam estado e aguardavam `createLead`; a rejection verdadeira ativa esses caminhos sem necessidade de alterar os seis componentes públicos.
 - O admin passou a emitir sua confirmação específica depois de `createLead` resolver; todos os callers possuem uma única autoridade de toast.
-- A implementação local está validada por lint, typecheck, 511 testes unitários e 51 testes direcionados.
-- O build de produção também está verde; Playwright público/admin será executado somente em ambiente de teste isolado e determinístico.
-- Story mantida em `In Progress`: faltam Playwright e os gates constitucionais completos; merge bloqueado por REC-403 e publicação por REC-401/REC-402.
+- A implementação está validada por lint, typecheck, 527 testes unitários, build de produção e 174 cenários Playwright agregados.
+- O Playwright público/admin foi executado no Supabase local isolado e determinístico; o cenário de lead confirmou persistência antes do sucesso e executou cleanup.
+- Os testes dos consumidores usam preenchimento determinístico, preservando as mesmas asserções sem depender de timeout ampliado.
+- Story movida para `Ready for Review`; publicação continua condicionada aos controles REC-401/REC-402.
 
 ## QA Results
 
@@ -386,3 +391,13 @@ GPT-5 (Codex)
 - Confirmado: preservação dos campos preenchidos nos sete consumidores, uma autoridade de toast e ausência de tracking de sucesso em falha.
 - Evidências: 49/49 testes direcionados, 497/497 unitários, lint, typecheck, build e `git diff --check` verdes.
 - A story permanece `In Progress` até Playwright isolado e `npm test` agregado passarem após REC-403.
+
+### 2026-07-14 — Re-gate final após ambiente isolado
+
+- **Veredito:** PASS.
+- Os 11 acceptance criteria estão cobertos por testes de contrato do store, testes dos sete consumidores e Playwright administrativo contra Supabase local isolado.
+- Evidências finais: lint PASS; typecheck PASS; 527/527 testes unitários PASS; build de produção PASS; lead admin 1/1 PASS; agregado Playwright 174/174 PASS.
+- O CodeRabbit revisou a estabilização não commitada dos testes e retornou `No findings`.
+- Revisão de segurança: fail-closed produtivo preservado; nenhum payload/PII logado; nenhum padrão novo de segredo hardcoded, execução dinâmica, DOM XSS ou CORS permissivo.
+- Verificação de falso positivo: confiança alta (0,95). O comportamento antigo foi reproduzido test-first; network/non-2xx/pending/configuração provam os caminhos negativos e o E2E confirma persistência real antes do sucesso.
+- Gate versionado em `docs/qa/gates/rec-302-remover-sucesso-falso-formularios.yml`; zero findings bloqueantes.
