@@ -242,3 +242,29 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     relatedCourseId: "select",
   });
 });
+
+test("class form narrows modality options to the selected course modalities", () => {
+  const store = createAdminStoreFixture();
+  store.courses = [
+    {
+      ...store.courses[0],
+      modalities: ["Presencial", "Ao vivo online"],
+      modality: "Presencial",
+    },
+  ];
+
+  const config = buildResourceConfig(
+    "classes",
+    store as never,
+    {
+      ...createDeps(),
+      form: { courseId: store.courses[0].id },
+    } as never
+  );
+
+  const modalityField = config.fields.find((field) => field.key === "modality");
+  expect(modalityField?.options).toEqual([
+    { value: "Presencial", label: "Presencial" },
+    { value: "Ao vivo online", label: "Ao vivo online" },
+  ]);
+});

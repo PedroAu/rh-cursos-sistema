@@ -39,7 +39,7 @@ for each row execute function public.curso_sync_modalidades();
 -- Defesa em profundidade: garante consistência mesmo em writes diretos via SQL
 -- que ignorem o trigger (ex.: `alter table ... disable trigger`, restore parcial).
 alter table public.curso
-  add constraint curso_modalidades_not_empty_chk check (array_length(modalidades, 1) > 0);
+  add constraint curso_modalidades_not_empty_chk check (cardinality(modalidades) > 0);
 alter table public.curso
   add constraint curso_modalidade_in_modalidades_chk check (modalidade = any(modalidades));
 comment on column public.curso.modalidades is

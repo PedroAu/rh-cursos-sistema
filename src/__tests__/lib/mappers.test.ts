@@ -33,6 +33,7 @@ const courseRow: CourseRow = {
   publico_alvo: ["Publico"],
   carga_horaria: 8,
   modalidade: "Online",
+  modalidades: ["Online"],
   nivel: "Basico",
   categoria: "Tecnologia",
   trilha_id: "path-tech",
@@ -116,6 +117,18 @@ describe("Supabase mappers", () => {
     expect(course.featured).toBe(true);
     expect(course.instructorId).toBe("inst-1");
     expect(course.nextClassId).toBe("class-1");
+    expect(course.modalities).toEqual(["Ao vivo online"]);
+  });
+
+  it("preserves every modalidade returned by the database", () => {
+    const course = mapCourse(
+      { ...courseRow, modalidade: "Presencial", modalidades: ["Presencial", "Online", "Gravado"] },
+      [courseInstructorRow],
+      [classRow]
+    );
+
+    expect(course.modality).toBe("Presencial");
+    expect(course.modalities).toEqual(["Presencial", "Ao vivo online", "Gravado"]);
   });
 
   it.each(COURSE_STATUSES)(

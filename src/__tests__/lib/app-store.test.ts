@@ -756,6 +756,61 @@ describe("AppStoreProvider and hooks", () => {
     expect(harness.store.courses).toHaveLength(initialCourseCount + 1);
   });
 
+  it("preserves the full modalities array when creating and editing courses", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: null }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const harness = renderStore();
+
+    await act(async () => {
+      await harness.store.upsertCourse({
+        title: "Curso Multimodal",
+        modality: "Presencial",
+        modalities: ["Presencial", "Ao vivo online"],
+      });
+    });
+
+    await waitFor(() =>
+      expect(harness.store.courses[0]).toMatchObject({
+        title: "Curso Multimodal",
+        modality: "Presencial",
+        modalities: ["Presencial", "Ao vivo online"],
+      })
+    );
+
+    await act(async () => {
+      await harness.store.upsertCourse({
+        id: harness.store.courses[0].id,
+        modalities: ["Gravado", "Ao vivo online"],
+      });
+    });
+
+    await waitFor(() =>
+      expect(harness.store.courses[0]).toMatchObject({
+        modality: "Gravado",
+        modalities: ["Gravado", "Ao vivo online"],
+      })
+    );
+
+    expect(mocks.invokeFunction).toHaveBeenLastCalledWith("admin-resources", {
+      body: {
+        resource: "courses",
+        action: "upsert",
+        payload: expect.objectContaining({
+          modality: "Gravado",
+          modalities: ["Gravado", "Ao vivo online"],
+        }),
+      },
+      sessionToken: "payload.signature",
+    });
+  });
+
   it("exposes derived course and dashboard hooks through the provider", async () => {
     let store: Store | undefined;
     render(

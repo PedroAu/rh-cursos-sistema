@@ -1131,8 +1131,19 @@ export function AppStoreProvider({
     const defaultPath = trainingPaths[0];
     const resolvedPathId = course.pathId ?? defaultPath?.id ?? "";
     const exists = course.id && snapshot.courses.some((item) => item.id === course.id);
+    const resolvedModalities = course.modalities?.length
+      ? course.modalities
+      : course.modality
+        ? [course.modality]
+        : ["Ao vivo online"];
+    const primaryModality = resolvedModalities[0] ?? "Ao vivo online";
     const nextCourse: Course = exists
-      ? ({ ...snapshot.courses.find((item) => item.id === course.id)!, ...course } as Course)
+      ? ({
+          ...snapshot.courses.find((item) => item.id === course.id)!,
+          ...course,
+          modality: primaryModality,
+          modalities: resolvedModalities
+        } as Course)
       : ({
           id: `course-${Date.now()}`,
           slug: slugify(course.title ?? "novo-curso"),
@@ -1142,8 +1153,8 @@ export function AppStoreProvider({
             trainingPaths.find((item) => item.id === resolvedPathId)?.name ??
             defaultPath?.name ??
             "",
-          modality: course.modality ?? course.modalities?.[0] ?? "Ao vivo online",
-          modalities: course.modalities ?? (course.modality ? [course.modality] : ["Ao vivo online"]),
+          modality: primaryModality,
+          modalities: resolvedModalities,
           durationLabel: course.durationLabel ?? "8h",
           durationHours: course.durationHours ?? 8,
           level: course.level ?? "Básico",

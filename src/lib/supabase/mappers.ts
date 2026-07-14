@@ -193,6 +193,14 @@ export function fromDbModality(value: CourseRow["modalidade"]): Course["modality
   return modalityDbToLabel(value);
 }
 
+function fromDbModalities(row: CourseRow): Course["modality"][] {
+  if (Array.isArray(row.modalidades) && row.modalidades.length > 0) {
+    return row.modalidades.map((value) => fromDbModality(value));
+  }
+
+  return [fromDbModality(row.modalidade)];
+}
+
 function fromDbLevel(value: CourseRow["nivel"]): Course["level"] {
   return levelDbToLabel(value);
 }
@@ -287,6 +295,7 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
   const nextClass = classes
     .filter((item) => item.curso_id === row.id)
     .sort((a, b) => a.data_inicio.localeCompare(b.data_inicio))[0];
+  const modalities = fromDbModalities(row);
 
   if (!row.trilha_nome && row.trilha_id && !(row.trilha_id in trainingPathNames)) {
     console.warn(`mapCourse: trilha_id "${row.trilha_id}" not found in trainingPathNames map (course ${row.id}).`);
@@ -299,8 +308,8 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     pathId: row.trilha_id ?? "path-dp",
     pathName: row.trilha_nome ?? trainingPathNames[row.trilha_id ?? ""] ?? "Cursos",
     category: row.categoria ?? undefined,
-    modality: fromDbModality(row.modalidade),
-    modalities: [fromDbModality(row.modalidade)],
+    modality: modalities[0] ?? fromDbModality(row.modalidade),
+    modalities,
     durationLabel: `${row.carga_horaria}h`,
     durationHours: row.carga_horaria,
     level: fromDbLevel(row.nivel),

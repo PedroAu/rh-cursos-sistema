@@ -413,11 +413,13 @@ export function buildResourceConfig(
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
       const selectedCourse = store.courses.find((c) => c.id === form.courseId);
+      const getCourseModalities = (course: Course) =>
+        course.modalities?.length ? course.modalities : [course.modality];
       const modalityOptions = selectedCourse
-        ? [{ value: selectedCourse.modality, label: selectedCourse.modality }]
+        ? getCourseModalities(selectedCourse).map((value) => ({ value, label: value }))
         : courseOptions.length
           ? store.courses
-              .map((course) => course.modality)
+              .flatMap((course) => getCourseModalities(course))
               .filter((value, index, list) => list.indexOf(value) === index)
               .map((value) => ({ value, label: value }))
           : [];
