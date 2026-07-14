@@ -44,6 +44,19 @@ import {
 
 type RhCursosClient = SupabaseClient<Database>;
 
+export class PublicCatalogUnavailableError extends Error {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "PublicCatalogUnavailableError";
+  }
+}
+
+type PublicCatalogResult = NonNullable<Awaited<ReturnType<typeof fetchPublicCatalog>>>;
+
+export type PublicCatalogServerState =
+  | { status: "ok"; catalog: PublicCatalogResult }
+  | { status: "unavailable"; error: PublicCatalogUnavailableError };
+
 /**
  * Categorias distintas já cadastradas em `curso`, para alimentar as
  * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
@@ -249,6 +262,23 @@ export function fetchPublicCatalogFromSupabase() {
 // ao Supabase por view.
 export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer() {
   return fetchPublicCatalog(createSupabaseServerClient());
+});
+
+export const fetchPublicCatalogServerState = cache(async function fetchPublicCatalogServerState(): Promise<PublicCatalogServerState> {
+  try {
+    const catalog = await fetchPublicCatalogFromSupabaseServer();
+    if (!catalog) {
+      throw new PublicCatalogUnavailableError("Supabase indisponível para carregar o catálogo público.");
+    }
+    return { status: "ok", catalog };
+  } catch (error) {
+    return {
+      status: "unavailable",
+      error: error instanceof PublicCatalogUnavailableError
+        ? error
+        : new PublicCatalogUnavailableError("Não foi possível carregar o catálogo público.", { cause: error })
+    };
+  }
 });
 
 export function fetchPublicBlogPostsFromSupabase() {

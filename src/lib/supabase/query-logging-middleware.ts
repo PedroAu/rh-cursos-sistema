@@ -17,6 +17,8 @@ interface QueryMetrics {
   table?: string;
   duration: number;
   isSlow: boolean;
+  status: "success" | "error";
+  errorMessage?: string;
   timestamp: string;
 }
 
@@ -44,10 +46,12 @@ export function wrapSupabaseWithQueryLogging(
   // Store original methods
   const originalFrom = supabase.from.bind(supabase);
 
-  function reportQuery(method: string, table: string, duration: number) {
+  function reportQuery(method: string, table: string, duration: number, error?: unknown) {
     const isSlow = duration > slowQueryThreshold;
+    const status = error ? "error" : "success";
+    const errorMessage = error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
 
-    if (!logAllQueries && !isSlow) return;
+    if (!error && !logAllQueries && !isSlow) return;
     if (Math.random() > samplingRate) return;
 
     recordQueryMetrics({
@@ -55,11 +59,18 @@ export function wrapSupabaseWithQueryLogging(
       table,
       duration,
       isSlow,
+      status,
+      errorMessage,
       timestamp: new Date().toISOString()
     });
 
     if (enableConsoleLogging) {
-      logQueryToConsole(method, table, duration, isSlow);
+      logQueryToConsole(method, table, duration, isSlow, status, errorMessage);
+    }
+
+    if (enableSentryLogging && error) {
+      captureFailedQuery(method, table, duration, errorMessage);
+      return;
     }
 
     if (enableSentryLogging && isSlow) {
@@ -89,7 +100,13 @@ export function wrapSupabaseWithQueryLogging(
         originalThen((result) => {
           reportQuery(method, table, performance.now() - startTime);
           return typeof onfulfilled === "function" ? onfulfilled(result) : result;
-        }, onrejected)) as typeof builder.then;
+        }, (reason) => {
+          reportQuery(method, table, performance.now() - startTime, reason);
+          if (typeof onrejected === "function") {
+            return onrejected(reason);
+          }
+          throw reason;
+        })) as typeof builder.then;
 
       return builder;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -142,6 +159,32 @@ function captureSlowQuery(
   }
 }
 
+function captureFailedQuery(
+  method: string,
+  table: string,
+  duration: number,
+  errorMessage?: string
+): void {
+  if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return;
+
+  Sentry.addBreadcrumb({
+    category: "database",
+    message: `Failed ${method} query on table "${table}"`,
+    level: "error",
+    data: {
+      method,
+      table,
+      duration: `${duration.toFixed(2)}ms`,
+      error: errorMessage ?? "unknown"
+    }
+  });
+
+  Sentry.captureMessage(
+    `Failed query detected: ${method} on ${table} (${duration.toFixed(2)}ms)`,
+    "error"
+  );
+}
+
 /**
  * Log query metrics to console (development)
  */
@@ -149,14 +192,17 @@ function logQueryToConsole(
   method: string,
   table: string,
   duration: number,
-  isSlow: boolean
+  isSlow: boolean,
+  status: "success" | "error",
+  errorMessage?: string
 ): void {
   const durationStr = `${duration.toFixed(2)}ms`;
-  const icon = isSlow ? "🐌" : "⚡";
-  const color = isSlow ? "color: orange" : "color: green";
+  const icon = status === "error" ? "❌" : isSlow ? "🐌" : "⚡";
+  const color = status === "error" ? "color: red" : isSlow ? "color: orange" : "color: green";
+  const suffix = status === "error" && errorMessage ? ` (${errorMessage})` : "";
 
   console.log(
-    `%c${icon} [QUERY] ${method.toUpperCase()} "${table}" - ${durationStr}`,
+    `%c${icon} [QUERY] ${method.toUpperCase()} "${table}" - ${durationStr}${suffix}`,
     color
   );
 }

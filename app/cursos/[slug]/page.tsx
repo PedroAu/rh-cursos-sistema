@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
 import {
-  fetchPublicCatalogFromSupabaseServer,
+  fetchPublicCatalogServerState,
   fetchPublicTestimonialsFromSupabaseServer
 } from "@/lib/supabase/rh-cursos-api";
 
@@ -17,17 +17,23 @@ type PageProps = {
 };
 
 async function getCourses() {
-  try {
-    const catalog = await fetchPublicCatalogFromSupabaseServer();
-    return catalog?.courses ?? [];
-  } catch {
-    return [];
+  const result = await fetchPublicCatalogServerState();
+  if (result.status === "unavailable") {
+    return null;
   }
+  return result.catalog.courses;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = (await getCourses()).find((item) => item.slug === slug);
+  const courses = await getCourses();
+  if (courses === null) {
+    return {
+      title: "Catálogo temporariamente indisponível | RH Cursos",
+      description: "Não foi possível carregar os detalhes deste curso no momento."
+    };
+  }
+  const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     return {
@@ -42,10 +48,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page() {
-  const [catalog, testimonials] = await Promise.all([
-    fetchPublicCatalogFromSupabaseServer().catch(() => null),
+  const [catalogState, testimonials] = await Promise.all([
+    fetchPublicCatalogServerState(),
     fetchPublicTestimonialsFromSupabaseServer().catch(() => [])
   ]);
+
+  if (catalogState.status === "unavailable") {
+    console.error("Falha ao carregar catálogo público na rota de curso:", catalogState.error);
+    throw catalogState.error;
+  }
 
   // Sem fallback para mockCatalog: se o curso não existir no catálogo real,
   // `courses` chega vazio e `CourseDetailPage` já renderiza o estado
@@ -53,10 +64,10 @@ export default async function Page() {
   return (
     <CourseDetailClient
       initialData={{
-        courses: catalog?.courses ?? [],
-        classes: catalog?.classes ?? [],
-        instructors: catalog?.instructors ?? [],
-        coursePublicContents: catalog?.coursePublicContents ?? [],
+        courses: catalogState.catalog.courses,
+        classes: catalogState.catalog.classes,
+        instructors: catalogState.catalog.instructors,
+        coursePublicContents: catalogState.catalog.coursePublicContents,
         testimonials: testimonials ?? []
       }}
     />

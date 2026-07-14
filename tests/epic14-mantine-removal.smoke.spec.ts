@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { attachRuntimeErrorProbe } from "./helpers/runtime-errors";
+import { attachRuntimeErrorProbe } from "@tests/helpers/runtime-errors";
 
 test.describe("epic 14 smoke — mantine removal", () => {
   test("home renderiza sem erro de runtime", async ({ page }) => {

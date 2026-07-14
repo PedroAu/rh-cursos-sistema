@@ -1,21 +1,29 @@
 status:
-  branch: main
+  branch: fix/remove-demo-seed-data
   modifiedFiles:
     - .aiox/project-status.yaml
-    - .gitignore
-    - docs/api/edge-functions.md
-    - docs/architecture/adr-014-redesign-trust-keith.md
-    - docs/checklists/GO-LIVE-2026-07-02.md
-  modifiedFilesTotalCount: 128
+    - app/cursos/[slug]/checkout/page.tsx
+    - app/cursos/[slug]/page.tsx
+    - src/__tests__/lib/query-logging-middleware.test.ts
+    - src/features/admin/dashboard/model/dashboard-overview.ts
+    - src/lib/admin-resource-configs.tsx
+    - src/lib/supabase/query-logging-middleware.ts
+    - src/lib/supabase/rh-cursos-api.ts
+    - supabase/migrations/20260713120000_remove_demo_seed_data.sql
+    - tests/agenda-runtime.spec.ts
+    - tests/epic14-mantine-removal.smoke.spec.ts
+    - tests/epic15-admin-dashboard-fidelity.spec.ts
+    - tsconfig.json
+  modifiedFilesTotalCount: 13
   recentCommits:
-    - 'docs: add design system exports'
     - >-
-      fix: classify enrollment errors and update validation tests [Story
-      EP-12.2]
+      fix(dashboard): corrigir ocupacao media e memoizar catalogo publico [Story
+      16.1]
+    - 'fix(db): corrigir CHECK de curso.modalidades vazio via cardinality()'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-12T11:30:01.896Z'
+  lastUpdate: '2026-07-14T01:36:29.752Z'
   isGitRepo: true
-timestamp: 1783855801897
+timestamp: 1783992989758
 ttl: 60
-gitFingerprint: 1783527338283.8445:1783823790634.5852
+gitFingerprint: 1783992989758.0000:1783992989758.0000

@@ -13,6 +13,47 @@
 
 begin;
 
+create temporary table tmp_demo_turma_ids (id varchar(80) primary key) on commit drop;
+insert into tmp_demo_turma_ids (id) values
+  ('class-1-1'),('class-1-2'),('class-1-3'),('class-1-4'),('class-1-5'),
+  ('class-2-1'),('class-2-2'),('class-2-3'),('class-2-4'),('class-2-5'),
+  ('class-3-1'),('class-3-2');
+
+create temporary table tmp_demo_curso_ids (id varchar(80) primary key) on commit drop;
+insert into tmp_demo_curso_ids (id) values
+  ('course-dp-1'),('course-dp-2'),('course-licitacoes-1'),('course-licitacoes-2'),
+  ('course-pessoas-1'),('course-pessoas-2'),('course-comunicacao-1'),('course-comunicacao-2'),
+  ('course-auditoria-1'),('course-auditoria-2'),('course-tech-1'),('course-tech-2');
+
+create temporary table tmp_demo_instrutor_ids (id varchar(80) primary key) on commit drop;
+insert into tmp_demo_instrutor_ids (id) values
+  ('inst-1'),('inst-2'),('inst-3'),('inst-4'),('inst-5'),('inst-6'),('inst-7'),('inst-8');
+
+do $$
+declare
+  reused_course_links integer;
+  reused_class_links integer;
+begin
+  select count(*)
+    into reused_course_links
+    from public.curso_instrutor ci
+   where ci.instrutor_id in (select id from tmp_demo_instrutor_ids)
+     and ci.curso_id not in (select id from tmp_demo_curso_ids);
+
+  select count(*)
+    into reused_class_links
+    from public.turma t
+   where t.instrutor_id in (select id from tmp_demo_instrutor_ids)
+     and t.id not in (select id from tmp_demo_turma_ids);
+
+  if reused_course_links > 0 or reused_class_links > 0 then
+    raise exception
+      'remove_demo_seed_data abortada: instrutores demo foram reutilizados por dados reais (curso_instrutor=% links, turma=% links). Reassocie os registros antes de aplicar a migration.',
+      reused_course_links,
+      reused_class_links;
+  end if;
+end $$;
+
 -- IDs demo do seed
 -- trilhas:   path-dp, path-licitacoes, path-pessoas, path-comunicacao, path-auditoria, path-tech
 -- instrutor: inst-1 .. inst-8
@@ -23,26 +64,14 @@ begin;
 
 -- 1. Avaliações e inscrições vinculadas às turmas demo (RESTRICT em turma)
 delete from public.avaliacao
-where turma_id in (
-  'class-1-1','class-1-2','class-1-3','class-1-4','class-1-5',
-  'class-2-1','class-2-2','class-2-3','class-2-4','class-2-5',
-  'class-3-1','class-3-2'
-);
+where turma_id in (select id from tmp_demo_turma_ids);
 
 delete from public.inscricao
-where turma_id in (
-  'class-1-1','class-1-2','class-1-3','class-1-4','class-1-5',
-  'class-2-1','class-2-2','class-2-3','class-2-4','class-2-5',
-  'class-3-1','class-3-2'
-);
+where turma_id in (select id from tmp_demo_turma_ids);
 
 -- 2. Turmas demo (RESTRICT em curso — precisa sair antes dos cursos)
 delete from public.turma
-where id in (
-  'class-1-1','class-1-2','class-1-3','class-1-4','class-1-5',
-  'class-2-1','class-2-2','class-2-3','class-2-4','class-2-5',
-  'class-3-1','class-3-2'
-);
+where id in (select id from tmp_demo_turma_ids);
 
 -- 3. Posts de blog demo (curso_id era SET NULL, remover explicitamente)
 delete from public.post_blog
@@ -52,25 +81,15 @@ where id in (
 
 -- 4. Vínculos curso-instrutor demo (CASCADE em curso, mas explícito por clareza)
 delete from public.curso_instrutor
-where curso_id in (
-  'course-dp-1','course-dp-2','course-licitacoes-1','course-licitacoes-2',
-  'course-pessoas-1','course-pessoas-2','course-comunicacao-1','course-comunicacao-2',
-  'course-auditoria-1','course-auditoria-2','course-tech-1','course-tech-2'
-);
+where curso_id in (select id from tmp_demo_curso_ids);
 
 -- 5. Cursos demo (curso_public_content tem CASCADE; lead.curso_id vira NULL)
 delete from public.curso
-where id in (
-  'course-dp-1','course-dp-2','course-licitacoes-1','course-licitacoes-2',
-  'course-pessoas-1','course-pessoas-2','course-comunicacao-1','course-comunicacao-2',
-  'course-auditoria-1','course-auditoria-2','course-tech-1','course-tech-2'
-);
+where id in (select id from tmp_demo_curso_ids);
 
 -- 6. Instrutores demo (RESTRICT em curso_instrutor/turma — já removidos acima)
 delete from public.instrutor
-where id in (
-  'inst-1','inst-2','inst-3','inst-4','inst-5','inst-6','inst-7','inst-8'
-);
+where id in (select id from tmp_demo_instrutor_ids);
 
 -- 7. Trilhas demo (curso.trilha_id era SET NULL)
 delete from public.trilha

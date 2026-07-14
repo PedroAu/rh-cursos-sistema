@@ -21,7 +21,7 @@ import {
 class FakeFilterBuilder<T> implements PromiseLike<{ data: T; error: null }> {
   calls: string[] = [];
 
-  constructor(private readonly result: { data: T; error: null }) {}
+  constructor(private readonly executor: () => Promise<{ data: T; error: null }>) {}
 
   eq(column: string, value: unknown) {
     this.calls.push(`eq(${column},${String(value)})`);
@@ -47,16 +47,16 @@ class FakeFilterBuilder<T> implements PromiseLike<{ data: T; error: null }> {
     onfulfilled?: ((value: { data: T; error: null }) => TResult1 | PromiseLike<TResult1>) | null,
     onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null
   ): PromiseLike<TResult1 | TResult2> {
-    return Promise.resolve(this.result).then(onfulfilled, onrejected);
+    return this.executor().then(onfulfilled, onrejected);
   }
 }
 
-function createFakeSupabaseClient<T>(result: { data: T; error: null }) {
+function createFakeSupabaseClient<T>(executor: () => Promise<{ data: T; error: null }>) {
   const builder = {
-    select: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(result)),
-    insert: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(result)),
-    update: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(result)),
-    delete: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(result))
+    select: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(executor)),
+    insert: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(executor)),
+    update: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(executor)),
+    delete: vi.fn((..._args: unknown[]) => new FakeFilterBuilder(executor))
   };
 
   return {
@@ -76,7 +76,7 @@ describe("wrapSupabaseWithQueryLogging", () => {
 
   it("preserva o encadeamento de filtros após select() (regressão do gate REL-001)", async () => {
     const rows = [{ id: "curso-1" }];
-    const client = createFakeSupabaseClient({ data: rows, error: null });
+    const client = createFakeSupabaseClient(async () => ({ data: rows, error: null }));
 
     wrapSupabaseWithQueryLogging(client as any, { logAllQueries: true });
 
@@ -87,7 +87,7 @@ describe("wrapSupabaseWithQueryLogging", () => {
   });
 
   it("preserva o encadeamento após insert()/update()/delete()", async () => {
-    const client = createFakeSupabaseClient({ data: null, error: null });
+    const client = createFakeSupabaseClient(async () => ({ data: null, error: null }));
 
     wrapSupabaseWithQueryLogging(client as any, { logAllQueries: true });
 
@@ -106,7 +106,7 @@ describe("wrapSupabaseWithQueryLogging", () => {
   });
 
   it("registra métricas de duração sem alterar o resultado da query", async () => {
-    const client = createFakeSupabaseClient({ data: [], error: null });
+    const client = createFakeSupabaseClient(async () => ({ data: [], error: null }));
 
     wrapSupabaseWithQueryLogging(client as any, { logAllQueries: true, enableConsoleLogging: false });
 
@@ -114,7 +114,26 @@ describe("wrapSupabaseWithQueryLogging", () => {
 
     const metrics = getQueryMetrics();
     expect(metrics).toHaveLength(1);
-    expect(metrics[0]).toMatchObject({ method: "select", table: "turma" });
+    expect(metrics[0]).toMatchObject({ method: "select", table: "turma", status: "success" });
     expect(metrics[0].duration).toBeGreaterThanOrEqual(0);
+  });
+
+  it("registra métricas e alerta quando a query rejeita", async () => {
+    const client = createFakeSupabaseClient(async () => {
+      throw new Error("timeout");
+    });
+
+    wrapSupabaseWithQueryLogging(client as any, { logAllQueries: false, enableConsoleLogging: false });
+
+    await expect(client.from("curso").select("*").eq("status", "Ativo")).rejects.toThrow("timeout");
+
+    const metrics = getQueryMetrics();
+    expect(metrics).toHaveLength(1);
+    expect(metrics[0]).toMatchObject({
+      method: "select",
+      table: "curso",
+      status: "error",
+      errorMessage: "timeout"
+    });
   });
 });

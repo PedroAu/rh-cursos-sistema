@@ -1,5 +1,6 @@
 import type { Course, Enrollment, Lead, TrainingClass } from "@/types";
 import { formatRelativeTime } from "@/features/admin/dashboard/model/dashboard-activity";
+import { toOccupancyPercent } from "@/lib/occupancy";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MONTH_ABBREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
@@ -7,6 +8,10 @@ const MONTH_ABBREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "s
 function isWithinDays(iso: string, days: number, now: number) {
   const value = new Date(iso).getTime();
   return !Number.isNaN(value) && value <= now && now - value <= days * DAY_MS;
+}
+
+function getRecentLeads(leads: Lead[], now: number) {
+  return leads.filter((lead) => isWithinDays(lead.createdAt, 30, now));
 }
 
 /**
@@ -59,7 +64,7 @@ export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiIn
     ? Math.round(((enrollmentsThisMonth - enrollmentsPrevMonth) / enrollmentsPrevMonth) * 100)
     : null;
 
-  const leadsRecent = leads.filter((lead) => isWithinDays(lead.createdAt, 30, now));
+  const leadsRecent = getRecentLeads(leads, now);
   const leadsAguardando = leadsRecent.filter((lead) => lead.status === "Novo").length;
 
   const turmasAbertas = classes.filter((item) => item.status === "Inscrições abertas");
@@ -73,11 +78,7 @@ export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiIn
   // -> 50% em vez de 100%).
   const ocupacaoBase = (turmasAbertas.length > 0 ? turmasAbertas : classes).filter((item) => item.totalSeats > 0);
   const ocupacaoMedia = ocupacaoBase.length > 0
-    ? Math.round(
-        (ocupacaoBase.reduce((sum, item) => sum + item.filledSeats / item.totalSeats, 0) /
-          ocupacaoBase.length) *
-          100
-      )
+    ? Math.round(ocupacaoBase.reduce((sum, item) => sum + toOccupancyPercent(item.filledSeats, item.totalSeats), 0) / ocupacaoBase.length)
     : 0;
 
   return [
@@ -124,7 +125,7 @@ export const ALL_ORIGINS_CHIP = "todas";
 
 /** Chips de filtro por origem — apenas origens presentes nos leads dos últimos 30 dias (AC3, §6). */
 export function buildLeadOriginChips(leads: Lead[], now: number = Date.now()): LeadOriginChip[] {
-  const recent = leads.filter((lead) => isWithinDays(lead.createdAt, 30, now));
+  const recent = getRecentLeads(leads, now);
   const origins = Array.from(new Set(recent.map((lead) => lead.origin)));
 
   return [{ name: ALL_ORIGINS_CHIP, label: "Todas" }, ...origins.map((origin) => ({ name: origin, label: origin }))];
@@ -142,7 +143,7 @@ export type RecentLeadRow = {
 
 /** Linhas da tabela "Leads recentes", filtradas por origem e ordenadas do mais recente (AC3, §4, §6). */
 export function buildRecentLeadRows(leads: Lead[], activeOrigin: string, now: number = Date.now()): RecentLeadRow[] {
-  const recent = leads.filter((lead) => isWithinDays(lead.createdAt, 30, now));
+  const recent = getRecentLeads(leads, now);
   const filtered = activeOrigin === ALL_ORIGINS_CHIP ? recent : recent.filter((lead) => lead.origin === activeOrigin);
 
   return filtered
@@ -187,7 +188,7 @@ export function buildUpcomingClasses({ classes, courses }: UpcomingClassInput, n
     .map((item) => {
       const start = new Date(item.startDate);
       const course = courses.find((entry) => entry.id === item.courseId);
-      const occupancyPct = item.totalSeats > 0 ? Math.round((item.filledSeats / item.totalSeats) * 100) : 0;
+      const occupancyPct = toOccupancyPercent(item.filledSeats, item.totalSeats);
       const availableSeats = Math.max(item.availableSeats, 0);
 
       return {
@@ -213,7 +214,7 @@ export type LeadOriginBreakdown = {
 
 /** Agregação de leads por origem nos últimos 30 dias; oculta o card se não houver leads no período (§5b, §6). */
 export function buildLeadsByOrigin(leads: Lead[], now: number = Date.now()): { items: LeadOriginBreakdown[]; showBreakdown: boolean } {
-  const recent = leads.filter((lead) => isWithinDays(lead.createdAt, 30, now));
+  const recent = getRecentLeads(leads, now);
 
   if (recent.length === 0) {
     return { items: [], showBreakdown: false };

@@ -2,7 +2,7 @@ import { loadEnvFile } from "node:process";
 import { expect, test } from "@playwright/test";
 
 import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-import { attachRuntimeErrorProbe } from "./helpers/runtime-errors";
+import { attachRuntimeErrorProbe } from "@tests/helpers/runtime-errors";
 
 // O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET via
 // .env.local automaticamente, mas este processo Playwright não — sem isso,

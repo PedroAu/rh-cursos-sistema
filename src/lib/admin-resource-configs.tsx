@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { SeatProgress } from "@/components/admin/seat-progress";
 import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
+import { toOccupancyPercent } from "@/lib/occupancy";
 import {
   COURSE_LEVEL_OPTIONS,
   COURSE_MODALITY_OPTIONS,
@@ -445,7 +446,7 @@ export function buildResourceConfig(
       }).length;
       const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
       const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
-      const occupancyRate = totalSeatsAll > 0 ? Math.round((filledSeatsAll / totalSeatsAll) * 100) : 0;
+      const occupancyRate = toOccupancyPercent(filledSeatsAll, totalSeatsAll);
 
       return {
         title: "Gestão de turmas",
