@@ -71,6 +71,14 @@ function isPlaceholderValue(value: string | undefined) {
 }
 
 function shouldUsePublicTestBaseline() {
+  if (process.env.NEXT_PUBLIC_USE_TEST_BASELINE === "true") {
+    return true;
+  }
+
+  if (process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true") {
+    return true;
+  }
+
   return (
     isPlaceholderValue(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
     isPlaceholderValue(

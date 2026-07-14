@@ -15,6 +15,7 @@ env:
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_ci_placeholder_key' }}
   NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL || 'http://127.0.0.1:3000' }}
   AUTH_SESSION_SECRET: ${{ secrets.AUTH_SESSION_SECRET || 'ci-auth-session-secret-placeholder-32' }}
+  NEXT_PUBLIC_USE_TEST_BASELINE: 'false'
 
 # Cancel superseded runs on the same ref to keep the queue fast.
 concurrency:
@@ -54,6 +55,8 @@ jobs:
     name: Build & A11y & E2E
     runs-on: ubuntu-latest
     environment: production
+    env:
+      NEXT_PUBLIC_USE_TEST_BASELINE: 'true'
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
