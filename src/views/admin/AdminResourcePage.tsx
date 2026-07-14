@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Download, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
-import { isValidElement, useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
+import { isValidElement, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,23 @@ function toExportableValue(value: unknown): string {
     return toExportableValue(value.props.children);
   }
   return String(value);
+}
+
+function serializeFormSnapshot(value: unknown): string {
+  if (value === null) return "null";
+  if (value === undefined) return "undefined";
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => serializeFormSnapshot(item)).join(",")}]`;
+  }
+  if (typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([left], [right]) =>
+      left.localeCompare(right)
+    );
+    return `{${entries
+      .map(([key, nextValue]) => `${JSON.stringify(key)}:${serializeFormSnapshot(nextValue)}`)
+      .join(",")}}`;
+  }
+  return JSON.stringify(value);
 }
 
 function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
@@ -89,6 +106,14 @@ function getSearchPlaceholder(resource: ResourceKey) {
   return "Buscar por nome, título ou referência.";
 }
 
+function getDefaultFormState(resource: ResourceKey) {
+  if (resource === "courses") {
+    return { featured: "Não" } satisfies Record<string, unknown>;
+  }
+
+  return {};
+}
+
 export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const store = useAppStore();
   const [search, setSearch] = useState("");
@@ -97,6 +122,38 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Record<string, unknown>>({});
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+  const [formSnapshot, setFormSnapshot] = useState("");
+  const previousOpenRef = useRef(open);
+
+  useEffect(() => {
+    if (open && !previousOpenRef.current) {
+      setFormSnapshot(serializeFormSnapshot(form));
+    }
+
+    if (!open && previousOpenRef.current) {
+      setFormSnapshot("");
+    }
+
+    previousOpenRef.current = open;
+  }, [form, open]);
+
+  const isFormDirty = useMemo(
+    () => serializeFormSnapshot(form) !== formSnapshot,
+    [form, formSnapshot]
+  );
+
+  const handleDialogOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      setOpen(true);
+      return;
+    }
+
+    if (isFormDirty && !window.confirm("Descartar as alterações deste registro?")) {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const errorsByField = useMemo(() => {
     const result: Record<string, string> = {};
@@ -119,7 +176,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     (event) => {
       event.preventDefault();
       setEditingId(null);
-      setForm({});
+      setForm(getDefaultFormState(resource));
       setOpen(true);
     }
   );
@@ -200,7 +257,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             className="rounded-full bg-tk-accent text-white hover:bg-tk-accent-strong"
             onClick={() => {
               setEditingId(null);
-              setForm({});
+              setForm(getDefaultFormState(resource));
               setOpen(true);
             }}
           >
@@ -331,7 +388,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                 <Button
                   onClick={() => {
                     setEditingId(null);
-                    setForm({});
+                    setForm(getDefaultFormState(resource));
                     setOpen(true);
                   }}
                 >
@@ -343,8 +400,16 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         )}
       </Panel>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="w-[min(96vw,1100px)] overflow-y-auto p-0">
+      <Dialog open={open} onOpenChange={handleDialogOpenChange}>
+        <DialogContent
+          className="w-[min(96vw,1100px)] overflow-y-auto p-0"
+          onInteractOutside={(event) => {
+            event.preventDefault();
+          }}
+          onPointerDownOutside={(event) => {
+            event.preventDefault();
+          }}
+        >
           <div className="max-h-[calc(100vh-2rem)] overflow-y-auto">
             <DialogHeader className="border-b border-tk-line px-6 py-5">
               <DialogTitle>{editingId ? "Editar registro" : "Criar novo registro"}</DialogTitle>
@@ -396,7 +461,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             </div>
 
             <DialogFooter className="border-t border-tk-line px-6 py-5">
-              <Button variant="outline" onClick={() => setOpen(false)}>
+              <Button variant="outline" onClick={() => handleDialogOpenChange(false)}>
                 Cancelar
               </Button>
               <Button loading={isSaving} onClick={handleSave}>
@@ -510,6 +575,7 @@ function RenderField({
         label={field.label}
         value={(form[field.key] as ModuleValue[]) || []}
         onChange={updateField}
+        hint={field.hint}
         error={error}
       />
     );
@@ -522,6 +588,8 @@ function RenderField({
         value={(form[field.key] as string[]) || []}
         onChange={updateField}
         error={error}
+        hint={field.hint}
+        placeholder={field.placeholder}
         suggestions={field.suggestions}
       />
     );
@@ -536,6 +604,7 @@ function RenderField({
         value={(form[field.key] as string[]) || []}
         onChange={updateField}
         error={error}
+        hint={field.hint}
       />
     );
   }
@@ -549,6 +618,7 @@ function RenderField({
         value={String(form[field.key] ?? "")}
         onChange={updateField}
         error={error}
+        hint={field.hint}
       />
     );
   }
@@ -558,7 +628,8 @@ function RenderField({
       <Textarea
         label={field.label}
         value={String(form[field.key] ?? "")}
-        placeholder={`Ex.: ${field.label}`}
+        placeholder={field.placeholder ?? `Ex.: ${field.label}`}
+        hint={field.hint}
         onChange={(event) => updateField(event.currentTarget.value)}
         error={error}
         aria-required={field.required || undefined}
@@ -572,6 +643,8 @@ function RenderField({
         label={field.label}
         type="number"
         value={String(form[field.key] ?? "")}
+        placeholder={field.placeholder}
+        hint={field.hint}
         onChange={(event) => {
           const nextValue = event.currentTarget.value;
           updateField(nextValue === "" ? "" : Number(nextValue));
@@ -588,6 +661,7 @@ function RenderField({
         label={field.label}
         type="date"
         value={String(form[field.key] ?? "")}
+        hint={field.hint}
         onChange={(event) => updateField(event.currentTarget.value)}
         error={error}
         aria-required={field.required || undefined}
@@ -630,6 +704,7 @@ function RenderField({
       <FileUploadField
         label={field.label}
         required={field.required}
+        hint={field.hint}
         value={typeof form[field.key] === "string" ? (form[field.key] as string) : ""}
         onChange={updateField}
         error={error}
@@ -641,7 +716,8 @@ function RenderField({
     <Input
       label={field.label}
       value={String(form[field.key] ?? "")}
-      placeholder={`Ex.: ${field.label}`}
+      placeholder={field.placeholder ?? `Ex.: ${field.label}`}
+      hint={field.hint}
       onChange={(event) => updateField(event.currentTarget.value)}
       error={error}
       aria-required={field.required || undefined}
@@ -652,11 +728,13 @@ function RenderField({
 function FieldShell({
   label,
   required,
+  hint,
   error,
   children
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
   error?: string;
   children: ReactNode;
 }) {
@@ -667,6 +745,7 @@ function FieldShell({
         {required ? <span className="ml-1 text-tk-error">*</span> : null}
       </span>
       {children}
+      {hint ? <span className="text-xs leading-5 text-tk-ink-muted">{hint}</span> : null}
       {error ? <span className="text-xs text-tk-error">{error}</span> : null}
     </label>
   );
@@ -678,6 +757,7 @@ function NativeSelectField({
   options,
   value,
   onChange,
+  hint,
   error
 }: {
   label: string;
@@ -685,10 +765,11 @@ function NativeSelectField({
   options: Array<{ value: string; label: string }>;
   value: string;
   onChange: (value: string) => void;
+  hint?: string;
   error?: string;
 }) {
   return (
-    <FieldShell label={label} required={required} error={error}>
+    <FieldShell label={label} required={required} hint={hint} error={error}>
       <select
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
@@ -714,6 +795,7 @@ function MultiSelectLite({
   options,
   value,
   onChange,
+  hint,
   error
 }: {
   label: string;
@@ -721,10 +803,11 @@ function MultiSelectLite({
   options: Array<{ value: string; label: string }>;
   value: string[];
   onChange: (value: string[]) => void;
+  hint?: string;
   error?: string;
 }) {
   return (
-    <FieldShell label={label} required={required} error={error}>
+    <FieldShell label={label} required={required} hint={hint} error={error}>
       <div className={cn("rounded-2xl border border-tk-line bg-tk-surface p-4", error && "border-tk-error")}>
         <div className="mb-3 flex flex-wrap gap-2">
           {value.length ? (
@@ -773,6 +856,7 @@ function ArrayInputLite({
   value = [],
   onChange,
   placeholder = "Digite um item e clique em adicionar",
+  hint,
   error,
   suggestions
 }: {
@@ -780,6 +864,7 @@ function ArrayInputLite({
   value: string[];
   onChange: (value: string[]) => void;
   placeholder?: string;
+  hint?: string;
   error?: string;
   suggestions?: string[];
 }) {
@@ -788,12 +873,13 @@ function ArrayInputLite({
   const hasSuggestions = Boolean(suggestions?.length);
 
   return (
-    <FieldShell label={label} error={error}>
+    <FieldShell label={label} hint={hint} error={error}>
       <div className="space-y-2">
         {value.map((item, index) => (
           <div key={`${item}-${index}`} className="flex items-center gap-2">
             <Input
               value={item}
+              placeholder={placeholder}
               list={hasSuggestions ? datalistId : undefined}
               onChange={(event) => {
                 const next = [...value];
@@ -861,15 +947,17 @@ function ModulesBuilderLite({
   label,
   value = [],
   onChange,
+  hint,
   error
 }: {
   label: string;
   value: ModuleValue[];
   onChange: (value: ModuleValue[]) => void;
+  hint?: string;
   error?: string;
 }) {
   return (
-    <FieldShell label={label} error={error}>
+    <FieldShell label={label} hint={hint} error={error}>
       <div className="space-y-3">
         {value.map((module, moduleIndex) => (
           <div key={moduleIndex} className="space-y-3 rounded-2xl border border-tk-line bg-tk-surface-2 p-4">
@@ -920,6 +1008,7 @@ function ModulesBuilderLite({
                 {module.topics.map((topic, topicIndex) => (
                   <div key={topicIndex} className="flex items-center gap-2">
                     <Input
+                      placeholder="Ex.: Casos reais, checklist e boas práticas"
                       value={topic}
                       onChange={(event) => {
                         const next = [...value];
@@ -983,12 +1072,14 @@ function ModulesBuilderLite({
 function FileUploadField({
   label,
   required,
+  hint,
   value,
   onChange,
   error
 }: {
   label: string;
   required?: boolean;
+  hint?: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
@@ -1007,7 +1098,7 @@ function FileUploadField({
   }
 
   return (
-    <FieldShell label={label} required={required} error={error}>
+    <FieldShell label={label} required={required} hint={hint} error={error}>
       <div className={cn("rounded-2xl border border-dashed border-tk-line p-4", error && "border-tk-error")}>
         <input
           ref={inputRef}

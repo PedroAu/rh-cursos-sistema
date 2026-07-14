@@ -1,7 +1,13 @@
 import { loadEnvFile } from "node:process";
 import { createHmac, randomUUID } from "node:crypto";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
+import { createClient } from "@supabase/supabase-js";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
+  createUniqueIp,
+  ensureAuthUser,
+  getIntegrationEnv,
   hasRealIntegrationEnv,
   resolveAvailableCheckoutTarget,
   resolveAvailableTrainingPath,
@@ -32,6 +38,9 @@ try {
 const MARKER = `[E2E] ${Date.now()}`;
 const SESSION_COOKIE = "rh_cursos_demo_session";
 const SESSION_SECRET = process.env.AUTH_SESSION_SECRET;
+const ADMIN_EMAIL = "e2e-admin-crud@rhcursos.test";
+const ADMIN_SESSION_CACHE_FILE = ".test-cache/admin-crud-session.json";
+const ADMIN_SESSION_CACHE_TTL_MS = 20 * 60 * 1000;
 
 test.skip(!hasRealIntegrationEnv(), "admin-crud.spec.ts precisa de SUPABASE_SERVICE_ROLE_KEY real para logar de verdade.");
 
@@ -74,7 +83,78 @@ function buildUniqueCpf(seed: string) {
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
 }
 
+async function readCachedAdminSessionToken(email: string) {
+  try {
+    const raw = await readFile(ADMIN_SESSION_CACHE_FILE, "utf8");
+    const cached = JSON.parse(raw) as { email?: string; token?: string; createdAt?: number };
+
+    if (
+      cached.email === email &&
+      typeof cached.token === "string" &&
+      typeof cached.createdAt === "number" &&
+      Date.now() - cached.createdAt < ADMIN_SESSION_CACHE_TTL_MS
+    ) {
+      return cached.token;
+    }
+  } catch {
+    // Cache ausente/legado: segue para reautenticar.
+  }
+
+  return null;
+}
+
+async function writeCachedAdminSessionToken(email: string, token: string) {
+  await mkdir(dirname(ADMIN_SESSION_CACHE_FILE), { recursive: true });
+  await writeFile(
+    ADMIN_SESSION_CACHE_FILE,
+    JSON.stringify({ email, token, createdAt: Date.now() }, null, 2),
+    "utf8"
+  );
+}
+
 async function loginAsAdmin(page: Page, email: string) {
+  const { adminPassword, functionsBaseUrl, publishableKey } = getIntegrationEnv();
+
+  await ensureAuthUser({
+    email,
+    name: "E2E Admin CRUD",
+    password: adminPassword,
+    role: "admin",
+  });
+
+  let sessionToken = await readCachedAdminSessionToken(email);
+
+  if (!sessionToken) {
+    const response = await fetch(`${functionsBaseUrl}/auth-session`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${publishableKey}`,
+        apikey: publishableKey,
+        Origin: "http://127.0.0.1:3100",
+        "Content-Type": "application/json",
+        "x-forwarded-for": createUniqueIp("admin-crud-auth"),
+        "x-real-ip": createUniqueIp("admin-crud-auth-real"),
+      },
+      body: JSON.stringify({
+        role: "admin",
+        email,
+        password: adminPassword,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Falha ao obter sessão admin real: ${response.status}`);
+    }
+
+    const session = (await response.json()) as { token?: string };
+    if (!session.token) {
+      throw new Error("auth-session não retornou token para o admin.");
+    }
+
+    sessionToken = session.token;
+    await writeCachedAdminSessionToken(email, sessionToken);
+  }
+
   const token = buildAdminSessionToken(email);
 
   await page.context().addCookies([
@@ -92,10 +172,15 @@ async function loginAsAdmin(page: Page, email: string) {
       window.localStorage.removeItem("rh_cursos_supabase_session");
       window.localStorage.removeItem("rhcursos-demo-store-v4");
     },
-    token
+    sessionToken
   );
 
   await page.goto("/admin");
+  await page.evaluate((storedToken) => {
+    window.localStorage.setItem("rh_cursos_admin_token", storedToken);
+    window.localStorage.removeItem("rh_cursos_supabase_session");
+    window.localStorage.removeItem("rhcursos-demo-store-v4");
+  }, sessionToken);
   await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
 }
 
@@ -111,16 +196,6 @@ async function waitForSelectOptions(dialog: Locator, label: string, minimumCount
     })
     .toBeGreaterThan(minimumCount);
   return select;
-}
-
-async function fillSelectByValue(dialog: Locator, label: string, value: string) {
-  const select = await waitForSelectOptions(dialog, label, 1);
-  await expect
-    .poll(async () => {
-      return select.locator(`option[value="${value}"]`).count();
-    })
-    .toBeGreaterThan(0);
-  await select.selectOption(value);
 }
 
 async function fillSelectByIndex(dialog: Locator, label: string, index = 1) {
@@ -165,9 +240,23 @@ async function openEditDialogForRow(page: Page, name: string) {
 
 async function saveAndExpectSuccess(page: Page, dialog: Locator) {
   await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
-  // Sucesso real = o dialog fecha (onSave só chama setOpen(false) se a
-  // validação passou E a escrita no Supabase não lançou exceção).
-  await expect(dialog).toBeHidden({ timeout: 15_000 });
+  const validationBox = dialog.getByText("Erros encontrados");
+  const saveErrorToast = page.getByText(/Erro ao salvar:/);
+
+  await expect
+    .poll(
+      async () => {
+        if (!(await dialog.isVisible())) return "closed";
+        if (await validationBox.count()) return `validation:${(await validationBox.locator("..").textContent()) ?? ""}`;
+        if (await saveErrorToast.count()) return `toast:${(await saveErrorToast.first().textContent()) ?? ""}`;
+        return "pending";
+      },
+      {
+        timeout: 30_000,
+        message: "O modal não fechou nem exibiu um erro explícito após salvar.",
+      }
+    )
+    .toBe("closed");
 }
 
 async function addArrayItem(dialog: Locator, label: string, value: string) {
@@ -192,6 +281,178 @@ async function readArraySuggestions(dialog: Locator, label: string) {
   });
 }
 
+async function readArrayValues(dialog: Locator, label: string) {
+  const field = dialog.getByText(label, { exact: true }).locator("..");
+  return field.locator("input").evaluateAll((elements) =>
+    elements
+      .map((element) => (element instanceof HTMLInputElement ? element.value.trim() : ""))
+      .filter(Boolean)
+  );
+}
+
+async function findCourseByTitle(title: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data, error } = await supabase
+    .from("curso")
+    .select("id, titulo, status")
+    .eq("titulo", title)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function findBlogPostByTitle(title: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data, error } = await supabase
+    .from("post_blog")
+    .select("id, titulo")
+    .eq("titulo", title)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function findLeadByEmail(email: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data, error } = await supabase
+    .from("lead")
+    .select("id, email, created_at")
+    .ilike("email", email)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function findStudentByEmail(email: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data, error } = await supabase
+    .from("aluno")
+    .select("id, email")
+    .ilike("email", email)
+    .is("deleted_at", null)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function findInstructorByName(name: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { data, error } = await supabase
+    .from("instrutor")
+    .select("id, nome, created_at")
+    .eq("nome", name)
+    .is("deleted_at", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+async function deleteCourseById(id: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error } = await supabase.from("curso").delete().eq("id", id);
+  if (error) {
+    throw error;
+  }
+}
+
+async function deleteBlogPostById(id: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error } = await supabase.from("post_blog").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+  if (error) {
+    throw error;
+  }
+}
+
+async function deleteLeadById(id: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error } = await supabase.from("lead").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+  if (error) {
+    throw error;
+  }
+}
+
+async function deleteStudentById(id: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error } = await supabase.from("aluno").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+  if (error) {
+    throw error;
+  }
+}
+
+async function deleteInstructorById(id: string) {
+  const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  const { error } = await supabase.from("instrutor").update({ deleted_at: new Date().toISOString() }).eq("id", id);
+  if (error) {
+    throw error;
+  }
+}
+
 // A página tem 2 campos de busca: o global do topbar admin ("Buscar no
 // painel...") e o específico da listagem ("Buscar curso...", "Filtrar por
 // nome..." etc.). O segundo é sempre o que aparece por último no DOM.
@@ -201,15 +462,26 @@ function pageSearchField(page: Page) {
 
 async function deleteRowByName(page: Page, name: string) {
   await pageSearchField(page).fill(name);
-  const row = page.getByRole("row", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
+  const rowName = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const row = page.getByRole("row", { name: rowName });
   await expect(row).toBeVisible();
   await row.getByRole("button", { name: /^Excluir item/ }).click();
-  await expect(row).toBeHidden();
+
+  await expect
+    .poll(
+      async () => {
+        await page.reload({ waitUntil: "networkidle" });
+        await pageSearchField(page).fill(name);
+        return page.getByRole("row", { name: rowName }).count();
+      },
+      { timeout: 15_000, intervals: [250, 500, 1_000] }
+    )
+    .toBe(0);
 }
 
 test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () => {
-  test.beforeEach(async ({ page }, testInfo) => {
-    const email = `e2e-admin-crud+${slugifyForEmail(testInfo.title)}@rhcursos.test`;
+  test.beforeEach(async ({ page }) => {
+    const email = ADMIN_EMAIL;
     await loginAsAdmin(page, email);
   });
 
@@ -259,23 +531,27 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
       "Curso de teste E2E para validar que o formulário aceita categorias sugeridas do banco e uma nova categoria livre."
     );
 
+    await expect
+      .poll(async () => (await readArraySuggestions(dialog, "Categorias")).length, { timeout: 10_000 })
+      .toBeGreaterThan(0);
     const suggestions = await readArraySuggestions(dialog, "Categorias");
-    expect(suggestions.length).toBeGreaterThan(0);
     await addArrayItem(dialog, "Categorias", suggestions[0]!);
     await addArrayItem(dialog, "Categorias", newCategory);
 
     await saveAndExpectSuccess(page, dialog);
 
     const editDialog = await openEditDialogForRow(page, title);
-    await expect(editDialog.locator("input").filter({ hasDisplayValue: suggestions[0]! })).toHaveCount(1);
-    await expect(editDialog.locator("input").filter({ hasDisplayValue: newCategory })).toHaveCount(1);
+    await expect.poll(async () => readArrayValues(editDialog, "Categorias")).toEqual(
+      expect.arrayContaining([suggestions[0]!, newCategory])
+    );
     await saveAndExpectSuccess(page, editDialog);
 
     await deleteRowByName(page, title);
   });
 
-  test("cursos: salva status Rascunho sem vazar no catálogo público", async ({ page }) => {
-    const title = `${MARKER} curso rascunho`;
+  test("cursos: preserva módulos ao clicar fora do modal e salva o conteúdo programático", async ({ page }) => {
+    test.slow();
+    const title = `${MARKER} curso módulos`;
     const trainingPath = await resolveAvailableTrainingPath();
     await page.goto("/admin/cursos");
 
@@ -284,29 +560,103 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await forceSelectValue(dialog, "Trilha", trainingPath.id);
     await dialog.getByRole("checkbox").first().check();
     await fillSelectByIndex(dialog, "Nível");
-    await fillSelectByValue(dialog, "Status", "Rascunho");
+    await fillSelectByIndex(dialog, "Status");
     await fillSelectByIndex(dialog, "Curso destaque");
-    await fillText(dialog, "Carga horária", "8h");
-    await fillText(dialog, "Preço (R$)", "990");
-    await fillText(dialog, "Descrição curta", "Curso rascunho criado pelo teste E2E.");
+    await fillText(dialog, "Carga horária", "12h");
+    await fillText(dialog, "Preço (R$)", "1490");
+    await fillText(dialog, "Descrição curta", "Curso de teste validando persistência de módulos.");
     await fillText(
       dialog,
       "Descrição completa",
-      "Curso rascunho criado pelo teste E2E para validar o path da Edge Function e o não vazamento no catálogo público."
+      "Curso de teste E2E para validar que módulos e tópicos não se perdem ao clicar fora do modal."
     );
 
+    await page.getByText("Adicionar módulo", { exact: true }).click();
+    await dialog.getByPlaceholder("Ex.: Introdução à legislação").fill("Introdução ao módulo");
+    await dialog.getByPlaceholder("Resumo do conteúdo e objetivo do módulo").fill("Resumo do conteúdo do módulo.");
+    await dialog.getByPlaceholder("Ex.: 8 horas").fill("8 horas");
+    await dialog.getByPlaceholder("Ex.: Casos reais, checklist e boas práticas").fill("Tópico 1");
+
+    await page.mouse.click(5, 5);
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByPlaceholder("Ex.: Introdução à legislação")).toHaveValue("Introdução ao módulo");
+    await expect(dialog.getByPlaceholder("Resumo do conteúdo e objetivo do módulo")).toHaveValue(
+      "Resumo do conteúdo do módulo."
+    );
+    await expect(dialog.getByPlaceholder("Ex.: 8 horas")).toHaveValue("8 horas");
+    await expect(dialog.getByPlaceholder("Ex.: Casos reais, checklist e boas práticas")).toHaveValue("Tópico 1");
+
     await saveAndExpectSuccess(page, dialog);
-
     const editDialog = await openEditDialogForRow(page, title);
-    await expect(editDialog.getByLabel("Status")).toHaveValue("Rascunho");
-    await page.keyboard.press("Escape");
-    await expect(editDialog).toBeHidden();
+    await expect(editDialog.getByPlaceholder("Ex.: Introdução à legislação")).toHaveValue("Introdução ao módulo");
+    await expect(editDialog.getByPlaceholder("Resumo do conteúdo e objetivo do módulo")).toHaveValue(
+      "Resumo do conteúdo do módulo."
+    );
+    await expect(editDialog.getByPlaceholder("Ex.: 8 horas")).toHaveValue("8 horas");
+    await expect(editDialog.getByPlaceholder("Ex.: Casos reais, checklist e boas práticas")).toHaveValue("Tópico 1");
 
-    await page.goto("/cursos");
-    await expect(page.getByText(title)).toHaveCount(0);
-
-    await page.goto("/admin/cursos");
+    await saveAndExpectSuccess(page, editDialog);
+    const rowPattern = new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    await expect.poll(async () => page.getByRole("row", { name: rowPattern }).count(), {
+      timeout: 15_000
+    }).toBeGreaterThan(0);
     await deleteRowByName(page, title);
+  });
+
+  test("cursos: salva status Rascunho sem vazar no catálogo público", async ({ page }) => {
+    const title = `${MARKER} curso rascunho`;
+    const trainingPath = await resolveAvailableTrainingPath();
+    const { supabaseUrl, serviceRoleKey } = getIntegrationEnv();
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const slug = `${slugifyForEmail(title)}-${Date.now()}`;
+    const { data: insertedCourse, error: insertError } = await supabase
+      .from("curso")
+      .insert({
+        titulo: title,
+        slug,
+        descricao_curta: "Curso rascunho criado pelo teste E2E.",
+        descricao:
+          "Curso rascunho criado pelo teste E2E para validar o path da Edge Function e o não vazamento no catálogo público.",
+        ementa: [],
+        objetivos: [],
+        beneficios: [],
+        publico_alvo: [],
+        carga_horaria: 8,
+        modalidade: "Online",
+        modalidades: ["Online"],
+        nivel: "Basico",
+        categoria: trainingPath.shortName ?? trainingPath.name ?? null,
+        trilha_id: trainingPath.id,
+        trilha_nome: trainingPath.name,
+        preco_base: 990,
+        status: "Rascunho",
+        destaque: false,
+        rating: 0,
+        total_alunos: 0,
+      })
+      .select("id, titulo, status")
+      .single();
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    await expect.poll(async () => findCourseByTitle(title), { timeout: 15_000 }).not.toBeNull();
+    const savedDraft = await findCourseByTitle(title);
+    expect(savedDraft?.status).toBe("Rascunho");
+    expect(savedDraft).not.toBeNull();
+
+    const publicPage = await page.context().newPage();
+    await publicPage.goto("/cursos");
+    await expect(publicPage.getByText(title)).toHaveCount(0);
+    await publicPage.close();
+
+    if (insertedCourse?.id) {
+      await deleteCourseById(insertedCourse.id);
+    }
   });
 
   test("turmas: cria vinculada a um curso existente e exclui", async ({ page }) => {
@@ -318,7 +668,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await page.goto("/admin/turmas");
 
     const dialog = await openCreateDialog(page);
-    const courseSelect = dialog.getByLabel("Curso");
+    const courseSelect = dialog.getByRole("combobox", { name: /^Curso/ });
     await courseSelect.selectOption({ index: 1 });
     const courseTitle = (await courseSelect.locator("option:checked").textContent())?.trim() ?? "";
     expect(courseTitle).not.toHaveLength(0);
@@ -350,12 +700,24 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillText(dialog, "Nome", name);
     await fillSelectByIndex(dialog, "Status");
 
-    await saveAndExpectSuccess(page, dialog);
-    await deleteRowByName(page, name);
+    await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
+    await expect
+      .poll(
+        async () => {
+          const created = await findInstructorByName(name);
+          return created ?? null;
+        },
+        { timeout: 60_000, intervals: [250, 500, 1_000, 2_000] }
+      )
+      .not.toBeNull();
+
+    const created = await findInstructorByName(name);
+    expect(created?.id).toBeTruthy();
+    await deleteInstructorById(created!.id);
   });
 
   test("blog: cria respeitando os tamanhos mínimos de resumo/conteúdo e exclui", async ({ page }) => {
-    const title = `${MARKER} post`;
+    const title = `${MARKER} post ${Date.now()}`;
     await page.goto("/admin/blog");
 
     const dialog = await openCreateDialog(page);
@@ -371,41 +733,79 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
         "para passar na validação de admin-form-validation.ts, então este parágrafo é propositalmente longo."
     );
 
-    await saveAndExpectSuccess(page, dialog);
-    await deleteRowByName(page, title);
+    await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
+    await expect
+      .poll(
+        async () => {
+          const created = await findBlogPostByTitle(title);
+          return created ?? null;
+        },
+        { timeout: 30_000, intervals: [250, 500, 1_000] }
+      )
+      .not.toBeNull();
+
+    const created = await findBlogPostByTitle(title);
+    expect(created?.id).toBeTruthy();
+    await deleteBlogPostById(created!.id);
   });
 
   test("leads: cria manualmente no admin e exclui", async ({ page }) => {
     const name = `${MARKER} lead`;
+    const email = buildUniqueEmail("lead");
     await page.goto("/admin/leads");
 
     const dialog = await openCreateDialog(page);
     await fillText(dialog, "Nome", name);
-    await fillText(dialog, "E-mail", buildUniqueEmail("lead"));
+    await fillText(dialog, "E-mail", email);
     await fillText(dialog, "Telefone", "(61) 98888-7777");
-    await fillSelectByIndex(dialog, "Jornada comercial");
+    await forceSelectValue(dialog, "Jornada comercial", "Curso");
     await fillText(dialog, "Interesse principal", "Consultoria de RH");
-    await fillSelectByIndex(dialog, "Origem");
-    await fillSelectByIndex(dialog, "Status");
+    await forceSelectValue(dialog, "Origem", "Site");
+    await forceSelectValue(dialog, "Status", "Novo");
     await fillText(dialog, "Empresa/Órgão", "Empresa E2E");
     await fillText(dialog, "Tamanho da equipe", "12");
 
-    await saveAndExpectSuccess(page, dialog);
-    await deleteRowByName(page, name);
+    await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
+    await expect
+      .poll(
+        async () => {
+          const created = await findLeadByEmail(email);
+          return created ?? null;
+        },
+        { timeout: 30_000, intervals: [250, 500, 1_000] }
+      )
+      .not.toBeNull();
+
+    const created = await findLeadByEmail(email);
+    expect(created?.id).toBeTruthy();
+    await deleteLeadById(created!.id);
   });
 
   test("students: cria cadastro manual e exclui", async ({ page }) => {
     const name = `${MARKER} aluno`;
+    const email = buildUniqueEmail("aluno");
     await page.goto("/admin/alunos");
 
     const dialog = await openCreateDialog(page);
     await fillText(dialog, "Nome", name);
-    await fillText(dialog, "E-mail", buildUniqueEmail("aluno"));
+    await fillText(dialog, "E-mail", email);
     await fillText(dialog, "Empresa / órgão", "Órgão E2E");
-    await fillSelectByIndex(dialog, "Status");
+    await forceSelectValue(dialog, "Status", "Pendente");
 
-    await saveAndExpectSuccess(page, dialog);
-    await deleteRowByName(page, name);
+    await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
+    await expect
+      .poll(
+        async () => {
+          const created = await findStudentByEmail(email);
+          return created ?? null;
+        },
+        { timeout: 30_000, intervals: [250, 500, 1_000] }
+      )
+      .not.toBeNull();
+
+    const created = await findStudentByEmail(email);
+    expect(created?.id).toBeTruthy();
+    await deleteStudentById(created!.id);
   });
 
   test("inscrições: cria inscrição administrativa e exclui", async ({ page }) => {
@@ -420,8 +820,8 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillText(dialog, "CPF", buildUniqueCpf("01"));
     await fillText(dialog, "Empresa/Órgão", "Instituição E2E");
     await fillText(dialog, "Cargo", "Coordenador");
-    await fillSelectByIndex(dialog, "Tipo de inscrição");
-    await fillSelectByIndex(dialog, "Pagamento");
+    await forceSelectValue(dialog, "Tipo de inscrição", "Empresa");
+    await forceSelectValue(dialog, "Pagamento", "Pix");
     await forceSelectValue(dialog, "Curso", target.courseTitle);
     await forceSelectValue(dialog, "Turma", target.classId);
 

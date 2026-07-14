@@ -63,6 +63,14 @@ function optStr(value: unknown): string | undefined {
 function strArr(value: unknown): string[] {
   return Array.isArray(value) ? value.map((item) => String(item)) : [];
 }
+function deriveCourseCategoriesFromCourses(courses: Course[]): string[] {
+  const categories = new Set<string>();
+  for (const course of courses) {
+    const values = course.categories?.length ? course.categories : course.category ? [course.category] : [];
+    for (const value of values) categories.add(value);
+  }
+  return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
 function numOrUndef(value: unknown): number | undefined {
   if (value === "" || value === undefined || value === null) return undefined;
   const parsed = Number(value);
@@ -98,6 +106,8 @@ export type FieldConfig = {
   options?: Array<{ value: string; label: string }>;
   /** Sugestões (datalist) para campos `type: "array"` — não restringe, só orienta. */
   suggestions?: string[];
+  placeholder?: string;
+  hint?: string;
   required?: boolean;
   section?: string;
 };
@@ -245,7 +255,10 @@ export function buildResourceConfig(
       );
       const pathOptions =
         store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
-      const categoryOptions = store.courseCategories ?? [];
+      const categoryOptions =
+        store.courseCategories?.length
+          ? store.courseCategories
+          : deriveCourseCategoriesFromCourses(store.courses);
       const modalityOptions = COURSE_MODALITY_OPTIONS;
       const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = COURSE_STATUS_OPTIONS;
@@ -373,14 +386,45 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "title", label: "Nome do curso", type: "text", required: true },
-          { key: "pathId", label: "Trilha", type: "select", options: pathOptions, required: true },
-          { key: "modalities", label: "Modalidades", type: "multiselect", options: modalityOptions, required: true },
           {
-            key: "level", label: "Nível", type: "select", required: true,
-            options: COURSE_LEVEL_OPTIONS,
+            key: "title",
+            label: "Nome do curso",
+            type: "text",
+            required: true,
+            placeholder: "Ex.: Gestão de contratos administrativos",
           },
-          { key: "status", label: "Status", type: "select", options: statusOptions, required: true },
+          {
+            key: "pathId",
+            label: "Trilha",
+            type: "select",
+            options: pathOptions,
+            required: true,
+            hint: "Define a trilha pública e a classificação do catálogo.",
+          },
+          {
+            key: "modalities",
+            label: "Modalidades",
+            type: "multiselect",
+            options: modalityOptions,
+            required: true,
+            hint: "Selecione todas as modalidades em que o curso pode ser ofertado.",
+          },
+          {
+            key: "level",
+            label: "Nível",
+            type: "select",
+            required: true,
+            options: COURSE_LEVEL_OPTIONS,
+            hint: "Use o nível que melhor representa a profundidade do conteúdo.",
+          },
+          {
+            key: "status",
+            label: "Status",
+            type: "select",
+            options: statusOptions,
+            required: true,
+            hint: "Ativo, Destaque e Em breve publicam no catálogo; Rascunho e Arquivado ficam ocultos.",
+          },
           {
             key: "featured",
             label: "Curso destaque",
@@ -389,19 +433,94 @@ export function buildResourceConfig(
               { value: "Não", label: "Não" },
               { value: "Sim", label: "Sim" },
             ],
-            required: true,
+            required: false,
+            hint: "Deixe como Não no cadastro inicial, a menos que o curso vá entrar em destaque.",
           },
-          { key: "durationLabel", label: "Carga horária", type: "text", required: true },
-          { key: "price", label: "Preço (R$)", type: "number", required: true },
-          { key: "image", label: "URL da imagem", type: "text" },
-          { key: "targetAudience", label: "Público-alvo", type: "array" },
-          { key: "categories", label: "Categorias", type: "array", suggestions: categoryOptions },
-          { key: "featuredCourseIds", label: "Cursos destaque relacionados", type: "multiselect", options: featuredCourseOptions },
-          { key: "shortDescription", label: "Descrição curta", type: "textarea", required: true },
-          { key: "fullDescription", label: "Descrição completa", type: "textarea", required: true },
-          { key: "objectives", label: "Objetivos", type: "array" },
-          { key: "benefits", label: "Benefícios", type: "array" },
-          { key: "modules", label: "Módulos", type: "modules" },
+          {
+            key: "durationLabel",
+            label: "Carga horária",
+            type: "text",
+            required: true,
+            placeholder: "Ex.: 16h",
+          },
+          {
+            key: "price",
+            label: "Preço (R$)",
+            type: "number",
+            required: true,
+            placeholder: "1290",
+            hint: "Informe o valor total em reais, sem símbolo de moeda.",
+          },
+          {
+            key: "image",
+            label: "URL da imagem",
+            type: "text",
+            required: false,
+            placeholder: "/images/courses/gestao-contratos.jpg",
+            hint: "Use uma URL pública ou um caminho do projeto para a capa do curso.",
+          },
+          {
+            key: "targetAudience",
+            label: "Público-alvo",
+            type: "array",
+            required: false,
+            placeholder: "Ex.: Gestores públicos",
+            hint: "Adicione um público por item, separando perfis relevantes do curso.",
+          },
+          {
+            key: "categories",
+            label: "Categorias",
+            type: "array",
+            suggestions: categoryOptions,
+            required: false,
+            placeholder: "Ex.: Licitações e Contratos",
+            hint: "Use categorias que ajudem a encontrar o curso no catálogo.",
+          },
+          {
+            key: "featuredCourseIds",
+            label: "Cursos destaque relacionados",
+            type: "multiselect",
+            options: featuredCourseOptions,
+            required: false,
+            hint: "Vincule cursos que complementam esta oferta.",
+          },
+          {
+            key: "shortDescription",
+            label: "Descrição curta",
+            type: "textarea",
+            required: true,
+            placeholder: "Ex.: Curso prático para equipes que precisam revisar contratos com segurança.",
+          },
+          {
+            key: "fullDescription",
+            label: "Descrição completa",
+            type: "textarea",
+            required: true,
+            placeholder: "Explique o problema atendido, o que será coberto e o resultado esperado.",
+          },
+          {
+            key: "objectives",
+            label: "Objetivos",
+            type: "array",
+            required: false,
+            placeholder: "Ex.: Reduzir falhas em processos de contratação",
+            hint: "Inclua objetivos observáveis e práticos.",
+          },
+          {
+            key: "benefits",
+            label: "Benefícios",
+            type: "array",
+            required: false,
+            placeholder: "Ex.: Material de apoio",
+            hint: "Liste os ganhos concretos que o participante terá.",
+          },
+          {
+            key: "modules",
+            label: "Módulos",
+            type: "modules",
+            required: false,
+            hint: "Cada módulo precisa de título, descrição, duração e tópicos.",
+          },
         ] as FieldConfig[],
       };
     }
@@ -803,6 +922,7 @@ export function buildResourceConfig(
                 courseInterest: str(form.courseInterest),
                 courseId: optStr(form.courseId),
                 origin: str(form.origin) as Lead["origin"],
+                status: str(form.status) as Lead["status"],
                 organization: optStr(form.organization),
                 teamSize: numOrUndef(form.teamSize),
                 preferredModality: optStr(form.preferredModality),

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -17,7 +18,7 @@ import { getInitials } from "@/lib/get-initials";
 import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
-import { invokeFunction, isFunctionsConfigured } from "@/lib/supabase/functions-client";
+import { invokeFunction, isFunctionsConfigured, getStableClientIp } from "@/lib/supabase/functions-client";
 import {
   getSessionToken,
   clearSessionToken,
@@ -253,6 +254,16 @@ function upsertCollection<T extends { id: string }>(
     : [nextItem, ...collection];
 }
 
+function restoreDeletedItem<T extends { id: string }>(
+  collection: T[],
+  removedItem: T,
+  removedIndex: number
+): T[] {
+  const next = [...collection];
+  next.splice(Math.min(Math.max(removedIndex, 0), next.length), 0, removedItem);
+  return next;
+}
+
 function leadNaturalKey(lead: Lead) {
   return `${lead.name.trim().toLowerCase()}|${lead.email.trim().toLowerCase()}`;
 }
@@ -340,17 +351,24 @@ function persistAdminMutation(mutation: AdminMutation, successMessage?: string):
 
   return invokeFunction("admin-resources", {
     body: mutation,
-    sessionToken: getAdminSessionTokenValue() ?? undefined
-  }).then(async (response) => {
-    if (!response.ok) {
-      const message = await getFunctionErrorMessage(
-        response,
-        "Não foi possível sincronizar a alteração com o Supabase."
-      );
+    sessionToken: getAdminSessionTokenValue() ?? undefined,
+    ...(mutation.action === "delete" ? { keepalive: true } : {}),
+  })
+    .then(async (response) => {
+      if (!response.ok) {
+        const message = await getFunctionErrorMessage(
+          response,
+          "Não foi possível sincronizar a alteração com o Supabase."
+        );
+        toast.error(message);
+        throw new Error(message);
+      }
+      if (successMessage) toast.success(successMessage);
+    })
+    .catch((error) => {
+      const message = error instanceof Error ? error.message : "Não foi possível sincronizar a alteração com o Supabase.";
       throw new Error(message);
-    }
-    if (successMessage) toast.success(successMessage);
-  });
+    });
 }
 
 async function getFunctionErrorMessage(response: Response, fallback: string) {
@@ -498,7 +516,10 @@ export function AppStoreProvider({
         const nextSession = payload?.session ?? null;
         if (!nextSession) return;
 
-        if (payload?.token) {
+        // Preserva tokens reais já emitidos pelas Edge Functions administrativas.
+        // O GET /api/auth/session retorna o token HMAC do cookie SSR, que não pode
+        // substituir um token de sessão já pronto para `admin-resources`.
+        if (payload?.token && !getSessionToken()) {
           setSessionToken(payload.token);
         }
 
@@ -749,9 +770,15 @@ export function AppStoreProvider({
 
     void (async () => {
       try {
+        const clientIp = getStableClientIp();
         const response = await fetch("/api/auth/session", {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "cf-connecting-ip": clientIp,
+            "x-forwarded-for": clientIp,
+            "x-real-ip": clientIp
+          },
           body: JSON.stringify({ accessToken })
         });
 
@@ -868,21 +895,10 @@ export function AppStoreProvider({
   }, []);
 
   const createStudent = useCallback<AppStoreValue["createStudent"]>(async (payload) => {
-    if (isFunctionsConfigured) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "students",
-          action: "create",
-          payload,
-        },
-        sessionToken: getAdminSessionTokenValue() ?? undefined,
-      });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível criar o aluno."));
-      }
-    }
-
+    await persistAdminMutation(
+      { resource: "students", action: "create", payload },
+      undefined
+    );
     setState((current) => ({
       ...current,
       students: [
@@ -897,54 +913,34 @@ export function AppStoreProvider({
   }, []);
 
   const deleteStudent = useCallback<AppStoreValue["deleteStudent"]>(async (id) => {
-    if (isFunctionsConfigured) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "students",
-          action: "delete",
-          id,
-        },
-        sessionToken: getAdminSessionTokenValue() ?? undefined,
-      });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir o aluno."));
-      }
-    }
+    const snapshot = stateRef.current.students;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
 
     setState((current) => ({
       ...current,
       students: current.students.filter((item) => item.id !== id),
     }));
+
+    try {
+      await persistAdminMutation({ resource: "students", action: "delete", id }, undefined);
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          students: restoreDeletedItem(current.students, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
     toast.success("Aluno excluído.");
   }, []);
 
   const createEnrollmentAdmin = useCallback<AppStoreValue["createEnrollmentAdmin"]>(async (payload) => {
-    let persistedEnrollmentId: string | undefined;
-    if (isFunctionsConfigured) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "enrollments",
-          action: "create",
-          payload,
-        },
-        sessionToken: getAdminSessionTokenValue() ?? undefined,
-      });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível criar a inscrição."));
-      }
-
-      const result = (await response.json().catch(() => null)) as
-        | {
-            data?: {
-              id?: string;
-            };
-          }
-        | null;
-      persistedEnrollmentId = result?.data?.id;
-    }
-
+    await persistAdminMutation(
+      { resource: "enrollments", action: "create", payload },
+      undefined
+    );
     setState((current) => {
       const student = buildStudentRecord(
         {
@@ -965,7 +961,7 @@ export function AppStoreProvider({
           enrolledAt: new Date().toISOString(),
         }
       );
-      const enrollment = buildEnrollmentRecord(payload, persistedEnrollmentId);
+      const enrollment = buildEnrollmentRecord(payload);
       const nextEnrollments = [enrollment, ...current.enrollments];
 
       return {
@@ -988,20 +984,9 @@ export function AppStoreProvider({
   }, []);
 
   const deleteEnrollment = useCallback<AppStoreValue["deleteEnrollment"]>(async (id) => {
-    if (isFunctionsConfigured) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "enrollments",
-          action: "delete",
-          id,
-        },
-        sessionToken: getAdminSessionTokenValue() ?? undefined,
-      });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir a inscrição."));
-      }
-    }
+    const snapshot = stateRef.current.enrollments;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
 
     setState((current) => {
       const enrollment = current.enrollments.find((item) => item.id === id);
@@ -1023,36 +1008,54 @@ export function AppStoreProvider({
           : current.classes,
       };
     });
+
+    try {
+      await persistAdminMutation({ resource: "enrollments", action: "delete", id }, undefined);
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          enrollments: restoreDeletedItem(current.enrollments, removedItem, removedIndex),
+          classes: current.classes.map((item) => ({
+            ...item,
+            ...deriveClassCapacity(item, restoreDeletedItem(current.enrollments, removedItem, removedIndex)),
+          })),
+        }));
+      }
+      throw error;
+    }
     toast.success("Inscrição excluída.");
   }, []);
 
   const deleteLead = useCallback<AppStoreValue["deleteLead"]>(async (id) => {
-    if (isFunctionsConfigured) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "leads",
-          action: "delete",
-          id,
-        },
-        sessionToken: getAdminSessionTokenValue() ?? undefined,
-      });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível excluir o lead."));
-      }
-    }
+    const snapshot = stateRef.current.leads;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
 
     setState((current) => ({
       ...current,
       leads: current.leads.filter((item) => item.id !== id),
     }));
+
+    try {
+      await persistAdminMutation({ resource: "leads", action: "delete", id }, undefined);
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          leads: restoreDeletedItem(current.leads, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
     toast.success("Lead excluído.");
   }, []);
 
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
     const adminSessionToken = getAdminSessionTokenValue() ?? undefined;
+    const usedAdminMutation = Boolean(isFunctionsConfigured && adminSessionToken);
 
-    if (isFunctionsConfigured && adminSessionToken) {
+    if (usedAdminMutation) {
       const response = await invokeFunction("admin-resources", {
         body: {
           resource: "leads",
@@ -1068,40 +1071,20 @@ export function AppStoreProvider({
       if (!response.ok) {
         throw new Error(await getFunctionErrorMessage(response, "Não foi possível cadastrar o lead."));
       }
+    }
 
-      const persistedLeads = await fetchAdminLeads(adminSessionToken).catch(() => null);
+    if (isFunctionsConfigured && !usedAdminMutation) {
+      void invokeFunction("leads", { body: payload }).catch(() => {
+        toast.error("Serviço indisponível no momento. A solicitação não foi sincronizada.");
+      });
+    }
 
+    startTransition(() => {
       setState((current) => ({
         ...current,
-        leads: persistedLeads?.length
-          ? mergeLeads(current.leads, persistedLeads)
-          : mergeLeads(current.leads, [buildLeadRecord(payload)])
+        leads: mergeLeads(current.leads, [buildLeadRecord(payload)])
       }));
-      toast.success("Lead cadastrado.");
-      return;
-    }
-
-    if (isFunctionsConfigured) {
-      try {
-        const response = await invokeFunction("leads", { body: payload });
-
-        if (!response.ok) {
-          throw new Error(await getFunctionErrorMessage(response, "Não foi possível enviar sua mensagem."));
-        }
-      } catch (error) {
-        if (error instanceof Error && /fetch/i.test(error.message)) {
-          toast.error("Serviço indisponível no momento. A solicitação não foi sincronizada.");
-          return;
-        } else {
-          throw error;
-        }
-      }
-    }
-
-    setState((current) => ({
-      ...current,
-      leads: mergeLeads(current.leads, [buildLeadRecord(payload)])
-    }));
+    });
     toast.success(
       isFunctionsConfigured
         ? "Lead cadastrado."
@@ -1125,7 +1108,7 @@ export function AppStoreProvider({
     return persistAdminMutation({ resource: "leads", action: "upsert", payload }, "Lead atualizado.");
   }, []);
 
-  const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>((course) => {
+  const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>(async (course) => {
     const snapshot = stateRef.current;
     const trainingPaths = snapshot.trainingPaths;
     const defaultPath = trainingPaths[0];
@@ -1183,22 +1166,37 @@ export function AppStoreProvider({
           nextClassId: course.nextClassId ?? snapshot.classes[0]?.id ?? ""
         } as Course);
 
+    await persistAdminMutation(
+      { resource: "courses", action: "upsert", payload: nextCourse },
+      course.id ? "Curso editado." : "Curso criado no admin."
+    );
     setState((current) => ({
       ...current,
       courses: upsertCollection(current.courses, Boolean(exists), nextCourse)
     }));
-    return persistAdminMutation(
-      { resource: "courses", action: "upsert", payload: nextCourse },
-      course.id ? "Curso editado." : "Curso criado no admin."
-    );
   }, []);
 
-  const deleteCourse = useCallback<AppStoreValue["deleteCourse"]>((id) => {
+  const deleteCourse = useCallback<AppStoreValue["deleteCourse"]>(async (id) => {
+    const snapshot = stateRef.current.courses;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
+
     setState((current) => ({
       ...current,
       courses: current.courses.filter((item) => item.id !== id)
     }));
-    return persistAdminMutation({ resource: "courses", action: "delete", id }, "Curso excluído.");
+
+    try {
+      await persistAdminMutation({ resource: "courses", action: "delete", id }, "Curso excluído.");
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          courses: restoreDeletedItem(current.courses, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
   }, []);
 
   const duplicateCourse = useCallback<AppStoreValue["duplicateCourse"]>((id) => {
@@ -1220,7 +1218,7 @@ export function AppStoreProvider({
     toast.success("Curso duplicado.");
   }, []);
 
-  const upsertClass = useCallback<AppStoreValue["upsertClass"]>((trainingClass) => {
+  const upsertClass = useCallback<AppStoreValue["upsertClass"]>(async (trainingClass) => {
     const snapshot = stateRef.current;
     const exists = trainingClass.id && snapshot.classes.some((item) => item.id === trainingClass.id);
     const baseClass: TrainingClass = exists
@@ -1247,25 +1245,40 @@ export function AppStoreProvider({
       ...deriveClassCapacity(baseClass, snapshot.enrollments)
     };
 
+    await persistAdminMutation(
+      { resource: "classes", action: "upsert", payload: nextClass },
+      trainingClass.id ? "Turma editada." : "Turma criada."
+    );
     setState((current) => ({
       ...current,
       classes: upsertCollection(current.classes, Boolean(exists), nextClass)
     }));
-    return persistAdminMutation(
-      { resource: "classes", action: "upsert", payload: nextClass },
-      trainingClass.id ? "Turma editada." : "Turma criada."
-    );
   }, []);
 
-  const deleteClass = useCallback<AppStoreValue["deleteClass"]>((id) => {
+  const deleteClass = useCallback<AppStoreValue["deleteClass"]>(async (id) => {
+    const snapshot = stateRef.current.classes;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
+
     setState((current) => ({
       ...current,
       classes: current.classes.filter((item) => item.id !== id)
     }));
-    return persistAdminMutation({ resource: "classes", action: "delete", id }, "Turma excluída.");
+
+    try {
+      await persistAdminMutation({ resource: "classes", action: "delete", id }, "Turma excluída.");
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          classes: restoreDeletedItem(current.classes, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
   }, []);
 
-  const upsertInstructor = useCallback<AppStoreValue["upsertInstructor"]>((instructor) => {
+  const upsertInstructor = useCallback<AppStoreValue["upsertInstructor"]>(async (instructor) => {
     const snapshot = stateRef.current;
     const exists = instructor.id && snapshot.instructors.some((item) => item.id === instructor.id);
     const nextInstructor: Instructor = exists
@@ -1296,22 +1309,37 @@ export function AppStoreProvider({
           status: instructor.status ?? "Ativo"
         } as Instructor);
 
+    await persistAdminMutation(
+      { resource: "instructors", action: "upsert", payload: nextInstructor },
+      instructor.id ? "Instrutor editado." : "Instrutor criado."
+    );
     setState((current) => ({
       ...current,
       instructors: upsertCollection(current.instructors, Boolean(exists), nextInstructor)
     }));
-    return persistAdminMutation(
-      { resource: "instructors", action: "upsert", payload: nextInstructor },
-      instructor.id ? "Instrutor editado." : "Instrutor criado."
-    );
   }, []);
 
-  const deleteInstructor = useCallback<AppStoreValue["deleteInstructor"]>((id) => {
+  const deleteInstructor = useCallback<AppStoreValue["deleteInstructor"]>(async (id) => {
+    const snapshot = stateRef.current.instructors;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
+
     setState((current) => ({
       ...current,
       instructors: current.instructors.filter((item) => item.id !== id)
     }));
-    return persistAdminMutation({ resource: "instructors", action: "delete", id }, "Instrutor excluído.");
+
+    try {
+      await persistAdminMutation({ resource: "instructors", action: "delete", id }, "Instrutor excluído.");
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          instructors: restoreDeletedItem(current.instructors, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
   }, []);
 
   const updateStudent = useCallback<AppStoreValue["updateStudent"]>((student) => {
@@ -1341,7 +1369,7 @@ export function AppStoreProvider({
     );
   }, []);
 
-  const upsertBlogPost = useCallback<AppStoreValue["upsertBlogPost"]>((post) => {
+  const upsertBlogPost = useCallback<AppStoreValue["upsertBlogPost"]>(async (post) => {
     const snapshot = stateRef.current;
     const exists = post.id && snapshot.blogPosts.some((item) => item.id === post.id);
     const nextPost: BlogPost = exists
@@ -1359,25 +1387,42 @@ export function AppStoreProvider({
           readingTime: post.readingTime ?? "5 min",
           status: post.status ?? "Rascunho",
           image: post.image ?? "https://images.unsplash.com/photo-1516321318423",
-          relatedCourseId: post.relatedCourseId ?? snapshot.courses[0]?.id ?? ""
+          relatedCourseId: post.relatedCourseId ?? ""
         } as BlogPost);
 
-    setState((current) => ({
-      ...current,
-      blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
-    }));
-    return persistAdminMutation(
+    await persistAdminMutation(
       { resource: "blog", action: "upsert", payload: nextPost },
       post.id ? "Post atualizado." : "Post publicado."
     );
+    startTransition(() => {
+      setState((current) => ({
+        ...current,
+        blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
+      }));
+    });
   }, []);
 
-  const deleteBlogPost = useCallback<AppStoreValue["deleteBlogPost"]>((id) => {
+  const deleteBlogPost = useCallback<AppStoreValue["deleteBlogPost"]>(async (id) => {
+    const snapshot = stateRef.current.blogPosts;
+    const removedIndex = snapshot.findIndex((item) => item.id === id);
+    const removedItem = removedIndex >= 0 ? snapshot[removedIndex] : null;
+
     setState((current) => ({
       ...current,
       blogPosts: current.blogPosts.filter((item) => item.id !== id)
     }));
-    return persistAdminMutation({ resource: "blog", action: "delete", id }, "Post excluído.");
+
+    try {
+      await persistAdminMutation({ resource: "blog", action: "delete", id }, "Post excluído.");
+    } catch (error) {
+      if (removedItem) {
+        setState((current) => ({
+          ...current,
+          blogPosts: restoreDeletedItem(current.blogPosts, removedItem, removedIndex),
+        }));
+      }
+      throw error;
+    }
   }, []);
 
   const resetStore = useCallback<AppStoreValue["resetStore"]>(() => {

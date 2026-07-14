@@ -36,7 +36,9 @@ export type AppState = {
 export type AppStoreInitialData = Partial<Omit<AppState, "currentSession">>;
 
 export type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
-export type LeadPayload = Omit<Lead, "id" | "createdAt" | "status">;
+export type LeadPayload = Omit<Lead, "id" | "createdAt" | "status"> & {
+  status?: Lead["status"];
+};
 export type StudentPayload = Pick<Student, "name" | "email" | "organization" | "enrollmentStatus"> &
   Partial<Pick<Student, "phone" | "cpf" | "jobTitle" | "courseId" | "classId" | "paymentMethod">>;
 export type AdminEnrollmentPayload = Pick<
