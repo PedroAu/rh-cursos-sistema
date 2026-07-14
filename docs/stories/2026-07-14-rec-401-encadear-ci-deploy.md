@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready for Review
+Done
 
 ## Executor Assignment
 
@@ -137,11 +137,11 @@ REC-401 corrige exclusivamente o encadeamento CI → deploy. A etapa obrigatóri
   - [x] Encadear frontend após Functions quando ambos forem necessários.
   - [x] Tratar job de Functions omitido sem transformar falha real em sucesso.
 
-- [ ] **Task 5 — Validar e documentar evidências** (AC: 8–10)
+- [x] **Task 5 — Validar e documentar evidências** (AC: 8–10)
   - [x] Executar teste estrutural direcionado.
   - [x] Executar gates constitucionais completos.
   - [x] Atualizar File List e registrar resultado sanitizado.
-  - [ ] Solicitar veredito independente de `@qa`.
+  - [x] Solicitar veredito independente de `@qa`.
 
 ## Dev Notes
 
@@ -250,6 +250,7 @@ REC-401 corrige exclusivamente o encadeamento CI → deploy. A etapa obrigatóri
 | 2026-07-14 | 0.1 | Draft criado a partir de FND-14/NFR-06/08/09, com separação explícita de REC-402 e teste estrutural do grafo CI → deploy. | @sm (River) |
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Título/valor, rastreabilidade, escopo, dependências, dez ACs mensuráveis, tarefas, testes negativos, segurança e rollback estão completos. A separação REC-401/REC-402 impede antecipar migrations. `@qa` permanece quality gate por autoridade constitucional, apesar da tabela legada do validador. Bloqueadores documentais: 0. Implementação local autorizada; mudanças remotas continuam exclusivas de `@devops` e dependentes da REC-001. | @po (Pax) |
 | 2026-07-14 | 1.1 | Pipeline canônico implementado com CI e deploys reutilizáveis, detecção fail-closed, ordem Functions → frontend, actions fixadas em SHA e regressão automatizada. Gates locais completos verdes; story enviada para revisão de QA sem executar deploy remoto. | @devops (Gage) |
+| 2026-07-14 | 1.2 | **Story encerrada — Done.** Implementação nos commits `486a729` e `dda532c`; gate QA PASS em `docs/qa/gates/rec-401-encadear-ci-deploy.yml`, 5/5 contratos direcionados, 532/532 unitários e 174/174 Playwright. Execução remota permanece condicionada à REC-001 e não foi declarada. | @po (Pax) |
 
 ## File List
 
@@ -258,6 +259,7 @@ REC-401 corrige exclusivamente o encadeamento CI → deploy. A etapa obrigatóri
 - `docs/stories/2026-07-14-rec-401-encadear-ci-deploy.md`
 - `.github/workflows/production-pipeline.yml`
 - `src/__tests__/ci/production-workflow.test.ts`
+- `docs/qa/gates/rec-401-encadear-ci-deploy.yml`
 
 ### Modificado
 
