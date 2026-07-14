@@ -103,7 +103,7 @@ type AnyPayload = Record<string, any>;
 export function courseToUpsert(p: AnyPayload): AnyPayload {
   const modalities = normalizeCourseModalities(p);
 
-  return {
+  const payload: AnyPayload = {
     id: p.id,
     titulo: p.title ?? "Novo curso",
     slug: p.slug ?? slugify(p.title ?? "novo-curso"),
@@ -125,8 +125,15 @@ export function courseToUpsert(p: AnyPayload): AnyPayload {
     destaque: p.featured ?? false,
     imagem_capa: p.image,
     rating: p.rating ?? 0,
-    total_alunos: p.studentsCount ?? 0,
   };
+
+  // total_alunos is maintained by enrollment triggers. Omitting it from ordinary
+  // admin saves prevents a stale form payload from overwriting the aggregate.
+  if (typeof p.studentsCount === "number") {
+    payload.total_alunos = p.studentsCount;
+  }
+
+  return payload;
 }
 
 export function classToUpsert(p: AnyPayload): AnyPayload {

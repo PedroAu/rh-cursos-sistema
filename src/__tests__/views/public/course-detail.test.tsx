@@ -179,6 +179,14 @@ describe("CourseDetailPage", () => {
     expect(mocks.navigate).toHaveBeenCalledWith("/cursos/curso-teste/checkout?classId=class-1");
   });
 
+  it("exibe o contador persistido de alunos como prova social", () => {
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getByText("120 alunos")).toBeInTheDocument();
+  });
+
   it("mostra CTA de interesse quando não há turma aberta", async () => {
     mockStore.classes = [];
     mocks.params = new URLSearchParams("");

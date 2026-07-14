@@ -28,4 +28,27 @@ describe("courseToUpsert", () => {
     expect(payload.modalidade).toBe("Hibrido");
     expect(payload.modalidades).toEqual(["Hibrido"]);
   });
+
+  it("omits the enrollment-managed student counter from ordinary admin saves", () => {
+    const payload = courseToUpsert({
+      title: "Curso existente",
+      pathId: "path-dp",
+      level: "Básico",
+      status: "Ativo",
+    });
+
+    expect(payload).not.toHaveProperty("total_alunos");
+  });
+
+  it("maps the student counter only when an explicit trusted caller supplies it", () => {
+    const payload = courseToUpsert({
+      title: "Curso importado",
+      pathId: "path-dp",
+      level: "Básico",
+      status: "Ativo",
+      studentsCount: 42,
+    });
+
+    expect(payload.total_alunos).toBe(42);
+  });
 });
