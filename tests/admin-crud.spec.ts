@@ -1,7 +1,11 @@
 import { loadEnvFile } from "node:process";
 import { createHmac, randomUUID } from "node:crypto";
 import { expect, test, type Locator, type Page } from "@playwright/test";
-import { hasRealIntegrationEnv, resolveAvailableCheckoutTarget } from "./helpers/integration-env";
+import {
+  hasRealIntegrationEnv,
+  resolveAvailableCheckoutTarget,
+  resolveAvailableTrainingPath,
+} from "./helpers/integration-env";
 
 // O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET/SUPABASE_*
 // reais via .env.local, mas este processo Node/Playwright não por padrão.
@@ -99,8 +103,29 @@ async function fillText(dialog: Locator, label: string, value: string) {
   await dialog.getByLabel(label).fill(value);
 }
 
+async function waitForSelectOptions(dialog: Locator, label: string, minimumCount: number) {
+  const select = dialog.getByLabel(label);
+  await expect
+    .poll(async () => {
+      return select.locator("option").count();
+    })
+    .toBeGreaterThan(minimumCount);
+  return select;
+}
+
+async function fillSelectByValue(dialog: Locator, label: string, value: string) {
+  const select = await waitForSelectOptions(dialog, label, 1);
+  await expect
+    .poll(async () => {
+      return select.locator(`option[value="${value}"]`).count();
+    })
+    .toBeGreaterThan(0);
+  await select.selectOption(value);
+}
+
 async function fillSelectByIndex(dialog: Locator, label: string, index = 1) {
-  await dialog.getByLabel(label).selectOption({ index });
+  const select = await waitForSelectOptions(dialog, label, index);
+  await select.selectOption({ index });
 }
 
 async function forceSelectValue(dialog: Locator, label: string, value: string) {
@@ -128,11 +153,43 @@ async function openCreateDialog(page: Page) {
   return dialog;
 }
 
+async function openEditDialogForRow(page: Page, name: string) {
+  await pageSearchField(page).fill(name);
+  const row = page.getByRole("row", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
+  await expect(row).toBeVisible();
+  await row.getByRole("button", { name: /^Editar item/ }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog.getByRole("heading", { name: "Editar registro" })).toBeVisible();
+  return dialog;
+}
+
 async function saveAndExpectSuccess(page: Page, dialog: Locator) {
   await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
   // Sucesso real = o dialog fecha (onSave só chama setOpen(false) se a
   // validação passou E a escrita no Supabase não lançou exceção).
   await expect(dialog).toBeHidden({ timeout: 15_000 });
+}
+
+async function addArrayItem(dialog: Locator, label: string, value: string) {
+  const field = dialog.getByText(label, { exact: true }).locator("..");
+  const input = field.locator("input").last();
+  await input.fill(value);
+  await input.press("Enter");
+}
+
+async function readArraySuggestions(dialog: Locator, label: string) {
+  const field = dialog.getByText(label, { exact: true }).locator("..");
+  const input = field.locator("input").last();
+
+  return input.evaluate((element) => {
+    const listId = element.getAttribute("list");
+    if (!listId) return [];
+    const datalist = document.getElementById(listId);
+    if (!(datalist instanceof HTMLDataListElement)) return [];
+    return Array.from(datalist.options)
+      .map((option) => option.value.trim())
+      .filter(Boolean);
+  });
 }
 
 // A página tem 2 campos de busca: o global do topbar admin ("Buscar no
@@ -177,6 +234,78 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     );
 
     await saveAndExpectSuccess(page, dialog);
+    await deleteRowByName(page, title);
+  });
+
+  test("cursos: salva categoria sugerida + nova categoria livre e persiste na edição", async ({ page }) => {
+    const title = `${MARKER} curso categorias`;
+    const newCategory = `${MARKER} Categoria Nova`;
+    const trainingPath = await resolveAvailableTrainingPath();
+    await page.goto("/admin/cursos");
+
+    const dialog = await openCreateDialog(page);
+    await fillText(dialog, "Nome do curso", title);
+    await forceSelectValue(dialog, "Trilha", trainingPath.id);
+    await dialog.getByRole("checkbox").first().check();
+    await fillSelectByIndex(dialog, "Nível");
+    await fillSelectByIndex(dialog, "Status");
+    await fillSelectByIndex(dialog, "Curso destaque");
+    await fillText(dialog, "Carga horária", "8h");
+    await fillText(dialog, "Preço (R$)", "990");
+    await fillText(dialog, "Descrição curta", "Curso de teste validando categorias sugeridas e novas.");
+    await fillText(
+      dialog,
+      "Descrição completa",
+      "Curso de teste E2E para validar que o formulário aceita categorias sugeridas do banco e uma nova categoria livre."
+    );
+
+    const suggestions = await readArraySuggestions(dialog, "Categorias");
+    expect(suggestions.length).toBeGreaterThan(0);
+    await addArrayItem(dialog, "Categorias", suggestions[0]!);
+    await addArrayItem(dialog, "Categorias", newCategory);
+
+    await saveAndExpectSuccess(page, dialog);
+
+    const editDialog = await openEditDialogForRow(page, title);
+    await expect(editDialog.locator("input").filter({ hasDisplayValue: suggestions[0]! })).toHaveCount(1);
+    await expect(editDialog.locator("input").filter({ hasDisplayValue: newCategory })).toHaveCount(1);
+    await saveAndExpectSuccess(page, editDialog);
+
+    await deleteRowByName(page, title);
+  });
+
+  test("cursos: salva status Rascunho sem vazar no catálogo público", async ({ page }) => {
+    const title = `${MARKER} curso rascunho`;
+    const trainingPath = await resolveAvailableTrainingPath();
+    await page.goto("/admin/cursos");
+
+    const dialog = await openCreateDialog(page);
+    await fillText(dialog, "Nome do curso", title);
+    await forceSelectValue(dialog, "Trilha", trainingPath.id);
+    await dialog.getByRole("checkbox").first().check();
+    await fillSelectByIndex(dialog, "Nível");
+    await fillSelectByValue(dialog, "Status", "Rascunho");
+    await fillSelectByIndex(dialog, "Curso destaque");
+    await fillText(dialog, "Carga horária", "8h");
+    await fillText(dialog, "Preço (R$)", "990");
+    await fillText(dialog, "Descrição curta", "Curso rascunho criado pelo teste E2E.");
+    await fillText(
+      dialog,
+      "Descrição completa",
+      "Curso rascunho criado pelo teste E2E para validar o path da Edge Function e o não vazamento no catálogo público."
+    );
+
+    await saveAndExpectSuccess(page, dialog);
+
+    const editDialog = await openEditDialogForRow(page, title);
+    await expect(editDialog.getByLabel("Status")).toHaveValue("Rascunho");
+    await page.keyboard.press("Escape");
+    await expect(editDialog).toBeHidden();
+
+    await page.goto("/cursos");
+    await expect(page.getByText(title)).toHaveCount(0);
+
+    await page.goto("/admin/cursos");
     await deleteRowByName(page, title);
   });
 

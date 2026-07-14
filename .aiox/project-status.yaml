@@ -2,28 +2,18 @@ status:
   branch: fix/remove-demo-seed-data
   modifiedFiles:
     - .aiox/project-status.yaml
-    - app/cursos/[slug]/checkout/page.tsx
-    - app/cursos/[slug]/page.tsx
-    - src/__tests__/lib/query-logging-middleware.test.ts
-    - src/features/admin/dashboard/model/dashboard-overview.ts
-    - src/lib/admin-resource-configs.tsx
-    - src/lib/supabase/query-logging-middleware.ts
-    - src/lib/supabase/rh-cursos-api.ts
-    - supabase/migrations/20260713120000_remove_demo_seed_data.sql
-    - tests/agenda-runtime.spec.ts
-    - tests/epic14-mantine-removal.smoke.spec.ts
-    - tests/epic15-admin-dashboard-fidelity.spec.ts
-    - tsconfig.json
-  modifiedFilesTotalCount: 13
+    - docs/stories/2026-07-13-adr015-fase2-categorias-dinamicas.md
+    - tests/admin-crud.spec.ts
+    - tests/baseline/agenda-baseline-desktop.png
+    - tests/baseline/agenda-baseline-mobile.png
+  modifiedFilesTotalCount: 23
   recentCommits:
-    - >-
-      fix(dashboard): corrigir ocupacao media e memoizar catalogo publico [Story
-      16.1]
-    - 'fix(db): corrigir CHECK de curso.modalidades vazio via cardinality()'
+    - 'chore(pr8): address remaining quick wins and docs'
+    - 'fix: stabilize ci public baseline and db tests'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-14T01:36:29.752Z'
+  lastUpdate: '2026-07-14T02:27:02.340Z'
   isGitRepo: true
-timestamp: 1783992989758
+timestamp: 1783996022342
 ttl: 60
-gitFingerprint: 1783992989758.0000:1783992989758.0000
+gitFingerprint: 1783992707341.5867:1783995259489.3374

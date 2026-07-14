@@ -39,6 +39,11 @@ export type CheckoutTarget = {
   time: string;
 };
 
+export type TrainingPathTarget = {
+  id: string;
+  name: string;
+};
+
 function isPlaceholderValue(value: string) {
   return (
     !value ||
@@ -304,6 +309,23 @@ export async function resolveAvailableCheckoutTargets(limit = 10): Promise<Check
 export async function resolveAvailableCheckoutTarget() {
   const [target] = await resolveAvailableCheckoutTargets(1);
   return target;
+}
+
+export async function resolveAvailableTrainingPath(): Promise<TrainingPathTarget> {
+  const supabase = createServiceRoleClient();
+  const { data, error } = await supabase
+    .from("trilha")
+    .select("id,nome")
+    .order("nome", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+  if (!data?.id || !data.nome) {
+    throw new Error("Nenhuma trilha disponível foi encontrada no ambiente de integração.");
+  }
+
+  return { id: data.id, name: data.nome };
 }
 
 export async function resolveUsableCheckoutTarget(page: Page, limit = 10) {

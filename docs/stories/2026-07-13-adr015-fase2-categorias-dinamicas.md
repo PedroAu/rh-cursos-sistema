@@ -126,3 +126,38 @@ Nenhum log de decisão gerado em arquivo separado (`decision-log-{story-id}.md`)
 
 ## QA Results
 _A preencher pelo @qa_
+
+### Revisão por Quinn (@qa) — 2026-07-13
+
+**Verdict: CONCERNS** (implementação correta; pendência residual apenas no smoke E2E do fluxo real de save)
+
+#### Gates de qualidade executados
+| Gate | Resultado |
+|---|---|
+| `npm run lint` | ✅ PASS |
+| `npm run typecheck` | ✅ PASS |
+| `npm run test:unit` | ✅ PASS (464/464, 39 arquivos) |
+| `npm run build` | ✅ PASS |
+| `npm run test:e2e:smoke` | ⚠️ NÃO EXECUTADO |
+
+#### Rastreabilidade das Acceptance Criteria
+| AC | Status | Evidência |
+|---|---|---|
+| AC1 — consulta de categorias distintas | ✅ | `fetchCourseCategories` em `src/lib/supabase/rh-cursos-api.ts` consulta `curso.categoria`, exclui `null`, ordena e deduplica no client; validação via `courseCategoryListSchema` |
+| AC2 — exposição no app-store | ✅ | `courseCategories` adicionado ao estado/contexto e integrado ao bootstrap em `src/lib/app-store.tsx`, `src/lib/contexts/store-types.ts` e `src/lib/contexts/course-context.tsx` |
+| AC3 — sugestões no formulário | ✅ | `admin-resource-configs.tsx` passa `suggestions: store.courseCategories` para o campo `categories` |
+| AC4 — campo continua array | ✅ | o campo permanece `type: "array"`; nenhuma mudança de cardinalidade no `onSave` |
+| AC5 — criação livre sem schema change | ✅ | `ArrayInputLite` usa `<datalist>` opcional em `src/views/admin/AdminResourcePage.tsx`, mas continua aceitando valores fora da lista |
+| AC6 — cobertura unitária | ✅ | `src/__tests__/lib/rh-cursos-api.test.ts` cobre dedup/ordenação/erro; `src/__tests__/lib/app-store.test.ts` cobre bootstrap/fallback de `courseCategories` |
+| AC7 — sem regressão no path de escrita | ✅ | `onSave` de cursos preserva `category: categories[0]` e `categories` exatamente como antes; mudança ficou restrita à origem das sugestões |
+
+#### Concern residual
+1. **[BAIXA — testes]** `test:e2e:smoke` não foi executado neste gate, então o fluxo real de salvar um curso com categoria sugerida vs. nova categoria digitada livremente ainda não foi validado ponta a ponta no browser. A mudança é pequena e localizada na UI, mas o smoke continua recomendado antes de promover a story para `Done`.
+
+#### Observação
+- O filtro `deleted_at is null` não aparece explicitamente em `fetchCourseCategories`; nesta base ele é aplicado pela mesma RLS usada pelas demais queries públicas de `curso`. O comportamento está consistente com o catálogo atual e não configura desvio funcional nesta story.
+
+#### Conclusão
+Implementação atende aos ACs funcionais da ADR015-F2 e está alinhada ao padrão do projeto. O gate fica em **CONCERNS** exclusivamente pela ausência do `test:e2e:smoke`; fora isso, a story está pronta para seguir após esse smoke ou após aceitação explícita desse risco residual.
+
+— Quinn, guardião da qualidade 🛡️
