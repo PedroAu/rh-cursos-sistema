@@ -83,6 +83,48 @@ describe("REC-401 production delivery graph", () => {
     expect(production).not.toContain("continue-on-error");
   });
 
+  it("passes only the secrets declared by each reusable workflow", () => {
+    const ciJob = readNestedBlock(production, "ci", 2);
+    const functionsJob = readNestedBlock(production, "deploy-functions", 2);
+    const frontendJob = readNestedBlock(production, "deploy-frontend", 2);
+
+    expect(production).not.toContain("secrets: inherit");
+
+    for (const secret of [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      "NEXT_PUBLIC_APP_URL",
+      "AUTH_SESSION_SECRET",
+    ]) {
+      expect(ciJob).toContain(`${secret}: \${{ secrets.${secret} }}`);
+    }
+    expect(ciJob).not.toContain("SUPABASE_ACCESS_TOKEN");
+    expect(ciJob).not.toContain("CLOUDFLARE_API_TOKEN");
+
+    for (const secret of [
+      "SUPABASE_ACCESS_TOKEN",
+      "SUPABASE_PROJECT_REF",
+      "AUTH_SESSION_SECRET",
+      "NEXT_PUBLIC_APP_URL",
+      "EXTRA_ALLOWED_ORIGINS",
+    ]) {
+      expect(functionsJob).toContain(`${secret}: \${{ secrets.${secret} }}`);
+    }
+    expect(functionsJob).not.toContain("CLOUDFLARE_API_TOKEN");
+
+    for (const secret of [
+      "CLOUDFLARE_API_TOKEN",
+      "CLOUDFLARE_ACCOUNT_ID",
+      "AUTH_SESSION_SECRET",
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+      "NEXT_PUBLIC_APP_URL",
+    ]) {
+      expect(frontendJob).toContain(`${secret}: \${{ secrets.${secret} }}`);
+    }
+    expect(frontendJob).not.toContain("SUPABASE_ACCESS_TOKEN");
+  });
+
   it("keeps path decisions fail-closed and makes manual dispatch explicit", () => {
     expect(production).toContain("EVENT_NAME: ${{ github.event_name }}");
     expect(production).toContain('"$EVENT_NAME" == "workflow_dispatch"');

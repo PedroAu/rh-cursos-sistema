@@ -291,4 +291,79 @@ GPT-5 Codex — persona `@devops` (Gage).
 
 ## QA Results
 
-_A preencher por `@qa`._
+### Review Date: 2026-07-14
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+O grafo implementa uma única entrada produtiva, impede deploy quando o CI falha,
+preserva a detecção fail-closed e ordena Functions antes do frontend. A revisão
+encontrou um compartilhamento excessivo de credenciais por `secrets: inherit`;
+o delta QA substituiu a herança por mapas explícitos e adicionou uma regressão
+que impede a reintrodução desse bypass de menor privilégio.
+
+### Refactoring Performed
+
+- **File**: `.github/workflows/production-pipeline.yml`
+  - **Change**: substituição dos três usos de `secrets: inherit` pelos secrets estritamente necessários a CI, Functions e frontend.
+  - **Why**: impedir que credenciais de deploy sejam disponibilizadas a workflows que não as consomem.
+  - **How**: cada chamada reutilizável recebe somente os identificadores declarados no respectivo `workflow_call`.
+- **File**: `src/__tests__/ci/production-workflow.test.ts`
+  - **Change**: novo cenário estrutural para rejeitar herança ampla e validar os mapas de secrets por job.
+  - **Why**: tornar o requisito de menor privilégio verificável e resistente a regressão.
+  - **How**: o teste falhou contra o commit original e passou após a correção, elevando o contrato direcionado para 5/5 cenários.
+
+### Requirements Traceability
+
+- **AC 1–4**: teste estrutural comprova entrada canônica, `workflow_call`, bloqueio por CI e ausência de execução duplicada em `main`.
+- **AC 5**: detecção de paths conserva escopos e assume ambos os deploys quando a base é desconhecida; despacho manual publica ambos explicitamente.
+- **AC 6–7**: `deploy-frontend` depende de `deploy-functions` e aceita somente `success` ou `skipped`, nunca `failure`.
+- **AC 8**: actions externas estão fixadas em SHA, permissões são de leitura e secrets são mapeados individualmente.
+- **AC 9**: 5/5 cenários direcionados cobrem gatilhos, grafo, paths, ordem e menor privilégio.
+- **AC 10**: lint, typecheck, 532/532 unitários, build e 174/174 Playwright passaram; nenhum deploy remoto foi alegado ou executado.
+
+### Compliance Check
+
+- Coding Standards: ✓ YAML e TypeScript legíveis, determinísticos e sem valor sensível.
+- Project Structure: ✓ workflows e regressão permanecem nos diretórios canônicos.
+- Testing Strategy: ✓ falha test-first reproduzida; regressão direcionada, suíte unitária e E2E verdes.
+- All ACs Met: ✓ implementação local atende AC 1–10; prova operacional remota continua condicionada à REC-001.
+
+### Improvements Checklist
+
+- [x] Remover herança ampla de secrets do pipeline canônico.
+- [x] Adicionar regressão de menor privilégio por workflow reutilizável.
+- [x] Validar sintaxe dos quatro YAMLs com parser.
+- [x] Executar CodeRabbit no delta `.github` sem findings.
+- [x] Reexecutar lint, typecheck, unitários e build após o refactor.
+
+### Security Review
+
+PASS. Não há secret hardcoded, os tokens não são enviados ao CI por herança e
+cada deploy recebe apenas seu conjunto declarado. A sintaxe de secrets nomeados
+e o uso de `needs`/`if` estão de acordo com a documentação oficial do GitHub
+Actions. A execução remota permanece suspensa até autorização operacional.
+
+### Performance Considerations
+
+Sem regressão de runtime da aplicação. O pipeline evita CI duplicado em `main` e
+omite deploys quando o diff não toca escopos produtivos.
+
+### Files Modified During Review
+
+- `.github/workflows/production-pipeline.yml`
+- `src/__tests__/ci/production-workflow.test.ts`
+- `docs/qa/gates/rec-401-encadear-ci-deploy.yml`
+
+Os dois primeiros arquivos já constam na File List da story; o gate é artefato
+de QA e deve acompanhar o próximo commit atômico.
+
+### Gate Status
+
+Gate: PASS → docs/qa/gates/rec-401-encadear-ci-deploy.yml
+
+### Recommended Status
+
+✓ Ready for Done após commit do delta QA. Este veredito aprova o contrato local;
+não substitui a prova remota sanitizada exigida antes de reabrir deploy produtivo.

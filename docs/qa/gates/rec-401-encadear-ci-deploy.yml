@@ -1,0 +1,71 @@
+schema: 1
+story: REC-401
+gate: PASS
+status_reason: >-
+  Os 10 critérios de aceite estão rastreados e o desvio de menor privilégio
+  encontrado na revisão foi corrigido com teste de regressão. Lint, typecheck,
+  532/532 testes unitários, build e 174/174 cenários Playwright passaram sem
+  finding bloqueante; nenhum deploy remoto foi alegado.
+reviewer: Quinn
+updated: '2026-07-14T22:24:42Z'
+top_issues: []
+waiver:
+  active: false
+quality_score: 100
+evidence:
+  tests_reviewed: 5
+  risks_identified: 1
+  risks_resolved: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
+  quality_gates:
+    workflow_contract: 5/5 PASS
+    workflow_yaml_parse: 4/4 PASS
+    lint: PASS
+    typecheck: PASS
+    unit: 532/532 PASS
+    build: PASS
+    playwright_aggregate: 174/174 PASS
+  test_first:
+    result: PASS
+    notes: >-
+      O cenário de menor privilégio falhou contra `secrets: inherit` e passou
+      após a substituição por mapas explícitos por workflow reutilizável.
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Secrets nomeados substituem herança ampla; actions externas estão fixadas
+      em SHA e o token padrão permanece limitado a contents: read.
+  performance:
+    status: PASS
+    notes: >-
+      O CI autônomo de main foi removido e deploys fora dos escopos produtivos
+      permanecem omitidos.
+  reliability:
+    status: PASS
+    notes: >-
+      CI falho bloqueia ambos os deploys; Functions falha bloqueia frontend e
+      base de diff desconhecida assume publicação fail-closed.
+  maintainability:
+    status: PASS
+    notes: >-
+      O grafo, os gatilhos, os secrets e a ordem de execução possuem regressão
+      estrutural versionada.
+automated_review:
+  tool: CodeRabbit
+  scope: uncommitted .github QA delta
+  result: No findings
+remote_execution:
+  status: NOT_RUN
+  reason: >-
+    Deploy, branch protection e prova remota dependem da autorização operacional
+    da REC-001; este gate não declara execução produtiva.
+recommendations:
+  immediate: []
+  future:
+    - action: Executar prova remota sanitizada antes de reabrir deploy produtivo.
+      refs:
+        - docs/stories/2026-07-14-rec-401-encadear-ci-deploy.md
+        - docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md
