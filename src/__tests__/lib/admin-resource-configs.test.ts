@@ -49,6 +49,26 @@ function expectFieldTypes(
   }
 }
 
+function expectFieldRequired(
+  config: { fields: Array<{ key: string; required?: boolean }> },
+  expectedRequired: Record<string, boolean>
+) {
+  for (const [key, required] of Object.entries(expectedRequired)) {
+    expect(config.fields.find((field) => field.key === key)?.required).toBe(required);
+  }
+}
+
+function expectFieldText(
+  config: { fields: Array<{ key: string; placeholder?: string; hint?: string }> },
+  expected: Record<string, { placeholder?: string; hint?: string }>
+) {
+  for (const [key, value] of Object.entries(expected)) {
+    const field = config.fields.find((item) => item.key === key);
+    expect(field?.placeholder).toBe(value.placeholder);
+    expect(field?.hint).toBe(value.hint);
+  }
+}
+
 test("AdminResourcePage configs cover all 7 resource field contracts", () => {
   const store = createAdminStoreFixture();
   const deps = createDeps();
@@ -111,6 +131,78 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     objectives: "array",
     benefits: "array",
     modules: "modules",
+  });
+  expectFieldRequired(configs.courses, {
+    title: true,
+    pathId: true,
+    modalities: true,
+    level: true,
+    status: true,
+    featured: false,
+    durationLabel: true,
+    price: true,
+    image: false,
+    targetAudience: false,
+    categories: false,
+    featuredCourseIds: false,
+    shortDescription: true,
+    fullDescription: true,
+    objectives: false,
+    benefits: false,
+    modules: false,
+  });
+  expectFieldText(configs.courses, {
+    title: { placeholder: "Ex.: Gestão de contratos administrativos" },
+    pathId: { hint: "Define a trilha pública e a classificação do catálogo." },
+    modalities: {
+      hint: "Selecione todas as modalidades em que o curso pode ser ofertado.",
+    },
+    level: {
+      hint: "Use o nível que melhor representa a profundidade do conteúdo.",
+    },
+    status: {
+      hint: "Ativo, Destaque e Em breve publicam no catálogo; Rascunho e Arquivado ficam ocultos.",
+    },
+    featured: {
+      hint: "Deixe como Não no cadastro inicial, a menos que o curso vá entrar em destaque.",
+    },
+    durationLabel: { placeholder: "Ex.: 16h" },
+    price: {
+      placeholder: "1290",
+      hint: "Informe o valor total em reais, sem símbolo de moeda.",
+    },
+    image: {
+      placeholder: "/images/courses/gestao-contratos.jpg",
+      hint: "Use uma URL pública ou um caminho do projeto para a capa do curso.",
+    },
+    targetAudience: {
+      placeholder: "Ex.: Gestores públicos",
+      hint: "Adicione um público por item, separando perfis relevantes do curso.",
+    },
+    categories: {
+      placeholder: "Ex.: Licitações e Contratos",
+      hint: "Use categorias que ajudem a encontrar o curso no catálogo.",
+    },
+    featuredCourseIds: {
+      hint: "Vincule cursos que complementam esta oferta.",
+    },
+    shortDescription: {
+      placeholder: "Ex.: Curso prático para equipes que precisam revisar contratos com segurança.",
+    },
+    fullDescription: {
+      placeholder: "Explique o problema atendido, o que será coberto e o resultado esperado.",
+    },
+    objectives: {
+      placeholder: "Ex.: Reduzir falhas em processos de contratação",
+      hint: "Inclua objetivos observáveis e práticos.",
+    },
+    benefits: {
+      placeholder: "Ex.: Material de apoio",
+      hint: "Liste os ganhos concretos que o participante terá.",
+    },
+    modules: {
+      hint: "Cada módulo precisa de título, descrição, duração e tópicos.",
+    },
   });
 
   expectFieldKeys(configs.classes, [
