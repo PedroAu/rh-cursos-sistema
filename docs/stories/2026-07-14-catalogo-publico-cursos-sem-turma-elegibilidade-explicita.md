@@ -82,10 +82,13 @@ supabase/migrations/20260710000000_course_public_content.sql
 | 2026-07-14 | 0.1 | Story criada no refinamento @sm para desdobrar do draft anterior o problema específico de publicação pública do catálogo, com regra objetiva de elegibilidade e feedback operacional explícito no admin. | @sm (River) |
 | 2026-07-14 | 0.2 | Smoke E2E adicionado em `tests/public-journeys.spec.ts` para validar curso elegível sem turma no catálogo e ausência na agenda; cenário validado com `npx playwright test tests/public-journeys.spec.ts -g "catalogo publica curso elegivel sem turma" --project=functional --reporter=line`. | @dev (Dex) |
 | 2026-07-14 | 0.3 | Regressão unitária do catálogo PASS, smoke real isolado 1/1 PASS, typecheck e lint PASS. A montagem dos cards agora parte dos cursos elegíveis e usa a turma aberta mais próxima apenas quando disponível. | @dev (Dex) |
+| 2026-07-14 | 0.4 | Detail público ajustado para exibir estado `Sem turma aberta`, FAQ coerente e CTA acionável de manifestação de interesse quando não existe turma disponível. | @dev (Dex) |
 
 ## File List
 
 - `src/views/public/Courses.tsx`
 - `src/__tests__/views/public/courses.test.tsx`
+- `src/views/public/CourseDetail.tsx`
+- `src/__tests__/views/public/course-detail.test.tsx`
 - `tests/public-journeys.spec.ts`
 - `docs/stories/2026-07-14-catalogo-publico-cursos-sem-turma-elegibilidade-explicita.md`

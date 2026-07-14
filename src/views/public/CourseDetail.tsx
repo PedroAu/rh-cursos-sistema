@@ -103,7 +103,7 @@ function getSpotMeta(trainingClass: TrainingClass) {
 
 function getUrgencyLabel(trainingClass?: TrainingClass) {
   if (!trainingClass) {
-    return null;
+    return "Sem turma aberta";
   }
 
   if (trainingClass.status === "Poucas vagas") {
@@ -190,7 +190,9 @@ function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: 
   return [
     {
       question: "Como faço minha inscrição?",
-      answer: `Clique em "Inscrever-se agora", selecione a turma e conclua o checkout guiado. O curso "${course.title}" usa o fluxo atual do app sem perder o contexto da turma escolhida.`
+      answer: selectedClass
+        ? `Clique em "Inscrever-se agora", selecione a turma e conclua o checkout guiado. O curso "${course.title}" usa o fluxo atual do app sem perder o contexto da turma escolhida.`
+        : `Este curso ainda não tem turma aberta. Clique em "Manifestar interesse" para falar com a equipe e receber a próxima agenda.`
     },
     {
       question: "Recebo certificado?",
@@ -352,6 +354,8 @@ export function CourseDetailPage() {
     secondaryLabel: courseContent?.corporateCta?.secondaryLabel ?? "Solicitar proposta",
     secondaryHref: courseContent?.corporateCta?.secondaryHref ?? "/in-company#quote-form"
   };
+  const primaryCtaLabel = selectedClass ? "Garantir minha vaga →" : "Manifestar interesse →";
+  const primaryCtaHref = selectedClass ? startCheckoutHref : "/falar-com-especialista";
 
   return (
     <>
@@ -728,15 +732,22 @@ export function CourseDetailPage() {
                       </div>
                     ) : null}
 
-                    <Button
-                      size="lg"
-                      className="mt-5 w-full bg-tk-brand text-white hover:bg-tk-brand-hover hover:text-white"
-                      onClick={startCheckout}
-                      aria-label="Inscrever-se agora"
-                      disabled={!courseClasses.length}
-                    >
-                      Garantir minha vaga →
-                    </Button>
+                    {selectedClass ? (
+                      <Button
+                        size="lg"
+                        className="mt-5 w-full bg-tk-brand text-white hover:bg-tk-brand-hover hover:text-white"
+                        onClick={startCheckout}
+                        aria-label="Inscrever-se agora"
+                      >
+                        {primaryCtaLabel}
+                      </Button>
+                    ) : (
+                      <Button asChild size="lg" className="mt-5 w-full bg-tk-brand text-white hover:bg-tk-brand-hover hover:text-white">
+                        <Link to={primaryCtaHref} aria-label="Manifestar interesse">
+                          {primaryCtaLabel}
+                        </Link>
+                      </Button>
+                    )}
 
                     <div className="mt-3 flex justify-center">
                       <button
