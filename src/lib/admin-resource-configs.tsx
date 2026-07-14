@@ -931,6 +931,7 @@ export function buildResourceConfig(
                 mainChallenges: optStr(form.mainChallenges),
                 message: optStr(form.message) || "Lead criado manualmente no admin.",
               });
+              toast.success("Lead cadastrado.");
             }
             setOpen(false);
             setValidationErrors([]);

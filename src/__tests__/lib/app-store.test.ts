@@ -377,6 +377,7 @@ describe("AppStoreProvider and hooks", () => {
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     vi.useRealTimers();
     window.localStorage.clear();
   });
@@ -554,7 +555,8 @@ describe("AppStoreProvider and hooks", () => {
       status: "Novo",
       createdAt: "2026-06-22T12:00:00.000Z",
     });
-    expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead registrado apenas nesta sessão de desenvolvimento.");
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
   });
 
   it("creates admin students with the canonical id returned by admin-resources", async () => {
@@ -605,7 +607,7 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.toastError).not.toHaveBeenCalled();
   });
 
-  it("creates admin leads optimistically while syncing through admin-resources", async () => {
+  it("creates admin leads with the canonical identity returned by admin-resources", async () => {
     mocks.functionsConfigured = true;
     mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
@@ -649,34 +651,272 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.invokeFunction).toHaveBeenCalledTimes(1);
     expect(harness.store.leads[0]).toMatchObject({
       ...payload,
-      id: "lead-1782129600000",
-      createdAt: "2026-06-22T12:00:00.000Z",
+      id: "lead-db-1",
+      createdAt: "2026-06-22T12:30:00.000Z",
       status: "Novo",
     });
-    expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead cadastrado.");
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
   });
 
-  it("does not report success when the public lead sync responds with a server error", async () => {
+  it("uses the canonical admin lead id in subsequent status and delete mutations", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            ok: true,
+            data: {
+              id: "lead-db-follow-up",
+              created_at: "2026-06-22T12:30:00.000Z",
+              status_crm: "Novo",
+            },
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } }
+        )
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+
+    await act(async () => {
+      await harness.store.createLead(payload);
+    });
+    await act(async () => {
+      await harness.store.updateLeadStatus("lead-db-follow-up", "Em atendimento");
+    });
+    await act(async () => {
+      await harness.store.deleteLead("lead-db-follow-up");
+    });
+
+    expect(mocks.invokeFunction).toHaveBeenNthCalledWith(2, "admin-resources", {
+      body: {
+        resource: "leads",
+        action: "update-status",
+        id: "lead-db-follow-up",
+        status: "Em atendimento",
+      },
+      sessionToken: "payload.signature",
+    });
+    expect(mocks.invokeFunction).toHaveBeenNthCalledWith(3, "admin-resources", {
+      body: { resource: "leads", action: "delete", id: "lead-db-follow-up" },
+      sessionToken: "payload.signature",
+      keepalive: true,
+    });
+  });
+
+  it.each([
+    ["missing canonical identity", { ok: true, data: { status_crm: "Novo" } }],
+    [
+      "ok false despite canonical-looking data",
+      {
+        ok: false,
+        data: {
+          id: "lead-must-not-be-accepted",
+          created_at: "2026-06-22T12:30:00.000Z",
+          status_crm: "Novo",
+        },
+      },
+    ],
+  ])("rejects an invalid admin success envelope (%s) without mutating lead state", async (_case, body) => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const initialLeadCount = harness.store.leads.length;
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify(body), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      await expect(harness.store.createLead(buildLeadPayload(harness.store))).rejects.toThrow(
+        "Resposta inválida ao cadastrar o lead."
+      );
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it("rejects admin lead network failures without mutating state or emitting toast", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    await act(async () => {
+      await expect(harness.store.createLead(payload)).rejects.toThrow(
+        "Serviço indisponível no momento. A solicitação não foi enviada."
+      );
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it("rejects non-2xx admin lead responses with the safe server message", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore({
+      role: "admin",
+      email: "admin@example.com",
+      name: "Admin",
+    });
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify({ error: "Sessão administrativa inválida." }), {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      await expect(harness.store.createLead(payload)).rejects.toThrow(
+        "Sessão administrativa inválida."
+      );
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it.each([400, 403, 409, 429, 500])(
+    "rejects public lead sync failures with status %s without mutating state or emitting toast",
+    async (status) => {
+      mocks.functionsConfigured = true;
+      mocks.getSessionToken.mockReturnValue(null);
+      const harness = renderStore();
+      const initialLeadCount = harness.store.leads.length;
+      const payload = buildLeadPayload(harness.store);
+      mocks.invokeFunction.mockResolvedValue(
+        new Response(JSON.stringify({ ok: false, error: "Solicitação rejeitada" }), {
+          status,
+          headers: { "Content-Type": "application/json" },
+        })
+      );
+
+      await act(async () => {
+        await expect(harness.store.createLead(payload)).rejects.toThrow("Solicitação rejeitada");
+      });
+
+      expect(harness.store.leads.length).toBe(initialLeadCount);
+      expect(mocks.toastError).not.toHaveBeenCalled();
+      expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    }
+  );
+
+  it("uses a safe fallback when the public lead sync returns a non-JSON error", async () => {
     mocks.functionsConfigured = true;
     mocks.getSessionToken.mockReturnValue(null);
     const harness = renderStore();
     const initialLeadCount = harness.store.leads.length;
     const payload = buildLeadPayload(harness.store);
     mocks.invokeFunction.mockResolvedValue(
-      new Response(JSON.stringify({ ok: false, error: "Erro interno" }), {
+      new Response("upstream unavailable", {
         status: 500,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain" },
       })
     );
 
     await act(async () => {
-      await harness.store.createLead(payload);
+      await expect(harness.store.createLead(payload)).rejects.toThrow(
+        "Não foi possível cadastrar o lead."
+      );
     });
 
     expect(harness.store.leads.length).toBe(initialLeadCount);
-    expect(mocks.toastError).toHaveBeenCalledWith(
-      "Serviço indisponível no momento. A solicitação não foi sincronizada."
-    );
+    expect(mocks.toastError).not.toHaveBeenCalled();
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("rejects network failures without mutating state or emitting toast", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue(null);
+    const harness = renderStore();
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+
+    await act(async () => {
+      await expect(harness.store.createLead(payload)).rejects.toThrow(
+        "Serviço indisponível no momento. A solicitação não foi enviada."
+      );
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastError).not.toHaveBeenCalled();
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("does not mutate leads while the public request is pending", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue(null);
+    const harness = renderStore();
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+    let resolveRequest: ((response: Response) => void) | undefined;
+    const request = new Promise<Response>((resolve) => {
+      resolveRequest = resolve;
+    });
+    mocks.invokeFunction.mockReturnValueOnce(request);
+
+    let creation: Promise<void>;
+    act(() => {
+      creation = harness.store.createLead(payload);
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastError).not.toHaveBeenCalled();
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+
+    await act(async () => {
+      resolveRequest?.(new Response(JSON.stringify({ ok: true }), { status: 201 }));
+      await creation!;
+    });
+
+    await waitFor(() => expect(harness.store.leads.length).toBe(initialLeadCount + 1));
+    expect(mocks.toastError).not.toHaveBeenCalled();
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("fails closed in production when Supabase Functions are not configured", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    mocks.functionsConfigured = false;
+    const harness = renderStore();
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+
+    await act(async () => {
+      await expect(harness.store.createLead(payload)).rejects.toThrow(
+        "Serviço de atendimento indisponível. Tente novamente mais tarde."
+      );
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.invokeFunction).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
     expect(mocks.toastSuccess).not.toHaveBeenCalled();
   });
 

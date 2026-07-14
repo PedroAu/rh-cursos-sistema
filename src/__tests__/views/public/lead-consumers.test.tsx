@@ -1,0 +1,251 @@
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { render, screen, waitFor } from "@/__tests__/utils";
+import { BlogPage } from "@/views/public/Blog";
+import { InCompanyPage } from "@/views/public/InCompany";
+import { SpecialistContactPage } from "@/views/public/SpecialistContact";
+
+const mocks = vi.hoisted(() => ({
+  createLead: vi.fn(),
+  openQuote: vi.fn(),
+  setSearchParams: vi.fn(),
+  toastSuccess: vi.fn(),
+  toastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mocks.toastSuccess,
+    error: mocks.toastError,
+  },
+}));
+
+vi.mock("@/lib/app-store", () => ({
+  useAppStore: () => ({
+    blogPosts: [],
+    createLead: mocks.createLead,
+  }),
+}));
+
+vi.mock("@/components/in-company/quote-modal", () => ({
+  useQuoteModal: () => ({ openQuote: mocks.openQuote }),
+}));
+
+vi.mock("@/hooks/use-simulated-loading", () => ({
+  useSimulatedLoading: () => false,
+}));
+
+vi.mock("@/lib/router-compat", () => ({
+  Link: ({ children }: { children: React.ReactNode }) => children,
+  useSearchParams: () => [new URLSearchParams(), mocks.setSearchParams],
+}));
+
+vi.mock("@/components/ui/select", async () => {
+  const React = await import("react");
+
+  function Select({
+    children,
+    onValueChange,
+    value,
+  }: {
+    children: React.ReactNode;
+    onValueChange: (value: string) => void;
+    value?: string;
+  }) {
+    const childArray = React.Children.toArray(children);
+    const trigger = childArray.find(
+      (child) => React.isValidElement(child) && Boolean((child.props as { id?: string }).id)
+    );
+    const triggerProps = React.isValidElement(trigger)
+      ? (trigger.props as { id?: string; "aria-labelledby"?: string })
+      : {};
+
+    return React.createElement(
+      "select",
+      {
+        id: triggerProps.id,
+        "aria-labelledby": triggerProps["aria-labelledby"],
+        value: value ?? "",
+        onChange: (event: React.ChangeEvent<HTMLSelectElement>) => onValueChange(event.target.value),
+      },
+      childArray
+    );
+  }
+
+  return {
+    Select,
+    SelectTrigger: () => null,
+    SelectValue: () => null,
+    SelectContent: ({ children }: { children: React.ReactNode }) =>
+      React.createElement(React.Fragment, null, children),
+    SelectItem: ({ children, value }: { children: React.ReactNode; value: string }) =>
+      React.createElement("option", { value }, children),
+  };
+});
+
+describe("consumidores públicos de createLead", () => {
+  beforeEach(() => {
+    mocks.createLead.mockReset();
+    mocks.openQuote.mockReset();
+    mocks.setSearchParams.mockReset();
+    mocks.toastSuccess.mockReset();
+    mocks.toastError.mockReset();
+  });
+
+  it("mantém a newsletter preenchida até a persistência e limpa somente após sucesso", async () => {
+    const user = userEvent.setup();
+    let resolveCreation: (() => void) | undefined;
+    mocks.createLead.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        resolveCreation = resolve;
+      })
+    );
+
+    render(<BlogPage />);
+
+    await user.type(screen.getByLabelText("Seu nome"), "Maria Newsletter");
+    await user.type(screen.getByLabelText("Seu melhor e-mail"), "maria@example.com");
+    await user.click(screen.getByRole("button", { name: /quero receber/i }));
+
+    expect(screen.getByLabelText("Seu nome")).toHaveValue("Maria Newsletter");
+    expect(screen.getByLabelText("Seu melhor e-mail")).toHaveValue("maria@example.com");
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(mocks.toastError).not.toHaveBeenCalled();
+
+    resolveCreation?.();
+
+    await waitFor(() => expect(screen.getByLabelText("Seu nome")).toHaveValue(""));
+    expect(screen.getByLabelText("Seu melhor e-mail")).toHaveValue("");
+    expect(mocks.toastSuccess).toHaveBeenCalledTimes(1);
+    expect(mocks.toastError).not.toHaveBeenCalled();
+  });
+
+  it("preserva newsletter e emite um único erro quando createLead rejeita", async () => {
+    const user = userEvent.setup();
+    mocks.createLead.mockRejectedValueOnce(new Error("Newsletter indisponível."));
+
+    render(<BlogPage />);
+
+    await user.type(screen.getByLabelText("Seu nome"), "Maria Newsletter");
+    await user.type(screen.getByLabelText("Seu melhor e-mail"), "maria@example.com");
+    await user.click(screen.getByRole("button", { name: /quero receber/i }));
+
+    await waitFor(() => expect(mocks.toastError).toHaveBeenCalledWith("Newsletter indisponível."));
+    expect(screen.getByLabelText("Seu nome")).toHaveValue("Maria Newsletter");
+    expect(screen.getByLabelText("Seu melhor e-mail")).toHaveValue("maria@example.com");
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("preserva o formulário In Company em falha e limpa somente no retry bem-sucedido", async () => {
+    const user = userEvent.setup();
+    mocks.createLead
+      .mockRejectedValueOnce(new Error("Proposta indisponível."))
+      .mockResolvedValueOnce(undefined);
+
+    render(<InCompanyPage />);
+
+    await user.type(screen.getByPlaceholderText("Seu nome"), "Ana Souza");
+    await user.type(screen.getByPlaceholderText("voce@organizacao.gov.br"), "ana@example.com");
+    await user.type(screen.getByPlaceholderText("Nome da organização"), "Secretaria de Gestão");
+    await user.type(screen.getByPlaceholderText("(00) 00000-0000"), "61999998888");
+    const inCompanySelects = screen.getAllByRole("combobox");
+    await user.selectOptions(inCompanySelects[0], "Gestão pública");
+    await user.selectOptions(inCompanySelects[1], "16 a 40 pessoas");
+    await user.type(
+      screen.getByPlaceholderText("Ex.: atualizar a equipe para nova legislação."),
+      "Atualizar a equipe para a nova legislação."
+    );
+    await user.type(
+      screen.getByPlaceholderText("Ex.: eSocial e departamento pessoal."),
+      "eSocial aplicado ao setor público."
+    );
+    await user.type(
+      screen.getByPlaceholderText("Ex.: reduzir retrabalho e padronizar execução."),
+      "Reduzir retrabalho e padronizar a execução."
+    );
+    await user.type(
+      screen.getByPlaceholderText("Conte o objetivo do treinamento e o contexto da sua equipe"),
+      "Precisamos capacitar a equipe pública."
+    );
+
+    await user.click(screen.getByRole("button", { name: "Enviar solicitação de proposta" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Proposta indisponível.");
+    expect(screen.getByPlaceholderText("Seu nome")).toHaveValue("Ana Souza");
+    expect(screen.getByPlaceholderText("voce@organizacao.gov.br")).toHaveValue("ana@example.com");
+    expect(screen.getByPlaceholderText("Nome da organização")).toHaveValue("Secretaria de Gestão");
+    expect(screen.getByPlaceholderText("(00) 00000-0000")).toHaveValue("(61) 99999-8888");
+    expect(inCompanySelects[0]).toHaveValue("Gestão pública");
+    expect(inCompanySelects[1]).toHaveValue("16 a 40 pessoas");
+    expect(screen.getByPlaceholderText("Ex.: atualizar a equipe para nova legislação.")).toHaveValue(
+      "Atualizar a equipe para a nova legislação."
+    );
+    expect(screen.getByPlaceholderText("Ex.: eSocial e departamento pessoal.")).toHaveValue(
+      "eSocial aplicado ao setor público."
+    );
+    expect(screen.getByPlaceholderText("Ex.: reduzir retrabalho e padronizar execução.")).toHaveValue(
+      "Reduzir retrabalho e padronizar a execução."
+    );
+    expect(
+      screen.getByPlaceholderText("Conte o objetivo do treinamento e o contexto da sua equipe")
+    ).toHaveValue("Precisamos capacitar a equipe pública.");
+    expect(screen.queryByText(/Recebemos os seus dados\./)).not.toBeInTheDocument();
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "Enviar solicitação de proposta" }));
+
+    expect(await screen.findByText(/Recebemos os seus dados\./)).toBeInTheDocument();
+    expect(mocks.toastSuccess).toHaveBeenCalledTimes(1);
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ["Especialista" as const, "Especialista"],
+    ["Consultoria" as const, "Consultoria"],
+  ])("preserva o formulário de %s e mantém a origem correta em falha", async (leadOrigin, expectedOrigin) => {
+    const user = userEvent.setup();
+    mocks.createLead
+      .mockRejectedValueOnce(new Error("Especialista indisponível."))
+      .mockResolvedValueOnce(undefined);
+
+    render(<SpecialistContactPage leadOrigin={leadOrigin} />);
+
+    await user.type(screen.getByPlaceholderText("Ex.: Maria Oliveira"), "Joana Lima");
+    await user.type(screen.getByPlaceholderText("voce@empresa.com.br"), "joana@example.com");
+    await user.type(screen.getByPlaceholderText("(61) 99999-9999"), "61999998888");
+    await user.type(screen.getByPlaceholderText("Ex.: Secretaria de Gestão"), "Órgão Exemplo");
+    await user.selectOptions(screen.getByRole("combobox"), "Gestão Pública");
+    await user.type(
+      screen.getByPlaceholderText("Descreva o desafio, o contexto da equipe e o tipo de apoio desejado."),
+      "Precisamos de um diagnóstico completo."
+    );
+    await user.click(screen.getByRole("button", { name: "Solicitar contato" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Especialista indisponível.");
+    expect(screen.getByPlaceholderText("Ex.: Maria Oliveira")).toHaveValue("Joana Lima");
+    expect(screen.getByPlaceholderText("voce@empresa.com.br")).toHaveValue("joana@example.com");
+    expect(screen.getByPlaceholderText("(61) 99999-9999")).toHaveValue("(61) 99999-8888");
+    expect(screen.getByPlaceholderText("Ex.: Secretaria de Gestão")).toHaveValue("Órgão Exemplo");
+    expect(screen.getByRole("combobox")).toHaveValue("Gestão Pública");
+    expect(
+      screen.getByPlaceholderText("Descreva o desafio, o contexto da equipe e o tipo de apoio desejado.")
+    ).toHaveValue(
+      "Precisamos de um diagnóstico completo."
+    );
+    expect(mocks.createLead).toHaveBeenCalledWith(expect.objectContaining({ origin: expectedOrigin }));
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    expect(screen.queryByText(/Solicitação registrada\. Um especialista retorna/)).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "Solicitar contato" }));
+
+    expect(await screen.findByText(/Solicitação registrada\. Um especialista retorna/)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Ex.: Maria Oliveira")).toHaveValue("");
+    expect(screen.getByPlaceholderText("voce@empresa.com.br")).toHaveValue("");
+    expect(mocks.toastSuccess).toHaveBeenCalledTimes(1);
+    expect(mocks.toastError).toHaveBeenCalledTimes(1);
+  });
+});

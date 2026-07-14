@@ -287,11 +287,44 @@ function mergeLeads(current: Lead[], incoming: Lead[]) {
 
 function buildLeadRecord(payload: LeadPayload, fallback?: Partial<Lead>): Lead {
   return {
+    ...payload,
     id: fallback?.id ?? `lead-${Date.now()}`,
     createdAt: fallback?.createdAt ?? new Date().toISOString(),
-    status: fallback?.status ?? "Novo",
-    ...payload,
+    status: fallback?.status ?? payload.status ?? "Novo",
   };
+}
+
+function parseAdminLeadConfirmation(payload: unknown): Pick<Lead, "id" | "createdAt" | "status"> {
+  const ok =
+    payload && typeof payload === "object" && "ok" in payload
+      ? (payload as { ok?: unknown }).ok
+      : undefined;
+  const data =
+    payload && typeof payload === "object" && "data" in payload
+      ? (payload as { data?: unknown }).data
+      : null;
+  const row = data && typeof data === "object"
+    ? (data as { id?: unknown; created_at?: unknown; status_crm?: unknown })
+    : null;
+  const statusByDatabaseValue: Record<string, Lead["status"]> = {
+    Novo: "Novo",
+    Contatado: "Em atendimento",
+    EmAtendimento: "Em atendimento",
+    PropostaEnviada: "Proposta enviada",
+    Convertido: "Convertido",
+    Perdido: "Perdido",
+  };
+  const id = typeof row?.id === "string" ? row.id.trim() : "";
+  const createdAt = typeof row?.created_at === "string" ? row.created_at : "";
+  const status = typeof row?.status_crm === "string"
+    ? statusByDatabaseValue[row.status_crm]
+    : undefined;
+
+  if (ok !== true || !id || !createdAt || Number.isNaN(Date.parse(createdAt)) || !status) {
+    throw new Error("Resposta inválida ao cadastrar o lead.");
+  }
+
+  return { id, createdAt, status };
 }
 
 function buildStudentRecord(
@@ -1068,44 +1101,59 @@ export function AppStoreProvider({
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
     const adminSessionToken = getAdminSessionTokenValue() ?? undefined;
     const usedAdminMutation = Boolean(isFunctionsConfigured && adminSessionToken);
+    let confirmedLead: Pick<Lead, "id" | "createdAt" | "status"> | undefined;
+
+    if (!isFunctionsConfigured && process.env.NODE_ENV === "production") {
+      throw new Error("Serviço de atendimento indisponível. Tente novamente mais tarde.");
+    }
 
     if (usedAdminMutation) {
-      const response = await invokeFunction("admin-resources", {
-        body: {
-          resource: "leads",
-          action: "create",
-          payload: {
-            ...payload,
-            status: "Novo",
+      let response: Response;
+
+      try {
+        response = await invokeFunction("admin-resources", {
+          body: {
+            resource: "leads",
+            action: "create",
+            payload: {
+              ...payload,
+              status: "Novo",
+            },
           },
-        },
-        sessionToken: adminSessionToken,
-      });
+          sessionToken: adminSessionToken,
+        });
+      } catch {
+        throw new Error("Serviço indisponível no momento. A solicitação não foi enviada.");
+      }
+
+      if (!response.ok) {
+        throw new Error(await getFunctionErrorMessage(response, "Não foi possível cadastrar o lead."));
+      }
+
+      const responsePayload = await response.json().catch(() => null);
+      confirmedLead = parseAdminLeadConfirmation(responsePayload);
+    }
+
+    if (isFunctionsConfigured && !usedAdminMutation) {
+      let response: Response;
+
+      try {
+        response = await invokeFunction("leads", { body: payload });
+      } catch {
+        throw new Error("Serviço indisponível no momento. A solicitação não foi enviada.");
+      }
 
       if (!response.ok) {
         throw new Error(await getFunctionErrorMessage(response, "Não foi possível cadastrar o lead."));
       }
     }
 
-    if (isFunctionsConfigured && !usedAdminMutation) {
-      const response = await invokeFunction("leads", { body: payload }).catch(() => null);
-      if (!response || !response.ok) {
-        toast.error("Serviço indisponível no momento. A solicitação não foi sincronizada.");
-        return;
-      }
-    }
-
     startTransition(() => {
       setState((current) => ({
         ...current,
-        leads: mergeLeads(current.leads, [buildLeadRecord(payload)])
+        leads: mergeLeads(current.leads, [buildLeadRecord(payload, confirmedLead)])
       }));
     });
-    toast.success(
-      isFunctionsConfigured
-        ? "Lead cadastrado."
-        : "Lead registrado apenas nesta sessão de desenvolvimento."
-    );
   }, []);
 
   const updateLeadStatus = useCallback<AppStoreValue["updateLeadStatus"]>((id, status) => {

@@ -1,7 +1,24 @@
-import { expect, test } from "vitest";
+import { beforeEach, expect, test, vi } from "vitest";
 
 import { createAdminStoreFixture } from "../../../tests/fixtures/admin-store";
 import { buildResourceConfig } from "@/lib/admin-resource-configs";
+
+const mocks = vi.hoisted(() => ({
+  toastSuccess: vi.fn(),
+  toastError: vi.fn(),
+}));
+
+vi.mock("sonner", () => ({
+  toast: {
+    success: mocks.toastSuccess,
+    error: mocks.toastError,
+  },
+}));
+
+beforeEach(() => {
+  mocks.toastSuccess.mockReset();
+  mocks.toastError.mockReset();
+});
 
 function createDeps() {
   const noop = () => undefined;
@@ -267,4 +284,87 @@ test("class form narrows modality options to the selected course modalities", ()
     { value: "Presencial", label: "Presencial" },
     { value: "Ao vivo online", label: "Ao vivo online" },
   ]);
+});
+
+test("manual lead creation closes only after persistence and emits one success toast", async () => {
+  const createLead = vi.fn().mockResolvedValue(undefined);
+  const store = { ...createAdminStoreFixture(), createLead };
+  const setOpen = vi.fn();
+  const setValidationErrors = vi.fn();
+  const form = {
+    name: "Maria Admin",
+    email: "maria.admin@example.com",
+    phone: "(61) 99999-8888",
+    type: "Contato",
+    courseInterest: "Curso Base",
+    origin: "Contato",
+    status: "Novo",
+    message: "Lead criado manualmente no admin.",
+  };
+  const config = buildResourceConfig(
+    "leads",
+    store as never,
+    {
+      ...createDeps(),
+      form,
+      setOpen,
+      setValidationErrors,
+    } as never
+  );
+
+  await config.onSave();
+
+  expect(createLead).toHaveBeenCalledTimes(1);
+  expect(createLead).toHaveBeenCalledWith(expect.objectContaining({
+    name: "Maria Admin",
+    email: "maria.admin@example.com",
+    status: "Novo",
+  }));
+  expect(setOpen).toHaveBeenCalledTimes(1);
+  expect(setOpen).toHaveBeenCalledWith(false);
+  expect(setValidationErrors).toHaveBeenCalledWith([]);
+  expect(mocks.toastSuccess).toHaveBeenCalledTimes(1);
+  expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead cadastrado.");
+  expect(mocks.toastError).not.toHaveBeenCalled();
+});
+
+test("manual lead creation preserves modal data and emits one error when persistence rejects", async () => {
+  const createLead = vi.fn().mockRejectedValue(new Error("Supabase indisponível."));
+  const store = { ...createAdminStoreFixture(), createLead };
+  const setOpen = vi.fn();
+  const setValidationErrors = vi.fn();
+  const form = {
+    name: "Maria Admin",
+    email: "maria.admin@example.com",
+    phone: "(61) 99999-8888",
+    type: "Contato",
+    courseInterest: "Curso Base",
+    origin: "Contato",
+    status: "Novo",
+    message: "Lead criado manualmente no admin.",
+  };
+  const config = buildResourceConfig(
+    "leads",
+    store as never,
+    {
+      ...createDeps(),
+      form,
+      setOpen,
+      setValidationErrors,
+    } as never
+  );
+
+  await config.onSave();
+
+  expect(createLead).toHaveBeenCalledTimes(1);
+  expect(setOpen).not.toHaveBeenCalled();
+  expect(setValidationErrors).not.toHaveBeenCalled();
+  expect(form).toEqual(expect.objectContaining({
+    name: "Maria Admin",
+    email: "maria.admin@example.com",
+    message: "Lead criado manualmente no admin.",
+  }));
+  expect(mocks.toastError).toHaveBeenCalledTimes(1);
+  expect(mocks.toastError).toHaveBeenCalledWith("Erro ao salvar: Supabase indisponível.");
+  expect(mocks.toastSuccess).not.toHaveBeenCalled();
 });
