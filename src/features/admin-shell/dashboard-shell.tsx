@@ -3,7 +3,6 @@
 import type { ReactNode } from "react";
 
 import type { DashboardRole } from "@/lib/auth";
-import { AppToaster } from "@/components/ui/toaster";
 import { AdminBottomNavigation } from "@/features/admin-shell/components/admin-bottom-navigation";
 import { AdminSidebar } from "@/features/admin-shell/components/admin-sidebar";
 import { AdminTopbar } from "@/features/admin-shell/components/admin-topbar";
@@ -25,7 +24,6 @@ export function DashboardShell({ role, children }: { role: DashboardRole; childr
       </div>
 
       <AdminBottomNavigation role={role} />
-      <AppToaster />
     </>
   );
 }

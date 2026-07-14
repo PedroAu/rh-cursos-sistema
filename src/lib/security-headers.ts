@@ -10,10 +10,7 @@ export interface SecurityHeadersConfig {
   permissionsPolicy?: string;
 }
 
-// Content Security Policy - strict by default
-export const CSP_POLICIES = {
-  // Production CSP - very restrictive
-  production: [
+const PRODUCTION_CSP_DIRECTIVES = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net", // Only self + CDN for next.js
     "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
@@ -24,10 +21,9 @@ export const CSP_POLICIES = {
     "base-uri 'self'",
     "form-action 'self'",
     "upgrade-insecure-requests",
-  ].join("; "),
+  ];
 
-  // Development CSP - more permissive for webpack HMR
-  development: [
+const DEVELOPMENT_CSP_DIRECTIVES = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' ws://localhost:*",
     "style-src 'self' 'unsafe-inline'",
@@ -37,16 +33,53 @@ export const CSP_POLICIES = {
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-  ].join("; "),
+  ];
+
+function getLocalSupabaseConnectSources(supabaseUrl?: string) {
+  if (!supabaseUrl) return [];
+
+  try {
+    const url = new URL(supabaseUrl);
+    if (
+      url.protocol !== "http:" ||
+      !["127.0.0.1", "localhost", "[::1]"].includes(url.hostname)
+    ) {
+      return [];
+    }
+
+    return [url.origin, `ws://${url.host}`];
+  } catch {
+    return [];
+  }
+}
+
+export function buildContentSecurityPolicy(
+  environment = process.env.NODE_ENV,
+  supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL
+) {
+  const directives =
+    environment === "production" ? PRODUCTION_CSP_DIRECTIVES : DEVELOPMENT_CSP_DIRECTIVES;
+  const localConnectSources = getLocalSupabaseConnectSources(supabaseUrl);
+
+  return directives
+    .map((directive) =>
+      directive.startsWith("connect-src") && localConnectSources.length > 0
+        ? `${directive} ${localConnectSources.join(" ")}`
+        : directive
+    )
+    .join("; ");
+}
+
+// Content Security Policy - strict by default
+export const CSP_POLICIES = {
+  production: buildContentSecurityPolicy("production"),
+  development: buildContentSecurityPolicy("development"),
 };
 
 // Default security headers
 export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
   // Content Security Policy
-  contentSecurityPolicy:
-    process.env.NODE_ENV === "production"
-      ? CSP_POLICIES.production
-      : CSP_POLICIES.development,
+  contentSecurityPolicy: buildContentSecurityPolicy(),
 
   // Prevent clickjacking
   xFrameOptions: "DENY",

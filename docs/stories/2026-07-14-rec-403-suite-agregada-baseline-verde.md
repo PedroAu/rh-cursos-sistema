@@ -125,12 +125,12 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
   - [x] Registrar dependência externa, tempo e artefatos de cada failure.
   - [x] Anexar o baseline completo ao Dev Agent Record e ao gate da story.
 
-- [ ] **Task 3 — Diagnosticar `admin-crud` de students** (AC: 2, 3, 5)
-  - [ ] Reexecutar o cenário `tests/admin-crud.spec.ts:784` isoladamente no projeto `functional`.
-  - [ ] Verificar resposta da UI sem expor credenciais.
+- [x] **Task 3 — Diagnosticar `admin-crud` de students** (AC: 2, 3, 5)
+  - [x] Reexecutar o cenário `tests/admin-crud.spec.ts:784` isoladamente no projeto `functional`.
+  - [x] Verificar resposta da UI sem expor credenciais.
   - [x] Verificar a mutação `students:create` e o contrato de persistência em `admin-resources`.
   - [x] Verificar a consulta `findStudentByEmail` e o cleanup de dados `[E2E]`.
-  - [ ] Confirmar causa raiz antes de editar aplicação/teste.
+  - [x] Confirmar causa raiz antes de editar aplicação/teste.
   - [x] Adicionar ou ajustar regressão preservando a intenção “criar, confirmar persistência e excluir”.
 
 - [x] **Task 4 — Corrigir os demais failures inventariados** (AC: 3, 5, 7)
@@ -272,6 +272,7 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 | 2026-07-14 | 1.2 | Correção parcial implementada: F02–F04 passam com fixture pública opt-in em bundle exclusivo do Playwright; F05/F06 usam o contrato atual de catálogo e passaram em desktop/mobile sem gravar PNG; `students:create` agora exige e usa o ID canônico, e o E2E captura a resposta sanitizada com cleanup em `finally`. Story permanece In Progress até reprodução de F01 e gate agregado em Supabase isolado. | @dev (Dex) |
 | 2026-07-14 | 1.3 | Hardening pós-revisão QA: mutações E2E agora falham fechado sem opt-in e project refs de teste/produção distintos; o skip global de `admin-crud` foi removido; o bundle determinístico foi isolado em `.next-playwright`; readiness valida separadamente `Ver turma` e `Ver detalhes`. | @dev (Dex) |
 | 2026-07-14 | 1.4 | Isolamento SSR do baseline visual concluído com cookie restrito ao bundle Playwright; `/cursos`, detalhe de curso e artigo usam fixtures sem consultar o catálogo real, enquanto build normal e contextos sem cookie permanecem reais. | @dev (Dex) |
+| 2026-07-14 | 1.5 | Supabase isolado local criado após indisponibilidade de cota remota; 24 migrations reaplicadas do zero, escrita E2E limitada a loopback com opt-in explícito, CSP local restrito à origem configurada e Edge Functions com secrets ignorados. O CRUD administrativo passou 10/10 e o agregado passou 174/174. A investigação adicional eliminou hidratação intermitente ao filtrar soft-deletes explicitamente no SSR service-role e hidratar o admin com catálogo inicial consistente. | @dev (Dex) |
 
 ## File List
 
@@ -284,11 +285,16 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 - `scripts/run-playwright.mjs`
 - `scripts/run-playwright-test-build.mjs`
 - `src/lib/app-store.tsx`
+- `src/lib/security-headers.ts`
 - `src/lib/public-test-baseline.ts`
 - `src/lib/supabase/rh-cursos-api.ts`
+- `src/components/next-page-shell.tsx`
+- `src/features/admin-shell/dashboard-shell.tsx`
+- `src/features/public-shell/public-layout.tsx`
 - `src/__tests__/lib/app-store.test.ts`
 - `src/__tests__/lib/public-test-baseline.test.ts`
 - `src/__tests__/lib/rh-cursos-api.test.ts`
+- `src/__tests__/lib/security-headers.test.ts`
 - `src/__tests__/helpers/integration-env.test.ts`
 - `tests/admin-crud.spec.ts`
 - `tests/helpers/integration-env.ts`
@@ -297,6 +303,10 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 - `tests/public-journeys.spec.ts`
 - `tests/ui-governance.spec.ts`
 - `tests/visual.baseline.spec.ts`
+- `scripts/setup-local-supabase-e2e.mjs`
+- `supabase/.gitignore`
+- `supabase/config.toml`
+- `app/admin/layout.tsx`
 - `app/cursos/page.tsx`
 - `app/cursos/[slug]/page.tsx`
 - `app/blog/[slug]/page.tsx`
@@ -324,6 +334,13 @@ GPT-5 Codex (`@dev` / Dex).
 - Prova fail-closed: o cenário F01 foi invocado contra a configuração atual e terminou antes da navegação com `Mutações E2E bloqueadas`, sem executar escrita; o antigo skip global foi removido.
 - Prova fail-closed ampliada: a jornada pública de contato/in-company também foi invocada e bloqueada antes da navegação; cada override público/server-side de Edge Functions é validado independentemente contra o ref isolado ou uma origem custom explicitamente aprovada.
 - Isolamento SSR: `ui-governance` permaneceu 8/8 sem logs `mapCourse`; navegação dirigida de detalhe de curso e artigo passou usando fixture, sem leitura observável do catálogo Supabase real.
+- Provisionamento remoto não alterou estado: a organização já possuía dois projetos free ativos e a API recusou um terceiro. O fallback local foi adotado sem pausar projetos e o banco anterior foi preservado em snapshot privado `~/.local/share/rh-cursos-e2e/snapshots/pre-isolated-reset-20260714T163406.sql`.
+- Ambiente isolado local: stack completa em loopback, porta de analytics deslocada para evitar conflito, `supabase db reset --local` reaplicou 24 migrations e restaurou o catálogo público mínimo. `supabase/functions/.env` contém apenas runtime local, possui modo restrito e é ignorado pelo Git.
+- Guarda de escrita local: exige simultaneamente opt-in, target `isolated-test`, project ref `local`, ref de produção diferente e URL HTTP em host loopback/porta 54321; origem hospedada e hostname enganoso continuam recusados. Testes focados: 14/14 PASS.
+- F01 reproduzido no ambiente isolado: o bloco `admin-crud` passou 10/10, incluindo criação de aluno com ID canônico, confirmação no backend e cleanup. Nenhum segredo, token ou credencial foi anexado.
+- Diagnóstico CSP/toast: chamadas do navegador ao Supabase local eram bloqueadas pelo `connect-src`; a política agora adiciona somente a origem loopback configurada e seu WebSocket. O `AppToaster` raiz tornou-se o único mount global, eliminando notificações duplicadas.
+- Diagnóstico de hidratação: uma primeira execução agregada passou 172/174 e revelou React #418 em `/cursos` e `/admin/instrutores`. Trace confirmou SSR service-role incluindo soft-deletes enquanto o cliente anon aplicava RLS; queries públicas receberam filtros explícitos e o admin passou a receber catálogo inicial no SSR. Repetição direcionada passou 10/10.
+- Prova final em banco resetado: lint PASS; typecheck PASS; unit 46 arquivos/518 testes PASS; build PASS; Playwright 174/174 PASS em aproximadamente 2,9 minutos; CRUD administrativo 10/10 dentro do agregado; nenhum snapshot foi atualizado como correção.
 
 ### Completion Notes
 
@@ -335,8 +352,8 @@ GPT-5 Codex (`@dev` / Dex).
 - Inserção de curso, conclusão de checkout, envio de leads e cleanups públicos exercitados pelo agregado recebem a mesma guarda antes da primeira escrita.
 - O bundle com capacidade de fixture vive em `.next-playwright`, ignorado por Git/ESLint; preview/deploy normal continua usando `.next`.
 - O cookie de baseline SSR só é aceito quando `PLAYWRIGHT_TEST_BUILD=1` e `NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE=1`; cookie isolado não ativa fixture em build normal.
-- Próximo passo seguro: provisionar/seedar Supabase exclusivo de testes, reproduzir F01 isoladamente e executar o gate agregado completo.
-- Merge continua bloqueado enquanto `npm test` não passar no mesmo commit e ambiente isolado sem delta inesperado de artefatos.
+- Próximo passo seguro: revisão independente de `@qa`, amostragem dos gates e veredito PASS/CONCERNS/FAIL; a alternativa remota continua bloqueada apenas pela cota do plano, não pela execução local.
+- Merge continua bloqueado até o veredito independente de `@qa`, embora os gates técnicos tenham passado no ambiente isolado local sem aceitar deltas de baseline.
 
 ## QA Results
 

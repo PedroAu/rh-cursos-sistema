@@ -6,7 +6,6 @@ import { PublicFooter } from "@/features/public-shell/components/public-footer";
 import { PublicHeader } from "@/features/public-shell/components/public-header";
 import { CommandPalette } from "@/components/common/command-palette";
 import { QuoteModalProvider } from "@/components/in-company/quote-modal";
-import { AppToaster } from "@/components/ui/toaster";
 import { Outlet } from "@/lib/router-compat";
 
 export function PublicLayout({ children }: { children?: ReactNode }) {
@@ -26,7 +25,6 @@ export function PublicLayout({ children }: { children?: ReactNode }) {
         <PublicFooter />
         <CommandPalette />
       </QuoteModalProvider>
-      <AppToaster />
     </div>
   );
 }

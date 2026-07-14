@@ -60,11 +60,12 @@ describe("explicit public test baseline", () => {
 function buildClient(data: Array<{ categoria: string | null }>, error: unknown = null) {
   const order = vi.fn(async () => ({ data, error }));
   const not = vi.fn(() => ({ order }));
-  const select = vi.fn(() => ({ not }));
+  const is = vi.fn(() => ({ not }));
+  const select = vi.fn(() => ({ is }));
   const from = vi.fn(() => ({ select }));
   const client = { from } as unknown as Parameters<typeof fetchCourseCategories>[0];
 
-  return { client, from, select, not, order };
+  return { client, from, select, is, not, order };
 }
 
 describe("fetchCourseCategories", () => {
@@ -91,12 +92,13 @@ describe("fetchCourseCategories", () => {
   });
 
   it("queries the curso table filtering out null categories, ordered", async () => {
-    const { client, from, select, not, order } = buildClient([{ categoria: "Compliance" }]);
+    const { client, from, select, is, not, order } = buildClient([{ categoria: "Compliance" }]);
 
     await fetchCourseCategories(client);
 
     expect(from).toHaveBeenCalledWith("curso");
     expect(select).toHaveBeenCalledWith("categoria");
+    expect(is).toHaveBeenCalledWith("deleted_at", null);
     expect(not).toHaveBeenCalledWith("categoria", "is", null);
     expect(order).toHaveBeenCalledWith("categoria");
   });

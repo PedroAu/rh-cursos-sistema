@@ -2,10 +2,19 @@ function isPlaceholderValue(value: string) {
   return !value || value.includes("example.supabase.co") || value.includes("placeholder");
 }
 
+function isLocalSupabaseUrl(url: URL) {
+  return (
+    url.protocol === "http:" &&
+    ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname) &&
+    url.port === "54321"
+  );
+}
+
 export function assertSafeWritableIntegrationEnv(env: NodeJS.ProcessEnv) {
   const targetProjectRef = env.E2E_SUPABASE_PROJECT_REF?.trim() ?? "";
   const productionProjectRef = env.E2E_PRODUCTION_PROJECT_REF?.trim() ?? "";
   const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL ?? env.SUPABASE_URL ?? "";
+  const localTargetEnabled = env.E2E_LOCAL_SUPABASE === "1";
   const functionsUrls = [
     ["NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL", env.NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL],
     ["SUPABASE_FUNCTIONS_URL", env.SUPABASE_FUNCTIONS_URL],
@@ -18,6 +27,7 @@ export function assertSafeWritableIntegrationEnv(env: NodeJS.ProcessEnv) {
     env.E2E_ALLOW_DATABASE_WRITES !== "1" && "E2E_ALLOW_DATABASE_WRITES=1",
     env.E2E_TARGET_KIND !== "isolated-test" && "E2E_TARGET_KIND=isolated-test",
     !targetProjectRef && "E2E_SUPABASE_PROJECT_REF",
+    localTargetEnabled && targetProjectRef !== "local" && "E2E_SUPABASE_PROJECT_REF=local",
     !productionProjectRef && "E2E_PRODUCTION_PROJECT_REF",
     targetProjectRef && productionProjectRef && targetProjectRef === productionProjectRef
       ? "E2E_SUPABASE_PROJECT_REF diferente de E2E_PRODUCTION_PROJECT_REF"
@@ -25,8 +35,13 @@ export function assertSafeWritableIntegrationEnv(env: NodeJS.ProcessEnv) {
   ].filter(Boolean);
 
   let targetMatchesUrl = false;
+  let targetOrigin = "";
   try {
-    targetMatchesUrl = new URL(supabaseUrl).hostname === `${targetProjectRef}.supabase.co`;
+    const url = new URL(supabaseUrl);
+    targetOrigin = url.origin;
+    targetMatchesUrl = localTargetEnabled
+      ? isLocalSupabaseUrl(url)
+      : url.hostname === `${targetProjectRef}.supabase.co`;
   } catch {
     targetMatchesUrl = false;
   }
@@ -41,10 +56,11 @@ export function assertSafeWritableIntegrationEnv(env: NodeJS.ProcessEnv) {
     let functionsTargetMatches = false;
     try {
       const url = new URL(functionsUrl);
-      functionsTargetMatches =
-        url.hostname === `${targetProjectRef}.supabase.co` ||
-        url.hostname === `${targetProjectRef}.functions.supabase.co` ||
-        (approvedFunctionsOrigin !== "" && url.origin === approvedFunctionsOrigin);
+      functionsTargetMatches = localTargetEnabled
+        ? isLocalSupabaseUrl(url) && url.origin === targetOrigin
+        : url.hostname === `${targetProjectRef}.supabase.co` ||
+          url.hostname === `${targetProjectRef}.functions.supabase.co` ||
+          (approvedFunctionsOrigin !== "" && url.origin === approvedFunctionsOrigin);
     } catch {
       functionsTargetMatches = false;
     }

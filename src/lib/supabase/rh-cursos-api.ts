@@ -110,12 +110,18 @@ function shouldUsePublicTestBaseline() {
  * Categorias distintas já cadastradas em `curso`, para alimentar as
  * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
  * A query é coberta pelo índice parcial `curso_categoria_idx`; o filtro
- * `deleted_at is null` é aplicado pela RLS `catalogo_publico_curso_select`
- * (mesmo padrão das demais queries de `curso` neste arquivo).
+ * O filtro `deleted_at is null` é explícito porque o cliente SSR usa service
+ * role e, portanto, não passa pelas políticas RLS aplicadas ao navegador.
  */
 export async function fetchCourseCategories(client: RhCursosClient): Promise<string[]> {
   const result = await withRetry(
-    () => client.from("curso").select("categoria").not("categoria", "is", null).order("categoria"),
+    () =>
+      client
+        .from("curso")
+        .select("categoria")
+        .is("deleted_at", null)
+        .not("categoria", "is", null)
+        .order("categoria"),
     { label: "fetchPublicCatalog:curso_categoria" }
   );
 
@@ -163,6 +169,7 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
           client
             .from("curso")
             .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+            .is("deleted_at", null)
             .order("titulo"),
         { label: "fetchPublicCatalog:curso" }
       ),
@@ -171,6 +178,7 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
           client
             .from("turma")
             .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
+            .is("deleted_at", null)
             .order("data_inicio"),
         { label: "fetchPublicCatalog:turma" }
       ),
@@ -179,6 +187,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
           client
             .from("instrutor")
             .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
+            .is("deleted_at", null)
+            .eq("status", "Ativo")
             .order("nome"),
         { label: "fetchPublicCatalog:instrutor" }
       ),
@@ -199,6 +209,7 @@ async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTest
           client
             .from("curso_public_content")
             .select("id,curso_id,hero_subtitle,highlights,faq_items,sidebar,corporate_cta,testimonial_override,published,created_at,updated_at,deleted_at")
+            .is("deleted_at", null)
             .eq("published", true)
             .order("created_at"),
         { label: "fetchPublicCatalog:curso_public_content" }
@@ -273,6 +284,7 @@ export async function fetchPublicClassesFromSupabase() {
       client
         .from("turma")
         .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
+        .is("deleted_at", null)
         .order("data_inicio"),
     { label: "fetchPublicClasses:turma" }
   );
@@ -300,6 +312,7 @@ async function fetchPublicBlogPosts(client: RhCursosClient | null, forcePublicTe
       client
         .from("post_blog")
         .select("id,titulo,slug,resumo,conteudo,categoria,tags,autor,publicado_em,tempo_leitura,status,imagem_url,curso_id,created_at")
+        .is("deleted_at", null)
         .eq("status", "Publicado")
         .order("publicado_em", { ascending: false }),
     { label: "fetchPublicBlogPosts:post_blog" }

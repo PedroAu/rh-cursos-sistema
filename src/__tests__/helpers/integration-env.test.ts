@@ -88,4 +88,55 @@ describe("assertSafeWritableIntegrationEnv", () => {
 
     expect(() => assertSafeWritableIntegrationEnv(process.env)).not.toThrow();
   });
+
+  it("allows the standard local Supabase stack only with an additional explicit opt-in", () => {
+    configureBaseIntegrationEnv();
+    vi.stubEnv("E2E_ALLOW_DATABASE_WRITES", "1");
+    vi.stubEnv("E2E_TARGET_KIND", "isolated-test");
+    vi.stubEnv("E2E_LOCAL_SUPABASE", "1");
+    vi.stubEnv("E2E_SUPABASE_PROJECT_REF", "local");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL", "http://127.0.0.1:54321/functions/v1");
+
+    expect(() => assertSafeWritableIntegrationEnv(process.env)).not.toThrow();
+  });
+
+  it("blocks a local URL when the additional local opt-in is absent", () => {
+    configureBaseIntegrationEnv();
+    vi.stubEnv("E2E_ALLOW_DATABASE_WRITES", "1");
+    vi.stubEnv("E2E_TARGET_KIND", "isolated-test");
+    vi.stubEnv("E2E_SUPABASE_PROJECT_REF", "local");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+
+    expect(() => assertSafeWritableIntegrationEnv(process.env)).toThrow(
+      /NEXT_PUBLIC_SUPABASE_URL correspondente a E2E_SUPABASE_PROJECT_REF/
+    );
+  });
+
+  it("blocks non-loopback targets even when local mode is enabled", () => {
+    configureBaseIntegrationEnv();
+    vi.stubEnv("E2E_ALLOW_DATABASE_WRITES", "1");
+    vi.stubEnv("E2E_TARGET_KIND", "isolated-test");
+    vi.stubEnv("E2E_LOCAL_SUPABASE", "1");
+    vi.stubEnv("E2E_SUPABASE_PROJECT_REF", "local");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://supabase.test.internal:54321");
+
+    expect(() => assertSafeWritableIntegrationEnv(process.env)).toThrow(
+      /NEXT_PUBLIC_SUPABASE_URL correspondente a E2E_SUPABASE_PROJECT_REF/
+    );
+  });
+
+  it("blocks a Functions override outside the local Supabase origin", () => {
+    configureBaseIntegrationEnv();
+    vi.stubEnv("E2E_ALLOW_DATABASE_WRITES", "1");
+    vi.stubEnv("E2E_TARGET_KIND", "isolated-test");
+    vi.stubEnv("E2E_LOCAL_SUPABASE", "1");
+    vi.stubEnv("E2E_SUPABASE_PROJECT_REF", "local");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "http://127.0.0.1:54321");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL", "http://localhost:54321/functions/v1");
+
+    expect(() => assertSafeWritableIntegrationEnv(process.env)).toThrow(
+      /NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL correspondente ao projeto isolado/
+    );
+  });
 });

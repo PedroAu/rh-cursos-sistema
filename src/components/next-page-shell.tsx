@@ -5,7 +5,6 @@ import { Suspense, type ReactNode } from "react";
 import type { DashboardRole } from "@/lib/auth";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
 import { PublicLayout } from "@/components/layout/public-layout";
-import { AppToaster } from "@/components/ui/toaster";
 import { AppStoreProvider, type AppStoreInitialData } from "@/lib/app-store";
 import type { CurrentSession } from "@/types";
 
@@ -40,7 +39,6 @@ export function BarePageShell({
     <AppStoreProvider initialData={initialData}>
       <Suspense fallback={null}>
         {children}
-        <AppToaster />
       </Suspense>
     </AppStoreProvider>
   );
@@ -49,14 +47,16 @@ export function BarePageShell({
 export function DashboardPageShell({
   role,
   initialSession,
+  initialData,
   children
 }: {
   role: DashboardRole;
   initialSession: CurrentSession;
+  initialData?: AppStoreInitialData;
   children: ReactNode;
 }) {
   return (
-    <AppStoreProvider initialSession={initialSession}>
+    <AppStoreProvider initialSession={initialSession} initialData={initialData}>
       <Suspense fallback={null}>
         <DashboardShell role={role}>{children}</DashboardShell>
       </Suspense>
