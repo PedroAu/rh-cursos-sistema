@@ -1,16 +1,16 @@
 # Graph Report - site-rh-cursos  (2026-07-13)
 
 ## Corpus Check
-- 1888 files · ~2,869,927 words
+- 1889 files · ~2,873,162 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 28347 nodes · 35557 edges · 1875 communities (1667 shown, 208 thin omitted)
+- 28365 nodes · 35575 edges · 1878 communities (1668 shown, 210 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 1137 edges (avg confidence: 0.52)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `eccf179c`
+- Built from commit: `afece44f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -1551,10 +1551,12 @@
 - status
 - git-repo.js
 - actor
+- changeType
 - category
 - criteria
 - test-greeting-system.js
 - goals
+- status
 - integrationPoints
 - metric
 - milestones
@@ -1562,6 +1564,9 @@
 - priority
 - probability
 - problemStatement
+- actor
+- priority
+- checklists
 - title
 - userFlows
 - sprint
@@ -1639,11 +1644,11 @@
 - description
 - name
 - whyNot
+- impact
 - tags
 - Dev Agent Record
 - timeline
 - userFlows
-- obrigatorio
 - notes
 - Agent System
 - Common Commands
@@ -1652,7 +1657,6 @@
 - Environment Setup
 - Workflow Execution
 - Communication Plan
-- persistido
 - Uma (@ux-design-expert)
 - Agent System
 - Common Commands
@@ -1680,7 +1684,6 @@
 - Story 1.5 Instructor MVP Portal Activation
 - Story 1.6 Regression, Access Control, and Compatibility Hardening
 - Story 1.2 Consulting Offer and Conversion Flow
-- BuildConfigCheck
 - relatedPMDRs
 - Goals and Background Context
 - Next Steps (Immediate Actions)
@@ -1764,55 +1767,55 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1875 total, 208 thin omitted)
+## Communities (1878 total, 210 thin omitted)
 
 ### Community 0 - "Checkout Modal & Pagamento"
 Cohesion: 0.40
 Nodes (3): SearchOptions, useAdminSearch(), items
 
 ### Community 1 - "Admin Shell & Toaster"
-Cohesion: 0.03
-Nodes (70): ArrayInput(), ModulesBuilder(), ModuleValue, MultiSelectField(), ArrayList, Modules, MultiSelect, Story (+62 more)
+Cohesion: 0.04
+Nodes (64): ArrayInput(), ModulesBuilder(), ModuleValue, MultiSelectField(), ArrayList, Modules, MultiSelect, Story (+56 more)
 
 ### Community 2 - "Calendar & Class Cards"
 Cohesion: 0.02
-Nodes (108): StatusBadge(), Danger, Neutral, Spectrum, Story, Success, Warning, CourseCard() (+100 more)
+Nodes (105): StatusBadge(), Danger, Neutral, Spectrum, Story, Success, Warning, CourseCard() (+97 more)
 
 ### Community 3 - "Course Cards & Quote Modal"
-Cohesion: 0.03
-Nodes (124): AdminDashboardPage(), leadStatusDotClass(), leadStatusToneClass(), ActivityInput, ActivityKind, buildPerformanceStats(), buildRecentActivities(), DashboardActivity (+116 more)
+Cohesion: 0.04
+Nodes (93): AdminDashboardPage(), leadStatusDotClass(), leadStatusToneClass(), ActivityInput, ActivityKind, buildPerformanceStats(), buildRecentActivities(), DashboardActivity (+85 more)
 
 ### Community 4 - "Testimonials & Feature Cards"
 Cohesion: 0.03
-Nodes (71): BrownfieldPhase, EventEmitter, fs, path, PhaseFailureAction, PostDiscoveryChoice, buildFileIndex(), COMPRESSION_FIELDS (+63 more)
+Nodes (72): BrownfieldPhase, EventEmitter, fs, path, PhaseFailureAction, PostDiscoveryChoice, buildFileIndex(), COMPRESSION_FIELDS (+64 more)
 
 ### Community 5 - "Link, Progress & Session Secret"
 Cohesion: 0.05
-Nodes (62): buildSessionResponse(), DELETE(), GET(), POST(), readSessionTokenFromCookieHeader(), toSessionPayload(), POST(), toTipoAluno() (+54 more)
+Nodes (51): buildSessionResponse(), DELETE(), GET(), POST(), readSessionTokenFromCookieHeader(), toSessionPayload(), POST(), toTipoAluno() (+43 more)
 
 ### Community 6 - "Form Base Components"
 Cohesion: 0.08
 Nodes (23): Acceptance Criteria, Change Log, Complexidade, Contexto, Decisões Travadas (@po — 2026-07-12), Dependencies, Dev Agent Record, Executor Assignment (+15 more)
 
 ### Community 7 - "App Store (State Management)"
-Cohesion: 0.08
-Nodes (22): AdminLayout(), StudentLayout(), InstructorLayout(), BarePageShell(), DashboardPageShell(), PublicPageShell(), Dashboard, Public (+14 more)
+Cohesion: 0.05
+Nodes (56): Default, LongName, Story, UserCell(), AdminMutation, AppStoreProvider(), AppStoreValue, buildEnrollmentRecord() (+48 more)
 
 ### Community 8 - "Database Types & Mappers"
 Cohesion: 0.06
 Nodes (14): Epic5Executor, CONFIG, fs, main(), path, readline, RollbackManager, DEFAULT_CONFIG (+6 more)
 
 ### Community 10 - "Admin Form Validation"
-Cohesion: 0.06
-Nodes (37): CalendarView(), Default, Empty, Loading, Story, LowSeats, OpenEnrollment, Story (+29 more)
+Cohesion: 0.04
+Nodes (58): AdminLayout(), StudentLayout(), InstructorLayout(), CalendarView(), Default, Empty, Loading, Story (+50 more)
 
 ### Community 11 - "Public API Client & Schemas"
-Cohesion: 0.04
-Nodes (60): FAQAccordion(), items, Default, Story, AccordionContent(), AccordionItem(), AccordionTrigger(), items (+52 more)
+Cohesion: 0.08
+Nodes (33): FAQAccordion(), items, Default, Story, AccordionContent(), AccordionItem(), AccordionTrigger(), items (+25 more)
 
 ### Community 12 - "Error Fallback Boundary"
-Cohesion: 0.06
-Nodes (50): SeatProgress(), SeatProgressProps, AlmostFull, Empty, Full, PartiallyFilled, Story, Default (+42 more)
+Cohesion: 0.08
+Nodes (45): SeatProgress(), SeatProgressProps, AlmostFull, Empty, Full, PartiallyFilled, Story, addError() (+37 more)
 
 ### Community 13 - "Admin Dashboard Activity"
 Cohesion: 0.07
@@ -1831,8 +1834,8 @@ Cohesion: 0.06
 Nodes (39): { CodeIntelSource }, COMMANDS, { exec }, FORMAT_MAP, { formatAsDot }, { formatAsHtml }, { formatAsJson }, { formatAsMermaid } (+31 more)
 
 ### Community 17 - "Seat Progress & Typography"
-Cohesion: 0.05
-Nodes (60): baseRoutes, CommandPalette(), formatPhone(), getPhoneDigits(), getTeamSizeLabel(), initialForm, QuoteModalContext, QuoteModalContextValue (+52 more)
+Cohesion: 0.03
+Nodes (94): baseRoutes, CommandPalette(), ErrorFallback(), ErrorFallbackProps, Custom, Default, Story, WithReset (+86 more)
 
 ### Community 18 - "Card Component"
 Cohesion: 0.07
@@ -1844,7 +1847,7 @@ Nodes (34): buildAdminSessionToken(), buildUniqueEmail(), deleteRowByName(), log
 
 ### Community 20 - "API Validation & Retry"
 Cohesion: 0.09
-Nodes (43): checkDuplicateArtefact(), enrichRegistryEntry(), _formatDuplicateWarning(), getCodebaseContext(), { getEnricher, getClient, isCodeIntelAvailable }, assessRefactoringImpact(), _calculateRiskLevel(), checkBeforeWriting() (+35 more)
+Nodes (45): checkDuplicateArtefact(), enrichRegistryEntry(), _formatDuplicateWarning(), getCodebaseContext(), { getEnricher, getClient, isCodeIntelAvailable }, assessRefactoringImpact(), _calculateRiskLevel(), checkBeforeWriting() (+37 more)
 
 ### Community 21 - "Admin Resource Page (CRUD)"
 Cohesion: 0.06
@@ -1856,15 +1859,15 @@ Nodes (5): chalk, { parse }, path, RefactoringSuggester, t
 
 ### Community 23 - "In-Company Page Form"
 Cohesion: 0.04
-Nodes (51): BaseCheck, CheckDomain, CheckSeverity, CheckStatus, { BaseCheck, CheckSeverity, CheckDomain }, { BaseCheck, CheckSeverity, CheckDomain }, path, { BaseCheck, CheckSeverity, CheckDomain } (+43 more)
+Nodes (51): BaseCheck, CheckDomain, CheckSeverity, CheckStatus, { BaseCheck, CheckSeverity, CheckDomain }, { BaseCheck, CheckSeverity, CheckDomain }, BuildConfigCheck, path (+43 more)
 
 ### Community 25 - "Rate Limiting"
 Cohesion: 0.06
 Nodes (3): chalk, path, RefactoringSuggester
 
 ### Community 27 - "Course Card & Badge Variants"
-Cohesion: 0.09
-Nodes (26): useHotkey(), useSimulatedLoading(), AGENDA_CATEGORY_ORDER, AgendaEntry, AgendaMode, AgendaPage(), AgendaView, buildAgendaEntries() (+18 more)
+Cohesion: 0.05
+Nodes (59): Chip, ChipProps, chipVariants, Link, LinkProps, linkVariants, useHotkey(), useSimulatedLoading() (+51 more)
 
 ### Community 28 - "Contact Page & Test Utils"
 Cohesion: 0.04
@@ -1965,8 +1968,8 @@ Cohesion: 0.05
 Nodes (43): 1. Agente (AI-Powered Execution), 2. Worker (Script-Based Execution), 3. Humano (Manual Human Execution), 4. Clone (Mind Emulation with Heuristics), AIOX Executor Decision Tree, Capability Matrix, Cost-Benefit Analysis, Criterion 1: Creativity / Subjectivity Required (+35 more)
 
 ### Community 50 - "Security Headers"
-Cohesion: 0.04
-Nodes (44): ComponentSearch, DependencyAnalyzer, ElicitationEngine, MetaAgent, TaskManager, TemplateEngine, chalk, ComponentGenerator (+36 more)
+Cohesion: 0.05
+Nodes (42): BasicInputValidator, chalk, ElicitationSessionManager, fs, inquirer, path, ComponentSearch, DependencyAnalyzer (+34 more)
 
 ### Community 51 - "Lead Mapping & Insert"
 Cohesion: 0.05
@@ -2081,7 +2084,7 @@ Nodes (9): Category, CATEGORY_KEYWORDS, CONFIG, fs, getGotchasForSelfCritique(),
 
 ### Community 68 - "route.ts"
 Cohesion: 0.07
-Nodes (20): { BaseCheck, CheckSeverity, CheckDomain }, BranchProtectionCheck, { execSync }, PROTECTED_BRANCHES, { BaseCheck, CheckSeverity, CheckDomain }, COMMIT_PREFIXES, CommitHistoryCheck, { execSync } (+12 more)
+Nodes (21): deploymentChecks, localChecks, projectChecks, repositoryChecks, servicesChecks, { BaseCheck, CheckSeverity, CheckDomain }, BranchProtectionCheck, { execSync } (+13 more)
 
 ### Community 69 - "command: "npx eslint --fix $FILE 2>/dev/null || true""
 Cohesion: 0.05
@@ -2105,15 +2108,27 @@ Nodes (14): AIReviewer, CodeQualityAnalyzer, DiffAnalyzer, EventEmitter, { execS
 
 ### Community 74 - "properties"
 Cohesion: 0.06
-Nodes (41): description, items, type, description, type, type, description, type (+33 more)
+Nodes (40): description, items, type, description, type, type, description, type (+32 more)
 
 ### Community 75 - "Technical Debt Report — Phase 9 Executive Summary"
 Cohesion: 0.05
 Nodes (41): After Phase A (Week 2), After Phase B (Week 4), After Phase C (Week 6), APPENDIX: GLOSSARY, Backend/API Layer: B+ (Good), Best Case (2 developers, parallel work): 6 weeks, BUSINESS IMPACT ANALYSIS, CONCLUSION & RECOMMENDATION (+33 more)
 
 ### Community 76 - "index.js"
-Cohesion: 0.05
-Nodes (34): path, RISK_THRESHOLDS, G1EpicCreationGate, path, { VerificationGate }, G2StoryCreationGate, path, { VerificationGate } (+26 more)
+Cohesion: 0.06
+Nodes (31): path, RISK_THRESHOLDS, G1EpicCreationGate, path, { VerificationGate }, {
+  CircuitBreaker,
+  STATE_CLOSED,
+  STATE_OPEN,
+  STATE_HALF_OPEN,
+  DEFAULT_FAILURE_THRESHOLD,
+  DEFAULT_SUCCESS_THRESHOLD,
+  DEFAULT_RESET_TIMEOUT_MS,
+}, {
+  FrameworkGovernor,
+  TIMEOUT_MS,
+  RISK_THRESHOLDS,
+}, { G1EpicCreationGate } (+23 more)
 
 ### Community 77 - "loadDomainFile"
 Cohesion: 0.06
@@ -2165,7 +2180,7 @@ Nodes (39): 1. **Session Token Rotation** (AC1), 2. **RBAC Middleware** (AC2), 3
 
 ### Community 90 - "index.js"
 Cohesion: 0.06
-Nodes (17): { CodeGraphProvider }, { RegistryProvider }, CodeIntelEnricher, { CodeGraphProvider, TOOL_MAP }, { CodeIntelClient }, { CodeIntelEnricher }, { CodeIntelProvider, CAPABILITIES }, enrichWithCodeIntel() (+9 more)
+Nodes (16): { CodeGraphProvider }, { RegistryProvider }, CodeIntelEnricher, { CodeGraphProvider, TOOL_MAP }, { CodeIntelClient }, { CodeIntelEnricher }, { CodeIntelProvider, CAPABILITIES }, { RegistryProvider } (+8 more)
 
 ### Community 91 - "index.js"
 Cohesion: 0.08
@@ -2217,7 +2232,7 @@ Nodes (3): chalk, path, TestQualityAssessment
 
 ### Community 103 - "Agenda.tsx"
 Cohesion: 0.05
-Nodes (64): ClassCard(), BlogCard(), EmptyState(), EmptyStateProps, Default, Story, WithAction, CourseCardProps (+56 more)
+Nodes (54): ClassCard(), BlogCard(), Default, Featured, Story, EmptyState(), EmptyStateProps, Default (+46 more)
 
 ### Community 104 - "command: "npx eslint --fix $FILE 2>/dev/null || true""
 Cohesion: 0.05
@@ -2292,8 +2307,8 @@ Cohesion: 0.11
 Nodes (11): { CheckStatus, CheckSeverity }, colors, icons, ConsoleReporter, JSONReporter, MarkdownReporter, ReporterManager, { CheckStatus, CheckSeverity } (+3 more)
 
 ### Community 122 - ".error"
-Cohesion: 0.08
-Nodes (6): NetworkCheck, PackageJsonCheck, GitRepoCheck, GitStatusCheck, LargeFilesCheck, HealthCheckEngine
+Cohesion: 0.07
+Nodes (7): DiskSpaceCheck, NetworkCheck, ConflictsCheck, GitRepoCheck, GitStatusCheck, LargeFilesCheck, HealthCheckEngine
 
 ### Community 123 - "master-orchestrator.js"
 Cohesion: 0.06
@@ -2327,10 +2342,6 @@ Nodes (36): 1. YOLO Mode - Fast, Autonomous (0-1 prompts), 2. Interactive Mode -
 Cohesion: 0.05
 Nodes (36): 1. YOLO Mode - Fast, Autonomous (0-1 prompts), 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**, 3. Pre-Flight Planning - Comprehensive Upfront Planning, Acceptance Criteria, Configuration Dependencies, Error Handling, Execution Modes, Fase 1: Setup Automático (+28 more)
 
-### Community 131 - "CommitMessageGenerator"
-Cohesion: 0.08
-Nodes (8): CommitMessageGenerator, { createHash }, DiffGenerator, ModificationValidator, yaml, DiffGenerator, { execSync }, path
-
 ### Community 132 - "VisualImpactGenerator"
 Cohesion: 0.11
 Nodes (3): chalk, path, VisualImpactGenerator
@@ -2340,8 +2351,8 @@ Cohesion: 0.05
 Nodes (36): 1. Class Capacity Calculation ✅, 1. Current App Context Architecture, 1. Domain-Based Separation, 2. Memoized Value Objects, 2. Re-Render Trigger Analysis, 2. Real-time Subscription Debouncing ✅, 3. Callback Dependency Chains ✅, 3. Performance Baseline (+28 more)
 
 ### Community 134 - "Story 14.2.1: Home Publica com Fidelidade Total Trust Keith"
-Cohesion: 0.12
-Nodes (15): Acceptance Criteria, ClickUp Sync, CodeRabbit Integration, Epic, Executor Assignment, File List, Prerequisites, Quality Gate Tasks (+7 more)
+Cohesion: 0.05
+Nodes (37): Acceptance Criteria, Category Results, Change Log, Checklist, ClickUp Sync, CodeRabbit Integration, Completion Notes, Current State Observed by @sm (+29 more)
 
 ### Community 135 - "form-base.tsx"
 Cohesion: 0.08
@@ -2396,8 +2407,8 @@ Cohesion: 0.06
 Nodes (35): Check 8a — Automated Verify Presence, Check 8b — Feedback Latency Assessment, Check 8c — Sampling Continuity, Check 8d — Wave 0 Completeness, Check 8e — VALIDATION.md Existence (Gate), Dimension 10: CLAUDE.md Compliance, Dimension 11: Research Resolution (#1602), Dimension 12: Pattern Compliance (#1861) (+27 more)
 
 ### Community 148 - "global-config-manager.js"
-Cohesion: 0.05
-Nodes (93): {
+Cohesion: 0.15
+Nodes (32): {
   addServer,
   removeServer,
   setServerEnabled,
@@ -2405,7 +2416,17 @@ Nodes (93): {
   getAvailableTemplates,
   getServerTemplate,
   listServers,
-}, { Command }, createAddCommand(), executeAdd(), { getGlobalConfigPath }, { Command }, { createAddCommand }, { createLinkCommand } (+85 more)
+}, { Command }, executeAdd(), { getGlobalConfigPath }, { Command }, {
+  createGlobalStructure,
+  createGlobalConfig,
+  globalConfigExists,
+  getAvailableTemplates,
+  getServerTemplate,
+}, executeSetup(), {
+  getGlobalAioxDir,
+  getGlobalMcpDir,
+  getGlobalConfigPath,
+} (+24 more)
 
 ### Community 149 - "Tech Preset Template"
 Cohesion: 0.06
@@ -2449,7 +2470,7 @@ Nodes (34): Add Missing Indexes, Autovacuum Tuning, Before Go-Live, Cache Hit Ra
 
 ### Community 159 - "properties"
 Cohesion: 0.06
-Nodes (35): type, type, type, type, description, enum, type, type (+27 more)
+Nodes (31): type, type, type, type, type, type, type, properties (+23 more)
 
 ### Community 160 - "AIOX Document Template Specification"
 Cohesion: 0.06
@@ -2525,7 +2546,7 @@ Nodes (34): 10. Automated Evidence Added in EP-12.4, 1.1 Authentication & Author
 
 ### Community 180 - "decorators.tsx"
 Cohesion: 0.02
-Nodes (147): generateMetadata(), generateStaticParams(), getBlogPosts(), Page(), PageProps, generateMetadata(), getCourses(), Page() (+139 more)
+Nodes (140): generateMetadata(), generateStaticParams(), getBlogPosts(), Page(), PageProps, generateMetadata(), getCourses(), Page() (+132 more)
 
 ### Community 181 - "link.js"
 Cohesion: 0.06
@@ -2573,7 +2594,7 @@ Nodes (32): Adding Columns (Safe), Adding Indexes (Safe with CONCURRENTLY), Addi
 
 ### Community 192 - "properties"
 Cohesion: 0.06
-Nodes (33): enum, type, type, type, type, enum, type, properties (+25 more)
+Nodes (33): enum, type, type, type, type, properties, type, type (+25 more)
 
 ### Community 193 - "{Agent ID} - {Checklist Title}"
 Cohesion: 0.06
@@ -2584,8 +2605,8 @@ Cohesion: 0.10
 Nodes (10): ErrorBoundary, ErrorBoundaryProps, ErrorBoundaryState, Default, MultipleErrorBoundaries, Story, WithCustomFallback, WithError (+2 more)
 
 ### Community 195 - "public-layout.tsx"
-Cohesion: 0.09
-Nodes (20): checkOperation(), createGuard(), enforcePermission(), { OperationGuard }, { PermissionMode }, { AgentConfigLoader }, ALL_AGENT_IDS, { atomicWriteSync } (+12 more)
+Cohesion: 0.10
+Nodes (18): { AgentConfigLoader }, ALL_AGENT_IDS, { atomicWriteSync }, _BOOT_TIME, ContextDetector, fsSync, GitConfigDetector, GreetingBuilder (+10 more)
 
 ### Community 196 - "RLS Policies"
 Cohesion: 0.17
@@ -2601,7 +2622,7 @@ Nodes (33): Achado de Test Architecture (dívida pré-existente, não bloqueante
 
 ### Community 199 - "index.js"
 Cohesion: 0.06
-Nodes (22): deploymentChecks, localChecks, projectChecks, repositoryChecks, servicesChecks, AioxDirectoryCheck, { BaseCheck, CheckSeverity, CheckDomain }, EXPECTED_STRUCTURE (+14 more)
+Nodes (20): AioxDirectoryCheck, { BaseCheck, CheckSeverity, CheckDomain }, EXPECTED_STRUCTURE, path, { BaseCheck, CheckSeverity, CheckDomain }, FrameworkConfigCheck, path, RECOMMENDED_CONFIGS (+12 more)
 
 ### Community 201 - "BobStatusWriter"
 Cohesion: 0.11
@@ -2637,7 +2658,7 @@ Nodes (31): 1. YOLO Mode - Fast, Autonomous (0-1 prompts), 2. Interactive Mode -
 
 ### Community 210 - "Quality Gates Specification v4.2"
 Cohesion: 0.06
-Nodes (32): Adjusting Thresholds, After Quality Gates (v4.2), Architecture Diagram, Before Quality Gates (v2.0), Checks, CODEOWNERS Configuration, CodeRabbit Self-Healing, Configuration (+24 more)
+Nodes (33): Adjusting Thresholds, After Quality Gates (v4.2), Architecture Diagram, Before Quality Gates (v2.0), Checks, CODEOWNERS Configuration, CodeRabbit Self-Healing, Configuration (+25 more)
 
 ### Community 211 - "Section Specifications"
 Cohesion: 0.06
@@ -2652,8 +2673,8 @@ Cohesion: 0.06
 Nodes (31): 1.1 Summary, 1.2 Goals, 1.3 Non-Goals, 1. Overview, 2.1 Functional Requirements, 2.2 Non-Functional Requirements, 2.3 Constraints, 2.4 Assumptions (+23 more)
 
 ### Community 214 - "type"
-Cohesion: 0.07
-Nodes (32): items, type, description, items, type, description, items, type (+24 more)
+Cohesion: 0.12
+Nodes (16): description, items, type, description, properties, type, agents, components (+8 more)
 
 ### Community 215 - "command: "npx eslint --fix $FILE 2>/dev/null || true""
 Cohesion: 0.06
@@ -2748,8 +2769,8 @@ Cohesion: 0.11
 Nodes (3): chalk, DependencyImpactAnalyzer, path
 
 ### Community 238 - "terminal-spawner.js"
-Cohesion: 0.06
-Nodes (27): EventEmitter, _path, { spawn }, SubagentDispatcher, activeChildProcesses, activeLockFiles, cleanupHandler(), cleanupLocks() (+19 more)
+Cohesion: 0.10
+Nodes (23): activeChildProcesses, activeLockFiles, cleanupHandler(), cleanupLocks(), createContextFile(), DEFAULT_OPTIONS, detectEnvironment(), ENVIRONMENT_TYPE (+15 more)
 
 ### Community 239 - "Decision Heuristics Framework"
 Cohesion: 0.07
@@ -2781,7 +2802,7 @@ Nodes (29): 1. Analyze Story Requirements, 1. YOLO Mode - Fast, Autonomous (0-1 
 
 ### Community 246 - "properties"
 Cohesion: 0.08
-Nodes (30): default, type, type, minimum, type, items, type, items (+22 more)
+Nodes (25): default, type, type, minimum, type, type, type, type (+17 more)
 
 ### Community 247 - "PatternExtractor"
 Cohesion: 0.12
@@ -2797,15 +2818,15 @@ Nodes (29): 1. New Session (Minimal Context), 2. Existing Context (Active Sessio
 
 ### Community 250 - "properties"
 Cohesion: 0.07
-Nodes (27): description, type, type, type, type, type, properties, description (+19 more)
+Nodes (30): description, type, type, type, type, type, properties, description (+22 more)
 
 ### Community 251 - "type"
-Cohesion: 0.07
-Nodes (31): description, items, type, items, type, description, type, items (+23 more)
+Cohesion: 0.06
+Nodes (35): description, items, type, items, type, description, type, items (+27 more)
 
 ### Community 252 - "index.js"
 Cohesion: 0.07
-Nodes (19): ApiEndpointsCheck, { BaseCheck, CheckSeverity, CheckDomain }, COMMON_ENDPOINTS, https, { BaseCheck, CheckSeverity, CheckDomain }, ClaudeCodeCheck, { execSync }, os (+11 more)
+Nodes (19): { BaseCheck, CheckSeverity, CheckDomain }, ClaudeCodeCheck, { execSync }, os, path, { BaseCheck, CheckSeverity, CheckDomain }, { execSync }, GeminiCliCheck (+11 more)
 
 ### Community 253 - "index.js"
 Cohesion: 0.10
@@ -2880,8 +2901,8 @@ Cohesion: 0.07
 Nodes (28): description, type, description, type, description, type, description, type (+20 more)
 
 ### Community 271 - "SubagentDispatcher"
-Cohesion: 0.08
-Nodes (25): 10-Point Validation (@po, 2026-07-13), Acceptance Criteria, Change Log, Completion Notes, Current State Observed (do diagnóstico @architect, confirmado por leitura direta do código), Debug Log References, Decisão de UX vazio/erro (@po, 2026-07-13), Dev Agent Record (+17 more)
+Cohesion: 0.06
+Nodes (33): 10-Point Validation (@po, 2026-07-13), Acceptance Criteria, 🔴 Achado Crítico (HIGH · REL-001) — root cause da Épica 16, Achado secundário (LOW · REL-002 · AC5), Change Log, Completion Notes, Current State Observed (do diagnóstico @architect, confirmado por leitura direta do código), Debug Log References (+25 more)
 
 ### Community 272 - "BackupManager"
 Cohesion: 0.13
@@ -2936,8 +2957,8 @@ Cohesion: 0.07
 Nodes (24): Always Enable RLS, Avoid Expensive Subqueries, Avoid USING (true), Common Issues, COMMON PATTERNS, DEBUGGING RLS, Default Deny, Enabling RLS (+16 more)
 
 ### Community 285 - "properties"
-Cohesion: 0.07
-Nodes (28): type, type, enum, type, properties, type, type, type (+20 more)
+Cohesion: 0.08
+Nodes (25): type, type, properties, type, type, type, type, description (+17 more)
 
 ### Community 286 - "AIOX V3 Schemas"
 Cohesion: 0.07
@@ -2960,8 +2981,8 @@ Cohesion: 0.07
 Nodes (27): Accessibility Audit Findings (Detailed), Accessibility Compliance, Accessibility Test Results, CI/CD Coverage, CI Pipeline Status, Conclusion, Critical Path for Wave 3 QA Gate, Critical Risks (+19 more)
 
 ### Community 291 - "workflow-orchestrator.js"
-Cohesion: 0.07
-Nodes (24): fs, path, normalizeContext(), normalizeProfile(), PROFILE_POLICIES, resolveExecutionProfile(), VALID_CONTEXTS, VALID_PROFILES (+16 more)
+Cohesion: 0.10
+Nodes (20): fs, path, normalizeContext(), normalizeProfile(), PROFILE_POLICIES, resolveExecutionProfile(), VALID_CONTEXTS, VALID_PROFILES (+12 more)
 
 ### Community 293 - "Tier System Framework"
 Cohesion: 0.07
@@ -2996,20 +3017,20 @@ Cohesion: 0.07
 Nodes (26): 1. YOLO Mode - Fast, Autonomous (0-1 prompts), 2. Interactive Mode - Balanced, Educational (5-10 prompts) **[DEFAULT]**, 3. Pre-Flight Planning - Comprehensive Upfront Planning, Acceptance Criteria, Error Handling, Error Handling, Execution Modes, Implementation Steps (+18 more)
 
 ### Community 301 - "properties"
-Cohesion: 0.07
-Nodes (27): description, type, description, type, description, type, description, type (+19 more)
+Cohesion: 0.08
+Nodes (25): description, type, description, type, description, type, description, format (+17 more)
 
 ### Community 302 - "WorktreeManager"
-Cohesion: 0.10
-Nodes (11): fraunces, inter, merriweather, metadata, ErrorBoundary(), ErrorBoundaryProps, ErrorBoundaryRoot, ErrorBoundaryState (+3 more)
+Cohesion: 0.12
+Nodes (8): fraunces, inter, merriweather, metadata, ErrorBoundary(), ErrorBoundaryProps, ErrorBoundaryRoot, ErrorBoundaryState
 
 ### Community 303 - "AIOX Tools - Integrations Directory"
 Cohesion: 0.07
 Nodes (26): Adding New Tools, AIOX Tools - Integrations Directory, Authentication Issues, Automation, Available CLI Tools, Available Local Tools, Available MCP Servers, Backend Services (+18 more)
 
 ### Community 304 - "default"
-Cohesion: 0.09
-Nodes (27): default, description, enum, type, description, type, default, type (+19 more)
+Cohesion: 0.08
+Nodes (30): default, description, enum, type, description, type, default, type (+22 more)
 
 ### Community 305 - "index.js"
 Cohesion: 0.13
@@ -3040,20 +3061,16 @@ Cohesion: 0.11
 Nodes (21): { Command }, createCleanupCommand(), { MetricsCollector }, { Command }, { createCleanupCommand }, createMetricsCommand(), { createRecordCommand }, { createSeedCommand } (+13 more)
 
 ### Community 311 - "info.js"
-Cohesion: 0.13
-Nodes (25): BOX, formatInfo(), formatInfoJSON(), formatInfoPretty(), formatInfoYAML(), formatNotFoundError(), wrapText(), yaml (+17 more)
-
-### Community 312 - "ElicitationEngine"
-Cohesion: 0.11
-Nodes (8): BasicInputValidator, chalk, ElicitationEngine, ElicitationSessionManager, fs, inquirer, isSafePattern(), path
+Cohesion: 0.12
+Nodes (24): BOX, formatInfo(), formatInfoJSON(), formatInfoPretty(), formatInfoYAML(), formatNotFoundError(), wrapText(), yaml (+16 more)
 
 ### Community 315 - "3. Dimension Details"
 Cohesion: 0.08
 Nodes (25): 1. Overview, 2. Standard Quality Dimensions, 3.10 Adaptability (Weight: 0.6), 3.1 Accuracy (Weight: 1.0, VETO), 3.2 Coherence (Weight: 0.9), 3.3 Strategic Alignment (Weight: 0.9), 3.4 Operational Excellence (Weight: 0.8), 3.5 Innovation Capacity (Weight: 0.7) (+17 more)
 
 ### Community 316 - "greeting-builder.js"
-Cohesion: 0.08
-Nodes (22): ContextDetector, fs, GitConfigDetector, GreetingPreferenceManager, { loadProjectStatus }, path, { PermissionMode }, { resolveConfig } (+14 more)
+Cohesion: 0.07
+Nodes (28): ContextDetector, fs, GitConfigDetector, GreetingPreferenceManager, { loadProjectStatus }, path, { PermissionMode }, { resolveConfig } (+20 more)
 
 ### Community 317 - "PerformanceAnalyzer"
 Cohesion: 0.15
@@ -3112,8 +3129,8 @@ Cohesion: 0.09
 Nodes (15): { execSync }, fs, { PMAdapter }, NOTE: Currently limited - GitHub Projects doesn't store full story content., yaml, fs, https, { PMAdapter } (+7 more)
 
 ### Community 331 - "properties"
-Cohesion: 0.10
-Nodes (26): items, type, items, type, properties, type, checklists, data (+18 more)
+Cohesion: 0.09
+Nodes (28): items, type, items, type, properties, type, type, checklists (+20 more)
 
 ### Community 333 - "PerformanceAnalyzer"
 Cohesion: 0.15
@@ -3128,16 +3145,16 @@ Cohesion: 0.08
 Nodes (25): AIOX Presets, Available Presets, Best Practices, Core Presets, Creating a New Preset, Creating Custom Presets, Domain-Specific Presets, Example: Layered Configuration (+17 more)
 
 ### Community 337 - "properties"
-Cohesion: 0.08
-Nodes (26): description, minLength, type, description, type, description, type, default (+18 more)
+Cohesion: 0.07
+Nodes (30): description, minLength, type, description, type, description, type, default (+22 more)
 
 ### Community 338 - "QA Report: {{storyId}}"
 Cohesion: 0.08
 Nodes (25): Critical (Blocks Release), Critical (Blocks Release), E2E Tests, {{id}}: {{title}}, {{id}}: {{title}}, {{id}}: {{title}}, Integration Tests, Issues Found (+17 more)
 
 ### Community 339 - "properties"
-Cohesion: 0.08
-Nodes (25): description, type, description, description, type, $id, description, type (+17 more)
+Cohesion: 0.09
+Nodes (22): description, type, description, $id, description, type, description, type (+14 more)
 
 ### Community 340 - "MCP Server Usage Rules - AIOX Architecture"
 Cohesion: 0.08
@@ -3170,15 +3187,6 @@ Nodes (22): BuildEvent, { BuildStateManager }, DEFAULT_CONFIG, { EventEmitter },
 ### Community 347 - "VerificationGate"
 Cohesion: 0.11
 Nodes (4): CircuitBreaker, { CircuitBreaker }, createGateResult(), VerificationGate
-
-### Community 348 - "RegistryHealer"
-Cohesion: 0.09
-Nodes (13): buildEntityIndex(), {
-  computeChecksum,
-  extractKeywords,
-  REPO_ROOT,
-  REGISTRY_PATH,
-}, crypto, daysSince(), fs, HEALING_BACKUP_DIR, HEALING_LOG_PATH, HEALING_RULES (+5 more)
 
 ### Community 351 - "safeReadJson"
 Cohesion: 0.13
@@ -3221,12 +3229,12 @@ Cohesion: 0.08
 Nodes (24): AIOX Documentation Template, API/Reference Template, Architecture Decision Record (ADR), Code Blocks, Creating New Documentation, Example 1: Creating an Agent Guide, Examples, File Structure (+16 more)
 
 ### Community 361 - "properties"
-Cohesion: 0.10
-Nodes (21): description, minLength, type, description, type, description, type, description (+13 more)
+Cohesion: 0.07
+Nodes (30): description, minLength, type, description, type, description, type, description (+22 more)
 
 ### Community 362 - "type"
 Cohesion: 0.09
-Nodes (25): items, minLength, required, type, items, description, items, minItems (+17 more)
+Nodes (25): description, items, minItems, type, items, minLength, required, type (+17 more)
 
 ### Community 363 - "Usage Examples"
 Cohesion: 0.08
@@ -3325,16 +3333,16 @@ Cohesion: 0.08
 Nodes (24): Agent Standards, AIOX Standards Documentation Index, Architecture Documentation, 📜 Change Log, Concepts Added, Core Framework Standards (Current v4.2), 📂 Document Organization, 📝 Document Status Legend (+16 more)
 
 ### Community 389 - "properties"
-Cohesion: 0.08
-Nodes (23): description, type, description, items, type, type, description, $id (+15 more)
+Cohesion: 0.10
+Nodes (20): description, type, required, type, description, items, type, description (+12 more)
 
 ### Community 390 - "properties"
-Cohesion: 0.08
-Nodes (24): minimum, type, description, items, minimum, type, type, description (+16 more)
+Cohesion: 0.11
+Nodes (19): minimum, type, type, description, properties, type, attempts, averageTimePerSubtask (+11 more)
 
 ### Community 391 - "modification-validator.js"
-Cohesion: 0.08
-Nodes (19): chalk, fs, { parse }, path, SecurityChecker, chalk, crypto, DependencyManager (+11 more)
+Cohesion: 0.13
+Nodes (12): chalk, fs, { parse }, path, SecurityChecker, chalk, crypto, DependencyManager (+4 more)
 
 ### Community 392 - "generate-optimization-report.js"
 Cohesion: 0.13
@@ -3413,8 +3421,8 @@ Cohesion: 0.15
 Nodes (19): { Command }, createQaCommand(), { createRunCommand }, { createStatusCommand }, { Command }, createRunCommand(), formatDuration(), printLayerResult() (+11 more)
 
 ### Community 413 - "properties"
-Cohesion: 0.09
-Nodes (23): additionalProperties, properties, type, default, type, additionalProperties, description, properties (+15 more)
+Cohesion: 0.18
+Nodes (11): additionalProperties, description, properties, type, ide_sync_system, redirects, source, additionalProperties (+3 more)
 
 ### Community 415 - "BacklogManager"
 Cohesion: 0.12
@@ -3489,8 +3497,8 @@ Cohesion: 0.09
 Nodes (23): Code Quality Assessment, Code Quality Assessment, Compliance Check, Compliance Check, Files Modified During Review, Files Modified During Review, Final Review Date: 2026-07-04, Gate Status (+15 more)
 
 ### Community 435 - "index.js"
-Cohesion: 0.11
-Nodes (20): { Command }, createManifestCommand(), { createRegenerateCommand }, { createValidateCommand }, { Command }, { createManifestGenerator }, createRegenerateCommand(), path (+12 more)
+Cohesion: 0.13
+Nodes (17): { Command }, createManifestCommand(), { createRegenerateCommand }, { createValidateCommand }, { Command }, { createManifestGenerator }, createRegenerateCommand(), path (+9 more)
 
 ### Community 436 - "ContextInjector"
 Cohesion: 0.15
@@ -3545,8 +3553,8 @@ Cohesion: 0.09
 Nodes (21): Complementary (Has Local Knowledge), Comprehensive (No Local Knowledge), Copywriting, Copywriting (Specialist-Based), Deep Research Prompt Template, Deliverables Templates, Example: Fully Rendered Prompt, Extended Deliverables (Deep Research) (+13 more)
 
 ### Community 450 - "properties"
-Cohesion: 0.09
-Nodes (22): properties, required, type, description, type, description, type, description (+14 more)
+Cohesion: 0.11
+Nodes (19): properties, description, type, description, type, description, type, description (+11 more)
 
 ### Community 451 - "validate-agents.js"
 Cohesion: 0.13
@@ -3622,7 +3630,7 @@ Nodes (21): description, items, type, description, items, type, required, type (
 
 ### Community 473 - "properties"
 Cohesion: 0.10
-Nodes (21): description, minLength, type, description, minLength, type, description, minLength (+13 more)
+Nodes (21): description, minLength, type, description, minLength, type, description, enum (+13 more)
 
 ### Community 476 - "AI Evaluation Reference"
 Cohesion: 0.10
@@ -3684,6 +3692,10 @@ Nodes (20): AIOX Color Palette - Quick Reference, Brand Colors, 🔗 Brand Refer
 Cohesion: 0.10
 Nodes (20): Agent Assignment, Arquitetura Modular v4.2, 🤖 CodeRabbit Integration, Configuração, 🧑‍💻 Dev Agent Record, Estrutura Completa, Estrutura de Squad, Execution Log (+12 more)
 
+### Community 497 - "ChangelogGenerator"
+Cohesion: 0.17
+Nodes (4): ChangelogGenerator, { execSync }, fs, path
+
 ### Community 498 - "Self-Critique Checklist"
 Cohesion: 0.10
 Nodes (19): Anti-Patterns to Avoid, Audit Trail, Checklist Items, Checklist Items, Configuration, Execution Process, Execution Process, Integration with Coder Agent (+11 more)
@@ -3701,12 +3713,12 @@ Cohesion: 0.10
 Nodes (19): Agent-Specific Tasks, Context Required, Description, Error Handling, Example {{EXAMPLE_NUMBER}}: {{EXAMPLE_TITLE}}, Examples, How to Apply, Interactive Elicitation (+11 more)
 
 ### Community 502 - "properties"
-Cohesion: 0.10
-Nodes (20): default, description, type, default, description, type, default, description (+12 more)
+Cohesion: 0.08
+Nodes (24): default, description, type, default, description, type, default, description (+16 more)
 
 ### Community 503 - "properties"
-Cohesion: 0.10
-Nodes (20): default, description, type, default, description, type, default, description (+12 more)
+Cohesion: 0.08
+Nodes (24): default, description, type, default, description, type, default, description (+16 more)
 
 ### Community 504 - "properties"
 Cohesion: 0.10
@@ -3753,12 +3765,12 @@ Cohesion: 0.11
 Nodes (18): 1. Story Development Cycle (SDC) — PRIMARY, 2. QA Loop — ITERATIVE REVIEW, 4. Brownfield Discovery — LEGACY ASSESSMENT, Bug Fix (Fast Track), Data Collection (Phases 1-3), Draft & Validation (Phases 4-7), Finalization (Phases 8-10), New Feature (End-to-End) (+10 more)
 
 ### Community 516 - "status.js"
-Cohesion: 0.14
-Nodes (13): fs, { getClient, isCodeIntelAvailable }, inferRole(), path, { RegistryLoader, DEFAULT_REGISTRY_PATH }, ROLE_MAP, yaml, crypto (+5 more)
+Cohesion: 0.15
+Nodes (12): fs, { getClient, isCodeIntelAvailable }, path, { RegistryLoader, DEFAULT_REGISTRY_PATH }, ROLE_MAP, yaml, crypto, DEFAULT_REGISTRY_PATH (+4 more)
 
 ### Community 517 - "index.js"
-Cohesion: 0.08
-Nodes (47): formatMigrationPlan(), calculateChecksum(), copyFileWithMetadata(), createBackup(), createBackupDirName(), crypto, findLatestBackup(), fs (+39 more)
+Cohesion: 0.16
+Nodes (18): listBackups(), askConfirmation(), { Command }, { createBackup, verifyBackup, listBackups }, createMigrateCommand(), createProgressReporter(), { detectV2Structure, analyzeMigrationPlan, formatMigrationPlan }, { executeMigration, saveMigrationState, clearMigrationState } (+10 more)
 
 ### Community 518 - "logging"
 Cohesion: 0.11
@@ -3885,8 +3897,8 @@ Cohesion: 0.22
 Nodes (16): activateAction(), { Command }, confirm(), createProCommand(), deactivateAction(), featuresAction(), formatDate(), fs (+8 more)
 
 ### Community 554 - "search.js"
-Cohesion: 0.08
-Nodes (26): { Command }, { createInfoCommand }, { createListCommand }, { createSearchCommand }, createWorkersCommand(), createInfoCommand(), createListCommand(), { applyFilters } (+18 more)
+Cohesion: 0.11
+Nodes (18): { applyFilters }, { calculateScores, sortByScore }, { Command }, executeSearch(), applyFilters(), { formatOutput }, path, { searchKeyword } (+10 more)
 
 ### Community 555 - "utility_scripts_registry"
 Cohesion: 0.12
@@ -4103,7 +4115,7 @@ Nodes (17): type, description, items, type, description, items, type, descriptio
 
 ### Community 618 - "properties"
 Cohesion: 0.12
-Nodes (17): description, type, description, type, description, type, description, enum (+9 more)
+Nodes (17): description, type, description, type, description, type, properties, assignee (+9 more)
 
 ### Community 619 - "GitHub Copilot-Specific Configuration"
 Cohesion: 0.12
@@ -4170,8 +4182,8 @@ Cohesion: 0.12
 Nodes (16): 1. **@pm (Morgan)** — Project Orchestration, 2. **@architect (Aria)** — Auth Architecture, 3. **@dev (Dex)** — Implementation, 4. **@security-reviewer** — Security Audit, 5. **@qa (Quinn)** — Testing & Validation, Blocker Escalation, 🚨 Communication Protocol, 📅 Critical Milestones (+8 more)
 
 ### Community 637 - "enrollment-class-resolution.ts"
-Cohesion: 0.08
-Nodes (33): ErrorFallback(), ErrorFallbackProps, Custom, Default, Story, WithReset, Link, LinkProps (+25 more)
+Cohesion: 0.09
+Nodes (26): Checkbox, CheckboxProps, Checked, Disabled, Indeterminate, Interactive, Story, Unchecked (+18 more)
 
 ### Community 638 - "admin-mappers.ts"
 Cohesion: 0.24
@@ -4186,8 +4198,8 @@ Cohesion: 0.12
 Nodes (15): additionalProperties, description, $id, default, description, type, properties, markdownExploder (+7 more)
 
 ### Community 641 - "properties"
-Cohesion: 0.10
-Nodes (19): additionalProperties, additionalProperties, description, type, description, additionalProperties, description, type (+11 more)
+Cohesion: 0.12
+Nodes (15): additionalProperties, additionalProperties, description, type, description, additionalProperties, description, type (+7 more)
 
 ### Community 642 - "properties"
 Cohesion: 0.12
@@ -4198,16 +4210,16 @@ Cohesion: 0.12
 Nodes (16): type, type, type, minimum, type, auto_cleanup, auto_create, branch_prefix (+8 more)
 
 ### Community 644 - "template_overrides"
-Cohesion: 0.17
-Nodes (12): description, items, type, optional_sections, sections_order, story, description, oneOf (+4 more)
+Cohesion: 0.12
+Nodes (16): description, items, type, optional_sections, sections_order, story, template_overrides, description (+8 more)
 
 ### Community 645 - "fix-handler.js"
 Cohesion: 0.14
 Nodes (11): EXPECTED_AGENTS, fs, path, EXPECTED_RULES, fs, path, { EXPECTED_AGENTS }, { EXPECTED_RULES } (+3 more)
 
 ### Community 647 - "os-detector.js"
-Cohesion: 0.06
-Nodes (35): Acceptance Criteria, Adendo — Captura visual comparativa (canvas ≥1280px) e contraste do chip ativo, Change Log, Checklist de 10 pontos, Completion Notes, Condição de acompanhamento (não bloqueante), Current State Observed, Debug Log References (+27 more)
+Cohesion: 0.05
+Nodes (36): Acceptance Criteria, Adendo — Captura visual comparativa (canvas ≥1280px) e contraste do chip ativo, Change Log, Checklist de 10 pontos, Completion Notes, Condição de acompanhamento (não bloqueante), Current State Observed, Debug Log References (+28 more)
 
 ### Community 648 - "cli-commands.js"
 Cohesion: 0.22
@@ -4270,16 +4282,16 @@ Cohesion: 0.29
 Nodes (14): colors, { execaSync }, fs, path, printError(), printHeader(), printInfo(), printSuccess() (+6 more)
 
 ### Community 663 - "type"
-Cohesion: 0.12
-Nodes (16): items, type, type, dependsOn, stakeholders, successCriteria, technicalRequirements, description (+8 more)
+Cohesion: 0.11
+Nodes (19): items, type, description, properties, type, items, type, type (+11 more)
 
 ### Community 664 - "properties"
 Cohesion: 0.12
-Nodes (16): description, type, description, minLength, type, properties, functional_requirements, owner (+8 more)
+Nodes (16): description, type, description, minLength, type, description, minLength, type (+8 more)
 
 ### Community 665 - "type"
-Cohesion: 0.13
-Nodes (16): description, items, minItems, type, items, type, description, properties (+8 more)
+Cohesion: 0.14
+Nodes (15): items, type, description, items, type, description, properties, type (+7 more)
 
 ### Community 666 - "properties"
 Cohesion: 0.22
@@ -4362,8 +4374,26 @@ Cohesion: 0.13
 Nodes (15): minimum, type, additionalProperties, properties, type, additionalProperties, description, properties (+7 more)
 
 ### Community 690 - "SubagentPromptBuilder"
-Cohesion: 0.23
-Nodes (12): AlertDialog(), AlertDialogAction(), AlertDialogCancel(), AlertDialogContent(), AlertDialogContext, AlertDialogContextType, AlertDialogDescription(), AlertDialogHeader() (+4 more)
+Cohesion: 0.15
+Nodes (30): {
+  analyzeMigration,
+  executeMigration,
+  MIGRATION_OPTION,
+}, { Command }, {
+  createLink,
+  removeLink,
+  checkLinkStatus,
+  LINK_STATUS,
+  getProjectMcpPath,
+}, executeLink(), {
+  getGlobalMcpDir,
+  getLinkType,
+  isWindows,
+}, {
+  globalConfigExists,
+  createGlobalStructure,
+  createGlobalConfig,
+}, analyzeMigration(), executeMigration() (+22 more)
 
 ### Community 691 - "ChecklistGenerator"
 Cohesion: 0.20
@@ -4470,8 +4500,8 @@ Cohesion: 0.18
 Nodes (4): addFormats, Ajv, path, TemplateValidator
 
 ### Community 720 - "properties"
-Cohesion: 0.13
-Nodes (15): description, type, description, type, enum, properties, description, type (+7 more)
+Cohesion: 0.11
+Nodes (18): description, type, description, items, type, description, type, properties (+10 more)
 
 ### Community 721 - "properties"
 Cohesion: 0.13
@@ -4654,8 +4684,8 @@ Cohesion: 0.14
 Nodes (13): Anti-patterns to Avoid, Duplicate Coverage Guard, End-to-End Tests, Favor E2E Tests When:, Favor Integration Tests When:, Favor Unit Tests When:, Integration Tests, Test ID Format (+5 more)
 
 ### Community 774 - "stories"
-Cohesion: 0.14
-Nodes (14): required, risks, sprints, stories, description, items, type, description (+6 more)
+Cohesion: 0.11
+Nodes (18): required, risks, sprints, stories, successCriteria, description, items, type (+10 more)
 
 ### Community 775 - "userStory"
 Cohesion: 0.14
@@ -4710,8 +4740,8 @@ Cohesion: 0.14
 Nodes (13): Auth Security Audit — EP-11.4, External references reviewed, Findings, PASS-01 — Authorization input uses `app_metadata.role`, PASS-02 — Session cookie is short-lived and rotates before expiry, PASS-03 — Logout is fail-safe locally, Recommendation, Residual risks (+5 more)
 
 ### Community 789 - "Story 14.0.2: Specs de Fidelidade por Página"
-Cohesion: 0.22
-Nodes (9): type, type, properties, type, archetype, communication, persona_profile, zodiac (+1 more)
+Cohesion: 0.14
+Nodes (4): EventEmitter, _path, { spawn }, SubagentDispatcher
 
 ### Community 790 - "devops-run-all.mjs"
 Cohesion: 0.15
@@ -4742,8 +4772,8 @@ Cohesion: 0.24
 Nodes (4): ChecklistRunner, fs, path, yaml
 
 ### Community 800 - "ConditionEvaluator"
-Cohesion: 0.38
-Nodes (9): buildSearchText(), cosineSimilarity(), fs, getEmbedding(), { getRegistry }, loadWorkerEmbeddings(), path, precomputeEmbeddings() (+1 more)
+Cohesion: 0.18
+Nodes (18): buildSearchFields(), escapeRegex(), fuzzyMatchScore(), { getRegistry }, searchByTags(), searchKeyword(), buildSearchText(), cosineSimilarity() (+10 more)
 
 ### Community 803 - "properties"
 Cohesion: 0.15
@@ -4759,7 +4789,7 @@ Nodes (6): getObjectDepth(), path, RateLimiter, safePath(), validateJSON(), vali
 
 ### Community 807 - "AIOX Knowledge Base"
 Cohesion: 0.15
-Nodes (12): AIOX Knowledge Base, Contributing to AIOX-Method, Environment-Specific Usage, Getting Help, Key Features, Overview, Performance Optimization, Quality Assurance (+4 more)
+Nodes (12): AIOX Knowledge Base, Contributing to AIOX-Method, Cost-Effective Document Creation Workflow, Document Creation Best Practices, Document Sharding, Getting Help, Key Features, Overview (+4 more)
 
 ### Community 808 - "Core Architecture"
 Cohesion: 0.15
@@ -4802,8 +4832,8 @@ Cohesion: 0.15
 Nodes (12): Available Capabilities, Client (primitive — via `getClient()`), Code Intelligence Integration Pattern, Complete Example, Enricher (composite — via `getEnricher()`), Existing Helpers (Reference), Mock Strategy, Partial Results Pattern (+4 more)
 
 ### Community 821 - "properties"
-Cohesion: 0.15
-Nodes (13): properties, enum, type, type, emoji_frequency, greeting_levels, signature_closing, tone (+5 more)
+Cohesion: 0.10
+Nodes (20): type, properties, type, enum, type, type, properties, archetype (+12 more)
 
 ### Community 822 - "path-analyzer.js"
 Cohesion: 0.26
@@ -4826,12 +4856,12 @@ Cohesion: 0.15
 Nodes (13): description, items, type, required, description, items, type, indexes (+5 more)
 
 ### Community 829 - "required"
-Cohesion: 0.50
-Nodes (4): description, items, type, non_functional_requirements
+Cohesion: 0.15
+Nodes (13): description, items, type, required, description, items, type, functional_requirements (+5 more)
 
 ### Community 830 - "required"
-Cohesion: 0.15
-Nodes (13): description, items, type, required, definitionOfDone, tasks, testing, description (+5 more)
+Cohesion: 0.14
+Nodes (14): description, items, minItems, type, required, acceptanceCriteria, tasks, testing (+6 more)
 
 ### Community 831 - "Pull Request"
 Cohesion: 0.15
@@ -4934,8 +4964,8 @@ Cohesion: 0.28
 Nodes (12): AdminSession, DashboardRole, decodeSession(), encodeSession(), fromBase64Url(), getSessionSecret(), getSessionToken(), isDashboardRole() (+4 more)
 
 ### Community 856 - "update-imports.js"
-Cohesion: 0.09
-Nodes (30): analyzeMigrationPlan(), categorizeFile(), detectV2Structure(), formatSize(), fs, { getAllFiles }, MODULE_MAPPING, path (+22 more)
+Cohesion: 0.27
+Nodes (11): buildPathTransformMap(), fs, getJsFiles(), IMPORT_PATTERNS, { MODULE_MAPPING, categorizeFile }, path, scanFileImports(), transformImportPath() (+3 more)
 
 ### Community 857 - "validate.js"
 Cohesion: 0.20
@@ -4953,13 +4983,17 @@ Nodes (11): type, additionalProperties, description, properties, type, cli_requi
 Cohesion: 0.17
 Nodes (12): description, type, additionalProperties, description, properties, required, type, description (+4 more)
 
+### Community 861 - "HealthCheck"
+Cohesion: 0.14
+Nodes (7): { BaseCheck, CheckSeverity, CheckStatus }, CheckRegistry, DEFAULT_CONFIG, HealerManager, HealthCheck, HealthCheckEngine, ReporterManager
+
 ### Community 863 - "manifest-generator.js"
 Cohesion: 0.20
 Nodes (10): 1. `set_updated_at()` — Update Timestamp Trigger, 2. `handle_new_user()` — Auto-create Profile, 3. `is_admin()` — Check Admin Role, 4. `registrar_inscricao_publica()` — Public Enrollment, 5. `sync_turma_status()` — Auto-update Class Status, 6. `validate_avaliacao_turma()` — Consistency Check, 7. `sync_curso_rating()` — Recalculate Course Rating, 8. `sync_curso_total_alunos()` — Maintain Student Counter (+2 more)
 
 ### Community 864 - "PermissionMode"
-Cohesion: 0.09
-Nodes (9): OperationGuard, { PermissionMode }, path, PermissionMode, yaml, { OperationGuard }, os, path (+1 more)
+Cohesion: 0.07
+Nodes (14): checkOperation(), createGuard(), enforcePermission(), { OperationGuard }, { PermissionMode }, OperationGuard, { PermissionMode }, path (+6 more)
 
 ### Community 865 - "ClickUp Integration Workflow"
 Cohesion: 0.17
@@ -5030,8 +5064,8 @@ Cohesion: 0.17
 Nodes (11): Error Handling, Implementation, Metadata, Process, Purpose, Step 1: Load Current Mode, Step 2: Cycle to Next Mode, Step 3: Save New Mode (+3 more)
 
 ### Community 884 - "query-logging-middleware.ts"
-Cohesion: 0.26
-Nodes (7): captureSlowQuery(), logQueryToConsole(), QueryLogConfig, QueryMetrics, recordQueryMetrics(), wrapSupabaseWithQueryLogging(), initializeQueryLogging()
+Cohesion: 0.23
+Nodes (6): clearQueryMetrics(), getQueryMetrics(), QueryLogConfig, QueryMetrics, wrapSupabaseWithQueryLogging(), initializeQueryLogging()
 
 ### Community 886 - "properties"
 Cohesion: 0.17
@@ -5082,8 +5116,8 @@ Cohesion: 0.17
 Nodes (11): Artifact Analysis Report #{{ARTIFACT_ID}}, {{ARTIFACT_NAME}}, 🎨 Color System, Colors Extracted, 🧩 Components Identified, 📐 Design Patterns, Fonts and Scales, 📊 Metrics Summary (+3 more)
 
 ### Community 900 - "type"
-Cohesion: 0.13
-Nodes (15): items, type, items, type, type, description, items, type (+7 more)
+Cohesion: 0.17
+Nodes (12): items, type, items, type, type, items, acceptance_criteria, deliverables (+4 more)
 
 ### Community 901 - "Migration Strategy: {{PROJECT_NAME}}"
 Cohesion: 0.17
@@ -5262,8 +5296,8 @@ Cohesion: 0.18
 Nodes (11): type, properties, type, type, additionalProperties, properties, type, async (+3 more)
 
 ### Community 947 - "properties"
-Cohesion: 0.24
-Nodes (4): { BaseCheck, CheckSeverity, CheckDomain }, DiskSpaceCheck, { execSync }, os
+Cohesion: 0.15
+Nodes (17): createAddCommand(), { Command }, { createAddCommand }, { createLinkCommand }, createMcpCommand(), { createSetupCommand }, { createStatusCommand }, createLinkCommand() (+9 more)
 
 ### Community 949 - "html-formatter.js"
 Cohesion: 0.25
@@ -5394,8 +5428,8 @@ Cohesion: 0.18
 Nodes (11): 4.1 CI/CD Pattern Validation, 4.2 Legacy Component Deprecation, 4.3 Documentation & Training, 4.4 Monitoring & Metrics, Goal, Phase 4: Enforcement, Prerequisites, Risk Assessment (+3 more)
 
 ### Community 984 - "properties"
-Cohesion: 0.18
-Nodes (11): items, type, items, type, properties, type, allowed_operations, blocked_operations (+3 more)
+Cohesion: 0.22
+Nodes (9): items, type, items, type, properties, allowed_operations, blocked_operations, redirect_message (+1 more)
 
 ### Community 985 - "properties"
 Cohesion: 0.18
@@ -5553,10 +5587,6 @@ Nodes (10): type, type, fail_on_drift, fail_on_orphaned, strict_mode, validation
 Cohesion: 0.31
 Nodes (9): handleStats(), asciichart, _generateSparkline(), _renderCachePerformance(), _renderEntityTable(), _renderLatencyChart(), renderStats(), SPARKLINE_CHARS (+1 more)
 
-### Community 1027 - "ManifestValidator"
-Cohesion: 0.21
-Nodes (4): ManifestValidator, parseCSV(), parseCSVContent(), path
-
 ### Community 1028 - "DataLifecycleManager"
 Cohesion: 0.18
 Nodes (10): 📋 Acceptance Criteria (AC) da Épica, 📂 Escopo, IN SCOPE (Fase 1 / Story 15.1), 🎯 Objetivo, OUT OF SCOPE (fases futuras — 15.2+), 🔗 Related Documents, 🎬 Stories da Épica, Stories futuras (não criadas ainda) (+2 more)
@@ -5630,8 +5660,8 @@ Cohesion: 0.24
 Nodes (3): CloudRunAdapter, EventEmitter, { execSync, execFileSync }
 
 ### Community 1048 - "WorkspaceAdapter"
-Cohesion: 0.31
-Nodes (8): fs, getUserProfile(), isAdvancedMode(), isBobMode(), loadAndValidateUserProfile(), path, VALID_USER_PROFILES, yaml
+Cohesion: 0.17
+Nodes (14): configMigrator, globalConfigManager, osDetector, symlinkManager, detectOS(), getHomeDir(), getOSInfo(), hasWindowsSymlinkSupport() (+6 more)
 
 ### Community 1049 - "properties"
 Cohesion: 0.20
@@ -5646,8 +5676,8 @@ Cohesion: 0.24
 Nodes (8): ATOMIC_CLASSIFICATIONS, CLASSIFICATION_MAP, classifyTask(), fs, main(), path, processTaskFile(), TASKS_DIR
 
 ### Community 1052 - "transaction-manager.js"
-Cohesion: 0.40
-Nodes (5): description, items, type, required, commands
+Cohesion: 0.13
+Nodes (7): { createHash }, DiffGenerator, ModificationValidator, yaml, DiffGenerator, { execSync }, path
 
 ### Community 1053 - "performance-and-error-resolver.js"
 Cohesion: 0.27
@@ -5804,8 +5834,8 @@ Cohesion: 0.25
 Nodes (3): G4DevContextGate, path, { VerificationGate }
 
 ### Community 1099 - "relevance-matrix.js"
-Cohesion: 0.25
-Nodes (7): Change Log, Epic, Executor Assignment, Gate File, Status, Story 14.0.6: QA Gate — Fundação Trust Keith (Fase 0), Veredito da Fase 0
+Cohesion: 0.21
+Nodes (4): fs, path, SubagentPromptBuilder, yaml
 
 ### Community 1100 - "l7-star-command.js"
 Cohesion: 0.28
@@ -5856,12 +5886,12 @@ Cohesion: 0.25
 Nodes (3): fs, path, PolicySync
 
 ### Community 1113 - "SecurityAdapter"
-Cohesion: 0.25
-Nodes (4): { BaseCheck, CheckSeverity, CheckDomain }, _CONFLICT_MARKERS, ConflictsCheck, { execSync }
+Cohesion: 0.22
+Nodes (13): calculateChecksum(), findLatestBackup(), verifyBackup(), clearMigrationState(), canRollback(), { clearMigrationState }, executeRollback(), { findLatestBackup, verifyBackup, copyFileWithMetadata } (+5 more)
 
 ### Community 1114 - "properties"
-Cohesion: 0.29
-Nodes (7): Category Results, Checklist, Notes, Review Date: 2026-07-05, Reviewed By: River (Scrum Master), Story Checklist, Validation Result
+Cohesion: 0.15
+Nodes (13): description, items, minimum, type, items, type, type, description (+5 more)
 
 ### Community 1115 - "properties"
 Cohesion: 0.22
@@ -6004,28 +6034,33 @@ Cohesion: 0.22
 Nodes (6): COMPILE_BUDGET_S, match, result, start, violations, WALL_BUDGET_S
 
 ### Community 1149 - "backup.js"
-Cohesion: 0.33
-Nodes (6): Current State Observed by @sm, Dev Notes, Fidelity Details to Preserve, Project Structure Notes, Sources, Technical Constraints
+Cohesion: 0.23
+Nodes (11): countFiles(), fs, generateSummary(), { MODULE_MAPPING }, path, runFullValidation(), runLintCheck(), runTests() (+3 more)
 
 ### Community 1150 - "search-filters.js"
-Cohesion: 0.25
-Nodes (8): Checks, Configuration, Expected Results, .husky/pre-commit, Layer 1: Pre-commit, .lintstagedrc.json, package.json scripts, Purpose
+Cohesion: 0.17
+Nodes (11): {
+  computeChecksum,
+  extractKeywords,
+  REPO_ROOT,
+  REGISTRY_PATH,
+}, crypto, daysSince(), fs, HEALING_BACKUP_DIR, HEALING_LOG_PATH, HEALING_RULES, path (+3 more)
 
 ### Community 1151 - "hook-runtime.js"
 Cohesion: 0.32
 Nodes (6): escapeXml(), formatAsXml(), getProvider(), path, { RegistryProvider }, resolveCodeIntel()
 
 ### Community 1152 - "heavy_sections"
-Cohesion: 0.25
-Nodes (8): description, items, type, additionalProperties, properties, type, heavy_sections, lazy_loading
+Cohesion: 0.18
+Nodes (11): default, type, description, items, type, additionalProperties, properties, type (+3 more)
 
 ### Community 1160 - "claude-code.js"
 Cohesion: 0.14
 Nodes (13): 1. Sidebar (`.adm-side`), 2. Cabeçalho da página (dentro de `<main>`), 3. KPIs (grid de 4 cards, `.adm-kpi`), 4. Bloco principal esquerdo — Card "Leads recentes" (`.adm-card`), 5. Bloco lateral direito, 5a. Card "Próximas turmas", 5b. Card "Leads por origem" (`sc-if value="{{ showBreakdown }}"`, condicional), 6. Contrato de dados (seções dinâmicas `sc-for` / `{{ }}`) (+5 more)
 
 ### Community 1161 - "gemini-cli.js"
-Cohesion: 0.29
-Nodes (7): items, type, description, properties, type, blocks, dependencies
+Cohesion: 0.30
+Nodes (6): escapeCSV(), extractAgentSection(), ManifestGenerator, parseYAMLFromMarkdown(), path, yaml
 
 ### Community 1163 - "validate-registry.js"
 Cohesion: 0.32
@@ -6096,12 +6131,12 @@ Cohesion: 0.25
 Nodes (8): AIOX Framework - Livro de Ouro v4.2 (Complete), 📖 Como Usar Este Livro, Competitive Positioning, 📣 IMPORTANTE: Sobre Este Documento, O Que Mudou de v2.0 para v4.0.4, O Sistema Operacional Definitivo para Orquestração de Agentes IA, 📜 Open Source vs. Serviço - Business Model v4.2, Repositório Multi-Repo Structure
 
 ### Community 1180 - "Layer 1: Pre-commit"
-Cohesion: 0.40
-Nodes (5): title, description, maxLength, minLength, type
+Cohesion: 0.24
+Nodes (9): analyzeMigrationPlan(), categorizeFile(), detectV2Structure(), formatMigrationPlan(), formatSize(), fs, { getAllFiles }, MODULE_MAPPING (+1 more)
 
 ### Community 1181 - "SupabaseAdapter"
-Cohesion: 0.40
-Nodes (5): Notes, PO Validation, Review Date: 2026-07-05, Reviewed By: Pax (Product Owner), Validation Result
+Cohesion: 0.25
+Nodes (9): copyFileWithMetadata(), { copyFileWithMetadata }, createModuleDirectories(), executeMigration(), fs, migrateModule(), { MODULE_MAPPING }, path (+1 more)
 
 ### Community 1184 - "build-state.schema.json"
 Cohesion: 0.25
@@ -6349,8 +6384,8 @@ Cohesion: 0.29
 Nodes (6): Code Intelligence Context, Collaboration, Commands, {{COMPONENTNAME}}, Configuration, Description
 
 ### Community 1247 - "📁 SOURCE TREE v2.2 (With Memory Layer + Agent Lightning)"
-Cohesion: 0.50
-Nodes (4): description, enum, type, impact
+Cohesion: 0.20
+Nodes (8): chalk, fs, path, chalk, ComponentMetadata, crypto, fs, path
 
 ### Community 1248 - "PM Adapters"
 Cohesion: 0.29
@@ -6383,10 +6418,6 @@ Nodes (5): ANTHROPIC_API_KEY, ANTHROPIC_MODEL, API_TIMEOUT_MS, check_proxy(), cl
 ### Community 1255 - "spot-check-validator.js"
 Cohesion: 0.33
 Nodes (6): fs, fsModule, main(), path, TASKS_DIR, validateTask()
-
-### Community 1257 - "OutputPatternValidator"
-Cohesion: 0.40
-Nodes (5): description, items, minItems, type, functionalRequirements
 
 ### Community 1258 - "scripts"
 Cohesion: 0.29
@@ -6572,25 +6603,29 @@ Nodes (6): assert(), cleanup(), enrollmentSql(), main(), runPsql(), scalar()
 Cohesion: 0.57
 Nodes (6): getMonitoringStatus(), initializeMonitoringDiagnostics(), isQueryLoggingConfigured(), isSentryConfigured(), printMonitoringStatus(), testSentryConnection()
 
+### Community 1304 - "sanitize.ts"
+Cohesion: 0.22
+Nodes (9): additionalProperties, properties, type, format, path, targets, additionalProperties, description (+1 more)
+
 ### Community 1305 - "ui-governance.spec.ts"
 Cohesion: 0.38
 Nodes (5): a11yRoutes, gotoStable(), waitForMotionSettle(), waitForStableUi(), wcagTags
 
 ### Community 1307 - "DiskSpaceCheck"
-Cohesion: 0.50
-Nodes (4): default, description, type, canCreateContext
+Cohesion: 0.22
+Nodes (9): description, items, type, description, items, type, required, checkpoints (+1 more)
 
 ### Community 1308 - "ReporterManager"
-Cohesion: 0.50
-Nodes (4): default, description, type, canWrite
+Cohesion: 0.22
+Nodes (7): DependencyAnalyzer, path, SecurityChecker, { validateYAML }, yaml, fs, yaml
 
 ### Community 1309 - "g1-epic-creation.js"
-Cohesion: 0.50
-Nodes (3): { execSync }, fs, path
+Cohesion: 0.32
+Nodes (6): createBackup(), createBackupDirName(), crypto, fs, getAllFiles(), path
 
 ### Community 1310 - "g2-story-creation.js"
-Cohesion: 0.50
-Nodes (4): description, minLength, type, decision
+Cohesion: 0.25
+Nodes (4): { BaseCheck, CheckSeverity, CheckDomain }, _crypto, LockfileIntegrityCheck, path
 
 ### Community 1311 - "Epic3Executor"
 Cohesion: 0.24
@@ -6693,8 +6728,8 @@ Cohesion: 0.33
 Nodes (6): Comparação de Modos, Escolhendo o Modo Certo, Modo 1: YOLO Mode 🚀, Modo 2: Interactive Mode 🤝, Modo 3: Pre-Flight Planning Mode 📋, Modos de Desenvolvimento de Stories
 
 ### Community 1336 - "Brownfield Best Practices"
-Cohesion: 0.50
-Nodes (4): risks, description, items, type
+Cohesion: 0.25
+Nodes (7): Change Log, Epic, Executor Assignment, Gate File, Status, Story 14.1.6: QA Gate — Remoção Mantine Fase 1, Veredito da Fase 1
 
 ### Community 1337 - "gsd-debugger.md"
 Cohesion: 0.33
@@ -6841,8 +6876,8 @@ Cohesion: 0.50
 Nodes (4): checkBoundaryAlignment(), fs, path, run()
 
 ### Community 1375 - "GitignoreCheck"
-Cohesion: 0.50
-Nodes (4): description, minLength, type, problem_statement
+Cohesion: 0.29
+Nodes (7): Checks, Configuration, Expected Results, .github/coderabbit.yaml, .github/workflows/quality-gates-pr.yml, Layer 2: PR Automation, Purpose
 
 ### Community 1376 - "LargeFilesCheck"
 Cohesion: 0.50
@@ -7301,8 +7336,8 @@ Cohesion: 0.50
 Nodes (4): description, format, type, abandonedAt
 
 ### Community 1504 - "lastCheckpoint"
-Cohesion: 0.50
-Nodes (4): description, format, type, lastCheckpoint
+Cohesion: 0.29
+Nodes (6): description, $id, required, $schema, title, type
 
 ### Community 1505 - "schemaVersion"
 Cohesion: 0.50
@@ -7388,9 +7423,9 @@ Nodes (4): description, items, type, documentation
 Cohesion: 0.50
 Nodes (4): description, pattern, type, id
 
-### Community 1526 - "objective"
-Cohesion: 0.50
-Nodes (4): status, description, enum, type
+### Community 1527 - "technicalRequirements"
+Cohesion: 0.33
+Nodes (3): G2StoryCreationGate, path, { VerificationGate }
 
 ### Community 1528 - "items"
 Cohesion: 0.50
@@ -7417,8 +7452,8 @@ Cohesion: 0.50
 Nodes (4): risks, description, items, type
 
 ### Community 1534 - "items"
-Cohesion: 0.20
-Nodes (10): items, required, description, items, type, milestones, success_metrics, description (+2 more)
+Cohesion: 0.50
+Nodes (4): description, items, type, milestones
 
 ### Community 1535 - "non_goals"
 Cohesion: 0.67
@@ -7429,12 +7464,16 @@ Cohesion: 0.50
 Nodes (4): stakeholders, description, items, type
 
 ### Community 1538 - "git-repo.js"
-Cohesion: 0.67
-Nodes (3): target, description, type
+Cohesion: 0.50
+Nodes (4): Environment-Specific Usage, Performance Optimization, Quality Assurance, Usage Patterns and Best Practices
 
 ### Community 1539 - "actor"
 Cohesion: 0.67
 Nodes (3): Executive Summary, Overall Grade: ✅ **A+** (Production-Ready), Validation Results
+
+### Community 1540 - "changeType"
+Cohesion: 0.50
+Nodes (4): description, enum, type, changeType
 
 ### Community 1541 - "category"
 Cohesion: 0.50
@@ -7442,15 +7481,19 @@ Nodes (4): description, minLength, type, category
 
 ### Community 1542 - "criteria"
 Cohesion: 0.50
-Nodes (4): schemaChanges, description, items, type
+Nodes (4): rollbackTriggers, description, items, type
 
 ### Community 1543 - "test-greeting-system.js"
 Cohesion: 0.50
-Nodes (4): Cost-Effective Document Creation Workflow, Document Creation Best Practices, Document Sharding, Required File Naming for Framework Integration
+Nodes (4): description, items, type, non_goals
 
 ### Community 1544 - "goals"
 Cohesion: 0.50
 Nodes (4): description, minItems, type, goals
+
+### Community 1545 - "status"
+Cohesion: 0.50
+Nodes (4): status, description, enum, type
 
 ### Community 1546 - "integrationPoints"
 Cohesion: 0.50
@@ -7461,8 +7504,8 @@ Cohesion: 0.50
 Nodes (4): description, minLength, type, metric
 
 ### Community 1548 - "milestones"
-Cohesion: 0.50
-Nodes (4): description, minItems, type, milestones
+Cohesion: 0.40
+Nodes (5): description, items, minItems, type, milestones
 
 ### Community 1549 - "mitigation"
 Cohesion: 0.50
@@ -7479,6 +7522,18 @@ Nodes (4): description, enum, type, probability
 ### Community 1552 - "problemStatement"
 Cohesion: 0.67
 Nodes (3): description, type, customerImpact
+
+### Community 1553 - "actor"
+Cohesion: 0.50
+Nodes (4): description, minLength, type, actor
+
+### Community 1554 - "priority"
+Cohesion: 0.50
+Nodes (4): description, enum, type, priority
+
+### Community 1555 - "checklists"
+Cohesion: 0.50
+Nodes (4): description, items, type, checklists
 
 ### Community 1556 - "title"
 Cohesion: 0.50
@@ -7533,8 +7588,8 @@ Cohesion: 0.50
 Nodes (4): A. Team Roles & Responsibilities, Appendix, B. Tools & Resources, C. Contact & Support
 
 ### Community 1569 - "canCreateContext"
-Cohesion: 0.67
-Nodes (3): enum, type, priority
+Cohesion: 0.50
+Nodes (4): default, description, type, obrigatorio
 
 ### Community 1570 - "canWrite"
 Cohesion: 0.67
@@ -7646,7 +7701,7 @@ Nodes (3): fs, path, stdinTimeout
 
 ### Community 1597 - "projectName"
 Cohesion: 0.50
-Nodes (4): default, enum, type, onFailure
+Nodes (4): default, description, type, persistido
 
 ### Community 1598 - "Category 6: SECURITY DEBT"
 Cohesion: 0.50
@@ -7746,7 +7801,7 @@ Nodes (4): target, description, minLength, type
 
 ### Community 1625 - "type"
 Cohesion: 0.67
-Nodes (3): type, enum, type
+Nodes (3): enum, type, impact
 
 ### Community 1627 - "engines"
 Cohesion: 0.67
@@ -7776,9 +7831,13 @@ Nodes (3): description, type, name
 Cohesion: 0.67
 Nodes (3): whyNot, description, type
 
+### Community 1634 - "impact"
+Cohesion: 0.67
+Nodes (3): enum, type, impact
+
 ### Community 1635 - "tags"
-Cohesion: 0.50
-Nodes (4): tags, description, items, type
+Cohesion: 0.13
+Nodes (16): items, type, type, scripts, tags, workflows, additionalProperties, description (+8 more)
 
 ### Community 1636 - "Dev Agent Record"
 Cohesion: 0.50
@@ -7791,10 +7850,6 @@ Nodes (3): timeline, description, type
 ### Community 1638 - "userFlows"
 Cohesion: 0.50
 Nodes (4): userFlows, description, items, type
-
-### Community 1639 - "obrigatorio"
-Cohesion: 0.50
-Nodes (4): Change Log, Completion Notes, Debug Log References, Dev Agent Record
 
 ### Community 1640 - "notes"
 Cohesion: 0.67
@@ -7827,10 +7882,6 @@ Nodes (3): Interactive Workflows, Task Execution Pattern, Workflow Execution
 ### Community 1647 - "Communication Plan"
 Cohesion: 0.67
 Nodes (3): Communication Plan, Stakeholder Updates, Team Communication
-
-### Community 1648 - "persistido"
-Cohesion: 0.67
-Nodes (3): description, type, currentSubtask
 
 ### Community 1650 - "Agent System"
 Cohesion: 0.67
@@ -7880,10 +7931,6 @@ Nodes (3): Acceptance Criteria, Integration Verification, Story 1.6 Regression, 
 Cohesion: 0.67
 Nodes (3): Acceptance Criteria, Integration Verification, Story 1.2 Consulting Offer and Conversion Flow
 
-### Community 1677 - "BuildConfigCheck"
-Cohesion: 0.67
-Nodes (3): description, type, id
-
 ### Community 1678 - "relatedPMDRs"
 Cohesion: 0.67
 Nodes (3): relatedPMDRs, description, type
@@ -7909,24 +7956,24 @@ Cohesion: 0.67
 Nodes (3): description, type, estimate
 
 ## Knowledge Gaps
-- **16012 isolated node(s):** `{ Command }`, `path`, `fs`, `yaml`, `configResolverPath` (+16007 more)
+- **16020 isolated node(s):** `{ Command }`, `path`, `fs`, `yaml`, `configResolverPath` (+16015 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **208 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **210 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `delay()` connect `enrollment-class-resolution.ts` to `.resolve`?**
+- **Why does `delay()` connect `Course Card & Badge Variants` to `.resolve`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Why does `precomputeEmbeddings()` connect `ConditionEvaluator` to `.resolve`, `info.js`?**
+- **Why does `precomputeEmbeddings()` connect `ConditionEvaluator` to `.resolve`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
-- **Why does `getRegistry()` connect `info.js` to `ConditionEvaluator`, `list.js`, `Admin Resource Page (CRUD)`?**
+- **Why does `getRegistry()` connect `ConditionEvaluator` to `list.js`, `Admin Resource Page (CRUD)`, `info.js`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **What connects `{ Command }`, `path`, `fs` to the rest of the system?**
-  _16025 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _16033 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Admin Shell & Toaster` be split into smaller, more focused modules?**
-  _Cohesion score 0.03157216494845361 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.03502051983584131 - nodes in this community are weakly interconnected._
 - **Should `Calendar & Class Cards` be split into smaller, more focused modules?**
-  _Cohesion score 0.022509198470528822 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.022744276522519827 - nodes in this community are weakly interconnected._
 - **Should `Course Cards & Quote Modal` be split into smaller, more focused modules?**
-  _Cohesion score 0.02805772796903975 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.0360192516689955 - nodes in this community are weakly interconnected._

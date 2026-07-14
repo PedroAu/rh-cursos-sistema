@@ -3435,8 +3435,8 @@
     "semantic_hash": ""
   },
   "eslint.config.mjs": {
-    "mtime": 1783527338.4208531,
-    "ast_hash": "955c25f6c3b3d570789654cfefb1d769",
+    "mtime": 1783987413.6937382,
+    "ast_hash": "fa0c70762b4590dca9b3c8daa740190d",
     "semantic_hash": ""
   },
   "instrumentation-client.ts": {
@@ -4675,8 +4675,8 @@
     "semantic_hash": ""
   },
   "src/lib/supabase/query-logging-middleware.ts": {
-    "mtime": 1782779106.9131248,
-    "ast_hash": "60bdbb5bca0e6e1fe651a3ef8369ab24",
+    "mtime": 1783988600.491371,
+    "ast_hash": "7bda0f4e843198f5eb3f99375bba638f",
     "semantic_hash": ""
   },
   "src/lib/supabase/rh-cursos-api.ts": {
@@ -5065,8 +5065,8 @@
     "semantic_hash": ""
   },
   "tests/checkout.e2e.spec.ts": {
-    "mtime": 1783855259.5995703,
-    "ast_hash": "d5a116eac607ecb793c01c5a7d6c2ea3",
+    "mtime": 1783987436.5478897,
+    "ast_hash": "f512fd68628e66bc936013fd4b400647",
     "semantic_hash": ""
   },
   "tests/contrast-report.baseline.spec.ts": {
@@ -5110,8 +5110,8 @@
     "semantic_hash": ""
   },
   "tests/public-journeys.spec.ts": {
-    "mtime": 1783866213.1744485,
-    "ast_hash": "d471bec5067f3560b1c18ac7efcd4cf5",
+    "mtime": 1783987442.38909,
+    "ast_hash": "45447aee1ba13bde9f0853b28b0e76d0",
     "semantic_hash": ""
   },
   "tests/quote-modal.e2e.spec.ts": {
@@ -10300,8 +10300,8 @@
     "semantic_hash": ""
   },
   "docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md": {
-    "mtime": 1783973865.0121896,
-    "ast_hash": "670a76a5f6102217c9756586ee1058a8",
+    "mtime": 1783990050.1385808,
+    "ast_hash": "0a2fade2b4ab2cc064e1c56eddfad09c",
     "semantic_hash": ""
   },
   "src/__tests__/lib/dashboard-overview.test.ts": {
@@ -10330,13 +10330,23 @@
     "semantic_hash": ""
   },
   "docs/qa/gates/epic15.1-admin-dashboard-fidelidade.yml": {
-    "mtime": 1783971213.2288742,
-    "ast_hash": "43b3e450600f2a8885f20a362a7f4303",
+    "mtime": 1783989958.0833805,
+    "ast_hash": "b58207d870f1424b4e9b5163939debc6",
     "semantic_hash": ""
   },
   "docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md": {
-    "mtime": 1783986971.8538244,
-    "ast_hash": "0ec50d6987b76e60f2c3b473582ebd06",
+    "mtime": 1783990024.9909914,
+    "ast_hash": "a61b2ebfd0ebac6d22e8bf23ad52ab1f",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/query-logging-middleware.test.ts": {
+    "mtime": 1783988753.3344033,
+    "ast_hash": "a91e59b7af891b6dca6cdbd27d63a0c0",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/16.1-remover-fallback-mock-producao.yml": {
+    "mtime": 1783989942.3760104,
+    "ast_hash": "5791fc6b3a2714b431578040448a7008",
     "semantic_hash": ""
   }
 }

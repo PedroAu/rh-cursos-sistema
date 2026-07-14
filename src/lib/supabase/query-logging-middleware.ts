@@ -44,145 +44,66 @@ export function wrapSupabaseWithQueryLogging(
   // Store original methods
   const originalFrom = supabase.from.bind(supabase);
 
+  function reportQuery(method: string, table: string, duration: number) {
+    const isSlow = duration > slowQueryThreshold;
+
+    if (!logAllQueries && !isSlow) return;
+    if (Math.random() > samplingRate) return;
+
+    recordQueryMetrics({
+      method,
+      table,
+      duration,
+      isSlow,
+      timestamp: new Date().toISOString()
+    });
+
+    if (enableConsoleLogging) {
+      logQueryToConsole(method, table, duration, isSlow);
+    }
+
+    if (enableSentryLogging && isSlow) {
+      captureSlowQuery(method, table, duration);
+    }
+  }
+
+  /**
+   * Envolve um método de query (select/insert/update/delete) para medir a
+   * duração sem quebrar o encadeamento. Os filtros do postgrest-js (.eq,
+   * .order, .not, .single, ...) fazem `return this` na mesma instância do
+   * builder — então sobrescrever apenas o `.then()` dessa instância (em vez
+   * de substituir o builder inteiro por uma Promise) preserva a cadeia e
+   * ainda mede o tempo no momento real da resolução.
+   */
+  function wrapQueryMethod<T extends (...args: never[]) => { then: PromiseLike<unknown>["then"] }>(
+    method: string,
+    table: string,
+    original: T
+  ): T {
+    return function (...args: Parameters<T>) {
+      const startTime = performance.now();
+      const builder = original(...args);
+      const originalThen = builder.then.bind(builder);
+
+      builder.then = ((onfulfilled, onrejected) =>
+        originalThen((result) => {
+          reportQuery(method, table, performance.now() - startTime);
+          return typeof onfulfilled === "function" ? onfulfilled(result) : result;
+        }, onrejected)) as typeof builder.then;
+
+      return builder;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any;
+  }
+
   // Override the from() method to intercept query operations
   supabase.from = function(table: string) {
     const query = originalFrom(table);
 
-    // Intercept select()
-    const originalSelect = query.select.bind(query);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (query.select as any) = function(...args: Parameters<typeof originalSelect>) {
-      const startTime = performance.now();
-
-      return originalSelect(...args).then((result) => {
-        const duration = performance.now() - startTime;
-        const isSlow = duration > slowQueryThreshold;
-
-        if (logAllQueries || isSlow) {
-          if (Math.random() <= samplingRate) {
-            recordQueryMetrics({
-              method: "select",
-              table,
-              duration,
-              isSlow,
-              timestamp: new Date().toISOString()
-            });
-
-            if (enableConsoleLogging) {
-              logQueryToConsole("select", table, duration, isSlow);
-            }
-
-            if (enableSentryLogging && isSlow) {
-              captureSlowQuery("select", table, duration);
-            }
-          }
-        }
-
-        return result;
-      });
-    };
-
-    // Intercept insert()
-    const originalInsert = query.insert.bind(query);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (query.insert as any) = function(...args: Parameters<typeof originalInsert>) {
-      const startTime = performance.now();
-
-      return originalInsert(...args).then((result) => {
-        const duration = performance.now() - startTime;
-        const isSlow = duration > slowQueryThreshold;
-
-        if (logAllQueries || isSlow) {
-          if (Math.random() <= samplingRate) {
-            recordQueryMetrics({
-              method: "insert",
-              table,
-              duration,
-              isSlow,
-              timestamp: new Date().toISOString()
-            });
-
-            if (enableConsoleLogging) {
-              logQueryToConsole("insert", table, duration, isSlow);
-            }
-
-            if (enableSentryLogging && isSlow) {
-              captureSlowQuery("insert", table, duration);
-            }
-          }
-        }
-
-        return result;
-      });
-    };
-
-    // Intercept update()
-    const originalUpdate = query.update.bind(query);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (query.update as any) = function(...args: Parameters<typeof originalUpdate>) {
-      const startTime = performance.now();
-
-      return originalUpdate(...args).then((result) => {
-        const duration = performance.now() - startTime;
-        const isSlow = duration > slowQueryThreshold;
-
-        if (logAllQueries || isSlow) {
-          if (Math.random() <= samplingRate) {
-            recordQueryMetrics({
-              method: "update",
-              table,
-              duration,
-              isSlow,
-              timestamp: new Date().toISOString()
-            });
-
-            if (enableConsoleLogging) {
-              logQueryToConsole("update", table, duration, isSlow);
-            }
-
-            if (enableSentryLogging && isSlow) {
-              captureSlowQuery("update", table, duration);
-            }
-          }
-        }
-
-        return result;
-      });
-    };
-
-    // Intercept delete()
-    const originalDelete = query.delete.bind(query);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (query.delete as any) = function(...args: Parameters<typeof originalDelete>) {
-      const startTime = performance.now();
-
-      return originalDelete(...args).then((result) => {
-        const duration = performance.now() - startTime;
-        const isSlow = duration > slowQueryThreshold;
-
-        if (logAllQueries || isSlow) {
-          if (Math.random() <= samplingRate) {
-            recordQueryMetrics({
-              method: "delete",
-              table,
-              duration,
-              isSlow,
-              timestamp: new Date().toISOString()
-            });
-
-            if (enableConsoleLogging) {
-              logQueryToConsole("delete", table, duration, isSlow);
-            }
-
-            if (enableSentryLogging && isSlow) {
-              captureSlowQuery("delete", table, duration);
-            }
-          }
-        }
-
-        return result;
-      });
-    };
+    query.select = wrapQueryMethod("select", table, query.select.bind(query));
+    query.insert = wrapQueryMethod("insert", table, query.insert.bind(query));
+    query.update = wrapQueryMethod("update", table, query.update.bind(query));
+    query.delete = wrapQueryMethod("delete", table, query.delete.bind(query));
 
     return query;
   };

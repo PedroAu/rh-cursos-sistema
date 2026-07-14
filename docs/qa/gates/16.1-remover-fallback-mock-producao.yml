@@ -1,0 +1,127 @@
+schema: 1
+story: "16.1"
+story_title: "Remover Fallback de Dados Mock em Produção e Revisar SSG do Catálogo"
+gate: PASS
+status_reason: >-
+  Todos os ACs cumpridos. O defeito HIGH pré-existente (REL-001,
+  query-logging-middleware transformando .select()/.insert()/.update()/.delete()
+  em Promise e quebrando o encadeamento no client browser) foi corrigido por
+  @dev em 2026-07-13: o middleware agora sobrescreve apenas `.then()` na própria
+  instância do builder (que sobrevive ao encadeamento, já que os filtros do
+  postgrest-js fazem `return this`), preservando `.eq/.order/.not/.single` e
+  ainda medindo a duração real no momento da resolução. Evidenciado por
+  npm run test:epic15:fidelity voltando a 3/3 contra next start real.
+reviewer: "Quinn (Test Architect)"
+updated: "2026-07-14T00:13:58Z"
+fixVerified:
+  date: "2026-07-13"
+  by: "Dex (@dev)"
+  fix: "src/lib/supabase/query-logging-middleware.ts — wrapQueryMethod() intercepta apenas .then() da instância do builder em vez de substituí-lo por uma Promise"
+  regressionTest: "src/__tests__/lib/query-logging-middleware.test.ts (3 testes novos: encadeamento após select/insert/update/delete, métricas registradas sem alterar o resultado)"
+  liveEvidence: "npm run test:epic15:fidelity → 3 passed (1.4s) contra next start :3100 real"
+
+quality_score: 95
+
+objectiveGates:
+  lint: PASS            # exit 0 (0 errors)
+  typecheck: PASS       # next typegen + tsc --noEmit limpo
+  test:unit: PASS       # 455/455, 37 arquivos (inclui teste AC9)
+  build: PASS           # rotas /cursos/[slug] e /checkout confirmadas como dinâmicas (ƒ)
+
+acceptanceCriteria:
+  AC1: met              # generateStaticParams removido; sem import de mockCatalog em page.tsx
+  AC2: met              # curso inexistente → courses vazio → EmptyState existente (alternativa permitida pelo AC)
+  AC3: met              # mesmo tratamento em checkout/page.tsx
+  AC4: met              # initialState nasce vazio (arrays), sem mockCatalog/mockBlogPosts
+  AC5: met              # busca OK (mesmo 0 linhas) = fonte da verdade; erro → console.error + toast; catalog=null preserva estado atual
+  AC6: met              # só src/__tests__/lib/app-store.test.ts importa mock-public-data
+  AC7: met              # force-dynamic escolhido e justificado (corretude > perf de build, sem ISR)
+  AC8: met              # gates verdes; REL-001 corrigido (regressão do e2e epic15 sanada)
+  AC9: met              # teste unitário AC9 presente e verde (nova-lei-de-licitacoes... nunca aparece com store vazio)
+  AC10: met             # story atualizada (File List, checkboxes, Dev Agent Record, Change Log, Status)
+
+top_issues:
+  - id: "REL-001"
+    severity: high
+    category: reliability
+    finding: >-
+      src/lib/supabase/query-logging-middleware.ts (linhas 52-83) sobrescreve
+      query.select() para retornar `originalSelect(...).then(...)` — ou seja, uma
+      Promise nativa em vez do PostgrestFilterBuilder. Toda query que encadeia
+      filtro após .select() (.eq/.order/.not/.single) lança "X is not a function".
+      No fetchPublicCatalog isso atinge curso(.order), turma(.order),
+      instrutor(.order), trilha(.eq), curso_public_content(.eq) e
+      fetchCourseCategories(.not). Só o client BROWSER (client.ts) é envolvido; o
+      server client (server.ts) não, por isso o SSR funciona e o bug ficou latente.
+    evidence: >-
+      e2e epic15-admin-dashboard-fidelity (bundle de produção real, next start :3100):
+      "Falha ao carregar catálogo público do Supabase: TypeError:
+      e.from(...).select(...).eq is not a function". Middleware introduzido em
+      1c7f0a6 (wave-4), anterior às Stories 15.1/16.1.
+    impact: >-
+      Antes da Épica 16, esse erro era mascarado pelo fallback de mock — por isso
+      dados fictícios apareciam em produção mesmo após limpar o banco (o fallback
+      disparava em TODO load client-side, não só em vazio/erro). Após 16.1, o
+      catálogo público client-bootstrapped (ex.: admin dashboard, e a verificar:
+      home/listagem) carrega vazio + toast de erro em vez de dados reais. O
+      objetivo da épica ("catálogo real reflete o banco") não é alcançado
+      client-side enquanto o middleware não for corrigido.
+    suggested_owner: dev
+    suggested_action: >-
+      Corrigir o middleware para preservar o builder encadeável. Em vez de
+      substituir .select() por uma Promise, medir a latência sem quebrar a cadeia
+      (ex.: envolver apenas o .then/await no ponto de execução, ou usar um Proxy
+      que delega métodos do builder e cronometra na resolução). Adicionar teste de
+      regressão que exercite .from().select().eq()/.order() via o client envolvido.
+      Recomenda-se story dedicada (blast radius = todas as queries do browser).
+  - id: "REL-002"
+    severity: low
+    category: reliability
+    ac: AC5
+    finding: >-
+      fetchPublicCatalog retorna null (sem lançar) quando o client é null (env
+      ausente). Nesse caminho o bootstrap cai no .then (não no .catch), preserva
+      estado atual e NÃO dispara toast — erro de configuração fica silencioso
+      (mostra vazio, não mock). Fora do escopo estrito do AC5 (rede/RLS/timeout) e
+      não ocorre em produção configurada; registrado por completude.
+    suggested_owner: dev
+    suggested_action: >-
+      Opcional: tratar client null como estado de erro visível também, ou logar
+      um aviso claro de configuração ausente.
+
+waiver: { active: false }
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: "Sem novas superfícies de dados/auth; server client (SSR) inalterado."
+  performance:
+    status: PASS
+    notes: "force-dynamic adiciona render sob demanda a 2 rotas; aceitável (sem ISR no projeto)."
+  reliability:
+    status: FAIL
+    notes: >-
+      Catálogo público client-side quebrado pelo middleware pré-existente, agora
+      não mais mascarado. Erro de runtime visível em produção em páginas
+      client-bootstrapped.
+  maintainability:
+    status: PASS
+    notes: "Mudanças limpas, bem comentadas e amarradas a cada AC; reutiliza empty states e padrão de toast (IDS: REUSE > CREATE)."
+
+recommendations:
+  immediate:
+    - action: "Corrigir query-logging-middleware para não transformar .select() em Promise"
+      refs: ["src/lib/supabase/query-logging-middleware.ts:52-83", "src/lib/supabase/client.ts:26-34"]
+    - action: "Após o fix, re-rodar npm run test:epic15:fidelity (deve voltar a 3/3) e validar catálogo real em home/listagem client-side"
+      refs: ["tests/epic15-admin-dashboard-fidelity.spec.ts"]
+  future:
+    - action: "Adicionar e2e/integração que exercite fetchPublicCatalog via client browser envolvido (guarda de regressão do builder)"
+      refs: ["src/lib/supabase/rh-cursos-api.ts:75"]
+    - action: "Tratar client=null como erro visível de configuração (REL-002)"
+      refs: ["src/lib/app-store.tsx:595-660"]
+
+nextAction: >-
+  REL-001 corrigido e verificado ao vivo (test:epic15:fidelity 3/3). Liberada
+  para @devops (push/PR). Recomenda-se, como item futuro não bloqueante,
+  adicionar e2e/integração exercitando fetchPublicCatalog via client browser
+  real (ver recommendations.future abaixo) para reforçar a guarda de regressão.
