@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { BlogPostClient } from "@/components/page-clients/blog-post-client";
 import {
   fetchPublicBlogPostsFromSupabaseServer,
-  fetchPublicCatalogFromSupabaseServer
+  fetchPublicCatalogFromSupabaseServer,
+  isPublicTestBaselineBuildEnabled
 } from "@/lib/supabase/rh-cursos-api";
 
 type PageProps = {
@@ -12,7 +13,7 @@ type PageProps = {
 
 async function getBlogPosts() {
   try {
-    return await fetchPublicBlogPostsFromSupabaseServer() ?? [];
+    return await fetchPublicBlogPostsFromSupabaseServer(isPublicTestBaselineBuildEnabled()) ?? [];
   } catch {
     return [];
   }
@@ -39,9 +40,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page() {
+  const usePublicTestBaseline = isPublicTestBaselineBuildEnabled();
   const [blogPosts, catalog] = await Promise.all([
-    fetchPublicBlogPostsFromSupabaseServer().catch(() => null),
-    fetchPublicCatalogFromSupabaseServer().catch(() => null)
+    fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline).catch(() => null),
+    fetchPublicCatalogFromSupabaseServer(usePublicTestBaseline).catch(() => null)
   ]);
 
   return (

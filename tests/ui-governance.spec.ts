@@ -5,6 +5,7 @@ import { publicTestBaselineCourses } from "../src/lib/public-test-baseline";
 const wcagTags = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const shouldSkipVisualBaselines = !!process.env.CI || process.platform !== "darwin";
 const publicTestBaselineStorageKey = "rh_cursos_public_test_baseline";
+const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100";
 
 const a11yRoutes = [
   "/",
@@ -80,7 +81,14 @@ async function normalizeScreenshotHeight(locator: import("@playwright/test").Loc
 test.describe("epica 6 — governanca de design", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ context, page }) => {
+    await context.addCookies([
+      {
+        name: publicTestBaselineStorageKey,
+        value: "1",
+        url: playwrightBaseUrl
+      }
+    ]);
     await page.addInitScript((storageKey) => {
       window.localStorage.setItem(storageKey, "1");
     }, publicTestBaselineStorageKey);

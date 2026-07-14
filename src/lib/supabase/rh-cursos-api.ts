@@ -71,6 +71,18 @@ function isPlaceholderValue(value: string | undefined) {
 }
 
 export const PUBLIC_TEST_BASELINE_STORAGE_KEY = "rh_cursos_public_test_baseline";
+export const PUBLIC_TEST_BASELINE_COOKIE_NAME = "rh_cursos_public_test_baseline";
+
+export function isPublicTestBaselineBuildEnabled() {
+  return (
+    process.env.PLAYWRIGHT_TEST_BUILD === "1" &&
+    process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE === "1"
+  );
+}
+
+export function isServerPublicTestBaselineEnabled(cookieValue: string | undefined) {
+  return isPublicTestBaselineBuildEnabled() && cookieValue === "1";
+}
 
 export function isExplicitPublicTestBaselineEnabled() {
   if (process.env.NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE !== "1" || typeof window === "undefined") {
@@ -123,8 +135,8 @@ export async function fetchCourseCategories(client: RhCursosClient): Promise<str
   return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
 }
 
-async function fetchPublicCatalog(client: RhCursosClient | null) {
-  if (shouldUsePublicTestBaseline()) {
+async function fetchPublicCatalog(client: RhCursosClient | null, forcePublicTestBaseline = false) {
+  if (forcePublicTestBaseline || shouldUsePublicTestBaseline()) {
     return {
       courses: publicTestBaselineCourses,
       classes: publicTestBaselineClasses,
@@ -276,8 +288,8 @@ export async function fetchPublicClassesFromSupabase() {
   return rows.map(mapClass);
 }
 
-async function fetchPublicBlogPosts(client: RhCursosClient | null) {
-  if (shouldUsePublicTestBaseline()) {
+async function fetchPublicBlogPosts(client: RhCursosClient | null, forcePublicTestBaseline = false) {
+  if (forcePublicTestBaseline || shouldUsePublicTestBaseline()) {
     return publicTestBaselineBlogPosts;
   }
 
@@ -312,13 +324,17 @@ export function fetchPublicCatalogFromSupabase() {
 // páginas públicas, generateMetadata e o componente de página chamam esta
 // função independentemente — sem cache() isso vira 2 round-trips completos
 // ao Supabase por view.
-export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer() {
-  return fetchPublicCatalog(createSupabaseServerClient());
+export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer(
+  usePublicTestBaseline = false
+) {
+  return fetchPublicCatalog(createSupabaseServerClient(), usePublicTestBaseline);
 });
 
-export const fetchPublicCatalogServerState = cache(async function fetchPublicCatalogServerState(): Promise<PublicCatalogServerState> {
+export const fetchPublicCatalogServerState = cache(async function fetchPublicCatalogServerState(
+  usePublicTestBaseline = false
+): Promise<PublicCatalogServerState> {
   try {
-    const catalog = await fetchPublicCatalogFromSupabaseServer();
+    const catalog = await fetchPublicCatalogFromSupabaseServer(usePublicTestBaseline);
     if (!catalog) {
       throw new PublicCatalogUnavailableError("Supabase indisponível para carregar o catálogo público.");
     }
@@ -337,8 +353,8 @@ export function fetchPublicBlogPostsFromSupabase() {
   return fetchPublicBlogPosts(supabase);
 }
 
-export function fetchPublicBlogPostsFromSupabaseServer() {
-  return fetchPublicBlogPosts(createSupabaseServerClient());
+export function fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline = false) {
+  return fetchPublicBlogPosts(createSupabaseServerClient(), usePublicTestBaseline);
 }
 
 export async function fetchPublicTestimonialsFromSupabase() {

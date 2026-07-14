@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   fetchCourseCategories,
   isExplicitPublicTestBaselineEnabled,
+  isPublicTestBaselineBuildEnabled,
+  isServerPublicTestBaselineEnabled,
   PUBLIC_TEST_BASELINE_STORAGE_KEY,
 } from "@/lib/supabase/rh-cursos-api";
 
@@ -39,6 +41,19 @@ describe("explicit public test baseline", () => {
     window.localStorage.setItem(PUBLIC_TEST_BASELINE_STORAGE_KEY, "1");
 
     expect(isExplicitPublicTestBaselineEnabled()).toBe(false);
+  });
+
+  it("requires the dedicated Playwright build and request cookie for SSR", () => {
+    vi.stubEnv("NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE", "1");
+    vi.stubEnv("PLAYWRIGHT_TEST_BUILD", "1");
+
+    expect(isPublicTestBaselineBuildEnabled()).toBe(true);
+    expect(isServerPublicTestBaselineEnabled(undefined)).toBe(false);
+    expect(isServerPublicTestBaselineEnabled("1")).toBe(true);
+
+    vi.stubEnv("PLAYWRIGHT_TEST_BUILD", "0");
+    expect(isPublicTestBaselineBuildEnabled()).toBe(false);
+    expect(isServerPublicTestBaselineEnabled("1")).toBe(false);
   });
 });
 

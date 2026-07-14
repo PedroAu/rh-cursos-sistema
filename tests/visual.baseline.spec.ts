@@ -31,8 +31,16 @@ const routes = [
   { path: "/inscricao-confirmada", name: "inscricao-confirmada" }
 ];
 const publicTestBaselineStorageKey = "rh_cursos_public_test_baseline";
+const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100";
 
 async function prepareStableCapture(routeName: string, page: import("@playwright/test").Page) {
+  await page.context().addCookies([
+    {
+      name: publicTestBaselineStorageKey,
+      value: "1",
+      url: playwrightBaseUrl
+    }
+  ]);
   await page.addInitScript((storageKey) => {
     window.localStorage.clear();
     window.sessionStorage.clear();

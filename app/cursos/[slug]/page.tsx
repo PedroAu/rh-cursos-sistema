@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
 import {
   fetchPublicCatalogServerState,
-  fetchPublicTestimonialsFromSupabaseServer
+  fetchPublicTestimonialsFromSupabaseServer,
+  isServerPublicTestBaselineEnabled,
+  PUBLIC_TEST_BASELINE_COOKIE_NAME
 } from "@/lib/supabase/rh-cursos-api";
 
 // Renderização dinâmica: o catálogo é editado via admin e precisa refletir o
@@ -16,8 +19,15 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-async function getCourses() {
-  const result = await fetchPublicCatalogServerState();
+async function getPublicTestBaselineEnabled() {
+  const cookieStore = await cookies();
+  return isServerPublicTestBaselineEnabled(
+    cookieStore.get(PUBLIC_TEST_BASELINE_COOKIE_NAME)?.value
+  );
+}
+
+async function getCourses(usePublicTestBaseline: boolean) {
+  const result = await fetchPublicCatalogServerState(usePublicTestBaseline);
   if (result.status === "unavailable") {
     return null;
   }
@@ -26,7 +36,7 @@ async function getCourses() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const courses = await getCourses();
+  const courses = await getCourses(await getPublicTestBaselineEnabled());
   if (courses === null) {
     return {
       title: "Catálogo temporariamente indisponível | RH Cursos",
@@ -48,9 +58,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page() {
+  const usePublicTestBaseline = await getPublicTestBaselineEnabled();
   const [catalogState, testimonials] = await Promise.all([
-    fetchPublicCatalogServerState(),
-    fetchPublicTestimonialsFromSupabaseServer().catch(() => [])
+    fetchPublicCatalogServerState(usePublicTestBaseline),
+    usePublicTestBaseline
+      ? Promise.resolve([])
+      : fetchPublicTestimonialsFromSupabaseServer().catch(() => [])
   ]);
 
   if (catalogState.status === "unavailable") {

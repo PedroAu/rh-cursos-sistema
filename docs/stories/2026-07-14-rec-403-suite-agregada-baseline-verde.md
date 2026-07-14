@@ -271,6 +271,7 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 | 2026-07-14 | 1.1 | **Ready → In Progress; triagem QA NO-GO.** Os seis failures foram classificados: F01 provável falha de aplicação/integração na mutação de students; F02–F04 dependem de Supabase mutável e baseline visual não canônico; F05–F06 usam contrato de prontidão legado em `/cursos`. Nenhum flake foi comprovado. Reexecução com escrita foi bloqueada até existir ambiente de teste isolado e decisão formal sobre snapshots. | @qa (Quinn) |
 | 2026-07-14 | 1.2 | Correção parcial implementada: F02–F04 passam com fixture pública opt-in em bundle exclusivo do Playwright; F05/F06 usam o contrato atual de catálogo e passaram em desktop/mobile sem gravar PNG; `students:create` agora exige e usa o ID canônico, e o E2E captura a resposta sanitizada com cleanup em `finally`. Story permanece In Progress até reprodução de F01 e gate agregado em Supabase isolado. | @dev (Dex) |
 | 2026-07-14 | 1.3 | Hardening pós-revisão QA: mutações E2E agora falham fechado sem opt-in e project refs de teste/produção distintos; o skip global de `admin-crud` foi removido; o bundle determinístico foi isolado em `.next-playwright`; readiness valida separadamente `Ver turma` e `Ver detalhes`. | @dev (Dex) |
+| 2026-07-14 | 1.4 | Isolamento SSR do baseline visual concluído com cookie restrito ao bundle Playwright; `/cursos`, detalhe de curso e artigo usam fixtures sem consultar o catálogo real, enquanto build normal e contextos sem cookie permanecem reais. | @dev (Dex) |
 
 ## File List
 
@@ -296,6 +297,9 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 - `tests/public-journeys.spec.ts`
 - `tests/ui-governance.spec.ts`
 - `tests/visual.baseline.spec.ts`
+- `app/cursos/page.tsx`
+- `app/cursos/[slug]/page.tsx`
+- `app/blog/[slug]/page.tsx`
 - `docs/stories/2026-07-14-rec-403-suite-agregada-baseline-verde.md`
 
 ## Dev Agent Record
@@ -315,10 +319,11 @@ GPT-5 Codex (`@dev` / Dex).
 - Preflight: branch `main`, commit `cea25013099b8afbfd975f4643016e27b963ad0e`, Node 25.8.1, npm 11.16.0, macOS arm64. Variáveis foram inspecionadas somente por presença; `.env.local` está documentado como produção.
 - F02–F04: bundle Playwright dedicado + opt-in por `localStorage`; `ui-governance` passou 8/8. Hashes de hero, home mobile e filtros permaneceram `457d4716…`, `b3c081e4…` e `49187869…`.
 - F05/F06: readiness de `/cursos` passou em desktop 1280×720 e mobile 393×851 sem executar a captura que grava PNG versionado.
-- Gates seguros pós-correção: lint PASS; typecheck PASS; unit 45 arquivos/510 testes PASS; build normal PASS após o build de teste; build Playwright isolado PASS; coleção Playwright preservada em 174 testes/20 arquivos.
+- Gates seguros pós-correção: lint PASS; typecheck PASS; unit 45 arquivos/511 testes PASS; build normal PASS após o build de teste; build Playwright isolado PASS; coleção Playwright preservada em 174 testes/20 arquivos.
 - Gate pendente: `admin-crud` não pôde ultrapassar a nova guarda e `npm test` integral não foi executado porque terminaria no mesmo bloqueio obrigatório até existir Supabase exclusivo de testes.
 - Prova fail-closed: o cenário F01 foi invocado contra a configuração atual e terminou antes da navegação com `Mutações E2E bloqueadas`, sem executar escrita; o antigo skip global foi removido.
 - Prova fail-closed ampliada: a jornada pública de contato/in-company também foi invocada e bloqueada antes da navegação; cada override público/server-side de Edge Functions é validado independentemente contra o ref isolado ou uma origem custom explicitamente aprovada.
+- Isolamento SSR: `ui-governance` permaneceu 8/8 sem logs `mapCourse`; navegação dirigida de detalhe de curso e artigo passou usando fixture, sem leitura observável do catálogo Supabase real.
 
 ### Completion Notes
 
@@ -329,6 +334,7 @@ GPT-5 Codex (`@dev` / Dex).
 - Toda chamada a `ensureAuthUser` também exige opt-in de escrita e target isolado; URL e project ref precisam concordar e o ref de produção precisa ser diferente.
 - Inserção de curso, conclusão de checkout, envio de leads e cleanups públicos exercitados pelo agregado recebem a mesma guarda antes da primeira escrita.
 - O bundle com capacidade de fixture vive em `.next-playwright`, ignorado por Git/ESLint; preview/deploy normal continua usando `.next`.
+- O cookie de baseline SSR só é aceito quando `PLAYWRIGHT_TEST_BUILD=1` e `NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE=1`; cookie isolado não ativa fixture em build normal.
 - Próximo passo seguro: provisionar/seedar Supabase exclusivo de testes, reproduzir F01 isoladamente e executar o gate agregado completo.
 - Merge continua bloqueado enquanto `npm test` não passar no mesmo commit e ambiente isolado sem delta inesperado de artefatos.
 
