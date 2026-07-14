@@ -1,6 +1,15 @@
 import { cache } from "react";
 import type { Enrollment, Lead } from "@/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  publicTestBaselineBlogPosts,
+  publicTestBaselineClasses,
+  publicTestBaselineCourseCategories,
+  publicTestBaselineCoursePublicContents,
+  publicTestBaselineCourses,
+  publicTestBaselineInstructors,
+  publicTestBaselineTrainingPaths
+} from "@/lib/public-test-baseline";
 import { supabase } from "@/lib/supabase/client";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
@@ -57,6 +66,19 @@ export type PublicCatalogServerState =
   | { status: "ok"; catalog: PublicCatalogResult }
   | { status: "unavailable"; error: PublicCatalogUnavailableError };
 
+function isPlaceholderValue(value: string | undefined) {
+  return !value || value.includes("example.supabase.co") || value.includes("placeholder");
+}
+
+function shouldUsePublicTestBaseline() {
+  return (
+    isPlaceholderValue(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
+    isPlaceholderValue(
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
+  );
+}
+
 /**
  * Categorias distintas já cadastradas em `curso`, para alimentar as
  * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
@@ -87,6 +109,17 @@ export async function fetchCourseCategories(client: RhCursosClient): Promise<str
 }
 
 async function fetchPublicCatalog(client: RhCursosClient | null) {
+  if (shouldUsePublicTestBaseline()) {
+    return {
+      courses: publicTestBaselineCourses,
+      classes: publicTestBaselineClasses,
+      instructors: publicTestBaselineInstructors,
+      trainingPaths: publicTestBaselineTrainingPaths,
+      coursePublicContents: publicTestBaselineCoursePublicContents,
+      courseCategories: publicTestBaselineCourseCategories
+    };
+  }
+
   if (!client) return null;
 
   const [
@@ -102,7 +135,7 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
         () =>
           client
             .from("curso")
-            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
             .order("titulo"),
         { label: "fetchPublicCatalog:curso" }
       ),
@@ -229,6 +262,10 @@ export async function fetchPublicClassesFromSupabase() {
 }
 
 async function fetchPublicBlogPosts(client: RhCursosClient | null) {
+  if (shouldUsePublicTestBaseline()) {
+    return publicTestBaselineBlogPosts;
+  }
+
   if (!client) return null;
 
   const result = await withRetry(
