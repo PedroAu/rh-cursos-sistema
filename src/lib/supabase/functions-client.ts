@@ -9,6 +9,7 @@
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey =
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const CLIENT_IP_STORAGE_KEY = "rh_cursos_function_client_ip";
 
 /**
  * Base das Edge Functions. Permite override explícito via
@@ -29,6 +30,7 @@ type InvokeOptions = {
   body?: unknown;
   /** Header opcional de sessão (cookie HMAC) repassado para functions de admin. */
   sessionToken?: string;
+  keepalive?: boolean;
 };
 
 /**
@@ -37,11 +39,12 @@ type InvokeOptions = {
  */
 export async function invokeFunction(
   name: string,
-  { method = "POST", body, sessionToken }: InvokeOptions = {}
+  { method = "POST", body, sessionToken, keepalive = false }: InvokeOptions = {}
 ): Promise<Response> {
-  const base = getFunctionsBaseUrl();
+  const useProxy = typeof window !== "undefined";
+  const base = useProxy ? "" : getFunctionsBaseUrl();
 
-  if (!base || !anonKey) {
+  if ((!useProxy && !base) || !anonKey) {
     throw new Error("Supabase Functions não configurado (URL ou anon key ausente).");
   }
 
@@ -55,12 +58,29 @@ export async function invokeFunction(
     headers["x-rh-session"] = sessionToken;
   }
 
+  if (useProxy) {
+    headers["x-rh-client-ip"] = getStableClientIp();
+  }
+
   // Sem credentials:"include" — a sessão admin trafega via header x-rh-session
   // (localStorage), não por cookies. Evita a fricção de CORS com credenciais
   // (cookies __cf_bm do Cloudflare) que bloqueava a resposta no browser.
-  return fetch(`${base}/${name}`, {
+  const url = useProxy ? `/api/functions/${name}` : `${base}/${name}`;
+
+  return fetch(url, {
     method,
     headers,
+    keepalive,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
+}
+
+export function getStableClientIp(): string {
+  const storage = window.localStorage;
+  const existing = storage.getItem(CLIENT_IP_STORAGE_KEY);
+  if (existing) return existing;
+
+  const value = `session-${crypto.randomUUID()}`;
+  storage.setItem(CLIENT_IP_STORAGE_KEY, value);
+  return value;
 }

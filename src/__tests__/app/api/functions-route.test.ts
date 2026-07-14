@@ -88,4 +88,52 @@ describe("app/api/functions/[name] route", () => {
       new URL("https://project-ref.supabase.co/functions/v1/leads")
     );
   });
+
+  it("forwards DELETE requests to the upstream functions host", async () => {
+    process.env.SUPABASE_FUNCTIONS_URL = "https://server-functions.example.com/functions/v1";
+
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { DELETE } = await import("../../../../app/api/functions/[name]/route");
+
+    await DELETE(
+      new Request("http://localhost/api/functions/admin-resources", {
+        method: "DELETE",
+        headers: {
+          "content-type": "application/json",
+          authorization: "Bearer publishable",
+          apikey: "publishable",
+          "x-rh-session": "session-token",
+        },
+        body: JSON.stringify({ resource: "students", action: "delete", id: "student-1" }),
+      }),
+      { params: Promise.resolve({ name: "admin-resources" }) }
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      new URL("https://server-functions.example.com/functions/v1/admin-resources"),
+      expect.objectContaining({
+        method: "DELETE",
+        body: JSON.stringify({ resource: "students", action: "delete", id: "student-1" }),
+      })
+    );
+  });
+
+  it("returns 503 when no functions host is configured", async () => {
+    const { POST } = await import("../../../../app/api/functions/[name]/route");
+
+    const response = await POST(
+      new Request("http://localhost/api/functions/leads", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ name: "Test" }),
+      }),
+      { params: Promise.resolve({ name: "leads" }) }
+    );
+
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body).toEqual({ ok: false, error: "Supabase Functions não configurado." });
+  });
 });

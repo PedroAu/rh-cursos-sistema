@@ -184,6 +184,7 @@ vi.mock("@/lib/supabase/functions-client", () => ({
     return mocks.functionsConfigured;
   },
   invokeFunction: mocks.invokeFunction,
+  getStableClientIp: () => "2001:db8::test",
 }));
 
 vi.mock("@/lib/supabase/rh-cursos-api", () => ({
@@ -307,6 +308,12 @@ function buildLeadPayload(store: Store): Omit<Lead, "id" | "createdAt" | "status
   };
 }
 
+function findDeleteSessionCall() {
+  return mocks.fetchMock.mock.calls.find(
+    ([input, init]) => input === "/api/auth/session" && (init as RequestInit | undefined)?.method === "DELETE"
+  );
+}
+
 function installMemoryStorage() {
   const values = new Map<string, string>();
   const storage = {
@@ -409,13 +416,14 @@ describe("AppStoreProvider and hooks", () => {
       harness.store.logout();
     });
 
-    await waitFor(() =>
-      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+    await waitFor(() => expect(findDeleteSessionCall()).toBeTruthy());
+    expect(findDeleteSessionCall()).toEqual([
+      "/api/auth/session",
+      expect.objectContaining({
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: undefined }),
-      })
-    );
+      }),
+    ]);
     expect(mocks.clearSessionToken).toHaveBeenCalled();
     expect(screen.getByTestId("session-email")).toHaveTextContent("none");
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
@@ -462,14 +470,19 @@ describe("AppStoreProvider and hooks", () => {
     });
 
     await waitFor(() => expect(screen.getByTestId("session-email")).toHaveTextContent("none"));
-    await waitFor(() =>
-      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+    await waitFor(() => expect(findDeleteSessionCall()).toBeTruthy());
+    expect(findDeleteSessionCall()).toEqual([
+      "/api/auth/session",
+      expect.objectContaining({
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accessToken: undefined }),
-      })
-    );
-    expect(mocks.fetchMock.mock.calls.every(([, init]) => (init as RequestInit | undefined)?.method === "DELETE")).toBe(true);
+      }),
+    ]);
+    expect(
+      mocks.fetchMock.mock.calls
+        .filter(([, init]) => (init as RequestInit | undefined)?.method !== "GET")
+        .every(([, init]) => (init as RequestInit | undefined)?.method === "DELETE")
+    ).toBe(true);
     expect(mocks.setSessionToken).not.toHaveBeenCalledWith("stale.token");
   });
 
@@ -499,13 +512,14 @@ describe("AppStoreProvider and hooks", () => {
       harness.store.logout();
     });
 
-    await waitFor(() =>
-      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/session", {
+    await waitFor(() => expect(findDeleteSessionCall()).toBeTruthy());
+    expect(findDeleteSessionCall()).toEqual([
+      "/api/auth/session",
+      expect.objectContaining({
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken: "supabase-access-token" }),
-      })
-    );
+        body: JSON.stringify({ accessToken: undefined }),
+      }),
+    ]);
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
     await waitFor(() =>
       expect(mocks.toastError).toHaveBeenCalledWith(
@@ -533,7 +547,7 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead registrado apenas nesta sessão de desenvolvimento.");
   });
 
-  it("creates admin leads through admin-resources and keeps the persisted id", async () => {
+  it("creates admin leads optimistically while syncing through admin-resources", async () => {
     mocks.functionsConfigured = true;
     mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
@@ -542,55 +556,22 @@ describe("AppStoreProvider and hooks", () => {
       name: "Admin",
     });
     const payload = buildLeadPayload(harness.store);
-    mocks.invokeFunction
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            ok: true,
-            data: {
-              id: "lead-db-1",
-              created_at: "2026-06-22T12:30:00.000Z",
-              status_crm: "Novo",
-            },
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          data: {
+            id: "lead-db-1",
+            created_at: "2026-06-22T12:30:00.000Z",
+            status_crm: "Novo",
+          },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
       )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            ok: true,
-            data: [
-              {
-                id: "lead-db-1",
-                nome: payload.name,
-                email: payload.email,
-                telefone: payload.phone,
-                tipo: "Curso",
-                tema_interesse: payload.courseInterest,
-                curso_id: null,
-                orgao: payload.organization,
-                num_participantes: payload.teamSize,
-                modalidade_preferida: payload.preferredModality,
-                objetivo_treinamento: payload.trainingObjective,
-                tema_treinamento: null,
-                desafios_principais: payload.mainChallenges,
-                origem: payload.origin,
-                status_crm: "Novo",
-                mensagem: payload.message,
-                created_at: "2026-06-22T12:30:00.000Z",
-              },
-            ],
-          }),
-          {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          }
-        )
-      );
+    );
 
     await act(async () => {
       await harness.store.createLead(payload);
@@ -607,13 +588,38 @@ describe("AppStoreProvider and hooks", () => {
       },
       sessionToken: "payload.signature",
     });
+    expect(mocks.invokeFunction).toHaveBeenCalledTimes(1);
     expect(harness.store.leads[0]).toMatchObject({
       ...payload,
-      id: "lead-db-1",
-      createdAt: "2026-06-22T12:30:00.000Z",
+      id: "lead-1782129600000",
+      createdAt: "2026-06-22T12:00:00.000Z",
       status: "Novo",
     });
     expect(mocks.toastSuccess).toHaveBeenCalledWith("Lead cadastrado.");
+  });
+
+  it("does not report success when the public lead sync responds with a server error", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue(null);
+    const harness = renderStore();
+    const initialLeadCount = harness.store.leads.length;
+    const payload = buildLeadPayload(harness.store);
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ ok: false, error: "Erro interno" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      await harness.store.createLead(payload);
+    });
+
+    expect(harness.store.leads.length).toBe(initialLeadCount);
+    expect(mocks.toastError).toHaveBeenCalledWith(
+      "Serviço indisponível no momento. A solicitação não foi sincronizada."
+    );
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
   });
 
   it("creates enrollments and updates the related class capacity from provider state", async () => {
@@ -708,6 +714,7 @@ describe("AppStoreProvider and hooks", () => {
         action: "delete",
         id: enrollmentId,
       },
+      keepalive: true,
       sessionToken: "payload.signature",
     });
     await waitFor(() => expect(harness.store.enrollments).toHaveLength(0));
@@ -718,6 +725,60 @@ describe("AppStoreProvider and hooks", () => {
       })
     );
     expect(mocks.toastSuccess).toHaveBeenCalledWith("Inscrição excluída.");
+  });
+
+  it("deletes an admin-created enrollment in the same session using the server-issued id", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    const harness = renderStore(
+      {
+        role: "admin",
+        email: "admin@example.com",
+        name: "Admin",
+      },
+      {
+        courses: mockCourses,
+        classes: mockClasses,
+        instructors: mocks.data.mockInstructors,
+        trainingPaths: mocks.data.trainingPaths,
+      } as Parameters<typeof AppStoreProvider>[0]["initialData"]
+    );
+    const payload = buildEnrollmentPayload(harness.store);
+
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, data: { id: "enrollment-db-1" } }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      await harness.store.createEnrollmentAdmin(payload);
+    });
+
+    expect(harness.store.enrollments[0]?.id).toBe("enrollment-db-1");
+
+    mocks.invokeFunction.mockResolvedValueOnce(
+      new Response(JSON.stringify({ ok: true, data: null }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    await act(async () => {
+      await harness.store.deleteEnrollment("enrollment-db-1");
+    });
+
+    expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
+      body: {
+        resource: "enrollments",
+        action: "delete",
+        id: "enrollment-db-1",
+      },
+      keepalive: true,
+      sessionToken: "payload.signature",
+    });
+    await waitFor(() => expect(harness.store.enrollments).toHaveLength(0));
   });
 
   it("upserts, duplicates, and deletes courses through exported store actions", async () => {
@@ -853,6 +914,27 @@ describe("AppStoreProvider and hooks", () => {
 
     await waitFor(() => expect(harness.store.currentSession).toEqual(decodedSession));
     expect(screen.getByTestId("session-email")).toHaveTextContent(decodedSession.email);
+  });
+
+  it("preserves an existing admin-resources token during session sync", async () => {
+    const decodedSession: CurrentSession = {
+      role: "admin",
+      email: "token@example.com",
+      name: "Token User",
+    };
+    mocks.getSessionToken.mockReturnValue("edge-session-token");
+    mocks.decodeSessionToken.mockReturnValue(decodedSession);
+    mocks.fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ session: decodedSession, token: "cookie-hmac-token" }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    renderStore();
+
+    await waitFor(() => expect(screen.getByTestId("session-email")).toHaveTextContent(decodedSession.email));
+    expect(mocks.setSessionToken).not.toHaveBeenCalled();
   });
 
   it("clears the optimistic session when the server reports expiration", async () => {

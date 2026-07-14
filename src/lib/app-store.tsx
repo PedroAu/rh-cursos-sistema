@@ -343,10 +343,13 @@ function buildEnrollmentRecord(
  * (ex.: manter o modal do admin aberto e mostrar o erro) em vez de a UI
  * declarar sucesso otimista sobre uma escrita que não aconteceu.
  */
-function persistAdminMutation(mutation: AdminMutation, successMessage?: string): Promise<void> {
+function persistAdminMutation(
+  mutation: AdminMutation,
+  successMessage?: string
+): Promise<{ id?: string } | undefined> {
   if (!isFunctionsConfigured) {
     if (successMessage) toast.success(successMessage);
-    return Promise.resolve();
+    return Promise.resolve(undefined);
   }
 
   return invokeFunction("admin-resources", {
@@ -364,6 +367,8 @@ function persistAdminMutation(mutation: AdminMutation, successMessage?: string):
         throw new Error(message);
       }
       if (successMessage) toast.success(successMessage);
+      const body = (await response.json().catch(() => null)) as { data?: { id?: string } } | null;
+      return body?.data;
     })
     .catch((error) => {
       const message = error instanceof Error ? error.message : "Não foi possível sincronizar a alteração com o Supabase.";
@@ -937,7 +942,7 @@ export function AppStoreProvider({
   }, []);
 
   const createEnrollmentAdmin = useCallback<AppStoreValue["createEnrollmentAdmin"]>(async (payload) => {
-    await persistAdminMutation(
+    const result = await persistAdminMutation(
       { resource: "enrollments", action: "create", payload },
       undefined
     );
@@ -961,7 +966,7 @@ export function AppStoreProvider({
           enrolledAt: new Date().toISOString(),
         }
       );
-      const enrollment = buildEnrollmentRecord(payload);
+      const enrollment = buildEnrollmentRecord(payload, result?.id);
       const nextEnrollments = [enrollment, ...current.enrollments];
 
       return {
@@ -1074,9 +1079,11 @@ export function AppStoreProvider({
     }
 
     if (isFunctionsConfigured && !usedAdminMutation) {
-      void invokeFunction("leads", { body: payload }).catch(() => {
+      const response = await invokeFunction("leads", { body: payload }).catch(() => null);
+      if (!response || !response.ok) {
         toast.error("Serviço indisponível no momento. A solicitação não foi sincronizada.");
-      });
+        return;
+      }
     }
 
     startTransition(() => {
@@ -1097,7 +1104,7 @@ export function AppStoreProvider({
       ...current,
       leads: current.leads.map((lead) => (lead.id === id ? { ...lead, status } : lead))
     }));
-    return persistAdminMutation({ resource: "leads", action: "update-status", id, status }, "Status do lead atualizado.");
+    return persistAdminMutation({ resource: "leads", action: "update-status", id, status }, "Status do lead atualizado.").then(() => undefined);
   }, []);
 
   const updateLead = useCallback<AppStoreValue["updateLead"]>((payload) => {
@@ -1105,7 +1112,7 @@ export function AppStoreProvider({
       ...current,
       leads: current.leads.map((lead) => (lead.id === payload.id ? { ...lead, ...payload } : lead))
     }));
-    return persistAdminMutation({ resource: "leads", action: "upsert", payload }, "Lead atualizado.");
+    return persistAdminMutation({ resource: "leads", action: "upsert", payload }, "Lead atualizado.").then(() => undefined);
   }, []);
 
   const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>(async (course) => {
@@ -1347,7 +1354,7 @@ export function AppStoreProvider({
       ...current,
       students: current.students.map((item) => (item.id === student.id ? { ...item, ...student } : item))
     }));
-    return persistAdminMutation({ resource: "students", action: "upsert", payload: student }, "Aluno atualizado.");
+    return persistAdminMutation({ resource: "students", action: "upsert", payload: student }, "Aluno atualizado.").then(() => undefined);
   }, []);
 
   const updateEnrollmentStatus = useCallback<AppStoreValue["updateEnrollmentStatus"]>((id, status) => {
@@ -1366,7 +1373,7 @@ export function AppStoreProvider({
     return persistAdminMutation(
       { resource: "enrollments", action: "update-status", id, status },
       "Status da inscrição atualizado."
-    );
+    ).then(() => undefined);
   }, []);
 
   const upsertBlogPost = useCallback<AppStoreValue["upsertBlogPost"]>(async (post) => {

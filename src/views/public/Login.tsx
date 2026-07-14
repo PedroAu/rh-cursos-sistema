@@ -55,6 +55,12 @@ function getPortalCopy(pathname: string | null) {
   return portalCopy[pathname] ?? defaultPortalCopy;
 }
 
+function resolveLoginRole(pathname: string | null): DashboardRole {
+  if (pathname === "/login/aluno") return "student";
+  if (pathname === "/login/instrutor") return "instructor";
+  return "admin";
+}
+
 export function LoginPage() {
   const navigate = useNavigate();
   const searchParams = useSearchParams();
@@ -65,6 +71,7 @@ export function LoginPage() {
   const [remember, setRemember] = useState(true);
   const status = searchParams.get("status");
   const nextPath = searchParams.get("next");
+  const loginRole = resolveLoginRole(pathname);
   const { badge: badgeLabel, subtitle } = getPortalCopy(pathname);
   const {
     control,
@@ -88,7 +95,7 @@ export function LoginPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email: values.email, password: values.password, remember })
+        body: JSON.stringify({ role: loginRole, email: values.email, password: values.password, remember })
       });
 
       if (!response.ok) {
