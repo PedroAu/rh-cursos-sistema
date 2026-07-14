@@ -49,14 +49,16 @@ export function BarePageShell({
 export function DashboardPageShell({
   role,
   initialSession,
+  initialData,
   children
 }: {
   role: DashboardRole;
   initialSession: CurrentSession;
+  initialData?: AppStoreInitialData;
   children: ReactNode;
 }) {
   return (
-    <AppStoreProvider initialSession={initialSession}>
+    <AppStoreProvider initialSession={initialSession} initialData={initialData}>
       <Suspense fallback={null}>
         <DashboardShell role={role}>{children}</DashboardShell>
       </Suspense>
