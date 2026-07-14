@@ -75,6 +75,11 @@ function formatModalityLabel(value: Course["modality"], location?: string) {
   return "Gravado";
 }
 
+function formatCourseModalities(course: Course) {
+  const modalities = course.modalities?.length ? course.modalities : [course.modality];
+  return modalities.join(" · ");
+}
+
 function getSpotMeta(trainingClass: TrainingClass) {
   if (trainingClass.status === "Poucas vagas") {
     return {
@@ -395,7 +400,7 @@ export function CourseDetailPage() {
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
                       <CalendarDays className="h-4 w-4 text-tk-accent" />
-                      {selectedClass ? formatModalityLabel(selectedClass.modality, selectedClass.location) : course.modality}
+                      {selectedClass ? formatModalityLabel(selectedClass.modality, selectedClass.location) : formatCourseModalities(course)}
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
                       <ShieldCheck className="h-4 w-4 text-tk-accent" />

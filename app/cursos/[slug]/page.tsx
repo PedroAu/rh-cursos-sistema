@@ -1,34 +1,39 @@
 import type { Metadata } from "next";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
-import { mockCatalog } from "@/lib/mock-public-data";
 import {
-  fetchPublicCatalogFromSupabaseServer,
+  fetchPublicCatalogServerState,
   fetchPublicTestimonialsFromSupabaseServer
 } from "@/lib/supabase/rh-cursos-api";
+
+// Renderização dinâmica: o catálogo é editado via admin e precisa refletir o
+// estado real do banco a cada request, sem "assar" cursos/turmas em páginas
+// estáticas geradas em build (ver Story 16.1, AC7 — corretude > performance
+// de build, dado que não há cache/ISR no projeto).
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 async function getCourses() {
-  try {
-    const catalog = await fetchPublicCatalogFromSupabaseServer();
-    return [...(catalog?.courses ?? []), ...mockCatalog.courses].filter(
-      (course, index, collection) => collection.findIndex((item) => item.slug === course.slug) === index
-    );
-  } catch {
-    return mockCatalog.courses;
+  const result = await fetchPublicCatalogServerState();
+  if (result.status === "unavailable") {
+    return null;
   }
-}
-
-export async function generateStaticParams() {
-  return (await getCourses()).map((course) => ({ slug: course.slug }));
+  return result.catalog.courses;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = (await getCourses()).find((item) => item.slug === slug);
+  const courses = await getCourses();
+  if (courses === null) {
+    return {
+      title: "Catálogo temporariamente indisponível | RH Cursos",
+      description: "Não foi possível carregar os detalhes deste curso no momento."
+    };
+  }
+  const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     return {
@@ -42,29 +47,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page({ params }: PageProps) {
-  const { slug } = await params;
-  const [catalog, testimonials] = await Promise.all([
-    fetchPublicCatalogFromSupabaseServer().catch(() => null),
+export default async function Page() {
+  const [catalogState, testimonials] = await Promise.all([
+    fetchPublicCatalogServerState(),
     fetchPublicTestimonialsFromSupabaseServer().catch(() => [])
   ]);
-  const liveCourseExists = catalog?.courses.some((course) => course.slug === slug) ?? false;
-  const initialCatalog = liveCourseExists
-    ? catalog
-    : {
-        courses: mockCatalog.courses,
-        classes: mockCatalog.classes,
-        instructors: mockCatalog.instructors,
-        coursePublicContents: []
-      };
 
+  if (catalogState.status === "unavailable") {
+    console.error("Falha ao carregar catálogo público na rota de curso:", catalogState.error);
+    throw catalogState.error;
+  }
+
+  // Sem fallback para mockCatalog: se o curso não existir no catálogo real,
+  // `courses` chega vazio e `CourseDetailPage` já renderiza o estado
+  // "Curso não encontrado" existente (AC2), sem dado fictício exibido.
   return (
     <CourseDetailClient
       initialData={{
-        courses: initialCatalog?.courses ?? [],
-        classes: initialCatalog?.classes ?? [],
-        instructors: initialCatalog?.instructors ?? [],
-        coursePublicContents: initialCatalog?.coursePublicContents ?? [],
+        courses: catalogState.catalog.courses,
+        classes: catalogState.catalog.classes,
+        instructors: catalogState.catalog.instructors,
+        coursePublicContents: catalogState.catalog.coursePublicContents,
         testimonials: testimonials ?? []
       }}
     />

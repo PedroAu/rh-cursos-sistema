@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { attachRuntimeErrorProbe } from "./helpers/runtime-errors";
+import { attachRuntimeErrorProbe } from "@tests/helpers/runtime-errors";
 
 test("agenda renders after navigation without tripping the error boundary", async ({ page }) => {
   const runtimeErrors = attachRuntimeErrorProbe(page);

@@ -107,6 +107,10 @@ function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
     .sort((left, right) => left.trainingClass.startDate.localeCompare(right.trainingClass.startDate));
 }
 
+function getCourseModalities(course: Course) {
+  return course.modalities?.length ? course.modalities : [course.modality];
+}
+
 export function CoursesPage() {
   const { courses, classes } = useAppStore();
   const [params, setParams] = useSearchParams();
@@ -139,7 +143,13 @@ export function CoursesPage() {
     return catalogEntries.filter((entry) => {
       const matchesQuery =
         !normalizedQuery ||
-        [entry.course.title, entry.category, entry.course.pathName, entry.course.shortDescription]
+        [
+          entry.course.title,
+          entry.category,
+          entry.course.pathName,
+          entry.course.shortDescription,
+          ...getCourseModalities(entry.course)
+        ]
           .join(" ")
           .toLowerCase()
           .includes(normalizedQuery);

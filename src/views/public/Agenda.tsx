@@ -166,6 +166,10 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
     .sort((left, right) => left.date.getTime() - right.date.getTime());
 }
 
+function getCourseModalities(course: Course) {
+  return course.modalities?.length ? course.modalities : [course.modality];
+}
+
 function buildCalendarDays(monthDate: Date) {
   const firstDay = startOfMonth(monthDate);
   const lastDay = endOfMonth(monthDate);
@@ -239,7 +243,8 @@ export function AgendaPage() {
           entry.course.title,
           entry.category,
           entry.instructor?.name ?? "",
-          entry.place
+          entry.place,
+          ...getCourseModalities(entry.course)
         ]
           .join(" ")
           .toLowerCase()

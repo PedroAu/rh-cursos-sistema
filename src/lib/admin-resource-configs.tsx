@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { SeatProgress } from "@/components/admin/seat-progress";
 import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
+import { toOccupancyPercent } from "@/lib/occupancy";
 import {
   COURSE_LEVEL_OPTIONS,
   COURSE_MODALITY_OPTIONS,
@@ -95,6 +96,8 @@ export type FieldConfig = {
     | "file"
     | "readonly";
   options?: Array<{ value: string; label: string }>;
+  /** Sugestões (datalist) para campos `type: "array"` — não restringe, só orienta. */
+  suggestions?: string[];
   required?: boolean;
   section?: string;
 };
@@ -242,6 +245,7 @@ export function buildResourceConfig(
       );
       const pathOptions =
         store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
+      const categoryOptions = store.courseCategories ?? [];
       const modalityOptions = COURSE_MODALITY_OPTIONS;
       const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = COURSE_STATUS_OPTIONS;
@@ -391,7 +395,7 @@ export function buildResourceConfig(
           { key: "price", label: "Preço (R$)", type: "number", required: true },
           { key: "image", label: "URL da imagem", type: "text" },
           { key: "targetAudience", label: "Público-alvo", type: "array" },
-          { key: "categories", label: "Categorias", type: "array" },
+          { key: "categories", label: "Categorias", type: "array", suggestions: categoryOptions },
           { key: "featuredCourseIds", label: "Cursos destaque relacionados", type: "multiselect", options: featuredCourseOptions },
           { key: "shortDescription", label: "Descrição curta", type: "textarea", required: true },
           { key: "fullDescription", label: "Descrição completa", type: "textarea", required: true },
@@ -409,11 +413,13 @@ export function buildResourceConfig(
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
       const selectedCourse = store.courses.find((c) => c.id === form.courseId);
+      const getCourseModalities = (course: Course) =>
+        course.modalities?.length ? course.modalities : [course.modality];
       const modalityOptions = selectedCourse
-        ? [{ value: selectedCourse.modality, label: selectedCourse.modality }]
+        ? getCourseModalities(selectedCourse).map((value) => ({ value, label: value }))
         : courseOptions.length
           ? store.courses
-              .map((course) => course.modality)
+              .flatMap((course) => getCourseModalities(course))
               .filter((value, index, list) => list.indexOf(value) === index)
               .map((value) => ({ value, label: value }))
           : [];
@@ -442,7 +448,7 @@ export function buildResourceConfig(
       }).length;
       const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
       const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
-      const occupancyRate = totalSeatsAll > 0 ? Math.round((filledSeatsAll / totalSeatsAll) * 100) : 0;
+      const occupancyRate = toOccupancyPercent(filledSeatsAll, totalSeatsAll);
 
       return {
         title: "Gestão de turmas",

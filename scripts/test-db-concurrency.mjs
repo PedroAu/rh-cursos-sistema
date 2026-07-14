@@ -4,7 +4,7 @@ import { spawn } from "node:child_process";
 
 const connectionString =
   process.env.SUPABASE_DB_URL ?? "postgresql://postgres:postgres@127.0.0.1:54322/postgres";
-const turmaId = "class-3-1";
+const turmaId = "class-public-esocial-1";
 const email = `ep12-concurrency-${Date.now()}@rhcursos.test`;
 
 function runPsql(sql, { allowFailure = false } = {}) {

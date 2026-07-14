@@ -1,5 +1,15 @@
+import { cache } from "react";
 import type { Enrollment, Lead } from "@/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  publicTestBaselineBlogPosts,
+  publicTestBaselineClasses,
+  publicTestBaselineCourseCategories,
+  publicTestBaselineCoursePublicContents,
+  publicTestBaselineCourses,
+  publicTestBaselineInstructors,
+  publicTestBaselineTrainingPaths
+} from "@/lib/public-test-baseline";
 import { supabase } from "@/lib/supabase/client";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
@@ -29,6 +39,7 @@ import { validateResponse, withRetry } from "@/lib/supabase/api-validation";
 import {
   assessmentWithCourseListSchema,
   blogPostListSchema,
+  courseCategoryListSchema,
   courseInstructorListSchema,
   enrollmentIdSchema,
   leadListSchema,
@@ -42,16 +53,89 @@ import {
 
 type RhCursosClient = SupabaseClient<Database>;
 
+export class PublicCatalogUnavailableError extends Error {
+  constructor(message: string, options?: ErrorOptions) {
+    super(message, options);
+    this.name = "PublicCatalogUnavailableError";
+  }
+}
+
+type PublicCatalogResult = NonNullable<Awaited<ReturnType<typeof fetchPublicCatalog>>>;
+
+export type PublicCatalogServerState =
+  | { status: "ok"; catalog: PublicCatalogResult }
+  | { status: "unavailable"; error: PublicCatalogUnavailableError };
+
+function isPlaceholderValue(value: string | undefined) {
+  return !value || value.includes("example.supabase.co") || value.includes("placeholder");
+}
+
+function shouldUsePublicTestBaseline() {
+  return (
+    isPlaceholderValue(process.env.NEXT_PUBLIC_SUPABASE_URL) ||
+    isPlaceholderValue(
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
+  );
+}
+
+/**
+ * Categorias distintas já cadastradas em `curso`, para alimentar as
+ * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
+ * A query é coberta pelo índice parcial `curso_categoria_idx`; o filtro
+ * `deleted_at is null` é aplicado pela RLS `catalogo_publico_curso_select`
+ * (mesmo padrão das demais queries de `curso` neste arquivo).
+ */
+export async function fetchCourseCategories(client: RhCursosClient): Promise<string[]> {
+  const result = await withRetry(
+    () => client.from("curso").select("categoria").not("categoria", "is", null).order("categoria"),
+    { label: "fetchPublicCatalog:curso_categoria" }
+  );
+
+  if (result.error) throw result.error;
+
+  const rows = validateResponse(result.data, courseCategoryListSchema, {
+    endpoint: "fetchCourseCategories",
+    resource: "curso_categoria",
+    schema: "courseCategoryListSchema"
+  });
+
+  const categories = new Set<string>();
+  for (const row of rows) {
+    if (row.categoria) categories.add(row.categoria);
+  }
+
+  return Array.from(categories).sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
 async function fetchPublicCatalog(client: RhCursosClient | null) {
+  if (shouldUsePublicTestBaseline()) {
+    return {
+      courses: publicTestBaselineCourses,
+      classes: publicTestBaselineClasses,
+      instructors: publicTestBaselineInstructors,
+      trainingPaths: publicTestBaselineTrainingPaths,
+      coursePublicContents: publicTestBaselineCoursePublicContents,
+      courseCategories: publicTestBaselineCourseCategories
+    };
+  }
+
   if (!client) return null;
 
-  const [coursesResult, classesResult, instructorsResult, courseInstructorsResult, trainingPathsResult, coursePublicContentResult] =
-    await Promise.all([
+  const [
+    coursesResult,
+    classesResult,
+    instructorsResult,
+    courseInstructorsResult,
+    trainingPathsResult,
+    coursePublicContentResult,
+    courseCategories
+  ] = await Promise.all([
       withRetry(
         () =>
           client
             .from("curso")
-            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
             .order("titulo"),
         { label: "fetchPublicCatalog:curso" }
       ),
@@ -91,7 +175,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
             .eq("published", true)
             .order("created_at"),
         { label: "fetchPublicCatalog:curso_public_content" }
-      )
+      ),
+      fetchCourseCategories(client)
     ]);
 
   if (coursesResult.error) throw coursesResult.error;
@@ -147,7 +232,8 @@ async function fetchPublicCatalog(client: RhCursosClient | null) {
     classes: classRows.map(mapClass),
     instructors: instructorRows.map((instructor) => mapInstructor(instructor, courseInstructorRows)),
     trainingPaths: trainingPathRows.map((path) => mapTrainingPath(path, courseCountByPath[path.id] ?? 0)),
-    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent)
+    coursePublicContents: coursePublicContentRows.map(mapCoursePublicContent),
+    courseCategories
   };
 }
 
@@ -176,6 +262,10 @@ export async function fetchPublicClassesFromSupabase() {
 }
 
 async function fetchPublicBlogPosts(client: RhCursosClient | null) {
+  if (shouldUsePublicTestBaseline()) {
+    return publicTestBaselineBlogPosts;
+  }
+
   if (!client) return null;
 
   const result = await withRetry(
@@ -203,9 +293,30 @@ export function fetchPublicCatalogFromSupabase() {
   return fetchPublicCatalog(supabase);
 }
 
-export function fetchPublicCatalogFromSupabaseServer() {
+// Memoizado por request (React cache()): com dynamic = "force-dynamic" nas
+// páginas públicas, generateMetadata e o componente de página chamam esta
+// função independentemente — sem cache() isso vira 2 round-trips completos
+// ao Supabase por view.
+export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer() {
   return fetchPublicCatalog(createSupabaseServerClient());
-}
+});
+
+export const fetchPublicCatalogServerState = cache(async function fetchPublicCatalogServerState(): Promise<PublicCatalogServerState> {
+  try {
+    const catalog = await fetchPublicCatalogFromSupabaseServer();
+    if (!catalog) {
+      throw new PublicCatalogUnavailableError("Supabase indisponível para carregar o catálogo público.");
+    }
+    return { status: "ok", catalog };
+  } catch (error) {
+    return {
+      status: "unavailable",
+      error: error instanceof PublicCatalogUnavailableError
+        ? error
+        : new PublicCatalogUnavailableError("Não foi possível carregar o catálogo público.", { cause: error })
+    };
+  }
+});
 
 export function fetchPublicBlogPostsFromSupabase() {
   return fetchPublicBlogPosts(supabase);

@@ -110,6 +110,14 @@ export const publicInstructorListSchema = z.array(publicInstructorSchema);
 export const courseInstructorListSchema = z.array(courseInstructorSchema);
 export const trainingPathListSchema = z.array(trainingPathSchema);
 
+// --- fetchCourseCategories --------------------------------------------------
+
+export const courseCategoryRowSchema = z.object({
+  categoria: z.string().nullable()
+});
+
+export const courseCategoryListSchema = z.array(courseCategoryRowSchema);
+
 // --- fetchPublicBlogPosts -------------------------------------------------
 
 export const blogPostSchema = z.object({

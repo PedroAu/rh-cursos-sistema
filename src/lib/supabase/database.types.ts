@@ -103,6 +103,7 @@ export type Database = {
           publico_alvo: Json;
           carga_horaria: number;
           modalidade: "Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado";
+          modalidades: ("Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado")[];
           nivel: "Basico" | "Intermediario" | "Avancado" | "Misto";
           categoria: string | null;
           trilha_id: string | null;
@@ -129,6 +130,7 @@ export type Database = {
           publico_alvo?: Json;
           carga_horaria?: number;
           modalidade?: "Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado";
+          modalidades?: ("Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado")[];
           nivel?: "Basico" | "Intermediario" | "Avancado" | "Misto";
           categoria?: string | null;
           trilha_id?: string | null;

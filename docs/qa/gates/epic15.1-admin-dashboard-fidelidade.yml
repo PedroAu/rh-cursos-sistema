@@ -1,0 +1,112 @@
+storyId: EPIC15-1
+title: "Admin Dashboard com Fidelidade Total Trust Keith"
+storyPath: docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md
+reviewer: "@qa (Quinn)"
+date: 2026-07-13
+verdict: PASS   # re-gate 2026-07-14 fecha PASS após fix do REL-001 — ver reReview abaixo
+
+objectiveGates:
+  typecheck: PASS
+  lint: PASS            # 0 errors, 19 warnings (arquivos alheios à story)
+  test:unit: PASS       # 440 testes / 36 arquivos
+  build: PASS
+  purge:gate: PASS      # zero @mantine/@emotion
+  bundle:check: PASS    # 576.3 KB / 1000 KB
+
+# ─────────────────────────────────────────────────────────────────────────────
+reReview:
+  date: 2026-07-14T00:13:58Z
+  reviewer: "Quinn (Test Architect)"
+  verdict: CONCERNS
+  status_reason: >-
+    As duas ressalvas de processo/cobertura do gate original foram RESOLVIDAS
+    (AC11 story atualizada, cobertura unitária do model adicionada). Porém, ao
+    executar o e2e de fidelidade ao vivo (antes só validado estruturalmente),
+    ele FALHA 1/3: o dashboard emite um erro de runtime real no carregamento.
+    A causa NÃO é o código da 15.1 (que está correto e atende todos os ACs), e
+    sim um defeito HIGH pré-existente no query-logging-middleware, agora exposto
+    pela Story 16.1 (commit 65ef021). Não promover para Done até o fix do
+    middleware e o e2e voltar a verde.
+  resolvedFromOriginalGate:
+    - ac: AC11
+      was: not_met
+      now: met
+      evidence: "File List real, checkboxes, Dev Agent Record, Change Log e Status atualizados (verificado por leitura)."
+    - ac: "cobertura-model"
+      was: missing
+      now: met
+      evidence: "src/__tests__/lib/dashboard-overview.test.ts com 14 testes; verificado passando (14/14). Suíte completa 455/455."
+  newFinding:
+    ac: AC10
+    was: partial          # gate original: estrutura validada, não executado ao vivo
+    now: failing           # executado ao vivo agora → 1 failed / 2 passed
+    severity: high
+    category: reliability
+    origin_story: "16.1"
+    origin_defect: "query-logging-middleware.ts:52-83 (.select() vira Promise → quebra .eq/.order/.not encadeados no client browser)"
+    evidence: >-
+      test:epic15:fidelity contra next start :3100 (bundle de produção):
+      teste "Visão geral renderiza ... sem erro de runtime" FALHA com
+      "Falha ao carregar catálogo público do Supabase: TypeError:
+      e.from(...).select(...).eq is not a function". Os outros 2 testes (chip
+      'Todas', responsivo <1024px) passam.
+    note: >-
+      O "3/3 passed" registrado pelo @dev da 15.1 era verdadeiro no commit
+      eccf179 (antes da 16.1). A 16.1 tornou o erro de fetch VISÍVEL (AC5),
+      surfando o defeito latente do middleware e quebrando o assert de
+      runtime-errors deste e2e.
+  nextAction: >-
+    Bloqueado por REL-001 (ver docs/qa/gates/16.1-remover-fallback-mock-producao.yml).
+    Após o fix do middleware, re-rodar test:epic15:fidelity (esperado 3/3) e
+    então liberar 15.1 para @devops. O código da 15.1 NÃO requer retrabalho.
+
+  fixVerified:
+    date: "2026-07-13"
+    by: "Dex (@dev)"
+    fix: "src/lib/supabase/query-logging-middleware.ts corrigido (ver docs/qa/gates/16.1-remover-fallback-mock-producao.yml)"
+    evidence: >-
+      npm run test:epic15:fidelity re-executado contra next start :3100 real
+      após o fix: 3 passed (1.4s) — os 3 testes, incluindo "Visão geral renderiza
+      ... sem erro de runtime", voltaram a passar. AC10 met novamente.
+    finalVerdict: PASS
+    note: "Código da 15.1 não precisou de nenhuma alteração — confirmado que o defeito era 100% do middleware (REL-001), não da story."
+
+acceptanceCriteria:
+  AC1: met
+  AC2: met
+  AC3: met              # Gerenciar Cursos preservado em AdminResourcePage (busca + export CSV)
+  AC4: met
+  AC5: met              # únicos hex são do banner pré-existente (protegido por AC8)
+  AC6: met
+  AC7: met
+  AC8: met
+  AC9: met
+  AC10: partial         # spec criado + script registrado; não executado ao vivo
+  AC11: not_met         # story não atualizada (File List/checkboxes/Dev Agent Record/Status)
+
+issues:
+  - severity: medium
+    category: requirements
+    ac: AC11
+    owner: "@dev"
+    description: "Artefato da story não atualizado: File List vazia, checkboxes desmarcados, Dev Agent Record vazio, Status ainda 'Ready'."
+    recommendation: "Preencher File List (incl. model/dashboard-overview.ts), marcar tasks/quality gates, preencher Dev Agent Record com evidências dos gates e Change Log; ajustar Status ao fluxo real."
+  - severity: low
+    category: tests
+    ac: AC10
+    owner: "@qa/@dev"
+    description: "Playwright test:epic15:fidelity validado estruturalmente, não executado contra servidor vivo (:3100)."
+    recommendation: "Rodar npm run test:epic15:fidelity em ambiente e2e e anexar resultado."
+  - severity: low
+    category: tests
+    owner: "@dev"
+    description: "model/dashboard-overview.ts (lógica pura de datas/agregações) sem teste unitário."
+    recommendation: "Adicionar testes de corte 30 dias, ordenação por proximidade, fallback de origem vazia e ocupação com totalSeats=0. Não bloqueante (módulos-irmãos também não têm)."
+
+nfr:
+  security: pass        # sem novas superfícies de dados/auth
+  performance: pass     # useMemo correto; bundle dentro do budget
+  reliability: pass     # fallbacks de lista vazia + guardas de NaN/divisão por zero
+  maintainability: pass # lógica de dados isolada em model/ puro
+
+nextAction: "Devolver ao @dev para cumprir AC11 (issue medium) e, idealmente, executar o e2e de fidelidade. Após re-revisão leve, liberar para @devops. NÃO promover para Done com story não rastreada."

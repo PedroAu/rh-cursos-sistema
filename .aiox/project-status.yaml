@@ -1,21 +1,19 @@
 status:
-  branch: main
+  branch: fix/remove-demo-seed-data
   modifiedFiles:
     - .aiox/project-status.yaml
-    - .gitignore
-    - docs/api/edge-functions.md
-    - docs/architecture/adr-014-redesign-trust-keith.md
-    - docs/checklists/GO-LIVE-2026-07-02.md
-  modifiedFilesTotalCount: 128
+    - docs/stories/2026-07-13-adr015-fase2-categorias-dinamicas.md
+    - tests/admin-crud.spec.ts
+    - tests/baseline/agenda-baseline-desktop.png
+    - tests/baseline/agenda-baseline-mobile.png
+  modifiedFilesTotalCount: 23
   recentCommits:
-    - 'docs: add design system exports'
-    - >-
-      fix: classify enrollment errors and update validation tests [Story
-      EP-12.2]
+    - 'chore(pr8): address remaining quick wins and docs'
+    - 'fix: stabilize ci public baseline and db tests'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-12T11:30:01.896Z'
+  lastUpdate: '2026-07-14T02:27:02.340Z'
   isGitRepo: true
-timestamp: 1783855801897
+timestamp: 1783996022342
 ttl: 60
-gitFingerprint: 1783527338283.8445:1783823790634.5852
+gitFingerprint: 1783992707341.5867:1783995259489.3374

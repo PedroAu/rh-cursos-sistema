@@ -1,34 +1,38 @@
 import type { Metadata } from "next";
 
 import { CourseCheckoutClient } from "@/components/page-clients/course-checkout-client";
-import { mockCatalog } from "@/lib/mock-public-data";
 import {
-  fetchPublicCatalogFromSupabaseServer,
+  fetchPublicCatalogServerState,
   fetchPublicTestimonialsFromSupabaseServer,
 } from "@/lib/supabase/rh-cursos-api";
+
+// Renderização dinâmica: mesmo racional de app/cursos/[slug]/page.tsx
+// (Story 16.1, AC7) — o checkout precisa refletir turmas/vagas reais a cada
+// request, sem páginas estáticas "assadas" em build.
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 async function getCourses() {
-  try {
-    const catalog = await fetchPublicCatalogFromSupabaseServer();
-    return [...(catalog?.courses ?? []), ...mockCatalog.courses].filter(
-      (course, index, collection) => collection.findIndex((item) => item.slug === course.slug) === index,
-    );
-  } catch {
-    return mockCatalog.courses;
+  const result = await fetchPublicCatalogServerState();
+  if (result.status === "unavailable") {
+    return null;
   }
-}
-
-export async function generateStaticParams() {
-  return (await getCourses()).map((course) => ({ slug: course.slug }));
+  return result.catalog.courses;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const course = (await getCourses()).find((item) => item.slug === slug);
+  const courses = await getCourses();
+  if (courses === null) {
+    return {
+      title: "Checkout temporariamente indisponível | RH Cursos",
+      description: "Não foi possível carregar este checkout no momento.",
+    };
+  }
+  const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     return {
@@ -42,30 +46,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page({ params }: PageProps) {
-  const { slug } = await params;
-  const [catalog, testimonials] = await Promise.all([
-    fetchPublicCatalogFromSupabaseServer().catch(() => null),
+export default async function Page() {
+  const [catalogState, testimonials] = await Promise.all([
+    fetchPublicCatalogServerState(),
     fetchPublicTestimonialsFromSupabaseServer().catch(() => []),
   ]);
 
-  const liveCourseExists = catalog?.courses.some((course) => course.slug === slug) ?? false;
-  const initialCatalog = liveCourseExists
-    ? catalog
-    : {
-        courses: mockCatalog.courses,
-        classes: mockCatalog.classes,
-        instructors: mockCatalog.instructors,
-        coursePublicContents: [],
-      };
+  if (catalogState.status === "unavailable") {
+    console.error("Falha ao carregar catálogo público na rota de checkout:", catalogState.error);
+    throw catalogState.error;
+  }
 
+  // Sem fallback para mockCatalog: se o curso/turma não existir no catálogo
+  // real, `CourseCheckoutPage` já renderiza seu estado de "não encontrado"
+  // existente a partir de `courses`/`classes` vazios (AC3).
   return (
     <CourseCheckoutClient
       initialData={{
-        courses: initialCatalog?.courses ?? [],
-        classes: initialCatalog?.classes ?? [],
-        instructors: initialCatalog?.instructors ?? [],
-        coursePublicContents: initialCatalog?.coursePublicContents ?? [],
+        courses: catalogState.catalog.courses,
+        classes: catalogState.catalog.classes,
+        instructors: catalogState.catalog.instructors,
+        coursePublicContents: catalogState.catalog.coursePublicContents,
         testimonials: testimonials ?? [],
       }}
     />

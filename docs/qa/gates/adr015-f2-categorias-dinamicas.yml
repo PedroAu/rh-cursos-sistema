@@ -1,0 +1,45 @@
+storyId: ADR015-F2
+story: docs/stories/2026-07-13-adr015-fase2-categorias-dinamicas.md
+reviewer: Quinn (@qa)
+date: 2026-07-13
+verdict: CONCERNS
+
+gates:
+  lint: PASS
+  typecheck: PASS
+  test_unit: PASS # 464/464, 39 arquivos
+  build: PASS
+  test_e2e_smoke: NOT_RUN
+
+acceptance_criteria:
+  AC1: PASS
+  AC2: PASS
+  AC3: PASS
+  AC4: PASS
+  AC5: PASS
+  AC6: PASS
+  AC7: PASS
+
+issues:
+  - id: 1
+    severity: low
+    category: tests
+    description: >-
+      test:e2e:smoke não foi executado neste gate. O fluxo real de salvar curso
+      com categoria sugerida e com categoria nova digitada livremente ainda não
+      foi validado ponta a ponta no browser.
+    recommendation: >-
+      Rodar test:e2e:smoke antes de promover a story para Done, ou aceitar
+      explicitamente esse risco residual se a janela de release exigir.
+
+observations:
+  - severity: low
+    category: implementation
+    description: >-
+      fetchCourseCategories não aplica deleted_at is null explicitamente na
+      query; nesta base o filtro é herdado da RLS pública de curso, em linha com
+      as demais queries do catálogo.
+
+nextAction: >-
+  Story funcionalmente aprovada. Falta apenas o smoke E2E para fechar o gate em
+  PASS; sem esse teste, manter em CONCERNS.

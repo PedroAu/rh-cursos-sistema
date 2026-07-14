@@ -29,6 +29,7 @@ export type AppState = {
   blogPosts: BlogPost[];
   testimonials: Testimonial[];
   trainingPaths: TrainingPath[];
+  courseCategories: string[];
   currentSession: CurrentSession | null;
 };
 

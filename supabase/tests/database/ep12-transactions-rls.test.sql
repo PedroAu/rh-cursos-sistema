@@ -2,10 +2,119 @@ begin;
 
 select plan(20);
 
+insert into public.curso (
+  id,
+  titulo,
+  slug,
+  descricao_curta,
+  descricao,
+  ementa,
+  objetivos,
+  beneficios,
+  publico_alvo,
+  carga_horaria,
+  modalidade,
+  nivel,
+  preco_base,
+  status,
+  destaque
+)
+values
+  (
+    'ep12-course-open',
+    'EP12 Curso Aberto',
+    'ep12-curso-aberto',
+    'Curso de apoio ao teste EP12.',
+    'Curso de apoio ao teste EP12.',
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    8,
+    'Online',
+    'Basico',
+    0,
+    'Ativo',
+    false
+  ),
+  (
+    'ep12-course-delete',
+    'EP12 Curso Delete',
+    'ep12-curso-delete',
+    'Curso de apoio ao teste de delete EP12.',
+    'Curso de apoio ao teste de delete EP12.',
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    '[]'::jsonb,
+    8,
+    'Online',
+    'Basico',
+    0,
+    'Ativo',
+    false
+  )
+on conflict (id) do update set
+  titulo = excluded.titulo,
+  slug = excluded.slug,
+  deleted_at = null;
+
+insert into public.turma (
+  id,
+  curso_id,
+  data_inicio,
+  data_fim,
+  horario,
+  local,
+  vagas_total,
+  vagas_preenchidas,
+  preco_turma,
+  modalidade,
+  status,
+  observacoes
+)
+values
+  (
+    'ep12-class-open',
+    'ep12-course-open',
+    '2026-08-01',
+    '2026-08-01',
+    '09:00 às 17:00',
+    'Online ao vivo',
+    30,
+    5,
+    0,
+    'Online',
+    'Aberta',
+    'Turma aberta criada pelo teste EP12.'
+  ),
+  (
+    'ep12-class-delete',
+    'ep12-course-delete',
+    '2026-08-02',
+    '2026-08-02',
+    '09:00 às 17:00',
+    'Online ao vivo',
+    30,
+    5,
+    0,
+    'Online',
+    'Aberta',
+    'Turma de delete criada pelo teste EP12.'
+  )
+on conflict (id) do update set
+  curso_id = excluded.curso_id,
+  vagas_total = excluded.vagas_total,
+  vagas_preenchidas = excluded.vagas_preenchidas,
+  modalidade = excluded.modalidade,
+  status = excluded.status,
+  observacoes = excluded.observacoes,
+  deleted_at = null;
+
 create temporary table ep12_ctx as
 select vagas_preenchidas::int as vagas_antes
 from public.turma
-where id = 'class-3-1';
+where id = 'ep12-class-open';
 
 select ok(
   exists(
@@ -28,7 +137,7 @@ select lives_ok(
       'Analista',
       'Orgao de Teste',
       'PF',
-      'class-3-1',
+      'ep12-class-open',
       'PF',
       'Pix',
       'primeira tentativa'
@@ -49,7 +158,7 @@ select is(
     from public.inscricao i
     join public.aluno a on a.id = i.aluno_id
     where lower(a.email) = 'ep12-rollback@rhcursos.test'
-      and i.turma_id = 'class-3-1'
+      and i.turma_id = 'ep12-class-open'
       and i.status_inscricao <> 'Cancelada'
   ),
   1,
@@ -72,7 +181,7 @@ select throws_ok(
       'Gerente',
       'Outro Orgao',
       'PF',
-      'class-3-1',
+      'ep12-class-open',
       'PF',
       'Pix',
       'segunda tentativa duplicada'
@@ -95,7 +204,7 @@ select is(
     from public.inscricao i
     join public.aluno a on a.id = i.aluno_id
     where lower(a.email) = 'ep12-rollback@rhcursos.test'
-      and i.turma_id = 'class-3-1'
+      and i.turma_id = 'ep12-class-open'
       and i.status_inscricao <> 'Cancelada'
   ),
   1,
@@ -109,7 +218,7 @@ select is(
 );
 
 select is(
-  (select vagas_preenchidas::int from public.turma where id = 'class-3-1'),
+  (select vagas_preenchidas::int from public.turma where id = 'ep12-class-open'),
   (select vagas_antes + 1 from ep12_ctx),
   'vagas da turma incrementam apenas uma vez'
 );
@@ -177,7 +286,7 @@ insert into public.inscricao (
 values (
   'ep12-rls-enrollment',
   'ep12-rls-student',
-  'class-1-1',
+  'ep12-class-delete',
   'Confirmada',
   'Pendente',
   'Pix',
@@ -256,7 +365,7 @@ select
   c.total_alunos::int as total_alunos_antes
 from public.turma t
 join public.curso c on c.id = t.curso_id
-where t.id = 'class-1-1';
+where t.id = 'ep12-class-delete';
 
 delete from public.inscricao
 where id = 'ep12-rls-enrollment';
@@ -268,7 +377,7 @@ select is(
 );
 
 select is(
-  (select vagas_preenchidas::int from public.turma where id = 'class-1-1'),
+  (select vagas_preenchidas::int from public.turma where id = 'ep12-class-delete'),
   (select vagas_antes - 1 from ep12_delete_ctx),
   'delete da inscricao libera exatamente uma vaga'
 );
@@ -277,7 +386,7 @@ select is(
   (
     select total_alunos::int
     from public.curso
-    where id = (select curso_id from public.turma where id = 'class-1-1')
+    where id = (select curso_id from public.turma where id = 'ep12-class-delete')
   ),
   (select total_alunos_antes - 1 from ep12_delete_ctx),
   'delete da inscricao reduz total_alunos apenas uma vez'

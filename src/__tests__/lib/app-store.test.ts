@@ -59,7 +59,7 @@ const mocks = vi.hoisted(() => {
       location: "Online",
       instructorId: "inst-1",
       totalSeats: 30,
-      manualFilledSeats: 4,
+      manualFilledSeats: 5,
       filledSeats: 5,
       availableSeats: 25,
       status: "Inscrições abertas",
@@ -252,13 +252,13 @@ function BrokenConsumer() {
   return null;
 }
 
-function renderStore(initialSession?: CurrentSession | null) {
+function renderStore(initialSession?: CurrentSession | null, initialData?: Parameters<typeof AppStoreProvider>[0]["initialData"]) {
   let latestStore: Store | undefined;
   const onStore = vi.fn((store: Store) => {
     latestStore = store;
   });
 
-  render(h(AppStoreProvider, { initialSession }, h(StoreProbe, { onStore })));
+  render(h(AppStoreProvider, { initialSession, initialData }, h(StoreProbe, { onStore })));
 
   return {
     onStore,
@@ -663,11 +663,19 @@ describe("AppStoreProvider and hooks", () => {
   });
 
   it("deletes enrollments through the provider and recalculates the class capacity from remaining rows", async () => {
-    const harness = renderStore({
-      role: "admin",
-      email: "admin@example.com",
-      name: "Admin",
-    });
+    const harness = renderStore(
+      {
+        role: "admin",
+        email: "admin@example.com",
+        name: "Admin",
+      },
+      {
+        courses: mockCourses,
+        classes: mockClasses,
+        instructors: mocks.data.mockInstructors,
+        trainingPaths: mocks.data.trainingPaths,
+      } as Parameters<typeof AppStoreProvider>[0]["initialData"]
+    );
     const initialClassCount = harness.store.classes.length;
     const payload = buildEnrollmentPayload(harness.store);
     const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
@@ -746,6 +754,61 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(harness.store.courses).toHaveLength(initialCourseCount + 1));
 
     expect(harness.store.courses).toHaveLength(initialCourseCount + 1);
+  });
+
+  it("preserves the full modalities array when creating and editing courses", async () => {
+    mocks.functionsConfigured = true;
+    mocks.getSessionToken.mockReturnValue("payload.signature");
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, data: null }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    const harness = renderStore();
+
+    await act(async () => {
+      await harness.store.upsertCourse({
+        title: "Curso Multimodal",
+        modality: "Presencial",
+        modalities: ["Presencial", "Ao vivo online"],
+      });
+    });
+
+    await waitFor(() =>
+      expect(harness.store.courses[0]).toMatchObject({
+        title: "Curso Multimodal",
+        modality: "Presencial",
+        modalities: ["Presencial", "Ao vivo online"],
+      })
+    );
+
+    await act(async () => {
+      await harness.store.upsertCourse({
+        id: harness.store.courses[0].id,
+        modalities: ["Gravado", "Ao vivo online"],
+      });
+    });
+
+    await waitFor(() =>
+      expect(harness.store.courses[0]).toMatchObject({
+        modality: "Gravado",
+        modalities: ["Gravado", "Ao vivo online"],
+      })
+    );
+
+    expect(mocks.invokeFunction).toHaveBeenLastCalledWith("admin-resources", {
+      body: {
+        resource: "courses",
+        action: "upsert",
+        payload: expect.objectContaining({
+          modality: "Gravado",
+          modalities: ["Gravado", "Ao vivo online"],
+        }),
+      },
+      sessionToken: "payload.signature",
+    });
   });
 
   it("exposes derived course and dashboard hooks through the provider", async () => {
@@ -835,5 +898,42 @@ describe("AppStoreProvider and hooks", () => {
     const harness = renderStore(initialSession);
 
     expect(harness.store.currentSession).toEqual(initialSession);
+  });
+
+  it("starts with an empty catalog (no mock fallback) when no initial data is provided", async () => {
+    const harness = renderStore();
+
+    expect(harness.store.courses).toEqual([]);
+    expect(harness.store.classes).toEqual([]);
+    expect(harness.store.instructors).toEqual([]);
+    expect(harness.store.blogPosts).toEqual([]);
+    expect(harness.store.courseCategories).toEqual([]);
+  });
+
+  it("never surfaces known mock-public-data course slugs when the catalog bootstraps empty (Story 16.1, AC9)", async () => {
+    const { mockCatalog } = await import("@/lib/mock-public-data");
+    const knownMockSlugs = mockCatalog.courses.map((course) => course.slug);
+    expect(knownMockSlugs).toContain("nova-lei-de-licitacoes-na-pratica-lei-14133-21");
+
+    const harness = renderStore();
+    const renderedSlugs = harness.store.courses.map((course) => course.slug);
+
+    expect(renderedSlugs).toEqual([]);
+    expect(renderedSlugs.some((slug) => knownMockSlugs.includes(slug))).toBe(false);
+  });
+
+  it("uses courseCategories from the initial catalog data when provided", async () => {
+    const harness = renderStore(undefined, { courseCategories: ["Auditoria", "Compliance"] });
+
+    expect(harness.store.courseCategories).toEqual(["Auditoria", "Compliance"]);
+  });
+
+  it("ignores a non-array courseCategories value in the initial catalog data", async () => {
+    const fallback = renderStore().store.courseCategories;
+    const harness = renderStore(undefined, {
+      courseCategories: "not-an-array" as unknown as string[],
+    });
+
+    expect(harness.store.courseCategories).toEqual(fallback);
   });
 });

@@ -19,11 +19,12 @@ function getRoleLabel(role: DashboardRole) {
 }
 
 export function AdminSidebar({ role }: { role: DashboardRole }) {
-  const { currentSession, logout } = useAppStore();
+  const { currentSession, logout, leads } = useAppStore();
   const location = useLocation();
   const initials = getInitials(currentSession?.name ?? "Admin");
   const navItems = getDashboardNavItems(role);
   const homePath = getDefaultDashboardPath(role);
+  const newLeadsCount = leads.filter((lead) => lead.status === "Novo").length;
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[248px] flex-col bg-[#0e4666] lg:flex">
@@ -61,7 +62,12 @@ export function AdminSidebar({ role }: { role: DashboardRole }) {
                 )}
               >
                 <Icon size={18} strokeWidth={2.2} className={isActive ? "text-[#2a2210]" : "text-white/78"} />
-                {item.label}
+                <span className="flex-1">{item.label}</span>
+                {item.to === "/admin/leads" && newLeadsCount > 0 ? (
+                  <span className="rounded-tk-pill bg-tk-brand px-2 py-0.5 text-xs font-bold text-white">
+                    {newLeadsCount}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

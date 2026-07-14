@@ -24,6 +24,18 @@ export function toDbModality(value: Modality): string {
   return map[value] ?? "Online";
 }
 
+function normalizeCourseModalities(p: AnyPayload): Modality[] {
+  if (Array.isArray(p.modalities) && p.modalities.length > 0) {
+    return p.modalities as Modality[];
+  }
+
+  if (typeof p.modality === "string" && p.modality.length > 0) {
+    return [p.modality as Modality];
+  }
+
+  return ["Ao vivo online"];
+}
+
 export function toDbLevel(value: string): string {
   if (value === "Avançado" || value.includes("Avançado")) return "Avancado";
   if (value === "Intermediário" || value.includes("Intermediário")) return "Intermediario";
@@ -89,6 +101,8 @@ export function toDbEnrollmentStatus(value: string): string {
 type AnyPayload = Record<string, any>;
 
 export function courseToUpsert(p: AnyPayload): AnyPayload {
+  const modalities = normalizeCourseModalities(p);
+
   return {
     id: p.id,
     titulo: p.title ?? "Novo curso",
@@ -100,7 +114,8 @@ export function courseToUpsert(p: AnyPayload): AnyPayload {
     beneficios: p.benefits ?? [],
     publico_alvo: p.targetAudience ?? [],
     carga_horaria: p.durationHours ?? Number(String(p.durationLabel ?? "").replace(/\D/g, "") || 8),
-    modalidade: toDbModality(p.modality ?? p.modalities?.[0] ?? "Ao vivo online"),
+    modalidade: toDbModality((p.modality as Modality | undefined) ?? modalities[0]),
+    modalidades: modalities.map((value) => toDbModality(value)),
     nivel: toDbLevel(p.level ?? "Básico"),
     categoria: p.category ?? p.categories?.[0],
     trilha_id: p.pathId,
