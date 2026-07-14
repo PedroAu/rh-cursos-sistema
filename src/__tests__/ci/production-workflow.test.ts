@@ -75,9 +75,9 @@ describe("REC-401 production delivery graph", () => {
 
   it("blocks deploys on CI failure and orders Functions before frontend", () => {
     expect(production).toMatch(/^  ci:\n    uses: \.\/\.github\/workflows\/ci\.yml$/m);
-    expect(production).toMatch(/^  deploy-functions:\n    needs: \[changes, ci\]$/m);
+    expect(production).toMatch(/^  deploy-functions:\n    needs: \[changes, ci, migrate-database\]$/m);
     expect(production).toContain("needs.ci.result == 'success'");
-    expect(production).toMatch(/^  deploy-frontend:\n    needs: \[changes, ci, deploy-functions\]$/m);
+    expect(production).toMatch(/^  deploy-frontend:\n    needs: \[changes, ci, migrate-database, deploy-functions\]$/m);
     expect(production).toContain("needs.deploy-functions.result == 'success'");
     expect(production).toContain("needs.deploy-functions.result == 'skipped'");
     expect(production).not.toContain("continue-on-error");
