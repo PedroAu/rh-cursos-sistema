@@ -46,7 +46,7 @@ test.describe("checkout — baseline de receita", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      const checkoutTarget = await resolveUsableCheckoutTarget(page);
+      await resolveUsableCheckoutTarget(page);
 
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
       await expect(page).toHaveURL(/\/checkout/);
@@ -94,7 +94,7 @@ test.describe("checkout — baseline de receita", () => {
 
   test("voltar preserva os dados já preenchidos", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
-    const checkoutTarget = await resolveUsableCheckoutTarget(page);
+    await resolveUsableCheckoutTarget(page);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page).toHaveURL(/\/checkout/);
 
@@ -108,7 +108,7 @@ test.describe("checkout — baseline de receita", () => {
 
   test("inscrição corporativa exige razão social, CNPJ e responsável", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Checkout baseline requer ambiente Supabase real.");
-    const checkoutTarget = await resolveUsableCheckoutTarget(page);
+    await resolveUsableCheckoutTarget(page);
     await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
     await expect(page).toHaveURL(/\/checkout/);
 

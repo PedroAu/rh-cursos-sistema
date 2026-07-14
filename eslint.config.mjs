@@ -28,7 +28,9 @@ const eslintConfig = [
       "public/_ds/**",
       "public/support.js",
       "docs/design/redesign/reference/canvases/**",
-      "docs/design-system/trust-keith/ds-package/**"
+      "docs/design-system/trust-keith/ds-package/**",
+      // Bundle gerado pela ferramenta de design system (@ds-bundle) — não é código de app, não deve ser editado manualmente
+      "docs/design-system/_ds_bundle.js"
     ]
   },
   ...nextCoreWebVitals,

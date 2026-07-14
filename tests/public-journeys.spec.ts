@@ -50,7 +50,7 @@ test.describe("epica 4 — jornadas publicas", () => {
     test.skip(!hasRealIntegrationEnv(), "Jornada pública com checkout real requer Supabase real.");
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
-    const checkoutTarget = await resolveUsableCheckoutTarget(page);
+    await resolveUsableCheckoutTarget(page);
 
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
