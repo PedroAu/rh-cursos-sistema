@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-import { ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
+import { createUniqueIp, ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
 
 // Modelo híbrido:
 // - páginas públicas seguem acessíveis por SSR/SSG;
@@ -179,8 +179,14 @@ test.describe("contrato da rota /api/auth/session", () => {
     });
     const loginResponse = await page.request.post("/api/auth/session", {
       data: {
+        role: "student",
         email: credentials.email,
         password: credentials.password
+      },
+      headers: {
+        "cf-connecting-ip": createUniqueIp("next-auth-login-real"),
+        "x-forwarded-for": createUniqueIp("next-auth-login-real-forward"),
+        "x-real-ip": createUniqueIp("next-auth-login-real-real")
       }
     });
     expect(loginResponse.status()).toBe(200);

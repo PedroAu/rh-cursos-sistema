@@ -274,6 +274,7 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 | 2026-07-14 | 1.4 | Isolamento SSR do baseline visual concluído com cookie restrito ao bundle Playwright; `/cursos`, detalhe de curso e artigo usam fixtures sem consultar o catálogo real, enquanto build normal e contextos sem cookie permanecem reais. | @dev (Dex) |
 | 2026-07-14 | 1.5 | Supabase isolado local criado após indisponibilidade de cota remota; 24 migrations reaplicadas do zero, escrita E2E limitada a loopback com opt-in explícito, CSP local restrito à origem configurada e Edge Functions com secrets ignorados. O CRUD administrativo passou 10/10 e o agregado passou 174/174. A investigação adicional eliminou hidratação intermitente ao filtrar soft-deletes explicitamente no SSR service-role e hidratar o admin com catálogo inicial consistente. | @dev (Dex) |
 | 2026-07-14 | 1.6 | Follow-up do veredito QA FAIL: leitura SSR pública passou a reproduzir status e relações das políticas RLS, depoimentos excluídos são filtrados explicitamente e o admin recebeu modelo próprio com cursos/posts não publicados e instrutores inativos. O bootstrap público do navegador não pode mais reduzir a visão administrativa. Story permanece In Progress até o gate do commit candidato e novo veredito independente. | @dev (Dex) |
+| 2026-07-14 | 1.7 | Gate limpo do commit `b2d326b` confirmou lint/typecheck/unit/build e CRUD admin, mas manteve 11 failures externos ao follow-up: contrato de role da sessão e mudanças visuais ainda não commitadas. A correção seguinte passa a validar a role solicitada contra os metadados autenticados. | @dev (Dex) |
 
 ## File List
 
@@ -346,6 +347,8 @@ GPT-5 Codex (`@dev` / Dex).
 - Gate executado em worktree limpo no commit `d061801`: lint/typecheck/unit PASS; Playwright 162/173 PASS e 11 FAIL. A divergência em relação ao worktree principal foi rastreada a mudanças paralelas não commitadas em autenticação e snapshots; o resultado verde anterior não é aceito como prova constitucional do commit.
 - Follow-up causal: seleção pública agora restringe cursos a `Ativo`, `Destaque` e `EmBreve`, remove turmas/vínculos/conteúdos relacionados a cursos ocultos ou instrutores inativos e aplica o mesmo filtro em memória após a query. A visão admin preserva registros não publicados/inativos e desativa o refetch público que os sobrescrevia.
 - Regressões do follow-up: 48/48 testes focados PASS; suíte unitária 46 arquivos/522 testes PASS; lint, typecheck e build PASS; CRUD administrativo no Supabase local isolado 10/10 PASS. O gate agregado do novo commit candidato permanece pendente.
+- Prova no worktree limpo do commit `b2d326b`: lint PASS, typecheck PASS, 45 arquivos/519 testes unitários PASS, build PASS e Playwright 162/173. Os 11 failures foram 1 contrato de role em `auth-session`, 8 gates de `ui-governance` dependentes de mudanças visuais não commitadas e 2 timeouts de `/cursos` dependentes dessas mesmas mudanças paralelas.
+- O contrato administrativo permaneceu verde nesse commit limpo: `admin-crud` 10/10 e smoke das nove rotas `/admin` 9/9. Isso isola os failures restantes da leitura SSR/admin corrigida no follow-up.
 
 ### Completion Notes
 

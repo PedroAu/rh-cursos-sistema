@@ -94,15 +94,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
   }
 
-  const body = (await request.json().catch(() => null)) as
-    | { email?: string; password?: string; remember?: boolean }
-    | null;
+  const body = await readLoginBody(request);
 
+  const role = typeof body?.role === "string" ? normalizeDashboardRole(body.role) : undefined;
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
   const remember = body?.remember === true;
 
-  if (!email || !password) {
+  if ((body?.role && !role) || !email || !password) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
   }
 
@@ -132,6 +131,10 @@ export async function POST(request: Request) {
 
   const metadataRole = normalizeDashboardRole(result.data.user.app_metadata?.role);
   if (!metadataRole) {
+    return NextResponse.json({ ok: false, error: "Acesso nao autorizado." }, { status: 403 });
+  }
+
+  if (role && metadataRole !== role) {
     return NextResponse.json({ ok: false, error: "Acesso nao autorizado." }, { status: 403 });
   }
 
@@ -215,4 +218,58 @@ export async function DELETE(request: Request) {
     maxAge: 0
   });
   return response;
+}
+
+async function readLoginBody(request: Request): Promise<{
+  role?: string;
+  email?: string;
+  password?: string;
+  remember?: boolean;
+} | null> {
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("multipart/form-data") || contentType.includes("application/x-www-form-urlencoded")) {
+    try {
+      const form = await request.formData();
+      if (Array.from(form.keys()).length > 0) {
+        const readTextField = (name: string) => {
+          const value = form.get(name);
+          return typeof value === "string" ? value : undefined;
+        };
+
+        return {
+          role: readTextField("role"),
+          email: readTextField("email"),
+          password: readTextField("password"),
+          remember: readTextField("remember") === "true"
+        };
+      }
+    } catch {
+      // Continua para o fallback de texto.
+    }
+  }
+
+  const rawBody = await request.text().catch(() => "");
+  if (!rawBody) return null;
+
+  try {
+    return JSON.parse(rawBody) as {
+      role?: string;
+      email?: string;
+      password?: string;
+      remember?: boolean;
+    };
+  } catch {
+    const params = new URLSearchParams(rawBody);
+    if (Array.from(params.keys()).length === 0) {
+      return null;
+    }
+
+    return {
+      role: params.get("role") ?? undefined,
+      email: params.get("email") ?? undefined,
+      password: params.get("password") ?? undefined,
+      remember: params.get("remember") === "true"
+    };
+  }
 }

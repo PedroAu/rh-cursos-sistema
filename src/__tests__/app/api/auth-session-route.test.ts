@@ -99,6 +99,57 @@ describe("app/api/auth/session POST", () => {
       error: "Muitas tentativas. Tente novamente mais tarde.",
     });
   });
+
+  it("rejects a valid user when the requested portal role does not match metadata", async () => {
+    mocks.signInWithPassword.mockResolvedValue({
+      data: {
+        user: {
+          email: "student@rhcursos.test",
+          app_metadata: { role: "student" },
+          user_metadata: { name: "Student" },
+        },
+        session: null,
+      },
+      error: null,
+    });
+
+    const { POST } = await import("../../../../app/api/auth/session/route");
+    const response = await POST(
+      new Request("http://localhost/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "admin",
+          email: "student@rhcursos.test",
+          password: "valid-password",
+        }),
+      })
+    );
+
+    expect(response.status).toBe(403);
+    await expect(response.json()).resolves.toEqual({
+      ok: false,
+      error: "Acesso nao autorizado.",
+    });
+  });
+
+  it("rejects non-text multipart credentials instead of throwing", async () => {
+    const form = new FormData();
+    form.set("role", "admin");
+    form.set("email", new Blob(["not-a-text-field"]), "email.txt");
+    form.set("password", "valid-password");
+
+    const { POST } = await import("../../../../app/api/auth/session/route");
+    const response = await POST(
+      new Request("http://localhost/api/auth/session", {
+        method: "POST",
+        body: form,
+      })
+    );
+
+    expect(response.status).toBe(400);
+    expect(mocks.signInWithPassword).not.toHaveBeenCalled();
+  });
 });
 
 describe("app/api/auth/session DELETE", () => {
