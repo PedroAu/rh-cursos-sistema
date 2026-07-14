@@ -1,0 +1,76 @@
+schema: 1
+story: REC-402
+gate: PASS
+status_reason: >-
+  Os 12 critérios de aceite estão rastreados e os dois riscos encontrados na
+  revisão foram corrigidos com regressão. Banco isolado, actionlint, lint,
+  typecheck, 537/537 unitários, build, 174/174 Playwright e CodeRabbit passaram
+  sem finding bloqueante; nenhuma execução produtiva foi alegada.
+reviewer: Quinn
+updated: '2026-07-14T23:01:29Z'
+top_issues: []
+waiver:
+  active: false
+quality_score: 100
+evidence:
+  tests_reviewed: 10
+  risks_identified: 2
+  risks_resolved: 2
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    ac_gaps: []
+  quality_gates:
+    workflow_contract: 10/10 PASS
+    workflow_yaml_parse: 5/5 PASS
+    actionlint: 5/5 PASS
+    migrations: 24/24 ALIGNED
+    database_tests: 25/25 PASS
+    migration_convergence: 2/2 PASS
+    lint: PASS
+    typecheck: PASS
+    unit: 537/537 PASS
+    build: PASS
+    playwright_aggregate: 174/174 PASS
+  test_first:
+    result: PASS
+    notes: >-
+      O contrato falhou inicialmente pela ausência do workflow de migration. A
+      revisão QA adicionou execução da lógica de escopo e endureceu o skip de
+      Functions; ambos os deltas passaram após as correções.
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Secrets são nomeados, actions estão fixadas em SHA, permissões são mínimas
+      e senha não aparece em argumento, summary ou valor versionado.
+  reliability:
+    status: PASS
+    notes: >-
+      Migration diferente de success bloqueia todo código; skip de Functions só
+      é aceito quando o detector afirma que Functions não são necessárias.
+  performance:
+    status: PASS
+    notes: >-
+      Commits documentais omitem migration/deploy e database-only não publica
+      código; a concorrência impede migrations produtivas sobrepostas.
+  maintainability:
+    status: PASS
+    notes: >-
+      O grafo, os secrets, as actions e os quatro caminhos de classificação têm
+      regressão versionada, incluindo execução do script real.
+automated_review:
+  tool: CodeRabbit
+  scope: uncommitted .github QA delta
+  result: No findings
+remote_execution:
+  status: NOT_RUN
+  reason: >-
+    Migration/deploy, secrets, branch protection e prova remota dependem da
+    autorização operacional da REC-001; este gate não declara produção alterada.
+recommendations:
+  immediate: []
+  future:
+    - action: Executar prova remota sanitizada antes de reabrir deploy produtivo.
+      refs:
+        - docs/stories/2026-07-14-rec-001-incidente-freeze-evidencias.md
+        - docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md

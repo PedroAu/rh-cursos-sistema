@@ -119,8 +119,10 @@ jobs:
       needs.changes.result == 'success' &&
       needs.migrate-database.result == 'success' &&
       needs.changes.outputs.frontend == 'true' &&
-      (needs.deploy-functions.result == 'success' ||
-       needs.deploy-functions.result == 'skipped')
+      ((needs.changes.outputs.functions == 'true' &&
+        needs.deploy-functions.result == 'success') ||
+       (needs.changes.outputs.functions == 'false' &&
+        needs.deploy-functions.result == 'skipped'))
     uses: ./.github/workflows/deploy-frontend.yml
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

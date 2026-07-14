@@ -2,7 +2,7 @@
 
 ## Status
 
-In Progress
+Ready for Done
 
 ## Executor Assignment
 
@@ -177,13 +177,13 @@ autoridade de `@data-engineer`.
   - [x] Fazer frontend depender de CI, changes, migration e Functions quando aplicável.
   - [x] Mapear somente os três secrets de banco ao workflow chamado.
 
-- [ ] **Task 5 — Validar e documentar evidências** (AC: 10–12)
+- [x] **Task 5 — Validar e documentar evidências** (AC: 10–12)
   - [x] Parsear todos os YAMLs de entrega.
   - [x] Executar teste estrutural direcionado e suíte unitária completa.
   - [x] Executar `npm run test:db` e gates constitucionais completos.
-  - [ ] Executar CodeRabbit no delta sem findings CRITICAL/HIGH.
+  - [x] Executar CodeRabbit no delta sem findings CRITICAL/HIGH.
   - [x] Atualizar File List e Dev Agent Record sem incluir secrets ou PII.
-  - [ ] Solicitar veredito independente de `@qa`.
+  - [x] Solicitar veredito independente de `@qa`.
 
 ## Dev Notes
 
@@ -305,12 +305,14 @@ autoridade de `@data-engineer`.
 | 2026-07-14 | 0.1 | Draft criado a partir de FND-14/AC-17.20, REC-401 e do contrato real da Supabase CLI 2.105.0; separado de qualquer migration de domínio. | @sm (River) |
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Doze ACs testáveis cobrem workflow reutilizável, environment protegido, secrets mínimos, ordem CI → migration → Functions → frontend, drift fail-closed, convergência local, database-only/docs-only e gates completos. A dupla autoridade `@data-engineer + @devops` e o gate `@qa` derivam diretamente da épica/Constitution, apesar da matriz legada admitir apenas um executor e não listar QA. Bloqueadores documentais: 0. | @po (Pax) |
 | 2026-07-14 | 1.1 | Workflow de migrations e encadeamento produtivo implementados; banco local, contratos CI/CD, actionlint, lint, tipos, unitários, build e E2E verdes. CodeRabbit/QA permanecem pendentes antes de `Ready for Review`. | @data-engineer (Dara) + @devops (Gage) |
+| 2026-07-14 | 1.2 | **QA PASS; In Progress → Ready for Done.** A revisão reforçou a execução real dos cenários database-only/docs-only/manual/base desconhecida e vinculou `Functions=skipped` explicitamente ao escopo `functions=false`. CodeRabbit retornou zero findings; 12/12 ACs e todos os gates locais passaram. | @qa (Quinn) |
 
 ## File List
 
 ### Criado
 
 - `docs/stories/2026-07-14-rec-402-migrations-obrigatorias-deploy.md`
+- `docs/qa/gates/rec-402-migrations-obrigatorias-deploy.yml`
 - `.github/workflows/apply-migrations.yml`
 - `src/__tests__/ci/production-migrations-workflow.test.ts`
 
@@ -345,10 +347,10 @@ GPT-5 Codex — personas `@data-engineer` (Dara) e `@devops` (Gage).
 - Test-first: o teste REC-402 falhou inicialmente com `ENOENT` para `.github/workflows/apply-migrations.yml`.
 - Banco isolado: 24/24 migrations alinhadas, 25 testes pgTAP verdes e teste de concorrência verde.
 - Convergência: duas execuções consecutivas de `supabase db push --local --yes` retornaram `Local database is up to date`.
-- Contratos direcionados: 2 arquivos e 9/9 cenários verdes.
+- Contratos direcionados: 2 arquivos e 10/10 cenários verdes, incluindo execução da rotina Bash de classificação em repositórios Git temporários.
 - YAML: cinco workflows carregados pelo parser Ruby/Psych; os cinco também passaram no actionlint 1.7.12.
-- Gates: lint, typecheck, 48 arquivos/536 testes unitários, build e 174/174 Playwright verdes.
-- CodeRabbit: duas tentativas receberam rate limit recuperável; nenhuma foi contabilizada como aprovação.
+- Gates: lint, typecheck, 48 arquivos/537 testes unitários, build e 174/174 Playwright verdes.
+- CodeRabbit: após duas tentativas limitadas pelo serviço, a revisão efetiva do delta final concluiu com zero findings.
 
 ### Completion Notes
 
@@ -361,4 +363,55 @@ GPT-5 Codex — personas `@data-engineer` (Dara) e `@devops` (Gage).
 
 ## QA Results
 
-_A preencher por `@qa`._
+### Review Date: 2026-07-14
+
+### Reviewed By: Quinn (Test Architect)
+
+### Code Quality Assessment
+
+O pipeline possui entrada produtiva única, credenciais mínimas nomeadas e ordem
+determinística CI → migration → Functions → frontend. A migration é obrigatória
+para qualquer escopo produtivo e falha fechada; commits documentais continuam
+sem mutação remota. Nenhum SQL, secret ou deploy remoto foi criado durante a
+story.
+
+### Refactoring Performed
+
+- **File**: `src/__tests__/ci/production-migrations-workflow.test.ts`
+  - **Change**: execução real do script Bash de detecção em repositórios Git temporários.
+  - **Why**: a inspeção estrutural original não provava os resultados database-only, docs-only, manual e base desconhecida.
+  - **How**: quatro cenários executam o bloco versionado e conferem exatamente os três outputs.
+- **File**: `.github/workflows/production-pipeline.yml`
+  - **Change**: `deploy-functions.result == skipped` só autoriza frontend quando `functions == false`.
+  - **Why**: impedir que um skip inesperado seja interpretado como ausência legítima de Functions.
+  - **How**: sucesso e skip foram associados explicitamente ao respectivo output de escopo.
+
+### Requirements Traceability
+
+- **AC 1–3**: workflow exclusivo `workflow_call`, três secrets obrigatórios, environment protegido, concorrência conservadora, CLI/actions fixadas e permissões mínimas.
+- **AC 4–6**: testes estruturais e actionlint comprovam dependências, ordem canônica e bloqueio para qualquer resultado de migration diferente de `success`.
+- **AC 7–8**: a rotina Bash real produziu database-only `{true,false,false}`, docs-only `{false,false,false}` e seleção total para manual/base desconhecida.
+- **AC 9–10**: `db push` sem repair/include, 24 migrations alinhadas, 25/25 pgTAP/concurrency e duas aplicações locais convergentes.
+- **AC 11–12**: 10/10 contratos direcionados, 537/537 unitários, 174/174 Playwright, lint, typecheck, build, YAML/actionlint e CodeRabbit verdes.
+
+### Compliance Check
+
+- Coding Standards: ✓ YAML/TypeScript legíveis e sem valor sensível.
+- Project Structure: ✓ artefatos nos diretórios canônicos.
+- Testing Strategy: ✓ casos estruturais e execução do script real, banco isolado e regressão integral.
+- All ACs Met: ✓ 12/12 no escopo local; execução produtiva permanece condicionada à REC-001.
+
+### Security Review
+
+PASS. Não há `secrets: inherit`, secret hardcoded, senha em argumento, repair,
+seed implícito ou `continue-on-error`. Actions externas estão fixadas em SHA e
+o frontend não trata skip inesperado de Functions como sucesso.
+
+### Gate Status
+
+Gate: PASS → `docs/qa/gates/rec-402-migrations-obrigatorias-deploy.yml`
+
+### Recommended Status
+
+✓ Ready for Done. O veredito aprova a implementação e a validação local; não
+declara migration/deploy remoto, branch protection ou configuração de secrets.
