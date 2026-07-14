@@ -11,9 +11,7 @@
 -- lead.curso_id e post_blog.curso_id são ON DELETE SET NULL e
 -- curso_public_content.curso_id é ON DELETE CASCADE — nenhuma ação extra.
 --
--- Idempotente: escopado por slug like 'e2e-%', seguro para reexecução.
-
-begin;
+-- Idempotente: escopado por slug like 'e2e-%-curso', seguro para reexecução.
 
 -- 1. Avaliações vinculadas às turmas dos cursos e2e (RESTRICT em turma)
 delete from public.avaliacao
@@ -21,7 +19,7 @@ where turma_id in (
   select t.id
   from public.turma t
   join public.curso c on c.id = t.curso_id
-  where c.slug like 'e2e-%'
+  where c.slug like 'e2e-%-curso'
 );
 
 -- 2. Inscrições vinculadas às turmas dos cursos e2e (RESTRICT em turma)
@@ -30,23 +28,21 @@ where turma_id in (
   select t.id
   from public.turma t
   join public.curso c on c.id = t.curso_id
-  where c.slug like 'e2e-%'
+  where c.slug like 'e2e-%-curso'
 );
 
 -- 3. Turmas dos cursos e2e (RESTRICT em curso)
 delete from public.turma
 where curso_id in (
-  select id from public.curso where slug like 'e2e-%'
+  select id from public.curso where slug like 'e2e-%-curso'
 );
 
 -- 4. Vínculos curso-instrutor dos cursos e2e (CASCADE em curso, explícito por clareza)
 delete from public.curso_instrutor
 where curso_id in (
-  select id from public.curso where slug like 'e2e-%'
+  select id from public.curso where slug like 'e2e-%-curso'
 );
 
 -- 5. Cursos e2e
 delete from public.curso
-where slug like 'e2e-%';
-
-commit;
+where slug like 'e2e-%-curso';

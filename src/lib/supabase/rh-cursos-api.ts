@@ -95,7 +95,7 @@ export async function fetchCourseCategories(client: RhCursosClient): Promise<str
   if (result.error) throw result.error;
 
   const rows = validateResponse(result.data, courseCategoryListSchema, {
-    endpoint: "fetchPublicCatalog",
+    endpoint: "fetchCourseCategories",
     resource: "curso_categoria",
     schema: "courseCategoryListSchema"
   });

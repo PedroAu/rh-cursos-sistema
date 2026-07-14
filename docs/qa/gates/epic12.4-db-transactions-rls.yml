@@ -14,8 +14,8 @@ quality_gates:
     status: PASS
     evidence: "npm test — 392 passed"
   - gate: test:db
-    status: PASS_WITH_NOTE
-    evidence: "pgTAP suite in supabase/tests/database/ep12-transactions-rls.test.sql implemented; Docker offline prevents local verification but implementation verified in story"
+    status: PASS
+    evidence: "2026-07-14: npm run test:db executado localmente com sucesso apos alinhar a suite EP12 e a migration de baseline ao pos-remove-demo-seed (25 testes PASS + concurrency race test PASS)"
   - gate: concurrency-race-test
     status: PASS
     evidence: "scripts/test-db-concurrency.mjs validates concurrent enrollment scenarios"
@@ -36,14 +36,15 @@ acceptance_criteria:
 
 issues: []
 blockers:
-  - Docker Desktop required for test:db verification (currently offline)
+  - Docker Desktop / Supabase local continuam sendo prerequisito ambiental para reexecucoes futuras da suite
 
 decision: PASS
 confidence: MEDIUM-HIGH
 notes: |
   - pgTAP suite and concurrency tests implemented as specified
   - DB-AUDIT.md updated with test evidence
-  - Docker dependency prevents local re-verification but implementation complete
+  - 2026-07-14: verificacao local real executada apos remover a dependencia de IDs demo (`class-1-1` / `class-3-1`) da suite EP12 e do race test
+  - O race test (`scripts/test-db-concurrency.mjs`) agora usa a turma baseline `class-public-esocial-1`, evitando acoplamento aos seeds demo removidos
   - Ready to merge
 
 reviewed_by: "@qa (Orion)"

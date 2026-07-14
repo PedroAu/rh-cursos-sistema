@@ -11,8 +11,6 @@
 -- Idempotente: DELETE ... WHERE id IN (...) é seguro para reexecução e,
 -- em um `db reset`, roda após o seed, garantindo estado final limpo.
 
-begin;
-
 create temporary table tmp_demo_turma_ids (id varchar(80) primary key) on commit drop;
 insert into tmp_demo_turma_ids (id) values
   ('class-1-1'),('class-1-2'),('class-1-3'),('class-1-4'),('class-1-5'),
@@ -96,5 +94,3 @@ delete from public.trilha
 where id in (
   'path-dp','path-licitacoes','path-pessoas','path-comunicacao','path-auditoria','path-tech'
 );
-
-commit;
