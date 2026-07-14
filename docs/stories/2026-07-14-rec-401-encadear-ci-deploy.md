@@ -1,0 +1,294 @@
+# Story REC-401: Encadear CI e deploy de produção
+
+## Status
+
+Ready for Review
+
+## Executor Assignment
+
+executor: "@devops"
+quality_gate: "@qa"
+quality_gate_tools:
+- validação estrutural dos workflows GitHub Actions
+- teste unitário do grafo CI → deploy
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test:unit`
+- `npm test`
+- `npm run build`
+- inspeção sanitizada de execução GitHub Actions sem exibir secrets
+
+## Épica e rastreabilidade
+
+- **Épica:** [Épica 17 — Recuperação SEV-0: Segurança, Integridade e Confiabilidade Operacional](../epics/epic-17-recuperacao-sev0-seguranca-integridade.md)
+- **Onda:** 3 — Identidade e entrega segura
+- **Prioridade:** P0
+- **Estimativa:** M, entre um e dois dias de esforço focado
+- **Finding:** FND-14
+- **Requisitos:** NFR-06, NFR-08, NFR-09, CON-03
+- **Critérios da épica:** AC-17.20 e AC-17.21; prepara a cadeia exigida por AC-17.23
+- **Gate relacionado:** G4 — pipeline normal
+
+## Story
+
+**As a** responsável pela entrega da RH Cursos,
+**I want** que toda publicação produtiva dependa explicitamente de um CI bem-sucedido,
+**so that** nenhum frontend ou Edge Function seja publicado a partir de um commit cujos gates falharam ou foram ignorados.
+
+## Contexto e diagnóstico confirmado
+
+O repositório possui três workflows independentes:
+
+1. `.github/workflows/ci.yml` executa gates em `push` para `main`.
+2. `.github/workflows/deploy-functions.yml` também executa diretamente em `push` para `main` quando paths de Supabase mudam.
+3. `.github/workflows/deploy-frontend.yml` executa diretamente em `push` para `main` quando paths do app mudam.
+
+Os dois workflows de deploy não possuem relação `needs`, `workflow_call` ou outra dependência verificável do resultado do CI. Assim, o GitHub pode iniciar publicação enquanto o CI ainda está executando ou mesmo quando um gate termina em falha. `workflow_dispatch` também permite acionar cada deploy isoladamente, contornando a prova agregada.
+
+REC-401 corrige exclusivamente o encadeamento CI → deploy. A etapa obrigatória de migrations e a ordem migration → Functions → frontend pertencem a REC-402.
+
+## Escopo
+
+### Incluído
+
+- Criar uma entrada canônica de produção para `push` em `main` e acionamento manual autorizado.
+- Tornar o CI reutilizável pelo pipeline canônico sem duplicar a execução no mesmo commit.
+- Tornar os workflows de frontend e Functions reutilizáveis e não acionáveis diretamente por `push`.
+- Fazer os jobs de deploy dependerem do sucesso integral do CI.
+- Preservar filtros de mudança ou substituí-los por detecção equivalente, fail-closed e testada.
+- Quando frontend e Functions mudarem no mesmo commit, publicar Functions antes do frontend.
+- Manter secrets somente em `secrets.*`, permissões mínimas e logs sem valores sensíveis.
+- Adicionar teste automatizado que falhe se um deploy voltar a ter gatilho direto ou perder a dependência do CI.
+
+### Fora do escopo
+
+- Criar ou executar migrations: REC-402.
+- Rotacionar credenciais, PATs, senhas ou HMAC: REC-002.
+- Alterar branch protection ou executar deploy remoto sem autorização: REC-001/CON-03.
+- Mudar a plataforma Cloudflare/Supabase ou a arquitetura da aplicação.
+- Corrigir cobertura, OpenAPI, dependências ou CSP: REC-404, REC-406, REC-407 e REC-408.
+- Declarar smoke pós-deploy completo: REC-402/REC-408 e gate G4.
+
+## Acceptance Criteria
+
+1. **Entrada canônica de produção**
+   **Given** um `push` para `main` ou um acionamento manual autorizado,
+   **when** o pipeline de produção inicia,
+   **then** existe uma única cadeia versionada responsável por executar CI e decidir os deploys desse commit.
+
+2. **CI falho bloqueia toda publicação**
+   **Given** qualquer job obrigatório do CI com resultado diferente de sucesso,
+   **when** o grafo de produção é avaliado,
+   **then** nenhum job de deploy de Functions ou frontend pode iniciar.
+
+3. **Deploys não possuem bypass direto**
+   `.github/workflows/deploy-functions.yml` e `.github/workflows/deploy-frontend.yml` não podem manter gatilho `push` independente nem `workflow_dispatch` que publique sem passar pelo pipeline canônico. Eles devem ser chamados como workflows reutilizáveis.
+
+4. **CI não duplica no mesmo push de main**
+   **Given** um commit em `main`,
+   **when** o pipeline canônico chama o CI,
+   **then** o mesmo `push` não dispara uma segunda execução autônoma equivalente de `.github/workflows/ci.yml`.
+
+5. **Detecção de mudança preservada**
+   **Given** um commit que altera somente documentação ou arquivo fora dos escopos produtivos,
+   **when** o CI passa,
+   **then** os deploys permanecem omitidos; em acionamento manual, o comportamento explícito e documentado pode publicar ambos.
+
+6. **Functions antecedem frontend quando ambos mudam**
+   **Given** um commit com mudanças de backend e frontend,
+   **when** o CI passa,
+   **then** o deploy de frontend só inicia depois do deploy de Functions terminar com sucesso.
+
+7. **Falha de Functions bloqueia frontend**
+   **Given** que o deploy de Functions foi necessário e falhou,
+   **when** o GitHub avalia o job de frontend,
+   **then** o frontend não é publicado.
+
+8. **Segredos e privilégios preservados**
+   Nenhum valor de secret aparece no YAML, logs, summaries ou testes; tokens dos workflows usam permissões mínimas e secrets são recebidos somente pelo mecanismo do GitHub Actions.
+
+9. **Regressão automatizada do grafo**
+   Um teste versionado valida ao menos: gatilhos permitidos, `workflow_call`, dependência de CI, ordem Functions → frontend, comportamento de job ignorado e ausência de bypass direto.
+
+10. **Gates constitucionais verdes**
+    `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm test` e `npm run build` passam. A story não declara deploy remoto concluído apenas com teste local; a prova remota é sanitizada e executada por `@devops` quando autorizada.
+
+## Tasks / Subtasks
+
+- [x] **Task 1 — Congelar o contrato atual com teste estrutural** (AC: 1–9)
+  - [x] Adicionar teste que reproduza os gatilhos independentes atuais.
+  - [x] Validar que o teste falha antes da correção pelo motivo esperado.
+  - [x] Cobrir CI reutilizável, deploys reutilizáveis, `needs` e ordem dos jobs.
+
+- [x] **Task 2 — Tornar CI reutilizável sem duplicar main** (AC: 1, 2, 4)
+  - [x] Adicionar `workflow_call` ao CI.
+  - [x] Preservar PRs, `develop` e `feature/**`.
+  - [x] Remover somente o gatilho autônomo redundante de `main`.
+
+- [x] **Task 3 — Isolar workflows de deploy como componentes chamados** (AC: 2, 3, 8)
+  - [x] Converter frontend para `workflow_call` com secrets declarados ou herança controlada.
+  - [x] Converter Functions para `workflow_call` com secrets declarados ou herança controlada.
+  - [x] Remover gatilhos diretos que contornem o pipeline canônico.
+
+- [x] **Task 4 — Criar pipeline canônico e detecção de mudanças** (AC: 1–7)
+  - [x] Criar workflow de produção para `main` e despacho manual.
+  - [x] Chamar CI antes de qualquer deploy.
+  - [x] Detectar escopos Functions/frontend sem imprimir diff sensível.
+  - [x] Encadear frontend após Functions quando ambos forem necessários.
+  - [x] Tratar job de Functions omitido sem transformar falha real em sucesso.
+
+- [ ] **Task 5 — Validar e documentar evidências** (AC: 8–10)
+  - [x] Executar teste estrutural direcionado.
+  - [x] Executar gates constitucionais completos.
+  - [x] Atualizar File List e registrar resultado sanitizado.
+  - [ ] Solicitar veredito independente de `@qa`.
+
+## Dev Notes
+
+### Estado atual verificado
+
+- `.github/workflows/ci.yml` possui `push.branches: [main, develop, feature/**]` e `pull_request` para `main/develop`.
+- `.github/workflows/deploy-functions.yml` possui `push` em `main` com paths de `supabase/functions/**` e `workflow_dispatch`.
+- `.github/workflows/deploy-frontend.yml` possui `push` em `main` com paths de app/frontend e `workflow_dispatch`.
+- Nenhum deploy atual declara dependência do resultado do CI.
+- O deploy de Functions configura secrets e publica quatro Functions.
+- O deploy de frontend valida env, publica Cloudflare Worker e executa verificação de rotas.
+
+### Restrições de implementação
+
+- Não copiar valor de secret para teste, fixture, output ou summary.
+- Não usar `continue-on-error` em CI/deploy/mutação de produção.
+- Não usar `if: always()` sem também distinguir explicitamente `success`, `failure` e `skipped` dos jobs necessários.
+- Não obter verde removendo jobs obrigatórios do CI.
+- Não usar evento `workflow_run` sem fixar inequivocamente o SHA/branch testado; preferir chamada reutilizável no mesmo grafo.
+- A migration obrigatória será inserida por REC-402 entre CI e Functions; REC-401 deve deixar ponto de extensão claro sem fingir que migration já existe.
+
+### Estrutura sugerida
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/deploy-functions.yml`
+- `.github/workflows/deploy-frontend.yml`
+- `.github/workflows/production-pipeline.yml` (nome final pode seguir convenção existente)
+- `src/__tests__/ci/production-workflow.test.ts` ou local equivalente seguindo a suíte Vitest existente
+
+### Referências
+
+- [Fonte: `docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md#onda-3--identidade-e-entrega-segura-t24-a-t72h`]
+- [Fonte: `docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md#acceptance-criteria-da-epica`]
+- [Fonte: `.github/workflows/ci.yml`]
+- [Fonte: `.github/workflows/deploy-functions.yml`]
+- [Fonte: `.github/workflows/deploy-frontend.yml`]
+
+## Testing
+
+### Teste estrutural local
+
+- Parsear ou inspecionar os workflows sem executar secrets.
+- Provar que CI aceita `workflow_call` e não dispara autonomamente em `main`.
+- Provar que deploys aceitam somente `workflow_call`.
+- Provar que o pipeline canônico chama CI e depende de sucesso.
+- Provar que frontend depende do resultado correto de Functions quando aplicável.
+- Provar que mudança fora de escopo não publica.
+- Provar que despacho manual é explícito e passa pelo CI.
+
+### Gates finais
+
+- teste Vitest direcionado do grafo
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test:unit`
+- `npm test`
+- `npm run build`
+- CodeRabbit sem findings CRITICAL/HIGH no delta
+
+## Observabilidade e evidência remota
+
+- Cada execução deve relacionar o mesmo `github.sha` entre CI e deploys.
+- O summary pode registrar nomes de jobs, SHA e conclusão, nunca valores de secrets.
+- A prova negativa deve mostrar deploys `skipped` quando CI falhar; não é necessário provocar publicação real para validar esse caminho.
+- A prova de produção só ocorre sob autoridade de `@devops` e dentro do freeze/rollout definido por REC-001.
+
+## Security Notes
+
+- `permissions: contents: read` deve permanecer o default, elevando permissão somente no job que comprovar necessidade.
+- Actions de terceiros devem ser fixadas em SHA ou manter o padrão de supply-chain aprovado pelo repositório.
+- Secrets herdados por workflow reutilizável não podem ser passados para jobs que não publicam.
+- Erro de secret/configuração deve falhar fechado antes de publicar.
+
+## Dependências
+
+- **Entrada operacional:** REC-001 com freeze/evidência ativa antes de alterar controles remotos.
+- **Entrada de qualidade:** REC-403 Done e baseline constitucional verde.
+- **Bloqueia:** REC-402 e o gate G4.
+- **Não depende para preparação/teste local:** acesso a secrets ou permissão de deploy.
+
+## Roll-forward / Rollback
+
+- **Roll-forward preferido:** corrigir o grafo mantendo deploy suspenso até CI verde.
+- **Rollback seguro:** desabilitar temporariamente o pipeline produtivo e preservar a indisponibilidade de deploy.
+- **Rollback proibido:** restaurar deploy independente em `push`, usar `continue-on-error`, ignorar CI falho ou executar deploy manual direto.
+
+## 🤖 CodeRabbit Integration
+
+> **CodeRabbit Integration**: Disabled
+>
+> `coderabbit_integration.enabled` não está definido em `.aiox-core/core-config.yaml`.
+> A validação usa revisão manual, teste estrutural, gates constitucionais e veredito independente de `@qa`.
+
+### Story Type Analysis
+
+- **Primary Type:** CI/CD / Security
+- **Secondary Type:** Delivery orchestration
+- **Complexity:** Média
+- **Primary Agent:** `@devops`
+- **Quality Gate:** `@qa`
+
+## Change Log
+
+| Date | Version | Description | Author |
+|---|---:|---|---|
+| 2026-07-14 | 0.1 | Draft criado a partir de FND-14/NFR-06/08/09, com separação explícita de REC-402 e teste estrutural do grafo CI → deploy. | @sm (River) |
+| 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Título/valor, rastreabilidade, escopo, dependências, dez ACs mensuráveis, tarefas, testes negativos, segurança e rollback estão completos. A separação REC-401/REC-402 impede antecipar migrations. `@qa` permanece quality gate por autoridade constitucional, apesar da tabela legada do validador. Bloqueadores documentais: 0. Implementação local autorizada; mudanças remotas continuam exclusivas de `@devops` e dependentes da REC-001. | @po (Pax) |
+| 2026-07-14 | 1.1 | Pipeline canônico implementado com CI e deploys reutilizáveis, detecção fail-closed, ordem Functions → frontend, actions fixadas em SHA e regressão automatizada. Gates locais completos verdes; story enviada para revisão de QA sem executar deploy remoto. | @devops (Gage) |
+
+## File List
+
+### Criado
+
+- `docs/stories/2026-07-14-rec-401-encadear-ci-deploy.md`
+- `.github/workflows/production-pipeline.yml`
+- `src/__tests__/ci/production-workflow.test.ts`
+
+### Modificado
+
+- `.github/workflows/ci.yml`
+- `.github/workflows/deploy-functions.yml`
+- `.github/workflows/deploy-frontend.yml`
+
+## Dev Agent Record
+
+### Agent Model Used
+
+GPT-5 Codex — persona `@devops` (Gage).
+
+### Debug Log References
+
+- Test-first: o teste direcionado falhou inicialmente porque `.github/workflows/production-pipeline.yml` ainda não existia (`ENOENT`), confirmando a regressão.
+- Regressão direcionada após a implementação: 4/4 testes verdes.
+- Sintaxe YAML: quatro workflows carregados com sucesso pelo parser Ruby/Psych.
+- Gates: `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` e `npm test` verdes.
+- Suíte unitária: 47 arquivos e 531 testes verdes.
+- Suíte E2E agregada: 174 testes verdes em ambiente Supabase local isolado.
+
+### Completion Notes
+
+- Criada uma única entrada de produção para `main` e despacho manual; CI não possui mais execução autônoma duplicada em `main`.
+- Workflows de deploy aceitam somente `workflow_call`, removendo publicação direta por `push` ou despacho isolado.
+- CI é requisito explícito dos dois deploys; Functions antecedem frontend e uma falha real de Functions impede frontend.
+- Detecção de mudanças preserva escopos e assume ambos os deploys quando a base de comparação é desconhecida, mantendo comportamento fail-closed.
+- Actions externas e Supabase CLI estão fixadas em versões imutáveis; nenhum valor de secret foi adicionado ao repositório ou aos testes.
+- Nenhum push, alteração de branch protection ou deploy remoto foi executado. A prova remota permanece dependente da autorização operacional da REC-001.
+
+## QA Results
+
+_A preencher por `@qa`._

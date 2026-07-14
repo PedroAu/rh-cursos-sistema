@@ -1,20 +1,20 @@
 name: Deploy Frontend to Cloudflare Workers
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'app/**'
-      - 'public/**'
-      - 'src/**'
-      - 'next.config.mjs'
-      - 'open-next.config.ts'
-      - 'wrangler.jsonc'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/deploy-frontend.yml'
-  workflow_dispatch:
+  workflow_call:
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: true
+      CLOUDFLARE_ACCOUNT_ID:
+        required: true
+      AUTH_SESSION_SECRET:
+        required: true
+      NEXT_PUBLIC_SUPABASE_URL:
+        required: true
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+        required: true
+      NEXT_PUBLIC_APP_URL:
+        required: true
 
 concurrency:
   group: deploy-frontend-production
@@ -28,10 +28,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
           cache: 'npm'

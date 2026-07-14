@@ -4,14 +4,21 @@ name: Deploy Supabase Edge Functions
 # Functions publicadas no Supabase por este workflow.
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'supabase/functions/**'
-      - 'supabase/config.toml'
-      - '.github/workflows/deploy-functions.yml'
-  workflow_dispatch:
+  workflow_call:
+    secrets:
+      SUPABASE_ACCESS_TOKEN:
+        required: true
+      SUPABASE_PROJECT_REF:
+        required: true
+      AUTH_SESSION_SECRET:
+        required: true
+      NEXT_PUBLIC_APP_URL:
+        required: true
+      EXTRA_ALLOWED_ORIGINS:
+        required: true
+
+permissions:
+  contents: read
 
 jobs:
   deploy-functions:
@@ -21,12 +28,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
+        uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
-          version: latest
+          version: 2.105.0
 
       - name: Link project
         run: supabase link --project-ref "$SUPABASE_PROJECT_REF"

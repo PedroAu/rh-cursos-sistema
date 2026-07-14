@@ -1,0 +1,91 @@
+name: Production Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-pipeline
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    name: Detect Production Changes
+    runs-on: ubuntu-latest
+    outputs:
+      functions: ${{ steps.scope.outputs.functions }}
+      frontend: ${{ steps.scope.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve deployment scopes
+        id: scope
+        shell: bash
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          functions=false
+          frontend=false
+
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            functions=true
+            frontend=true
+          elif [[ -z "$BEFORE_SHA" || "$BEFORE_SHA" =~ ^0+$ ]] || ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
+            # Unknown comparison base must never suppress a required deployment.
+            functions=true
+            frontend=true
+          else
+            while IFS= read -r -d '' file; do
+              case "$file" in
+                supabase/functions/*|supabase/config.toml)
+                  functions=true
+                  ;;
+                app/*|public/*|src/*|next.config.mjs|open-next.config.ts|wrangler.jsonc|package.json|package-lock.json)
+                  frontend=true
+                  ;;
+                .github/workflows/*)
+                  functions=true
+                  frontend=true
+                  ;;
+              esac
+            done < <(git diff --name-only -z "$BEFORE_SHA" "$CURRENT_SHA")
+          fi
+
+          echo "functions=$functions" >> "$GITHUB_OUTPUT"
+          echo "frontend=$frontend" >> "$GITHUB_OUTPUT"
+
+  ci:
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  deploy-functions:
+    needs: [changes, ci]
+    if: >-
+      needs.ci.result == 'success' &&
+      needs.changes.result == 'success' &&
+      needs.changes.outputs.functions == 'true'
+    uses: ./.github/workflows/deploy-functions.yml
+    secrets: inherit
+
+  deploy-frontend:
+    needs: [changes, ci, deploy-functions]
+    if: >-
+      always() &&
+      needs.ci.result == 'success' &&
+      needs.changes.result == 'success' &&
+      needs.changes.outputs.frontend == 'true' &&
+      (needs.deploy-functions.result == 'success' ||
+       needs.deploy-functions.result == 'skipped')
+    uses: ./.github/workflows/deploy-frontend.yml
+    secrets: inherit
