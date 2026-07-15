@@ -240,4 +240,17 @@ describe("CourseDetailPage", () => {
       expect(screen.getByText("1 turmas abertas")).toBeInTheDocument();
     });
   });
+
+  it("nunca cruza benefits[i] com objectives[i] de comprimento diferente nos destaques [higiene]", () => {
+    // Fixture já tem 3 benefits e apenas 2 objectives (comprimentos diferentes de propósito).
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getByText("Beneficio 1")).toBeInTheDocument();
+    expect(screen.getByText("Beneficio 3")).toBeInTheDocument();
+    // A descrição nunca deve ser um objetivo de índice descasado — usa o resumo do curso.
+    expect(screen.queryByText("Objetivo 1")).not.toBeInTheDocument();
+    expect(screen.queryByText("Objetivo 2")).not.toBeInTheDocument();
+  });
 });

@@ -57,7 +57,7 @@ function formatDateRange(trainingClass: TrainingClass) {
 
 function formatModalityLabel(value: Course["modality"], location?: string) {
   if (value === "Ao vivo online") {
-    return location && location.toLowerCase().includes("online") ? "Online ao vivo" : "Online ao vivo";
+    return "Online ao vivo";
   }
 
   if (value === "Presencial") {
@@ -159,17 +159,20 @@ type CourseDetailContent = {
   heroSubtitle?: string | null;
 };
 
+// benefits e objectives são listas independentes (tamanhos podem divergir);
+// nunca parear por índice entre elas — isso já produziu descrição trocada
+// quando as listas tinham comprimentos diferentes.
 function buildHighlightCards(course: Course, content?: CourseDetailContent) {
-  const items =
-    content?.highlights?.length ? content.highlights : course.benefits.length ? course.benefits.map((title, index) => ({
-      title,
-      description: course.objectives[index] ?? course.shortDescription
-    })) : course.objectives.length ? course.objectives.map((title, index) => ({
-      title,
-      description: course.benefits[index] ?? course.shortDescription
-    })) : [{ title: course.shortDescription, description: course.shortDescription }];
+  if (content?.highlights?.length) {
+    return content.highlights;
+  }
 
-  return items;
+  const titles = course.benefits.length ? course.benefits : course.objectives.length ? course.objectives : null;
+  if (!titles) {
+    return [{ title: course.shortDescription, description: course.shortDescription }];
+  }
+
+  return titles.map((title) => ({ title, description: course.shortDescription }));
 }
 
 function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: CourseDetailContent) {
