@@ -307,6 +307,7 @@ autoridade de `@data-engineer`.
 | 2026-07-14 | 1.1 | Workflow de migrations e encadeamento produtivo implementados; banco local, contratos CI/CD, actionlint, lint, tipos, unitários, build e E2E verdes. CodeRabbit/QA permanecem pendentes antes de `Ready for Review`. | @data-engineer (Dara) + @devops (Gage) |
 | 2026-07-14 | 1.2 | **QA PASS; In Progress → Ready for Done.** A revisão reforçou a execução real dos cenários database-only/docs-only/manual/base desconhecida e vinculou `Functions=skipped` explicitamente ao escopo `functions=false`. CodeRabbit retornou zero findings; 12/12 ACs e todos os gates locais passaram. | @qa (Quinn) |
 | 2026-07-14 | 1.3 | **Ready for Done → Done.** Gate `docs/qa/gates/rec-402-migrations-obrigatorias-deploy.yml` PASS, 12/12 ACs, 537/537 unitários e 174/174 Playwright; commits `30e3cd8` e `e8e6bc6` preservam implementação e correções QA. Operações produtivas permanecem corretamente fora do escopo até REC-001. | @po (Pax) |
+| 2026-07-15 | 1.4 | **Story fechada formalmente.** Encerramento do lifecycle `*close-story`: QA PASS confirmado (commits `30e3cd8`/`e8e6bc6`), dependência REC-401 Done satisfeita. Épica 17 (SEV-0) atualizada para refletir REC-402 fechada. | @po (Pax) |
 
 ## File List
 

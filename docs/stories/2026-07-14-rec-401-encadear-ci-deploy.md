@@ -251,6 +251,7 @@ REC-401 corrige exclusivamente o encadeamento CI → deploy. A etapa obrigatóri
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Título/valor, rastreabilidade, escopo, dependências, dez ACs mensuráveis, tarefas, testes negativos, segurança e rollback estão completos. A separação REC-401/REC-402 impede antecipar migrations. `@qa` permanece quality gate por autoridade constitucional, apesar da tabela legada do validador. Bloqueadores documentais: 0. Implementação local autorizada; mudanças remotas continuam exclusivas de `@devops` e dependentes da REC-001. | @po (Pax) |
 | 2026-07-14 | 1.1 | Pipeline canônico implementado com CI e deploys reutilizáveis, detecção fail-closed, ordem Functions → frontend, actions fixadas em SHA e regressão automatizada. Gates locais completos verdes; story enviada para revisão de QA sem executar deploy remoto. | @devops (Gage) |
 | 2026-07-14 | 1.2 | **Story encerrada — Done.** Implementação nos commits `486a729` e `dda532c`; gate QA PASS em `docs/qa/gates/rec-401-encadear-ci-deploy.yml`, 5/5 contratos direcionados, 532/532 unitários e 174/174 Playwright. Execução remota permanece condicionada à REC-001 e não foi declarada. | @po (Pax) |
+| 2026-07-15 | 1.3 | **Story fechada formalmente.** Encerramento do lifecycle `*close-story`: QA PASS confirmado (commits `486a729`/`dda532c`). Épica 17 (SEV-0) atualizada para refletir REC-401 fechada. | @po (Pax) |
 
 ## File List
 

@@ -335,6 +335,9 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 | 2026-07-14 | 1.3 | Follow-up da revisão CodeRabbit: recibos validados nas duas bordas, concorrência serializada por lock da turma, referência canônica devolvida pela RPC, storage tolerante a bloqueio, consentimento explícito, fluxo PJ sem dado descartado e preço/CTA coerentes com a turma selecionada. | @dev (Dex) + @data-engineer (Dara) |
 | 2026-07-14 | 1.4 | Task 8 fechada. `createEnrollmentInSupabase` passou a validar o payload com `enrollmentSchema.parse` antes da RPC; dois testes de storage bloqueado endurecidos (`mockImplementation` em vez de `mockImplementationOnce`). Commit `38d5e14`. Gates verdes: lint, typecheck, `test:unit` 562/562, `test:db` 36/36 pgTAP, build (29 páginas), CodeRabbit 0 findings (escopo do diff). `npm test` (Playwright) ficou parcial — ver Dev Agent Record. Status permanece `In Progress`; gate independente `@qa` solicitado nesta entrada. | @dev (Dex) |
 | 2026-07-15 | 1.5 | Gap do `npm test` fechado: `supabase/config.toml` teve `[analytics].enabled` desligado (container Logflare travava `supabase start` neste ambiente Docker, sem relação com REC-301) e o stack local completo (Kong/Auth/REST/Storage/Edge Runtime) subiu limpo. Com `E2E_LOCAL_SUPABASE=1`/`E2E_TARGET_KIND=isolated-test` apontando para `http://127.0.0.1:54321`, a suíte Playwright completa rodou **174/174 PASS**, incluindo `checkout.e2e.spec.ts` e `public-journeys.spec.ts`. Nenhuma credencial de produção foi usada. Status: In Review → Done. | @dev (sessão de fechamento) |
+| 2026-07-15 | 1.6 | **Correção de consistência — Done → In Review (Changes Required).** O campo Status desta story havia sido movido para `Done` na entrada 1.5, mas a seção QA Results (2026-07-15, Quinn) registra **Gate: CONCERNS** e **Recommended Status: ✗ Changes Required**, com item aberto para `@devops` (re-execução do Playwright integral em ambiente isolado pós-commit `38d5e14`). Revertido para refletir o veredito QA real; não fechar via `*close-story` até o gate ser promovido a PASS. | @po (Pax) |
+| 2026-07-15 | 1.7 | **Gate promovido: CONCERNS → PASS.** Re-revisão QA verificou de forma independente a evidência da entrada 1.5: commit `d65e63d` (analytics off), `test-results/.last-run.json` com `status: passed`/zero falhas (01:16), artefatos cobrindo todas as suítes, e ambiente isolado provado pelo próprio guard fail-closed (checkout/public-journeys verdes). Recommended Status: ✓ Ready for Done — `@po` decide a transição. Observação aberta: 16 baselines PNG regenerados e não commitados em `tests/baseline/`. | @qa (Quinn) |
+| 2026-07-15 | 1.8 | **Story fechada formalmente — In Review → Done.** Gate QA PASS (100/100) confirmado em `docs/qa/gates/rec-301-converter-checkout-pre-inscricao.yml`, evidência independente dos 174/174 Playwright aceita. Encerramento do lifecycle `*close-story`; item aberto não bloqueante segue registrado abaixo. Épica 17 (SEV-0) atualizada para refletir REC-301 fechada. | @po (Pax) |
 
 ## File List
 
@@ -474,3 +477,45 @@ Quality score: 90/100. Único item aberto (medium, owner `@devops`): re-execuç�
 ### Recommended Status
 
 ✗ Changes Required — apenas o item de ambiente/E2E acima; nenhuma mudança de código exigida. Após `npm test` integral verde em ambiente isolado, o gate pode ser promovido a PASS sem nova revisão profunda. (Story owner decide o status final; REC-001 segue bloqueador operacional de merge/publicação.)
+
+---
+
+### Review Date: 2026-07-15 (re-revisão — verificação do item aberto)
+
+### Reviewed By: Quinn (Test Architect)
+
+### Escopo desta re-revisão
+
+Focada exclusivamente no único item aberto do gate CONCERNS anterior: re-execução da suíte Playwright integral pós-commit `38d5e14` em ambiente isolado. Nenhum código de produção mudou desde a revisão profunda anterior; os 11 ACs já verificados não foram re-auditados.
+
+### Verificação independente da evidência (entrada 1.5 do Change Log)
+
+- **Commit `d65e63d`** confirma `[analytics].enabled = false` em `supabase/config.toml`, exatamente a mitigação recomendada no gate anterior ("excluir o serviço analytics do start").
+- **`test-results/.last-run.json`** registra `status: "passed"` com `failedTests: []`, gravado em 2026-07-15 01:16; os diretórios de artefatos (timestamps 01:15–01:16) cobrem suítes visual, a11y, admin, login, blog, agenda e cursos — consistente com execução integral (174/174).
+- **Prova de ambiente isolado pelo próprio guard:** `checkout.e2e.spec.ts` e `public-journeys.spec.ts` só passam quando `assertSafeWritableIntegrationEnv` aceita o alvo; na revisão anterior, com `.env.local` apontando para produção, essas specs falhavam corretamente. Execução verde delas prova que o alvo era o Supabase local isolado — nenhuma credencial de produção foi usada.
+- O Docker daemon está parado no momento desta re-revisão, então não re-executei a suíte; a aceitação baseia-se na tríade commit + artefatos timestampados + coerência do guard fail-closed.
+
+### Observação nova (baixa severidade)
+
+A execução regenerou 16 PNGs em `tests/baseline/` (specs de captura de referência gravam baselines por design; o conteúdo mudou porque os dados agora vêm do stack isolado). Estão modificados e **não commitados** na working tree — decidir commitar ou descartar antes do push.
+
+### Improvements Checklist
+
+- [x] Ambiente Supabase local isolado estável + `npm test` integral verde (fechado via commit `d65e63d` + execução 174/174 de 2026-07-15)
+- [ ] Decidir destino dos 16 baselines PNG regenerados (commitar ou descartar) antes do push
+- [ ] Futuro: renomear rota `/cursos/[slug]/checkout` para vocabulário de pré-inscrição
+- [ ] Futuro: mapear duplicidade (P0004) para HTTP 409 nas duas bordas
+- [ ] Futuro (REC-101/REC-107): remover parâmetro legado `p_forma_pagamento` da RPC
+
+### Files Modified During Review
+
+Nenhum arquivo de código. Atualizado: `docs/qa/gates/rec-301-converter-checkout-pre-inscricao.yml` (CONCERNS → PASS).
+
+### Gate Status
+
+Gate: **PASS** → docs/qa/gates/rec-301-converter-checkout-pre-inscricao.yml
+Quality score: 100/100. AC1–AC12 cobertos; zero issues bloqueantes.
+
+### Recommended Status
+
+✓ Ready for Done — todos os 12 ACs verificados com evidência íntegra. (Story owner — `@po` — decide o status final; REC-001 permanece bloqueador **operacional** de merge/publicação/deploy, o que não impede marcar a story como Done localmente conforme a política da Épica 17.)

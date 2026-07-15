@@ -1,6 +1,6 @@
 # Épica 17 — Recuperação SEV-0: Segurança, Integridade e Confiabilidade Operacional
 
-**Status:** Validated — GO para decomposição formal das stories por `@sm`; implementação continua condicionada à validação individual de cada story
+**Status:** Validated — GO para decomposição formal das stories por `@sm`; implementação continua condicionada à validação individual de cada story. Fechadas em 2026-07-15 (`*close-story` @po, QA PASS): REC-403, REC-302, REC-401, REC-402, REC-301 (gate promovido CONCERNS → PASS 100/100 após verificação independente da suíte Playwright integral). REC-001 segue `Ready` (trabalho operacional não iniciado). Pendência não bloqueante em REC-301: 16 baselines PNG regenerados em `tests/baseline/` aguardando decisão de commitar/descartar.
 **Prioridade:** P0 / SEV-0
 **Tipo:** Programa brownfield de recuperação, executado em ondas com gates fail-closed
 **Owner de produto:** `@pm` (Morgan)

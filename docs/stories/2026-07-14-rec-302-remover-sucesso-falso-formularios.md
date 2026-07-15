@@ -318,6 +318,7 @@ Para cada consumidor:
 | 2026-07-14 | 1.2 | Revalidação após a estabilização local da REC-403: 51/51 testes direcionados, 511/511 unitários, lint, typecheck e build de produção verdes. O Playwright administrativo e o `npm test` agregado continuam bloqueados até existir um Supabase de teste isolado com autorização explícita de escrita. | @dev (Dex) |
 | 2026-07-14 | 1.3 | Ambiente Supabase local isolado reativado com guarda fail-closed; Playwright de lead admin passou 1/1 com persistência e cleanup. Flakes de preenchimento dos consumidores foram removidos sem ampliar timeout. Gates finais: lint, typecheck, 527/527 unitários, build e Playwright agregado 174/174 verdes. Tasks 7–8 concluídas; story movida para Ready for Review. | @dev (Dex) |
 | 2026-07-14 | 1.4 | **Ready for Review → Done.** Gate QA versionado em `docs/qa/gates/rec-302-remover-sucesso-falso-formularios.yml` permanece PASS, com 11/11 ACs cobertos, zero finding bloqueante e dependências locais REC-403/REC-401 satisfeitas. Publicação continua condicionada à conclusão operacional aplicável de REC-402/REC-001, sem impedir o fechamento da implementação local. | @po (Pax) |
+| 2026-07-15 | 1.5 | **Story fechada formalmente.** Encerramento do lifecycle `*close-story`: QA PASS confirmado, dependência REC-403 Done satisfeita. Épica 17 (SEV-0) atualizada para refletir REC-302 fechada. | @po (Pax) |
 
 ## File List
 

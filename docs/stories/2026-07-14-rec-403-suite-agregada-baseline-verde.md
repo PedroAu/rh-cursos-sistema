@@ -277,6 +277,7 @@ As causas raiz dos seis failures ainda não estão confirmadas e não podem ser 
 | 2026-07-14 | 1.7 | Gate limpo do commit `b2d326b` confirmou lint/typecheck/unit/build e CRUD admin, mas manteve 11 failures externos ao follow-up: contrato de role da sessão e mudanças visuais ainda não commitadas. A correção seguinte passa a validar a role solicitada contra os metadados autenticados. | @dev (Dex) |
 | 2026-07-14 | 1.8 | Artefatos de `ui-governance` já modificados no worktree foram auditados sem recaptura: seis PNGs são byte a byte idênticos aos `actual` estáveis do commit limpo, e o snapshot de filtros passou após a correção causal do catálogo. Gate direcionado 8/8 PASS; PNGs de `tests/baseline/` permanecem fora. | @dev (Dex) |
 | 2026-07-14 | 2.0 | **QA PASS; In Progress → Done.** Commit candidato `32ebdb5` aprovado sem achados P0/P1/P2: lint, typecheck, 46 arquivos/522 testes unitários, build e Playwright 174/174 PASS em worktree detached exato. | @qa (Quinn) |
+| 2026-07-15 | 2.1 | **Story fechada formalmente.** Encerramento do lifecycle `*close-story`: QA PASS confirmado (commit `32ebdb5`), sem PR próprio pois o merge ocorreu direto via commits locais registrados nesta story. Épica 17 (SEV-0) atualizada para refletir REC-403 fechada. | @po (Pax) |
 
 ## File List
 
