@@ -130,6 +130,15 @@ async function resolveInstructorId(
   );
 }
 
+async function resolveTrilhaNome(supabase: ReturnType<typeof adminClient>, trilhaId: unknown) {
+  if (typeof trilhaId !== "string" || trilhaId.length === 0) return null;
+
+  const { data, error } = await supabase.from("trilha").select("nome").eq("id", trilhaId).limit(1);
+  if (error) throw error;
+
+  return (data?.[0]?.nome as string | undefined) ?? null;
+}
+
 function validateMutation(mutation: AdminMutation): string | null {
   try {
     if (mutation.action === "list") return null;
@@ -347,7 +356,8 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
   // upsert
   const p = mutation.payload;
   if (mutation.resource === "courses") {
-    const { error } = await supabase.from("curso").upsert(courseToUpsert(p));
+    const trilhaNome = await resolveTrilhaNome(supabase, p.pathId);
+    const { error } = await supabase.from("curso").upsert(courseToUpsert(p, trilhaNome ?? ""));
     if (error) throw error;
   } else if (mutation.resource === "classes") {
     const resolvedCourseId = await resolveCourseIdOrThrow(supabase, String(p.courseId ?? ""));

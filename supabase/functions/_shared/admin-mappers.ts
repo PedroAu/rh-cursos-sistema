@@ -100,7 +100,11 @@ export function toDbEnrollmentStatus(value: string): string {
 // deno-lint-ignore no-explicit-any
 type AnyPayload = Record<string, any>;
 
-export function courseToUpsert(p: AnyPayload): AnyPayload {
+// trilhaNome é resolvido pelo servidor a partir de trilha_id (ver
+// resolveTrilhaNome em admin-resources/index.ts) — nunca confiar no
+// p.pathName do payload do cliente, que pode ficar desatualizado quando o
+// form envia um spread do curso antigo (Story 17.4).
+export function courseToUpsert(p: AnyPayload, trilhaNome: string): AnyPayload {
   const modalities = normalizeCourseModalities(p);
 
   const payload: AnyPayload = {
@@ -119,7 +123,7 @@ export function courseToUpsert(p: AnyPayload): AnyPayload {
     nivel: toDbLevel(p.level ?? "Básico"),
     categoria: p.category ?? p.categories?.[0],
     trilha_id: p.pathId,
-    trilha_nome: p.pathName,
+    trilha_nome: trilhaNome,
     preco_base: p.price ?? 0,
     status: toDbCourseStatus(p.status ?? "Ativo"),
     destaque: p.featured ?? false,
