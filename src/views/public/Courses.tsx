@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
-import { getOpenEnrollmentClasses } from "@/lib/enrollment-class-resolution";
+import { getOpenEnrollmentClasses, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { PUBLIC_COURSE_STATUSES } from "@/lib/domain/course-enums";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
@@ -21,7 +21,7 @@ type CatalogEntry = {
   category: string;
   course: Course;
   gradient: string;
-  price: number;
+  price: number | null;
   spotColorClass: string;
   spotLabel: string;
   trainingClass?: TrainingClass;
@@ -103,7 +103,7 @@ function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
         category,
         course,
         gradient: createCategoryGradient(category),
-        price: trainingClass?.price ?? course.price,
+        price: resolveDisplayPrice(trainingClass?.price, course.price),
         spotColorClass: spot.colorClass,
         spotLabel: spot.label,
         trainingClass
@@ -356,8 +356,10 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
 
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-[var(--tk-line)] pt-[14px]">
           <div>
-            <div className="text-[0.82rem] text-tk-ink-muted">a partir de</div>
-            <div className="font-tk-display text-xl font-bold text-tk-accent-strong">{currency(entry.price)}</div>
+            <div className="text-[0.82rem] text-tk-ink-muted">{entry.price === null ? "valor" : "a partir de"}</div>
+            <div className="font-tk-display text-xl font-bold text-tk-accent-strong">
+              {entry.price === null ? "Sob consulta" : currency(entry.price)}
+            </div>
           </div>
           <Link
             to={`/cursos/${entry.course.slug}`}

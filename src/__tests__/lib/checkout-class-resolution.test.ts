@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getOpenEnrollmentClasses,
   isEnrollmentClassOpen,
+  resolveDisplayPrice,
   resolveOpenEnrollmentClassId,
 } from "@/lib/enrollment-class-resolution";
 import type { TrainingClass } from "@/types";
@@ -56,5 +57,27 @@ describe("checkout class resolution", () => {
         requestedClassId: openClass.id,
       }),
     ).toBe(openClass.id);
+  });
+});
+
+describe("resolveDisplayPrice", () => {
+  it("prefers a positive class price over the course price", () => {
+    expect(resolveDisplayPrice(1500, 1000)).toBe(1500);
+  });
+
+  it("falls back to the course price when the class price is 0", () => {
+    expect(resolveDisplayPrice(0, 1000)).toBe(1000);
+  });
+
+  it("falls back to the course price when the class price is undefined", () => {
+    expect(resolveDisplayPrice(undefined, 1000)).toBe(1000);
+  });
+
+  it("returns null (Sob consulta) when both class and course price are 0", () => {
+    expect(resolveDisplayPrice(0, 0)).toBeNull();
+  });
+
+  it("returns null (Sob consulta) when class price is undefined and course price is 0", () => {
+    expect(resolveDisplayPrice(undefined, 0)).toBeNull();
   });
 });

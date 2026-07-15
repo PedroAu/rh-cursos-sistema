@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
+import { resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
 import type { Course, Instructor, TrainingClass } from "@/types";
@@ -55,7 +56,7 @@ type AgendaEntry = {
   modeClassName: string;
   modeLabel: string;
   place: string;
-  price: number;
+  price: number | null;
   spotBgClass: string;
   spotColorClass: string;
   spotLabel: string;
@@ -155,7 +156,7 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
             : "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)] text-white",
         modeLabel: mode === "Online" ? "Online ao vivo" : "Presencial",
         place: formatPlace(trainingClass),
-        price: trainingClass.price || course.price,
+        price: resolveDisplayPrice(trainingClass.price, course.price),
         spotBgClass: spot.bgClass,
         spotColorClass: spot.colorClass,
         spotLabel: spot.label,
@@ -259,11 +260,15 @@ export function AgendaPage() {
     });
 
     if (sort === "preco-asc") {
-      return [...next].sort((left, right) => left.price - right.price || left.date.getTime() - right.date.getTime());
+      return [...next].sort(
+        (left, right) => (left.price ?? 0) - (right.price ?? 0) || left.date.getTime() - right.date.getTime()
+      );
     }
 
     if (sort === "preco-desc") {
-      return [...next].sort((left, right) => right.price - left.price || left.date.getTime() - right.date.getTime());
+      return [...next].sort(
+        (left, right) => (right.price ?? 0) - (left.price ?? 0) || left.date.getTime() - right.date.getTime()
+      );
     }
 
     return next;
@@ -722,8 +727,12 @@ export function AgendaPage() {
                               {entry.spotLabel}
                             </span>
                             <div>
-                              <p className="text-[11px] uppercase tracking-[0.08em] text-tk-ink-muted">a partir de</p>
-                              <p className="font-tk-display text-[20px] font-bold text-tk-accent-strong">{currency(entry.price)}</p>
+                              <p className="text-[11px] uppercase tracking-[0.08em] text-tk-ink-muted">
+                                {entry.price === null ? "valor" : "a partir de"}
+                              </p>
+                              <p className="font-tk-display text-[20px] font-bold text-tk-accent-strong">
+                                {entry.price === null ? "Sob consulta" : currency(entry.price)}
+                              </p>
                             </div>
                             <Button asChild size="sm" className="min-w-[130px]">
                               <Link to={`/cursos/${entry.course.slug}`}>Inscrever-se →</Link>

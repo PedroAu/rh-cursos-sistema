@@ -32,31 +32,14 @@ const curatedGridSlugs = [
   "pregao-eletronico-pontos-de-atencao-no-julgamento"
 ] as const;
 
-const trendingEditorial = [
-  {
-    category: "Licitações",
-    read: "5 min de leitura",
-    slug: "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
-    title: "Lei 14.133: o que muda no rito de contratação direta"
-  },
-  {
-    category: "LGPD",
-    read: "7 min de leitura",
-    slug: "ripd-quando-deixa-de-ser-opcional",
-    title: "Compartilhamento de dados entre órgãos: o que a lei permite"
-  },
-  {
-    category: "Compliance",
-    read: "4 min de leitura",
-    slug: "canal-denuncias-que-as-pessoas-realmente-usam",
-    title: "Conflito de interesses: como declarar e como fiscalizar"
-  },
-  {
-    category: "Gestão Pública",
-    read: "6 min de leitura",
-    slug: "gestao-de-riscos-transformando-matriz-em-decisao",
-    title: "Indicadores que a alta gestão realmente acompanha"
-  }
+// Curadoria editorial fixa por slug: título/categoria/tempo de leitura são
+// sempre derivados do post real publicado, nunca hardcoded aqui (evita
+// exibir um título que não corresponde ao artigo linkado).
+const trendingSlugs = [
+  "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
+  "ripd-quando-deixa-de-ser-opcional",
+  "canal-denuncias-que-as-pessoas-realmente-usam",
+  "gestao-de-riscos-transformando-matriz-em-decisao"
 ] as const;
 
 const categoryPresentation: Record<string, { glyph: string; tint: string }> = {
@@ -180,6 +163,19 @@ export function BlogPage() {
         .map((slug) => publishedPosts.find((post) => post.slug === slug))
         .filter((post): post is BlogPost => Boolean(post))
     : filteredPosts.filter((post) => post.slug !== featuredPost?.slug).slice(0, 9);
+  const trendingItems = useMemo(
+    () =>
+      trendingSlugs
+        .map((slug) => publishedPosts.find((post) => post.slug === slug))
+        .filter((post): post is BlogPost => Boolean(post))
+        .map((post) => ({
+          slug: post.slug,
+          title: post.title,
+          category: normalizeBlogCategory(post.category),
+          read: `${post.readingTime} de leitura`
+        })),
+    [publishedPosts]
+  );
   const loading = useSimulatedLoading([query, category]);
   const visibleCount = isEditorialDefault ? 9 : filteredPosts.length;
 
@@ -270,13 +266,13 @@ export function BlogPage() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-tk-ink-muted">Em alta esta semana</p>
                   </div>
                   <div className="mt-5">
-                    {trendingEditorial.map((item, index) => (
+                    {trendingItems.map((item, index) => (
                       <Link
-                        key={item.title}
+                        key={item.slug}
                         to={`/blog/${item.slug}`}
                         className={cn(
                           "flex gap-4 py-4 transition hover:text-tk-accent-strong",
-                          index < trendingEditorial.length - 1 && "border-b border-tk-line"
+                          index < trendingItems.length - 1 && "border-b border-tk-line"
                         )}
                       >
                         <span className="w-6 font-tk-display text-2xl font-bold text-[var(--rh-paper-line)]">{index + 1}</span>

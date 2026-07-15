@@ -634,6 +634,7 @@ export function buildResourceConfig(
             instructorId: row.instructorId || "",
             totalSeats: String(row.totalSeats),
             manualFilledSeats: String(row.manualFilledSeats ?? Math.max(row.filledSeats - rowConfirmedEnrollments, 0)),
+            price: row.price > 0 ? String(row.price) : "",
           });
           setValidationErrors([]);
           setOpen(true);
@@ -659,6 +660,7 @@ export function buildResourceConfig(
               manualFilledSeats,
               filledSeats: Math.min(totalSeats, confirmedEnrollments + manualFilledSeats),
               availableSeats: Math.max(0, totalSeats - (confirmedEnrollments + manualFilledSeats)),
+              price: numOrUndef(form.price) ?? 0,
             });
             setOpen(false);
             setValidationErrors([]);
@@ -674,6 +676,12 @@ export function buildResourceConfig(
           { key: "modality", label: "Modalidade", type: "select", options: modalityOptions, required: true },
           { key: "totalSeats", label: "Quantidade de vagas", type: "number", required: true },
           { key: "manualFilledSeats", label: "Vagas preenchidas manualmente", type: "number" },
+          {
+            key: "price",
+            label: "Preço da turma (R$)",
+            type: "number",
+            hint: "Vazio = usa o preço do curso. Preencha só se esta turma tiver um valor diferente.",
+          },
           { key: "status", label: "Status", type: "select", options: classStatusOptions, required: true },
           { key: "instructorId", label: "Instrutor", type: "select", options: instructorOptions },
           { key: "location", label: "Local", type: "text" },

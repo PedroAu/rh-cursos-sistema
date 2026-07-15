@@ -15,6 +15,16 @@ export function getOpenEnrollmentClasses(classes: TrainingClass[], courseId: str
     .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
 }
 
+/**
+ * Preço da turma é opcional no formulário (0 = não preenchido, não "grátis").
+ * Retorna null quando turma e curso estão ambos sem preço definido, para o
+ * chamador exibir "Sob consulta" em vez de R$ 0,00.
+ */
+export function resolveDisplayPrice(classPrice: number | undefined, coursePrice: number): number | null {
+  const effectivePrice = classPrice && classPrice > 0 ? classPrice : coursePrice;
+  return effectivePrice > 0 ? effectivePrice : null;
+}
+
 export function resolveOpenEnrollmentClassId({
   classes,
   requestedClassId,

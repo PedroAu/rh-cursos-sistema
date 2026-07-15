@@ -213,6 +213,7 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     "modality",
     "totalSeats",
     "manualFilledSeats",
+    "price",
     "status",
     "instructorId",
     "location",
@@ -224,6 +225,7 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     modality: "select",
     totalSeats: "number",
     manualFilledSeats: "number",
+    price: "number",
     status: "select",
     instructorId: "select",
   });
