@@ -1,0 +1,173 @@
+schema: 1
+story: REC-301
+story_title: 'Converter checkout em pré-inscrição verdadeira'
+gate: PASS
+status_reason: >-
+  Item único do CONCERNS anterior resolvido e verificado de forma independente:
+  commit d65e63d desligou o analytics local (Logflare) que travava o stack, e a
+  suíte Playwright integral pós-commit 38d5e14 rodou verde em 2026-07-15 01:16
+  (test-results/.last-run.json: status "passed", failedTests []), com artefatos
+  cobrindo visual/a11y/admin/jornadas públicas. checkout.e2e e public-journeys
+  verdes provam ambiente isolado, pois assertSafeWritableIntegrationEnv bloqueia
+  produção. Demais 11 ACs já verificados na revisão profunda de 2026-07-15.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-15T12:00:00Z'
+expires: '2026-07-29T00:00:00Z'
+quality_score: 100
+
+top_issues: []
+
+history:
+  - date: '2026-07-15T00:20:00Z'
+    gate: CONCERNS
+    resolved: >-
+      Playwright integral pendente por bloqueio de ambiente (analytics/Logflare
+      derrubava supabase start; .env.local apontava para produção). Resolvido
+      pelo commit d65e63d + execução 174/174 PASS em stack isolado
+      (E2E_LOCAL_SUPABASE=1, E2E_TARGET_KIND=isolated-test).
+
+observations:
+  - severity: low
+    category: housekeeping
+    suggested_owner: dev
+    description: >-
+      A execução da suíte regenerou 16 PNGs de baseline (specs de captura de
+      referência) que estão modificados e não commitados na working tree,
+      refletindo dados do stack isolado. Decidir commitar ou descartar antes do
+      push para não poluir comparações visuais futuras.
+
+waiver:
+  active: false
+
+evidence:
+  tests_reviewed: 617
+  risks_identified: 1
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    ac_gaps: []
+  acceptance_criteria:
+    AC1_AC3:
+      status: PASS
+      tests:
+        - src/__tests__/views/public/pre-enrollment.test.tsx
+        - src/__tests__/lib/public-pre-enrollment-contract.test.ts
+      notes: >-
+        Busca negativa independente em CourseCheckout/EnrollmentSuccess/
+        CourseDetail não encontra cartão, CVV, validade, parcela, Pix, boleto,
+        cupom nem alegações financeiras; migration saneou conteúdo editorial
+        persistido (FAQ, investmentLabel → "Valor de referência", garantia →
+        "não confirma vaga nem gera cobrança").
+    AC4:
+      status: PASS
+      tests:
+        - src/__tests__/lib/validation.test.ts
+        - tests/api-contract.spec.ts
+      notes: >-
+        enrollmentSchema e o espelho da Edge Function são .strict() e não
+        contêm paymentMethod; chaves financeiras retornam 400 antes de qualquer
+        RPC. Contrato administrativo (AdminEnrollmentPayload) permanece separado.
+    AC5:
+      status: PASS
+      tests:
+        - supabase/tests/database/rec-301-pre-enrollment.test.sql
+      notes: >-
+        Migration forward-only 20260714231000: RPC grava status_inscricao e
+        status_pagamento 'Pendente', forma_pagamento NULL, codigo_confirmacao
+        opaco, lock FOR UPDATE na turma. 36/36 pgTAP + teste de concorrência
+        re-executados e verdes nesta revisão (test:db PASS).
+    AC6_AC8:
+      status: PASS
+      tests:
+        - src/__tests__/lib/app-store.test.ts
+      notes: >-
+        Route handler e Edge Function passam p_forma_pagamento null, validam o
+        recibo {ok, enrollmentId, classId} com enrollmentReceiptSchema antes do
+        201 e devolvem o mesmo contrato canônico. createEnrollment falha fechado
+        sem backend, usa o ID persistido, projeta status 'Pendente' e
+        paymentMethod null.
+    AC9_AC10:
+      status: PASS
+      tests:
+        - src/__tests__/views/public/enrollment-success.test.tsx
+      notes: >-
+        EnrollmentSuccess valida navigation state e sessionStorage com
+        preEnrollmentReceiptStateSchema (.strict, apenas enrollmentId/courseId/
+        classId); sem recibo válido mostra estado neutro com retorno ao
+        catálogo; fallback enrollments[0] removido; nenhuma PII em query.
+    AC11:
+      status: PASS
+      tests:
+        - src/__tests__/views/public/pre-enrollment.test.tsx
+      notes: >-
+        Falha de envio preserva formulário e turma (setSubmitError sem reset),
+        exibe mensagem segura via getEnrollmentErrorMessage e permite retry;
+        logs de erro não registram payload/PII.
+    AC12:
+      status: PASS
+      tests:
+        - npm run test:unit (562/562 PASS — re-executado em 2026-07-15)
+        - npm run test:db (36/36 pgTAP PASS — re-executado em 2026-07-15)
+        - npm run lint / typecheck / build (PASS — re-executados em 2026-07-15)
+        - npm test (Playwright integral 174/174 PASS em 2026-07-15 01:16, stack isolado)
+      notes: >-
+        Verificação independente da re-revisão: test-results/.last-run.json
+        registra status "passed" com failedTests vazio, timestamps coerentes
+        (01:15–01:16); commit d65e63d (analytics off) confirmado; specs que
+        exigem ambiente isolado (checkout.e2e, public-journeys) verdes provam
+        que o alvo não era produção, pelo próprio guard fail-closed.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Zero coleta financeira pública; schemas strict fail-closed nas duas
+      bordas; RPC SECURITY DEFINER com search_path fixado; rate limit + guarda
+      de configuração retornando 503; nenhum payload/PII em logs; referência
+      opaca (codigo_confirmacao) sem derivação de PII.
+  performance:
+    status: PASS
+    notes: >-
+      FOR UPDATE serializa apenas a linha da turma; consultas com limit; sem
+      novo hot path. Build de produção com 29 páginas OK.
+  reliability:
+    status: PASS
+    notes: >-
+      Fail-closed em produção sem Functions, network error, timeout, non-2xx e
+      envelope inválido; nenhum caminho produz sucesso local sem recibo
+      persistido.
+  maintainability:
+    status: PASS
+    notes: >-
+      Contrato público reutiliza store-types (EnrollmentPayload omite
+      paymentMethod); schema espelhado na Edge documentado até REC-206;
+      testes test-first legíveis e direcionados.
+
+automated_review:
+  tool: CodeRabbit
+  result: >-
+    Ciclo documentado pelo dev: 20 findings no primeiro commit (1 crítico —
+    TOCTOU de capacidade, fechado com FOR UPDATE) → follow-up → 0 findings no
+    escopo final. Re-execução vs main é no-op nesta revisão porque o trabalho
+    já está commitado em main (c87344b..38d5e14).
+
+recommendations:
+  immediate:
+    - action: >-
+        Antes do push, decidir o destino dos 16 PNGs de baseline regenerados
+        pela execução no stack isolado (commitar como novos baselines canônicos
+        ou descartar) — hoje estão modificados e não commitados.
+      refs: ['tests/baseline/']
+  future:
+    - action: >-
+        Renomear a rota pública `/cursos/[slug]/checkout` (e componentes
+        CourseCheckout*) para vocabulário de pré-inscrição — o termo persiste
+        na URL visível ao usuário, embora ausente da copy.
+      refs: ['app/cursos/[slug]/checkout/page.tsx', 'src/views/public/CourseCheckout.tsx']
+    - action: >-
+        Mapear duplicidade de inscrição (P0004) para HTTP 409 em vez de 500 nas
+        duas bordas, alinhando o contrato aos códigos citados em AC11.
+      refs: ['app/api/enrollments/route.ts', 'supabase/functions/enrollments/index.ts']
+    - action: >-
+        Remover o parâmetro legado p_forma_pagamento da assinatura da RPC
+        quando REC-101/REC-107 revisarem grants e contrato público antigo.
+      refs: ['supabase/migrations/20260714231000_public_pre_enrollment_pending.sql']
