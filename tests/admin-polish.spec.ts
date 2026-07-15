@@ -150,6 +150,7 @@ test.describe("epica 3 — admin polish", () => {
       "modality",
       "totalSeats",
       "manualFilledSeats",
+      "price",
       "status",
       "instructorId",
       "location",
@@ -161,6 +162,7 @@ test.describe("epica 3 — admin polish", () => {
       modality: "select",
       totalSeats: "number",
       manualFilledSeats: "number",
+      price: "number",
       status: "select",
       instructorId: "select",
     });
