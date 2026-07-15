@@ -4,7 +4,12 @@ import { createContext, useContext } from "react";
 
 import type { Enrollment, EnrollmentStatus, Student } from "@/types";
 
-import type { AdminEnrollmentPayload, EnrollmentPayload, StudentPayload } from "./store-types";
+import type {
+  AdminEnrollmentPayload,
+  EnrollmentPayload,
+  EnrollmentReceipt,
+  StudentPayload,
+} from "./store-types";
 
 /**
  * Domínio de alunos: matrículas, inscrições e progresso. Consumidores deste
@@ -13,7 +18,7 @@ import type { AdminEnrollmentPayload, EnrollmentPayload, StudentPayload } from "
 export type StudentStoreValue = {
   students: Student[];
   enrollments: Enrollment[];
-  createEnrollment: (payload: EnrollmentPayload) => Promise<void>;
+  createEnrollment: (payload: EnrollmentPayload) => Promise<EnrollmentReceipt>;
   createEnrollmentAdmin: (payload: AdminEnrollmentPayload) => Promise<void>;
   createStudent: (payload: StudentPayload) => Promise<void>;
   updateStudent: (student: Partial<Student> & { id: string }) => Promise<void>;

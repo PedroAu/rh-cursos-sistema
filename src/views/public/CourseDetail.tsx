@@ -191,7 +191,7 @@ function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: 
     {
       question: "Como faço minha inscrição?",
       answer: selectedClass
-        ? `Clique em "Inscrever-se agora", selecione a turma e conclua o checkout guiado. O curso "${course.title}" usa o fluxo atual do app sem perder o contexto da turma escolhida.`
+        ? `Clique em "Inscrever-se agora", selecione a turma e envie a pré-inscrição. A solicitação para o curso "${course.title}" seguirá para análise sem perder o contexto da turma escolhida.`
         : `Este curso ainda não tem turma aberta. Clique em "Manifestar interesse" para falar com a equipe e receber a próxima agenda.`
     },
     {
@@ -331,12 +331,12 @@ export function CourseDetailPage() {
   const urgencyLabel = getUrgencyLabel(selectedClass);
   const portrait = getInstructorPortrait(instructor);
   const sidebarCopy = {
-    investmentLabel: courseContent?.sidebar?.investmentLabel ?? "Investimento por participante",
-    installmentText: courseContent?.sidebar?.installmentText ?? "até 6x sem juros · ou empenho para órgãos públicos",
+    investmentLabel: courseContent?.sidebar?.investmentLabel ?? "Valor de referência por participante",
+    installmentText: courseContent?.sidebar?.installmentText ?? "Condições comerciais informadas após a análise da pré-inscrição.",
     nextClassesLabel: courseContent?.sidebar?.nextClassesLabel ?? "Próximas turmas",
     nextClassesEmptyLabel: courseContent?.sidebar?.nextClassesEmptyLabel ?? "Sem turmas abertas no momento.",
-    guaranteeTitle: courseContent?.sidebar?.guaranteeTitle ?? "Garantia de satisfação.",
-    guaranteeText: courseContent?.sidebar?.guaranteeText ?? "Cancele até 7 dias antes do início e receba 100% do valor de volta, sem burocracia.",
+    guaranteeTitle: courseContent?.sidebar?.guaranteeTitle ?? "Solicitação sujeita a análise.",
+    guaranteeText: courseContent?.sidebar?.guaranteeText ?? "A pré-inscrição não confirma vaga nem gera cobrança.",
     supportTitle: courseContent?.sidebar?.supportTitle ?? "Dúvidas sobre a inscrição?",
     supportText: courseContent?.sidebar?.supportText ?? "Fale com nossa equipe comercial para validar turma, proposta e formato ideal.",
     supportCtaLabel: courseContent?.sidebar?.supportCtaLabel ?? "Chamar no WhatsApp",
@@ -765,7 +765,7 @@ export function CourseDetailPage() {
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
                             <ShieldCheck className="h-3.5 w-3.5" />
                           </span>
-                          <span>Material de apoio e confirmação por e-mail após a inscrição.</span>
+                          <span>A pré-inscrição será analisada antes de qualquer confirmação de vaga.</span>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
@@ -777,7 +777,7 @@ export function CourseDetailPage() {
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
                             <ShieldCheck className="h-3.5 w-3.5" />
                           </span>
-                          <span>Escolha da turma preservada no checkout guiado.</span>
+                          <span>Escolha da turma preservada no envio da pré-inscrição.</span>
                         </div>
                       </div>
                     </div>

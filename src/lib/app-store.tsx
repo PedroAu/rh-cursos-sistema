@@ -34,6 +34,7 @@ import {
   isExplicitPublicTestBaselineEnabled
 } from "@/lib/supabase/rh-cursos-api";
 import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
+import { enrollmentReceiptSchema } from "@/lib/validation";
 import type {
   BlogPost,
   Course,
@@ -867,43 +868,45 @@ export function AppStoreProvider({
   }, []);
 
   const createEnrollment = useCallback<AppStoreValue["createEnrollment"]>(async (payload) => {
-    let resolvedClassId = payload.classId;
+    let response: Response;
 
     if (shouldUseLocalEnrollmentProxy()) {
-      const response = await fetch("/api/enrollments", {
+      response = await fetch("/api/enrollments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
-      }
-
-      const responsePayload = (await response.json().catch(() => null)) as { classId?: string } | null;
-      resolvedClassId = responsePayload?.classId ?? resolvedClassId;
     } else if (isFunctionsConfigured) {
-      const response = await invokeFunction("enrollments", { body: payload });
-
-      if (!response.ok) {
-        throw new Error(await getFunctionErrorMessage(response, "Não foi possível registrar a inscrição."));
-      }
-
-      const responsePayload = (await response.json().catch(() => null)) as { classId?: string } | null;
-      resolvedClassId = responsePayload?.classId ?? resolvedClassId;
+      response = await invokeFunction("enrollments", { body: payload });
+    } else {
+      throw new Error("Pré-inscrição indisponível no momento.");
     }
 
-    const enrollmentId = `enrollment-${Date.now()}`;
-    const studentId = `student-sim-${Date.now()}`;
+    if (!response.ok) {
+      throw new Error(await getFunctionErrorMessage(response, "Não foi possível enviar a pré-inscrição."));
+    }
+
+    const responsePayload = await response.json().catch(() => null);
+    const parsedReceipt = enrollmentReceiptSchema.safeParse(responsePayload);
+    if (!parsedReceipt.success) {
+      throw new Error("Resposta inválida ao enviar a pré-inscrição.");
+    }
+
+    const receipt = {
+      enrollmentId: parsedReceipt.data.enrollmentId,
+      classId: parsedReceipt.data.classId,
+    };
+    const createdAt = new Date().toISOString();
 
     setState((current) => {
       const enrollments = [
         {
-          id: enrollmentId,
-          createdAt: new Date().toISOString(),
-          status: "Confirmada" as const,
+          id: receipt.enrollmentId,
+          createdAt,
+          status: "Pendente" as const,
           ...payload,
-          classId: resolvedClassId
+          classId: receipt.classId,
+          paymentMethod: null,
         },
         ...current.enrollments
       ];
@@ -911,41 +914,12 @@ export function AppStoreProvider({
       return {
         ...current,
         enrollments,
-        students: [
-          {
-            id: studentId,
-            name: payload.studentName,
-            email: payload.email,
-            phone: payload.phone,
-            cpf: payload.cpf,
-            organization: payload.organization,
-            jobTitle: payload.jobTitle,
-            courseId: payload.courseId,
-            classId: resolvedClassId,
-            enrollmentStatus: "Confirmada",
-            certificateIssued: false,
-            enrolledAt: new Date().toISOString(),
-            paymentMethod: payload.paymentMethod
-          },
-          ...current.students
-        ],
-        classes: current.classes.map((item) => {
-          if (item.id !== resolvedClassId) return item;
-          const capacity = deriveClassCapacity(item, enrollments);
-          return {
-            ...item,
-            ...capacity,
-            status: capacity.availableSeats <= 5 ? "Poucas vagas" : item.status
-          };
-        })
+        students: current.students,
+        classes: current.classes,
       };
     });
 
-    toast.success(
-      isFunctionsConfigured
-        ? "Inscrição realizada com sucesso."
-        : "Inscrição registrada apenas nesta sessão de desenvolvimento."
-    );
+    return receipt;
   }, []);
 
   const createStudent = useCallback<AppStoreValue["createStudent"]>(async (payload) => {

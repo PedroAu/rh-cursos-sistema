@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+In Progress
 
 ## Executor Assignment
 
@@ -169,56 +169,56 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Congelar o comportamento inseguro com testes test-first** (AC: 1–4, 6–11)
-  - [ ] Provar que cartão/CVV/cupom/parcelamento e alegações financeiras existem antes da correção.
-  - [ ] Adicionar teste do payload público rejeitando chaves financeiras desconhecidas.
-  - [ ] Adicionar teste do store para ID real, pending, envelope inválido e ausência de fallback local.
-  - [ ] Adicionar teste da página de sucesso direta/corrompida/recibo válido.
-  - [ ] Atualizar Playwright para inspecionar request e persistência, não pagamento simulado.
+- [x] **Task 1 — Congelar o comportamento inseguro com testes test-first** (AC: 1–4, 6–11)
+  - [x] Provar que cartão/CVV/cupom/parcelamento e alegações financeiras existem antes da correção.
+  - [x] Adicionar teste do payload público rejeitando chaves financeiras desconhecidas.
+  - [x] Adicionar teste do store para ID real, pending, envelope inválido e ausência de fallback local.
+  - [x] Adicionar teste da página de sucesso direta/corrompida/recibo válido.
+  - [x] Atualizar Playwright para inspecionar request e persistência, não pagamento simulado.
 
-- [ ] **Task 2 — Criar contrato público mínimo de pré-inscrição** (AC: 4, 6, 7, 11)
-  - [ ] Separar `PublicEnrollmentPayload` do contrato administrativo.
-  - [ ] Remover `paymentMethod` dos schemas público e Edge; tornar objetos strict.
-  - [ ] Validar recibo `{ ok, enrollmentId, classId }` nas duas respostas.
-  - [ ] Preservar mensagens seguras para 400/409/429/500 e envelope inválido.
+- [x] **Task 2 — Criar contrato público mínimo de pré-inscrição** (AC: 4, 6, 7, 11)
+  - [x] Separar `PublicEnrollmentPayload` do contrato administrativo.
+  - [x] Remover `paymentMethod` dos schemas público e Edge; tornar objetos strict.
+  - [x] Validar recibo `{ ok, enrollmentId, classId }` nas duas respostas.
+  - [x] Preservar mensagens seguras para 400/409/429/500 e envelope inválido.
 
-- [ ] **Task 3 — Persistir estado pendente sem forma de pagamento** (AC: 5, 12)
-  - [ ] `@data-engineer` criar nova migration, sem editar as 24 existentes.
-  - [ ] Fazer a RPC inserir status de inscrição/pagamento pendentes e forma nula.
-  - [ ] Manter confirmação opaca e invariantes existentes de turma/duplicidade.
-  - [ ] Adicionar pgTAP para status, forma nula, recibo e erro duplicado.
-  - [ ] Executar reset completo e segunda aplicação convergente.
+- [x] **Task 3 — Persistir estado pendente sem forma de pagamento** (AC: 5, 12)
+  - [x] `@data-engineer` criar nova migration, sem editar as 24 existentes.
+  - [x] Fazer a RPC inserir status de inscrição/pagamento pendentes e forma nula.
+  - [x] Manter confirmação opaca e invariantes existentes de turma/duplicidade.
+  - [x] Adicionar pgTAP para status, forma nula, recibo e erro duplicado.
+  - [x] Executar reset completo e segunda aplicação convergente.
 
-- [ ] **Task 4 — Corrigir route handler e Edge Function** (AC: 4–7, 11)
-  - [ ] Passar `p_forma_pagamento: null` após validação estrita.
-  - [ ] Nunca registrar payload, PII ou recibo completo em logs de erro.
-  - [ ] Retornar o mesmo contrato canônico nas duas entradas.
-  - [ ] Cobrir ausência de RPC, erro conhecido, envelope válido e inválido.
+- [x] **Task 4 — Corrigir route handler e Edge Function** (AC: 4–7, 11)
+  - [x] Passar `p_forma_pagamento: null` após validação estrita.
+  - [x] Nunca registrar payload, PII ou recibo completo em logs de erro.
+  - [x] Retornar o mesmo contrato canônico nas duas entradas.
+  - [x] Cobrir ausência de RPC, erro conhecido, envelope válido e inválido.
 
-- [ ] **Task 5 — Converter a interface em pré-inscrição** (AC: 1–3, 11)
-  - [ ] Remover tipos, estado, formatadores, componentes e ícones financeiros.
-  - [ ] Remover etapa de pagamento e campos de cobrança/cupom.
-  - [ ] Manter seleção de turma e dados mínimos da pessoa/organização.
-  - [ ] Reescrever CTA, stepper, resumo e avisos como solicitação pendente.
-  - [ ] Preservar valores e turma em erro/retry.
+- [x] **Task 5 — Converter a interface em pré-inscrição** (AC: 1–3, 11)
+  - [x] Remover tipos, estado, formatadores, componentes e ícones financeiros.
+  - [x] Remover etapa de pagamento e campos de cobrança/cupom.
+  - [x] Manter seleção de turma e dados mínimos da pessoa/organização.
+  - [x] Reescrever CTA, stepper, resumo e avisos como solicitação pendente.
+  - [x] Preservar valores e turma em erro/retry.
 
-- [ ] **Task 6 — Tornar store e sucesso dependentes do recibo** (AC: 6–10)
-  - [ ] Fazer `createEnrollment` retornar recibo canônico e falhar sem backend.
-  - [ ] Mutar estado somente após recibo, com ID real/status Pendente.
-  - [ ] Não contabilizar pré-inscrição pendente como vaga confirmada no cliente.
-  - [ ] Navegar sem query PII e armazenar somente recibo mínimo validado.
-  - [ ] Remover fallback da página de sucesso para o primeiro item do store.
+- [x] **Task 6 — Tornar store e sucesso dependentes do recibo** (AC: 6–10)
+  - [x] Fazer `createEnrollment` retornar recibo canônico e falhar sem backend.
+  - [x] Mutar estado somente após recibo, com ID real/status Pendente.
+  - [x] Não contabilizar pré-inscrição pendente como vaga confirmada no cliente.
+  - [x] Navegar sem query PII e armazenar somente recibo mínimo validado.
+  - [x] Remover fallback da página de sucesso para o primeiro item do store.
 
-- [ ] **Task 7 — Reconciliar consumidores e contratos** (AC: 4, 8–12)
-  - [ ] Atualizar testes/componentes que esperam `paymentMethod` no payload público.
-  - [ ] Preservar formulário administrativo e relatórios legítimos fora da jornada pública.
-  - [ ] Atualizar checkout/public journeys e quaisquer fixtures diretamente afetadas.
-  - [ ] Buscar usos públicos remanescentes de cartão/CVV/Pix/Boleto/cupom/compra.
+- [x] **Task 7 — Reconciliar consumidores e contratos** (AC: 4, 8–12)
+  - [x] Atualizar testes/componentes que esperam `paymentMethod` no payload público.
+  - [x] Preservar formulário administrativo e relatórios legítimos fora da jornada pública.
+  - [x] Atualizar checkout/public journeys e quaisquer fixtures diretamente afetadas.
+  - [x] Buscar usos públicos remanescentes de cartão/CVV/Pix/Boleto/cupom/compra.
 
 - [ ] **Task 8 — Executar gates e registrar evidências** (AC: 12)
-  - [ ] Executar testes direcionados test-first e suíte unitária completa.
-  - [ ] Executar `npm run test:db` e convergência local.
-  - [ ] Executar lint, typecheck, `npm test` e build.
+  - [x] Executar testes direcionados test-first e suíte unitária completa.
+  - [x] Executar `npm run test:db` e convergência local.
+  - [x] Executar lint, typecheck, `npm test` e build.
   - [ ] Executar CodeRabbit sem findings CRITICAL/HIGH.
   - [ ] Atualizar File List/Dev Agent Record e solicitar gate independente `@qa`.
 
@@ -330,6 +330,8 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 |---|---:|---|---|
 | 2026-07-14 | 0.1 | Draft criado a partir de FND-05/FR-05 e do diagnóstico real de coleta financeira, payload público, RPC Confirmada e recibo ignorado. | @sm (River) |
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Doze ACs testáveis cobrem zero coleta/alegação financeira, payload estrito, migration pending/null, recibo canônico, fail-closed, página de sucesso vinculada à tentativa, URL sem PII e gates integrais. Escopo separa explicitamente gateway, atomicidade, identidade por e-mail e hardening definitivo; `@dev` e `@data-engineer` respeitam suas autoridades. REC-001 permanece bloqueador de merge/publicação, sem impedir implementação local isolada. Bloqueadores documentais: 0. | @po (Pax) |
+| 2026-07-14 | 1.1 | Ready → In Progress; execução test-first iniciada em ambiente local isolado. Os `devLoadAlwaysFiles` configurados no AIOX e seus fallbacks não existem, portanto foram usadas as referências reais listadas na story. | @dev (Dex) |
+| 2026-07-14 | 1.2 | Implementação local concluída: checkout financeiro removido, contrato público estrito, recibo canônico/fail-closed, migration pending/null, conteúdo editorial saneado e gates técnicos verdes. CodeRabbit e gate independente permanecem abertos. | @dev (Dex) + @data-engineer (Dara) |
 
 ## File List
 
@@ -337,20 +339,37 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 
 - `docs/stories/2026-07-14-rec-301-converter-checkout-pre-inscricao.md`
 
-### Planejado para implementação
+### Modificado
 
-- `src/views/public/CourseCheckout.tsx`
-- `src/views/public/EnrollmentSuccess.tsx`
+- `app/api/enrollments/route.ts`
+- `app/cursos/[slug]/checkout/page.tsx`
+- `src/components/common/faq-accordion.tsx`
+- `src/lib/app-store.tsx`
 - `src/lib/contexts/store-types.ts`
 - `src/lib/contexts/student-context.tsx`
-- `src/lib/app-store.tsx`
+- `src/lib/supabase/rh-cursos-api.ts`
 - `src/lib/validation.ts`
-- `app/api/enrollments/route.ts`
+- `src/types/index.ts`
+- `src/views/public/CourseCheckout.tsx`
+- `src/views/public/CourseDetail.tsx`
+- `src/views/public/EnrollmentSuccess.tsx`
 - `supabase/functions/_shared/validation.ts`
 - `supabase/functions/enrollments/index.ts`
-- `supabase/migrations/<timestamp>_public_pre_enrollment_pending.sql`
-- `supabase/tests/database/<rec-301-pre-enrollment>.test.sql`
-- testes Vitest e Playwright diretamente afetados
+- `src/__tests__/lib/app-store.test.ts`
+- `src/__tests__/lib/core-utilities.test.ts`
+- `src/__tests__/lib/validation.test.ts`
+- `tests/api-contract.spec.ts`
+- `tests/checkout.e2e.spec.ts`
+- `tests/public-journeys.spec.ts`
+- `tests/ui-governance.spec.ts`
+
+### Criado
+
+- `src/__tests__/lib/public-pre-enrollment-contract.test.ts`
+- `src/__tests__/views/public/enrollment-success.test.tsx`
+- `src/__tests__/views/public/pre-enrollment.test.tsx`
+- `supabase/migrations/20260714231000_public_pre_enrollment_pending.sql`
+- `supabase/tests/database/rec-301-pre-enrollment.test.sql`
 
 ### Referências somente leitura
 
@@ -363,15 +382,25 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 
 ### Agent Model Used
 
-A preencher por `@dev`/`@data-engineer`.
+GPT-5 Codex — personas `@dev` (Dex) e `@data-engineer` (Dara).
 
 ### Debug Log References
 
-A preencher após testes test-first, sem PII.
+- Test-first: contrato estático REC-301 iniciou com 5/5 falhas contra o comportamento financeiro antigo e passou após a implementação.
+- Banco test-first: pgTAP iniciou com estado `Confirmada` onde `Pendente` era esperado; a migration corrigiu o resultado sem editar migrations anteriores.
+- Revisão manual encontrou e fechou dois gaps adicionais: recibo com chaves extras/PII e aluno local com ID sintético.
+- A suíte integral revelou dois flakes preexistentes do harness: clique antes da hidratação na jornada pública e header sticky em posição variável no screenshot do contato. Ambos foram estabilizados sem relaxar assertions nem atualizar snapshots.
 
 ### Completion Notes
 
-A preencher pelo executor.
+- Jornada pública não coleta cartão, CVV, validade, parcela, Pix, boleto, cupom ou forma de pagamento; preço é somente referência.
+- Payload público e Edge são strict, omitem `paymentMethod` e rejeitam chaves financeiras com 400 antes da RPC.
+- RPC forward-only persiste inscrição/pagamento `Pendente`, forma nula e referência opaca; parâmetro financeiro legado é ignorado e testado.
+- Store falha fechado sem backend/envelope canônico, usa somente o ID persistido e não cria aluno sintético nem altera capacidade local.
+- Página de sucesso aceita exatamente `enrollmentId`, `courseId` e `classId`; acesso direto, recibo corrompido ou com PII extra não confirma sucesso.
+- Conteúdo público persistido/fallbacks tiveram checkout, parcelamento e garantia financeira simulada removidos.
+- Evidência final: lint PASS; typecheck PASS; 51 arquivos/556 unitários PASS; 25 migrations/34 pgTAP + concorrência PASS; duas reaplicações `up to date`; `npm test` com build de 29 páginas e 174/174 Playwright PASS; `npm run build` PASS.
+- Nenhuma migration, Functions ou deploy foi executado remotamente; REC-001 continua bloqueador operacional.
 
 ## QA Results
 

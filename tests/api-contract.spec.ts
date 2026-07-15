@@ -34,6 +34,22 @@ function routeHeaders(ip: string) {
   };
 }
 
+function publicEnrollmentPayload(extra: Record<string, unknown> = {}) {
+  return {
+    studentName: "Pessoa Contrato",
+    email: "pre-enrollment-contract@rhcursos.test",
+    cpf: "123.456.789-10",
+    phone: "(61) 99999-0001",
+    courseId: "course-contract",
+    classId: "class-contract",
+    organization: "",
+    jobTitle: "",
+    enrollmentType: "Pessoa física",
+    notes: "Contrato sintético",
+    ...extra,
+  };
+}
+
 async function edgeRequest(
   path: string,
   options: {
@@ -204,6 +220,26 @@ test.describe("contratos HTTP — edge functions", () => {
     });
     expect(enrollmentInvalid.status()).toBe(400);
     await expect(enrollmentInvalid.json()).resolves.toMatchObject({
+      ok: false,
+      error: "Validation failed",
+    });
+
+    const routeFinancialField = await request.post("/api/enrollments", {
+      data: publicEnrollmentPayload({ paymentMethod: "Pix" }),
+      headers: routeHeaders(createUniqueIp("next-enrollments-financial-field")),
+    });
+    expect(routeFinancialField.status()).toBe(400);
+    await expect(routeFinancialField.json()).resolves.toMatchObject({
+      ok: false,
+      error: "Validation failed",
+    });
+
+    const edgeFinancialField = await request.post(`${functionsBaseUrl}/enrollments`, {
+      data: publicEnrollmentPayload({ cardCvv: "synthetic-value" }),
+      headers: edgeHeaders(createUniqueIp("edge-enrollments-financial-field")),
+    });
+    expect(edgeFinancialField.status()).toBe(400);
+    await expect(edgeFinancialField.json()).resolves.toMatchObject({
       ok: false,
       error: "Validation failed",
     });

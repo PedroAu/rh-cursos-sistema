@@ -61,15 +61,20 @@ export const enrollmentSchema = z.object({
     .default("")
     .transform((val) => val.trim()),
   enrollmentType: z.enum(["Pessoa física", "Empresa", "Órgão público"]).default("Pessoa física"),
-  paymentMethod: z.enum(["Pix", "Cartão", "Boleto", "Empenho"]).default("Pix"),
   notes: z
     .string()
     .max(500, "Notas não podem ter mais de 500 caracteres")
     .default("")
     .transform((val) => val.trim()),
-});
+}).strict();
 
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
+
+export const enrollmentReceiptSchema = z.object({
+  ok: z.literal(true),
+  enrollmentId: resourceIdSchema,
+  classId: resourceIdSchema,
+}).strict();
 
 // User profile validation
 export const userProfileSchema = z.object({

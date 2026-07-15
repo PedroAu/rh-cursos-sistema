@@ -164,7 +164,7 @@ export type Student = {
   enrollmentStatus: EnrollmentStatus;
   certificateIssued: boolean;
   enrolledAt: string;
-  paymentMethod: "Pix" | "Cartão" | "Boleto" | "Empenho";
+  paymentMethod: "Pix" | "Cartão" | "Boleto" | "Empenho" | null;
 };
 
 export type Instructor = {
@@ -246,7 +246,7 @@ export type Enrollment = {
   organization: string;
   jobTitle: string;
   enrollmentType: "Pessoa física" | "Empresa" | "Órgão público";
-  paymentMethod: "Pix" | "Cartão" | "Boleto" | "Empenho";
+  paymentMethod: "Pix" | "Cartão" | "Boleto" | "Empenho" | null;
   courseId: string;
   classId: string;
   status: EnrollmentStatus;

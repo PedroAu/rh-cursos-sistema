@@ -7,7 +7,7 @@ import {
 } from "@/lib/supabase/rh-cursos-api";
 
 // Renderização dinâmica: mesmo racional de app/cursos/[slug]/page.tsx
-// (Story 16.1, AC7) — o checkout precisa refletir turmas/vagas reais a cada
+// (Story 16.1, AC7) — a pré-inscrição precisa refletir turmas/vagas reais a cada
 // request, sem páginas estáticas "assadas" em build.
 export const dynamic = "force-dynamic";
 
@@ -28,21 +28,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const courses = await getCourses();
   if (courses === null) {
     return {
-      title: "Checkout temporariamente indisponível | RH Cursos",
-      description: "Não foi possível carregar este checkout no momento.",
+      title: "Pré-inscrição temporariamente indisponível | RH Cursos",
+      description: "Não foi possível carregar esta pré-inscrição no momento.",
     };
   }
   const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     return {
-      title: "Checkout não encontrado | RH Cursos",
+      title: "Pré-inscrição não encontrada | RH Cursos",
     };
   }
 
   return {
-    title: `Checkout • ${course.title} | RH Cursos`,
-    description: `Finalize a inscrição para ${course.title}.`,
+    title: `Pré-inscrição • ${course.title} | RH Cursos`,
+    description: `Envie uma solicitação de pré-inscrição para ${course.title}.`,
   };
 }
 
@@ -53,7 +53,7 @@ export default async function Page() {
   ]);
 
   if (catalogState.status === "unavailable") {
-    console.error("Falha ao carregar catálogo público na rota de checkout:", catalogState.error);
+    console.error("Falha ao carregar catálogo público na rota de pré-inscrição:", catalogState.error);
     throw catalogState.error;
   }
 

@@ -97,7 +97,7 @@ Deno.serve(async (request) => {
       p_tipo_aluno: toTipoAluno(data.enrollmentType),
       p_turma_id: resolvedClassId,
       p_tipo_inscricao: data.enrollmentType,
-      p_forma_pagamento: data.paymentMethod === "Cartão" ? "Cartao" : data.paymentMethod,
+      p_forma_pagamento: null,
       p_observacoes: data.notes,
     });
 

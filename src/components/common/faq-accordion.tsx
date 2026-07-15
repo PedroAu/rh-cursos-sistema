@@ -4,7 +4,7 @@ const items = [
   {
     value: "item-1",
     question: "Como faço minha inscrição?",
-    answer: "Escolha o curso, selecione a turma, preencha os dados e conclua o checkout simulado em poucos passos."
+    answer: "Escolha o curso, selecione a turma e envie a pré-inscrição. A equipe analisará a solicitação antes de confirmar a vaga."
   },
   {
     value: "item-2",
@@ -18,8 +18,8 @@ const items = [
   },
   {
     value: "item-4",
-    question: "Quais formas de pagamento aparecem?",
-    answer: "Pix, cartão, boleto e empenho são apresentados de forma simulada para validar o fluxo comercial."
+    question: "O que acontece após a pré-inscrição?",
+    answer: "A equipe confere os dados e entra em contato para orientar os próximos passos e as condições comerciais aplicáveis."
   }
 ];
 

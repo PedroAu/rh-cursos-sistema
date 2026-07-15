@@ -35,7 +35,14 @@ export type AppState = {
 
 export type AppStoreInitialData = Partial<Omit<AppState, "currentSession">>;
 
-export type EnrollmentPayload = Omit<Enrollment, "id" | "createdAt" | "status">;
+export type EnrollmentPayload = Omit<
+  Enrollment,
+  "id" | "createdAt" | "status" | "paymentMethod"
+>;
+export type EnrollmentReceipt = {
+  enrollmentId: string;
+  classId: string;
+};
 export type LeadPayload = Omit<Lead, "id" | "createdAt" | "status"> & {
   status?: Lead["status"];
 };

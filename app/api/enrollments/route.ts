@@ -15,7 +15,7 @@ function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Se
 
 export async function POST(request: Request) {
   if (!isSupabaseServerConfigured) {
-    return NextResponse.json({ ok: false, error: "Checkout indisponivel." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Pre-inscricao indisponivel." }, { status: 503 });
   }
 
   const rate = await checkRateLimit(`enrollment:${clientIp(request)}`, rateLimitConfigs.enrollment);
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
   const supabase = createSupabaseServerClient();
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: "Checkout indisponivel." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Pre-inscricao indisponivel." }, { status: 503 });
   }
 
   const data = parsed.data;
@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       p_tipo_aluno: toTipoAluno(data.enrollmentType),
       p_turma_id: resolvedClassId,
       p_tipo_inscricao: data.enrollmentType,
-      p_forma_pagamento: data.paymentMethod === "Cartão" ? "Cartao" : data.paymentMethod,
+      p_forma_pagamento: null,
       p_observacoes: data.notes,
     });
 

@@ -48,12 +48,11 @@ export const enrollmentSchema = z.object({
   enrollmentType: z
     .enum(["Pessoa física", "Empresa", "Órgão público"])
     .default("Pessoa física"),
-  paymentMethod: z.enum(["Pix", "Cartão", "Boleto", "Empenho"]).default("Pix"),
   notes: z
     .string()
     .max(500, "Notas não podem ter mais de 500 caracteres")
     .default("")
     .transform((val) => val.trim()),
-});
+}).strict();
 
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;

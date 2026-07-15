@@ -26,7 +26,6 @@ describe('Validation Schemas', () => {
         organization: 'Tech Corp',
         jobTitle: 'Developer',
         enrollmentType: 'Pessoa física' as const,
-        paymentMethod: 'Pix' as const,
         notes: 'Some notes',
       };
 
@@ -37,6 +36,23 @@ describe('Validation Schemas', () => {
         expect(result.data.studentName).toBe('João Silva');
       }
     });
+
+    it.each(['paymentMethod', 'cardNumber', 'cardCvv', 'installments', 'couponCode'])(
+      'should reject the unexpected financial field %s',
+      (field) => {
+        const result = enrollmentSchema.safeParse({
+          studentName: 'João Silva',
+          email: 'joao@example.com',
+          cpf: '123.456.789-10',
+          phone: '(61) 99999-9999',
+          courseId: 'course-123',
+          classId: 'class-456',
+          [field]: 'synthetic-value',
+        });
+
+        expect(result.success).toBe(false);
+      },
+    );
 
     it('should trim student name', () => {
       const data = {

@@ -157,7 +157,19 @@ test.describe("epica 6 — governanca de design", () => {
     test.skip(shouldSkipVisualBaselines, "Baselines visuais são mantidos fora do runner CI/Linux.");
     await gotoStable(page, "/contato");
 
-    await expect(page.getByTestId("ui-contact-form")).toHaveScreenshot("contact-form-governance.png");
+    const contactForm = page.getByTestId("ui-contact-form");
+    await page.evaluate(() => {
+      const spacer = document.createElement("div");
+      spacer.dataset.visualTestSpacer = "contact-form";
+      spacer.style.height = `${window.innerHeight}px`;
+      spacer.setAttribute("aria-hidden", "true");
+      document.body.appendChild(spacer);
+    });
+    await contactForm.evaluate((element) => {
+      const top = element.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo(0, top);
+    });
+    await expect(contactForm).toHaveScreenshot("contact-form-governance.png");
   });
 
   test("card de login mantém baseline visual", async ({ page }) => {

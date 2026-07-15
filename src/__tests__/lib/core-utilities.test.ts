@@ -299,7 +299,7 @@ describe('Core Utilities Coverage - Part 2', () => {
       expect(result.success).toBe(false);
     });
 
-    it('validates payment method enum', () => {
+    it('rejects payment methods from the public pre-enrollment contract', () => {
       const validMethods = ['Pix', 'Cartão', 'Boleto', 'Empenho'];
       validMethods.forEach((method) => {
         const result = enrollmentSchema.safeParse({
@@ -311,7 +311,7 @@ describe('Core Utilities Coverage - Part 2', () => {
           classId: 'class-1',
           paymentMethod: method as any,
         });
-        expect(result.success).toBe(true);
+        expect(result.success).toBe(false);
       });
     });
   });
@@ -329,7 +329,7 @@ describe('Core Utilities Coverage - Part 2', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.enrollmentType).toBe('Pessoa física');
-        expect(result.data.paymentMethod).toBe('Pix');
+        expect(result.data).not.toHaveProperty('paymentMethod');
         expect(result.data.organization).toBe('');
         expect(result.data.jobTitle).toBe('');
         expect(result.data.notes).toBe('');

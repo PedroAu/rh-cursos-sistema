@@ -295,7 +295,9 @@ function renderStore(
   };
 }
 
-function buildEnrollmentPayload(store: Store): Omit<Enrollment, "id" | "createdAt" | "status"> {
+function buildEnrollmentPayload(
+  store: Store,
+): Omit<Enrollment, "id" | "createdAt" | "status" | "paymentMethod"> {
   const targetClass = store.classes.find((item) => item.availableSeats > 0);
   const course = store.courses.find((item) => item.id === targetClass?.courseId) ?? store.courses[0];
 
@@ -307,7 +309,6 @@ function buildEnrollmentPayload(store: Store): Omit<Enrollment, "id" | "createdA
     organization: "Empresa Teste",
     jobTitle: "Analista",
     enrollmentType: "Pessoa física",
-    paymentMethod: "Pix",
     courseId: course?.id ?? "course-1",
     classId: targetClass?.id ?? "class-1",
     notes: "Inscrição unitária",
@@ -982,7 +983,7 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.fetchPublicBlogPosts).not.toHaveBeenCalled();
   });
 
-  it("creates enrollments and updates the related class capacity from provider state", async () => {
+  it("creates pending pre-enrollments from the canonical receipt without changing capacity", async () => {
     const harness = renderStore();
     const initialCourseCount = harness.store.courses.length;
     await act(async () => {
@@ -1002,11 +1003,20 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(harness.store.classes).toHaveLength(initialClassCount + 1));
 
     const initialEnrollmentCount = harness.store.enrollments.length;
+    const studentsBefore = harness.store.students;
     const payload = buildEnrollmentPayload(harness.store);
     const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
+    mocks.toastSuccess.mockClear();
+    mocks.fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: true, enrollmentId: "enrollment-db-public-1", classId: payload.classId }),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      ),
+    );
 
+    let receipt: Awaited<ReturnType<Store["createEnrollment"]>> | undefined;
     await act(async () => {
-      await harness.store.createEnrollment(payload);
+      receipt = await harness.store.createEnrollment(payload);
     });
 
     const classAfter = harness.store.classes.find((item) => item.id === payload.classId);
@@ -1014,18 +1024,17 @@ describe("AppStoreProvider and hooks", () => {
     expect(screen.getByTestId("enrollment-count")).toHaveTextContent(String(initialEnrollmentCount + 1));
     expect(harness.store.enrollments[0]).toMatchObject({
       ...payload,
-      id: "enrollment-1782129600000",
-      status: "Confirmada",
+      id: "enrollment-db-public-1",
+      status: "Pendente",
+      paymentMethod: null,
       createdAt: "2026-06-22T12:00:00.000Z",
     });
-    expect(harness.store.students[0]).toMatchObject({
-      name: payload.studentName,
-      email: payload.email,
-      classId: payload.classId,
-      enrollmentStatus: "Confirmada",
-    });
-    expect(classAfter?.availableSeats).toBeLessThanOrEqual(classBefore?.availableSeats ?? Number.POSITIVE_INFINITY);
-    expect(classAfter?.filledSeats).toBeGreaterThanOrEqual(classBefore?.filledSeats ?? 0);
+    expect(harness.store.students).toEqual(studentsBefore);
+    expect(receipt).toEqual({ enrollmentId: "enrollment-db-public-1", classId: payload.classId });
+    expect(classAfter).toEqual(classBefore);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    const requestBody = JSON.parse(String(mocks.fetchMock.mock.calls.at(-1)?.[1]?.body));
+    expect(requestBody).not.toHaveProperty("paymentMethod");
   });
 
   it("deletes enrollments through the provider and recalculates the class capacity from remaining rows", async () => {
@@ -1045,6 +1054,12 @@ describe("AppStoreProvider and hooks", () => {
     const initialClassCount = harness.store.classes.length;
     const payload = buildEnrollmentPayload(harness.store);
     const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
+    mocks.fetchMock.mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({ ok: true, enrollmentId: "enrollment-db-public-2", classId: payload.classId }),
+        { status: 201, headers: { "Content-Type": "application/json" } },
+      ),
+    );
 
     await act(async () => {
       await harness.store.createEnrollment(payload);
@@ -1113,7 +1128,7 @@ describe("AppStoreProvider and hooks", () => {
     );
 
     await act(async () => {
-      await harness.store.createEnrollmentAdmin(payload);
+      await harness.store.createEnrollmentAdmin({ ...payload, paymentMethod: "Pix" });
     });
 
     expect(harness.store.enrollments[0]?.id).toBe("enrollment-db-1");

@@ -116,8 +116,8 @@ test.describe("epica 4 — jornadas publicas", () => {
     }
   });
 
-  test("checkout guiado valida campos e conclui inscrição com resumo", async ({ page }) => {
-    test.skip(!hasRealIntegrationEnv(), "Jornada pública com checkout real requer Supabase real.");
+  test("pré-inscrição valida campos e confirma somente após persistência", async ({ page }) => {
+    test.skip(!hasRealIntegrationEnv(), "Jornada pública com pré-inscrição real requer Supabase real.");
     assertSafeWritableIntegrationEnv();
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
@@ -128,7 +128,9 @@ test.describe("epica 4 — jornadas publicas", () => {
     try {
       await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
       await expect(page).toHaveURL(/\/checkout/);
-      await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
+      await page.waitForLoadState("networkidle");
+      await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
+      await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 
       await expect(page.getByText("Nome deve ter no mínimo 3 caracteres.")).toBeVisible();
       await expect(page.getByText("Informe um e-mail válido.")).toBeVisible();
@@ -137,18 +139,16 @@ test.describe("epica 4 — jornadas publicas", () => {
       await page.getByLabel("E-mail").fill(enrollmentEmail);
       await page.getByLabel("Telefone").fill("61999998888");
       await page.getByLabel("CPF").fill(enrollmentCpf);
-      await page.getByRole("button", { name: "Continuar para pagamento →" }).click();
-
-      await expect(page.getByText("Forma de pagamento")).toBeVisible();
-      await expect(page.getByText("Resumo do pedido")).toBeVisible();
-      await page.getByText("Li e aceito os termos de uso e a política de cancelamento").click();
-      await page.getByRole("radio", { name: "Pix" }).click();
-      await page.getByRole("button", { name: "Finalizar compra →" }).click();
+      await expect(page.getByText("Resumo da pré-inscrição")).toBeVisible();
+      await expect(page.getByText("valor de referência")).toBeVisible();
+      await page.getByText("Li e aceito os termos de uso e a política de privacidade.").click();
+      await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 
       await expect(page).toHaveURL(/\/inscricao-confirmada/);
-      await expect(page.getByText("Tudo pronto para a próxima etapa.")).toBeVisible();
-      await expect(page.getByText("Aluno", { exact: true })).toBeVisible();
-      await expect(page.getByText("Maria Oliveira", { exact: true })).toBeVisible();
+      await expect(page.getByText("Pré-inscrição recebida")).toBeVisible();
+      await expect(page.getByText("Sua solicitação está pendente de análise.")).toBeVisible();
+      await expect(page.getByText("Referência", { exact: true })).toBeVisible();
+      expect(page.url()).not.toContain(enrollmentEmail);
     } finally {
       await cleanupEnrollmentArtifacts(enrollmentEmail);
     }

@@ -23,7 +23,6 @@ import {
   mapInstructor,
   mapLead,
   mapTrainingPath,
-  toDbPaymentMethod,
   toDbStudentType,
   type AssessmentWithCourseRow,
   type BlogPostRow,
@@ -560,7 +559,9 @@ export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt
   return mapLead(row);
 }
 
-export async function createEnrollmentInSupabase(payload: Omit<Enrollment, "id" | "createdAt" | "status">) {
+export async function createEnrollmentInSupabase(
+  payload: Omit<Enrollment, "id" | "createdAt" | "status" | "paymentMethod">
+) {
   if (!supabase) return null;
 
   const client = supabase;
@@ -576,7 +577,7 @@ export async function createEnrollmentInSupabase(payload: Omit<Enrollment, "id" 
         p_tipo_aluno: toDbStudentType(payload.enrollmentType),
         p_turma_id: payload.classId,
         p_tipo_inscricao: payload.enrollmentType,
-        p_forma_pagamento: toDbPaymentMethod(payload.paymentMethod),
+        p_forma_pagamento: null,
         p_observacoes: payload.notes
       }),
     { label: "createEnrollment:registrar_inscricao_publica" }
