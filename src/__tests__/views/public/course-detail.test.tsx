@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { render, screen, waitFor } from "@/__tests__/utils";
 import { CourseDetailPage } from "@/views/public/CourseDetail";
@@ -198,5 +198,46 @@ describe("CourseDetailPage", () => {
       "href",
       "/falar-com-especialista"
     );
+  });
+
+  describe("prova social sem dado fabricado [Épica 17 · Story 17.2]", () => {
+    const originalCourse = mockStore.courses[0];
+    const originalTestimonials = mockStore.testimonials;
+
+    beforeEach(() => {
+      mocks.params = new URLSearchParams("");
+    });
+
+    afterEach(() => {
+      mockStore.courses = [originalCourse];
+      mockStore.testimonials = originalTestimonials;
+    });
+
+    it("não exibe depoimento fabricado quando não há override nem avaliação real vinculada ao curso", () => {
+      mockStore.testimonials = [];
+
+      render(<CourseDetailPage />);
+
+      expect(screen.queryByText("Mariana Ferreira")).not.toBeInTheDocument();
+      expect(screen.queryByText("Prefeitura de Campinas")).not.toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: /depoimento/i })).not.toBeInTheDocument();
+    });
+
+    it("oculta os chips de avaliação e de alunos quando o curso não tem métrica real", () => {
+      mockStore.courses = [{ ...originalCourse, rating: 0, studentsCount: 0 }];
+
+      render(<CourseDetailPage />);
+
+      expect(screen.queryByText(/Avaliação média/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/^\d+ alunos$/i)).not.toBeInTheDocument();
+      expect(screen.getByText("1 turmas abertas")).toBeInTheDocument();
+    });
+
+    it("descreve o chip de turmas como 'turmas abertas', nunca 'turmas ministradas'", () => {
+      render(<CourseDetailPage />);
+
+      expect(screen.queryByText(/turmas ministradas/i)).not.toBeInTheDocument();
+      expect(screen.getByText("1 turmas abertas")).toBeInTheDocument();
+    });
   });
 });

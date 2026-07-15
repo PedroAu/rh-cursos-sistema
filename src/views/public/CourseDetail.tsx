@@ -159,16 +159,6 @@ type CourseDetailContent = {
   heroSubtitle?: string | null;
 };
 
-const testimonialFallback: Testimonial = {
-  id: "testimonial-fallback-course-detail",
-  name: "Mariana Ferreira",
-  role: "Pregoeira",
-  organization: "Prefeitura de Campinas",
-  course: "Curso RH Cursos",
-  text: "Saí do curso com o checklist pronto para revisar nossos editais. Na semana seguinte já estávamos aplicando o novo fluxo de planejamento da contratação, sem retrabalho e com respaldo jurídico.",
-  rating: 5
-};
-
 function buildHighlightCards(course: Course, content?: CourseDetailContent) {
   const items =
     content?.highlights?.length ? content.highlights : course.benefits.length ? course.benefits.map((title, index) => ({
@@ -215,6 +205,8 @@ function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: 
   ];
 }
 
+// Sem depoimento real (override editorial ou avaliação vinculada ao curso),
+// a seção não é renderizada — nunca exibimos um depoimento fabricado (Story 17.2).
 function buildTestimonial(course: Course, testimonials: Testimonial[], content?: CourseDetailContent) {
   if (content?.testimonialOverride?.text) {
     return {
@@ -228,8 +220,7 @@ function buildTestimonial(course: Course, testimonials: Testimonial[], content?:
     } satisfies Testimonial;
   }
 
-  const testimonial = testimonials.find((item) => item.course === course.title);
-  return testimonial ?? testimonialFallback;
+  return testimonials.find((item) => item.course === course.title) ?? null;
 }
 
 export function CourseDetailPage() {
@@ -258,7 +249,7 @@ export function CourseDetailPage() {
   const openClassesCount = courseClasses.filter((item) => item.status !== "Encerrada").length;
   const highlightCards = course ? buildHighlightCards(course, courseContent).slice(0, 6) : [];
   const faqItems = course ? buildFaqItems(course, selectedClass, courseContent) : [];
-  const testimonial = course ? buildTestimonial(course, testimonials, courseContent) : testimonialFallback;
+  const testimonial = course ? buildTestimonial(course, testimonials, courseContent) : null;
 
   useEffect(() => {
     if (!courseClasses.length) {
@@ -561,56 +552,62 @@ export function CourseDetailPage() {
                       <div className="mt-5 flex flex-wrap gap-2">
                         <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
                           <UserRound className="h-4 w-4 text-tk-accent" />
-                          {courseClasses.length} turmas ministradas
+                          {courseClasses.length} turmas abertas
                         </span>
-                        <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                          <Star className="h-4 w-4 text-tk-accent" />
-                          {course.studentsCount.toLocaleString("pt-BR")} alunos
-                        </span>
-                        <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                          <ShieldCheck className="h-4 w-4 text-tk-accent" />
-                          Avaliação média {course.rating.toFixed(1)}/5
-                        </span>
+                        {course.studentsCount > 0 ? (
+                          <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
+                            <Star className="h-4 w-4 text-tk-accent" />
+                            {course.studentsCount.toLocaleString("pt-BR")} alunos
+                          </span>
+                        ) : null}
+                        {course.rating > 0 ? (
+                          <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
+                            <ShieldCheck className="h-4 w-4 text-tk-accent" />
+                            Avaliação média {course.rating.toFixed(1)}/5
+                          </span>
+                        ) : null}
                       </div>
                     </div>
                   </div>
                 </section>
 
-                <section
-                  aria-labelledby="depoimento"
-                  className="relative overflow-hidden rounded-[16px] border border-[var(--tk-cream-dark)] bg-[var(--tk-cream)] p-8"
-                >
-                  <div className="absolute -right-2 -top-3 text-[5rem] font-tk-display font-bold text-tk-brand/10">“</div>
-                  <div className="relative flex flex-col gap-5 md:flex-row md:items-center">
-                    <div className="flex-none">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.25)]">
-                        <div className="h-20 w-20 overflow-hidden rounded-full">
-                          <Image
-                            src={course.image}
-                            alt={course.title}
-                            width={80}
-                            height={80}
-                            className="h-full w-full object-cover"
-                          />
+                {testimonial ? (
+                  <section
+                    aria-labelledby="depoimento"
+                    className="relative overflow-hidden rounded-[16px] border border-[var(--tk-cream-dark)] bg-[var(--tk-cream)] p-8"
+                  >
+                    <div className="absolute -right-2 -top-3 text-[5rem] font-tk-display font-bold text-tk-brand/10">“</div>
+                    <div className="relative flex flex-col gap-5 md:flex-row md:items-center">
+                      <div className="flex-none">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-[0_8px_20px_-10px_rgba(0,0,0,0.25)]">
+                          <div className="h-20 w-20 overflow-hidden rounded-full">
+                            <Image
+                              src={course.image}
+                              alt={course.title}
+                              width={80}
+                              height={80}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-3 flex gap-1" aria-label={`Avaliação ${testimonial.rating} de 5`}>
+                          {Array.from({ length: testimonial.rating }).map((_, index) => (
+                            <Star key={`star-${index}`} aria-hidden="true" className="h-4 w-4 fill-[#e8a33d] text-[#e8a33d]" />
+                          ))}
+                        </div>
+                        <blockquote id="depoimento" className="font-tk-serif text-[1.05rem] font-normal leading-7 text-tk-ink">
+                          &ldquo;{testimonial.text}&rdquo;
+                        </blockquote>
+                        <div className="mt-4 text-sm font-semibold text-tk-ink">{testimonial.name}</div>
+                        <div className="text-caption text-tk-ink-muted">
+                          {testimonial.role} · {testimonial.organization}
                         </div>
                       </div>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-3 flex gap-1" aria-label={`Avaliação ${testimonial.rating} de 5`}>
-                        {Array.from({ length: testimonial.rating }).map((_, index) => (
-                          <Star key={`star-${index}`} aria-hidden="true" className="h-4 w-4 fill-[#e8a33d] text-[#e8a33d]" />
-                        ))}
-                      </div>
-                      <blockquote id="depoimento" className="font-tk-serif text-[1.05rem] font-normal leading-7 text-tk-ink">
-                        &ldquo;{testimonial.text}&rdquo;
-                      </blockquote>
-                      <div className="mt-4 text-sm font-semibold text-tk-ink">{testimonial.name}</div>
-                      <div className="text-caption text-tk-ink-muted">
-                        {testimonial.role} · {testimonial.organization}
-                      </div>
-                    </div>
-                  </div>
-                </section>
+                  </section>
+                ) : null}
 
                 <section aria-labelledby="faq" className="text-center">
                   <h2 id="faq" className="font-tk-display text-[2rem] font-bold tracking-[-0.02em] text-tk-ink">

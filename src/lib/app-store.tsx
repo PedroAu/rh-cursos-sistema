@@ -1210,7 +1210,7 @@ export function AppStoreProvider({
           modules: course.modules ?? [],
           instructorId: course.instructorId ?? snapshot.instructors[0]?.id ?? "inst-1",
           image: course.image ?? courseCoverByPath[resolvedPathId] ?? defaultCourseCover,
-          rating: course.rating ?? 4.8,
+          rating: course.rating ?? 0,
           studentsCount: course.studentsCount ?? 0,
           status: course.status ?? "Ativo",
           featured: course.featured ?? false,
