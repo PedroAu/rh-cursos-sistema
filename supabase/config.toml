@@ -396,7 +396,7 @@ verify_jwt = false
 verify_jwt = false
 
 [analytics]
-enabled = true
+enabled = false
 port = 56327
 # Configure one of the supported backends: `postgres`, `bigquery`.
 backend = "postgres"
