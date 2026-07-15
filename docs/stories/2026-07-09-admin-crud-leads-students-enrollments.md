@@ -1,7 +1,7 @@
 # Story: Full CRUD para leads, students e enrollments no admin
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -62,3 +62,4 @@ quality_gate_tools:
 - 2026-07-09 - @dev - Story criada para formalizar o CRUD administrativo de leads, students e enrollments.
 - 2026-07-11 - @dev - CRUD de leads/students/enrollments validado ponta a ponta; handoff preparado para @devops.
 - 2026-07-14 - @dev - Leitura administrativa de leads passou a filtrar soft-deletes explicitamente, com regressão unitária do contrato de query.
+- 2026-07-15 - @dev (sessão de fechamento) - AC7 confirmado: `tests/admin-crud.spec.ts` (10 specs, cursos/turmas/alunos/inscrições) rodou 10/10 PASS contra Supabase local isolado (`npm test`, 174/174 no total). Status: In Progress → Done.

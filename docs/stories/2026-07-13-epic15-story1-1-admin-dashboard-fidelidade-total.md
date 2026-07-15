@@ -1,7 +1,7 @@
 # Story 15.1: Admin Dashboard com Fidelidade Total Trust Keith
 
 ## Status
-Ready for Review
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -285,3 +285,5 @@ Defeito HIGH **pré-existente** em `src/lib/supabase/query-logging-middleware.ts
 **Próxima ação:** bloqueado por REL-001. Após o fix do middleware, re-rodar `test:epic15:fidelity` (esperado 3/3) e então liberar para @devops. Não promover para Done enquanto o e2e de fidelidade estiver vermelho na branch.
 
 Gate: CONCERNS → docs/qa/gates/epic15.1-admin-dashboard-fidelidade.yml
+
+- 2026-07-15 - @po (sessão de fechamento) - Gate `fixVerified.finalVerdict: PASS` confirmado em `docs/qa/gates/epic15.1-admin-dashboard-fidelidade.yml` — REL-001 corrigido (commit `d6a8bc8`), `test:epic15:fidelity` voltou a 3/3, código da 15.1 não precisou de retrabalho. Commits do fix confirmados no HEAD atual de `main`. Status: Ready for Review → Done.

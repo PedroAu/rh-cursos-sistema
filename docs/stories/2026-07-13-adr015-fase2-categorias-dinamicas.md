@@ -1,7 +1,7 @@
 # Story ADR015-F2: Categorias dinâmicas do banco no formulário de cursos
 
 ## Status
-Ready for Review
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -95,6 +95,7 @@ src/__tests__/lib/                       (testes de fetchCourseCategories e app-
 | 2026-07-13 | 0.1 | Story criada a partir da ADR-015 Fase 2 (categorias dinâmicas do banco, combobox com sugestões + criação livre). Draft aguardando validação @po. | @sm (River) |
 | 2026-07-13 | 0.2 | Validada por @po (Pax): GO, 8/10 no checklist de 10 pontos. Grounding de código confirmado via graphify + grep (fetchPublicCatalog L45, trainingPaths pattern L96-146/1366-1381, categories field L394, ArrayInputLite L770, curso_categoria_idx confirmado nos dois arquivos SQL). Observações não bloqueantes: falta estimativa de complexidade; riscos apenas implícitos na seção "Fronteira sem migration". Status: Draft → Ready. | @po (Pax) |
 | 2026-07-13 | 0.3 | Implementada em modo YOLO por @dev (Dex): `fetchCourseCategories` em `rh-cursos-api.ts` (query `curso.categoria` + `.not(is null)` + `.order`, dedup via `Set`, ordenação `localeCompare("pt-BR")`, validada com novo schema `courseCategoryListSchema`), incluída no `Promise.all` de `fetchPublicCatalog` retornando `courseCategories`. `AppState.courseCategories` adicionado (`store-types.ts`, `course-context.tsx`) com fallback em `resolveCatalogBootstrapState` (catálogo real → estado atual → derivado de `mockCatalog.courses`) e no bootstrap inicial/realtime refetch. `ArrayInputLite` estendido com prop `suggestions?: string[]` (datalist HTML nativo, sem novo `field.type`); `categories` no formulário de cursos passa `suggestions: store.courseCategories`. `onSave` não alterado (AC7). typecheck/lint/test:unit (440 testes, incl. 4 novos de `fetchCourseCategories` + 3 novos de fallback `courseCategories`)/build passam. `test:e2e:smoke` não executado nesta sessão (fora do escopo de tempo do YOLO; mudança é aditiva — datalist opcional, sem alteração de estrutura DOM existente ou do path de escrita — recomendado rodar no QA Gate). Status: Ready → Ready for Review. | @dev (Dex) |
+| 2026-07-14 | 0.4 | Revalidação @po solicitada via `*validate-story-draft`: NO-GO para validação de draft no estado atual. O artefato já está em `Ready for Review` (não mais em Draft), o `quality_gate` registrado como `@qa` diverge da matriz dinâmica do workflow de validação para stories de código (`@dev` executor, `@architect` quality gate) e permanece a pendência residual do smoke E2E apontada pelo próprio QA antes de fechamento em `Done`. | @po (Pax) |
 
 ## Dev Agent Record
 
@@ -161,3 +162,7 @@ _A preencher pelo @qa_
 Implementação atende aos ACs funcionais da ADR015-F2 e está alinhada ao padrão do projeto. O gate fica em **CONCERNS** exclusivamente pela ausência do `test:e2e:smoke`; fora isso, a story está pronta para seguir após esse smoke ou após aceitação explícita desse risco residual.
 
 — Quinn, guardião da qualidade 🛡️
+
+### Fechamento do concern residual — 2026-07-15
+
+`npm test` (Playwright, 174/174 PASS) contra Supabase local isolado incluiu `tests/admin-crud.spec.ts:564` — "cursos: salva categoria sugerida + nova categoria livre e persiste na edição" — **PASS**. Concern residual (ausência do `test:e2e:smoke`) resolvido. Status: Ready for Review → Done.

@@ -1,7 +1,7 @@
 # Story 16.1: Remover Fallback de Dados Mock em Produção e Revisar SSG do Catálogo
 
 ## Status
-Ready for Review
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -249,3 +249,4 @@ Ver `docs/qa/gates/16.1-remover-fallback-mock-producao.yml` (gate FAIL → PASS)
 
 - 2026-07-14 - @dev (Dex) - Ajuste de performance do fetch público: `fetchPublicCatalogFromSupabaseServer()` memoizada com `cache()` para evitar dois round-trips ao Supabase em rotas dinâmicas que chamam `generateMetadata` e o render da página. File List atualizado para registrar `src/lib/supabase/rh-cursos-api.ts`.
 Gate: FAIL → docs/qa/gates/16.1-remover-fallback-mock-producao.yml
+- 2026-07-15 - @po (sessão de fechamento) - Gate confirmado **PASS** em `docs/qa/gates/16.1-remover-fallback-mock-producao.yml` (`nextAction`: "REL-001 corrigido e verificado ao vivo... Liberada para @devops"). Commits `d6a8bc8` (fix REL-001) e `d221b37` (Story 16.1) confirmados presentes no HEAD atual de `main` via `git merge-base --is-ancestor`. Nenhuma pendência bloqueante restante. Status: Ready for Review → Done.

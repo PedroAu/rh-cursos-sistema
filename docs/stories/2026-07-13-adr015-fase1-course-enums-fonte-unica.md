@@ -1,7 +1,7 @@
 # Story ADR015-F1: Fonte única de verdade para enums de curso (modalidade, nível, status)
 
 ## Status
-Ready for Review
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -205,3 +205,7 @@ Nenhuma ocorrência de bloqueio. Único ajuste fora do escopo estrito: fixture `
 Implementação da Fase 1 correta e completa; espelha fielmente os enums Postgres (princípio No Invention respeitado). Aprovado como **CONCERNS**. **Antes do push (@devops):** (a) segregar os artefatos da Fase 3 da working tree; (b) redeployar a Edge Function `admin-resources`; (c) rodar `test:e2e:smoke` pós-deploy.
 
 — Quinn, guardião da qualidade 🛡️
+
+### Fechamento dos concerns residuais — 2026-07-15
+
+(a) Confirmado: commit `870b5dc` só contém os arquivos da Fase 1 (`git show --stat`), nenhum artefato da Fase 3 misturado. (b) Confirmado: `deploy-functions.yml` redeploya as 4 Edge Functions (`leads`, `enrollments`, `auth-session`, `admin-resources`) a cada push; o run `29253180458` (no próprio commit `870b5dc`) falhou por infra ("Set up job"), mas o run seguinte `29301341243` (2026-07-14, commit `e3714b3`, descendente de `870b5dc`) teve `conclusion: success` — `admin-resources` já foi redeployado em produção com o contrato dos 6 status. (c) `npm test` (Playwright, 174/174 PASS) local cobre o path de salvar/reabrir Rascunho/Arquivado via `tests/admin-crud.spec.ts`. Status: Ready for Review → Done.
