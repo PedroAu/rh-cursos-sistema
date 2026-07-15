@@ -1,7 +1,7 @@
 # Story 14.3.4: DevOps Commit, Push, PR e CI Verde
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@devops"
@@ -77,7 +77,7 @@ Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 ## Quality Gate Tasks
 - [x] Pre-Push (@devops): executar `npm run devops:all` ou comandos equivalentes documentados.
 - [x] QA Evidence Review (@qa): confirmar gates 14.3.1, 14.3.2 e 14.3.3.
-- [ ] PR Creation (@devops): criar PR e acompanhar CI.
+- [x] PR Creation (@devops): criar PR e acompanhar CI.
 
 ## Tasks / Subtasks
 - [x] Confirmar que 14.3.1, 14.3.2 e 14.3.3 estao aprovadas ou possuem waiver aceito.
@@ -86,8 +86,8 @@ Source: `docs/epics/epic-14-redesign-trust-keith-fidelidade-total.md`
 - [x] Executar `npm run devops:all` ou suite equivalente.
 - [x] Se necessario, executar explicitamente lint, typecheck, unit, build, purge, fidelity, e2e smoke e bundle.
 - [x] Criar commit atomico para Epic 14/Fase 3.
-- [ ] Fazer push remoto exclusivamente via @devops.
-- [ ] Criar PR exclusivamente via @devops.
+- [x] Fazer push remoto exclusivamente via @devops.
+- [x] Criar PR exclusivamente via @devops.
 - [x] Acompanhar CI remoto ate status verde ou registrar bloqueio.
 - [x] Atualizar esta story com commit, branch, PR URL, CI e Change Log.
 
@@ -158,6 +158,7 @@ Manual checks:
 - 2026-07-07 - @devops (Gage) - Credencial GitHub foi renovada com sucesso (`gh auth status` OK para `PedroAu`, scopes `repo` e `workflow`), a branch `codex-epic14-phase3-delivery` foi publicada no `origin` e o repositório já expõe PR aberto `#5` para `main`.
 - 2026-07-07 - @devops (Gage) - Estado remoto atual confirmado: PR `#5 fix(epic14): stabilize final smoke gate` em `https://github.com/PedroAu/rh-cursos-sistema/pull/5`, `reviewDecision: CHANGES_REQUESTED` e dois checks históricos falhando (`Build & A11y & E2E`, `DB Tests`) antes do follow-up local desta sessão.
 - 2026-07-07 - @devops (Gage) - Follow-up local executado após o review: `npm run lint` ✅, `npm run typecheck` ✅, `npm run purge:gate` ✅, `LHCI_PORT=3102 npm run test:lighthouse` ✅ e `npm run test:e2e:smoke` ✅ (84 passed) em execução sequencial para evitar race de build em `.next`.
+- 2026-07-15 - @devops (Gage, via sessão de fechamento) - Estado remoto confirmado via `gh pr view 5`: PR `#5` (`https://github.com/PedroAu/rh-cursos-sistema/pull/5`) mesclado em `2026-07-08T14:02:19Z`, merge commit `05def486f34c10c1103ccb980c43664ba012f403`. Os 6 checks do `CI Pipeline` (Static Checks, Unit Tests, Build & A11y & E2E, API Docs, Performance Budgets, DB Tests) e o status `CodeRabbit` retornaram `SUCCESS`. AC 1-10 satisfeitos; story estava apenas desatualizada após o merge remoto ter concluído em sessão anterior.
 
 ## PO Validation
 2026-07-06 · @po (Pax) via Codex · **GO com observação** — checklist 10/10; a story respeita autoridade exclusiva de @devops, define gates mínimos, evidências obrigatórias e comportamento em caso de CI falha. Observação não bloqueante: branch alvo e política base/target devem ser confirmados pelo @devops contra o estado remoto real antes do PR. Status: Draft → Ready.
@@ -172,3 +173,4 @@ Manual checks:
 - 2026-07-06 - @devops (Gage) - Base real do repositório confirmada como `main`; bloqueio remoto identificado por credencial GitHub invalida no `gh`. Story permanece `In Progress` ate push/PR/CI.
 - 2026-07-06 - @devops (Gage) - Commits locais finais gerados e tentativa de push ao `origin` falhou por autenticacao HTTPS invalida; bloqueio remoto mantido e documentado.
 - 2026-07-07 - @devops (Gage) - Story atualizada com o estado remoto real da branch/PR e com a nova rodada de evidências locais gerada para responder ao review pós-PR.
+- 2026-07-15 - @devops (Gage) - PR #5 confirmado mesclado (2026-07-08) com CI 100% verde (6/6 checks + CodeRabbit). Todos os ACs satisfeitos. Status: In Progress → Done.
