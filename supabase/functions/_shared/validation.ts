@@ -56,3 +56,9 @@ export const enrollmentSchema = z.object({
 }).strict();
 
 export type EnrollmentInput = z.infer<typeof enrollmentSchema>;
+
+export const enrollmentReceiptSchema = z.object({
+  ok: z.literal(true),
+  enrollmentId: resourceIdSchema,
+  classId: resourceIdSchema,
+}).strict();

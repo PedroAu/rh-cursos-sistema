@@ -40,7 +40,7 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
 
     try {
       await resolveUsableCheckoutTarget(page);
-      await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+      await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
       await expect(page).toHaveURL(/\/checkout/);
       await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
       await expect(page.getByText("valor de referência")).toBeVisible();
@@ -49,9 +49,13 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
 
       await fillPersonalForm(page, enrollmentEmail, enrollmentCpf);
       await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
-      await expect(page.getByText("Aceite os termos e a política de privacidade para enviar.")).toBeVisible();
+      await expect(
+        page.getByText("Autorize o uso dos dados e o contato sobre esta solicitação.")
+      ).toBeVisible();
 
-      await page.getByText("Li e aceito os termos de uso e a política de privacidade.").click();
+      await page.getByText(
+        "Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição."
+      ).click();
       const requestPromise = page.waitForRequest(
         (request) => request.method() === "POST" && request.url().endsWith("/api/enrollments"),
       );
@@ -102,7 +106,9 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
         forma_pagamento: null,
       });
       expect(enrollments?.[0]?.codigo_confirmacao).toMatch(/^[0-9a-f]{16}$/);
-      await expect(page.getByText(enrollments?.[0]?.id ?? "missing-receipt")).toBeVisible();
+      await expect(
+        page.getByText(enrollments?.[0]?.codigo_confirmacao ?? "missing-receipt")
+      ).toBeVisible();
     } finally {
       await cleanupEnrollmentArtifacts(enrollmentEmail);
     }
@@ -111,9 +117,11 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
   test("falha de persistência preserva os dados e não navega", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Pré-inscrição requer ambiente Supabase real.");
     await resolveUsableCheckoutTarget(page);
-    await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+    await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
     await fillPersonalForm(page);
-    await page.getByText("Li e aceito os termos de uso e a política de privacidade.").click();
+    await page.getByText(
+      "Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição."
+    ).click();
     await page.route("**/api/enrollments", (route) =>
       route.fulfill({
         status: 503,
@@ -132,20 +140,27 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
     await expect(page).toHaveURL(/\/checkout/);
   });
 
-  test("solicitação de empresa exige organização, CNPJ e responsável", async ({ page }) => {
+  test("solicitação de empresa exige organização e responsável sem persistir", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Pré-inscrição requer ambiente Supabase real.");
     await resolveUsableCheckoutTarget(page);
-    await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+    await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
     await page.getByRole("button", { name: "Empresa" }).click();
     await page.getByLabel("Telefone").fill("61999990000");
     await page.getByLabel("E-mail").fill("contato@empresa.com.br");
     await page.getByLabel("CPF do responsável").fill("98765432100");
-    await page.getByText("Li e aceito os termos de uso e a política de privacidade.").click();
+    await page.getByText(
+      "Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição."
+    ).click();
+    let enrollmentRequests = 0;
+    await page.route("**/api/enrollments", (route) => {
+      enrollmentRequests += 1;
+      return route.abort();
+    });
     await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 
     await expect(page.getByText("Informe a organização.")).toBeVisible();
-    await expect(page.getByText("CNPJ deve ter 14 dígitos.")).toBeVisible();
     await expect(page.getByText("Informe o nome do responsável.")).toBeVisible();
+    expect(enrollmentRequests).toBe(0);
   });
 
   test("deeplink legado ?checkout=1 redireciona para a rota dedicada", async ({ page }) => {

@@ -35,6 +35,7 @@ import {
   type TrilhaRow
 } from "@/lib/supabase/mappers";
 import { validateResponse, withRetry } from "@/lib/supabase/api-validation";
+import { enrollmentReceiptSchema } from "@/lib/validation";
 import {
   assessmentWithCourseListSchema,
   blogPostListSchema,
@@ -585,9 +586,16 @@ export async function createEnrollmentInSupabase(
 
   if (result.error) throw result.error;
 
-  return validateResponse(result.data, enrollmentIdSchema, {
+  const enrollmentId = validateResponse(result.data, enrollmentIdSchema, {
     endpoint: "createEnrollment",
     resource: "registrar_inscricao_publica",
     schema: "enrollmentIdSchema"
   });
+
+  const receipt = enrollmentReceiptSchema.parse({
+    ok: true,
+    enrollmentId,
+    classId: payload.classId,
+  });
+  return { enrollmentId: receipt.enrollmentId, classId: receipt.classId };
 }

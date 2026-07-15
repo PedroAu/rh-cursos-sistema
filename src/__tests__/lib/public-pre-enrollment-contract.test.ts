@@ -40,6 +40,7 @@ describe("REC-301 public pre-enrollment contract", () => {
 
     expect(checkout).toContain("Pré-inscrição");
     expect(checkout).toContain("valor de referência");
+    expect(checkout).not.toContain("CNPJ");
   });
 
   it("removes checkout and simulated-payment claims from public entry points", () => {
@@ -68,6 +69,8 @@ describe("REC-301 public pre-enrollment contract", () => {
     expect(routeHandler).toContain("p_forma_pagamento: null");
     expect(edgeHandler).toContain("p_forma_pagamento: null");
     expect(legacyClient).toContain("p_forma_pagamento: null");
+    expect(routeHandler).toContain("enrollmentReceiptSchema.safeParse");
+    expect(edgeHandler).toContain("enrollmentReceiptSchema.safeParse");
     expect(routeHandler).not.toContain("data.paymentMethod");
     expect(edgeHandler).not.toContain("data.paymentMethod");
     expect(legacyClient).not.toContain("payload.paymentMethod");

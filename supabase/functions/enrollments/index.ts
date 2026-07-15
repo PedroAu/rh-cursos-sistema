@@ -8,7 +8,11 @@ import { getEnrollmentErrorMessage } from "../_shared/enrollment-errors.ts";
 import { resolveEnrollmentClassIdOrThrow } from "../_shared/enrollment-class-resolution.ts";
 import { anonClient } from "../_shared/supabase.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
-import { enrollmentSchema, type EnrollmentInput } from "../_shared/validation.ts";
+import {
+  enrollmentReceiptSchema,
+  enrollmentSchema,
+  type EnrollmentInput,
+} from "../_shared/validation.ts";
 
 function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Servidor" {
   if (type === "Empresa") return "PJ";
@@ -103,7 +107,16 @@ Deno.serve(async (request) => {
 
     if (error) throw error;
 
-    return jsonResponse({ ok: true, enrollmentId, classId: resolvedClassId }, 201, request, {
+    const receipt = enrollmentReceiptSchema.safeParse({
+      ok: true,
+      enrollmentId,
+      classId: resolvedClassId,
+    });
+    if (!receipt.success) {
+      throw new Error("RPC retornou recibo de pré-inscrição inválido.");
+    }
+
+    return jsonResponse(receipt.data, 201, request, {
       "X-RateLimit-Remaining": rate.remaining.toString(),
     });
   } catch (error) {

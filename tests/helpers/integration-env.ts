@@ -343,7 +343,7 @@ export async function resolveUsableCheckoutTarget(page: Page, limit = 10) {
   for (const target of targets) {
     await page.goto(target.coursePath, { waitUntil: "networkidle" });
 
-    const button = page.getByRole("button", { name: "Inscrever-se agora" }).first();
+    const button = page.getByRole("button", { name: "Enviar pré-inscrição" }).first();
     if ((await button.count()) === 0) {
       attempts.push(`${target.coursePath} (CTA ausente)`);
       continue;

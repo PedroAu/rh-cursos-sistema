@@ -23,6 +23,12 @@ const PRE_ENROLLMENT_RECEIPT_STORAGE_KEY = "__latest_pre_enrollment_receipt__";
 
 type ApplicantType = "person" | "company" | "public-organization";
 
+const APPLICANT_OPTIONS: ReadonlyArray<{ value: ApplicantType; label: string }> = [
+  { value: "person", label: "Pessoa física" },
+  { value: "company", label: "Empresa" },
+  { value: "public-organization", label: "Órgão público" },
+];
+
 type PreEnrollmentFormState = {
   applicantType: ApplicantType;
   classId: string;
@@ -31,7 +37,6 @@ type PreEnrollmentFormState = {
   phone: string;
   cpf: string;
   organization: string;
-  cnpj: string;
   contactName: string;
   acceptedTerms: boolean;
 };
@@ -44,23 +49,9 @@ const initialForm: PreEnrollmentFormState = {
   phone: "",
   cpf: "",
   organization: "",
-  cnpj: "",
   contactName: "",
   acceptedTerms: false,
 };
-
-function formatCNPJ(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 14);
-  if (digits.length <= 2) return digits;
-  if (digits.length <= 5) return `${digits.slice(0, 2)}.${digits.slice(2)}`;
-  if (digits.length <= 8) {
-    return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
-  }
-  if (digits.length <= 12) {
-    return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
-  }
-  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12)}`;
-}
 
 function formatCurrency(value: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -235,9 +226,6 @@ export function CourseCheckoutPage() {
       }
     } else {
       if (!form.organization.trim()) nextErrors.organization = "Informe a organização.";
-      if (form.cnpj.replace(/\D/g, "").length !== 14) {
-        nextErrors.cnpj = "CNPJ deve ter 14 dígitos.";
-      }
       if (form.contactName.trim().length < 3) {
         nextErrors.contactName = "Informe o nome do responsável.";
       }
@@ -253,7 +241,7 @@ export function CourseCheckoutPage() {
       nextErrors.cpf = "CPF deve ter 11 dígitos.";
     }
     if (!form.acceptedTerms) {
-      nextErrors.acceptedTerms = "Aceite os termos e a política de privacidade para enviar.";
+      nextErrors.acceptedTerms = "Autorize o uso dos dados e o contato sobre esta solicitação.";
     }
 
     setFieldErrors(nextErrors);
@@ -294,7 +282,7 @@ export function CourseCheckoutPage() {
         email: form.email,
         phone: form.phone,
         cpf: form.cpf,
-        organization: form.organization.trim(),
+        organization: form.applicantType === "person" ? "" : form.organization.trim(),
         jobTitle: "",
         enrollmentType,
         courseId: course.id,
@@ -307,10 +295,14 @@ export function CourseCheckoutPage() {
         classId: receipt.classId,
       };
 
-      window.sessionStorage.setItem(
-        PRE_ENROLLMENT_RECEIPT_STORAGE_KEY,
-        JSON.stringify(receiptState),
-      );
+      try {
+        window.sessionStorage.setItem(
+          PRE_ENROLLMENT_RECEIPT_STORAGE_KEY,
+          JSON.stringify(receiptState),
+        );
+      } catch {
+        // Navigation state still transports the canonical receipt.
+      }
       navigate("/inscricao-confirmada", { state: receiptState });
     } catch (error) {
       const message =
@@ -433,16 +425,12 @@ export function CourseCheckoutPage() {
                 />
 
                 <div className="mb-5 grid gap-1 rounded-[10px] border border-tk-line bg-[var(--tk-surface-2)] p-1 sm:grid-cols-3">
-                  {[
-                    ["person", "Pessoa física"],
-                    ["company", "Empresa"],
-                    ["public-organization", "Órgão público"],
-                  ].map(([value, label]) => (
+                  {APPLICANT_OPTIONS.map(({ value, label }) => (
                     <button
                       key={value}
                       type="button"
                       aria-pressed={form.applicantType === value}
-                      onClick={() => updateField("applicantType", value as ApplicantType)}
+                      onClick={() => updateField("applicantType", value)}
                       className={cn(
                         "rounded-[7px] px-3 py-2.5 text-sm font-semibold transition",
                         form.applicantType === value
@@ -503,13 +491,6 @@ export function CourseCheckoutPage() {
                         />
                       </Field>
                     </div>
-                    <Field label="CNPJ" required error={fieldErrors.cnpj}>
-                      <Input
-                        value={form.cnpj}
-                        onChange={(event) => updateField("cnpj", formatCNPJ(event.target.value))}
-                        placeholder="00.000.000/0000-00"
-                      />
-                    </Field>
                     <Field label="Nome do responsável" required error={fieldErrors.contactName}>
                       <Input
                         value={form.contactName}
@@ -550,9 +531,9 @@ export function CourseCheckoutPage() {
                     <Checkbox
                       checked={form.acceptedTerms}
                       onCheckedChange={(checked) => updateField("acceptedTerms", checked)}
-                      aria-label="Li e aceito os termos de uso e a política de privacidade"
+                      aria-label="Autorizo o uso dos dados e o contato sobre esta pré-inscrição"
                     />
-                    <span>Li e aceito os termos de uso e a política de privacidade.</span>
+                    <span>Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição.</span>
                   </label>
                   {fieldErrors.acceptedTerms ? (
                     <div className="mt-3 rounded-lg border border-[#f7ccd2] bg-[#fdeef0] px-3 py-2 text-sm text-tk-error" role="alert">
@@ -595,7 +576,7 @@ export function CourseCheckoutPage() {
                       valor de referência
                     </p>
                     <p className="mt-1 font-display text-2xl font-bold text-tk-brand">
-                      {formatCurrency(course.price)}
+                      {formatCurrency(selectedClass?.price ?? course.price)}
                     </p>
                     <p className="mt-2 text-caption leading-5 text-tk-ink-muted">
                       Condições comerciais e disponibilidade serão confirmadas pela equipe após a análise.

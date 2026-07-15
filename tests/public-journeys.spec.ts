@@ -126,7 +126,7 @@ test.describe("epica 4 — jornadas publicas", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      await page.getByRole("button", { name: "Inscrever-se agora" }).first().click();
+      await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
       await expect(page).toHaveURL(/\/checkout/);
       await page.waitForLoadState("networkidle");
       await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
@@ -141,7 +141,9 @@ test.describe("epica 4 — jornadas publicas", () => {
       await page.getByLabel("CPF").fill(enrollmentCpf);
       await expect(page.getByText("Resumo da pré-inscrição")).toBeVisible();
       await expect(page.getByText("valor de referência")).toBeVisible();
-      await page.getByText("Li e aceito os termos de uso e a política de privacidade.").click();
+      await page.getByText(
+        "Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição."
+      ).click();
       await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 
       await expect(page).toHaveURL(/\/inscricao-confirmada/);

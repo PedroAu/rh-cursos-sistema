@@ -174,7 +174,7 @@ describe("CourseDetailPage", () => {
 
     render(<CourseDetailPage />);
 
-    await user.click(screen.getByRole("button", { name: /inscrever-se agora/i }));
+    await user.click(screen.getByRole("button", { name: /enviar pré-inscrição/i }));
 
     expect(mocks.navigate).toHaveBeenCalledWith("/cursos/curso-teste/checkout?classId=class-1");
   });

@@ -37,7 +37,15 @@ describe('Validation Schemas', () => {
       }
     });
 
-    it.each(['paymentMethod', 'cardNumber', 'cardCvv', 'installments', 'couponCode'])(
+    it.each([
+      'paymentMethod',
+      'cardName',
+      'cardNumber',
+      'cardExpiry',
+      'cardCvv',
+      'installments',
+      'couponCode',
+    ])(
       'should reject the unexpected financial field %s',
       (field) => {
         const result = enrollmentSchema.safeParse({

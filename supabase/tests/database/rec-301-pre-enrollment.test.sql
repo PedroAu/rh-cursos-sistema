@@ -1,6 +1,6 @@
 begin;
 
-select plan(9);
+select plan(11);
 
 insert into public.curso (
   id,
@@ -76,9 +76,8 @@ on conflict (id) do update set
   status = 'Aberta',
   deleted_at = null;
 
-select lives_ok(
-  $$
-    select public.registrar_inscricao_publica(
+select matches(
+  public.registrar_inscricao_publica(
       'Pessoa REC-301',
       'rec-301-pre-enrollment@rhcursos.test',
       '12345678901',
@@ -90,8 +89,8 @@ select lives_ok(
       'Pessoa física',
       'Pix',
       'Pré-inscrição sintética REC-301'
-    );
-  $$,
+    ),
+  '^[0-9a-f]{16}$',
   'pré-inscrição ignora forma financeira legada enviada diretamente à RPC'
 );
 
@@ -172,6 +171,52 @@ select ok(
   ),
   'sidebar persistida não promete parcelamento nem garantia financeira'
 );
+
+select throws_ok(
+  $$
+    select public.registrar_inscricao_publica(
+      'Pessoa Sem Turma',
+      'rec-301-no-class@rhcursos.test',
+      '12345678902',
+      '61999990002',
+      '',
+      '',
+      'PF',
+      'rec301-class-inexistente',
+      'Pessoa física',
+      null,
+      null
+    );
+  $$,
+  'P0001',
+  'Turma não encontrada.',
+  'turma inexistente continua rejeitada'
+);
+
+update public.turma set status = 'Encerrada' where id = 'rec301-class';
+
+select throws_ok(
+  $$
+    select public.registrar_inscricao_publica(
+      'Pessoa Turma Fechada',
+      'rec-301-closed-class@rhcursos.test',
+      '12345678903',
+      '61999990003',
+      '',
+      '',
+      'PF',
+      'rec301-class',
+      'Pessoa física',
+      null,
+      null
+    );
+  $$,
+  'P0002',
+  'Turma não está disponível para inscrição (status: Encerrada).',
+  'turma encerrada continua rejeitada'
+);
+
+update public.turma set status = 'Aberta' where id = 'rec301-class';
 
 select throws_ok(
   $$

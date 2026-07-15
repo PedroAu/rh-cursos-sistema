@@ -1003,9 +1003,10 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(harness.store.classes).toHaveLength(initialClassCount + 1));
 
     const initialEnrollmentCount = harness.store.enrollments.length;
-    const studentsBefore = harness.store.students;
+    const studentsBefore = harness.store.students.map((student) => ({ ...student }));
     const payload = buildEnrollmentPayload(harness.store);
-    const classBefore = harness.store.classes.find((item) => item.id === payload.classId);
+    const originalClass = harness.store.classes.find((item) => item.id === payload.classId);
+    const classBefore = originalClass ? { ...originalClass } : undefined;
     mocks.toastSuccess.mockClear();
     mocks.fetchMock.mockResolvedValueOnce(
       new Response(
@@ -1029,9 +1030,9 @@ describe("AppStoreProvider and hooks", () => {
       paymentMethod: null,
       createdAt: "2026-06-22T12:00:00.000Z",
     });
-    expect(harness.store.students).toEqual(studentsBefore);
+    expect(harness.store.students).toStrictEqual(studentsBefore);
     expect(receipt).toEqual({ enrollmentId: "enrollment-db-public-1", classId: payload.classId });
-    expect(classAfter).toEqual(classBefore);
+    expect(classAfter).toStrictEqual(classBefore);
     expect(mocks.toastSuccess).not.toHaveBeenCalled();
     const requestBody = JSON.parse(String(mocks.fetchMock.mock.calls.at(-1)?.[1]?.body));
     expect(requestBody).not.toHaveProperty("paymentMethod");

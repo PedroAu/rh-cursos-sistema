@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
 
 import { fireEvent, render, screen, waitFor } from "@/__tests__/utils";
 import { CourseCheckoutPage } from "@/views/public/CourseCheckout";
@@ -71,7 +72,7 @@ function fillValidPersonForm() {
     target: { value: "maria@example.com" },
   });
   fireEvent.click(
-    screen.getByLabelText("Li e aceito os termos de uso e a política de privacidade"),
+    screen.getByLabelText("Autorizo o uso dos dados e o contato sobre esta pré-inscrição"),
   );
 }
 
@@ -132,6 +133,72 @@ describe("CourseCheckoutPage as pre-enrollment", () => {
       .toEqual({ enrollmentId: "receipt-public-1", courseId: "course-1", classId: "class-1" });
   });
 
+  it("submits an organization request without collecting or discarding CNPJ", async () => {
+    const user = userEvent.setup();
+    mocks.createEnrollment.mockResolvedValue({
+      enrollmentId: "receipt-company-1",
+      classId: "class-1",
+    });
+
+    render(<CourseCheckoutPage />);
+    const companyButton = screen.getByRole("button", { name: "Empresa" });
+    await user.click(companyButton);
+    expect(companyButton).toHaveAttribute("aria-pressed", "true");
+    fireEvent.change(await screen.findByLabelText(/^Organização/), {
+      target: { value: "Empresa Teste" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Nome do responsável/), {
+      target: { value: "Ana Responsável" },
+    });
+    fireEvent.change(screen.getByLabelText(/^CPF do responsável/), {
+      target: { value: "12345678910" },
+    });
+    fireEvent.change(screen.getByLabelText(/^Telefone/), {
+      target: { value: "61999998888" },
+    });
+    fireEvent.change(screen.getByLabelText(/^E-mail/), {
+      target: { value: "ana@empresa.test" },
+    });
+    fireEvent.click(
+      screen.getByLabelText("Autorizo o uso dos dados e o contato sobre esta pré-inscrição"),
+    );
+    fireEvent.click(screen.getByRole("button", { name: /enviar pré-inscrição/i }));
+
+    await waitFor(() => expect(mocks.createEnrollment).toHaveBeenCalledOnce());
+    expect(mocks.createEnrollment.mock.calls[0]?.[0]).toMatchObject({
+      studentName: "Ana Responsável",
+      organization: "Empresa Teste",
+      enrollmentType: "Empresa",
+    });
+    expect(mocks.createEnrollment.mock.calls[0]?.[0]).not.toHaveProperty("cnpj");
+    expect(screen.queryByLabelText("CNPJ")).not.toBeInTheDocument();
+  });
+
+  it("does not submit hidden organization data after switching to a person", async () => {
+    const user = userEvent.setup();
+    mocks.createEnrollment.mockResolvedValue({
+      enrollmentId: "receipt-person-after-company",
+      classId: "class-1",
+    });
+
+    render(<CourseCheckoutPage />);
+    const companyButton = screen.getByRole("button", { name: "Empresa" });
+    await user.click(companyButton);
+    expect(companyButton).toHaveAttribute("aria-pressed", "true");
+    fireEvent.change(await screen.findByLabelText(/^Organização/), {
+      target: { value: "Organização Oculta" },
+    });
+    await user.click(screen.getByRole("button", { name: "Pessoa física" }));
+    fillValidPersonForm();
+    fireEvent.click(screen.getByRole("button", { name: /enviar pré-inscrição/i }));
+
+    await waitFor(() => expect(mocks.createEnrollment).toHaveBeenCalledOnce());
+    expect(mocks.createEnrollment.mock.calls[0]?.[0]).toMatchObject({
+      organization: "",
+      enrollmentType: "Pessoa física",
+    });
+  });
+
   it("preserves all entered values when persistence fails", async () => {
     mocks.createEnrollment.mockRejectedValue(new Error("Serviço temporariamente indisponível."));
 
@@ -148,5 +215,34 @@ describe("CourseCheckoutPage as pre-enrollment", () => {
     expect(screen.getByLabelText(/e-mail/i)).toHaveValue("maria@example.com");
     expect(mocks.navigate).not.toHaveBeenCalled();
     expect(mocks.toastError).toHaveBeenCalledOnce();
+  });
+
+  it("navigates with the canonical receipt when session storage is blocked", async () => {
+    mocks.createEnrollment.mockResolvedValue({
+      enrollmentId: "receipt-storage-blocked",
+      classId: "class-1",
+    });
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
+      throw new DOMException("Storage blocked", "SecurityError");
+    });
+
+    try {
+      render(<CourseCheckoutPage />);
+      fillValidPersonForm();
+      fireEvent.click(screen.getByRole("button", { name: /enviar pré-inscrição/i }));
+
+      await waitFor(() =>
+        expect(mocks.navigate).toHaveBeenCalledWith("/inscricao-confirmada", {
+          state: {
+            enrollmentId: "receipt-storage-blocked",
+            courseId: "course-1",
+            classId: "class-1",
+          },
+        }),
+      );
+      expect(mocks.toastError).not.toHaveBeenCalled();
+    } finally {
+      setItem.mockRestore();
+    }
   });
 });

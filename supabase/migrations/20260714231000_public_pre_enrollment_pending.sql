@@ -27,9 +27,10 @@ declare
 begin
   select id, status, vagas_total, vagas_preenchidas, vagas_restantes, deleted_at
     into v_turma
-    from public.turma
+   from public.turma
    where id = p_turma_id
-   limit 1;
+   limit 1
+   for update;
 
   if not found or v_turma.deleted_at is not null then
     raise exception 'Turma não encontrada.' using errcode = 'P0001';
@@ -110,7 +111,7 @@ begin
     p_tipo_inscricao,
     p_observacoes
   )
-  returning id into v_inscricao_id;
+  returning codigo_confirmacao into v_inscricao_id;
 
   update public.turma
      set vagas_preenchidas = least(vagas_total, vagas_preenchidas + 1)

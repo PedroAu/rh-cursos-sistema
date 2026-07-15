@@ -191,7 +191,7 @@ function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: 
     {
       question: "Como faço minha inscrição?",
       answer: selectedClass
-        ? `Clique em "Inscrever-se agora", selecione a turma e envie a pré-inscrição. A solicitação para o curso "${course.title}" seguirá para análise sem perder o contexto da turma escolhida.`
+        ? `Clique em "Enviar pré-inscrição", selecione a turma e envie a solicitação. O pedido para o curso "${course.title}" seguirá para análise sem perder o contexto da turma escolhida.`
         : `Este curso ainda não tem turma aberta. Clique em "Manifestar interesse" para falar com a equipe e receber a próxima agenda.`
     },
     {
@@ -354,7 +354,7 @@ export function CourseDetailPage() {
     secondaryLabel: courseContent?.corporateCta?.secondaryLabel ?? "Solicitar proposta",
     secondaryHref: courseContent?.corporateCta?.secondaryHref ?? "/in-company#quote-form"
   };
-  const primaryCtaLabel = selectedClass ? "Garantir minha vaga →" : "Manifestar interesse →";
+  const primaryCtaLabel = selectedClass ? "Enviar pré-inscrição →" : "Manifestar interesse →";
   const primaryCtaHref = selectedClass ? startCheckoutHref : "/falar-com-especialista";
 
   return (
@@ -664,7 +664,7 @@ export function CourseDetailPage() {
                     <div className="text-caption text-tk-ink-muted">{sidebarCopy.investmentLabel}</div>
                     <div className="mt-1 flex items-baseline gap-3">
                       <span className="font-tk-display text-[2.1rem] font-bold tracking-[-0.01em] text-tk-brand">
-                        {currency(course.price)}
+                        {currency(selectedClass?.price ?? course.price)}
                       </span>
                     </div>
                     <div className="mt-1 text-caption text-tk-ink-muted">{sidebarCopy.installmentText}</div>
@@ -737,7 +737,7 @@ export function CourseDetailPage() {
                         size="lg"
                         className="mt-5 w-full bg-tk-brand text-white hover:bg-tk-brand-hover hover:text-white"
                         onClick={startCheckout}
-                        aria-label="Inscrever-se agora"
+                        aria-label="Enviar pré-inscrição"
                       >
                         {primaryCtaLabel}
                       </Button>

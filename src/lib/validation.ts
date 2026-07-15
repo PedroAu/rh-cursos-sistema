@@ -76,6 +76,14 @@ export const enrollmentReceiptSchema = z.object({
   classId: resourceIdSchema,
 }).strict();
 
+export const preEnrollmentReceiptStateSchema = z.object({
+  enrollmentId: resourceIdSchema,
+  courseId: resourceIdSchema,
+  classId: resourceIdSchema,
+}).strict();
+
+export type PreEnrollmentReceiptState = z.infer<typeof preEnrollmentReceiptStateSchema>;
+
 // User profile validation
 export const userProfileSchema = z.object({
   firstName: z

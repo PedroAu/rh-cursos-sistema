@@ -332,6 +332,7 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 | 2026-07-14 | 1.0 | **GO — 10/10; Draft → Ready.** Doze ACs testáveis cobrem zero coleta/alegação financeira, payload estrito, migration pending/null, recibo canônico, fail-closed, página de sucesso vinculada à tentativa, URL sem PII e gates integrais. Escopo separa explicitamente gateway, atomicidade, identidade por e-mail e hardening definitivo; `@dev` e `@data-engineer` respeitam suas autoridades. REC-001 permanece bloqueador de merge/publicação, sem impedir implementação local isolada. Bloqueadores documentais: 0. | @po (Pax) |
 | 2026-07-14 | 1.1 | Ready → In Progress; execução test-first iniciada em ambiente local isolado. Os `devLoadAlwaysFiles` configurados no AIOX e seus fallbacks não existem, portanto foram usadas as referências reais listadas na story. | @dev (Dex) |
 | 2026-07-14 | 1.2 | Implementação local concluída: checkout financeiro removido, contrato público estrito, recibo canônico/fail-closed, migration pending/null, conteúdo editorial saneado e gates técnicos verdes. CodeRabbit e gate independente permanecem abertos. | @dev (Dex) + @data-engineer (Dara) |
+| 2026-07-14 | 1.3 | Follow-up da revisão CodeRabbit: recibos validados nas duas bordas, concorrência serializada por lock da turma, referência canônica devolvida pela RPC, storage tolerante a bloqueio, consentimento explícito, fluxo PJ sem dado descartado e preço/CTA coerentes com a turma selecionada. | @dev (Dex) + @data-engineer (Dara) |
 
 ## File List
 
@@ -358,8 +359,10 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 - `src/__tests__/lib/app-store.test.ts`
 - `src/__tests__/lib/core-utilities.test.ts`
 - `src/__tests__/lib/validation.test.ts`
+- `src/__tests__/views/public/course-detail.test.tsx`
 - `tests/api-contract.spec.ts`
 - `tests/checkout.e2e.spec.ts`
+- `tests/helpers/integration-env.ts`
 - `tests/public-journeys.spec.ts`
 - `tests/ui-governance.spec.ts`
 
@@ -376,7 +379,6 @@ o estado verdadeiro `Pendente` e `forma_pagamento = null` na RPC existente.
 - `docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md`
 - `supabase/migrations/20260512193000_initial_rh_cursos_schema.sql`
 - `supabase/migrations/20260513200000_sprint2_integrity.sql`
-- `tests/helpers/integration-env.ts`
 
 ## Dev Agent Record
 
@@ -390,6 +392,8 @@ GPT-5 Codex — personas `@dev` (Dex) e `@data-engineer` (Dara).
 - Banco test-first: pgTAP iniciou com estado `Confirmada` onde `Pendente` era esperado; a migration corrigiu o resultado sem editar migrations anteriores.
 - Revisão manual encontrou e fechou dois gaps adicionais: recibo com chaves extras/PII e aluno local com ID sintético.
 - A suíte integral revelou dois flakes preexistentes do harness: clique antes da hidratação na jornada pública e header sticky em posição variável no screenshot do contato. Ambos foram estabilizados sem relaxar assertions nem atualizar snapshots.
+- CodeRabbit encontrou 20 pontos no primeiro commit (1 crítico, 12 maiores, 6 menores e 1 trivial); o follow-up fechou o TOCTOU de capacidade com `FOR UPDATE`, validou recibos em todas as bordas e cobriu os demais gaps funcionais/privacidade antes da nova revisão.
+- Após o reset DB-only, uma execução Playwright foi bloqueada pelo guard de ambiente isolado e outra detectou bundle com chave local expirada. O stack foi reiniciado, o bundle recompilado com credenciais efêmeras locais e os contratos afetados passaram sem acesso remoto.
 
 ### Completion Notes
 
@@ -399,7 +403,7 @@ GPT-5 Codex — personas `@dev` (Dex) e `@data-engineer` (Dara).
 - Store falha fechado sem backend/envelope canônico, usa somente o ID persistido e não cria aluno sintético nem altera capacidade local.
 - Página de sucesso aceita exatamente `enrollmentId`, `courseId` e `classId`; acesso direto, recibo corrompido ou com PII extra não confirma sucesso.
 - Conteúdo público persistido/fallbacks tiveram checkout, parcelamento e garantia financeira simulada removidos.
-- Evidência final: lint PASS; typecheck PASS; 51 arquivos/556 unitários PASS; 25 migrations/34 pgTAP + concorrência PASS; duas reaplicações `up to date`; `npm test` com build de 29 páginas e 174/174 Playwright PASS; `npm run build` PASS.
+- Evidência final: lint PASS; typecheck PASS; 51 arquivos/562 unitários PASS; 25 migrations/36 pgTAP + concorrência PASS; duas reaplicações `up to date`; build de produção com 29 páginas PASS; suíte integral pré-follow-up com 174/174 Playwright PASS; pós-follow-up API/Edge/checkout 10/10 e jornadas públicas 7/7 PASS em Supabase local isolado.
 - Nenhuma migration, Functions ou deploy foi executado remotamente; REC-001 continua bloqueador operacional.
 
 ## QA Results

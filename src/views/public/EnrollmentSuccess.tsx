@@ -6,40 +6,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useAppStore } from "@/lib/app-store";
 import { Link, useLocation, useNavigate } from "@/lib/router-compat";
 import { formatDate } from "@/lib/utils";
+import {
+  preEnrollmentReceiptStateSchema,
+  type PreEnrollmentReceiptState,
+} from "@/lib/validation";
 
 const PRE_ENROLLMENT_RECEIPT_STORAGE_KEY = "__latest_pre_enrollment_receipt__";
 
-type ReceiptState = {
-  enrollmentId: string;
-  courseId: string;
-  classId: string;
-};
-
-function isReceiptState(value: unknown): value is ReceiptState {
-  if (!value || typeof value !== "object") return false;
-  const allowedKeys = new Set(["enrollmentId", "courseId", "classId"]);
-  const keys = Object.keys(value);
-  if (keys.length !== allowedKeys.size || keys.some((key) => !allowedKeys.has(key))) {
-    return false;
-  }
-  const candidate = value as Partial<ReceiptState>;
-  return [candidate.enrollmentId, candidate.courseId, candidate.classId].every(
-    (item) =>
-      typeof item === "string" &&
-      item.length > 0 &&
-      item.length <= 80 &&
-      /^[A-Za-z0-9_-]+$/.test(item),
-  );
-}
-
-function readStoredReceipt() {
+function readStoredReceipt(): PreEnrollmentReceiptState | undefined {
   if (typeof window === "undefined") return undefined;
-  const stored = window.sessionStorage.getItem(PRE_ENROLLMENT_RECEIPT_STORAGE_KEY);
-  if (!stored) return undefined;
 
   try {
+    const stored = window.sessionStorage.getItem(PRE_ENROLLMENT_RECEIPT_STORAGE_KEY);
+    if (!stored) return undefined;
     const parsed: unknown = JSON.parse(stored);
-    return isReceiptState(parsed) ? parsed : undefined;
+    const receipt = preEnrollmentReceiptStateSchema.safeParse(parsed);
+    return receipt.success ? receipt.data : undefined;
   } catch {
     return undefined;
   }
@@ -49,7 +31,8 @@ export function EnrollmentSuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { courses, classes } = useAppStore();
-  const navigationState = isReceiptState(location.state) ? location.state : undefined;
+  const parsedNavigationState = preEnrollmentReceiptStateSchema.safeParse(location.state);
+  const navigationState = parsedNavigationState.success ? parsedNavigationState.data : undefined;
   const receipt = navigationState ?? readStoredReceipt();
 
   if (!receipt) {

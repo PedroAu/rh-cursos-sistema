@@ -3,7 +3,11 @@ import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
-import { enrollmentSchema, type EnrollmentInput } from "@/lib/validation";
+import {
+  enrollmentReceiptSchema,
+  enrollmentSchema,
+  type EnrollmentInput,
+} from "@/lib/validation";
 import { resolveEnrollmentClassIdOrThrow } from "../../../supabase/functions/_shared/enrollment-class-resolution";
 import { getEnrollmentErrorMessage } from "../../../supabase/functions/_shared/enrollment-errors";
 
@@ -15,7 +19,7 @@ function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Se
 
 export async function POST(request: Request) {
   if (!isSupabaseServerConfigured) {
-    return NextResponse.json({ ok: false, error: "Pre-inscricao indisponivel." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Pré-inscrição indisponível." }, { status: 503 });
   }
 
   const rate = await checkRateLimit(`enrollment:${clientIp(request)}`, rateLimitConfigs.enrollment);
@@ -46,7 +50,7 @@ export async function POST(request: Request) {
 
   const supabase = createSupabaseServerClient();
   if (!supabase) {
-    return NextResponse.json({ ok: false, error: "Pre-inscricao indisponivel." }, { status: 503 });
+    return NextResponse.json({ ok: false, error: "Pré-inscrição indisponível." }, { status: 503 });
   }
 
   const data = parsed.data;
@@ -96,8 +100,17 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    const receipt = enrollmentReceiptSchema.safeParse({
+      ok: true,
+      enrollmentId,
+      classId: resolvedClassId,
+    });
+    if (!receipt.success) {
+      throw new Error("RPC retornou recibo de pré-inscrição inválido.");
+    }
+
     return NextResponse.json(
-      { ok: true, enrollmentId, classId: resolvedClassId },
+      receipt.data,
       {
         status: 201,
         headers: {

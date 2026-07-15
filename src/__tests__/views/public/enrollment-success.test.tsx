@@ -50,6 +50,19 @@ describe("EnrollmentSuccessPage pre-enrollment receipt", () => {
     expect(screen.getByText("Nenhuma pré-inscrição recente")).toBeInTheDocument();
   });
 
+  it("fails closed when the browser blocks session storage", () => {
+    const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+      throw new DOMException("Storage blocked", "SecurityError");
+    });
+
+    try {
+      render(<EnrollmentSuccessPage />);
+      expect(screen.getByText("Nenhuma pré-inscrição recente")).toBeInTheDocument();
+    } finally {
+      getItem.mockRestore();
+    }
+  });
+
   it("rejects a receipt that smuggles personal fields beside valid ids", () => {
     window.sessionStorage.setItem(
       "__latest_pre_enrollment_receipt__",
