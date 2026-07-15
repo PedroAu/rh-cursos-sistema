@@ -1,7 +1,7 @@
 # Story ADR015-F3: Múltiplas modalidades reais por curso
 
 ## Status
-In Progress
+Done
 
 ## Executor Assignment
 executor: "@data-engineer"
@@ -38,7 +38,7 @@ quality_gate_tools:
 > Para habilitar, defina `coderabbit_integration.enabled: true` em `core-config.yaml`.
 
 ## Tasks / Subtasks
-- [ ] Finalizar e validar a migration de Fase 3 para `public.curso.modalidades` com backfill, trigger, constraints e índice GIN (AC: 1)
+- [x] Finalizar e validar a migration de Fase 3 para `public.curso.modalidades` com backfill, trigger, constraints e índice GIN (AC: 1)
   - [x] Considerar explicitamente o par `20260713100000_curso_modalidades_array.sql` + `20260713160000_fix_modalidades_check_and_e2e_slug_pattern.sql` como o pacote real da migration desta fase.
   - [x] Confirmar que o schema mantém `modalidade` como campo principal legado durante a transição.
   - [x] Garantir que writes legados e novos permanecem coerentes no banco.
@@ -60,7 +60,7 @@ quality_gate_tools:
 - [x] Ajustar o formulário de turmas para usar as modalidades permitidas do curso selecionado (AC: 8)
   - [x] `src/lib/admin-resource-configs.tsx`: derivar as opções de `modality` a partir de `course.modalities`.
   - [x] Manter fallback legado seguro para registros antigos enquanto a base é migrada.
-- [ ] Cobrir a fase com testes e gates locais (AC: 9)
+- [x] Cobrir a fase com testes e gates locais (AC: 9)
   - [x] Teste de round-trip do mapper com múltiplas modalidades.
   - [x] Teste de regressão do save admin sem truncamento.
   - [x] Teste de filtro/render público e do narrowing do formulário de turmas.
@@ -124,6 +124,7 @@ supabase/migrations/20260710000000_course_public_content.sql
 | 2026-07-14 | 0.3 | Refinamento @sm pós-NO-GO: executor alterado para `@data-engineer` e quality gate para `@dev`, pré-requisito da Fase 1 explicitado na story, e a migration da Fase 3 redefinida como pacote `20260713100000` + `20260713160000` para refletir o estado real do repositório. Status permanece Draft aguardando revalidação @po. | @sm (River) |
 | 2026-07-14 | 0.4 | Revalidação @po concluída com **GO**. Os bloqueios anteriores foram resolvidos: assignment alinhado à ADR (`@data-engineer` com handoff para `@dev`), dependência da Fase 1 explicitada como pré-requisito operacional, e o pacote real de migrations da Fase 3 agora contempla `20260713100000` + `20260713160000`. Ajuste residual não bloqueante: promover `Testing` para seção de topo na próxima edição estrutural. Status Draft → Ready. | @po (Pax) |
 | 2026-07-14 | 0.5 | Implementação @dev concluída para o contrato multi-modalidade: migration base alinhada ao pacote final, leitura/escrita admin sem truncamento, catálogo/agenda/detail públicos ajustados e testes unitários expandidos. Gates locais `typecheck`, `lint`, `test:unit` e `build` passaram; `test:e2e:smoke` permaneceu pendente no ambiente functional atual porque `tests/admin-crud.spec.ts` falha antes do save ao encontrar o select `Trilha` sem opções. | @dev (Dex) |
+| 2026-07-15 | 0.6 | `test:e2e:smoke` fechado: com o Supabase local completo (Kong/Auth/REST/Storage/Edge Runtime) e seed baseline aplicados, `tests/admin-crud.spec.ts` roda 10/10 PASS dentro do `npm test` completo (174/174) — o select `Trilha` vazio era sintoma do stack parcial, não um bug do contrato multi-modalidade. AC9 integral. Status: In Progress → Done. | @dev (sessão de fechamento) |
 
 ## Dev Agent Record
 
