@@ -35,7 +35,7 @@ import {
   type TrilhaRow
 } from "@/lib/supabase/mappers";
 import { validateResponse, withRetry } from "@/lib/supabase/api-validation";
-import { enrollmentReceiptSchema } from "@/lib/validation";
+import { enrollmentReceiptSchema, enrollmentSchema } from "@/lib/validation";
 import {
   assessmentWithCourseListSchema,
   blogPostListSchema,
@@ -563,23 +563,24 @@ export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt
 export async function createEnrollmentInSupabase(
   payload: Omit<Enrollment, "id" | "createdAt" | "status" | "paymentMethod">
 ) {
+  const enrollment = enrollmentSchema.parse(payload);
   if (!supabase) return null;
 
   const client = supabase;
   const result = await withRetry(
     () =>
       client.rpc("registrar_inscricao_publica", {
-        p_nome_completo: payload.studentName,
-        p_email: payload.email,
-        p_cpf: payload.cpf,
-        p_telefone: payload.phone,
-        p_cargo: payload.jobTitle,
-        p_orgao: payload.organization,
-        p_tipo_aluno: toDbStudentType(payload.enrollmentType),
-        p_turma_id: payload.classId,
-        p_tipo_inscricao: payload.enrollmentType,
+        p_nome_completo: enrollment.studentName,
+        p_email: enrollment.email,
+        p_cpf: enrollment.cpf,
+        p_telefone: enrollment.phone,
+        p_cargo: enrollment.jobTitle,
+        p_orgao: enrollment.organization,
+        p_tipo_aluno: toDbStudentType(enrollment.enrollmentType),
+        p_turma_id: enrollment.classId,
+        p_tipo_inscricao: enrollment.enrollmentType,
         p_forma_pagamento: null,
-        p_observacoes: payload.notes
+        p_observacoes: enrollment.notes
       }),
     { label: "createEnrollment:registrar_inscricao_publica" }
   );
@@ -595,7 +596,7 @@ export async function createEnrollmentInSupabase(
   const receipt = enrollmentReceiptSchema.parse({
     ok: true,
     enrollmentId,
-    classId: payload.classId,
+    classId: enrollment.classId,
   });
   return { enrollmentId: receipt.enrollmentId, classId: receipt.classId };
 }

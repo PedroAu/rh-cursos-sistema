@@ -51,7 +51,7 @@ describe("EnrollmentSuccessPage pre-enrollment receipt", () => {
   });
 
   it("fails closed when the browser blocks session storage", () => {
-    const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementationOnce(() => {
+    const getItem = vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new DOMException("Storage blocked", "SecurityError");
     });
 

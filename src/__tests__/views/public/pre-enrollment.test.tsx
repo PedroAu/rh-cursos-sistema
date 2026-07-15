@@ -222,7 +222,7 @@ describe("CourseCheckoutPage as pre-enrollment", () => {
       enrollmentId: "receipt-storage-blocked",
       classId: "class-1",
     });
-    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
+    const setItem = vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
       throw new DOMException("Storage blocked", "SecurityError");
     });
 
