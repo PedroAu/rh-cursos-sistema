@@ -1,19 +1,19 @@
 status:
-  branch: fix/remove-demo-seed-data
+  branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
-    - docs/stories/2026-07-13-adr015-fase2-categorias-dinamicas.md
-    - tests/admin-crud.spec.ts
-    - tests/baseline/agenda-baseline-desktop.png
-    - tests/baseline/agenda-baseline-mobile.png
-  modifiedFilesTotalCount: 23
+    - app/api/auth/session/route.ts
+    - '"docs/design-system/Agenda export.dc.html"'
+    - '"docs/design-system/RH Cursos Agenda.dc.html"'
+    - '"docs/design-system/RH Cursos Agenda.html"'
+  modifiedFilesTotalCount: 51
   recentCommits:
-    - 'chore(pr8): address remaining quick wins and docs'
-    - 'fix: stabilize ci public baseline and db tests'
+    - 'fix: reject unpersisted lead success [REC-302]'
+    - 'fix: isolate visual baseline SSR [REC-403]'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-14T02:27:02.340Z'
+  lastUpdate: '2026-07-14T19:31:18.103Z'
   isGitRepo: true
-timestamp: 1783996022342
+timestamp: 1784057478106
 ttl: 60
-gitFingerprint: 1783992707341.5867:1783995259489.3374
+gitFingerprint: 1783996413321.067:1784057148240.3372
