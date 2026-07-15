@@ -900,7 +900,7 @@ export function buildResourceConfig(
                 id: editingId,
                 name: str(form.name),
                 email: str(form.email),
-                phone: optStr(form.phone) || "(61) 90000-0000",
+                phone: optStr(form.phone),
                 type: str(form.type) as Lead["type"],
                 courseInterest: str(form.courseInterest),
                 courseId: optStr(form.courseId),
@@ -917,7 +917,7 @@ export function buildResourceConfig(
               await store.createLead({
                 name: str(form.name),
                 email: str(form.email),
-                phone: optStr(form.phone) || "(61) 90000-0000",
+                phone: optStr(form.phone),
                 type: str(form.type) as Lead["type"],
                 courseInterest: str(form.courseInterest),
                 courseId: optStr(form.courseId),

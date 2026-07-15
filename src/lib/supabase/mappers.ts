@@ -388,7 +388,7 @@ export function mapLead(row: LeadRow): Lead {
     id: row.id,
     name: row.nome,
     email: row.email ?? "",
-    phone: row.telefone ?? "",
+    phone: row.telefone ?? undefined,
     type: fromDbLeadType(row.tipo),
     courseInterest: row.tema_interesse ?? "",
     courseId: row.curso_id ?? undefined,

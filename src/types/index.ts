@@ -186,7 +186,7 @@ export type Lead = {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   type: LeadType;
   courseInterest: string;
   courseId?: string;
