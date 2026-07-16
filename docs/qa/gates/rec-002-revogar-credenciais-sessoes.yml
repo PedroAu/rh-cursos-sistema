@@ -1,0 +1,224 @@
+schema: 1
+story: 'REC-002'
+story_title: 'Revogar credenciais e sessões comprometidas'
+gate: CONCERNS
+status_reason: >-
+  Rotação tecnicamente comprovada em todos os itens de credencial e no segredo
+  HMAC. @qa verificou independentemente: (a) os dois verificadores de sessão
+  (src/lib/auth.ts, supabase/functions/_shared/auth.ts) recomputam a assinatura
+  HMAC com o segredo atual e rejeitam via timingSafeEqual, ambos exigindo ≥32
+  caracteres — a rotação de AUTH_SESSION_SECRET invalida sessões antigas de
+  forma determinística (AC2 sólido); (b) scripts descartáveis (.tmp-*.mjs)
+  nunca commitados, ausentes da história do Git e removidos do disco; (c) zero
+  padrões de segredo real nos 3 artefatos versionados (AC5/AC6). Veredito
+  CONCERNS (não FAIL) por dois pontos medium em torno da Task 6: SEC-103
+  (token de recuperação exposto, mitigado por revogação global no mesmo ciclo,
+  com janela residual de TTL de access_token já decorrida) e SEC-104 (MFA
+  enrolled na conta Supabase Auth, porém NÃO exigido pelo login do app —
+  signInWithPassword sem challenge AAL2; correção pertence a story de código,
+  fora do escopo de REC-002). Nenhum bloqueia a contenção SEV-0; ambos ficam
+  registrados como follow-up.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T15:10:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 80
+
+history:
+  - at: '2026-07-16T15:10:00Z'
+    gate: CONCERNS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. AC1/AC2/AC4/AC5/AC6/AC7 PASS verificados; AC3
+      CONCERNS (outcome atingido via caminho alternativo, com SEC-103/SEC-104).
+      quality_score 80 (dois findings medium mitigados/fora de escopo).
+
+top_issues:
+  - id: SEC-101
+    severity: low
+    finding: >-
+      Escopo residual `gist` no token gh CLI (CRED-02) — comportamento padrão
+      do app OAuth embutido do gh CLI (escopo mínimo do device flow, não
+      removível via --scopes nem via revogação+relogin). Não alcança código de
+      repositório nem segredo de produção.
+    suggested_owner: incident-commander
+    suggested_action: >-
+      Aceito como risco residual pelo IC. Migrar para PAT fine-grained manual
+      (sem gist) apenas se a política de segurança exigir escopo exato.
+    refs:
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#3-task-2--cred-02-token-github-cli'
+  - id: SEC-102
+    severity: low
+    finding: >-
+      Verificação técnica independente do token Cloudflare novo não foi
+      possível neste ambiente (sem wrangler) — baseada em teste positivo
+      reportado pelo IC em terminal próprio (`wrangler whoami` → sucesso).
+      Mesma limitação estrutural documentada no gate do REC-001.
+    suggested_owner: devops
+    suggested_action: >-
+      Aceitar por atestação, mesma linha do REC-001 (SEC-001/Cloudflare).
+    refs:
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#5-task-4--cred-04-cloudflare'
+  - id: SEC-103
+    severity: medium
+    finding: >-
+      Incidente lateral durante a Task 6: um access_token/refresh_token de
+      sessão de recuperação de senha foi colado na sessão de trabalho com
+      @devops, fora do fluxo padrão da story. Mitigado no mesmo ciclo pela
+      revogação global de sessões (auth.admin.signOut) executada como parte da
+      troca de senha via Admin API — o refresh token exposto foi invalidado
+      junto com as demais sessões antigas.
+    suggested_owner: incident-commander
+    suggested_action: >-
+      @qa avaliar se a mitigação (revogação global no mesmo ciclo) é
+      suficiente para considerar o vetor fechado, ou se recomenda verificação
+      adicional (ex.: checar audit log do Supabase Auth para essa sessão
+      específica, se acessível).
+    refs:
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#7-task-6--senha-e-mfa-da-conta-administrativa'
+  - id: SEC-104
+    severity: medium
+    finding: >-
+      MFA (TOTP) foi enrolled na conta Supabase Auth (admin@rhcursos.com.br),
+      satisfazendo "ativação de MFA" do AC3 no nível da conta. Porém o login do
+      próprio app NÃO exige o fator: app/api/auth/session/route.ts usa
+      supabase.auth.signInWithPassword e valida apenas app_metadata.role, sem
+      challenge AAL2 (getAuthenticatorAssuranceLevel / mfa.challenge). Ou seja,
+      senha sozinha continua abrindo sessão admin no app — o MFA protege fluxos
+      que checam AAL (ex.: dashboard Supabase), não o login administrativo do
+      site. Verificado por @qa lendo o código do fluxo de login.
+    suggested_owner: incident-commander
+    suggested_action: >-
+      Não corrigir dentro de REC-002 (é alteração de código de aplicação, fora
+      do escopo declarado). Abrir story de follow-up para exigir AAL2 no login
+      admin do app (aal2 obrigatório ou verificação explícita de fator TOTP
+      antes de emitir a sessão HMAC). Considerar vínculo com a trilha REC-201+
+      (migração da autoridade de sessão).
+    refs:
+      - 'app/api/auth/session/route.ts:126'
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#7-task-6--senha-e-mfa-da-conta-administrativa'
+  - id: REL-101
+    severity: low
+    finding: >-
+      Site URL/Redirect URLs da configuração de Auth do Supabase apontam para
+      domínio Cloudflare Pages obsoleto (site-rh-cursos.pages.dev),
+      DNS_PROBE_FINISHED_NXDOMAIN. Quebra o fluxo padrão de recuperação de
+      senha por e-mail até ser corrigido. Não é rotação de credencial — fora
+      do escopo de execução desta story.
+    suggested_owner: incident-commander
+    suggested_action: >-
+      Corrigir em Supabase Dashboard → Authentication → URL Configuration
+      para https://rhcursos.com.br (e www.rhcursos.com.br se aplicável).
+    refs:
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#7-task-6--senha-e-mfa-da-conta-administrativa'
+  - id: REL-102
+    severity: low
+    finding: >-
+      Audit logs de Supabase/Cloudflare durante a rotação não foram
+      coletados neste ciclo — mesma limitação estrutural do REC-001 (sem
+      acesso de auditoria de provedor neste ambiente de execução).
+    suggested_owner: devops
+    suggested_action: >-
+      Mesma linha do REL-002 do gate REC-001: aceitar como limitação
+      estrutural, reavaliar se acesso de auditoria for viabilizado.
+    refs:
+      - 'docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#8-gaps-e-recomendações-não-bloqueantes'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 6
+  independent_verification:
+    - 'gh auth status → "token in keyring is invalid" após gh auth logout, antes de qualquer novo login (CRED-02, teste negativo por efeito)'
+    - 'gh api .../environments/production/secrets/SUPABASE_ACCESS_TOKEN → updated_at avançou de 2026-07-12T14:10:55Z para 2026-07-16T13:33:02Z (sem leitura de valor)'
+    - 'gh api .../environments/production/secrets/CLOUDFLARE_API_TOKEN → updated_at avançou de 2026-07-03T14:13:34Z para 2026-07-16T13:41:00Z (sem leitura de valor)'
+    - 'gh api .../environments/production/secrets/AUTH_SESSION_SECRET → updated_at avançou de 2026-07-03T13:58:18Z para 2026-07-16T14:27:30Z (sem leitura de valor)'
+    - 'gh api .../actions/workflows → 4 workflows de deploy/release seguem disabled_manually (freeze do REC-001 intacto durante toda a execução)'
+    - 'grep sem impressão de valor completo em .claude/settings.json → confirma tecnicamente FND-01 (6 ocorrências de padrão sbp_, dois prefixos distintos), sem exposição adicional do valor'
+    - 'grep de secrets.GH_/GITHUB_/PAT nos workflows → nenhum PAT customizado armazenado além do GITHUB_TOKEN efêmero automático (release.yml)'
+  human_confirmation:
+    - 'IC: revogação do token gh CLI e novo login confirmados (CRED-02)'
+    - 'IC: supabase projects list → sucesso com token novo (CRED-03)'
+    - 'IC: wrangler whoami → sucesso com token novo (CRED-04)'
+    - 'IC: sessão admin antiga rejeitada após rotação de AUTH_SESSION_SECRET nos 3 ambientes (SESS-01)'
+    - 'IC: "senha trocada com sucesso" + "sessões antigas revogadas globalmente" (script Admin API)'
+    - 'IC: "MFA ativado com sucesso" (script enrollment TOTP)'
+  trace:
+    ac_covered: [1, 2, 4, 5, 6, 7]
+    ac_partial: [3]
+    ac_gaps:
+      - 'AC3: senha e MFA confirmados pelo IC, porém via caminho alternativo (Admin API + scripts descartáveis) por causa de dois obstáculos no fluxo padrão de e-mail (Site URL obsoleto + rate limit) — @qa avaliar se o caminho alternativo atende ao espírito do AC3.'
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'CRED-02, CRED-03, CRED-04 rotacionados com teste negativo do valor antigo (por efeito, sem reuso de valor) e teste positivo do valor novo, confirmado pelo IC.'
+    AC2:
+      status: PASS
+      notes: 'Sessão HMAC antiga (AUTH_SESSION_SECRET anterior) rejeitada após rotação nos 3 ambientes, testado pelo IC com sessão admin real ativa em produção.'
+    AC3:
+      status: CONCERNS
+      notes: >-
+        Decisão @qa: outcome do AC3 ATINGIDO — senha trocada e MFA (TOTP)
+        enrolled na conta Supabase Auth, com confirmação humana explícita em
+        duas etapas separadas, sem suposição de conclusão. O AC3 não prescreve o
+        fluxo de e-mail; o caminho alternativo (Admin API) atende ao espírito e
+        ainda adicionou revogação global de sessões. Mantido CONCERNS (não PASS)
+        por dois residuais ligados a esta task: SEC-103 (incidente lateral,
+        mitigado) e SEC-104 (MFA enrolled porém não exigido pelo login do app —
+        alteração de código, follow-up fora do escopo de REC-002). Ambos
+        documentados; nenhum bloqueia a contenção.
+    AC4:
+      status: PASS
+      notes: 'AUTH_SESSION_SECRET atualizado nos 3 ambientes (GitHub Actions, Supabase Edge Functions, Cloudflare Worker) na mesma janela, sem gap — REC-003 não foi necessário acionar.'
+    AC5:
+      status: PASS
+      notes: 'Inventário de rotação sem valor de credencial: identificador, consumidor, ambiente, timestamp, owner, resultado do teste, para cada item.'
+    AC6:
+      status: PASS
+      notes: 'Relatório e gate revisados sem valor de credencial, senha, JWT ou segredo reproduzido.'
+    AC7:
+      status: PASS
+      notes: '@devops não emite veredito de gate; solicitado a @qa. Gate criado com PENDING.'
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: >-
+      Rotação tecnicamente completa nos 4 itens de credencial + segredo HMAC,
+      com AC2 verificado no código pelos dois verificadores HMAC. Dois pontos
+      medium residuais: (1) SEC-103 — token de recuperação exposto na sessão de
+      trabalho, mitigado por revogação global (auth.admin.signOut global) no
+      mesmo ciclo; o vetor persistente (refresh token) está fechado, restando
+      apenas a janela de TTL do access_token JWT (default ~1h), já decorrida na
+      data desta revisão; @qa considera o vetor efetivamente fechado.
+      (2) SEC-104 — MFA enrolled mas não exigido pelo login do app; correção é
+      alteração de código, fora do escopo de REC-002, encaminhada como
+      follow-up. Nenhum bloqueia a contenção SEV-0.
+  reliability:
+    status: PASS
+    notes: 'Freeze do REC-001 permaneceu intacto durante toda a execução (nenhum workflow reabilitado, nenhum deploy disparado).'
+  auditability:
+    status: CONCERNS
+    notes: 'Mesma limitação estrutural do REC-001: audit logs de provedor (Supabase/Cloudflare) não coletados neste ciclo (REL-102).'
+
+recommendations:
+  immediate:
+    - action: >-
+        RESOLVIDO por @qa: gate emitido CONCERNS. AC3 outcome atingido; SEC-103
+        considerado vetor fechado (janela de TTL decorrida). Nenhuma ação
+        imediata bloqueante restante para REC-002.
+      refs: ['docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md']
+  future:
+    - action: >-
+        Abrir story de follow-up (código) para exigir AAL2/MFA no login admin do
+        app — hoje signInWithPassword não desafia o fator TOTP (SEC-104). Avaliar
+        vínculo com a trilha REC-201+.
+      refs: ['app/api/auth/session/route.ts:126']
+    - action: >-
+        IC corrigir Site URL/Redirect URLs obsoletos no Supabase Auth
+        (REL-101), fora do escopo de execução desta story.
+      refs: ['docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#8-gaps-e-recomendações-não-bloqueantes']
+    - action: >-
+        Avaliar migração do token gh CLI para PAT fine-grained sem escopo
+        gist (SEC-101), se a política de segurança exigir escopo exato.
+      refs: ['docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md#3-task-2--cred-02-token-github-cli']
