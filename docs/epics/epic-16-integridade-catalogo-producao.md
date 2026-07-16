@@ -1,6 +1,6 @@
 # Épica 16 — Integridade de Dados do Catálogo em Produção
 
-**Status:** Draft
+**Status:** Complete (2026-07-15, fechada via `*close-story` @po) — Story 16.1 `Done`, gate PASS em `docs/qa/gates/16.1-remover-fallback-mock-producao.yml`, commits `d6a8bc8`/`d221b37` confirmados em `main`. Banner corrigido nesta entrada — permanecia `Draft` por omissão.
 **PRD Source:** Investigação ad-hoc de causa raiz (`@architect`) sobre divergência entre dados exibidos em produção (admin + páginas públicas) e o estado real do banco Supabase.
 **Prioridade:** P1 (defeito de correção de dados — usuário reporta que a população de dados reais em produção está sendo afetada)
 **Fonte:** Handoff `@architect → @sm`, `.aiox/handoffs/2026-07-13-architect-to-sm-mock-fallback-story.yaml`, consolidando achados de uma investigação (agente Explore) sobre por que cursos/turmas/instrutores/posts fictícios aparecem em produção mesmo após limpezas manuais do banco (commits `29da4dc`, `fa284aa`).
@@ -45,7 +45,7 @@ Eliminar as fontes de dados fictícios ("mock") do caminho de renderização de 
 
 ### Story 16.1: Remover fallback de dados mock em produção e revisar SSG do catálogo
 **Objetivo:** Implementar AC-16.1 a AC-16.5
-**Status:** Ready
+**Status:** Done
 **Arquivo:** `docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md`
 
 ---

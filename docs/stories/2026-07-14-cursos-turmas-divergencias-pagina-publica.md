@@ -1,7 +1,7 @@
 # Story: Corrigir divergências entre formulários de curso/turma e a página pública do curso
 
 ## Status
-Draft
+Ready
 
 ## Executor Assignment
 executor: "@dev"
@@ -17,6 +17,15 @@ quality_gate_tools:
 **As a** operador do admin da RH Cursos,
 **I want** que tudo o que eu cadastro nos formulários de curso e turma apareça de forma fiel na página pública do curso,
 **so that** o que o cliente vê corresponda ao que foi configurado, sem turmas somindo, instrutor genérico ou dados fantasma antes do go-live de 02/07/2026.
+
+## Estimativa
+**M** — entre um e dois dias de esforço focado (7 ACs tocando elegibilidade de turma, mapper de instrutor, formulário de curso e página pública).
+
+## Dependências
+- **Sobreposição de arquivo com Épica 17 (`Done`):** a Story 17.2 (commit `a992597`, fechada em 2026-07-15) já alterou `CourseDetail.tsx` nesta mesma área (chips de rating/turmas, `buildTestimonial`). Esta story foi escrita em 2026-07-14, antes da 17.2 — dois itens precisam de reconciliação, já aplicada nesta validação:
+  - AC3 item 6 (chip "turmas ministradas"): **já resolvido pela 17.2**, que relabelou para "turmas abertas" pelo mesmo motivo descrito aqui. Task removida desta story para não duplicar trabalho.
+  - AC6 (remover chip de rating): a 17.2 decidiu manter o chip condicional a `rating > 0`. **Decisão @po nesta validação: esta story sobrescreve a 17.2 e remove o chip incondicionalmente**, mesmo quando `rating > 0` — ver AC6 atualizado abaixo.
+- **Não depende de nenhuma story REC-* em aberto.** Não bloqueia nem é bloqueada pela ADR015-F3 (arquivos distintos: esta story não toca `categoria`/`categorias`).
 
 ## 🤖 CodeRabbit Integration
 > **CodeRabbit Integration**: Disabled
@@ -47,8 +56,8 @@ quality_gate_tools:
 10. O formulário de curso passa a ter um campo numérico `durationHours` como fonte de verdade; `durationLabel` é derivado para exibição, invertendo a heurística atual `Number(str(form.durationLabel).replace(/\D/g,""))` (`admin-resource-configs.tsx:366`).
 11. Validação (`src/lib/admin-form-validation.ts` e `supabase/functions/_shared/admin-validation.ts`) garante `durationHours > 0`. "Certificado de {durationHours}h" (`CourseDetail.tsx:411`) passa a refletir o valor cadastrado sem ambiguidade.
 
-### AC6 — Rating removido da página (Decisão de produto: remover)
-12. O chip "Avaliação média {rating}/5" (`CourseDetail.tsx:572`) é removido. Nenhum campo de rating é adicionado ao formulário. `studentsCount` permanece derivado (real) e continua exibido.
+### AC6 — Rating removido da página (Decisão de produto: remover incondicionalmente — sobrescreve Story 17.2)
+12. O chip "Avaliação média {rating}/5" (atualmente em `CourseDetail.tsx:567-571`, renderizado condicionalmente a `rating > 0` desde a Story 17.2) é removido **por completo, independente do valor de `rating`**. Nenhum campo de rating é adicionado ao formulário. `studentsCount` permanece derivado (real) e continua exibido. **Esta decisão sobrescreve a Story 17.2** (que optou por manter o chip condicional); a 17.2 não precisa ser reaberta, mas o código dela nesta área é substituído por esta story.
 
 ### AC7 — Qualidade
 13. `npm run typecheck`, `npm run lint`, `npm run test:unit` e `npm run build` passam. `npm run test:e2e:smoke` executado ou risco aceito explicitamente no gate.
@@ -61,7 +70,7 @@ quality_gate_tools:
   - [ ] Testes de `getOpenEnrollmentClasses` cobrindo os dois casos.
 - [ ] Instrutor determinístico + chip correto (AC3)
   - [ ] Tornar `primaryInstructor` determinístico em `mappers.ts` (nextClass → mais recente).
-  - [ ] Corrigir/remover chip "turmas ministradas".
+  - [x] ~~Corrigir/remover chip "turmas ministradas"~~ — já resolvido pela Story 17.2 (relabelado para "turmas abertas").
   - [ ] Aviso de turma sem instrutor no form.
 - [ ] Exibir nível (AC4)
   - [ ] Chip de `course.level` no hero; remover/condicionar texto fixo.
@@ -85,6 +94,18 @@ quality_gate_tools:
 ### Fronteira (No Invention)
 - Esta story **não** altera schema do banco. `rating`/`studentsCount`/`categoria` continuam como estão no banco; apenas a exibição de rating é removida. Mudança de cardinalidade de categorias é a story separada de ADR-015 Fase 3.
 
+## Riscos e Roll-forward / Rollback
+
+### Riscos
+- **Conflito de merge com Épica 17:** `CourseDetail.tsx` foi tocado pela Story 17.2 na sessão anterior a esta validação; qualquer branch aberta antes dessa story precisa rebasear antes de editar os mesmos trechos (chips do hero/sidebar).
+- **Mudança de comportamento de `courseClasses`:** ao incluir "Em breve" e "Esgotada" em `getOpenEnrollmentClasses`, qualquer código que assuma que todo item da lista tem `availableSeats > 0` (ex.: cálculo de urgência) precisa ser revisado — `getUrgencyLabel` já tem branch para "Em breve" mas não para "Esgotada"; adicionar tratamento explícito para evitar mensagem de urgência incorreta em turma esgotada.
+- **Instrutor determinístico pode mudar o instrutor exibido em cursos já publicados:** cursos onde `principal` não está setado corretamente podem trocar de instrutor exibido ao mudar a regra de fallback (array-order → nextClass). Mitigação: `@dev` roda uma amostragem antes/depois da mudança para cursos publicados, sem alterar dados.
+
+### Roll-forward / Rollback
+- **Roll-forward preferido:** ajustar a lógica de elegibilidade/instrutor mantendo os testes de regressão; não reverter para o comportamento antigo de turmas sumindo.
+- **Rollback seguro:** reverter isoladamente `CourseDetail.tsx`/`enrollment-class-resolution.ts` para o estado anterior a esta story, preservando as correções já shippadas pela Story 17.2 (testimonial/rating condicional) — não é um rollback total do arquivo.
+- **Rollback proibido:** remover o teste de regressão de elegibilidade de turma sem substituir por outro equivalente.
+
 ### Relevant Source Tree
 ```
 src/lib/enrollment-class-resolution.ts
@@ -105,3 +126,4 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 | Date | Version | Description | Author |
 |---|---|---|---|
 | 2026-07-14 | 0.1 | Story criada a partir da análise de divergências entre formulários de curso/turma e a página pública. Decisões de produto travadas: "Em breve" exibido, instrutor inferido determinístico, rating removido da página. Categorias multi-valor foram isoladas em story separada (ADR-015 Fase 3) por exigirem migration. Draft aguardando validação @po. | @architect (Aria) |
+| 2026-07-15 | 1.0 | **NO-GO inicial (~5,5/10) → correções aplicadas → GO; Draft → Ready.** Grounding técnico verificado no código real; checklist de 10 pontos identificou ausência de Estimativa, Dependências e Riscos/Rollback — corrigidos nesta entrada. Dois achados de conteúdo, não só de forma: (1) AC3 item 6 ("chip turmas ministradas") já estava resolvido pela Story 17.2 (Épica 17, commit `a992597`), que relabelou o chip para "turmas abertas" antes desta validação — task marcada como já resolvida, sem duplicar trabalho; (2) AC6 (remover chip de rating) conflitava com a decisão já implementada pela 17.2 de manter o chip condicional a `rating > 0`. Decisão @po (usuário consultado): **esta story sobrescreve a 17.2 e remove o chip incondicionalmente** — AC6 atualizado para deixar isso explícito, e a Dependências documenta a sobreposição de arquivo para quem for implementar não reabrir a 17.2. Bloqueadores documentais: 0. | @po (Pax) |

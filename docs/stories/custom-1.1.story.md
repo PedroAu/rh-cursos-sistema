@@ -3,7 +3,7 @@ epicNum: custom
 storyNum: "1.1"
 storyId: "custom-1.1"
 title: "Implementar Design System Trust Keith com Economia de Tokens"
-status: ReadyForReview
+status: Done
 created: 2026-06-28
 priority: P0
 estimatedPoints: 21
@@ -479,10 +479,15 @@ Must be available in project:
 
 ---
 
-**Story Status:** Ready for Review
+**Story Status:** Done
 **Created:** 2026-06-28
-**Last Updated:** 2026-07-04
+**Last Updated:** 2026-07-15
 **Author:** @sm (River, Scrum Master)
+
+## Change Log
+| Date | Version | Description | Author |
+|---|---|---|---|
+| 2026-07-15 | 1.0 | **Story fechada formalmente — ReadyForReview → Done.** Gate QA PASS confirmado (re-review 2026-07-04, escopo Fase 1-2/fundação: tokens + componentes base), com "Recommended Status: Ready for Done" nunca aplicado ao campo Status. Fases 3-4 (rollout de páginas + quality gates) corretamente cobertas pela story de continuação `custom-1.2`, já `Done`. Encerramento do lifecycle `*close-story`. | @po (Pax) |
 
 ## QA Results
 

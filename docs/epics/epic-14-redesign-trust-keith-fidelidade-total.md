@@ -1,6 +1,6 @@
 # EPIC 14 — Redesign Trust Keith: Fidelidade Total + Remoção do Mantine
 
-**Status:** Draft
+**Status:** Complete (2026-07-15, fechada via `*close-story` @po) — 22/22 stories `Done`; PR #5 (story 14.3.4) confirmado mesclado em 2026-07-08 com CI 100% verde (6/6 checks + CodeRabbit). Banner corrigido nesta entrada — permanecia `Draft` por omissão desde a criação, apesar de todas as sub-stories já fechadas.
 **Owner:** @aiox-master (Orion) — orquestração
 **Executor de implementação:** Codex (stories de @dev serão prompts autossuficientes)
 **Branch alvo:** `main` (via PR de branch de entrega)

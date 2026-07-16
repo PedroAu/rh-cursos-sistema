@@ -1,6 +1,6 @@
 # Épica 15 — Admin Dashboard: Fidelidade Total (Trust Keith)
 
-**Status:** Draft
+**Status:** Em andamento — Fase 1 (Story 15.1, Dashboard) `Done` (fechada via `*close-story` @po em 2026-07-15, QA PASS após correção do REL-001 em `query-logging-middleware.ts`). Fases 15.2–15.8 (Cursos, Turmas, Matrículas, Alunos, Instrutores, Leads, Blog/Páginas/Configurações) permanecem **não criadas**, aguardando priorização de `@pm` antes de virarem stories.
 **PRD Source:** Auditoria de fidelidade ad-hoc (dashboard admin em produção vs. canvas Trust Keith)
 **Prioridade:** P2 (débito de design — dashboard admin nunca migrado para o novo DS)
 **Fonte:** Épica 14 (Redesign Trust Keith) excluiu explicitamente o redesign visual do admin do seu escopo (ver `docs/stories/2026-07-02-epic14-story1-3-admin-shell-resign.md`, linha "Redesign visual do admin — não é escopo desta epic"). Esta épica cobre essa lacuna.
@@ -45,7 +45,7 @@ Levar as telas do painel administrativo (`docs/design-system/RH Cursos Admin Das
 
 ### Story 15.1: Admin Dashboard — Fidelidade Total (Trust Keith)
 **Objetivo:** Implementar a tela Dashboard conforme `spec-admin-dashboard.md`
-**Status:** Draft
+**Status:** Done
 **Arquivo:** `docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md`
 
 ### Stories futuras (não criadas ainda)
