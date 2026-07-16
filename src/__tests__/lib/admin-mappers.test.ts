@@ -35,6 +35,52 @@ describe("courseToUpsert", () => {
     expect(payload.modalidades).toEqual(["Hibrido"]);
   });
 
+  it("persists every selected category while keeping the primary legacy field coherent [Story ADR015-F3]", () => {
+    const payload = courseToUpsert(
+      {
+        title: "Curso multicategoria",
+        pathId: "path-dp",
+        level: "Básico",
+        status: "Ativo",
+        categories: ["Tecnologia", "Gestão Pública"],
+      },
+      "Departamento Pessoal"
+    );
+
+    expect(payload.categoria).toBe("Tecnologia");
+    expect(payload.categorias).toEqual(["Tecnologia", "Gestão Pública"]);
+  });
+
+  it("falls back to the singular category only for legacy callers [Story ADR015-F3]", () => {
+    const payload = courseToUpsert(
+      {
+        title: "Curso legado",
+        pathId: "path-dp",
+        level: "Básico",
+        status: "Ativo",
+        category: "Saúde",
+      },
+      "Departamento Pessoal"
+    );
+
+    expect(payload.categoria).toBe("Saúde");
+    expect(payload.categorias).toEqual(["Saúde"]);
+  });
+
+  it("persists an empty categorias array when no category is provided [Story ADR015-F3]", () => {
+    const payload = courseToUpsert(
+      {
+        title: "Curso sem categoria",
+        pathId: "path-dp",
+        level: "Básico",
+        status: "Ativo",
+      },
+      "Departamento Pessoal"
+    );
+
+    expect(payload.categorias).toEqual([]);
+  });
+
   it("omits the enrollment-managed student counter from ordinary admin saves", () => {
     const payload = courseToUpsert(
       {

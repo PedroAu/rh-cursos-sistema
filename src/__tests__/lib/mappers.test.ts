@@ -36,6 +36,7 @@ const courseRow: CourseRow = {
   modalidades: ["Online"],
   nivel: "Basico",
   categoria: "Tecnologia",
+  categorias: ["Tecnologia"],
   trilha_id: "path-tech",
   trilha_nome: null,
   preco_base: 1200,
@@ -129,6 +130,37 @@ describe("Supabase mappers", () => {
 
     expect(course.modality).toBe("Presencial");
     expect(course.modalities).toEqual(["Presencial", "Ao vivo online", "Gravado"]);
+  });
+
+  it("preserves every categoria returned by the database [Story ADR015-F3]", () => {
+    const course = mapCourse(
+      { ...courseRow, categoria: "Tecnologia", categorias: ["Tecnologia", "Gestão Pública", "Saúde"] },
+      [courseInstructorRow],
+      [classRow]
+    );
+
+    expect(course.category).toBe("Tecnologia");
+    expect(course.categories).toEqual(["Tecnologia", "Gestão Pública", "Saúde"]);
+  });
+
+  it("falls back to [categoria] when categorias is empty (legacy row, pre-backfill) [Story ADR015-F3]", () => {
+    const course = mapCourse(
+      { ...courseRow, categoria: "Tecnologia", categorias: [] },
+      [courseInstructorRow],
+      [classRow]
+    );
+
+    expect(course.categories).toEqual(["Tecnologia"]);
+  });
+
+  it("returns an empty categories array when both categoria and categorias are absent [Story ADR015-F3]", () => {
+    const course = mapCourse(
+      { ...courseRow, categoria: null, categorias: [] },
+      [courseInstructorRow],
+      [classRow]
+    );
+
+    expect(course.categories).toEqual([]);
   });
 
   it.each(COURSE_STATUSES)(

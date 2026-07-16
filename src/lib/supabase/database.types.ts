@@ -106,6 +106,7 @@ export type Database = {
           modalidades: ("Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado")[];
           nivel: "Basico" | "Intermediario" | "Avancado" | "Misto";
           categoria: string | null;
+          categorias: string[];
           trilha_id: string | null;
           trilha_nome: string | null;
           preco_base: number;
@@ -133,6 +134,7 @@ export type Database = {
           modalidades?: ("Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado")[];
           nivel?: "Basico" | "Intermediario" | "Avancado" | "Misto";
           categoria?: string | null;
+          categorias?: string[];
           trilha_id?: string | null;
           trilha_nome?: string | null;
           preco_base?: number;

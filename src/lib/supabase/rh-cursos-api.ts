@@ -216,7 +216,7 @@ async function fetchCatalog(
         () => {
           const query = client
             .from("curso")
-            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
+            .select("id,titulo,slug,descricao_curta,descricao,ementa,objetivos,beneficios,publico_alvo,carga_horaria,modalidade,modalidades,nivel,categoria,categorias,trilha_id,trilha_nome,preco_base,status,destaque,imagem_capa,rating,total_alunos")
             .is("deleted_at", null);
 
           return (visibility === "public"

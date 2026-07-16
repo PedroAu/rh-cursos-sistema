@@ -1,0 +1,164 @@
+schema: 1
+story: ADR015-F3
+story_title: 'Persistência de múltiplas categorias por curso'
+gate: PASS
+status_reason: >-
+  Todos os itens do CONCERNS anterior fechados e verificados de primeira mão
+  nesta re-revisão: npm run test:db verde (45/45 pgTAP, incl. as 9 assertions
+  do trigger curso_sync_categoria_trg) com a migration aplicada em db reset
+  limpo; e2e smoke re-executado com bundle corretamente buildado contra a
+  stack isolada (119 passed, 3 failed) — o teste de UI que exercita o
+  round-trip multi-categoria (admin-crud "salva categoria sugerida + nova
+  categoria livre e persiste na edição") passou, e as 3 falhas restantes são
+  divergência de seed do ambiente (catálogo local com 1 curso vs baseline de
+  3), sem relação com categorias. typecheck/lint/unit (582/582)/build verdes.
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-15T20:30:00Z'
+expires: '2026-07-29T00:00:00Z'
+quality_score: 100
+
+top_issues: []
+
+history:
+  - date: '2026-07-15T18:00:00Z'
+    gate: CONCERNS
+    resolved: >-
+      Item bloqueante (medium): pgTAP do trigger nunca executado (Docker down).
+      Resolvido — Docker subiu, npm run test:db rodou verde 45/45 (9 do trigger
+      de categorias) e npm run test:e2e:smoke rodou verde no path da story.
+      Itens low (docs/requirements) já haviam sido tratados pelo dev/@po no
+      Change Log 1.4.
+
+observations:
+  - severity: low
+    category: process
+    suggested_owner: dev
+    description: >-
+      A alegação de e2e do dev no Change Log 1.4 (71 passed/42 failed,
+      atribuídas ao guard) foi verificada e é enganosa: o run do dev reutilizou
+      um bundle .next buildado com env de produção, então as NEXT_PUBLIC_* não
+      apontavam para a stack isolada. Com rebuild correto (env local desde o
+      build) o smoke cai para 119 passed / 3 failed, e as 3 falhas são seed do
+      ambiente, não o guard nem regressão. Conclusão de "não-regressão" do dev
+      estava certa, mas o raciocínio/evidência não. Registrado para não
+      reutilizar o padrão.
+
+waiver:
+  active: false
+
+evidence:
+  tests_reviewed: 636
+  risks_identified: 3
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_gaps: []
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      tests:
+        - supabase/tests/database/adr015-f3-curso-categorias.test.sql (9/9 executado nesta revisão)
+        - npm run test:db (45/45 pgTAP verde; db reset aplicou a migration limpa)
+      notes: >-
+        Migration correta por execução, não só inspeção: coluna text[] not null
+        default '{}', backfill idempotente, trigger BEFORE com direção
+        autoritativa categorias -> categoria (incl. reset por write legado e
+        categoria=null esvaziando o array), índice parcial preservado + GIN
+        novo, RLS/GRANTs verificados (policy por linha, grants table-level).
+        Triggers pré-existentes em curso não conflitam. Aplicação em produção
+        segue via pipeline REC-402 (task da story ainda aberta, corretamente).
+    AC2:
+      status: PASS
+      tests:
+        - src/__tests__/lib/mappers.test.ts (3 casos novos)
+        - src/__tests__/lib/schemas.test.ts (novo — prova anti-strip do zod)
+      notes: >-
+        fromDbCategories lê categorias com fallback [categoria]; category
+        continua categories[0]. Gap de zod-strip em publicCourseSchema +
+        select de fetchCatalog encontrado e corrigido pelo dev — sem isso o
+        campo seria descartado silenciosamente em validateResponse.
+    AC3:
+      status: PASS
+      tests:
+        - src/__tests__/lib/admin-mappers.test.ts (3 casos novos)
+      notes: >-
+        normalizeCourseCategories persiste o array completo + categoria
+        derivada; payload de ida confirmado em admin-resource-configs.tsx
+        (category + categories enviados pelo form).
+    AC4:
+      status: PASS
+      tests:
+        - unit em camadas (mapper/edge/schema) PASS
+        - pgTAP round-trip de update (executado, verde)
+        - e2e admin-crud "salva categoria sugerida + nova categoria livre e persiste na edição" (verde)
+      notes: >-
+        Round-trip fiel provado end-to-end nesta revisão: o teste de UI que
+        salva categoria sugerida + nova categoria livre e recarrega na edição
+        passou contra a stack isolada, cobrindo form -> edge -> trigger -> DB
+        -> mapper -> releitura.
+    AC5:
+      status: PASS
+      tests:
+        - inspeção do diff (nenhum arquivo de UI tocado)
+      notes: >-
+        admin-resource-configs.tsx inalterado; form já era type array desde a
+        F2.
+    AC6:
+      status: PASS
+      tests:
+        - npm run typecheck / lint / test:unit (582/582) / build — verdes (re-executados)
+        - npm run test:db (45/45) — verde
+        - npm run test:e2e:smoke — 119 passed / 3 failed (falhas = seed do ambiente, não regressão)
+      notes: >-
+        Todos os gates da story executados. As 3 falhas de smoke são
+        divergência de seed do stack local (1 curso ativo vs baseline de 3:
+        WCAG e baseline visual do painel de filtros esperam "3 cursos no
+        catálogo"; strict-mode de "Taxonomia" no artigo de blog) — nenhuma
+        toca categorias. RLS revisada conforme exigido.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Coluna coberta por GRANTs table-level existentes; policy por linha
+      inalterada; trigger sem SECURITY DEFINER (roda com privilégios do
+      caller); sem PII.
+  performance:
+    status: PASS
+    notes: >-
+      curso_categoria_idx permanece válido (categoria segue populada);
+      curso_categorias_gin_idx adequado para filtro por qualquer categoria;
+      trigger O(1) por linha.
+  reliability:
+    status: PASS
+    notes: >-
+      Comportamento do trigger agora verificado por execução (pgTAP 9/9 verde,
+      incl. reset por write legado e categoria=null). Sequenciamento
+      migration-antes-de-deploy depende do pipeline REC-402 (mandatório) — o
+      fallback do mapper não cobre coluna ausente no select explícito, mas o
+      pipeline serializa a migration antes de qualquer deploy dependente.
+  maintainability:
+    status: PASS
+    notes: >-
+      Espelha o padrão modalidades em todos os níveis (helper, trigger,
+      testes); comentários registram as decisões travadas; débito do gap
+      análogo de modalidades no publicCourseSchema apontado para backlog.
+
+recommendations:
+  immediate: []
+  future:
+    - action: >-
+        Registrar débito técnico: modalidades tem o mesmo gap de zod-strip em
+        publicCourseSchema (não coberto), pré-existente e fora do escopo desta
+        story.
+      refs: ['src/lib/supabase/schemas.ts']
+    - action: >-
+        Aplicar a migration exclusivamente via
+        .github/workflows/apply-migrations.yml (REC-402) — task da story ainda
+        aberta, nunca manualmente em produção.
+      refs: ['supabase/migrations/20260715090000_curso_categorias_array.sql']
+    - action: >-
+        Investigar por que o seed baseline (20260713170000_seed_public_baseline_catalog)
+        deixou 1 curso ativo no stack local em vez dos 3 esperados por
+        publicTestBaselineCourses — afeta reprodutibilidade do smoke local, não
+        esta story.
+      refs: ['supabase/migrations/20260713170000_seed_public_baseline_catalog.sql']

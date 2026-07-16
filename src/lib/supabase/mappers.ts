@@ -201,6 +201,18 @@ function fromDbModalities(row: CourseRow): Course["modality"][] {
   return [fromDbModality(row.modalidade)];
 }
 
+// ADR-015 Fase 3 (Story ADR015-F3, AC2): `categorias` é autoritativo; cai
+// para `[categoria]` quando `categorias` for nulo/vazio (linhas legadas ainda
+// não backfilled ou deploy do mapper antes da migration, AC2/risco de
+// sequenciamento documentado na story).
+function fromDbCategories(row: CourseRow): string[] {
+  if (Array.isArray(row.categorias) && row.categorias.length > 0) {
+    return row.categorias;
+  }
+
+  return row.categoria ? [row.categoria] : [];
+}
+
 function fromDbLevel(value: CourseRow["nivel"]): Course["level"] {
   return levelDbToLabel(value);
 }
@@ -308,6 +320,7 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     pathId: row.trilha_id ?? "path-dp",
     pathName: row.trilha_nome ?? trainingPathNames[row.trilha_id ?? ""] ?? "Cursos",
     category: row.categoria ?? undefined,
+    categories: fromDbCategories(row),
     modality: modalities[0] ?? fromDbModality(row.modalidade),
     modalities,
     durationLabel: `${row.carga_horaria}h`,
@@ -317,7 +330,6 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     shortDescription: row.descricao_curta ?? "",
     fullDescription: row.descricao ?? row.descricao_curta ?? "",
     targetAudience: asStringArray(row.publico_alvo),
-    categories: row.categoria ? [row.categoria] : [],
     objectives: asStringArray(row.objetivos),
     benefits: asStringArray(row.beneficios),
     modules: asModules(row.ementa),

@@ -36,6 +36,21 @@ function normalizeCourseModalities(p: AnyPayload): Modality[] {
   return ["Ao vivo online"];
 }
 
+// ADR-015 Fase 3 (Story ADR015-F3, AC3): `categorias` é o array completo
+// enviado pelo admin; `categoria` continua derivado da primeira entrada para
+// compatibilidade com leitores legados (também mantido por trigger no banco).
+function normalizeCourseCategories(p: AnyPayload): string[] {
+  if (Array.isArray(p.categories) && p.categories.length > 0) {
+    return p.categories as string[];
+  }
+
+  if (typeof p.category === "string" && p.category.length > 0) {
+    return [p.category];
+  }
+
+  return [];
+}
+
 export function toDbLevel(value: string): string {
   if (value === "Avançado" || value.includes("Avançado")) return "Avancado";
   if (value === "Intermediário" || value.includes("Intermediário")) return "Intermediario";
@@ -122,6 +137,7 @@ export function courseToUpsert(p: AnyPayload, trilhaNome: string): AnyPayload {
     modalidades: modalities.map((value) => toDbModality(value)),
     nivel: toDbLevel(p.level ?? "Básico"),
     categoria: p.category ?? p.categories?.[0],
+    categorias: normalizeCourseCategories(p),
     trilha_id: p.pathId,
     trilha_nome: trilhaNome,
     preco_base: p.price ?? 0,

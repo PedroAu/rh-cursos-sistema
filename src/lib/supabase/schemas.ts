@@ -29,6 +29,7 @@ export const publicCourseSchema = z.object({
   modalidade: modalidadeEnum,
   nivel: z.enum(["Basico", "Intermediario", "Avancado", "Misto"]),
   categoria: z.string().nullable(),
+  categorias: z.array(z.string()).default([]),
   trilha_id: z.string().nullable(),
   trilha_nome: z.string().nullable(),
   preco_base: dbNumber,
