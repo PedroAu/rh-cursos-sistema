@@ -3140,8 +3140,8 @@
     "semantic_hash": ""
   },
   ".claude/settings.json": {
-    "mtime": 1783527338.3989098,
-    "ast_hash": "78c6f3de51cfef0101a056cf3204ccd8",
+    "mtime": 1784216856.1847284,
+    "ast_hash": "b63d894b908010aab96754bdedbc9357",
     "semantic_hash": ""
   },
   ".codex/hooks.json": {
@@ -3300,8 +3300,8 @@
     "semantic_hash": ""
   },
   "app/api/enrollments/route.ts": {
-    "mtime": 1784078225.623301,
-    "ast_hash": "28c478c8c0a96701cbae2fbe84fdf497",
+    "mtime": 1784289749.8381414,
+    "ast_hash": "3b6f9f9106c36d7c4bfc19a9380c2487",
     "semantic_hash": ""
   },
   "app/blog/[slug]/page.tsx": {
@@ -3455,7 +3455,7 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1784125727.617557,
+    "mtime": 1784255432.170997,
     "ast_hash": "2a74d3909800ca5467fa83b0ab4a4890",
     "semantic_hash": ""
   },
@@ -3470,8 +3470,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1784055749.7064989,
-    "ast_hash": "d7d128ce5913e764279df747325600bc",
+    "mtime": 1784253432.092449,
+    "ast_hash": "762c8bb9aafd3d75c65299ea7a7cbcc4",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
@@ -3590,8 +3590,8 @@
     "semantic_hash": ""
   },
   "scripts/test-db.mjs": {
-    "mtime": 1782486718.9961088,
-    "ast_hash": "86a7c7ff3473e934680921a983497f03",
+    "mtime": 1784234174.0018413,
+    "ast_hash": "7629e48c4aad67cd7858dc602ebbbc0e",
     "semantic_hash": ""
   },
   "scripts/validate-design-system.mjs": {
@@ -3690,8 +3690,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/app-store.test.ts": {
-    "mtime": 1784078376.500936,
-    "ast_hash": "d9ca62e0b76bed263d053217e9504520",
+    "mtime": 1784291719.8812008,
+    "ast_hash": "bc84a6ba17a9dae74e960df576ee25eb",
     "semantic_hash": ""
   },
   "src/__tests__/lib/auth.test.ts": {
@@ -3725,8 +3725,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/csv-export.test.ts": {
-    "mtime": 1782524109.1557662,
-    "ast_hash": "2bd34515b36574efafd765b83aa1ed2f",
+    "mtime": 1784293668.145291,
+    "ast_hash": "ff4eb98ed2af1d59e99674c796e6e5bf",
     "semantic_hash": ""
   },
   "src/__tests__/lib/debounce.test.ts": {
@@ -3740,8 +3740,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/enrollment-errors.test.ts": {
-    "mtime": 1783746452.012517,
-    "ast_hash": "1b46bbbae46bca48d1211a65e654d2ef",
+    "mtime": 1784238023.8901587,
+    "ast_hash": "7ee06d3546059dc4c2bb748f118d5987",
     "semantic_hash": ""
   },
   "src/__tests__/lib/execution-test.test.ts": {
@@ -3765,8 +3765,8 @@
     "semantic_hash": ""
   },
   "src/__tests__/lib/rate-limit.test.ts": {
-    "mtime": 1783773534.0813088,
-    "ast_hash": "7e4b26ca2ffad57765981079d586e1d6",
+    "mtime": 1784289770.762331,
+    "ast_hash": "aae6d70bc962eba00856bafbb2252620",
     "semantic_hash": ""
   },
   "src/__tests__/lib/reference-resolution.test.ts": {
@@ -4345,8 +4345,8 @@
     "semantic_hash": ""
   },
   "src/features/admin-shell/components/admin-topbar.tsx": {
-    "mtime": 1783014422.7058177,
-    "ast_hash": "1e48ad420d6d559dcecbbc158fc45299",
+    "mtime": 1784308380.7857418,
+    "ast_hash": "88eb52444d0e59b1d1665ed91257b4af",
     "semantic_hash": ""
   },
   "src/features/admin-shell/config/admin-navigation.ts": {
@@ -4355,8 +4355,8 @@
     "semantic_hash": ""
   },
   "src/features/admin-shell/dashboard-shell.tsx": {
-    "mtime": 1784058682.556985,
-    "ast_hash": "3bb10b9eb636aa417eeba6041f5af321",
+    "mtime": 1784308344.1971366,
+    "ast_hash": "bdeea8977e49e68320c71e01f54bbea2",
     "semantic_hash": ""
   },
   "src/features/admin/dashboard/admin-dashboard-page.tsx": {
@@ -4500,8 +4500,8 @@
     "semantic_hash": ""
   },
   "src/lib/app-store.tsx": {
-    "mtime": 1784086835.7776532,
-    "ast_hash": "39ea2c19c1f2451b1024ea59ba45ced6",
+    "mtime": 1784291515.5920339,
+    "ast_hash": "6a531dff3b29eee064f313853fd43631",
     "semantic_hash": ""
   },
   "src/lib/auth-session.ts": {
@@ -4610,8 +4610,8 @@
     "semantic_hash": ""
   },
   "src/lib/rate-limit.ts": {
-    "mtime": 1783772603.4691768,
-    "ast_hash": "9cd89a4f2eb7a441b129f1498cddb45d",
+    "mtime": 1784289721.5282767,
+    "ast_hash": "b673611e2ce4496c22d7b0f3fe8f902e",
     "semantic_hash": ""
   },
   "src/lib/router-compat.tsx": {
@@ -4655,8 +4655,8 @@
     "semantic_hash": ""
   },
   "src/lib/supabase/database.types.ts": {
-    "mtime": 1784126839.8970835,
-    "ast_hash": "0f6e90a3179eda6207674f7a8239324d",
+    "mtime": 1784217923.211557,
+    "ast_hash": "72314aeeaf30db2125e92e0cfea77e26",
     "semantic_hash": ""
   },
   "src/lib/supabase/functions-client.ts": {
@@ -4680,18 +4680,18 @@
     "semantic_hash": ""
   },
   "src/lib/supabase/rh-cursos-api.ts": {
-    "mtime": 1784126974.2085428,
-    "ast_hash": "36f75c38e1262619bdb98503bf2111cf",
+    "mtime": 1784291523.0863314,
+    "ast_hash": "c01d118d5a2e77af323cb678161773cc",
     "semantic_hash": ""
   },
   "src/lib/supabase/schemas.ts": {
-    "mtime": 1784126969.0091834,
-    "ast_hash": "6bc2076cfe787688bb8783b54129a05f",
+    "mtime": 1784217940.8036807,
+    "ast_hash": "030e22ea9dd0bb70794852d7ebc9b15e",
     "semantic_hash": ""
   },
   "src/lib/supabase/server.ts": {
-    "mtime": 1783021735.478498,
-    "ast_hash": "afdc9b125ba613672940a5ae81e2dbd5",
+    "mtime": 1784234032.650239,
+    "ast_hash": "3c1b2a16d2b9a01d9381086bf2d26ef4",
     "semantic_hash": ""
   },
   "src/lib/supabase/session-token.ts": {
@@ -4710,8 +4710,8 @@
     "semantic_hash": ""
   },
   "src/lib/utils/csv-export.ts": {
-    "mtime": 1782438375.5573401,
-    "ast_hash": "ae9555d57d16851912815d864f306f00",
+    "mtime": 1784293622.4931362,
+    "ast_hash": "d9cb4c0df1cc1c7eef77baa025b9429b",
     "semantic_hash": ""
   },
   "src/lib/validation.ts": {
@@ -4745,8 +4745,8 @@
     "semantic_hash": ""
   },
   "src/views/admin/AdminResourcePage.tsx": {
-    "mtime": 1784033582.2129343,
-    "ast_hash": "3308ac7b791bc31d241dff2d012ede14",
+    "mtime": 1784293633.3868551,
+    "ast_hash": "7de58bab4cf5c425ca4abcfe97f58fe4",
     "semantic_hash": ""
   },
   "src/views/admin/AdminSettingsPage.tsx": {
@@ -4820,8 +4820,8 @@
     "semantic_hash": ""
   },
   "src/views/public/Login.tsx": {
-    "mtime": 1784039192.761629,
-    "ast_hash": "a5094188d8623d176e5e73a4144e47c9",
+    "mtime": 1784310387.6284974,
+    "ast_hash": "1098b7ce713b3bc424d2ae141edeed68",
     "semantic_hash": ""
   },
   "src/views/public/SpecialistContact.tsx": {
@@ -4865,8 +4865,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/_shared/enrollment-errors.ts": {
-    "mtime": 1783746413.601846,
-    "ast_hash": "718ac5bb8f2602696fc495c57c91f14b",
+    "mtime": 1784238036.6772773,
+    "ast_hash": "f24d365e37692f4f414556a66ca9650b",
     "semantic_hash": ""
   },
   "supabase/functions/_shared/rate-limit.ts": {
@@ -4890,8 +4890,8 @@
     "semantic_hash": ""
   },
   "supabase/functions/admin-resources/index.ts": {
-    "mtime": 1784086549.0888886,
-    "ast_hash": "477653930773a3a3289237dd798193f3",
+    "mtime": 1784216716.8040328,
+    "ast_hash": "801bbd1410102a412d9c046b1cf8697d",
     "semantic_hash": ""
   },
   "supabase/functions/auth-session/index.ts": {
@@ -4900,13 +4900,13 @@
     "semantic_hash": ""
   },
   "supabase/functions/enrollments/index.ts": {
-    "mtime": 1784078225.6240168,
-    "ast_hash": "4fa5688240d662234ff36a6934d83bf7",
+    "mtime": 1784237937.6842158,
+    "ast_hash": "d677b51cd47be3fb63b0050345670d5d",
     "semantic_hash": ""
   },
   "supabase/functions/leads/index.ts": {
-    "mtime": 1782905625.8158696,
-    "ast_hash": "65ca61e3ae02e6d9ecab1198778108b4",
+    "mtime": 1784216705.6263132,
+    "ast_hash": "b67222de801489c01f33863306cab32e",
     "semantic_hash": ""
   },
   "supabase/migrations/20260512193000_initial_rh_cursos_schema.sql": {
@@ -5145,8 +5145,8 @@
     "semantic_hash": ""
   },
   "vitest.config.ts": {
-    "mtime": 1782523849.9758399,
-    "ast_hash": "c13187e941dcde8d8606a8acdb7a4447",
+    "mtime": 1784252910.387525,
+    "ast_hash": "61d57761600e91f463a0ade139544ea1",
     "semantic_hash": ""
   },
   ".agents/skills/aios-god-mode/SKILL.md": {
@@ -10545,8 +10545,8 @@
     "semantic_hash": ""
   },
   "docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md": {
-    "mtime": 1784125096.8852136,
-    "ast_hash": "3e10b41cd2df98ce14631879548ccfb2",
+    "mtime": 1784310673.980763,
+    "ast_hash": "f5b6d601f7c79575c4cf317dcaeae771",
     "semantic_hash": ""
   },
   "docs/qa/gates/rec-301-converter-checkout-pre-inscricao.yml": {
@@ -10570,8 +10570,8 @@
     "semantic_hash": ""
   },
   "docs/stories/2026-07-14-adr015-fase3-categorias-multivalor-persistencia.md": {
-    "mtime": 1784127316.7020702,
-    "ast_hash": "969caabaa38696ee5c4aac3e7af996e8",
+    "mtime": 1784146093.8537176,
+    "ast_hash": "d70ee33f00bb9d4bbc1118eb76224699",
     "semantic_hash": ""
   },
   "docs/stories/2026-07-14-cursos-turmas-divergencias-pagina-publica.md": {
@@ -10590,8 +10590,8 @@
     "semantic_hash": ""
   },
   "docs/stories/2026-07-14-rec-001-incidente-freeze-evidencias.md": {
-    "mtime": 1784053181.4357898,
-    "ast_hash": "145220f0e61d755e15e0fdc73e54be7b",
+    "mtime": 1784160252.1048594,
+    "ast_hash": "15d8aab1312ae21760d4d66f91515fc1",
     "semantic_hash": ""
   },
   "docs/stories/2026-07-14-rec-301-converter-checkout-pre-inscricao.md": {
@@ -10617,6 +10617,576 @@
   "docs/stories/2026-07-14-rec-403-suite-agregada-baseline-verde.md": {
     "mtime": 1784123223.6366374,
     "ast_hash": "d2afd51d824581e7101ca9063d8f330f",
+    "semantic_hash": ""
+  },
+  "scripts/test-db-rec105-concurrency.mjs": {
+    "mtime": 1784234777.0049798,
+    "ast_hash": "49f1c4e841bd5c3c6ed5aacd8496844a",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/lockdown.test.ts": {
+    "mtime": 1784216803.205791,
+    "ast_hash": "9391a90690b77d2c55e81053c7cae79f",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/rh-cursos-api-server-client.test.ts": {
+    "mtime": 1784234731.0513034,
+    "ast_hash": "bfa991652daa1eaad0774ad9c811463a",
+    "semantic_hash": ""
+  },
+  "src/lib/lockdown.ts": {
+    "mtime": 1784216677.4402215,
+    "ast_hash": "112f7a27332fb1d4f964218a92d5d6e6",
+    "semantic_hash": ""
+  },
+  "supabase/functions/_shared/lockdown.ts": {
+    "mtime": 1784216683.7015758,
+    "ast_hash": "a6312dee01e4e1592b0e4edeb97df6d4",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260715100000_revoke_public_enrollment_rpc.sql": {
+    "mtime": 1784216691.5227184,
+    "ast_hash": "b4b61f4cdbf3097f8189177165e91b42",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260715110000_revoke_anon_lead_insert.sql": {
+    "mtime": 1784216685.1097043,
+    "ast_hash": "f582d646d89a6fcd381c82c38c9a2f62",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260716090000_rec103_public_projections.sql": {
+    "mtime": 1784218225.1252615,
+    "ast_hash": "e61409b94a7fe2393265e89a02b6977b",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260716100000_rec105_atomic_enrollment.sql": {
+    "mtime": 1784234113.5539296,
+    "ast_hash": "c59b1fcf8b0671c8f68d510211c09ecb",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260716120000_rec104_grant_avaliacao_select.sql": {
+    "mtime": 1784234449.9705768,
+    "ast_hash": "5f960af81e655936b748466f62fb9577",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-101-revoke-public-enrollment-rpc.test.sql": {
+    "mtime": 1784216994.0524383,
+    "ast_hash": "bbac25f5eed961febeb8afe1a26e39e2",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-102-revoke-anon-lead-insert.test.sql": {
+    "mtime": 1784216705.903548,
+    "ast_hash": "e1c2b7782df0d236cf619c1b3136c607",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-103-public-projections.test.sql": {
+    "mtime": 1784218215.612036,
+    "ast_hash": "d5886d537a4e4a7271acbc1a168fb69d",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-104-anon-client.test.sql": {
+    "mtime": 1784234186.5036943,
+    "ast_hash": "92d59d00446b507c87fb51e6d636af80",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-105-atomic-enrollment.test.sql": {
+    "mtime": 1784234397.4954534,
+    "ast_hash": "698a0811ed432952e9d98f4f167033a4",
+    "semantic_hash": ""
+  },
+  "docs/architecture/adr-016-identidade-bff-rec201.md": {
+    "mtime": 1784217679.9009173,
+    "ast_hash": "8fc11916a39451736174a2eaf3e1d9c8",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-001-inventario-exposicao-2026-07-14.md": {
+    "mtime": 1784149416.37779,
+    "ast_hash": "46f882d342f34c2eadd498ac77d128ad",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-001-sev0-incident-2026-07-14.md": {
+    "mtime": 1784159729.800963,
+    "ast_hash": "a3c5b43d89d3c6da624873222aab2f18",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-002-rotacao-credenciais-2026-07-15.md": {
+    "mtime": 1784215717.0228302,
+    "ast_hash": "467110973d11ae31bdf5e3ad3c22eaaa",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-003-fail-closed-2026-07-15.md": {
+    "mtime": 1784216878.5588639,
+    "ast_hash": "914cef65e7e6155808ddcfdd942816aa",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-004-sanear-configuracao-2026-07-16.md": {
+    "mtime": 1784217105.1458101,
+    "ast_hash": "440b73169f41efb5534b12cb97dffd14",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-101-revogar-rpc-2026-07-15.md": {
+    "mtime": 1784217164.8741736,
+    "ast_hash": "7e01c57240c07c7852e78e7db506ba1a",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md": {
+    "mtime": 1784217007.6710331,
+    "ast_hash": "f0311f6b979db9fa30fe963cc0fe6df8",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-103-projecoes-publicas-2026-07-16.md": {
+    "mtime": 1784218468.7416236,
+    "ast_hash": "e32f91ec4f96d164b2fa7415af180073",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-104-cliente-anon-2026-07-16.md": {
+    "mtime": 1784237050.0507996,
+    "ast_hash": "c207a22ad32fb3f40a773536238b47f0",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-105-inscricao-atomica-2026-07-16.md": {
+    "mtime": 1784237125.125422,
+    "ast_hash": "f8ef9cde1748897a7c1b42bf6f170b97",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/adr015-f3-categorias-multivalor-persistencia.yml": {
+    "mtime": 1784145901.8938932,
+    "ast_hash": "b511c7e111ce27b2024097c1ffccd0dd",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-001-incidente-freeze-evidencias.yml": {
+    "mtime": 1784160159.057811,
+    "ast_hash": "d41639bc1f8b0fc24079be40441153a0",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-002-revogar-credenciais-sessoes.yml": {
+    "mtime": 1784216060.8970144,
+    "ast_hash": "41bdc85b74b27f81b2eb9539a46f2f3b",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml": {
+    "mtime": 1784217205.0463564,
+    "ast_hash": "84041b84dfd9ff117f1c3f853525182d",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-004-sanear-configuracao-versionada.yml": {
+    "mtime": 1784217217.3068953,
+    "ast_hash": "c07ba88bdf3e49deee2fb4711a40e002",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-101-revogar-rpc-inscricao-publica.yml": {
+    "mtime": 1784217241.784364,
+    "ast_hash": "720fee46914f3b14d6f9d84ba9a155e4",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml": {
+    "mtime": 1784217257.823418,
+    "ast_hash": "88b155d0799c4450d45aed9a0e37356b",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-103-projecoes-publicas-seguras.yml": {
+    "mtime": 1784218533.933574,
+    "ast_hash": "de18182b34b7e6ba4c263edc9564620e",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-15-rec-002-revogar-credenciais-sessoes.md": {
+    "mtime": 1784216541.5356963,
+    "ast_hash": "7d416a59e76b117829bc4b0b82c90478",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-15-rec-003-fail-closed-indisponibilidade.md": {
+    "mtime": 1784217375.9495714,
+    "ast_hash": "8d35b979ec01e1dd18b795c3b915f0c3",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-15-rec-101-revogar-rpc-inscricao-publica.md": {
+    "mtime": 1784217389.1760905,
+    "ast_hash": "127ca336d1d8415ff3323ab43d582073",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-15-rec-102-revogar-insert-anonimo-leads.md": {
+    "mtime": 1784217397.7793596,
+    "ast_hash": "03361e8ac70f6433bff3043b109965c2",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-004-sanear-configuracao-versionada.md": {
+    "mtime": 1784217384.5515828,
+    "ast_hash": "b9dc7d5920e5f4ac19a023ddc0c0e1f5",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-103-projecoes-publicas-seguras.md": {
+    "mtime": 1784233849.2852862,
+    "ast_hash": "e8def2050625b1016666bc637d52132c",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-104-cliente-publico-anon.md": {
+    "mtime": 1784237286.1038575,
+    "ast_hash": "c0a605a3ad7a16266daadc340f2fd9a8",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-105-inscricao-atomica.md": {
+    "mtime": 1784237311.417243,
+    "ast_hash": "002ca56db6d0e11a3184688583202683",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-201-adr-identidade-bff.md": {
+    "mtime": 1784217848.3245642,
+    "ast_hash": "c0e69dd19712cc65ce886d62bd8b10ac",
+    "semantic_hash": ""
+  },
+  "app/api/auth/ssr-session/route.ts": {
+    "mtime": 1784256469.223918,
+    "ast_hash": "d397903b13fe59534a254ea170e09115",
+    "semantic_hash": ""
+  },
+  "src/__tests__/app/api/enrollments-route.test.ts": {
+    "mtime": 1784289834.4877434,
+    "ast_hash": "1a196f5133ce3fe54abf73b8e4f0eb42",
+    "semantic_hash": ""
+  },
+  "src/__tests__/ci/visual-baseline-separation.test.ts": {
+    "mtime": 1784253444.7411573,
+    "ast_hash": "a44f35ad77203e30cce468488664bf84",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/supabase-ssr-session.test.ts": {
+    "mtime": 1784256557.5559602,
+    "ast_hash": "7541e00c406ee48f6a11cc19ef64907b",
+    "semantic_hash": ""
+  },
+  "src/lib/supabase/session.ts": {
+    "mtime": 1784256441.3920352,
+    "ast_hash": "29cbb422189a4e67e014896ccec57b5a",
+    "semantic_hash": ""
+  },
+  "supabase/migrations/20260716130000_rec106_protect_existing_student_pii.sql": {
+    "mtime": 1784237416.5621798,
+    "ast_hash": "cf19000eea2bd0cf219fa40fb9737cd4",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-106-protect-existing-student-pii.test.sql": {
+    "mtime": 1784237447.395024,
+    "ast_hash": "9e73788521f91be35d0968c533faf5d6",
+    "semantic_hash": ""
+  },
+  "supabase/tests/database/rec-107-enrollment-endpoint-hardening.test.sql": {
+    "mtime": 1784238199.243584,
+    "ast_hash": "9faa1d1c6238acfaa378a205eaf983f3",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-106-protecao-pii-aluno-2026-07-16.md": {
+    "mtime": 1784237614.3064878,
+    "ast_hash": "25b8c4b740c6675a8ebda29949efb3ad",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-107-endurecer-endpoints-2026-07-16.md": {
+    "mtime": 1784238439.4205117,
+    "ast_hash": "92ea19662a0ae328259885da09befc9b",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-202-sessao-ssr-2026-07-16.md": {
+    "mtime": 1784256740.6382217,
+    "ast_hash": "bf2ec949765dcee7f4a9cdb8246a8429",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-404-cobertura-real-2026-07-16.md": {
+    "mtime": 1784253061.3214335,
+    "ast_hash": "6430cd038858dac82f2c1332b07ee826",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-405-separar-comparacao-2026-07-16.md": {
+    "mtime": 1784256090.807892,
+    "ast_hash": "10173c23563486d589116f72383ea4a3",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-407-dependencias-vulneraveis-2026-07-16.md": {
+    "mtime": 1784253125.4628572,
+    "ast_hash": "d564820933b030cd5a51f7aec201f9fb",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-104-cliente-publico-anon.yml": {
+    "mtime": 1784237245.335155,
+    "ast_hash": "b4739f286640a8141bfb204842aeaa53",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-105-inscricao-atomica.yml": {
+    "mtime": 1784237261.6907587,
+    "ast_hash": "7f955771428fb94f2db07cc82208b924",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-106-proteger-pii-aluno-existente.yml": {
+    "mtime": 1784237657.8310437,
+    "ast_hash": "e5669d512cc0a1e515c5d113342eb75f",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-107-endurecer-endpoints-publicos.yml": {
+    "mtime": 1784252657.9778404,
+    "ast_hash": "63b6e50ec43475e65bbea0e7ffa5e427",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-404-medir-cobertura-real.yml": {
+    "mtime": 1784253114.6888552,
+    "ast_hash": "4e3a49d89de0689626064485c50a6183",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-405-separar-comparacao-atualizacao.yml": {
+    "mtime": 1784256106.9288855,
+    "ast_hash": "7db836b5063adc4806586b665b57ed6e",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-407-remediar-dependencias-vulneraveis.yml": {
+    "mtime": 1784253175.0932198,
+    "ast_hash": "8fc34de771ff6da28f97887058e95407",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-106-proteger-pii-aluno-existente.md": {
+    "mtime": 1784237674.671983,
+    "ast_hash": "60fcbae143c833dcc5d87b7dcefbc54d",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-107-endurecer-endpoints-publicos.md": {
+    "mtime": 1784252668.9209113,
+    "ast_hash": "2dd44bfcc31915bed038011c4d1df6d0",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-202-sessao-supabase-ssr.md": {
+    "mtime": 1784256885.2232535,
+    "ast_hash": "66cd70c4eb9c8631cbbb45859cd245a3",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-404-medir-cobertura-real.md": {
+    "mtime": 1784253145.8223257,
+    "ast_hash": "3b0da10c81a3606e48e42fc351c01ad9",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-405-separar-comparacao-atualizacao.md": {
+    "mtime": 1784256076.766184,
+    "ast_hash": "3ec3e2c3bd2f05bcecd73c29d40715d7",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-407-remediar-dependencias-vulneraveis.md": {
+    "mtime": 1784253204.396718,
+    "ast_hash": "5a0690a67a470e0ebd0b129c13e33f83",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/supabase-authorize.test.ts": {
+    "mtime": 1784257087.4897122,
+    "ast_hash": "9ecc2bd1fc57f786386422353fcf46d3",
+    "semantic_hash": ""
+  },
+  "src/lib/supabase/authorize.ts": {
+    "mtime": 1784257062.9916532,
+    "ast_hash": "db2f48a386029b532b81440fb09ef3d7",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-203-autorizacao-servidor-2026-07-16.md": {
+    "mtime": 1784257258.6587245,
+    "ast_hash": "e3be41640c74880b524dff9fd172b637",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-202-sessao-supabase-ssr.yml": {
+    "mtime": 1784256859.6788802,
+    "ast_hash": "4c64211263f89b81957d59befd33e85e",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-16-rec-203-autorizacao-servidor.md": {
+    "mtime": 1784257361.598799,
+    "ast_hash": "8319ab5792695dbafeea8462ed4ca54c",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-205-rate-limit-identidade-autenticada-2026-07-17.md": {
+    "mtime": 1784290025.5260987,
+    "ast_hash": "8a47666327042898732b8a129a7de738",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-203-autorizacao-servidor.yml": {
+    "mtime": 1784257340.3263576,
+    "ast_hash": "b3426e0813f3f7f123ca54a2573fa45e",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-205-rate-limit-identidade-autenticada.yml": {
+    "mtime": 1784290052.616378,
+    "ast_hash": "85339e31bfcffb86aa43ed767cc94168",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-205-rate-limit-identidade-autenticada.md": {
+    "mtime": 1784289988.182821,
+    "ast_hash": "7739531daae781613ee22f8ff8c70802",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-206-consolidar-bff-canonico-2026-07-17.md": {
+    "mtime": 1784291961.9110074,
+    "ast_hash": "eb89244b2c100a7a94168c3966f9edc2",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-206-consolidar-bff-canonico.yml": {
+    "mtime": 1784291920.4471118,
+    "ast_hash": "c1ceedd51df612f45b24ea306411fff7",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-206-consolidar-bff-canonico.md": {
+    "mtime": 1784291883.3665237,
+    "ast_hash": "3e05d7642cd12f59f5ca05e5a627a239",
+    "semantic_hash": ""
+  },
+  "app/api/admin/enrollments/route.ts": {
+    "mtime": 1784292450.6138341,
+    "ast_hash": "80ad24378fd77d1c9c4432b781308038",
+    "semantic_hash": ""
+  },
+  "app/api/admin/students/route.ts": {
+    "mtime": 1784292454.8286104,
+    "ast_hash": "ac3df560ee7a1f2ecba37ed85afba114",
+    "semantic_hash": ""
+  },
+  "src/__tests__/app/api/admin-read-models-route.test.ts": {
+    "mtime": 1784292589.4276547,
+    "ast_hash": "2357bcaabe334f51e010ed29d0fa4fa5",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/admin-read-models.test.ts": {
+    "mtime": 1784292506.9611647,
+    "ast_hash": "512fca3d5e9a94d26172eec8dea8533b",
+    "semantic_hash": ""
+  },
+  "src/lib/supabase/admin-api-auth.ts": {
+    "mtime": 1784292440.0140083,
+    "ast_hash": "40f29eaff7bb8bba57c55549340e3ee6",
+    "semantic_hash": ""
+  },
+  "src/lib/supabase/admin-read-models.ts": {
+    "mtime": 1784292408.9571126,
+    "ast_hash": "87eb99acc56911490043e9f226081018",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-303-read-models-alunos-inscricoes-2026-07-17.md": {
+    "mtime": 1784292710.2055004,
+    "ast_hash": "78d3dbb8606137a8dc5f5523051fe1cf",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-303-read-models-alunos-inscricoes.yml": {
+    "mtime": 1784292785.7287955,
+    "ast_hash": "f03e33ff54e80df9ec83d209e9f6664a",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-303-read-models-alunos-inscricoes.md": {
+    "mtime": 1784292675.248862,
+    "ast_hash": "c3425b230e8d0cef6a17e1706981e23d",
+    "semantic_hash": ""
+  },
+  "app/api/admin/classes/route.ts": {
+    "mtime": 1784293069.1701157,
+    "ast_hash": "5c19a13935d7c31a7eb348bd72d62d8d",
+    "semantic_hash": ""
+  },
+  "app/api/admin/courses/route.ts": {
+    "mtime": 1784293064.3117845,
+    "ast_hash": "7659a9c0c786702e8fa0718e4990b5bd",
+    "semantic_hash": ""
+  },
+  "app/api/admin/instructors/route.ts": {
+    "mtime": 1784293073.5377033,
+    "ast_hash": "831ad8e9161f7603fae5f36b0d565dc6",
+    "semantic_hash": ""
+  },
+  "src/__tests__/app/api/admin-catalog-read-models-route.test.ts": {
+    "mtime": 1784293181.9768,
+    "ast_hash": "4a1f928e351811f341026e3ea23eefc6",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/admin-catalog-read-models.test.ts": {
+    "mtime": 1784293153.221881,
+    "ast_hash": "af8339edac1410f1abe80879ae6694f1",
+    "semantic_hash": ""
+  },
+  "src/lib/supabase/admin-catalog-read-models.ts": {
+    "mtime": 1784293104.4887717,
+    "ast_hash": "ac270d3c95d93f801718c8162d80c7d6",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-304-read-models-catalogo-admin-2026-07-17.md": {
+    "mtime": 1784293311.8907745,
+    "ast_hash": "891477987ab8df47f4bd23cd4fdaaf98",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-304-read-models-catalogo-admin.yml": {
+    "mtime": 1784293494.4934704,
+    "ast_hash": "cee7e87d7651cb18df300eae9588c478",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-304-read-models-catalogo-admin.md": {
+    "mtime": 1784293267.729564,
+    "ast_hash": "391afc9424d0bb01ff8ea9d00b99e0b7",
+    "semantic_hash": ""
+  },
+  "src/__tests__/features/admin-shell/admin-mobile-navigation.test.tsx": {
+    "mtime": 1784308430.9022198,
+    "ast_hash": "5d1f92758e86dd4197127c050d7d4959",
+    "semantic_hash": ""
+  },
+  "src/features/admin-shell/components/admin-mobile-drawer.tsx": {
+    "mtime": 1784308329.7377179,
+    "ast_hash": "1379012741219456714435290c76e006",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-306-corrigir-navegacao-acoes-admin-2026-07-17.md": {
+    "mtime": 1784308620.3274183,
+    "ast_hash": "2a8cc90fc2764a7a03a9de816c4e87a2",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-307-corrigir-exportacao-csv-2026-07-17.md": {
+    "mtime": 1784308060.0232868,
+    "ast_hash": "683e12fc01fb15cae57d92090b723f2f",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-306-corrigir-navegacao-acoes-admin.yml": {
+    "mtime": 1784308752.6807942,
+    "ast_hash": "dbe297f035c690fe09069a9fd6d5dc44",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-307-corrigir-exportacao-csv.yml": {
+    "mtime": 1784308074.1010296,
+    "ast_hash": "107c2cfe6b30360f3972d983edbd92b8",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-306-corrigir-navegacao-acoes-admin.md": {
+    "mtime": 1784308579.6037352,
+    "ast_hash": "ade423171e865fed00aa4be16dd1519b",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-307-corrigir-exportacao-csv.md": {
+    "mtime": 1784293770.5141053,
+    "ast_hash": "0dca7e40ba357f1aa139b7a05fda8bfe",
+    "semantic_hash": ""
+  },
+  "src/__tests__/lib/session-routing.test.ts": {
+    "mtime": 1784310415.6899228,
+    "ast_hash": "7dddd7b1c15c7f6931323bb5b33f713f",
+    "semantic_hash": ""
+  },
+  "src/__tests__/views/public/login-page.test.tsx": {
+    "mtime": 1784310488.5126054,
+    "ast_hash": "95a80e12fdb60049281298366e3ba394",
+    "semantic_hash": ""
+  },
+  "docs/history/reports/rec-305-corrigir-login-tres-papeis-recovery-2026-07-17.md": {
+    "mtime": 1784310622.4320662,
+    "ast_hash": "1f9c41aa0221553fc591e8e4b3d9ef21",
+    "semantic_hash": ""
+  },
+  "docs/qa/gates/rec-305-corrigir-login-tres-papeis-recovery.yml": {
+    "mtime": 1784310649.7782326,
+    "ast_hash": "76db5ce94802f4d7f7258fc2bd1fdde3",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-204-remover-hmac-localstorage-header.md": {
+    "mtime": 1784310146.751125,
+    "ast_hash": "4a750cb997b87ec2f4ad5947f9f4b38f",
+    "semantic_hash": ""
+  },
+  "docs/stories/2026-07-17-rec-305-corrigir-login-tres-papeis-recovery.md": {
+    "mtime": 1784310578.7283037,
+    "ast_hash": "701c684bb2de0b0f0356bcd8533e3034",
     "semantic_hash": ""
   }
 }
