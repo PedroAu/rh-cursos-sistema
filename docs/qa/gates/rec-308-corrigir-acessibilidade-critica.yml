@@ -1,0 +1,93 @@
+schema: 1
+story: 'REC-308'
+story_title: 'Corrigir acessibilidade crítica'
+gate: PASS
+quality_score: 96
+status_reason: >-
+  Auditoria de acessibilidade WCAG 2.1 AA das jornadas críticas concluída pelo
+  executor. Uma única violação SÉRIA encontrada e corrigida: no formulário de
+  pré-inscrição (src/views/public/CourseCheckout.tsx, componente Field) o erro
+  de validação não era associado ao campo (sem aria-describedby, sem
+  aria-invalid) e ficava dentro de um <label> implícito — leitor de tela não
+  vinculava o erro ao input. Corrigido com id/htmlFor explícitos, clone do
+  controle para injetar aria-describedby + aria-invalid, e id no erro (role=alert
+  preservado). Login (REC-305) e navegação admin (REC-306) auditados e
+  confirmados JÁ conformes — nenhuma correção inventada (Article IV); adicionadas
+  travas de regressão. Catálogo público (Courses/CourseDetail) auditado: sem
+  violação séria/crítica; duas pendências de baixa severidade documentadas
+  (P-308-1 ícones decorativos sem aria-hidden; P-308-2 overlay Play decorativo).
+  A revisão independente executou também npm run test:a11y em browser real:
+  9/9 testes Axe WCAG 2.1 A/AA passaram. As duas pendências cosméticas de
+  baixa severidade permanecem como follow-up não bloqueante.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T19:46:00Z'
+expires: '2026-07-31T00:00:00Z'
+
+history:
+  - at: '2026-07-17T19:46:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente concluída: lint e typecheck limpos; 70 arquivos e
+      729/729 testes unitários; npm run test:a11y com 9/9 testes Playwright/Axe
+      WCAG 2.1 A/AA. Associação erro-campo do checkout confirmada por testes;
+      login, catálogo e navegação sem violação séria/crítica. Sem alteração em
+      auth. P-308-1 e P-308-2 são low e não bloqueiam.
+
+evidence:
+  lint: 'npx eslint (arquivos modificados) → 0 erros'
+  typecheck: 'npm run typecheck → PASS (tsc --noEmit limpo)'
+  tests: 'npx vitest run → 715 passed / 67 arquivos (baseline 710, +5)'
+  current_regression: 'npm run test:unit → 70 arquivos, 729/729'
+  browser_a11y: 'npm run test:a11y → 9/9 Playwright/Axe WCAG 2.1 A/AA'
+  auth_untouched: >-
+    src/lib/auth.ts, supabase/functions/_shared/auth.ts,
+    app/api/auth/session/route.ts, src/lib/supabase/session.ts,
+    src/lib/supabase/authorize.ts — não modificados
+  new_tests:
+    - 'src/__tests__/views/public/course-checkout-a11y.test.tsx (3 testes)'
+    - 'src/__tests__/views/public/login-page.test.tsx (+2 testes de a11y)'
+
+acceptance_criteria:
+  - id: AC1
+    status: PASS
+    note: >-
+      Login e pré-inscrição associam erro↔campo via aria-describedby +
+      aria-invalid, com role="alert"; travado por teste.
+  - id: AC2
+    status: PASS
+    note: 'Campos alcançáveis por getByLabelText nas duas jornadas de formulário.'
+  - id: AC3
+    status: PASS
+    note: >-
+      Navegação admin (REC-306) e login (REC-305) permanecem conformes; sem
+      regressão (suíte verde).
+  - id: AC4
+    status: PASS
+    note: >-
+      Catálogo sem violação séria/crítica; pendências de baixa severidade
+      (P-308-1/P-308-2) documentadas explicitamente na story.
+  - id: AC5
+    status: PASS
+    note: 'lint/typecheck/vitest verdes; 710 → 715 (sem regressão).'
+  - id: AC6
+    status: PASS
+    note: 'Nenhum arquivo de autenticação (HMAC/SSR) tocado.'
+
+top_issues:
+  - id: A11Y-308-1
+    severity: low
+    finding: >-
+      Ícones decorativos do lucide-react sem aria-hidden nas views públicas.
+      SVG inline sem texto acessível — tratados como apresentacionais; não é
+      violação séria. Higiene futura.
+    suggested_owner: ux-design-expert
+    suggested_action: 'Padronizar aria-hidden em ícones puramente decorativos.'
+  - id: A11Y-308-2
+    severity: low
+    finding: >-
+      Overlay com ícone Play (div não focável, sem role/handler) em
+      CourseDetail.tsx sugere player inexistente — decorativo, não anunciado
+      como controle por AT.
+    suggested_owner: ux-design-expert
+    suggested_action: 'Remover/ajustar o afeto visual do overlay em follow-up de UX.'
