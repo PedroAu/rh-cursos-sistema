@@ -23,6 +23,7 @@ import { buildResourceConfig, type FieldConfig, type ResourceKey } from "@/lib/a
 import { useAppStore } from "@/lib/app-store";
 import { formatCPF, formatPhone } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { neutralizeCsvFormula } from "@/lib/utils/csv-export";
 
 type CsvColumn = {
   label: string;
@@ -60,12 +61,13 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
   if (data.length === 0) return;
 
   const csvContent = [
-    columns.map((col) => `"${col.label}"`).join(","),
+    columns.map((col) => `"${neutralizeCsvFormula(col.label).replace(/"/g, '""')}"`).join(","),
     ...data.map((row) =>
       columns
         .map((col) => {
           const value = col.exportValue ? col.exportValue(row) : col.render(row);
-          return `"${toExportableValue(value).replace(/"/g, '""')}"`
+          // Neutralize CSV formula injection (CWE-1236) before RFC 4180 quoting
+          return `"${neutralizeCsvFormula(toExportableValue(value)).replace(/"/g, '""')}"`
         })
         .join(",")
     )

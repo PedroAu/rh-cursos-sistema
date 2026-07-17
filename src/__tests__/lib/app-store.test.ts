@@ -205,7 +205,6 @@ vi.mock("@/lib/supabase/functions-client", () => ({
 vi.mock("@/lib/supabase/rh-cursos-api", () => ({
   fetchPublicCatalogFromSupabase: mocks.fetchPublicCatalog,
   fetchPublicBlogPostsFromSupabase: mocks.fetchPublicBlogPosts,
-  fetchLeadsFromSupabase: vi.fn(),
   isExplicitPublicTestBaselineEnabled: vi.fn(() => false),
 }));
 
@@ -394,9 +393,15 @@ describe("AppStoreProvider and hooks", () => {
     mocks.functionsConfigured = false;
     mocks.clearSessionToken.mockClear();
     mocks.setSessionToken.mockClear();
-    mocks.getSessionToken.mockClear();
-    mocks.decodeSessionToken.mockClear();
-    mocks.getSupabaseSession.mockClear();
+    // mockClear preserva return values configurados por testes individuais;
+    // restaura os defaults para evitar vazamento entre casos (ex.: token HMAC
+    // do teste de hidratação REC-206).
+    mocks.getSessionToken.mockReset();
+    mocks.getSessionToken.mockReturnValue(null);
+    mocks.decodeSessionToken.mockReset();
+    mocks.decodeSessionToken.mockReturnValue(null);
+    mocks.getSupabaseSession.mockReset();
+    mocks.getSupabaseSession.mockReturnValue(null);
     mocks.supabaseConfigured = false;
     mocks.fetchPublicCatalog.mockReset();
     mocks.fetchPublicBlogPosts.mockReset();
@@ -563,6 +568,52 @@ describe("AppStoreProvider and hooks", () => {
         "Não foi possível confirmar a revogação global da sessão."
       )
     );
+  });
+
+  it("hydrates admin leads on bootstrap exclusively through the same-origin BFF (REC-206)", async () => {
+    // REC-206: com sessão HMAC ativa, o reload administrativo hidrata os leads
+    // pelo contrato same-origin admin-resources leads/list — sem o caminho
+    // duplicado de leitura via cliente Supabase direto.
+    mocks.functionsConfigured = true;
+    mocks.supabaseConfigured = true;
+    mocks.getSessionToken.mockReturnValue("admin.hmac.token");
+    const leadRow = {
+      id: "lead-hydrated",
+      nome: "Lead Hidratado",
+      email: "hidratado@example.com",
+      telefone: null,
+      tipo: "Curso",
+      tema_interesse: null,
+      curso_id: null,
+      orgao: null,
+      num_participantes: null,
+      modalidade_preferida: null,
+      objetivo_treinamento: null,
+      tema_treinamento: null,
+      desafios_principais: null,
+      origem: null,
+      status_crm: "Novo",
+      mensagem: null,
+      created_at: "2026-06-10T12:00:00.000Z",
+    };
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ data: [leadRow] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    // bootstrapPublicData=false isola o caminho administrativo (a hidratação
+    // de leads via BFF não depende do bootstrap público).
+    const harness = renderStore(null, undefined, false);
+
+    await waitFor(() =>
+      expect(harness.store.leads.some((lead) => lead.id === "lead-hydrated")).toBe(true)
+    );
+    expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
+      body: { resource: "leads", action: "list" },
+      sessionToken: "admin.hmac.token",
+    });
   });
 
   it("creates leads through the provider and prepends them to state", async () => {

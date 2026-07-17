@@ -69,14 +69,18 @@ export const publicClassSchema = z.object({
   preco_turma: dbNumber,
   modalidade: modalidadeEnum,
   status: z.enum(["Aberta", "PoucasVagas", "Encerrada", "Cancelada", "Realizada", "EmBreve"]),
-  observacoes: z.string().nullable()
+  // Opcional (REC-103): ausente quando a linha vem da projeção pública
+  // `turma_publica`, que não seleciona a observação interna de operação.
+  observacoes: z.string().nullable().optional()
 });
 
 export const publicInstructorSchema = z.object({
   id: z.string(),
   nome: z.string(),
-  email: z.string().nullable(),
-  telefone: z.string().nullable(),
+  // Opcionais (REC-103): ausentes quando a linha vem da projeção pública
+  // `instrutor_publico`, que não seleciona contato de instrutor.
+  email: z.string().nullable().optional(),
+  telefone: z.string().nullable().optional(),
   bio: z.string().nullable(),
   foto_url: z.string().nullable(),
   formacao: z.string().nullable(),

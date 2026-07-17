@@ -7,6 +7,7 @@ import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts
 import { adminClient } from "../_shared/supabase.ts";
 import { requireAdmin } from "../_shared/auth.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
+import { isLockdownActive, LOCKDOWN_RESPONSE_BODY } from "../_shared/lockdown.ts";
 import { AdminResourceError, isAdminResourceError } from "../_shared/admin-resource-errors.ts";
 import {
   isEnrollmentClassOpen,
@@ -438,6 +439,10 @@ Deno.serve(async (request) => {
 
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, error: "Method not allowed" }, 405, request);
+  }
+
+  if (isLockdownActive()) {
+    return jsonResponse(LOCKDOWN_RESPONSE_BODY, 503, request);
   }
 
   const origin = request.headers.get("origin");

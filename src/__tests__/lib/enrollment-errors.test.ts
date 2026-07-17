@@ -22,6 +22,16 @@ describe("getEnrollmentErrorMessage", () => {
     );
   });
 
+  it("classifica a violação bruta do índice único de duplicidade sob concorrência (REC-107)", () => {
+    expect(
+      getEnrollmentErrorMessage({
+        code: "23505",
+        message:
+          'duplicate key value violates unique constraint "inscricao_aluno_turma_active_idx"',
+      })
+    ).toBe("Aluno já possui inscrição ativa nesta turma.");
+  });
+
   it("retorna null para erros desconhecidos", () => {
     expect(getEnrollmentErrorMessage({ code: "XX001", message: "falha inesperada" })).toBeNull();
   });

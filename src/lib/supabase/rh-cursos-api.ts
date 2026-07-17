@@ -11,7 +11,7 @@ import {
   publicTestBaselineTrainingPaths
 } from "@/lib/public-test-baseline";
 import { supabase } from "@/lib/supabase/client";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicServerClient, createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 import {
   leadToInsert,
@@ -79,7 +79,13 @@ export type PublicCatalogServerState =
 
 /**
  * Replica no processo SSR as relações protegidas pelas políticas RLS públicas.
- * O cliente server usa service role e não recebe essa proteção automaticamente.
+ *
+ * Defesa em profundidade: desde REC-104, o caminho `visibility === "public"`
+ * já usa `createSupabasePublicServerClient()` (chave anon), portanto RLS e os
+ * grants de coluna de REC-103 já são a barreira ativa nesse caminho. Este
+ * filtro em memória permanece como segunda camada, caso uma consulta futura
+ * volte, por engano, a apontar para o cliente privilegiado
+ * (`createSupabaseServerClient()`, ainda usado pelo caminho `"admin"`).
  */
 export function selectCatalogRowsForVisibility(
   rows: CatalogRows,
@@ -153,9 +159,11 @@ function shouldUsePublicTestBaseline() {
 /**
  * Categorias distintas já cadastradas em `curso`, para alimentar as
  * sugestões do combobox de categorias no formulário de cursos (ADR-015 F2).
- * A query é coberta pelo índice parcial `curso_categoria_idx`. O filtro
- * `deleted_at is null` é explícito porque o cliente SSR usa service
- * role e, portanto, não passa pelas políticas RLS aplicadas ao navegador.
+ * A query é coberta pelo índice parcial `curso_categoria_idx`. Chamada
+ * apenas pelo caminho `"admin"` (`fetchAdminCatalogFromSupabaseServer`), que
+ * usa `createSupabaseServerClient()` (service role) — o filtro
+ * `deleted_at is null` é explícito porque esse cliente não passa pelas
+ * políticas RLS aplicadas ao navegador/anon.
  */
 export async function fetchCourseCategories(client: RhCursosClient): Promise<string[]> {
   const result = await withRetry(
@@ -227,23 +235,38 @@ async function fetchCatalog(
         { label: "fetchPublicCatalog:curso" }
       ),
       withRetry(
+        // REC-103: a projeção pública `turma_publica` já embute
+        // `deleted_at is null` e não seleciona `observacoes` (nota interna
+        // de operação), fechando o vazamento descrito em FND-10.
         () =>
-          client
-            .from("turma")
-            .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
-            .is("deleted_at", null)
-            .order("data_inicio"),
+          visibility === "public"
+            ? client
+                .from("turma_publica")
+                .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status")
+                .order("data_inicio")
+            : client
+                .from("turma")
+                .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
+                .is("deleted_at", null)
+                .order("data_inicio"),
         { label: "fetchPublicCatalog:turma" }
       ),
       withRetry(
-        () => {
-          const query = client
-            .from("instrutor")
-            .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
-            .is("deleted_at", null);
-
-          return (visibility === "public" ? query.eq("status", "Ativo") : query).order("nome");
-        },
+        // REC-103: a projeção pública `instrutor_publico` já embute
+        // `deleted_at is null and status = 'Ativo'` e não seleciona
+        // `email`/`telefone` (contato de instrutor), fechando o vazamento
+        // descrito em FND-10.
+        () =>
+          visibility === "public"
+            ? client
+                .from("instrutor_publico")
+                .select("id,nome,bio,foto_url,formacao,especialidade,rating,status")
+                .order("nome")
+            : client
+                .from("instrutor")
+                .select("id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status")
+                .is("deleted_at", null)
+                .order("nome"),
         { label: "fetchPublicCatalog:instrutor" }
       ),
       withRetry(() => client.from("curso_instrutor").select("id,curso_id,instrutor_id,principal"), {
@@ -360,11 +383,12 @@ export async function fetchPublicClassesFromSupabase() {
   const client = supabase;
 
   const result = await withRetry(
+    // REC-103: usa a projeção pública `turma_publica` (sem `observacoes`),
+    // que já embute `deleted_at is null`.
     () =>
       client
-        .from("turma")
-        .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status,observacoes")
-        .is("deleted_at", null)
+        .from("turma_publica")
+        .select("id,curso_id,instrutor_id,data_inicio,data_fim,horario,local,vagas_total,vagas_preenchidas,vagas_restantes,preco_turma,modalidade,status")
         .order("data_inicio"),
     { label: "fetchPublicClasses:turma" }
   );
@@ -420,7 +444,9 @@ export function fetchPublicCatalogFromSupabase() {
 export const fetchPublicCatalogFromSupabaseServer = cache(function fetchPublicCatalogFromSupabaseServer(
   usePublicTestBaseline = false
 ) {
-  return fetchPublicCatalog(createSupabaseServerClient(), usePublicTestBaseline);
+  // REC-104: caminho público usa exclusivamente o cliente anon dedicado —
+  // nunca o cliente privilegiado usado pelo caminho admin (FND-03).
+  return fetchPublicCatalog(createSupabasePublicServerClient(), usePublicTestBaseline);
 });
 
 export const fetchAdminCatalogFromSupabaseServer = cache(function fetchAdminCatalogFromSupabaseServer() {
@@ -451,7 +477,8 @@ export function fetchPublicBlogPostsFromSupabase() {
 }
 
 export function fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline = false) {
-  return fetchPublicBlogPosts(createSupabaseServerClient(), usePublicTestBaseline);
+  // REC-104: caminho público usa exclusivamente o cliente anon dedicado.
+  return fetchPublicBlogPosts(createSupabasePublicServerClient(), usePublicTestBaseline);
 }
 
 export async function fetchAdminBlogPostsFromSupabaseServer() {
@@ -511,7 +538,8 @@ export async function fetchPublicTestimonialsFromSupabase() {
 }
 
 export async function fetchPublicTestimonialsFromSupabaseServer() {
-  const client = createSupabaseServerClient();
+  // REC-104: caminho público usa exclusivamente o cliente anon dedicado.
+  const client = createSupabasePublicServerClient();
   if (!client) return null;
   return fetchPublicTestimonialsWithClient(client);
 }
@@ -535,11 +563,6 @@ export async function fetchLeadsWithClient(client: RhCursosClient) {
   }) as LeadRow[];
 
   return rows.map(mapLead);
-}
-
-export async function fetchLeadsFromSupabase() {
-  if (!supabase) return null;
-  return fetchLeadsWithClient(supabase);
 }
 
 export async function createLeadInSupabase(payload: Omit<Lead, "id" | "createdAt" | "status">) {

@@ -1,10 +1,13 @@
 // Edge Function: leads
 // Substitui app/api/leads/route.ts no deploy estático.
-// Cria um lead no Supabase (RLS permite insert anônimo conforme policy).
+// Cria um lead no Supabase. Persistência via adminClient() (service-role, server-only):
+// insert direto por anon/authenticated foi revogado (REC-102), este endpoint é o único
+// caminho de escrita, com validação, rate limit e checagem de origem já aplicados abaixo.
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
-import { anonClient } from "../_shared/supabase.ts";
+import { adminClient } from "../_shared/supabase.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
+import { isLockdownActive, LOCKDOWN_RESPONSE_BODY } from "../_shared/lockdown.ts";
 
 type LeadPayload = {
   name?: string;
@@ -31,6 +34,10 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Method not allowed" }, 405, request);
   }
 
+  if (isLockdownActive()) {
+    return jsonResponse(LOCKDOWN_RESPONSE_BODY, 503, request);
+  }
+
   const origin = request.headers.get("origin");
   if (!isOriginAllowed(origin)) {
     return jsonResponse({ ok: false, error: "Origin not allowed" }, 403, request);
@@ -54,7 +61,7 @@ Deno.serve(async (request) => {
   }
 
   try {
-    const supabase = anonClient();
+    const supabase = adminClient();
     const { error } = await supabase
       .from("lead")
       .insert({

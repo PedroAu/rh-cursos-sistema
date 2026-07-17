@@ -62,8 +62,10 @@ export type Database = {
         Row: {
           id: string;
           nome: string;
-          email: string | null;
-          telefone: string | null;
+          // Opcionais (REC-103): ausentes quando a linha vem da projeção
+          // pública `instrutor_publico`, que não expõe contato de instrutor.
+          email?: string | null;
+          telefone?: string | null;
           user_id: string | null;
           bio: string | null;
           foto_url: string | null;
@@ -89,6 +91,22 @@ export type Database = {
           status?: "Ativo" | "Inativo";
         };
         Update: Partial<Database["public"]["Tables"]["instrutor"]["Insert"]>;
+      };
+      // REC-103: projeção pública de `instrutor` (allowlist de colunas,
+      // sem email/telefone). Somente leitura — sem Insert/Update.
+      instrutor_publico: {
+        Row: {
+          id: string;
+          nome: string;
+          bio: string | null;
+          foto_url: string | null;
+          formacao: string | null;
+          especialidade: string | null;
+          rating: number;
+          status: "Ativo" | "Inativo";
+        };
+        Insert: never;
+        Update: never;
       };
       curso: {
         Row: {
@@ -205,7 +223,9 @@ export type Database = {
           preco_turma: number;
           modalidade: "Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado";
           status: "Aberta" | "PoucasVagas" | "Encerrada" | "Cancelada" | "Realizada" | "EmBreve";
-          observacoes: string | null;
+          // Opcional (REC-103): ausente quando a linha vem da projeção
+          // pública `turma_publica`, que não expõe a observação interna.
+          observacoes?: string | null;
           created_at: string;
           updated_at: string;
           deleted_at: string | null;
@@ -226,6 +246,27 @@ export type Database = {
           observacoes?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["turma"]["Insert"]>;
+      };
+      // REC-103: projeção pública de `turma` (allowlist de colunas, sem
+      // observacoes). Somente leitura — sem Insert/Update.
+      turma_publica: {
+        Row: {
+          id: string;
+          curso_id: string;
+          instrutor_id: string | null;
+          data_inicio: string;
+          data_fim: string | null;
+          horario: string | null;
+          local: string | null;
+          vagas_total: number;
+          vagas_preenchidas: number;
+          vagas_restantes: number;
+          preco_turma: number;
+          modalidade: "Presencial" | "Online" | "Hibrido" | "InCompany" | "Gravado";
+          status: "Aberta" | "PoucasVagas" | "Encerrada" | "Cancelada" | "Realizada" | "EmBreve";
+        };
+        Insert: never;
+        Update: never;
       };
       inscricao: {
         Row: {

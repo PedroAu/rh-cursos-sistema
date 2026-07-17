@@ -6,13 +6,19 @@
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
 import { getEnrollmentErrorMessage } from "../_shared/enrollment-errors.ts";
 import { resolveEnrollmentClassIdOrThrow } from "../_shared/enrollment-class-resolution.ts";
-import { anonClient } from "../_shared/supabase.ts";
+import { anonClient, adminClient } from "../_shared/supabase.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
+import { isLockdownActive, LOCKDOWN_RESPONSE_BODY } from "../_shared/lockdown.ts";
 import {
   enrollmentReceiptSchema,
   enrollmentSchema,
   type EnrollmentInput,
 } from "../_shared/validation.ts";
+
+// REC-107: corpo máximo aceito antes de qualquer parse, defesa contra payload
+// excessivo. O maior payload legítimo (todos os campos no limite de
+// enrollmentSchema) fica bem abaixo de 8 KiB.
+const MAX_BODY_BYTES = 8 * 1024;
 
 function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Servidor" {
   if (type === "Empresa") return "PJ";
@@ -26,6 +32,10 @@ Deno.serve(async (request) => {
 
   if (request.method !== "POST") {
     return jsonResponse({ ok: false, error: "Method not allowed" }, 405, request);
+  }
+
+  if (isLockdownActive()) {
+    return jsonResponse(LOCKDOWN_RESPONSE_BODY, 503, request);
   }
 
   const origin = request.headers.get("origin");
@@ -44,7 +54,28 @@ Deno.serve(async (request) => {
     );
   }
 
-  const payload = await request.json().catch(() => null);
+  // REC-107: body limit — rejeita corpos excessivos antes de qualquer parse.
+  // Content-Length pode estar ausente/incorreto (chunked), então o tamanho
+  // real do texto lido é sempre validado, não apenas o header.
+  const contentLength = request.headers.get("content-length");
+  if (contentLength && Number(contentLength) > MAX_BODY_BYTES) {
+    return jsonResponse({ ok: false, error: "Corpo da requisição excede o tamanho máximo permitido." }, 413, request);
+  }
+
+  const rawBody = await request.text().catch(() => null);
+  if (rawBody === null) {
+    return jsonResponse({ ok: false, error: "Invalid request body" }, 400, request);
+  }
+  if (new TextEncoder().encode(rawBody).length > MAX_BODY_BYTES) {
+    return jsonResponse({ ok: false, error: "Corpo da requisição excede o tamanho máximo permitido." }, 413, request);
+  }
+
+  let payload: unknown = null;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    payload = null;
+  }
   if (!payload) {
     return jsonResponse({ ok: false, error: "Invalid request body" }, 400, request);
   }
@@ -91,7 +122,16 @@ Deno.serve(async (request) => {
       courseClasses: courseClasses ?? [],
     });
 
-    const { data: enrollmentId, error } = await supabase.rpc("registrar_inscricao_publica", {
+    // REC-107: REC-101 revogou `execute` de `anon`/`authenticated` sobre esta
+    // RPC (SEV-0, FND-02). Seguindo o mesmo padrão já aplicado por REC-102 a
+    // `leads/index.ts` (endpoint controlado com RPC/insert direto revogado do
+    // público), a chamada da RPC usa `adminClient()` (service_role,
+    // server-only, já detém `grant execute on all functions in schema public`
+    // desde 20260604164120_content_access_alignment.sql — nenhuma migration
+    // nova de grant é necessária). As leituras de `turma` acima permanecem em
+    // `anonClient()` porque já são publicamente legíveis via RLS/grants de
+    // REC-103/REC-104 e não precisam de privilégio elevado (least privilege).
+    const { data: enrollmentId, error } = await adminClient().rpc("registrar_inscricao_publica", {
       p_nome_completo: data.studentName,
       p_email: data.email,
       p_cpf: data.cpf,

@@ -7,7 +7,6 @@ import { AlertCircle } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -215,21 +214,11 @@ export function LoginPage() {
               )}
             />
 
-            <div className="-mt-0.5 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <Checkbox id="login-remember" checked={remember} onCheckedChange={setRemember} />
-                <label htmlFor="login-remember" className="cursor-pointer text-body-small text-tk-ink-muted">
-                  Manter conectado
-                </label>
-              </div>
-              <Button
-                type="button"
-                variant="tertiary"
-                className="ml-auto"
-                onClick={() => toast.success("Link de recuperação enviado para o seu e-mail.")}
-              >
-                Esqueci minha senha
-              </Button>
+            <div className="-mt-0.5 flex items-center gap-2">
+              <Checkbox id="login-remember" checked={remember} onCheckedChange={setRemember} />
+              <label htmlFor="login-remember" className="cursor-pointer text-body-small text-tk-ink-muted">
+                Manter conectado
+              </label>
             </div>
 
             {error ? (

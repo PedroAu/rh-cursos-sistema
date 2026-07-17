@@ -1,0 +1,47 @@
+-- REC-104: implementar cliente público anon (FND-03)
+--
+-- Épica 17 exige que nenhum caminho público importe ou prefira
+-- `service_role`. `src/lib/supabase/rh-cursos-api.ts` trocou
+-- `fetchPublicTestimonialsFromSupabaseServer` para usar
+-- `createSupabasePublicServerClient()` (chave anon), em vez do cliente
+-- privilegiado (`createSupabaseServerClient()`, service role).
+--
+-- Achado durante a implementação (1/2): `public.avaliacao` já possui a
+-- policy RLS `avaliacao_public_or_owner_select`
+-- (`20260513100000_sprint1_security.sql`, `to anon, authenticated`,
+-- liberando linhas com `publicar = true`), mas nenhuma migration jamais
+-- concedeu o privilégio `select` de tabela para `anon` nem para
+-- `authenticated` nessa tabela. No PostgreSQL, uma RLS policy só é avaliada
+-- depois que o `grant` de tabela permite o comando — sem o `grant`, o role
+-- recebe "permission denied for table avaliacao" independente da policy
+-- existir. Isso ficou mascarado até agora porque o único consumidor SSR de
+-- depoimentos públicos usava `service_role` (que possui `grant select` em
+-- todas as tabelas do schema `public`,
+-- `20260604164120_content_access_alignment.sql`, linha 244) e o consumidor
+-- de browser (`fetchPublicTestimonialsFromSupabase`, cliente anon) nunca
+-- havia sido exercitado por um teste real contra o banco.
+--
+-- Achado durante a implementação (2/2): mesmo com o `grant select` acima, a
+-- própria avaliação da policy falha para `anon` com "permission denied for
+-- function is_admin" — a policy usa `public.is_admin()` na cláusula `or`, e
+-- `execute` nessa função só foi concedido a `authenticated`
+-- (`20260604164120_content_access_alignment.sql`, linha 246). `is_admin()`
+-- é `security definer`, `stable`, e apenas compara `auth.uid()` (nulo para
+-- `anon`) com `profiles.role`; conceder `execute` a `anon` não expõe dado
+-- algum além do booleano já usado pela própria policy, e permite que a
+-- RLS termine de avaliar a cláusula `or` sem erro (resultado sempre `false`
+-- para `anon`, que nunca tem `auth.uid()`).
+--
+-- Correção: conceder `select` na tabela e `execute` na função para os
+-- mesmos papéis já previstos pela policy de leitura (`anon, authenticated`
+-- para a tabela; `anon` adicional para a função, que `authenticated` já
+-- possui). Nenhum privilégio de insert/update é concedido aqui — os fluxos
+-- de escrita de avaliação (`avaliacao_owner_insert`, `avaliacao_admin_update`)
+-- permanecem fora do escopo desta story (autenticação/portal, tratados por
+-- REC-201 a REC-204).
+--
+-- Roll-forward only: nenhuma migration futura deve revogar estes grants sem
+-- revisar todos os consumidores públicos de depoimentos.
+
+grant select on public.avaliacao to anon, authenticated;
+grant execute on function public.is_admin() to anon;

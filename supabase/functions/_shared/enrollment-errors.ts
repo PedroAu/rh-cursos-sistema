@@ -24,6 +24,19 @@ const enrollmentErrorMatchers = [
     needle: "aluno já possui inscrição ativa nesta turma",
     message: "Aluno já possui inscrição ativa nesta turma.",
   },
+  // REC-107: sob concorrência real, duas chamadas simultâneas para o mesmo
+  // aluno/turma podem passar da checagem `if exists` (P0004) da RPC antes de
+  // qualquer uma commitar. Nesse caso, a perdedora não recebe P0004 — ela
+  // recebe a violação bruta do índice único parcial `inscricao_aluno_turma_active_idx`
+  // (23505), que é a barreira real de idempotência (mesma garantia de
+  // atomicidade que REC-105 aplicou à reserva de vaga). Mapear essa violação
+  // para a mesma mensagem amigável evita expor detalhe de schema ao usuário
+  // sem enfraquecer a proteção — a duplicata nunca é persistida em nenhum caso.
+  {
+    code: undefined,
+    needle: "inscricao_aluno_turma_active_idx",
+    message: "Aluno já possui inscrição ativa nesta turma.",
+  },
 ] as const;
 
 export function getEnrollmentErrorMessage(error: unknown): string | null {

@@ -11,7 +11,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   isSupabaseAdminConfigured: true,
 }));
 
-import { checkRateLimit, rateLimitConfigs, clientIp } from '@/lib/rate-limit';
+import { buildRateLimitKey, checkRateLimit, rateLimitConfigs, clientIp } from '@/lib/rate-limit';
 
 async function loadRateLimitModule() {
   vi.resetModules();
@@ -216,6 +216,42 @@ describe('rate-limit', () => {
       const rateLimitModule = await loadRateLimitModule();
 
       expect(rateLimitModule.rateLimitConfigs.auth.maxRequests).toBe(30);
+    });
+  });
+
+  describe('buildRateLimitKey — REC-205 authenticated key composition', () => {
+    it('keeps the anonymous key byte-identical to the previous scope:ip format', () => {
+      expect(buildRateLimitKey('enrollment', '192.0.2.44')).toBe('enrollment:192.0.2.44');
+    });
+
+    it('treats undefined userIdentifier as anonymous (unchanged key)', () => {
+      expect(buildRateLimitKey('enrollment', '192.0.2.44', undefined)).toBe(
+        'enrollment:192.0.2.44',
+      );
+    });
+
+    it('treats null userIdentifier as anonymous (unchanged key)', () => {
+      expect(buildRateLimitKey('enrollment', '192.0.2.44', null)).toBe('enrollment:192.0.2.44');
+    });
+
+    it('treats an empty-string userIdentifier as anonymous (unchanged key)', () => {
+      expect(buildRateLimitKey('enrollment', '192.0.2.44', '')).toBe('enrollment:192.0.2.44');
+    });
+
+    it('produces a more specific key when an authenticated userIdentifier is present', () => {
+      const anon = buildRateLimitKey('enrollment', '192.0.2.44');
+      const authed = buildRateLimitKey('enrollment', '192.0.2.44', 'abc123');
+
+      expect(authed).toBe('enrollment:192.0.2.44:user:abc123');
+      expect(authed).not.toBe(anon);
+      expect(authed.startsWith(anon)).toBe(true);
+    });
+
+    it('separates buckets for two authenticated users sharing the same proxy IP', () => {
+      const userA = buildRateLimitKey('enrollment', '192.0.2.44', 'aaaa');
+      const userB = buildRateLimitKey('enrollment', '192.0.2.44', 'bbbb');
+
+      expect(userA).not.toBe(userB);
     });
   });
 

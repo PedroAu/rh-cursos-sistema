@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { cloneElement, isValidElement, useEffect, useId, useMemo, useState } from "react";
 import { Check, CheckCircle2, ClipboardCheck, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 
@@ -123,19 +123,30 @@ function Field({
   required?: boolean;
   children: React.ReactNode;
 }) {
+  const generatedId = useId();
+  const fieldId = `checkout-field-${generatedId}`;
+  const errorId = error ? `${fieldId}-error` : undefined;
+  const control = isValidElement(children)
+    ? cloneElement(children as React.ReactElement<Record<string, unknown>>, {
+        id: fieldId,
+        "aria-describedby": errorId,
+        "aria-invalid": error ? true : undefined,
+      })
+    : children;
+
   return (
-    <label className="grid gap-2 text-sm font-medium text-tk-ink">
-      <span>
+    <div className="grid gap-2 text-sm font-medium text-tk-ink">
+      <label htmlFor={fieldId}>
         {label}
         {required ? <span className="ml-1 text-tk-error">*</span> : null}
-      </span>
-      {children}
+      </label>
+      {control}
       {error ? (
-        <span className="text-caption text-tk-error" role="alert">
+        <span id={errorId} className="text-caption text-tk-error" role="alert">
           {error}
         </span>
       ) : null}
-    </label>
+    </div>
   );
 }
 

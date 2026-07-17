@@ -142,3 +142,29 @@ export function clientIp(request: Request): string {
     "unknown"
   );
 }
+
+/**
+ * REC-205 — Compõe a chave de rate limit a partir do escopo/operação, do
+ * identificador do proxy confiável (`clientIp`) e, OPCIONALMENTE, de um
+ * identificador da sessão autenticada.
+ *
+ * A inclusão do `userIdentifier` serve APENAS para tornar a chave mais
+ * específica quando existe uma sessão SSR (REC-202) ativa — é granularidade de
+ * bucket, NÃO uma decisão de autorização (REC-203 permanece infraestrutura não
+ * ativada e não é consumida aqui).
+ *
+ * Sem `userIdentifier` (requisição anônima) a chave é byte-idêntica ao
+ * comportamento anterior (`${scope}:${clientIdentifier}`), preservando bucket,
+ * limite e respostas do tráfego não autenticado.
+ */
+export function buildRateLimitKey(
+  scope: string,
+  clientIdentifier: string,
+  userIdentifier?: string | null
+): string {
+  const base = `${scope}:${clientIdentifier}`;
+  if (typeof userIdentifier === "string" && userIdentifier.length > 0) {
+    return `${base}:user:${userIdentifier}`;
+  }
+  return base;
+}

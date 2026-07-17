@@ -3,6 +3,32 @@ export interface ExportOptions {
   headers?: string[];
 }
 
+/**
+ * Characters that Excel, LibreOffice Calc and Google Sheets interpret as the
+ * start of a formula when they appear at the beginning of a cell value:
+ * `=`, `+`, `-`, `@`, tab (`\t`) and carriage return (`\r`).
+ *
+ * @see https://owasp.org/www-community/attacks/CSV_Injection (CWE-1236)
+ */
+const CSV_FORMULA_TRIGGER = /^[=+\-@\t\r]/;
+
+/**
+ * Neutralizes CSV Formula Injection (CWE-1236) by prefixing any value that
+ * begins with a formula trigger character with a single quote (`'`). The
+ * apostrophe forces spreadsheet applications to treat the whole cell as
+ * literal text instead of evaluating it as a formula.
+ *
+ * This is a serialization-layer control only: the returned value is used when
+ * building the CSV file and never mutates the underlying stored data. Per the
+ * OWASP guidance, ANY string starting with a trigger character is neutralized,
+ * including legitimate-looking values such as negative numbers (`-5`) or
+ * international phone numbers (`+5511...`); over-neutralizing is preferred to
+ * leaving an injection vector open.
+ */
+export function neutralizeCsvFormula(value: string): string {
+  return CSV_FORMULA_TRIGGER.test(value) ? `'${value}` : value;
+}
+
 export function exportToCSV<T extends Record<string, unknown>>(
   data: T[],
   options: ExportOptions = {}
@@ -18,7 +44,7 @@ export function exportToCSV<T extends Record<string, unknown>>(
   // Build CSV content
   const csvContent = [
     // Header row
-    headers.map((header) => `"${header}"`).join(","),
+    headers.map((header) => `"${neutralizeCsvFormula(header).replace(/"/g, '""')}"`).join(","),
     // Data rows
     ...data.map((row) =>
       headers
@@ -27,8 +53,8 @@ export function exportToCSV<T extends Record<string, unknown>>(
           if (value === null || value === undefined) {
             return '""';
           }
-          const stringValue = String(value);
-          // Escape quotes and wrap in quotes
+          // Neutralize formula injection, then escape quotes and wrap in quotes
+          const stringValue = neutralizeCsvFormula(String(value));
           return `"${stringValue.replace(/"/g, '""')}"`;
         })
         .join(",")

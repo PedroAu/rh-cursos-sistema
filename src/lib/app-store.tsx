@@ -28,7 +28,6 @@ import {
   SESSION_ACTIVITY_SYNC_MS,
 } from "@/lib/supabase/session-token";
 import {
-  fetchLeadsFromSupabase,
   fetchPublicBlogPostsFromSupabase,
   fetchPublicCatalogFromSupabase,
   isExplicitPublicTestBaselineEnabled
@@ -652,9 +651,15 @@ export function AppStoreProvider({
 
     const scheduleLeadRefetch = debounce(() => {
       if (!active) return;
-      fetchLeadsFromSupabase()
+      // REC-206: o refetch de leads disparado por realtime também trafega
+      // exclusivamente pelo BFF same-origin (admin-resources leads/list,
+      // HMAC via requireAdmin), nunca pelo cliente Supabase direto — este era
+      // o contrato duplicado de leitura de leads e foi removido.
+      const adminSessionToken = getAdminSessionTokenValue();
+      if (!adminSessionToken) return;
+      fetchAdminLeads(adminSessionToken)
         .then((updated) => {
-          if (!active || !updated) return;
+          if (!active || !updated.length) return;
           setState((current) => ({ ...current, leads: mergeLeads(current.leads, updated) }));
         })
         .catch(() => undefined);
@@ -748,52 +753,50 @@ export function AppStoreProvider({
           refresh_token: stored.refresh_token,
         })
         .then(({ error }) => {
-          if (!active || error) return;
-          return fetchLeadsFromSupabase().then((leads) => {
-            if (!active || !leads) return;
-            setState((current) => ({ ...current, leads: mergeLeads(current.leads, leads) }));
+          if (!active || error || !supabase) return;
 
-            // Real-time subscriptions para leads (admin only)
-            if (supabase) {
-              const leadSub = createRealtimeSubscription(
-                supabase,
-                "lead_changes",
-                "lead",
-                () => active,
-                scheduleLeadRefetch
-              );
+          // REC-206: a leitura de leads é servida exclusivamente pelo BFF
+          // same-origin (fetchAdminLeads, acima). A sessão Supabase Auth aqui
+          // habilita apenas as subscriptions realtime sob RLS — o contrato
+          // duplicado de leitura de leads via cliente Supabase direto foi
+          // removido. A consolidação do transporte realtime (WebSocket direto
+          // ao Supabase) permanece fora do escopo desta story.
+          const leadSub = createRealtimeSubscription(
+            supabase,
+            "lead_changes",
+            "lead",
+            () => active,
+            scheduleLeadRefetch
+          );
 
-              // Real-time para inscrições (admin only). Mudanças em inscrição
-              // afetam a capacidade das turmas (vagas), por isso refetch do
-              // catálogo para reconciliar as contagens de vagas.
-              subscriptions.push(leadSub);
+          subscriptions.push(leadSub);
 
-              // O bootstrap administrativo contém também registros inativos.
-              // Um refetch público não pode substituir esse conjunto por uma
-              // visão RLS reduzida após eventos de inscrição/aluno.
-              if (bootstrapPublicData) {
-                const enrollmentSub = createRealtimeSubscription(
-                  supabase,
-                  "inscricao_changes",
-                  "inscricao",
-                  () => active,
-                  scheduleCatalogRefetch
-                );
+          // O bootstrap administrativo contém também registros inativos.
+          // Um refetch público não pode substituir esse conjunto por uma
+          // visão RLS reduzida após eventos de inscrição/aluno.
+          if (bootstrapPublicData) {
+            // Mudanças em inscrição afetam a capacidade das turmas (vagas),
+            // por isso refetch do catálogo para reconciliar as contagens.
+            const enrollmentSub = createRealtimeSubscription(
+              supabase,
+              "inscricao_changes",
+              "inscricao",
+              () => active,
+              scheduleCatalogRefetch
+            );
 
-                // Real-time para alunos (admin only). Alterações em aluno podem
-                // refletir nas estatísticas do catálogo (total de alunos por curso).
-                const studentSub = createRealtimeSubscription(
-                  supabase,
-                  "aluno_changes",
-                  "aluno",
-                  () => active,
-                  scheduleCatalogRefetch
-                );
+            // Alterações em aluno podem refletir nas estatísticas do catálogo
+            // (total de alunos por curso).
+            const studentSub = createRealtimeSubscription(
+              supabase,
+              "aluno_changes",
+              "aluno",
+              () => active,
+              scheduleCatalogRefetch
+            );
 
-                subscriptions.push(enrollmentSub, studentSub);
-              }
-            }
-          });
+            subscriptions.push(enrollmentSub, studentSub);
+          }
         })
         .catch(() => undefined);
     }
