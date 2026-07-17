@@ -42,3 +42,4 @@ run("supabase", [
 run("supabase", ["db", "reset", "--local", "--yes"]);
 run("supabase", ["test", "db", "--local", "supabase/tests/database"]);
 run("node", ["scripts/test-db-concurrency.mjs"]);
+run("node", ["scripts/test-db-rec105-concurrency.mjs"]);

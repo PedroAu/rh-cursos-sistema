@@ -27,6 +27,8 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e:smoke": "node scripts/run-playwright.mjs --project=functional",
+    "test:visual": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional",
+    "test:visual:update": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional --update-snapshots",
     "test:epic14:fidelity:capture": "node scripts/capture-epic14-fidelity.mjs",
     "test:epic14:fidelity": "node scripts/run-playwright.mjs epic5-search-motion.spec.ts epic14-mantine-removal.smoke.spec.ts --project=functional",
     "test:epic15:fidelity": "node scripts/run-playwright.mjs epic15-admin-dashboard-fidelity.spec.ts --project=functional",

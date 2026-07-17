@@ -10,14 +10,21 @@ export default defineConfig({
     setupFiles: ['./src/__tests__/setup.ts'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json', 'html', 'lcov'],
+      reporter: ['text', 'json', 'json-summary', 'html', 'lcov'],
       reportsDirectory: './coverage/unit',
+      // REC-404: baseline real medido em 2026-07-16 (ver docs/history/reports/
+      // rec-404-cobertura-real-2026-07-16.md). Ratchet: não pode cair abaixo
+      // do baseline registrado; não é uma meta de qualidade arbitrária.
       thresholds: {
-        statements: 70,
-        branches: 70,
-        functions: 70,
-        lines: 70,
+        statements: 47,
+        branches: 39,
+        functions: 44,
+        lines: 48,
       },
+      // Cobertura medida sobre o código elegível real do projeto (src/**),
+      // excluindo apenas artefatos gerados, tipos e configuração — não mais
+      // restrita a uma allowlist manual de arquivos (FND-15, REC-404).
+      include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'node_modules/',
         'src/__tests__/',
@@ -25,22 +32,12 @@ export default defineConfig({
         '**/*.test.tsx',
         '**/*.spec.ts',
         '**/*.spec.tsx',
+        '**/*.stories.tsx',
         'src/lib/supabase/database.types.ts',
-      ],
-      // Gate explícito sobre a superfície unitária hoje auditada pela suíte.
-      include: [
-        'src/lib/validation.ts',
-        'src/lib/auth.ts',
-        'src/lib/utils.ts',
-        'src/lib/company.ts',
-        'src/lib/get-initials.ts',
-        'src/lib/debounce.ts',
-        'src/lib/admin-form-validation.ts',
-        'src/lib/analytics.ts',
-        'src/lib/utils/csv-export.ts',
-        'src/hooks/use-hotkey.ts',
-        'src/hooks/use-simulated-loading.ts',
-        'src/lib/hooks/useAdminSearch.ts',
+        'src/design-tokens/**',
+        'src/types/**',
+        'src/graphify-out/**',
+        '**/*.d.ts',
       ],
     },
     include: ['src/__tests__/**/*.test.ts', 'src/__tests__/**/*.test.tsx'],
