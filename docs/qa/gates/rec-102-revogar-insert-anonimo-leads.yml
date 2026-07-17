@@ -1,0 +1,96 @@
+schema: 1
+story: 'REC-102'
+story_title: 'Revogar insert anônimo de leads'
+gate: PASS
+status_reason: >-
+  Migration, ajuste de endpoint e testes verificados independentemente,
+  com validação real (não simulada) contra Postgres + PostgREST + Edge
+  Functions em Docker local: insert direto anônimo negado via chamada HTTP
+  real (401/42501), authenticated sem privilégio negado via pgTAP,
+  endpoint controlado (adminClient()) confirmado persistindo via chamada
+  HTTP real ao Edge Function (201), regressões de validação/origem
+  confirmadas inalteradas (400/403). Suíte completa 58/58 PASS. Escopo
+  restrito exatamente ao declarado (migration + troca de cliente em
+  leads/index.ts), sem tocar lógica de validação/rate-limit/origem
+  pré-existente.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T18:30:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 96
+
+history:
+  - at: '2026-07-16T18:30:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Diff de supabase/functions/leads/index.ts
+      confirmado restrito à troca anonClient()→adminClient(); migration
+      revisada linha a linha; evidência de teste HTTP real (não apenas
+      pgTAP) considerada forte o suficiente para PASS sem ressalva.
+
+top_issues:
+  - id: REL-105
+    severity: low
+    finding: >-
+      checkRateLimit não foi exercitado até o limite durante a validação
+      HTTP real desta story (não há motivo para suspeitar de regressão,
+      confirmado por leitura de código que a chamada de rate limit
+      permanece antes do bloco de persistência, não tocada pela troca de
+      cliente, mas não foi testado em carga).
+    suggested_owner: qa
+    suggested_action: >-
+      Aceitar — leitura de código confirma que a ordem de verificação não
+      mudou. Reavaliar apenas se REC-107 (endurecimento do endpoint)
+      alterar essa lógica.
+    refs:
+      - 'docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md#35-teste-positivo-real--endpoint-ajustado-ac3-ac4'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 5
+  risks_identified: 1
+  independent_verification:
+    - 'npm run test:db → Files=6, Tests=58, Result: PASS'
+    - 'git diff supabase/functions/leads/index.ts revisado: única mudança funcional é anonClient()→adminClient() na persistência, mais a guarda de lockdown da REC-003 (story paralela, preservada intacta)'
+    - 'Leitura da migration 20260715110000_revoke_anon_lead_insert.sql: revoke insert, drop policy lead_public_insert, grant insert explícito a service_role'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'Insert direto anônimo negado via chamada HTTP real (401, 42501 permission denied for table lead).'
+    AC2:
+      status: PASS
+      notes: 'authenticated sem privilégio negado via pgTAP throws_ok 42501.'
+    AC3:
+      status: PASS
+      notes: 'Endpoint ajustado confirmado persistindo via chamada HTTP real ao Edge Function (201), linha verificada e removida (dado sintético).'
+    AC4:
+      status: PASS
+      notes: 'Validação de campo obrigatório (400) e verificação de origem (403) confirmadas inalteradas por teste real.'
+    AC5:
+      status: PASS
+      notes: 'Migration idempotente confirmada por reaplicação direta via psql sem erro.'
+    AC6:
+      status: PASS
+      notes: 'Nenhuma regressão em outras tabelas confirmada pela suíte completa e asserção específica de public.curso.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'service_role restrito a código server-only (Edge Function), nunca exposto ao browser. Insert direto anônimo fechado, único caminho de escrita é o endpoint validado.'
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada de banco 100% verde; validação de regressão positiva e negativa executada com chamadas HTTP reais, não apenas simuladas.'
+  auditability:
+    status: PASS
+    notes: 'Relatório detalha timestamp de colisão de migration resolvido de forma transparente, sem esconder o ajuste.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md']
+  future: []

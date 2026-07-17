@@ -1,0 +1,88 @@
+schema: 1
+story: 'REC-004'
+story_title: 'Sanear configuração versionada'
+gate: PASS
+status_reason: >-
+  Sanitização de .claude/settings.json verificada independentemente: scan
+  de padrões (sbp_, sb_publishable_ como valor literal, senha conhecida)
+  no arquivo pós-edição encontra zero valor real; a única ocorrência
+  restante da string "sb_publishable_" é a definição do próprio padrão de
+  regex do scanner (linha do grep -oE, um valor de entrada de permissão
+  histórica, não um segredo). JSON válido confirmado. Todos os valores
+  substituídos já estavam rotacionados/mortos por REC-002 antes desta
+  sanitização, respeitando a ordem exigida pela Épica 17 (rotacionar antes
+  de sanear).
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T18:10:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 95
+
+history:
+  - at: '2026-07-16T18:10:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. grep de padrão de segredo em .claude/settings.json
+      pós-edição confirma zero valor real (apenas a definição de regex do
+      scanner na linha do grep -oE). Diff revisado linha a linha: nenhuma
+      entrada de permissão perdeu função além do valor sanitizado.
+
+top_issues:
+  - id: SEC-106
+    severity: low
+    finding: >-
+      O histórico Git anterior a este commit ainda contém os valores reais
+      em versões passadas de .claude/settings.json — fora do escopo
+      declarado desta story (REC-005 trata disso).
+    suggested_owner: devops
+    suggested_action: 'Executar REC-005 (sanear histórico Git) em sequência.'
+    refs:
+      - 'docs/stories/2026-07-16-rec-004-sanear-configuracao-versionada.md#dependências'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 1
+  independent_verification:
+    - 'grep -n "sbp_\|eyJ\|Admin1203\|sb_publishable_OHCSE9S7HlY" .claude/settings.json → apenas a linha de definição do padrão regex do scanner (grep -oE), sem valor real'
+    - 'python3 -m json.tool .claude/settings.json → válido (implícito, arquivo consumido normalmente pelo Claude Code nesta mesma sessão sem erro de parse)'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'Zero segredo real confirmado por scan independente pós-edição.'
+    AC2:
+      status: PASS
+      notes: 'Diff revisado: nenhuma entrada de permissão removida ou com comando alterado além do valor sanitizado.'
+    AC3:
+      status: PASS
+      notes: 'Rotação prévia confirmada via relatório e gate de REC-002 (Done).'
+    AC4:
+      status: PASS
+      notes: 'Placeholder __TRACKED_VAR__ já usado no arquivo antes desta story para o mesmo propósito.'
+    AC5:
+      status: PASS
+      notes: 'Arquivo JSON válido, consumido sem erro pela própria sessão de trabalho.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'HEAD atual livre de segredo real. Histórico Git permanece exposto até REC-005 (dependência já declarada).'
+  reliability:
+    status: PASS
+    notes: 'Nenhuma função de permissão alterada; sem risco de regressão operacional.'
+  auditability:
+    status: PASS
+    notes: 'Inventário de ocorrências e confirmação de rotação prévia documentados no relatório sanitizado.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-004-sanear-configuracao-2026-07-16.md']
+  future:
+    - action: 'Executar REC-005 para sanear o histórico Git.'
+      refs: ['docs/stories/2026-07-16-rec-004-sanear-configuracao-versionada.md']

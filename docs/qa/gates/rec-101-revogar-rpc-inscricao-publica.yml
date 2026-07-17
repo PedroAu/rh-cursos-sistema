@@ -1,0 +1,121 @@
+schema: 1
+story: 'REC-101'
+story_title: 'Revogar RPC pública de inscrição'
+gate: CONCERNS
+status_reason: >-
+  Migration de revogação tecnicamente sólida e verificada contra banco real
+  (npm run test:db, suíte completa PASS, 58/58 testes incluindo os 8 desta
+  story). has_function_privilege() confirma anon/authenticated/public sem
+  execute na RPC, service_role preservado, idempotência e ausência de
+  regressão em is_admin()/leitura pública. Mantido CONCERNS (não PASS) por
+  um gap declarado pelo próprio executor: a validação HTTP real via
+  PostgREST (curl com chave anon/authenticated contra o endpoint REST) não
+  foi exercitada para esta story especificamente — diferente da story
+  irmã REC-102, que rodou o teste HTTP real via supabase start. A evidência
+  de ACL de banco é o equivalente correto ao que o PostgREST consulta, mas
+  não substitui integralmente a chamada HTTP fim-a-fim exigida pelos
+  quality_gate_tools declarados na própria story.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T18:20:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 82
+
+history:
+  - at: '2026-07-16T18:20:00Z'
+    gate: CONCERNS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Migration e teste pgTAP revisados linha a linha;
+      suíte completa reexecutada após correção de uma asserção desatualizada
+      (interação com REC-102) — 58/58 PASS. Gap: validação HTTP real via
+      PostgREST não executada nesta story (mitigado por has_function_privilege,
+      que consulta o mesmo catálogo ACL usado pelo PostgREST para autorizar).
+
+top_issues:
+  - id: SEC-107
+    severity: medium
+    finding: >-
+      Validação HTTP real via PostgREST (curl/cliente real com chave anon e
+      authenticated contra rpc/registrar_inscricao_publica) não foi
+      executada. A evidência de ACL de banco (has_function_privilege) é
+      tecnicamente equivalente — consulta o mesmo catálogo pg_proc que o
+      PostgREST usa para autorizar — mas os quality_gate_tools da própria
+      story pedem "teste negativo de chamada direta à RPC via PostgREST".
+    suggested_owner: qa
+    suggested_action: >-
+      Não bloqueia G0 (REC-101 não é da Onda 0), mas recomenda-se executar o
+      teste HTTP real (mesmo padrão usado por REC-102, via supabase start)
+      antes de contar REC-101 como encerrando G1/G2 para reabertura de
+      catálogo/pré-inscrição.
+    refs:
+      - 'docs/history/reports/rec-101-revogar-rpc-2026-07-15.md#5-validação-http-real--gap-explícito'
+  - id: REL-104
+    severity: low
+    finding: >-
+      Uma asserção do teste original desta story (nº 9, sobre anon manter
+      insert em public.lead) ficou desatualizada por interação com REC-102
+      (aplicada na mesma sequência de migrations) e foi removida durante
+      esta revisão de QA, não pelo executor original.
+    suggested_owner: qa
+    suggested_action: >-
+      Aceito — a asserção era redundante com a cobertura equivalente em
+      rec-102-revoke-anon-lead-insert.test.sql. Nenhuma perda de cobertura.
+    refs:
+      - 'supabase/tests/database/rec-101-revoke-public-enrollment-rpc.test.sql'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 8
+  risks_identified: 2
+  independent_verification:
+    - 'npm run test:db → Files=6, Tests=58, Result: PASS (após correção da asserção 9 desatualizada)'
+    - 'Leitura da migration 20260715100000_revoke_public_enrollment_rpc.sql: assinatura de parâmetros confirmada idêntica à dos grants originais em 20260512193000_initial_rh_cursos_schema.sql e 20260604164120_content_access_alignment.sql'
+    - 'Leitura do teste rec-101-revoke-public-enrollment-rpc.test.sql: 8 asserções cobrindo AC1-AC4 e AC6, todas via has_function_privilege/has_table_privilege'
+  trace:
+    ac_covered: [2, 3, 4, 5, 6]
+    ac_partial: [1]
+    ac_gaps:
+      - 'AC1: negação confirmada a nível de ACL (has_function_privilege), não por chamada HTTP real via PostgREST, conforme os quality_gate_tools da story pediam explicitamente.'
+  acceptance_criteria:
+    AC1:
+      status: CONCERNS
+      notes: 'ACL de banco confirma ausência de execute para anon; chamada HTTP real via PostgREST não foi disparada nesta story (SEC-107).'
+    AC2:
+      status: PASS
+      notes: 'authenticated sem privilégio confirmado sem execute, mesma ressalva de nível ACL vs. HTTP.'
+    AC3:
+      status: PASS
+      notes: 'Idempotência confirmada por reaplicação testada na suíte pgTAP.'
+    AC4:
+      status: PASS
+      notes: 'service_role preservado; nenhuma outra função afetada (is_admin() e leitura pública confirmados sem regressão).'
+    AC5:
+      status: PASS
+      notes: 'Indisponibilidade do endpoint enrollments documentada explicitamente no relatório, com dependência declarada em REC-104/REC-105/REC-107.'
+    AC6:
+      status: PASS
+      notes: 'Nenhuma regressão de leitura pública confirmada (curso, turma).'
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: 'Revogação tecnicamente sólida a nível de ACL; gap de validação HTTP real registrado como SEC-107, não bloqueante para o merge, mas recomendado antes de contar como encerrando G1/G2.'
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada de banco 100% verde após correção da interação com REC-102 (baseline constitucional REC-403 preservado).'
+  auditability:
+    status: PASS
+    notes: 'Relatório documenta claramente o gap de validação HTTP, sem disfarçar como concluído.'
+
+recommendations:
+  immediate:
+    - action: >-
+        RESOLVIDO por @qa: asserção desatualizada corrigida, suíte 100%
+        verde. Nenhuma ação imediata bloqueante para merge da migration.
+      refs: ['docs/history/reports/rec-101-revogar-rpc-2026-07-15.md']
+  future:
+    - action: >-
+        Executar teste HTTP real via PostgREST (mesmo padrão de REC-102)
+        antes de considerar G1/G2 plenamente encerrados para este vetor.
+      refs: ['supabase/migrations/20260715100000_revoke_public_enrollment_rpc.sql']

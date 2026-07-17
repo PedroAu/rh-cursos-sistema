@@ -1,0 +1,72 @@
+schema: 1
+story: 'REC-405'
+story_title: 'Separar comparação visual da atualização'
+gate: PASS
+status_reason: >-
+  .github/workflows/ci.yml já usava npm run test:e2e:smoke (sem flag de
+  atualização) antes desta story — nenhum risco real de CI atualizar
+  baseline automaticamente. A contribuição real desta story é formalizar
+  a separação: scripts test:visual/test:visual:update nomeados
+  explicitamente, mais um teste automatizado
+  (visual-baseline-separation.test.ts, 5 asserções) que trava a garantia
+  estruturalmente contra regressão futura (ex: alguém adicionar
+  --update-snapshots a um workflow por engano). Suíte completa 606/606
+  em execução limpa (um timeout de worker isolado em execução anterior,
+  confirmado como flake de infraestrutura não-reprodutível na reexecução
+  imediata). Lint/typecheck limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T23:45:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 91
+
+history:
+  - at: '2026-07-16T23:45:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Teste isolado reexecutado (5/5). Suíte
+      completa reexecutada após flake de worker timeout em execução
+      anterior: 606 passed (606), limpo. Confirmado que ci.yml já estava
+      correto antes desta story.
+
+top_issues: []
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 5
+  risks_identified: 0
+  independent_verification:
+    - 'npx vitest run src/__tests__/ci/visual-baseline-separation.test.ts → 5/5 passing'
+    - 'npx vitest run (suíte completa, execução limpa) → 606 passed (606)'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Leitura de .github/workflows/ci.yml: usa test:e2e:smoke, nenhuma referência a test:visual:update ou --update-snapshots'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Todos os 7 ACs confirmados: scripts corretamente separados, CI
+        nunca invoca atualização, garantia travada por teste automatizado,
+        suíte completa sem regressão.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'N/A direto de segurança; fecha parte de FND-15 (sinal de qualidade confiável).'
+  reliability:
+    status: PASS
+    notes: 'Teste automatizado previne regressão futura da separação comparação/atualização, não depende de disciplina manual.'
+  auditability:
+    status: PASS
+    notes: 'Flake de worker timeout documentado com transparência, não escondido nem apresentado como falha real.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-405-separar-comparacao-2026-07-16.md']
+  future: []

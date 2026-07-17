@@ -1,0 +1,119 @@
+schema: 1
+story: 'REC-306'
+story_title: 'Corrigir navegação e ações administrativas'
+gate: PASS
+quality_score: 92
+status_reason: >-
+  Escopo puramente frontend/UX do admin shell (FND-17, FR-10, NFR-07). Menu
+  móvel antes inerte (o hambúrguer de admin-topbar.tsx alternava mobileOpened
+  sem renderizar nada; no mobile só 5 dos 9 itens de nav eram alcançáveis via
+  barra inferior) agora abre um drawer acessível (Radix Dialog, novo
+  admin-mobile-drawer.tsx) com TODOS os itens + catálogo + logout, operável por
+  teclado (Escape fecha, foco preso/restaurado pelo Radix), com aria-controls/
+  aria-expanded ligando o toggle ao drawer. Controles inertes do topbar
+  resolvidos por FR-10 caso a caso: busca global inerte REMOVIDA (cada página
+  de recurso já tem busca real); Notificações e Ajuda MARCADAS indisponíveis
+  (disabled + aria-disabled + label "em breve"), sem implementação fake
+  (Article IV, evita o antipadrão de falso sucesso de REC-302). Nenhum arquivo
+  de autenticação (HMAC/SSR) tocado. Suíte agregada 684 → 694 (+10),
+  lint/typecheck limpos. Gate deixado PENDING para revisão humana de @qa
+  (evidência completa abaixo).
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T14:25:00Z'
+expires: '2026-07-31T00:00:00Z'
+
+history:
+  - at: '2026-07-17T14:25:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Leitura completa de admin-mobile-drawer.tsx: Radix Dialog cuida
+      corretamente de foco preso/restaurado, Escape e overlay; aria-label no
+      conteúdo e no botão de fechar; navegação por Link com onClick={close}
+      fecha o drawer ao trocar de rota. Decisão caso a caso por controle
+      inerte é criteriosa (implementar apenas o que já tinha contrato,
+      remover o enganoso, marcar indisponível o que exigiria API nova) —
+      evita reintroduzir o antipadrão de falso sucesso de REC-302. git status
+      confirma HMAC/SSR sem modificação. npx vitest run → 694 passed (694).
+      npm run lint/typecheck limpos (revalidado de forma independente).
+
+evidence:
+  tests: '694/694 (baseline 684 + 10 novos)'
+  focused_tests: '10/10 (admin-mobile-navigation.test.tsx)'
+  lint: OK
+  typecheck: OK
+  files_created:
+    - src/features/admin-shell/components/admin-mobile-drawer.tsx
+    - src/__tests__/features/admin-shell/admin-mobile-navigation.test.tsx
+  files_modified:
+    - src/features/admin-shell/dashboard-shell.tsx
+    - src/features/admin-shell/components/admin-topbar.tsx
+  hmac_untouched:
+    - src/lib/auth.ts
+    - supabase/functions/_shared/auth.ts
+    - app/api/auth/session/route.ts
+    - src/lib/supabase/session.ts
+    - src/lib/supabase/authorize.ts
+
+inert_controls_decision:
+  - control: 'Hambúrguer móvel + drawer'
+    decision: IMPLEMENTED
+    note: 'Contrato de estado já existia; drawer real (Radix Dialog) conectado, com aria-controls.'
+  - control: 'Itens de nav 6–9 no mobile (Inscrições, Instrutores, Blog, Configurações)'
+    decision: IMPLEMENTED
+    note: 'Drawer expõe os 9 itens; barra inferior mantida como atalho aos 5 principais.'
+  - control: 'Busca global do topbar'
+    decision: REMOVED
+    note: 'Input inerte sem handler nem backing; busca real já existe por página de recurso.'
+  - control: 'Notificações (sino)'
+    decision: MARKED_UNAVAILABLE
+    note: 'Sem sistema de notificações; disabled + aria-disabled + title/label "em breve".'
+  - control: 'Ajuda (CircleHelp)'
+    decision: MARKED_UNAVAILABLE
+    note: 'Sem central de ajuda; disabled + aria-disabled + label "em breve".'
+
+acceptance_criteria:
+  - id: AC-306.01
+    status: PASS
+    note: 'Menu móvel abre e renderiza drawer real (antes não renderizava nada).'
+  - id: AC-306.02
+    status: PASS
+    note: 'Drawer expõe os 9 itens admin, inclusive Inscrições/Instrutores/Blog/Configurações.'
+  - id: AC-306.03
+    status: PASS
+    note: 'Operável por teclado: Escape fecha; foco preso/restaurado via Radix Dialog.'
+  - id: AC-306.04
+    status: PASS
+    note: 'Toggle com aria-expanded e aria-controls=admin-mobile-drawer; drawer rotulado.'
+  - id: AC-306.05
+    status: PASS
+    note: 'Busca global inerte removida; Notificações/Ajuda disabled + aria-disabled + "em breve".'
+  - id: AC-306.06
+    status: PASS
+    note: 'Navegar por item fecha o menu; Sair chama logout e fecha.'
+  - id: AC-306.07
+    status: PASS
+    note: 'Nenhum arquivo de autenticação (HMAC/SSR) tocado.'
+  - id: AC-306.08
+    status: PASS
+    note: 'Baseline verde: 684 → 694 (+10), lint/typecheck OK, sem regressão.'
+
+nfr_validation:
+  accessibility:
+    status: PASS
+    notes: >-
+      Navegação móvel operável por teclado (Tab/Enter/Escape), foco preso e
+      restaurado pelo Radix Dialog; toggle com aria-expanded/aria-controls;
+      controles indisponíveis marcados com aria-disabled em vez de inertes.
+      Varredura axe end-to-end das jornadas fica para REC-308 (dependente).
+  usability:
+    status: PASS
+    notes: >-
+      Itens de navegação antes inacessíveis no mobile agora alcançáveis;
+      controles enganosos (busca falsa) removidos, alinhando com FR-10.
+  security:
+    status: PASS
+    notes: 'Sem superfície de auth: nenhum arquivo HMAC/SSR alterado.'
+
+top_issues: []
+waiver: { active: false }

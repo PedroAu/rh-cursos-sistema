@@ -1,0 +1,83 @@
+schema: 1
+story: 'REC-404'
+story_title: 'Medir cobertura real'
+gate: PASS
+status_reason: >-
+  Allowlist artificial de 12 arquivos removida de vitest.config.ts,
+  substituída por include: src/**/*.{ts,tsx} com exclusões restritas a
+  artefatos gerados/tipos/cache/testes. Baseline real medido honestamente:
+  47.49% statements / 39.33% branches / 44.32% functions / 48.84% lines —
+  sem inflar nem inventar meta arbitrária de 80/90%. Thresholds fixados
+  como piso de não-regressão (ratchet) usando apenas coverage.thresholds
+  nativo do Vitest, sem dependência nova. Suíte 601/601 sem regressão,
+  lint/typecheck limpos. Encadeamento do gate no CI corretamente
+  encaminhado como follow-up (escopo de REC-401/402), não improvisado.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T23:15:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 92
+
+history:
+  - at: '2026-07-16T23:15:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Diff de vitest.config.ts revisado: include
+      ampliado corretamente, exclude restrito ao mínimo justificável.
+      npx vitest run --coverage reexecutado: 601 passed, thresholds OK.
+
+top_issues:
+  - id: PROC-103
+    severity: low
+    finding: >-
+      O ratchet de cobertura funciona apenas localmente (npx vitest run
+      --coverage); ainda não está encadeado como gate obrigatório no
+      pipeline de CI (GitHub Actions).
+    suggested_owner: devops
+    suggested_action: >-
+      Adicionar npm run test:coverage como etapa do pipeline de CI,
+      escopo de REC-401/REC-402 (já Done) ou story de follow-up dedicada.
+    refs:
+      - 'docs/history/reports/rec-404-cobertura-real-2026-07-16.md#recomendação-de-follow-up-não-implementada-nesta-story'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 601
+  risks_identified: 1
+  independent_verification:
+    - 'npx vitest run --coverage → 601 passed, thresholds (47/39/44/48) OK, exit code 0'
+    - 'npx vitest run (sem coverage) → 56 files/601 tests PASS, sem regressão do baseline de REC-403'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'git status --short → apenas vitest.config.ts + 2 docs novos alterados'
+  trace:
+    ac_covered: []
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Allowlist artificial removida; cobertura real medida e documentada
+        sem meta inventada; ratchet local implementado com ferramenta já
+        presente; nenhuma regressão na suíte.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'N/A direto de segurança; fecha FND-15 (sinal de qualidade real).'
+  reliability:
+    status: PASS
+    notes: 'Suíte 601/601 sem regressão; ratchet previne queda futura de cobertura.'
+  auditability:
+    status: PASS
+    notes: 'Número real documentado com transparência total, incluindo áreas de cobertura zero identificadas (não escondidas).'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-404-cobertura-real-2026-07-16.md']
+  future:
+    - action: 'Encadear npm run test:coverage no pipeline de CI (PROC-103).'
+      refs: ['.github/workflows/ci.yml']

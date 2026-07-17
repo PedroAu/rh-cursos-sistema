@@ -1,0 +1,99 @@
+schema: 1
+story: 'REC-203'
+story_title: 'Migrar autorização administrativa'
+gate: PASS
+status_reason: >-
+  Implementa D1 do ADR-016 como infraestrutura pura, sem ativação em
+  nenhuma rota real: resolveServerRole() consulta app_metadata.role fresco
+  via client.auth.getUser() a cada chamada (sem cache/payload assinado,
+  mesma fonte já validada por REC-202 — Article IV respeitado);
+  requireServerRole() é o helper fail-closed pronto para consumo futuro.
+  Confirmado por git status que nenhum arquivo HMAC (auth.ts,
+  _shared/auth.ts, session/route.ts) nem os arquivos de REC-202
+  (session.ts, ssr-session/route.ts) foram modificados — apenas lidos/
+  importados. Rebaixamento de papel comprovado bloqueando a requisição
+  seguinte via teste com mock sequenciado (admin → student entre duas
+  chamadas). HMAC confirmado como única autoridade real em produção,
+  sem exceção. Suíte agregada 632/632 (+11 testes novos), lint/typecheck
+  limpos.
+reviewer: '@qa (Quinn) + @architect (Aria)'
+updated: '2026-07-17T00:30:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 95
+
+history:
+  - at: '2026-07-17T00:30:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn) + @architect (Aria)'
+    note: >-
+      Revisão de alto rigor (segunda story consecutiva de auth). Leitura
+      completa de authorize.ts: fail-closed correto (null nunca satisfaz),
+      hierarquia de papéis coerente com DashboardRole. git status confirma
+      zero arquivo de produção/REC-202 modificado. npx vitest run → 632
+      passed (632). npm run lint/typecheck limpos.
+
+top_issues:
+  - id: PROC-106
+    severity: info
+    finding: >-
+      A entrega mensurável da épica ("rebaixamento bloqueia a requisição
+      seguinte") é demonstrada a nível de mecanismo/teste, não em uma rota
+      de produção real — decisão deliberada e correta, pois ativar em rota
+      real hoje causaria lockout (nenhum login real popula a sessão SSR
+      ainda). Propriedade da decomposição forward-only da épica (D5),
+      não uma lacuna desta story.
+    suggested_owner: architect
+    suggested_action: >-
+      Ativação em rota real é escopo de REC-204 (ou passo dedicado
+      subsequente), quando a sessão SSR já estiver sendo populada por login
+      real. Não avançar isso sem que REC-202 esteja de fato em uso.
+    refs:
+      - 'docs/history/reports/rec-203-autorizacao-servidor-2026-07-16.md'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 11
+  risks_identified: 1
+  independent_verification:
+    - 'git status --short src/lib/auth.ts supabase/functions/_shared/auth.ts app/api/auth/session/route.ts src/lib/supabase/session.ts app/api/auth/ssr-session/route.ts → apenas os 2 arquivos de REC-202 aparecem, como untracked (não modificados por REC-203)'
+    - 'npx vitest run → Test Files 59 passed (59), Tests 632 passed (632)'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Leitura de src/lib/supabase/authorize.ts: resolveServerRole() sem cache, requireServerRole() fail-closed, roleSatisfies() trata null como não-satisfeito'
+    - 'grep confirma admin-resources/index.ts continua usando requireAdmin() (HMAC), não importa authorize.ts'
+  trace:
+    ac_covered: []
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Mecanismo de resolução de papel sem cache construído e testado;
+        rebaixamento comprovado bloqueando a chamada seguinte a nível de
+        mecanismo; nenhuma rota real migrada (decisão correta e
+        documentada); HMAC confirmado como autoridade real inalterada.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Fail-closed correto em todos os ramos (sem sessão, sem papel válido,
+      papel insuficiente). Nenhuma fonte nova de papel introduzida.
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada sem regressão (632/632); nenhuma mudança de comportamento em produção, pois nada consome o módulo novo ainda.'
+  auditability:
+    status: PASS
+    notes: >-
+      Relatório e comentários no código documentam com transparência total
+      o que é infraestrutura vs. o que seria ativação futura.
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-203-autorizacao-servidor-2026-07-16.md']
+  future:
+    - action: 'Ativar requireServerRole() em rotas reais é escopo de REC-204, condicionado à sessão SSR já estar em uso real (PROC-106).'
+      refs: ['src/lib/supabase/authorize.ts']

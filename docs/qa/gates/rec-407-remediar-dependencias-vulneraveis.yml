@@ -1,0 +1,110 @@
+schema: 1
+story: 'REC-407'
+story_title: 'Remediar dependências vulneráveis'
+gate: PASS
+status_reason: >-
+  Levantamento completo via npm audit: 8 advisories (6 low, 2 moderate, 0
+  high/critical). Investigação individual e honesta de cada um: cadeia
+  elliptic (6× low) confirmada sem release corrigido upstream (range: *) e
+  exclusiva de devDependency (Storybook), ausente da árvore de produção
+  (npm audit --omit=dev confirma). Cadeia postcss/next (2× moderate)
+  confirmada como dependência interna fixada pelo próprio pacote next, sem
+  release estável disponível que a corrija. npm audit fix --force avaliado
+  e corretamente rejeitado por propor downgrades destrutivos (next 16→9)
+  que não resolveriam o advisory real. Todas as 8 exceções documentadas com
+  pacote, severidade, motivo, data e prazo de reavaliação. Nenhuma mudança
+  de dependência = nenhuma regressão possível; suíte confirmada como
+  baseline.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T23:20:00Z'
+expires: '2026-08-16T00:00:00Z'
+quality_score: 90
+
+history:
+  - at: '2026-07-16T23:20:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Reexecutado npm audit: 8 vulnerabilities (6
+      low, 2 moderate, 0 high, 0 critical), idêntico ao relatório. Decisão
+      de rejeitar npm audit fix --force revisada e confirmada correta.
+
+top_issues:
+  - id: DEP-101
+    severity: low
+    finding: >-
+      Cadeia elliptic (GHSA-848j-6mx2-7j84) sem correção upstream — risco
+      residual aceito, mitigado por estar restrita a devDependency (Storybook).
+    suggested_owner: dev
+    suggested_action: 'Reavaliar em 2026-08-16 ou na próxima execução de npm audit em CI.'
+    refs: ['docs/history/reports/rec-407-dependencias-vulneraveis-2026-07-16.md#61-cadeia-elliptic']
+  - id: DEP-102
+    severity: medium
+    finding: >-
+      postcss@8.4.31 (interno ao next) — GHSA-qx2v-qp2m-jg93, XSS via
+      unescaped </style> no output de stringify. Presente na árvore de
+      produção (next 16.2.9), sem release estável que corrija.
+    suggested_owner: devops
+    suggested_action: >-
+      Monitorar releases estáveis do Next.js >= 16.2.10 que atualizem a
+      dependência interna de postcss; reavaliar na próxima rotina de
+      npm audit/npm outdated.
+    refs: ['docs/history/reports/rec-407-dependencias-vulneraveis-2026-07-16.md#42-cadeia-postcssnext']
+
+waiver:
+  active: true
+  reason: >-
+    8 advisories (6 low, 2 moderate) sem correção segura disponível no
+    momento; nenhum tem exploração conhecida no contexto do projeto
+    (elliptic restrito a devDependency; postcss é dependência interna do
+    próprio next, sem release estável corrigido). Downgrade forçado via
+    npm audit fix --force rejeitado por quebrar a aplicação sem resolver
+    o problema real.
+  approved_by: '@qa (Quinn)'
+  expires: '2026-08-16'
+
+evidence:
+  tests_reviewed: 0
+  risks_identified: 2
+  independent_verification:
+    - 'npm audit → 8 vulnerabilities (6 low, 2 moderate, 0 high, 0 critical), confirmado idêntico ao relatório'
+    - 'npm audit --omit=dev → 2 vulnerabilities (2 moderate), confirma cadeia elliptic exclusiva de dev'
+    - 'npm view elliptic versions → 6.6.1 (latest) ainda dentro do range afetado, sem fix disponível'
+    - 'npm view next dist-tags → latest 16.2.10, ainda pinando postcss@8.4.31 internamente'
+    - 'npm run lint / npm run typecheck / npx vitest run → todos limpos (baseline, nenhuma dependência alterada)'
+  trace:
+    ac_covered: [1, 2, 4, 5, 6]
+    ac_partial: [3]
+    ac_gaps:
+      - 'AC3 (correção segura aplicada onde disponível): não aplicável neste ciclo — nenhum dos 8 advisories tinha correção segura disponível, confirmado por investigação individual.'
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Levantamento completo, separação produção/dev, exceções justificadas
+        e datadas para os 8 advisories, zero regressão (zero dependência
+        alterada), rastreabilidade completa.
+
+nfr_validation:
+  security:
+    status: CONCERNS
+    notes: >-
+      2 advisories moderate residuais em produção (postcss interno ao
+      next), sem correção disponível — risco aceito com justificativa
+      técnica sólida e prazo de reavaliação, não uma omissão silenciosa.
+  reliability:
+    status: PASS
+    notes: 'Nenhuma dependência alterada; suíte confirmada como baseline sem regressão.'
+  auditability:
+    status: PASS
+    notes: 'Cada advisory investigado individualmente com evidência (npm view, npm audit --omit=dev), decisão de rejeitar --force documentada com raciocínio completo.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-407-dependencias-vulneraveis-2026-07-16.md']
+  future:
+    - action: 'Reavaliar cadeia elliptic em 2026-08-16 (DEP-101).'
+      refs: ['package.json']
+    - action: 'Monitorar releases estáveis do Next.js >= 16.2.10 para postcss interno corrigido (DEP-102).'
+      refs: ['package.json']

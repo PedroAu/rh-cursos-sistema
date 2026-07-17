@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -84,27 +84,27 @@ Esta story adiciona um controle operacional simples (kill-switch por ambiente) q
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Definir o contrato do sinal de lockdown** (AC: 1, 4)
-  - [ ] Nomear a variável de ambiente e documentar onde é lida (frontend implantado, Edge Functions).
-  - [ ] Documentar o critério objetivo de ativação a partir de REC-002.
+- [x] **Task 1 — Definir o contrato do sinal de lockdown** (AC: 1, 4)
+  - [x] Nomear a variável de ambiente e documentar onde é lida (frontend implantado, Edge Functions).
+  - [x] Documentar o critério objetivo de ativação a partir de REC-002.
 
-- [ ] **Task 2 — Implementar a guarda mínima** (AC: 2, 3, 6)
-  - [ ] Adicionar verificação do sinal nos pontos de entrada server-side de rotas administrativas autenticadas.
-  - [ ] Adicionar verificação do sinal nos endpoints públicos de escrita (`supabase/functions/enrollments/index.ts`, `supabase/functions/leads/index.ts`).
-  - [ ] Confirmar que o comportamento sem o sinal ativo permanece inalterado.
+- [x] **Task 2 — Implementar a guarda mínima** (AC: 2, 3, 6)
+  - [x] Adicionar verificação do sinal nos pontos de entrada server-side de rotas administrativas autenticadas.
+  - [x] Adicionar verificação do sinal nos endpoints públicos de escrita (`supabase/functions/enrollments/index.ts`, `supabase/functions/leads/index.ts`).
+  - [x] Confirmar que o comportamento sem o sinal ativo permanece inalterado.
 
-- [ ] **Task 3 — Definir autoridade de ativação/desativação** (AC: 4, 5)
-  - [ ] Registrar quem pode ativar (incident commander/`@devops`) e quem confirma a desativação (`@qa` + incident commander).
+- [x] **Task 3 — Definir autoridade de ativação/desativação** (AC: 4, 5)
+  - [x] Registrar quem pode ativar (incident commander/`@devops`) e quem confirma a desativação (`@qa` + incident commander).
 
-- [ ] **Task 4 — Testar o ciclo completo** (AC: 2, 3, 5, 6)
-  - [ ] Simular ativação e validar bloqueio nas rotas em escopo.
-  - [ ] Simular desativação e validar retorno ao comportamento normal.
-  - [ ] Verificar ausência de bypass nos caminhos testados.
+- [x] **Task 4 — Testar o ciclo completo** (AC: 2, 3, 5, 6)
+  - [x] Simular ativação e validar bloqueio nas rotas em escopo.
+  - [x] Simular desativação e validar retorno ao comportamento normal.
+  - [x] Verificar ausência de bypass nos caminhos testados.
 
-- [ ] **Task 5 — Consolidar evidência e gate** (AC: 1–7)
-  - [ ] Produzir relatório sanitizado em `docs/history/reports/rec-003-fail-closed-2026-07-15.md`.
-  - [ ] Criar/atualizar `docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml`.
-  - [ ] Solicitar veredito de `@qa`.
+- [x] **Task 5 — Consolidar evidência e gate** (AC: 1–7)
+  - [x] Produzir relatório sanitizado em `docs/history/reports/rec-003-fail-closed-2026-07-15.md`.
+  - [ ] Criar/atualizar `docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml`. *(fora do escopo do executor — responsabilidade da revisão QA independente)*
+  - [ ] Solicitar veredito de `@qa`. *(story movida para InReview; veredito pendente)*
 
 ## Dev Notes
 
@@ -188,6 +188,8 @@ Esta story adiciona um controle operacional simples (kill-switch por ambiente) q
 |---|---:|---|---|
 | 2026-07-15 | 0.1 | Draft criado a partir da Épica 17 (autorização de decomposição pós-REC-001), com escopo de kill-switch fail-closed para rotas administrativas e writes públicos. | @sm (River) |
 | 2026-07-15 | 1.0 | **GO (10/10) → Draft → Ready.** Checklist de 10 pontos sem lacunas: título claro, contexto/valor completo, ACs em Given/When/Then, escopo incluído/excluído explícito, dependências mapeadas (REC-001 entrada, consome sinal de REC-002, baseline verde de REC-403 exigido antes do merge), estimativa (S–M), valor de negócio (evita operação em estado misto), riscos e roll-forward/rollback documentados, critérios de conclusão claros via gate independente do @qa, alinhamento com Épica 17/Onda 0 confirmado. Bloqueadores documentais: 0. | @po (Pax) |
+| 2026-07-16 | 1.1 | **Ready → InProgress → InReview.** Implementado o sinal `INCIDENT_LOCKDOWN` (contrato documentado) com guarda mínima fail-closed em 4 pontos de entrada server-side: `admin-resources` (rota administrativa autenticada), `enrollments` (Edge Function + rota Next.js equivalente, incluída por representar bypass real dado o deploy via Cloudflare Workers) e `leads` (Edge Function). Teste automatizado (7 casos), `typecheck` e `lint` verdes. Relatório de evidência em `docs/history/reports/rec-003-fail-closed-2026-07-15.md`. Gate QA e ativação real em produção permanecem pendentes/fora do escopo do executor. | @dev |
+| 2026-07-16 | 1.2 | **InReview → Done.** Gate PASS (90/100) emitido por `@qa` após verificação independente da posição da guarda nos 4 pontos de entrada. Residuais `low` (SEC-105, REL-103) não bloqueiam. | @qa (Quinn) |
 
 ## File List
 
@@ -195,10 +197,23 @@ Esta story adiciona um controle operacional simples (kill-switch por ambiente) q
 
 - `docs/stories/2026-07-15-rec-003-fail-closed-indisponibilidade.md`
 
-### Planejado para implementação/validação
+### Criado na implementação
 
-- `docs/history/reports/rec-003-fail-closed-2026-07-15.md`
-- `docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml`
+- `src/lib/lockdown.ts` — módulo `isLockdownActive()` / `LOCKDOWN_RESPONSE_BODY` (runtime Next.js/Node).
+- `supabase/functions/_shared/lockdown.ts` — mesma lógica portada para runtime Deno (Edge Functions).
+- `src/__tests__/lib/lockdown.test.ts` — 7 casos de teste automatizado (Vitest) cobrindo AC2, AC3 e fail-closed.
+- `docs/history/reports/rec-003-fail-closed-2026-07-15.md` — relatório sanitizado de evidência.
+
+### Modificado na implementação
+
+- `supabase/functions/admin-resources/index.ts` — guarda de lockdown adicionada antes de `requireAdmin()`.
+- `supabase/functions/enrollments/index.ts` — guarda de lockdown adicionada logo após checagem de método.
+- `supabase/functions/leads/index.ts` — guarda de lockdown adicionada logo após checagem de método.
+- `app/api/enrollments/route.ts` — guarda de lockdown adicionada no início do handler `POST` (caminho alternativo real ao Edge Function equivalente, guardado para evitar bypass — AC6).
+
+### Planejado, fora do escopo do executor
+
+- `docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml` — a criar por `@qa` na revisão independente.
 
 ### Referências somente leitura
 
@@ -207,23 +222,44 @@ Esta story adiciona um controle operacional simples (kill-switch por ambiente) q
 - `docs/stories/2026-07-15-rec-002-revogar-credenciais-sessoes.md`
 - `src/lib/auth.ts`
 - `supabase/functions/_shared/auth.ts`
-- `supabase/functions/enrollments/index.ts`
-- `supabase/functions/leads/index.ts`
+- `app/api/functions/[name]/route.ts` (proxy genérico — sem guarda própria; repassa o `503` da Edge Function de destino)
+- `app/api/auth/session/route.ts` (fora do escopo — não é rota administrativa autenticada nem endpoint de escrita de negócio)
 
 ## Dev Agent Record
 
 ### Agent Model Used
 
-A preencher pelo executor.
+Claude Sonnet 5 (executor `@dev`), via agente Executor da orquestração OMC.
 
 ### Debug Log References
 
-A preencher pelo executor, somente com referências sanitizadas.
+- `npm run typecheck` → `Types generated successfully`, 0 erros.
+- `npx eslint src/lib/lockdown.ts app/api/enrollments/route.ts src/__tests__/lib/lockdown.test.ts` → 0 erros.
+- `npx vitest run src/__tests__/lib/lockdown.test.ts` → 7/7 testes passando.
+- Ver relatório completo (comandos e saídas) em `docs/history/reports/rec-003-fail-closed-2026-07-15.md`.
 
 ### Completion Notes
 
-A preencher pelo executor.
+- Criado o sinal de lockdown `INCIDENT_LOCKDOWN` (variável de ambiente, não é segredo), com módulo compartilhado replicado nos dois runtimes do projeto: `src/lib/lockdown.ts` (Next.js/Node) e `supabase/functions/_shared/lockdown.ts` (Deno/Edge Functions). Fail-closed por padrão (erro de leitura → bloqueia).
+- Guarda mínima adicionada como primeira verificação (logo após tratamento de preflight/método) em 4 pontos de entrada server-side: `supabase/functions/admin-resources/index.ts` (única rota administrativa autenticada — `requireAdmin()`), `supabase/functions/enrollments/index.ts`, `supabase/functions/leads/index.ts` e `app/api/enrollments/route.ts`.
+- `app/api/enrollments/route.ts` foi incluído além dos 2 arquivos citados no Dev Notes original porque a investigação da árvore de arquivos mostrou que o deploy usa Cloudflare Workers via OpenNext (não export estático puro) — essa rota Next.js é um caminho de escrita alternativo real e vivo em produção que bypassaria o lockdown da Edge Function equivalente se não fosse guardado (AC6). `app/api/functions/[name]/route.ts` é um proxy genérico sem lógica própria — repassa o `503` da Edge Function de destino, sem necessidade de guarda adicional. `app/api/auth/session/route.ts` (login) ficou fora do escopo por não ser rota administrativa autenticada nem endpoint de escrita de negócio.
+- Nenhum novo serviço de autorização foi criado; a guarda é uma checagem local (`if (isLockdownActive()) return 503`) no início de cada handler, sem tocar na lógica de negócio existente.
+- Teste automatizado (`src/__tests__/lib/lockdown.test.ts`, 7 casos) cobre: inatividade por padrão (sem regressão), ativação por `"true"`/`"1"`, case-insensitivity, valores neutros, e o comportamento fail-closed sob erro de leitura simulado.
+- **Lacuna explícita documentada:** não foi possível rodar um teste de integração real contra o runtime Deno (Edge Functions) neste ambiente de execução por falta de `deno`/`supabase` CLI interativo — a lógica do módulo Deno é uma portagem 1:1 revisada manualmente linha a linha do módulo Node já testado, seguindo o mesmo padrão de portagem já usado em `supabase/functions/_shared/auth.ts`. Recomendado que `@qa` rode o teste negativo real em ambiente não produtivo antes de emitir o veredito, conforme já previsto na story.
+- Ativação real de `INCIDENT_LOCKDOWN` em produção não foi executada nesta story (é ação operacional de `@devops`/incident commander, condicionada ao critério de ativação documentado no relatório).
 
 ## QA Results
 
-A preencher por `@qa` após validação independente.
+### Gate: PASS ✅ — @qa (Quinn), 2026-07-16
+
+**Gate file:** [`docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml`](../qa/gates/rec-003-fail-closed-indisponibilidade.yml) · **Quality score:** 90/100
+
+Verificação independente por leitura de código: guarda `isLockdownActive()` confirmada antes de `requireAdmin()` em `admin-resources/index.ts:444-445`, antes de CORS/rate-limit em `enrollments/index.ts:32-33` e `leads/index.ts`, e como primeira linha do handler `POST` em `app/api/enrollments/route.ts:22-23`. `npm run typecheck` e `npm run lint` limpos. 7/7 testes Vitest confirmados.
+
+AC1-AC4 e AC6: PASS. AC5 (reversibilidade auditável): CONCERNS — processo documentado, execução real é ação operacional futura de `@devops`/incident commander, fora do escopo de código. Nenhum bloqueio para `Done`.
+
+Residual `low`: SEC-105 (integração real do runtime Deno não testada neste ambiente, mitigada por revisão manual da portagem 1:1), REL-103 (registro de ativação/desativação é processo manual, sem webhook).
+
+**Veredito:** PASS. Recomendo executar teste de integração real do runtime Deno antes da primeira ativação real de `INCIDENT_LOCKDOWN` em produção.
+
+— Quinn, guardião da qualidade 🛡️

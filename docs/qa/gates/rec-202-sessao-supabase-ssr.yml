@@ -1,0 +1,114 @@
+schema: 1
+story: 'REC-202'
+story_title: 'Implementar sessão Supabase SSR'
+gate: PASS
+status_reason: >-
+  Implementa D2 (cookies httpOnly/secure/SameSite=Lax via @supabase/ssr,
+  já dependência existente) e D3 (AAL2 obrigatório e fail-closed quando MFA
+  ativo) do ADR-016, como caminho ADITIVO — decisão de design (rota nova
+  /api/auth/ssr-session, independente do POST HMAC existente) elimina o
+  risco de lockout documentado na Épica 17 por construção: nenhuma linha
+  do fluxo HMAC (src/lib/auth.ts, auth-session.ts, session-token.ts,
+  supabase/functions/_shared/auth.ts, app/api/auth/session/route.ts)
+  foi tocada, confirmado por git status. Lógica de AAL2 revisada linha a
+  linha: toda falha de challenge/verify/nível encerra a sessão (signOut),
+  nunca deixa AAL1 abrir sessão admin quando há fator MFA ativo — fail-
+  closed real, fecha SEC-104 no novo caminho. Nenhuma chamada de rede real
+  contra produção; 15 testes mockados cobrindo o contrato completo.
+  Suíte agregada 621/621, lint/typecheck limpos.
+reviewer: '@qa (Quinn) + @architect (Aria)'
+updated: '2026-07-17T00:00:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 94
+
+history:
+  - at: '2026-07-17T00:00:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn) + @architect (Aria)'
+    note: >-
+      Revisão independente de alto rigor (story sensível, toca autenticação).
+      Confirmado via git status que nenhum arquivo do fluxo HMAC foi
+      modificado. Lógica de signInSSR revisada linha a linha: todos os
+      ramos de falha (unauthorized, mfa_required, mfa_failed, aal !== aal2)
+      chamam signOut antes de retornar, sem exceção. npx vitest run → 621
+      passed (621). npm run lint/typecheck limpos.
+
+top_issues:
+  - id: PROC-104
+    severity: info
+    finding: >-
+      Teste de integração real contra Supabase local (Docker, conta de
+      teste com TOTP verificado) não foi executado nesta story — decisão
+      deliberada do executor para não arriscar tocar infraestrutura de
+      auth sem uma conta de teste garantida neste ambiente. Cobertura
+      ficou em testes mockados (15 asserções).
+    suggested_owner: qa
+    suggested_action: >-
+      Antes de REC-203 consumir esta sessão SSR para autorização real,
+      recomenda-se um teste de integração contra Supabase local com conta
+      de teste dedicada (nunca a conta admin real), validando o fluxo AAL2
+      ponta a ponta.
+    refs:
+      - 'docs/history/reports/rec-202-sessao-ssr-2026-07-16.md'
+  - id: PROC-105
+    severity: info
+    finding: >-
+      A rota SSR nova (/api/auth/ssr-session) não é consumida por nenhuma
+      UI ainda — é infraestrutura pronta, mas inerte até REC-203 ligar o
+      app-store a ela. Isso é intencional (D5, coexistência), não uma
+      lacuna desta story.
+    suggested_owner: dev
+    suggested_action: 'Nenhuma — escopo correto de REC-203/204, não desta story.'
+    refs: ['docs/architecture/adr-016-identidade-bff-rec201.md']
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 15
+  risks_identified: 2
+  independent_verification:
+    - 'git status --short src/lib/auth.ts src/lib/auth-session.ts supabase/functions/_shared/auth.ts src/lib/supabase/session-token.ts app/api/auth/session/route.ts src/lib/app-store.tsx → vazio (nenhum arquivo HMAC tocado)'
+    - 'npx vitest run → Test Files 58 passed (58), Tests 621 passed (621)'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Leitura de src/lib/supabase/session.ts: @supabase/ssr já era dependência existente (^0.10.3), nenhuma dependência nova adicionada'
+    - 'Revisão linha a linha de signInSSR: unauthorized/mfa_required/mfa_failed/aal!==aal2 todos chamam client.auth.signOut() antes de retornar — fail-closed sem exceção'
+  trace:
+    ac_covered: []
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        D2 (cookies SSR) e D3 (AAL2 fail-closed) implementados como caminho
+        aditivo, coexistindo com o HMAC (autoridade inalterada até
+        REC-203/204), conforme a sequência de migração fixada pelo ADR-016.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      AAL2 fail-closed implementado corretamente (SEC-104 fechado no novo
+      caminho); nenhuma credencial real tocada; nenhuma chamada de rede
+      real contra produção; chave anon/publishable exclusivamente (nunca
+      service_role) no cliente SSR.
+  reliability:
+    status: PASS
+    notes: >-
+      Risco de lockout eliminado por construção (rota aditiva independente,
+      HMAC 100% intocado); suíte agregada sem regressão.
+  auditability:
+    status: PASS
+    notes: >-
+      Relatório documenta com honestidade o que foi feito, o que foi
+      deliberadamente deixado para REC-203/204, e a limitação de não ter
+      testado contra Docker real.
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-202-sessao-ssr-2026-07-16.md']
+  future:
+    - action: 'Validar fluxo AAL2 ponta a ponta contra Supabase local com conta de teste dedicada antes de REC-203 consumir esta sessão para autorização real (PROC-104).'
+      refs: ['src/lib/supabase/session.ts']

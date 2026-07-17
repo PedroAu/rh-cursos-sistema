@@ -1,0 +1,102 @@
+schema: 1
+story: 'REC-205'
+story_title: 'Expandir rate limiting para identidade autenticada'
+gate: PASS
+status_reason: >-
+  Estende APENAS a composição da chave de rate limit da inscrição pública:
+  buildRateLimitKey(scope, ip, userId?) mantém a chave anônima byte-idêntica
+  a REC-107 (enrollment:<ip>) e, quando há sessão SSR ativa (REC-202),
+  anexa um identificador do usuário (enrollment:<ip>:user:<hash>) só para
+  granularidade de bucket. Nenhuma decisão de autorização foi introduzida —
+  grep confirma zero uso de resolveServerRole/requireServerRole (REC-203)
+  em app/api/enrollments/route.ts. git status confirma que os arquivos de
+  auth HMAC de produção (auth.ts, _shared/auth.ts, session/route.ts) não
+  foram modificados; authorize.ts (REC-203) permanece untracked e não
+  referenciado. Identificador é hash SHA-256 truncado (sem PII persistida);
+  leitura best-effort com try/catch degradando para null (NFR-04). Suíte
+  agregada 638/638 (+6 testes sobre 632), lint/typecheck limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T12:00:00Z'
+expires: '2026-07-31T00:00:00Z'
+quality_score: 94
+
+history:
+  - at: '2026-07-17T12:00:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. buildRateLimitKey revisado: anônimo (null/
+      undefined/"") retorna ${scope}:${ip} idêntico a REC-107; com usuário
+      retorna sufixo :user:<id> mais específico. readRateLimitUserIdentity()
+      best-effort (short-circuit se SSR não configurado; try/catch → null;
+      hash SHA-256 do e-mail). git status confirma auth HMAC intocada;
+      grep confirma REC-203 não consumida. npx vitest run → 638 passed
+      (638). npm run lint/typecheck limpos.
+
+top_issues: []
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 6
+  risks_identified: 0
+  independent_verification:
+    - 'git status --short src/lib/auth.ts supabase/functions/_shared/auth.ts app/api/auth/session/route.ts → sem saída (nenhum arquivo de auth HMAC modificado)'
+    - 'git status --short src/lib/supabase/authorize.ts → ?? (untracked, REC-203 não modificada)'
+    - 'grep -c "resolveServerRole|requireServerRole|authorize" app/api/enrollments/route.ts → 0 (REC-203 não consumida)'
+    - 'npx vitest run → Test Files 59 passed (59), Tests 638 passed (638) — +6 sobre baseline 632'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Teste dedicado: buildRateLimitKey("enrollment","192.0.2.44") === "enrollment:192.0.2.44" (chave anônima byte-idêntica)'
+    - 'Testes de REC-107 (enrollments-route.test.ts) reexecutam verdes com SSR não configurado (caminho anônimo preservado)'
+  trace:
+    ac_covered:
+      - 'AC1 — chave anônima byte-idêntica (enrollment:<ip>)'
+      - 'AC2 — chave mais específica com usuário autenticado (:user:<hash>)'
+      - 'AC3 — null/undefined/"" tratados como anônimo'
+      - 'AC4 — nenhuma decisão de autorização (REC-203 não consumida)'
+      - 'AC5 — degradação segura da leitura de identidade (try/catch → null)'
+      - 'AC6 — sem PII persistida (hash SHA-256 truncado)'
+      - 'AC7 — auth HMAC e REC-202/203 intocados'
+      - 'AC8 — verificação verde sem regressão (638/638)'
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Composição de chave estendida com identidade opcional; anônimo
+        byte-idêntico a REC-107; nenhuma autorização acoplada; auth de
+        produção e REC-203 intocadas/não consumidas.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Sem PII no armazenamento de rate limit (hash SHA-256 truncado).
+      Nenhuma decisão de autorização derivada da identidade; REC-203 não
+      consumida. Auth HMAC de produção intocada. Leitura de identidade
+      somente-leitura (setAll no-op), sem emitir/renovar sessão.
+  reliability:
+    status: PASS
+    notes: >-
+      Degradação segura: leitura best-effort com try/catch → null; falha
+      nunca bloqueia nem altera a resposta da inscrição. Suíte agregada
+      sem regressão (638/638). Anônimo mantém limite e respostas de REC-107.
+  maintainability:
+    status: PASS
+    notes: >-
+      buildRateLimitKey é função pura e testada; wiring isolado em helpers
+      pequenos e comentados na rota. Nenhuma abstração de uso único
+      desnecessária.
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-205-rate-limit-identidade-autenticada-2026-07-17.md']
+  future:
+    - action: >-
+        Quando a sessão SSR estiver em uso real (pós REC-204), avaliar
+        estender a mesma composição de chave a outros endpoints públicos
+        (ex.: leads) se houver benefício de granularidade.
+      refs: ['src/lib/rate-limit.ts']

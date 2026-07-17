@@ -1,0 +1,91 @@
+schema: 1
+story: 'REC-105'
+story_title: 'Corrigir inscrição atômica'
+gate: PASS
+status_reason: >-
+  registrar_inscricao_publica corrigida para reserva atômica de vaga em
+  instrução única (UPDATE ... WHERE vagas_preenchidas < vagas_total
+  RETURNING id), removendo a dependência de SELECT ... FOR UPDATE +
+  UPDATE separado. Executor investigou honestamente e reportou que a
+  versão vigente já mitigava parcialmente a corrida clássica (efeito
+  colateral não documentado de REC-301), sem inflar a severidade do achado
+  original. Validado com concorrência REAL (dois processos psql distintos
+  disputando a última vaga), não apenas pgTAP sequencial — achado de caso
+  de borda determinístico (P0002 vs P0003 por causa do trigger de
+  fechamento automático de turma) tratado corretamente, não escondido.
+  Suíte agregada 100/100, scripts de concorrência (EP12 + REC-105) PASS,
+  lint/typecheck limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T19:20:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 97
+
+history:
+  - at: '2026-07-16T19:20:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Migration revisada linha a linha — reserva
+      atômica correta, ordem de operações (reserva antes de upsert/checagem
+      de duplicidade) garante rollback automático em caso de P0004. Suíte
+      completa e ambos os scripts de concorrência reexecutados nesta
+      revisão: PASS.
+
+top_issues:
+  - id: PROC-102
+    severity: info
+    finding: >-
+      npm run test:db (comando único orquestrado) sofreu interferência de
+      infraestrutura Docker compartilhada durante a execução original do
+      agente (outro agente rodando REC-104 em paralelo no mesmo container).
+      O executor validou os 3 passos manualmente em sequência em vez de
+      alegar uma execução única que não ocorreu.
+    suggested_owner: qa
+    suggested_action: >-
+      Não bloqueia — resolvido nesta revisão de @qa com uma execução limpa
+      de npm run test:db (comando único, ambos os agentes já finalizados):
+      Files=9, Tests=100, PASS, mais os dois scripts de concorrência PASS.
+    refs:
+      - 'docs/history/reports/rec-105-inscricao-atomica-2026-07-16.md#53-limitação-honesta-npm-run-testdb-como-comando-único-orquestrado'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 10
+  risks_identified: 0
+  independent_verification:
+    - 'npm run test:db (execução limpa, pós ambos os agentes) → Files=9, Tests=100, Result: PASS'
+    - 'Script de concorrência real REC-105 → PASS: "disputa concorrente real pela última vaga produziu exatamente 1 sucesso e 1 conflito coerente (P0002/P0003), sem overbooking"'
+    - 'Script de concorrência EP12 (pré-existente) → PASS, sem regressão'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Leitura da migration 20260716100000_rec105_atomic_enrollment.sql: reserva atômica confirmada como decisão única de sucesso/conflito, sem SELECT prévio decisório'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Todos os 7 itens de AC→evidência do relatório confirmados,
+        incluindo o item 2 (concorrência real) com evidência de execução
+        dupla independente, e o item 5 (sem regressão de códigos de erro)
+        confirmado contra REC-301/EP12.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'N/A direto de segurança, mas fecha FND-12 (integridade transacional) — overbooking eliminado por construção.'
+  reliability:
+    status: PASS
+    notes: 'Reserva atômica reduz a superfície de corretude a uma garantia elementar do MVCC, testada com concorrência real, não apenas simulada.'
+  auditability:
+    status: PASS
+    notes: 'Achado de mitigação parcial pré-existente (REC-301) e o caso de borda P0002/P0003 documentados com transparência total, sem inflar nem esconder nada.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-105-inscricao-atomica-2026-07-16.md']
+  future: []

@@ -1,0 +1,73 @@
+schema: 1
+story: 'REC-106'
+story_title: 'Proteger PII de aluno existente'
+gate: PASS
+status_reason: >-
+  registrar_inscricao_publica corrigida para nunca mais sobrescrever PII de
+  aluno existente (nome_completo, cpf, telefone, cargo, orgao, tipo_aluno)
+  a partir do payload — o UPDATE incondicional anterior foi removido por
+  completo, mantendo apenas a reutilização do aluno_id existente para a
+  nova inscrição. Decisão de escopo (Opção A, sem inventar coluna de
+  "e-mail verificado" inexistente no schema) corretamente fundamentada em
+  Article IV (No Invention) da Constitution, com investigação real do
+  schema documentada. Caminho de aluno novo inalterado. Reserva atômica de
+  vaga (REC-105) e checagem de duplicidade (P0004) preservadas intactas.
+  Suíte agregada 100→109 testes (100% verde), scripts de concorrência
+  (EP12 + REC-105) confirmados sem regressão.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T19:35:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 95
+
+history:
+  - at: '2026-07-16T19:35:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Migration revisada linha a linha: o UPDATE
+      incondicional de PII foi removido, nenhuma outra parte da função
+      (reserva de vaga, P0001-P0004, contrato de retorno) foi tocada.
+      npm run test:db confirmado 10 arquivos/109 testes, PASS.
+
+top_issues: []
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 9
+  risks_identified: 0
+  independent_verification:
+    - 'npm run test:db → Files=10, Tests=109, Result: PASS (100 pré-existentes + 9 novos de REC-106)'
+    - 'node scripts/test-db-concurrency.mjs (EP12) → PASS, sem regressão'
+    - 'node scripts/test-db-rec105-concurrency.mjs (REC-105) → PASS, atomicidade de vaga preservada'
+    - 'Leitura da migration 20260716130000_rec106_protect_existing_student_pii.sql: UPDATE incondicional de PII removido; caminho de aluno novo (INSERT) inalterado; reserva de vaga e P0001-P0004 idênticos à versão de REC-105'
+  trace:
+    ac_covered: []
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Aluno novo continua sendo criado normalmente com dados do payload;
+        aluno existente reutilizado para nova inscrição sem ter PII
+        sobrescrita, mesmo com payload contendo valores diferentes —
+        confirmado pelas 9 asserções pgTAP e por leitura direta do código
+        da função.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'FND-02 fechado na parte de integridade de PII: e-mail sozinho não é mais suficiente para alterar dados de um aluno cadastrado.'
+  reliability:
+    status: PASS
+    notes: 'Nenhuma regressão na reserva atômica de vaga (REC-105) nem na checagem de duplicidade (P0004), confirmado por reexecução dos scripts de concorrência.'
+  auditability:
+    status: PASS
+    notes: 'Decisão de escopo (Opção A vs B) documentada com investigação real do schema, evitando invenção de mecanismo não solicitado.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-106-protecao-pii-aluno-2026-07-16.md']
+  future: []

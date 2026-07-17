@@ -1,0 +1,134 @@
+schema: 1
+story: 'REC-206'
+story_title: 'Consolidar BFF canônico (remover contrato duplicado de leitura de leads no browser)'
+gate: PASS
+status_reason: >-
+  Consolida o roteamento de LEITURA de leads administrativos no browser em um
+  único contrato same-origin: admin-resources leads/list, roteado por
+  /api/functions/[name] e protegido pelo HMAC real de produção (requireAdmin).
+  O contrato duplicado — fetchLeadsFromSupabase, leitura direta do cliente
+  Supabase browser (Supabase Auth + RLS) contra *.supabase.co — foi removido de
+  app-store.tsx e de rh-cursos-api.ts; o refetch realtime (scheduleLeadRefetch)
+  também passou a trafegar same-origin (BFF). Nenhuma autoridade de autorização
+  foi introduzida: grep confirma zero uso de resolveServerRole/requireServerRole
+  (REC-203); git status confirma que auth.ts, _shared/auth.ts e session/route.ts
+  (HMAC de produção) não foram modificados. Os read models completos de
+  alunos/inscrições (paginação/filtros/autorização) NÃO foram antecipados —
+  fronteira com REC-303/304 preservada. Transporte realtime (WebSocket direto)
+  e leituras públicas de catálogo permanecem diferidos e documentados. Suíte
+  agregada 639/639 (+1 teste sobre 638), lint/typecheck limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T13:30:00Z'
+expires: '2026-07-31T00:00:00Z'
+quality_score: 93
+
+history:
+  - at: '2026-07-17T13:30:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Teste dedicado prova hidratação de leads no
+      bootstrap exclusivamente por invokeFunction("admin-resources",
+      {resource:"leads",action:"list"}) com sessionToken HMAC. fetchLeadsFromSupabase
+      removido (app-store.tsx + rh-cursos-api.ts); fetchLeadsWithClient (genérico)
+      mantido. scheduleLeadRefetch repontado para o BFF. grep confirma REC-203
+      não consumida; git status confirma auth HMAC intocada. npx vitest run →
+      639 passed (639). npm run lint/typecheck limpos.
+
+top_issues:
+  - id: ARCH-206-1
+    severity: low
+    finding: >-
+      Transporte realtime das subscriptions (lead_changes, inscricao_changes,
+      aluno_changes) segue conectando diretamente ao Supabase via WebSocket —
+      ainda não é same-origin. A proxificação de WebSocket é mudança
+      arquitetural maior, deliberadamente fora do escopo desta story.
+    suggested_owner: dev
+    suggested_action: >-
+      Avaliar consolidação do transporte realtime em trabalho posterior
+      (relacionado a REC-408). Não bloqueia REC-206: o refetch de dados
+      disparado por realtime já trafega same-origin (BFF).
+    refs:
+      - 'src/lib/app-store.tsx'
+  - id: ARCH-206-2
+    severity: low
+    finding: >-
+      Leituras públicas de catálogo do browser (fetchPublicCatalogFromSupabase,
+      fetchPublicBlogPostsFromSupabase) seguem indo direto ao cliente Supabase
+      (dados públicos, anon key, RLS público). Fora do foco administrativo de
+      FND-08.
+    suggested_owner: dev
+    suggested_action: >-
+      Consolidação mais ampla das leituras públicas pode ser avaliada
+      separadamente; sem impacto na operação administrativa confiável.
+    refs:
+      - 'src/lib/supabase/rh-cursos-api.ts'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 1
+  risks_identified: 2
+  independent_verification:
+    - 'git status --short src/lib/auth.ts supabase/functions/_shared/auth.ts app/api/auth/session/route.ts → sem saída (nenhum arquivo de auth HMAC modificado)'
+    - 'grep -rn "resolveServerRole|requireServerRole" src/lib/app-store.tsx src/lib/supabase/rh-cursos-api.ts → 0 (REC-203 não consumida)'
+    - 'grep -rn "fetchLeadsFromSupabase" src app → apenas ausência (export removido; nenhum consumidor restante)'
+    - 'admin-resources/index.ts suporta {resource:"leads",action:"list"} sob requireAdmin (HMAC) — contrato preexistente, nenhuma rota BFF nova criada'
+    - 'Teste dedicado: bootstrap com token HMAC hidrata leads via invokeFunction("admin-resources",{body:{resource:"leads",action:"list"},sessionToken:"admin.hmac.token"})'
+    - 'npx vitest run → Test Files 59 passed (59), Tests 639 passed (639) — +1 sobre baseline 638'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+  trace:
+    ac_covered:
+      - 'AC1 — leads hidratados por contrato same-origin único (admin-resources leads/list, HMAC)'
+      - 'AC2 — contrato duplicado removido (fetchLeadsFromSupabase; refetch realtime via BFF)'
+      - 'AC3 — nenhuma nova autoridade de autorização (HMAC intocado; REC-203 não consumida)'
+      - 'AC4 — read models completos de alunos/inscrições NÃO implementados (fronteira REC-303/304)'
+      - 'AC5 — auth HMAC e módulos de REC-202/203 intocados'
+      - 'AC6 — verificação verde sem regressão (639/639)'
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: >-
+        Roteamento de leitura de leads consolidado em same-origin (BFF/HMAC);
+        contrato duplicado removido; nenhuma autorização acoplada; read models
+        deixados para REC-303/304; realtime/catálogo público diferidos.
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Autoridade de autorização inalterada: rotas admin seguem sob HMAC real
+      (requireAdmin). REC-203 não consumida nem ativada. Auth HMAC de produção
+      intocada (git status). A remoção do caminho direto ao cliente Supabase
+      elimina uma segunda superfície de leitura administrativa no browser.
+  reliability:
+    status: PASS
+    notes: >-
+      Hidratação de leads no reload passa a ter fonte única e determinística
+      (same-origin/HMAC), removendo a corrida entre BFF e leitura direta —
+      coerente com FR-08 (operação admin confiável após reload). Suíte agregada
+      sem regressão (639/639).
+  maintainability:
+    status: PASS
+    notes: >-
+      Contrato duplicado removido reduz a superfície de manutenção; helper
+      genérico fetchLeadsWithClient preservado para reutilização server-side
+      (REC-303). Nenhuma abstração de uso único introduzida.
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-206-consolidar-bff-canonico-2026-07-17.md']
+  future:
+    - action: >-
+        Construir os read models administrativos completos (alunos/inscrições)
+        sobre o roteamento canônico consolidado — REC-303/REC-304.
+      refs: ['docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md']
+    - action: >-
+        Avaliar consolidação do transporte realtime (WebSocket) e das leituras
+        públicas de catálogo do browser em trabalho posterior (relacionado a
+        REC-408).
+      refs: ['src/lib/app-store.tsx', 'src/lib/supabase/rh-cursos-api.ts']

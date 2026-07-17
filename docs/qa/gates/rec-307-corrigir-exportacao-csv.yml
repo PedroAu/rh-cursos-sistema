@@ -1,0 +1,78 @@
+schema: 1
+story: 'REC-307'
+story_title: 'Corrigir exportação CSV (neutralizar fórmulas)'
+gate: PASS
+status_reason: >-
+  Primitivo neutralizeCsvFormula (src/lib/utils/csv-export.ts) prefixa com
+  apóstrofo qualquer valor iniciando com =, +, -, @, tab ou carriage return
+  (CWE-1236, padrão OWASP), reutilizado tanto no exportToCSV genérico quanto
+  no caminho real de exportação administrativa (AdminResourcePage.tsx), que
+  é o que efetivamente serializa dados de leads/alunos/inscrições
+  potencialmente controlados por terceiros. Quoting RFC 4180 preservado e
+  testado em coexistência (round-trip). Nenhum arquivo de autenticação
+  (HMAC ou sessão SSR) tocado. Suíte agregada 672 → 684 (+12), lint/typecheck
+  limpos. Story concluída via recuperação manual após o agent original
+  atingir limite de sessão da API exatamente ao escrever a documentação —
+  código, testes e story já estavam completos e corretos; relatório e gate
+  redigidos por mim após revalidação independente de toda a evidência.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T14:10:00Z'
+expires: '2026-07-31T00:00:00Z'
+quality_score: 94
+
+history:
+  - at: '2026-07-17T14:10:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Leitura completa de neutralizeCsvFormula e dos dois pontos de reuso
+      (csv-export.ts, AdminResourcePage.tsx): regex de gatilho correta,
+      aplicada à string bruta antes do escape de aspas, sem alterar dado
+      armazenado. git status confirma HMAC/SSR sem modificação. npx vitest
+      run → 684 passed (684). npm run lint/typecheck limpos.
+
+evidence:
+  tests: '684/684 (baseline 672 + 12 novos)'
+  lint: OK
+  typecheck: OK
+  hmac_untouched:
+    - src/lib/auth.ts
+    - supabase/functions/_shared/auth.ts
+    - app/api/auth/session/route.ts
+
+acceptance_criteria:
+  - id: AC-307.01
+    status: PASS
+    note: 'neutralizeCsvFormula prefixa apóstrofo a =, +, -, @, tab, CR.'
+  - id: AC-307.02
+    status: PASS
+    note: 'exportToCSV (csv-export.ts) aplica a neutralização em header e dados.'
+  - id: AC-307.03
+    status: PASS
+    note: 'AdminResourcePage.tsx (caminho real de exportação) reutiliza o mesmo primitivo.'
+  - id: AC-307.04
+    status: PASS
+    note: 'Valores seguros não sofrem over-quoting indevido.'
+  - id: AC-307.05
+    status: PASS
+    note: 'Quoting RFC 4180 coexiste com a neutralização, comprovado por round-trip.'
+  - id: AC-307.06
+    status: PASS
+    note: 'Decisão OWASP de neutralizar casos-limite documentada e testada.'
+  - id: AC-307.07
+    status: PASS
+    note: 'Nenhum arquivo de autenticação (HMAC/SSR) tocado.'
+  - id: AC-307.08
+    status: PASS
+    note: 'Baseline verde: 672 → 684, sem regressão.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'CWE-1236 mitigado nos dois caminhos de exportação, incluindo o efetivamente usado em produção.'
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada sem regressão; alteração isolada à camada de serialização.'
+
+top_issues: []
+waiver: { active: false }

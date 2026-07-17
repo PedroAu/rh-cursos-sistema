@@ -1,0 +1,126 @@
+schema: 1
+story: 'REC-305'
+story_title: 'Corrigir login dos três papéis e recovery'
+gate: PASS
+quality_score: 95
+status_reason: >-
+  Bugfix restrito de FND-07 (login dos três papéis + recovery), mantendo o HMAC
+  como único mecanismo de sessão exatamente como hoje. Investigação confirmou
+  que o destino pós-login JÁ deriva do papel server-side: Login.tsx redireciona
+  por data.session.role (resposta do servidor), e o endpoint HMAC
+  app/api/auth/session/route.ts é autoritativo — deriva o papel de
+  app_metadata.role (route.ts:132) e responde 403 quando o portal pedido diverge
+  do papel real (route.ts:137-139). Nenhum bug de destino foi inventado
+  (Article IV); a lacuna real era ausência de trava de regressão
+  (session-routing.ts sem testes; sem teste de componente da derivação), agora
+  fechada (+16 testes). O defeito real era o recovery: o botão "Esqueci minha
+  senha" disparava toast.success incondicional sem nenhuma chamada de rede nem
+  fluxo de reset por trás — falso sucesso (antipadrão de REC-302), violando
+  Article IV/FR-10. Recuperação de autosserviço real exigiria feature NET-NEW
+  (página reset-password + token), fora do bugfix; seguindo "recovery é real ou
+  removido", o controle enganoso foi REMOVIDO e o canal real ("Fale com a
+  coordenação" → /contato) mantido. Nenhum arquivo de autenticação (HMAC/SSR)
+  tocado; isto NÃO é o cutover de REC-204. Suíte 694 → 710 (+16), lint/typecheck
+  limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T14:55:00Z'
+expires: '2026-07-31T00:00:00Z'
+
+history:
+  - at: '2026-07-17T14:55:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      git diff de Login.tsx confirmado: única mudança é a remoção do botão
+      "Esqueci minha senha" (toast.success incondicional sem chamada de rede)
+      e do import de sonner; lógica de destino pós-login intocada (já era
+      correta, agora travada por 16 testes novos). grep confirma ausência de
+      signInSSR/readSSRSession/createSupabaseSSRClient/resolveServerRole/
+      requireServerRole em Login.tsx. git status confirma HMAC (auth.ts,
+      _shared/auth.ts, session/route.ts) sem modificação. npx vitest run →
+      710 passed (710). npm run lint/typecheck limpos (revalidado de forma
+      independente). Decisão de escopo (bugfix restrito) respeitada
+      integralmente — não é o cutover de REC-204.
+
+evidence:
+  tests: '710/710 (baseline 694 + 16 novos)'
+  focused_tests: '16/16 (session-routing.test.ts 7 + login-page.test.tsx 9)'
+  lint: OK
+  typecheck: OK
+  files_created:
+    - src/__tests__/lib/session-routing.test.ts
+    - src/__tests__/views/public/login-page.test.tsx
+  files_modified:
+    - src/views/public/Login.tsx
+  hmac_untouched:
+    - src/lib/auth.ts
+    - supabase/functions/_shared/auth.ts
+    - app/api/auth/session/route.ts
+
+recovery_decision:
+  - control: '"Esqueci minha senha" (Login.tsx)'
+    previous_state: 'toast.success("Link de recuperação enviado...") incondicional; nenhuma chamada de rede; nenhum fluxo de reset por trás'
+    decision: REMOVED
+    justification: >-
+      Falso sucesso (antipadrão de REC-302), viola Article IV/FR-10. Reset de
+      autosserviço real é feature NET-NEW arquitetural (página reset-password +
+      resetPasswordForEmail + token), fora do bugfix. Canal de recuperação real
+      já existe na mesma tela ("Fale com a coordenação" → /contato); botão falso
+      era duplicado enganoso.
+  - control: '"Fale com a coordenação" (→ /contato)'
+    previous_state: 'funcional'
+    decision: KEPT
+    justification: 'Canal de recuperação/acesso real (atendimento humano) hoje. Rota real e funcional.'
+
+login_destination_finding:
+  status: ALREADY_SERVER_SIDE
+  detail: >-
+    Login.tsx redireciona por data.session.role (resposta server-side), não pelo
+    pathname. route.ts:132 deriva o papel de app_metadata.role; route.ts:137-139
+    retorna 403 em divergência portal/papel. ?next validado por isRolePathAllowed
+    (sem open redirect). Sem alteração de código no destino; travado por testes.
+
+acceptance_criteria:
+  - id: AC-305.01
+    status: PASS
+    note: 'Destino deriva do papel server-side; caso cruzado (portal aluno + resposta admin → /admin) provado por teste.'
+  - id: AC-305.02
+    status: PASS
+    note: 'Três papéis: student → /aluno, instructor → /instrutor, admin → /admin.'
+  - id: AC-305.03
+    status: PASS
+    note: '?next honrado só dentro do namespace do papel; fora dele cai no dashboard padrão (sem open redirect).'
+  - id: AC-305.04
+    status: PASS
+    note: 'Botão de falso sucesso "Esqueci minha senha" removido; toast de sucesso nunca dispara.'
+  - id: AC-305.05
+    status: PASS
+    note: 'Canal real "Fale com a coordenação" → /contato mantido e funcional.'
+  - id: AC-305.06
+    status: PASS
+    note: 'Nenhum arquivo HMAC/SSR tocado; HMAC segue único mecanismo de sessão. Não é o cutover de REC-204.'
+  - id: AC-305.07
+    status: PASS
+    note: 'Baseline verde: 694 → 710 (+16), lint/typecheck OK, sem regressão.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: >-
+      Nenhuma superfície de auth alterada (HMAC/SSR intocados). Destino continua
+      derivado do papel server-side autoritativo; ?next protegido contra open
+      redirect por isRolePathAllowed. Remoção do falso sucesso elimina um vetor
+      de engano ao usuário.
+  usability:
+    status: PASS
+    notes: >-
+      Controle enganoso removido (FR-10); canal de recuperação real preservado
+      na mesma tela.
+  maintainability:
+    status: PASS
+    notes: >-
+      session-routing.ts (antes sem testes) e a derivação do destino agora
+      travados por 16 testes, prevenindo regressão silenciosa.
+
+top_issues: []
+waiver: { active: false }

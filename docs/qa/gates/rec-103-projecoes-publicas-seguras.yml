@@ -1,0 +1,85 @@
+schema: 1
+story: 'REC-103'
+story_title: 'Criar projeções públicas seguras'
+gate: PASS
+status_reason: >-
+  Views instrutor_publico/turma_publica com allowlist explícita criadas e
+  verificadas independentemente: email/telefone de instrutor e observacoes
+  de turma ausentes das views (18 asserções pgTAP), grant de anon corrigido
+  de tabela inteira para colunas explícitas (revoke total + grant de
+  allowlist, após o executor identificar corretamente que um revoke de
+  coluna não reduz um grant de tabela já concedido — achado documentado na
+  migration/teste). rh-cursos-api.ts consome as views no caminho público;
+  caminho admin inalterado. Suíte de banco 58→76 (100% verde), 589 testes
+  unitários verdes, lint/typecheck limpos. Confirmado por busca que nenhum
+  componente público renderizava os campos removidos, portanto sem
+  regressão de UI.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T19:00:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 94
+
+history:
+  - at: '2026-07-16T19:00:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Migration e teste revisados; suíte completa
+      confirmada 76/76. Diff de rh-cursos-api.ts revisado: caminho admin
+      preservado, apenas visibility === "public" migrado para as views.
+
+top_issues:
+  - id: SEC-108
+    severity: low
+    finding: >-
+      A barreira de ACL de `anon` criada aqui só se torna a barreira ativa
+      no caminho SSR real quando REC-104 trocar o cliente público de
+      service_role para anon (FND-03, ainda aberto). Até lá, a proteção
+      efetiva é a própria query não pedir mais os campos privados,
+      independente da credencial usada.
+    suggested_owner: dev
+    suggested_action: >-
+      Não bloqueia REC-103 (a query já não vaza os campos, com qualquer
+      credencial). Tratado formalmente por REC-104, que já depende desta
+      story conforme a matriz de rastreabilidade da Épica 17.
+    refs:
+      - 'docs/history/reports/rec-103-projecoes-publicas-2026-07-16.md#7-escopo-não-coberto-por-esta-story-documentado-não-bloqueante'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 18
+  risks_identified: 1
+  independent_verification:
+    - 'npm run test:db → Files=7, Tests=76, Result: PASS (58 pré-existentes + 18 novos)'
+    - 'npm run typecheck → 0 erros'
+    - 'npm run lint → 0 erros'
+    - 'npx vitest run → 589/589 passing'
+    - 'Leitura de rh-cursos-api.ts: caminho visibility === "admin" não tocado, apenas o caminho público migrado para instrutor_publico/turma_publica'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC_geral:
+      status: PASS
+      notes: 'Todos os 8 itens de AC→evidência do relatório confirmados: views com allowlist correta, anon sem colunas privadas na tabela base, authenticated sem regressão, catálogo consumindo as views, migration idempotente, sem regressão em curso/trilha/post_blog, suíte 100% verde, lint/typecheck limpos.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'PII de instrutor (email/telefone) e observações internas de turma removidas da resposta pública na camada de query, com defesa em profundidade na camada de ACL. FND-10 fechado.'
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada de banco e unitária 100% verde; nenhum componente público afetado (confirmado por busca de uso dos campos removidos).'
+  auditability:
+    status: PASS
+    notes: 'Achado técnico (ACL de coluna vs. tabela) documentado de forma transparente na migration, no teste e no relatório, evitando repetição do erro em stories futuras.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-103-projecoes-publicas-2026-07-16.md']
+  future:
+    - action: 'REC-104 deve trocar o cliente público de service_role para anon para que a barreira de ACL desta story se torne a proteção ativa (SEC-108/FND-03).'
+      refs: ['supabase/migrations/20260716090000_rec103_public_projections.sql']

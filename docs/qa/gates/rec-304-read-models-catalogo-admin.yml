@@ -1,0 +1,83 @@
+storyId: REC-304
+title: "Implementar demais read models administrativos (catálogo: cursos/turmas/instrutores)"
+epic: epic-17-recuperacao-sev0-seguranca-integridade
+date: 2026-07-17
+status: PASS
+verdict: PASS
+quality_score: 93
+reviewer: "@qa (Quinn)"
+executor: "@dev (Dex) + @data-engineer (Dara)"
+review_note: >
+  Leitura completa de admin-catalog-read-models.ts e das 3 rotas: reutiliza
+  mapCourse/mapClass/mapInstructor já validados (sem invenção de forma),
+  busca sanitizada contra injeção no filtro PostgREST (mesma disciplina de
+  REC-303), joins de página (curso_instrutor/turma) buscados escopados via
+  .in(...). git status confirma HMAC (auth.ts, _shared/auth.ts,
+  session/route.ts) sem modificação; a diff em admin-resources/index.ts é do
+  REC-003 (guarda de lockdown antes de requireAdmin(), documentada desde
+  2026-07-16), não relacionada a REC-304. npx vitest run -> 672 passed (672).
+  npm run lint/typecheck limpos. Exclusão de leads/conteúdo/métricas
+  justificada por recurso, sem invenção de contrato (Article IV).
+
+summary: >
+  Rotas same-origin NET-NEW (app/api/admin/courses|classes|instructors) que hidratam
+  cursos, turmas e instrutores server-side após reload, com paginação (page/pageSize,
+  cap 100) e busca equivalente à UI (título/nome/título do curso, sanitizada),
+  reutilizando as projeções DB→domínio de mappers.ts (mapCourse/mapClass/mapInstructor).
+  Autorização via requireAdminApi() -> requireServerRole(ssrClient,"admin") (REC-203)
+  sobre a sessão SSR de REC-202. Subconjunto central; leads/conteúdo/métricas
+  documentados como pendência explícita (REC-304b). HMAC de produção intocado.
+
+evidence:
+  lint: "npm run lint -> OK"
+  typecheck: "npm run typecheck -> OK"
+  tests: "npx vitest run -> 63 arquivos, 672/672 (baseline 657 + 15 novos), sem regressão"
+  new_tests: 15
+  baseline_before: 657
+  baseline_after: 672
+
+acceptance_criteria:
+  - id: AC-304.01
+    desc: "Rotas NET-NEW hidratam cursos/turmas/instrutores após reload, com paginação e busca equivalente à UI"
+    met: true
+  - id: AC-304.02
+    desc: "Protegidas por requireAdminApi() -> requireServerRole(ssrClient,'admin') (REC-203) sobre a sessão SSR de REC-202"
+    met: true
+  - id: AC-304.03
+    desc: "Fail-closed por teste: sem sessão -> 401 sem consultar o banco; student -> 403; lockdown -> 503"
+    met: true
+  - id: AC-304.04
+    desc: "Admin -> 200 paginado; busca chega ao read model; joins de página buscados scoped via .in(...)"
+    met: true
+  - id: AC-304.05
+    desc: "Reutiliza mapCourse/mapClass/mapInstructor (No Invention); service-role só após autorização; busca sanitizada"
+    met: true
+  - id: AC-304.06
+    desc: "HMAC de produção intocado (auth.ts, _shared/auth.ts, auth/session/route.ts, admin-resources/index.ts)"
+    met: true
+  - id: AC-304.07
+    desc: "Escopo excluído (leads/conteúdo/métricas) documentado como pendência REC-304b, com justificativa por recurso"
+    met: true
+  - id: AC-304.08
+    desc: "Baseline constitucional verde: lint/typecheck OK, 657 -> 672 (+15), sem regressão"
+    met: true
+
+scope_excluded:
+  - resource: leads
+    reason: "Já servido por admin-resources leads/list (REC-206); nova rota SSR duplicaria autoridade"
+  - resource: conteudo_blog
+    reason: "mapBlogPost existe; fora do núcleo do catálogo priorizado; pendência REC-304b"
+  - resource: metricas
+    reason: "Sem contrato server-side — derivadas no cliente a partir da store; implementar seria inventar contrato (Article IV)"
+
+hmac_untouched:
+  - src/lib/auth.ts
+  - supabase/functions/_shared/auth.ts
+  - app/api/auth/session/route.ts
+  - supabase/functions/admin-resources/index.ts
+
+known_limitation: >
+  Admin logado apenas via HMAC não possui sessão SSR e recebe 401 nessas rotas novas.
+  Decisão consciente (não bug), idêntica a REC-303; integração fica para REC-305.
+
+issues: []

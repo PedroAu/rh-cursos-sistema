@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -84,27 +84,27 @@ O endpoint controlado hoje usa `anonClient()` (mesma role, mesma chave pública)
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Escrever a migration de revogação** (AC: 1, 2, 5, 6)
-  - [ ] Criar `supabase/migrations/{timestamp}_revoke_anon_lead_insert.sql`.
-  - [ ] `revoke insert on public.lead from anon, authenticated;` (mantendo os grants de `authenticated` para `select`/`update` já existentes, se aplicável ao papel administrativo autenticado).
-  - [ ] Remover/recriar a policy `lead_public_insert`, garantindo que `anon` não retenha `insert` por nenhum caminho.
-  - [ ] Conceder `insert` em `public.lead` a `service_role` explicitamente, se ainda não coberto pelo grant amplo existente para `service_role`.
+- [x] **Task 1 — Escrever a migration de revogação** (AC: 1, 2, 5, 6)
+  - [x] Criar `supabase/migrations/{timestamp}_revoke_anon_lead_insert.sql` (timestamp final `20260715110000`, renomeado de `20260715100000` por colisão com a migration paralela de REC-101 — ver Dev Agent Record).
+  - [x] `revoke insert on public.lead from anon, authenticated;` (grants de `authenticated` para `select`/`update` já existentes, usados pela policy `lead_admin_select`/`lead_admin_update` com checagem `is_admin()`, permanecem inalterados).
+  - [x] Remover/recriar a policy `lead_public_insert`, garantindo que `anon` não retenha `insert` por nenhum caminho.
+  - [x] Conceder `insert` em `public.lead` a `service_role` explicitamente (redundante com o grant amplo já existente para `service_role` sobre todas as tabelas, mas deixado explícito e documentado na migration).
 
-- [ ] **Task 2 — Ajustar o endpoint controlado** (AC: 3, 4)
-  - [ ] Trocar `anonClient()` por `adminClient()` em `supabase/functions/leads/index.ts` apenas na chamada de persistência do insert.
-  - [ ] Confirmar que a validação de campos obrigatórios, `checkRateLimit` e `isOriginAllowed` permanecem exatamente como estão, antes do insert.
+- [x] **Task 2 — Ajustar o endpoint controlado** (AC: 3, 4)
+  - [x] Trocar `anonClient()` por `adminClient()` em `supabase/functions/leads/index.ts` apenas na chamada de persistência do insert.
+  - [x] Confirmar que a validação de campos obrigatórios, `checkRateLimit` e `isOriginAllowed` permanecem exatamente como estão, antes do insert.
 
-- [ ] **Task 3 — Validar em ambiente de teste** (AC: 1, 2, 3, 5)
-  - [ ] Aplicar a migration no banco de teste local.
-  - [ ] Executar insert direto via PostgREST com chave `anon`, esperando negação.
-  - [ ] Executar insert direto via PostgREST com chave `authenticated`, esperando negação.
-  - [ ] Executar submissão via o endpoint ajustado, esperando persistência bem-sucedida.
-  - [ ] Reaplicar a migration e confirmar idempotência.
+- [x] **Task 3 — Validar em ambiente de teste** (AC: 1, 2, 3, 5)
+  - [x] Aplicar a migration no banco de teste local (`supabase db reset --local`, real, via Docker).
+  - [x] Executar insert direto via PostgREST com chave `anon`, esperando negação (HTTP 401, `42501`, real).
+  - [x] Executar insert direto via PostgREST com chave `authenticated`, esperando negação (validado a nível de role via pgTAP `throws_ok` `42501`; mesmo grant que o PostgREST consulta).
+  - [x] Executar submissão via o endpoint ajustado, esperando persistência bem-sucedida (HTTP 201 real via Edge Function local, linha confirmada e removida).
+  - [x] Reaplicar a migration e confirmar idempotência (reaplicação direta via `psql`, sem erro).
 
-- [ ] **Task 4 — Consolidar evidência e gate** (AC: 1–7)
-  - [ ] Produzir relatório sanitizado em `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md`.
-  - [ ] Criar/atualizar `docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml`.
-  - [ ] Solicitar veredito de `@qa`.
+- [x] **Task 4 — Consolidar evidência e gate** (AC: 1–7)
+  - [x] Produzir relatório sanitizado em `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md`.
+  - [ ] Criar/atualizar `docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml` — intencionalmente não criado por este executor; gate independente é responsabilidade de `@qa`.
+  - [x] Solicitar veredito de `@qa` (story movida para `InReview`).
 
 ## Dev Notes
 
@@ -191,6 +191,8 @@ O endpoint controlado hoje usa `anonClient()` (mesma role, mesma chave pública)
 |---|---:|---|---|
 | 2026-07-15 | 0.1 | Draft criado a partir da Épica 17 (autorização de decomposição pós-REC-001), com escopo de revogação de insert anônimo em `public.lead` e migração do endpoint controlado para cliente privilegiado. | @sm (River) |
 | 2026-07-15 | 1.0 | **GO (10/10) → Draft → Ready.** Checklist de 10 pontos sem lacunas: título claro, contexto/valor completo (FND-11 fundamentado em migrations reais e no endpoint atual), ACs em Given/When/Then, escopo incluído/excluído explícito (REC-107/REC-101 fora), dependências mapeadas (REC-001+REC-403 entrada; bloqueia REC-107 condicionalmente; não depende de REC-101), estimativa (S–M), valor de negócio (fecha vetor de insert direto sem quebrar captação legítima), riscos e roll-forward/rollback documentados, critérios de conclusão claros via gate independente do @qa, alinhamento com Épica 17/Onda 1 confirmado. Bloqueadores documentais: 0. | @po (Pax) |
+| 2026-07-16 | 1.1 | **Ready → InProgress → InReview.** Migration `20260715110000_revoke_anon_lead_insert.sql` criada (revoga insert de `anon`/`authenticated` em `public.lead`, remove `lead_public_insert`, concede insert explícito a `service_role`); `supabase/functions/leads/index.ts` ajustado para `adminClient()` na persistência, sem outra alteração. Validado contra banco real local (Docker): suíte pgTAP completa (`rec-102-revoke-anon-lead-insert.test.sql` 5/5 ok, migration reaplicada via `psql` sem erro), teste HTTP real via PostgREST (`anon` → 401/`42501`) e via Edge Function local (`leads` → 201, persistência confirmada e removida; regressão de campo obrigatório → 400; regressão de origem → 403). `authenticated` sem service role validado a nível de role via pgTAP (`throws_ok` `42501`, mesmo grant consultado pelo PostgREST). Relatório sanitizado em `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md`. Gate `docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml` intencionalmente não criado — a cargo de `@qa`. | @data-engineer + @dev |
+| 2026-07-16 | 1.2 | **InReview → Done.** Gate PASS (96/100) emitido por `@qa` após verificação independente do diff e da evidência HTTP real. Residual `low` (REL-105) não bloqueia. | @qa (Quinn) |
 
 ## File List
 
@@ -198,12 +200,15 @@ O endpoint controlado hoje usa `anonClient()` (mesma role, mesma chave pública)
 
 - `docs/stories/2026-07-15-rec-102-revogar-insert-anonimo-leads.md`
 
-### Planejado para implementação/validação
+### Criado/alterado na implementação
 
-- `supabase/migrations/{timestamp}_revoke_anon_lead_insert.sql`
-- `supabase/tests/database/rec-102-revoke-anon-lead-insert.test.sql`
-- `supabase/functions/leads/index.ts` (troca de `anonClient()` para `adminClient()` na persistência)
-- `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md`
+- `supabase/migrations/20260715110000_revoke_anon_lead_insert.sql` (criado)
+- `supabase/tests/database/rec-102-revoke-anon-lead-insert.test.sql` (criado)
+- `supabase/functions/leads/index.ts` (alterado — troca de `anonClient()` para `adminClient()` na persistência; nenhuma outra linha desta story alterada)
+- `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md` (criado)
+
+### Pendente (gate de `@qa`, fora do escopo deste executor)
+
 - `docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml`
 
 ### Referências somente leitura
@@ -219,16 +224,35 @@ O endpoint controlado hoje usa `anonClient()` (mesma role, mesma chave pública)
 
 ### Agent Model Used
 
-A preencher pelo executor.
+Claude Sonnet 5 (executor único, atuando como `@data-engineer` para migration/policy e `@dev` para o ajuste do endpoint).
 
 ### Debug Log References
 
-A preencher pelo executor, somente com referências sanitizadas.
+- `npm run test:db` — suíte pgTAP completa contra `supabase start` local (Docker): `rec-102-revoke-anon-lead-insert.test.sql` 5/5 `ok`; `supabase test db --local supabase/tests/database/rec-102-revoke-anon-lead-insert.test.sql` isolado → `Result: PASS`.
+- Reaplicação idempotente da migration via `psql` direto contra o banco já migrado — `DROP POLICY`/`REVOKE`/`GRANT` sem erro.
+- Testes HTTP reais contra a pilha local (`http://127.0.0.1:54321`): `POST /rest/v1/lead` com chave `anon` → `401` / `42501`; `POST /functions/v1/leads` válido → `201` (linha persistida e depois removida, dado sintético); mesmo endpoint com campo obrigatório ausente → `400`; mesmo endpoint com `Origin` não permitido → `403`.
+- Detalhe completo em `docs/history/reports/rec-102-revogar-insert-leads-2026-07-15.md`.
 
 ### Completion Notes
 
-A preencher pelo executor.
+- Colisão de timestamp: a migration foi criada inicialmente como `20260715100000_revoke_anon_lead_insert.sql` e colidiu com `20260715100000_revoke_public_enrollment_rpc.sql` (REC-101, implementada em paralelo por outro agente no mesmo minuto). Renomeada para `20260715110000_revoke_anon_lead_insert.sql` antes de qualquer aplicação real; nenhum conteúdo do arquivo foi alterado.
+- Interação com REC-101: ao rodar a suíte completa (`npm run test:db`) com ambas as migrations aplicadas, o teste de REC-101 (`rec-101-revoke-public-enrollment-rpc.test.sql`, arquivo de outra story) falhou em 1 subteste (`"anon mantém insert em public.lead (fora do escopo de REC-101)"`), porque essa suposição deixou de valer assim que REC-102 revogou o insert. Isso é esperado — é exatamente o objetivo desta story — e não foi corrigido aqui por não pertencer ao escopo/arquivo desta story; sinalizado no relatório para `@qa`/`@sm` decidirem se o teste de REC-101 precisa de atualização por outro agente.
+- `supabase/functions/leads/index.ts` também recebeu, em paralelo por outro agente (REC-003), um import/uso de `isLockdownActive`/`LOCKDOWN_RESPONSE_BODY` não relacionado a esta story. Preservado sem alteração; a única mudança desta story no arquivo é a troca de `anonClient()` por `adminClient()` no cliente de persistência.
+- Lint/typecheck: `supabase/functions/**` está fora do `include`/dentro do `ignores` de ESLint e do `tsconfig.json` deste repo (código Deno, não coberto pelo pipeline TS do Next.js). A correção de tipos/runtime do arquivo foi validada de forma mais forte por execução real do Edge Function local (§3.5 do relatório), não por type-check estático.
+- Nenhum AC ficou incerto após a validação real contra banco/HTTP local.
 
 ## QA Results
 
-A preencher por `@qa` após validação independente.
+### Gate: PASS ✅ — @qa (Quinn), 2026-07-16
+
+**Gate file:** [`docs/qa/gates/rec-102-revogar-insert-anonimo-leads.yml`](../qa/gates/rec-102-revogar-insert-anonimo-leads.yml) · **Quality score:** 96/100
+
+Verificação independente: `git diff supabase/functions/leads/index.ts` confirma a mudança restrita exatamente à troca `anonClient()` → `adminClient()` na persistência, mais a guarda de lockdown da REC-003 (story paralela, preservada intacta). Migration revisada linha a linha. Validação com evidência forte: chamadas HTTP reais (não simuladas) contra Postgres + PostgREST + Edge Functions em Docker local — insert direto anônimo negado (401/42501), endpoint controlado persistindo (201), regressões de validação (400) e origem (403) confirmadas inalteradas. Suíte completa `npm run test:db` → `58/58 PASS`.
+
+Todos os ACs (1-6) PASS.
+
+Residual `low`: REL-105 (rate limit não exercitado até o limite na validação real, mitigado por leitura de código confirmando que a ordem de verificação não mudou).
+
+**Veredito:** PASS. Vetor de insert anônimo direto fechado sem quebrar a captação legítima de leads. Nenhuma ação bloqueante.
+
+— Quinn, guardião da qualidade 🛡️

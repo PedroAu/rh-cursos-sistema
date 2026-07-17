@@ -1,0 +1,102 @@
+schema: 1
+story: 'REC-104'
+story_title: 'Implementar cliente público anon'
+gate: PASS
+status_reason: >-
+  createSupabasePublicServerClient() criado e verificado independentemente:
+  os 3 caminhos públicos de leitura (catálogo, blog, depoimentos) usam
+  exclusivamente a chave anon, confirmado por teste de aplicação mockado
+  (5 asserções) e por leitura de diff. Caminho admin preservado com
+  service_role. RLS real confirmada como barreira ativa via teste de banco
+  (14 asserções, set local role anon): conteúdo publicado visível,
+  rascunho/soft-deleted/não-publicado bloqueados. Duas lacunas de grant
+  reais descobertas e corrigidas (public.avaliacao sem grant de tabela;
+  is_admin() sem grant de execução para anon), root-cause bem documentado.
+  Suíte agregada 100/100 (Files=9), lint e typecheck limpos.
+reviewer: '@qa (Quinn) + @architect (Aria)'
+updated: '2026-07-16T19:15:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 93
+
+history:
+  - at: '2026-07-16T19:15:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn) + @architect (Aria)'
+    note: >-
+      Revisão independente. npm run test:db → Files=9, Tests=100, PASS.
+      npm run lint e npm run typecheck limpos. Diff de server.ts/
+      rh-cursos-api.ts revisado: separação de cliente público/privilegiado
+      correta, caminho admin intocado. Grants de avaliacao/is_admin()
+      escopados ao mínimo necessário, sem privilégio de escrita.
+
+top_issues:
+  - id: PROC-101
+    severity: info
+    finding: >-
+      O agente executor original sofreu uma falha de conexão de API
+      (infraestrutura, não relacionada ao conteúdo) após concluir código e
+      testes, mas antes de escrever a story/relatório. A documentação final
+      foi consolidada por aiox-master a partir de inspeção direta do
+      trabalho já produzido, sem alterar código.
+    suggested_owner: qa
+    suggested_action: >-
+      Nenhuma ação necessária — código e testes foram produzidos e
+      verificados normalmente; apenas a redação final da story mudou de
+      autor. Registrado por transparência de processo.
+    refs:
+      - 'docs/stories/2026-07-16-rec-104-cliente-publico-anon.md#change-log'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 19
+  risks_identified: 0
+  independent_verification:
+    - 'npm run test:db → Files=9, Tests=100, Result: PASS (inclui rec-104-anon-client.test.sql, 14/14)'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'Leitura de src/lib/supabase/server.ts: createSupabasePublicServerClient() usa exclusivamente NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY/ANON_KEY, nunca SUPABASE_SERVICE_ROLE_KEY'
+    - 'Leitura de src/__tests__/lib/rh-cursos-api-server-client.test.ts: 5 asserções confirmam roteamento correto de cliente por função'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'Confirmado por teste de aplicação mockado: nenhum caminho público chama createSupabaseServerClient().'
+    AC2:
+      status: PASS
+      notes: 'Caminho admin confirmado usando exclusivamente o cliente privilegiado.'
+    AC3:
+      status: PASS
+      notes: 'Rascunho/arquivado/soft-deleted confirmados bloqueados sob anon real (teste de banco).'
+    AC4:
+      status: PASS
+      notes: 'Catálogo público legítimo confirmado visível e completo sob anon.'
+    AC5:
+      status: PASS
+      notes: 'Lacunas de grant corrigidas por migration nova, documentando root-cause; nenhuma reversão de credencial.'
+    AC6:
+      status: PASS
+      notes: 'Regressão de REC-103 (colunas privadas) confirmada ausente.'
+    AC7:
+      status: PASS
+      notes: 'Suíte agregada 100/100, lint e typecheck limpos.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'FND-03 fechado estruturalmente: RLS e grants passam a ser a barreira real do caminho público. Grants novos escopados ao mínimo (somente leitura).'
+  reliability:
+    status: PASS
+    notes: 'Suíte agregada 100% verde; nenhuma regressão em catálogo/blog/conteúdo público.'
+  auditability:
+    status: PASS
+    notes: 'Achado de grants ausentes documentado com root-cause técnico completo na migration e no relatório.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-104-cliente-anon-2026-07-16.md']
+  future: []

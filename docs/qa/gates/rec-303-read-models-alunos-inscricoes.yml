@@ -1,0 +1,89 @@
+schema: 1
+story: 'REC-303'
+story_title: 'Implementar read models de alunos e inscrições'
+gate: PASS
+status_reason: >-
+  Rotas same-origin NET-NEW (app/api/admin/students, app/api/admin/enrollments)
+  que hidratam alunos/inscrições server-side após reload, com paginação
+  (page/pageSize, cap 100) e filtros (turma via turma_id, status via
+  EnrollmentStatus conhecido, busca por nome/email sanitizada contra o operador
+  PostgREST .or()). Protegidas por requireServerRole(ssrClient, "admin") —
+  PRIMEIRA ativação real de REC-203, apenas nestas rotas net-new (não é o
+  cutover de REC-204; HMAC de produção intocado). Fail-closed provado por
+  teste e por leitura direta de admin-api-auth.ts: sem sessão → 401 sem
+  consultar o banco, student → 403, lockdown/config ausente → 503, admin → 200
+  paginado. Cliente service-role só é devolvido após autorização confirmada.
+  Limitação de integração com o login HMAC (rotas hoje não consumíveis por
+  admin logado só via HMAC, pois a sessão SSR só é populada por signInSSR)
+  documentada como decisão consciente (não bug) na story, no relatório e no
+  cabeçalho de admin-api-auth.ts — integração fica para REC-305. Suíte agregada
+  639 → 657 (+18), lint/typecheck verdes (reverificado de forma independente).
+reviewer: '@qa (Quinn)'
+updated: '2026-07-17T10:05:00Z'
+expires: '2026-07-31T00:00:00Z'
+quality_score: 93
+
+history:
+  - at: '2026-07-17T10:05:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Leitura completa de admin-api-auth.ts, admin-read-models.ts e
+      app/api/admin/students/route.ts: guard fail-closed correto (503 sem
+      config/lockdown, 401 sem sessão, 403 papel insuficiente), service-role
+      só liberado após autorização, filtros sem invenção de campo (derivam de
+      src/types + AdminResourcePage), busca sanitizada contra injeção no
+      .or() do PostgREST. git status confirma HMAC (auth.ts, _shared/auth.ts,
+      session/route.ts, admin-resources/index.ts) sem modificação. npx vitest
+      run → 657 passed (657). npm run lint/typecheck limpos.
+
+evidence:
+  files_created:
+    - src/lib/supabase/admin-read-models.ts
+    - src/lib/supabase/admin-api-auth.ts
+    - app/api/admin/enrollments/route.ts
+    - app/api/admin/students/route.ts
+    - src/__tests__/lib/admin-read-models.test.ts
+    - src/__tests__/app/api/admin-read-models-route.test.ts
+  files_untouched_hmac:
+    - src/lib/auth.ts
+    - supabase/functions/_shared/auth.ts
+    - app/api/auth/session/route.ts
+    - supabase/functions/admin-resources/index.ts
+  tests: '657/657 (baseline 639 + 18 novos)'
+  lint: OK
+  typecheck: OK
+
+acceptance_criteria:
+  - id: AC-303.01
+    status: PASS
+    note: Rotas net-new hidratam alunos/inscrições após reload, com paginação e filtros.
+  - id: AC-303.02
+    status: PASS
+    note: requireServerRole(ssrClient, "admin") sobre sessão SSR (REC-202); papel resolvido na fonte.
+  - id: AC-303.03
+    status: PASS
+    note: Fail-closed provado — 401 (sem sessão, sem query), 403 (student), 503 (lockdown).
+  - id: AC-303.04
+    status: PASS
+    note: Admin → 200 paginado; filtros turma/status/busca produzem a query esperada.
+  - id: AC-303.05
+    status: PASS
+    note: service-role só após autorização; busca sanitizada contra injeção no filtro PostgREST.
+  - id: AC-303.06
+    status: PASS
+    note: HMAC de produção intocado (4 arquivos sem modificação).
+  - id: AC-303.07
+    status: PASS
+    note: Limitação de integração HMAC documentada como decisão consciente (não bug).
+  - id: AC-303.08
+    status: PASS
+    note: lint/typecheck verdes; 639 → 657 sem regressão.
+
+top_issues:
+  - id: INT-303
+    severity: low
+    finding: >-
+      Rotas hoje não consumíveis por admin logado apenas via HMAC (sessão SSR
+      não populada pelo login de produção). Decisão consciente e documentada;
+      integração é escopo de REC-305 / ajuste dedicado. Não é bug, não bloqueia.

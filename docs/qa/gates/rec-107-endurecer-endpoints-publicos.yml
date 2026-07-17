@@ -1,0 +1,113 @@
+schema: 1
+story: 'REC-107'
+story_title: 'Endurecer endpoints públicos (inscrição)'
+gate: PASS
+status_reason: >-
+  Endpoint de inscrição pública restaurado via adminClient()/
+  createSupabaseServerClient() (service-role) exclusivamente na chamada da
+  RPC, seguindo o mesmo padrão já validado por REC-102 para o dilema
+  estruturalmente idêntico em leads/index.ts. Nenhum grant execute
+  restaurado para anon/authenticated — REC-101 permanece intacta,
+  confirmado por teste pgTAP novo. Least privilege preservado: leituras de
+  turma permanecem no cliente público em ambos os pontos de entrada,
+  incluindo correção de uma inconsistência pré-existente na rota Next.js.
+  Body limit adicionado (8 KiB, Content-Length + tamanho real). Idempotência
+  analisada com honestidade — índice único parcial já é a barreira real,
+  hardening pontual do mapeamento de erro 23505. Gap de CAPTCHA documentado
+  com transparência, sem invenção de dependência externa (Article IV).
+  Suíte agregada 113/113 (banco) + 601/601 (Vitest), lint/typecheck limpos.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T22:50:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 96
+
+history:
+  - at: '2026-07-16T22:50:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. npm run test:db → Files=11, Tests=113, PASS
+      (incluindo os dois scripts de concorrência real). npm run lint e
+      npm run typecheck limpos. Decisão de arquitetura (adminClient vs.
+      grant) revisada e confirmada consistente com o precedente de REC-102.
+
+top_issues:
+  - id: SEC-109
+    severity: low
+    finding: >-
+      CAPTCHA não implementado — nenhuma infraestrutura existe no projeto
+      para nenhum provedor (hCaptcha/reCAPTCHA/Turnstile). Item explicitamente
+      pedido pela Épica 17 ("rate limit público... CAPTCHA") mas corretamente
+      não inventado por ausência de decisão de produto sobre provedor.
+    suggested_owner: pm
+    suggested_action: >-
+      Abrir story própria (REC-107b) se o produto decidir priorizar CAPTCHA,
+      incluindo escolha de provedor e orçamento de dependência externa nova.
+      Rate limit + validação de origem + body limit + idempotência mitigam
+      parcialmente nesta rodada.
+    refs:
+      - 'docs/history/reports/rec-107-endurecer-endpoints-2026-07-16.md#7-gaps-e-pendências-conhecidas'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 11
+  risks_identified: 1
+  independent_verification:
+    - 'npm run test:db → Files=11, Tests=113, Result: PASS (incluindo rec-107-enrollment-endpoint-hardening.test.sql, 4/4)'
+    - 'node scripts/test-db-concurrency.mjs (EP12) → PASS'
+    - 'node scripts/test-db-rec105-concurrency.mjs (REC-105) → PASS, sem regressão de atomicidade'
+    - 'npm run lint → 0 erros'
+    - 'npm run typecheck → 0 erros'
+    - 'npx vitest run → 601 passed (601), incluindo os 6 testes novos de enrollments-route.test.ts'
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ac_partial: []
+    ac_gaps: []
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'Endpoint funcional confirmado via adminClient()/createSupabaseServerClient(), sem grant execute restaurado para anon/authenticated.'
+    AC2:
+      status: PASS
+      notes: 'Least privilege preservado — leituras de turma no cliente público em ambos os pontos de entrada.'
+    AC3:
+      status: PASS
+      notes: 'Body limit de 8 KiB confirmado, cobrindo Content-Length ausente/incorreto.'
+    AC4:
+      status: PASS
+      notes: 'Schema estrito confirmado sem regressão.'
+    AC5:
+      status: PASS
+      notes: 'Análise de idempotência honesta; índice único parcial confirmado como barreira real; hardening de mapeamento de erro 23505 aplicado.'
+    AC6:
+      status: PASS
+      notes: 'Rate limit por proxy confiável confirmado sem alteração necessária.'
+    AC7:
+      status: PASS
+      notes: 'Status server-side confirmado sem regressão de REC-302.'
+    AC8:
+      status: PASS
+      notes: 'Gap de CAPTCHA documentado com transparência, sem invenção de integração externa.'
+    AC9:
+      status: PASS
+      notes: 'Suíte completa 100% verde (banco + Vitest + lint + typecheck).'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'REC-101 preservada integralmente; privilégio elevado restrito à chamada da RPC; body limit e mapeamento de erro fecham lacunas reais sem dependência externa nova.'
+  reliability:
+    status: PASS
+    notes: 'Índice único parcial confirmado como barreira de idempotência mesmo sob concorrência real; suíte agregada 100% verde.'
+  auditability:
+    status: PASS
+    notes: 'Decisão de arquitetura documentada com precedente direto (REC-102); gap de CAPTCHA registrado com honestidade, não escondido.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done. Onda 2 da Épica 17 está completa.'
+      refs: ['docs/history/reports/rec-107-endurecer-endpoints-2026-07-16.md']
+  future:
+    - action: 'Avaliar priorização de CAPTCHA (SEC-109) como story própria, dependente de decisão de produto sobre provedor.'
+      refs: ['supabase/functions/enrollments/index.ts']

@@ -1,0 +1,119 @@
+schema: 1
+story: 'REC-003'
+story_title: 'Ativar indisponibilidade fail-closed quando necessário'
+gate: PASS
+status_reason: >-
+  Kill-switch INCIDENT_LOCKDOWN implementado e verificado independentemente:
+  guarda presente e posicionada corretamente (antes de requireAdmin()/CORS/
+  rate-limit/lógica de negócio) nos 4 pontos de entrada reais identificados
+  por investigação de árvore de arquivos, não apenas os 2 citados no Dev
+  Notes original (admin-resources, enrollments Edge Function, leads Edge
+  Function, e app/api/enrollments/route.ts como caminho alternativo Next.js
+  vivo em produção via Cloudflare Workers/OpenNext). Fail-closed por padrão
+  confirmado por teste automatizado (erro de leitura → bloqueia). Sem
+  impacto quando inativo, sem regressão de lógica pré-existente. Único gap:
+  integração real do runtime Deno não testada neste ambiente (sem deno/
+  supabase CLI interativo) — mitigado por portagem 1:1 revisada linha a
+  linha do módulo Node já testado, e pelo padrão idêntico já usado em
+  supabase/functions/_shared/auth.ts.
+reviewer: '@qa (Quinn)'
+updated: '2026-07-16T18:00:00Z'
+expires: '2026-07-30T00:00:00Z'
+quality_score: 90
+
+history:
+  - at: '2026-07-16T18:00:00Z'
+    gate: PASS
+    reviewer: '@qa (Quinn)'
+    note: >-
+      Revisão independente. Guarda verificada por leitura de código nos 4
+      arquivos (grep confirma isLockdownActive() antes de requireAdmin() em
+      admin-resources/index.ts:444-445, antes de CORS/rate-limit em
+      enrollments/index.ts:32-33 e leads/index.ts, e como primeira linha do
+      handler POST em app/api/enrollments/route.ts:22-23). 7/7 testes Vitest
+      passando. npm run typecheck e npm run lint limpos.
+
+top_issues:
+  - id: SEC-105
+    severity: low
+    finding: >-
+      Teste de integração real do runtime Deno (subir a Edge Function
+      localmente com INCIDENT_LOCKDOWN=true e disparar requisição HTTP real)
+      não foi executado — ambiente sem deno/supabase CLI interativo neste
+      ciclo. Cobertura ficou no módulo Node compartilhado (testado) + revisão
+      manual linha a linha do módulo Deno idêntico.
+    suggested_owner: qa
+    suggested_action: >-
+      Antes de ativar INCIDENT_LOCKDOWN em produção pela primeira vez,
+      executar um teste negativo real em ambiente não produtivo (supabase
+      functions serve local), conforme já recomendado pela própria story.
+    refs:
+      - 'docs/history/reports/rec-003-fail-closed-2026-07-15.md#5-lacunas-explícitas'
+  - id: REL-103
+    severity: low
+    finding: >-
+      Não há alerta automático (webhook/notificação) na ativação/desativação
+      do lockdown — depende do canal operacional do incident commander,
+      registrado manualmente.
+    suggested_owner: devops
+    suggested_action: >-
+      Aceitar como processo manual nesta onda; automatizar apenas se o
+      volume de incidentes futuros justificar.
+    refs:
+      - 'docs/history/reports/rec-003-fail-closed-2026-07-15.md#5-lacunas-explícitas'
+
+waiver: { active: false }
+
+evidence:
+  tests_reviewed: 7
+  risks_identified: 2
+  independent_verification:
+    - 'grep isLockdownActive supabase/functions/admin-resources/index.ts → linha 444, antes de requireAdmin() na linha 453'
+    - 'grep isLockdownActive supabase/functions/enrollments/index.ts → linha 32, antes de CORS/rate-limit'
+    - 'grep isLockdownActive app/api/enrollments/route.ts → linha 22, primeira linha do handler POST'
+    - 'npm run typecheck → 0 erros'
+    - 'npm run lint → 0 erros'
+    - 'npx vitest run src/__tests__/lib/lockdown.test.ts → 7/7 passing (confirmado no relatório)'
+  trace:
+    ac_covered: [1, 2, 3, 4, 6]
+    ac_partial: [5]
+    ac_gaps:
+      - 'AC5: reversibilidade auditável documentada como processo, mas execução real (ativação/desativação em produção) é ação operacional de @devops/IC, não exercitada nesta story de código.'
+  acceptance_criteria:
+    AC1:
+      status: PASS
+      notes: 'Variável INCIDENT_LOCKDOWN documentada com nome, escopo, valores de ativação e efeito.'
+    AC2:
+      status: PASS
+      notes: 'Guarda retorna 503 com corpo claro nos 4 pontos de entrada, verificado por leitura de código e teste automatizado do módulo compartilhado.'
+    AC3:
+      status: PASS
+      notes: 'Guarda inativa (variável ausente) preserva 100% do comportamento pré-existente — nenhuma lógica de negócio alterada, apenas checagem adicionada antes dela.'
+    AC4:
+      status: PASS
+      notes: 'Critério objetivo de ativação (rotação REC-002 não comprovada até checkpoint) documentado explicitamente.'
+    AC5:
+      status: CONCERNS
+      notes: 'Processo de ativação/desativação auditável documentado; execução real é ação operacional futura, fora do escopo de código desta story.'
+    AC6:
+      status: PASS
+      notes: '4 caminhos de escrita/mutação vivos guardados; proxy genérico app/api/functions/[name]/route.ts repassa o 503 da Edge Function de destino, sem bypass.'
+
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Fail-closed por padrão confirmado por teste (erro de leitura → bloqueia). Sem novo segredo introduzido — controle puramente operacional.'
+  reliability:
+    status: PASS
+    notes: 'Nenhuma regressão funcional quando lockdown inativo, confirmada por teste automatizado e ausência de alteração de lógica pré-existente.'
+  auditability:
+    status: CONCERNS
+    notes: 'Processo de registro de ativação/desativação documentado mas manual (SEC-105/REL-103), consistente com a limitação estrutural já aceita nos gates anteriores da Onda 0.'
+
+recommendations:
+  immediate:
+    - action: 'Nenhuma ação bloqueante. Story pode avançar para Done.'
+      refs: ['docs/history/reports/rec-003-fail-closed-2026-07-15.md']
+  future:
+    - action: 'Executar teste de integração real do runtime Deno antes da primeira ativação real em produção (SEC-105).'
+      refs: ['supabase/functions/_shared/lockdown.ts']
