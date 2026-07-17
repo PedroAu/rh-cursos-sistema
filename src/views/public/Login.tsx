@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "@/lib/router-compat";
 import { useAppStore } from "@/lib/app-store";
 import { getDefaultDashboardPath, isRolePathAllowed } from "@/lib/session-routing";
-import { setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
+import { clearSessionToken, setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
 import { supabase } from "@/lib/supabase/client";
 import type { DashboardRole } from "@/lib/auth";
 
@@ -68,6 +68,8 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
   const status = searchParams.get("status");
   const nextPath = searchParams.get("next");
   const loginRole = resolveLoginRole(pathname);
@@ -94,21 +96,36 @@ export function LoginPage() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ role: loginRole, email: values.email, password: values.password, remember })
+        body: JSON.stringify({
+          role: loginRole,
+          email: values.email,
+          password: values.password,
+          remember,
+          ...(mfaRequired ? { mfaCode } : {}),
+        })
       });
 
+      const data = (await response.json().catch(() => null)) as {
+        session?: { role: DashboardRole; email: string; name: string };
+        token?: string | null;
+        supabaseSession?: { access_token: string; refresh_token: string } | null;
+        mfaRequired?: boolean;
+      } | null;
+
       if (!response.ok) {
-        setError("E-mail ou senha incorretos. Verifique seus dados e tente novamente.");
+        if (data?.mfaRequired) {
+          setMfaRequired(true);
+          setError("Informe o código do aplicativo autenticador para continuar.");
+        } else {
+          setError("E-mail ou senha incorretos. Verifique seus dados e tente novamente.");
+        }
         return;
       }
 
-      const data = (await response.json()) as {
-        session: { role: DashboardRole; email: string; name: string };
-        token: string;
-        supabaseSession: { access_token: string; refresh_token: string } | null;
-      };
+      if (!data?.session) throw new Error("Resposta de login inválida.");
 
-      setSessionToken(data.token);
+      if (data.token) setSessionToken(data.token);
+      else clearSessionToken();
 
       if (data.supabaseSession && supabase) {
         setSupabaseSession(data.supabaseSession);
@@ -220,6 +237,22 @@ export function LoginPage() {
                 Manter conectado
               </label>
             </div>
+
+            {mfaRequired ? (
+              <FormField label="Código de autenticação" required>
+                {({ fieldId, ariaDescribedBy }) => (
+                  <Input
+                    id={fieldId}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={mfaCode}
+                    maxLength={8}
+                    aria-describedby={ariaDescribedBy}
+                    onChange={(event) => setMfaCode(event.target.value.replace(/\D/g, ""))}
+                  />
+                )}
+              </FormField>
+            ) : null}
 
             {error ? (
               <div

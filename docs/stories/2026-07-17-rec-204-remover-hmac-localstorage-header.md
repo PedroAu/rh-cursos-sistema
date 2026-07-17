@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+In Progress
 
 ## Executor Assignment
 
@@ -124,19 +124,19 @@ REC-204 é o **passo 3 de D5**: a "ativação em rota real" que REC-203 document
 
 ## Tasks / Subtasks
 
-- [ ] **Task 1 — Confirmar pré-condições e inventário da autoridade real** (AC: 1, 9)
-  - [ ] Confirmar REC-202 e REC-203 `Done`; reler `src/lib/supabase/authorize.ts` (`requireServerRole`) como mecanismo pronto a usar.
-  - [ ] Confirmar que `supabase/functions/admin-resources/index.ts` é a única rota real chamando `requireAdmin()` (já verificado nesta preparação: `grep -rl "requireAdmin(" supabase/ app/ src/` retorna apenas `admin-resources/index.ts` e `_shared/auth.ts`).
-  - [ ] Confirmar que `app/api/admin/*` (REC-303/REC-206) já usa `requireServerRole`/`requireAdminApi` e não precisa de mudança.
+- [x] **Task 1 — Confirmar pré-condições e inventário da autoridade real** (AC: 1, 9)
+  - [x] Confirmar REC-202 e REC-203 `Done`; reler `src/lib/supabase/authorize.ts` (`requireServerRole`) como mecanismo pronto a usar.
+  - [x] Confirmar que `supabase/functions/admin-resources/index.ts` é a única rota real chamando `requireAdmin()` (já verificado nesta preparação: `grep -rl "requireAdmin(" supabase/ app/ src/` retorna apenas `admin-resources/index.ts` e `_shared/auth.ts`).
+  - [x] Confirmar que `app/api/admin/*` (REC-303/REC-206) já usa `requireServerRole`/`requireAdminApi` e não precisa de mudança.
 
-- [ ] **Task 2 — Fase A: allowlist de rollout + desvio condicional em `admin-resources`** (AC: 1, 2, 3)
-  - [ ] Nova env var server-only (ex. `SSR_AUTH_ROLLOUT_ACCOUNTS`), documentada, sem valor real versionado (segue NFR-01/FND-01).
-  - [ ] Em `admin-resources/index.ts`: resolver sessão SSR primeiro; se usuário está na allowlist, usar `requireServerRole`; senão, fluxo atual (`requireAdmin` HMAC) inalterado.
-  - [ ] Testes automatizados: allowlist ativa autoriza via SSR; fora da allowlist segue HMAC; rebaixamento da conta de teste bloqueia a requisição seguinte na rota real; ausência de sessão SSR para conta da allowlist nega (não cai para HMAC).
+- [x] **Task 2 — Fase A: allowlist de rollout + desvio condicional em `admin-resources`** (AC: 1, 2, 3)
+  - [x] Nova env var server-only (ex. `SSR_AUTH_ROLLOUT_ACCOUNTS`), documentada, sem valor real versionado (segue NFR-01/FND-01).
+  - [x] Em `admin-resources/index.ts`: resolver sessão SSR primeiro; se usuário está na allowlist, usar `requireServerRole`; senão, fluxo atual (`requireAdmin` HMAC) inalterado.
+  - [x] Testes automatizados: allowlist ativa autoriza via SSR; fora da allowlist segue HMAC; rebaixamento da conta de teste bloqueia a requisição seguinte na rota real; ausência de sessão SSR para conta da allowlist nega (não cai para HMAC).
 
 - [ ] **Task 3 — Validação da Fase A e relatório** (AC: 2, 3, 9)
   - [ ] Relatório sanitizado documentando os testes de rebaixamento/logout na rota real, sem credencial ou PII.
-  - [ ] `npm run lint`, `npm run typecheck`, `npx vitest run` verdes.
+  - [x] `npm run lint`, `npm run typecheck`, `npx vitest run` verdes.
   - [ ] Reportar a `@po`/`@architect` para a validação antes do gate humano de Fase B.
 
 - [ ] **Task 4 — Gate humano de Fase B (bloqueante)** (AC: 4)
@@ -209,10 +209,29 @@ Nenhum mecanismo novo de autorização é criado: `requireServerRole` (REC-203) 
 |---|---:|---|---|
 | 2026-07-17 | 0.1 | **Draft.** Story criada a partir do ADR-016 (D1/D2/D4/D5), Onda 3, passo 3 de identidade (cutover real). Decisão humana de Fase A (rollout com conta de teste) coletada e registrada acima; Fase B requer gate humano adicional, ainda não coletado. Escopo dividido em Fase A / Gate humano / Fase B dentro da mesma story, em vez de nova numeração, seguindo a disciplina de REC-203 de não inventar IDs fora do backlog da épica. | @sm (River) |
 | 2026-07-17 | 0.2 | **Ready.** Validação `@po` (checklist 10/10, GO): AC testáveis, escopo IN/OUT claro, dependências e riscos mapeados, alinhamento com ADR-016/Épica 17 confirmado. Afirmações técnicas da story (única rota real usando `requireAdmin()` HMAC, `app/api/admin/*` já em `requireServerRole`, chaves de `localStorage`, etc.) auditadas contra o código atual — todas corretas. Ponto de atenção não-bloqueante registrado: hoje um admin autenticado só via HMAC recebe 401 em `app/api/admin/*` por falta de sessão SSR; story já trata isso como fora de escopo (remetido a REC-305) — validar com `@dev`/`@architect` se a Fase B deve fechar esse gap explicitamente. | @po (Pax) |
+| 2026-07-17 | 0.3 | **In Progress — Fase A implementada localmente.** Addendum D4-A ratificada por `@architect`: SSR é validado no BFF same-origin e o canal BFF→Edge usa a service role existente, sem segredo novo. Login/logout/layout/BFF da conta allowlisted usam SSR sem emitir HMAC; allowlist fail-closed e bloqueio de bypass HMAC direto implementados. 742/742 testes unitários, lint, typecheck e build verdes. Validação operacional com conta real de homologação permanece pendente; Fase B não iniciada. | @dev (Dex) |
 
 ## File List
 
-_A preencher pelo `@dev` durante a implementação._
+- `.env.example`
+- `README.md`
+- `app/api/functions/[name]/route.ts`
+- `app/api/auth/session/route.ts`
+- `docs/architecture/adr-016-identidade-bff-rec201.md`
+- `docs/history/reports/rec-204-fase-a-rollout-2026-07-17.md`
+- `docs/stories/2026-07-17-rec-204-remover-hmac-localstorage-header.md`
+- `src/__tests__/app/api/functions-auth-rollout-route.test.ts`
+- `src/__tests__/app/api/auth-session-route.test.ts`
+- `src/__tests__/lib/supabase-auth-rollout.test.ts`
+- `src/__tests__/lib/server-session-rollout.test.ts`
+- `src/__tests__/mocks/server-only.ts`
+- `src/__tests__/supabase/edge-auth-rollout.test.ts`
+- `src/lib/supabase/auth-rollout.ts`
+- `src/lib/server-session.ts`
+- `src/views/public/Login.tsx`
+- `supabase/functions/_shared/auth.ts`
+- `supabase/functions/admin-resources/index.ts`
+- `vitest.config.ts`
 
 ## QA Results
 

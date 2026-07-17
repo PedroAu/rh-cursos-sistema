@@ -3,10 +3,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   cookies: {
     get: vi.fn(),
+    getAll: vi.fn(() => []),
+    set: vi.fn(),
   },
   signOut: vi.fn(),
   signInWithPassword: vi.fn(),
   checkRateLimit: vi.fn(),
+  signInSSR: vi.fn(),
+  signOutSSR: vi.fn(),
+  readSSRSession: vi.fn(),
   supabaseServerClient: null as
     | null
     | {
@@ -44,6 +49,14 @@ vi.mock("@/lib/supabase/admin", () => ({
   },
 }));
 
+vi.mock("@/lib/supabase/session", () => ({
+  isSupabaseSsrConfigured: true,
+  createSupabaseSSRClient: vi.fn(() => ({ auth: {} })),
+  signInSSR: (...args: unknown[]) => mocks.signInSSR(...args),
+  signOutSSR: (...args: unknown[]) => mocks.signOutSSR(...args),
+  readSSRSession: (...args: unknown[]) => mocks.readSSRSession(...args),
+}));
+
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimit: (...args: unknown[]) => mocks.checkRateLimit(...args),
   clientIp: vi.fn(() => "203.0.113.9"),
@@ -58,7 +71,9 @@ vi.mock("@/lib/rate-limit", () => ({
 
 describe("app/api/auth/session POST", () => {
   beforeEach(() => {
+    process.env.SSR_AUTH_ROLLOUT_ACCOUNTS = "";
     mocks.signInWithPassword.mockReset();
+    mocks.signInSSR.mockReset();
     mocks.checkRateLimit.mockReset();
     mocks.checkRateLimit.mockResolvedValue({ allowed: true, remaining: 4, retryAfter: 0 });
     mocks.supabaseServerClient = {
@@ -66,6 +81,73 @@ describe("app/api/auth/session POST", () => {
         signInWithPassword: mocks.signInWithPassword,
       },
     };
+  });
+
+  it("uses only the SSR login path for an allowlisted account", async () => {
+    process.env.SSR_AUTH_ROLLOUT_ACCOUNTS = "rollout@rhcursos.test";
+    mocks.signInSSR.mockResolvedValue({
+      status: "authenticated",
+      aal: "aal2",
+      role: "admin",
+      email: "rollout@rhcursos.test",
+      name: "Rollout",
+    });
+
+    const { POST } = await import("../../../../app/api/auth/session/route");
+    const response = await POST(
+      new Request("http://localhost/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "admin",
+          email: "rollout@rhcursos.test",
+          password: "valid-password",
+          mfaCode: "123456",
+        }),
+      })
+    );
+
+    expect(mocks.signInSSR).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ email: "rollout@rhcursos.test", mfaCode: "123456" })
+    );
+    expect(mocks.signInWithPassword).not.toHaveBeenCalled();
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      authMode: "ssr",
+      token: null,
+      supabaseSession: null,
+      aal: "aal2",
+    });
+  });
+
+  it("requests MFA without emitting a legacy token for an allowlisted account", async () => {
+    process.env.SSR_AUTH_ROLLOUT_ACCOUNTS = "rollout@rhcursos.test";
+    mocks.signInSSR.mockResolvedValue({
+      status: "mfa_required",
+      factorId: "factor-redacted",
+    });
+
+    const { POST } = await import("../../../../app/api/auth/session/route");
+    const response = await POST(
+      new Request("http://localhost/api/auth/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role: "admin",
+          email: "rollout@rhcursos.test",
+          password: "valid-password",
+        }),
+      })
+    );
+
+    expect(response.status).toBe(401);
+    expect(mocks.signInWithPassword).not.toHaveBeenCalled();
+    await expect(response.json()).resolves.toMatchObject({
+      authMode: "ssr",
+      mfaRequired: true,
+    });
   });
 
   it("blocks login attempts before Supabase auth when the rate limiter is exhausted", async () => {
@@ -178,6 +260,7 @@ describe("app/api/auth/session DELETE", () => {
       mode: "local-only",
       revoked: false,
     });
+    expect(mocks.signOutSSR).toHaveBeenCalledTimes(1);
   });
 
   it("reports global logout when Supabase session revocation succeeds", async () => {

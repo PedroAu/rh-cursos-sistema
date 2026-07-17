@@ -9,6 +9,7 @@ export type AdminSession = {
   role: DashboardRole;
   email: string;
   name: string;
+  userId?: string;
   /** Epoch ms de expiração da sessão assinada. */
   exp?: number;
 };
@@ -116,5 +117,41 @@ export function getSessionToken(request: Request): string | null {
 
 export async function requireAdmin(request: Request): Promise<AdminSession | null> {
   const session = await decodeSession(getSessionToken(request));
-  return session?.role === "admin" ? session : null;
+  if (session?.role !== "admin") return null;
+
+  // A conta em rollout nunca pode contornar o BFF usando HMAC direto no Edge.
+  const rolloutAccounts = new Set(
+    (Deno.env.get("SSR_AUTH_ROLLOUT_ACCOUNTS") ?? "")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean)
+  );
+  return rolloutAccounts.has(session.email.trim().toLowerCase()) ? null : session;
+}
+
+/**
+ * Identidade SSR encaminhada pelo BFF same-origin durante REC-204.
+ *
+ * O header de identidade sozinho nunca e confiavel: ele so e aceito quando
+ * Authorization e apikey carregam a service-role ja existente, que permanece
+ * exclusivamente no servidor. Nenhum segredo adicional e introduzido.
+ */
+export function requireTrustedSsrAdmin(request: Request): AdminSession | null {
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const authorization = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
+  const apiKey = request.headers.get("apikey") ?? "";
+  const userId = request.headers.get("x-rh-ssr-admin-id")?.trim() ?? "";
+  const email = request.headers.get("x-rh-ssr-admin-email")?.trim() ?? "";
+
+  if (
+    !serviceRoleKey ||
+    !userId ||
+    !email ||
+    !timingSafeEqual(authorization, serviceRoleKey) ||
+    !timingSafeEqual(apiKey, serviceRoleKey)
+  ) {
+    return null;
+  }
+
+  return { role: "admin", userId, email, name: email.split("@")[0] || "admin" };
 }

@@ -13,10 +13,29 @@ import { REMEMBER_SESSION_TTL_MS, SESSION_TTL_MS, shouldRotateSession } from "@/
 import { logger } from "@/lib/logger";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
+import { isSsrAuthRolloutAccount } from "@/lib/supabase/auth-rollout";
 import { createSupabaseServerClient, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import {
+  createSupabaseSSRClient,
+  isSupabaseSsrConfigured,
+  readSSRSession,
+  signInSSR,
+  signOutSSR,
+  type SsrCookieAdapter,
+} from "@/lib/supabase/session";
 
 const GLOBAL_SIGNOUT_TIMEOUT_MS = 1_500;
+
+async function getSsrCookieAdapter(): Promise<SsrCookieAdapter> {
+  const cookieStore = await cookies();
+  return {
+    getAll: () => cookieStore.getAll().map(({ name, value }) => ({ name, value })),
+    setAll: (toSet) => {
+      for (const { name, value, options } of toSet) cookieStore.set(name, value, options);
+    },
+  };
+}
 
 function toSessionPayload(session: {
   role: DashboardRole;
@@ -29,6 +48,11 @@ function toSessionPayload(session: {
     email: session.email,
     name: session.name
   } as const;
+}
+
+function clearLegacySessionCookie(response: NextResponse) {
+  response.cookies.set(SESSION_COOKIE, "", { ...getCookieOptions(), maxAge: 0 });
+  return response;
 }
 
 async function buildSessionResponse(
@@ -72,7 +96,31 @@ export async function GET(request: Request) {
     null;
   const session = await decodeSession(currentToken ?? undefined);
 
-  if (!session) {
+  if (!session || isSsrAuthRolloutAccount(session.email)) {
+    if (isSupabaseSsrConfigured) {
+      const ssrClient = createSupabaseSSRClient(await getSsrCookieAdapter());
+      if (ssrClient) {
+        const ssrSession = await readSSRSession(ssrClient);
+        if (
+          ssrSession.status === "active" &&
+          ssrSession.role &&
+          isSsrAuthRolloutAccount(ssrSession.email)
+        ) {
+          return NextResponse.json({
+            ok: true,
+            authMode: "ssr",
+            session: toSessionPayload({
+              role: ssrSession.role,
+              email: ssrSession.email,
+              name: ssrSession.name,
+            }),
+            token: null,
+            rotated: false,
+            supabaseSession: null,
+          });
+        }
+      }
+    }
     return NextResponse.json({ ok: false, error: "Sessao invalida ou expirada." }, { status: 401 });
   }
 
@@ -90,16 +138,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!isSupabaseServerConfigured) {
-    return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
-  }
-
   const body = await readLoginBody(request);
 
   const role = typeof body?.role === "string" ? normalizeDashboardRole(body.role) : undefined;
   const email = body?.email?.trim() ?? "";
   const password = body?.password ?? "";
   const remember = body?.remember === true;
+  const mfaCode = typeof body?.mfaCode === "string" ? body.mfaCode.trim() : undefined;
 
   if ((body?.role && !role) || !email || !password) {
     return NextResponse.json({ ok: false, error: "Dados de login invalidos." }, { status: 400 });
@@ -116,6 +161,53 @@ export async function POST(request: Request) {
         }
       }
     );
+  }
+
+  if (isSsrAuthRolloutAccount(email)) {
+    if (!isSupabaseSsrConfigured) {
+      return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
+    }
+    const ssrClient = createSupabaseSSRClient(await getSsrCookieAdapter());
+    if (!ssrClient) {
+      return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
+    }
+    const result = await signInSSR(ssrClient, { email, password, role: role ?? null, mfaCode });
+    if (result.status === "mfa_required" || result.status === "mfa_failed") {
+      return clearLegacySessionCookie(NextResponse.json(
+        {
+          ok: false,
+          authMode: "ssr",
+          mfaRequired: true,
+          error:
+            result.status === "mfa_required"
+              ? "Verificacao MFA obrigatoria."
+              : "Codigo MFA invalido ou expirado.",
+        },
+        { status: 401 }
+      ));
+    }
+    if (result.status !== "authenticated") {
+      const status = result.status === "unauthorized" ? 403 : result.status === "unconfigured" ? 503 : 401;
+      return NextResponse.json(
+        { ok: false, authMode: "ssr", error: status === 403 ? "Acesso nao autorizado." : "Credenciais invalidas." },
+        { status }
+      );
+    }
+    const response = NextResponse.json({
+      ok: true,
+      authMode: "ssr",
+      session: toSessionPayload(result),
+      token: null,
+      rotated: false,
+      supabaseSession: null,
+      aal: result.aal,
+    });
+    response.headers.set("x-rh-dashboard-path", getDefaultDashboardPath(result.role));
+    return clearLegacySessionCookie(response);
+  }
+
+  if (!isSupabaseServerConfigured) {
+    return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
   }
 
   const supabase = createSupabaseServerClient();
@@ -213,6 +305,10 @@ export async function DELETE(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true, mode, revoked });
+  if (isSupabaseSsrConfigured) {
+    const ssrClient = createSupabaseSSRClient(await getSsrCookieAdapter());
+    if (ssrClient) await signOutSSR(ssrClient);
+  }
   response.cookies.set(SESSION_COOKIE, "", {
     ...getCookieOptions(),
     maxAge: 0
@@ -225,6 +321,7 @@ async function readLoginBody(request: Request): Promise<{
   email?: string;
   password?: string;
   remember?: boolean;
+  mfaCode?: string;
 } | null> {
   const contentType = request.headers.get("content-type") ?? "";
 
@@ -241,7 +338,8 @@ async function readLoginBody(request: Request): Promise<{
           role: readTextField("role"),
           email: readTextField("email"),
           password: readTextField("password"),
-          remember: readTextField("remember") === "true"
+          remember: readTextField("remember") === "true",
+          mfaCode: readTextField("mfaCode"),
         };
       }
     } catch {
@@ -258,6 +356,7 @@ async function readLoginBody(request: Request): Promise<{
       email?: string;
       password?: string;
       remember?: boolean;
+      mfaCode?: string;
     };
   } catch {
     const params = new URLSearchParams(rawBody);
@@ -269,7 +368,8 @@ async function readLoginBody(request: Request): Promise<{
       role: params.get("role") ?? undefined,
       email: params.get("email") ?? undefined,
       password: params.get("password") ?? undefined,
-      remember: params.get("remember") === "true"
+      remember: params.get("remember") === "true",
+      mfaCode: params.get("mfaCode") ?? undefined,
     };
   }
 }

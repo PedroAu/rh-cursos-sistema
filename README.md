@@ -64,6 +64,7 @@ Consulte `.env.example` para a lista completa e comentada. As principais:
 | Variável | Obrigatória | Descrição |
 |----------|-------------|-----------|
 | `AUTH_SESSION_SECRET` | Sim (produção) | Segredo de assinatura do cookie de sessão (mín. 32 chars) |
+| `SSR_AUTH_ROLLOUT_ACCOUNTS` | Somente REC-204 Fase A | Allowlist server-only de contas de teste (e-mails separados por vírgula); vazio preserva o fluxo legado |
 | `NEXT_PUBLIC_SUPABASE_URL` | Sim | URL pública do projeto Supabase |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Sim | Anon key (segura para o frontend) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Sim (scripts/migrations) | Service role key — **secreta**, nunca exposta no frontend |

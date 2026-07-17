@@ -5,7 +5,7 @@
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
-import { requireAdmin } from "../_shared/auth.ts";
+import { requireAdmin, requireTrustedSsrAdmin } from "../_shared/auth.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
 import { isLockdownActive, LOCKDOWN_RESPONSE_BODY } from "../_shared/lockdown.ts";
 import { AdminResourceError, isAdminResourceError } from "../_shared/admin-resource-errors.ts";
@@ -450,7 +450,7 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Origin not allowed" }, 403, request);
   }
 
-  const session = await requireAdmin(request);
+  const session = requireTrustedSsrAdmin(request) ?? await requireAdmin(request);
   if (!session) {
     return jsonResponse({ ok: false, error: "Não autorizado." }, 401, request);
   }

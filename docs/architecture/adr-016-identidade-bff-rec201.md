@@ -86,6 +86,40 @@ Deriva de **NFR-08 (roll-forward)** e do risco "Migração de auth gerar lockout
 
 Regra de transição fail-closed: em nenhum momento a sessão HMAC pode voltar a ser **autoridade**; durante a janela de REC-202 ela pode, no máximo, ser aceita para leitura enquanto a sessão SSR não estiver propagada, e é removida em REC-204. Rollback que restaure o HMAC como autoridade é **proibido** (Épica 17 §9, linha "Autenticação").
 
+### Addendum D4-A — Fronteira executável BFF → Edge no rollout de REC-204. RATIFICADA
+
+**Data da ratificação:** 2026-07-17
+
+**Motivo:** a preparação de REC-204 revelou uma instrução tecnicamente inexequível na story: `supabase/functions/admin-resources/index.ts`, executada no runtime Deno e no domínio do Supabase, não consegue ler o cookie `httpOnly` de sessão SSR pertencente ao domínio do Next.js, nem importar `requireServerRole()` do runtime Next. A restrição já estava implícita na evidência técnica deste ADR (ponto 4) e em D4, mas o salto BFF → Edge ainda não havia sido especificado.
+
+Esta addendum **não altera D1–D5**. Ela torna D4 executável durante o rollout gradual de REC-204 e fixa a seguinte fronteira:
+
+1. **A decisão de identidade e papel ocorre no BFF same-origin.** `app/api/functions/[name]/route.ts` é o componente que recebe o cookie SSR do browser e, para a conta incluída na allowlist de rollout, deve validar a sessão com `requireServerRole(..., "admin")`. O Edge não tenta ler cookie SSR e não replica essa regra de autorização.
+2. **A service role autentica o canal, não o usuário.** Depois de autorizar a sessão SSR, o BFF chama `admin-resources` com a `SUPABASE_SERVICE_ROLE_KEY` já existente em `Authorization: Bearer ...` **e** `apikey`, mais identidade interna mínima derivada exclusivamente da sessão SSR validada (identificador estável e e-mail necessário ao rate limit/audit atuais). A service role não substitui Supabase Auth como autoridade de identidade e não pode ser exposta ao browser, resposta, log ou mensagem de erro.
+3. **Headers internos são não confiáveis por padrão.** O BFF deve descartar quaisquer headers internos homônimos recebidos do cliente e reconstruí-los após a autorização. O Edge só pode aceitar a identidade interna quando **ambos** `Authorization` e `apikey` correspondem à `SUPABASE_SERVICE_ROLE_KEY` configurada no próprio runtime; comparação ausente ou divergente falha com `401`. Um header interno acompanhado apenas de anon key, HMAC ou bearer arbitrário nunca autoriza.
+4. **Fail-closed para a conta em rollout.** A identidade de um token HMAC legado, quando verificada no BFF, pode ser usada somente para decidir que a requisição pertence a uma conta incluída na allowlist; não autoriza a operação. Se essa conta não tiver sessão SSR válida, estiver deslogada, expirada ou rebaixada, o BFF nega a requisição e **não** encaminha pelo fallback HMAC.
+5. **Compatibilidade fica restrita a contas fora da allowlist.** Durante a Fase A, requisições de contas não incluídas preservam o caminho HMAC existente e seus contratos. O BFF não injeta identidade interna nesse caminho. Essa exceção transitória termina obrigatoriamente na Fase B de REC-204; ela não revoga a proibição de criar novos consumidores HMAC.
+6. **A superfície Edge permanece protegida em profundidade.** `admin-resources` mantém validação de origem, lockdown, rate limit, validação de payload e audit log. No caminho interno, a chave do rate limit e o autor do audit log usam apenas a identidade entregue pelo canal BFF autenticado. A resposta do proxy continua com allowlist explícita de headers e nunca encaminha credenciais internas ao browser.
+
+Fluxo normativo da Fase A:
+
+```text
+browser ── cookie SSR / HMAC legado ──> BFF same-origin
+  ├─ conta em rollout ── requireServerRole(admin) ──> service-role + identidade interna ──> Edge
+  │                        └─ falha/ausência/rebaixamento: 401/403, sem fallback
+  └─ conta fora da allowlist ── contrato HMAC byte-idêntico ──> Edge (transitório)
+```
+
+**Invariantes de segurança para implementação e QA:**
+
+- uma chamada direta do browser ao Edge não consegue produzir o caminho interno sem conhecer a service role;
+- a service role isolada, sem identidade interna completa, não declara papel de usuário; a confiança na identidade anexada pressupõe custódia exclusiva dessa chave pelos runtimes server-side autorizados;
+- o proxy nunca encaminha cegamente credenciais ou headers internos fornecidos pelo cliente no caminho SSR;
+- configuração ausente de service role, allowlist inválida ou identidade interna incompleta falha fechado para a conta em rollout;
+- a Fase B remove o fallback HMAC e a allowlist, preservando o mesmo canal BFF autenticado até REC-206 consolidar os contratos.
+
+**Risco residual aceito:** durante a Fase A, a service role trafega entre dois componentes server-side e concede alto privilégio se exfiltrada; quem obtiver a chave poderá forjar o canal e a identidade interna. O risco é mitigado por HTTPS, armazenamento somente em secrets server-side, não propagação de resposta/log, comparação no Edge e janela curta de rollout. Usar a chave já existente evita introduzir um terceiro segredo de canal, em conformidade com Article IV (No Invention). A remoção desse acoplamento e a consolidação do BFF permanecem em REC-206.
+
 ---
 
 ## Consequências
