@@ -50,10 +50,18 @@ teste. Registrar, sem PII:
    `403`;
 5. restauração roll-forward do papel da conta de teste.
 
-A ativação deve ser tratada como mudança atômica de configuração. A allowlist
-divergente entre Next e Edge invalida o gate: antes do teste, confirmar a
-presença do mesmo identificador sanitizado nos dois runtimes; depois, provar
-por chamada direta que o HMAC antigo da conta allowlisted recebe `401` no Edge.
+A ativação deve ser tratada como procedimento indivisível e **ordenado**, não
+como duas configurações independentes:
+
+1. configurar a allowlist primeiro no runtime Edge;
+2. provar por chamada direta que o HMAC antigo da conta allowlisted recebe
+   `401` no Edge;
+3. somente então configurar a mesma allowlist no runtime Next;
+4. executar a validação SSR descrita acima.
+
+Para desativar a Fase A, a ordem é inversa: remover primeiro do Next e só depois
+do Edge. Ativar Next com allowlist ausente/divergente no Edge invalida o gate e
+é proibido, pois permitiria bypass direto com HMAC antigo.
 
 Até essa evidência existir, a Fase A não está validada operacionalmente e o
 gate humano da Fase B não é elegível.
