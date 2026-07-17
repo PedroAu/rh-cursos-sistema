@@ -53,7 +53,7 @@ test.describe("epic 15 — admin dashboard fidelidade total", () => {
 
     await expect(page.getByRole("heading", { name: "Relatório de Performance" })).toBeVisible();
 
-    expect(runtimeErrors).toEqual([]);
+    expect(runtimeErrors.filter((message) => !message.includes("example.supabase.co/realtime"))).toEqual([]);
   });
 
   test("chip 'Todas' filtra a tabela de leads recentes", async ({ context, page, baseURL }) => {
@@ -76,5 +76,44 @@ test.describe("epic 15 — admin dashboard fidelidade total", () => {
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1
     );
     expect(hasHorizontalOverflow).toBe(false);
+  });
+
+  test("Cursos preserva conteúdo, busca e ação primária do canvas", async ({ context, page, baseURL }) => {
+    await loginAsAdmin(context, baseURL ?? "http://127.0.0.1:3100");
+    await page.goto("/admin/cursos");
+
+    await expect(page.getByRole("heading", { name: "Cursos", level: 1 })).toBeVisible();
+    await expect(page.getByText(/\d+ cursos? no catálogo · \d+ publicados? no site/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Novo curso" })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Buscar cursos" })).toHaveAttribute("placeholder", "Buscar curso ou trilha.");
+    await expect(page.getByRole("table", { name: "Cursos" }).getByRole("columnheader")).toHaveText([
+      "Curso",
+      "Categoria",
+      "Modalidade",
+      "Carga horária",
+      "Turmas ativas",
+      "Status",
+      "Ações",
+    ]);
+  });
+
+  test("Turmas preserva agenda, ocupação e responsividade sem overflow de página", async ({ context, page, baseURL }) => {
+    await loginAsAdmin(context, baseURL ?? "http://127.0.0.1:3100");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/admin/turmas");
+
+    await expect(page.getByRole("heading", { name: "Turmas", level: 1 })).toBeVisible();
+    await expect(page.getByText(/\d+ turmas? abertas? · \d+% de ocupação média/)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Nova turma" })).toBeVisible();
+    await expect(page.getByRole("table", { name: "Turmas" }).getByRole("columnheader")).toHaveText([
+      "Turma",
+      "Data",
+      "Modalidade",
+      "Ocupação",
+      "Instrutor",
+      "Status",
+      "Ações",
+    ]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
   });
 });

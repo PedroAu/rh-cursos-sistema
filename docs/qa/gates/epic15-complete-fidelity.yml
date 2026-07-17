@@ -1,0 +1,36 @@
+schema: 1
+epic: "15"
+title: "Admin Dashboard — Fidelidade Total Trust Keith"
+date: "2026-07-17"
+reviewer: "@qa (Quinn)"
+decision: PASS
+score: 100
+summary: >-
+  As fases 15.1–15.8 estão implementadas com rastreabilidade local, contratos
+  existentes preservados e cobertura automatizada nos níveis unitário,
+  integração de componentes e Playwright. Nenhum achado bloqueante permanece.
+requirements:
+  dashboard: PASS
+  courses: PASS
+  classes: PASS
+  enrollments: PASS
+  students: PASS
+  instructors: PASS
+  leads: PASS
+  blog: PASS
+  pages: PASS
+  settings: PASS
+  navigation: PASS
+evidence:
+  lint: "PASS — npm run lint"
+  typecheck: "PASS — npm run typecheck"
+  unit: "PASS — 70 files, 729/729 tests"
+  build: "PASS — Next.js production build, 36/36 pages"
+  fidelity: "PASS — 8/8 Playwright"
+  accessibility: "PASS — WCAG 2.1 A/AA automated gate for /admin/paginas"
+  purge: "PASS — zero @mantine/@emotion"
+  bundle: "PASS — 625.3 KB / 1000 KB; largest chunk 79.4 KB / 175 KB"
+notes:
+  - "Build local validado com valores públicos fictícios e segredo de sessão exclusivo de teste; nenhum segredo foi persistido."
+  - "O warning de convenção middleware/proxy é preexistente e não bloqueia a épica."
+  - "ClickUp não foi sincronizado porque o conector não estava disponível; docs/stories permanece a fonte canônica local."

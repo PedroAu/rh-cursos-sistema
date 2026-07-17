@@ -6,6 +6,7 @@ import {
   ContactRound,
   GraduationCap,
   LayoutDashboard,
+  PanelsTopLeft,
   Newspaper,
   ReceiptText,
   Settings,
@@ -18,18 +19,20 @@ export type DashboardNavItem = {
   label: string;
   mobileLabel: string;
   icon: LucideIcon;
+  group?: "Visão geral" | "Gestão" | "Conteúdo" | "Sistema";
 };
 
 const adminNavItems: DashboardNavItem[] = [
-  { to: "/admin", label: "Visão geral", mobileLabel: "Início", icon: LayoutDashboard },
-  { to: "/admin/cursos", label: "Cursos", mobileLabel: "Cursos", icon: BookOpen },
-  { to: "/admin/turmas", label: "Turmas", mobileLabel: "Turmas", icon: CalendarDays },
-  { to: "/admin/alunos", label: "Alunos", mobileLabel: "Alunos", icon: GraduationCap },
-  { to: "/admin/leads", label: "Leads", mobileLabel: "Leads", icon: Users },
-  { to: "/admin/inscricoes", label: "Inscrições", mobileLabel: "Inscrições", icon: ReceiptText },
-  { to: "/admin/instrutores", label: "Instrutores", mobileLabel: "Equipe", icon: ShieldUser },
-  { to: "/admin/blog", label: "Blog", mobileLabel: "Blog", icon: Newspaper },
-  { to: "/admin/configuracoes", label: "Configurações", mobileLabel: "Config.", icon: Settings }
+  { to: "/admin", label: "Visão geral", mobileLabel: "Início", icon: LayoutDashboard, group: "Visão geral" },
+  { to: "/admin/cursos", label: "Cursos", mobileLabel: "Cursos", icon: BookOpen, group: "Gestão" },
+  { to: "/admin/turmas", label: "Turmas", mobileLabel: "Turmas", icon: CalendarDays, group: "Gestão" },
+  { to: "/admin/alunos", label: "Alunos", mobileLabel: "Alunos", icon: GraduationCap, group: "Gestão" },
+  { to: "/admin/leads", label: "Leads", mobileLabel: "Leads", icon: Users, group: "Gestão" },
+  { to: "/admin/inscricoes", label: "Inscrições", mobileLabel: "Inscrições", icon: ReceiptText, group: "Gestão" },
+  { to: "/admin/instrutores", label: "Instrutores", mobileLabel: "Equipe", icon: ShieldUser, group: "Gestão" },
+  { to: "/admin/blog", label: "Blog", mobileLabel: "Blog", icon: Newspaper, group: "Conteúdo" },
+  { to: "/admin/paginas", label: "Páginas", mobileLabel: "Páginas", icon: PanelsTopLeft, group: "Conteúdo" },
+  { to: "/admin/configuracoes", label: "Configurações", mobileLabel: "Config.", icon: Settings, group: "Sistema" }
 ];
 
 const studentNavItems: DashboardNavItem[] = [

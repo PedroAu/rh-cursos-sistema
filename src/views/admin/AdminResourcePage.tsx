@@ -5,6 +5,7 @@ import { Download, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react"
 import { isValidElement, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { UserCell } from "@/components/admin/user-cell";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +25,7 @@ import { useAppStore } from "@/lib/app-store";
 import { formatCPF, formatPhone } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { neutralizeCsvFormula } from "@/lib/utils/csv-export";
+import type { Instructor, Lead, LeadOrigin } from "@/types";
 
 type CsvColumn = {
   label: string;
@@ -85,19 +87,18 @@ function exportToCSV(data: unknown[], columns: CsvColumn[], filename: string) {
 }
 
 function getPageTitle(resource: ResourceKey, fallback: string) {
-  if (resource === "classes") return "Gestão de Cursos e Turmas";
-  if (resource === "students") return "Gestão de Cadastros";
-  if (resource === "courses") return "Gestão de Cursos";
+  if (resource === "students") return "Alunos";
+  if (resource === "instructors") return "Instrutores";
+  if (resource === "leads") return "Leads";
   return fallback;
 }
 
 function getPageDescription(resource: ResourceKey, fallback: string) {
-  if (resource === "classes") {
-    return "Administre o catálogo educacional, monitore inscrições em tempo real e organize o cronograma das próximas turmas presenciais e online.";
-  }
   if (resource === "students") {
-    return "Gerencie alunos, instrutores e acessos operacionais com a mesma linguagem visual do novo painel administrativo.";
+    return "Localize cadastros e acompanhe os vínculos reais de cada aluno com suas matrículas.";
   }
+  if (resource === "instructors") return "Acompanhe especialistas, vínculos com cursos e turmas ativas.";
+  if (resource === "leads") return "Priorize contatos por origem, interesse e estágio comercial.";
   return fallback;
 }
 
@@ -106,6 +107,12 @@ function getSearchPlaceholder(resource: ResourceKey) {
   if (resource === "classes") return "Buscar turma, curso ou modalidade.";
   if (resource === "courses") return "Buscar curso ou trilha.";
   return "Buscar por nome, título ou referência.";
+}
+
+function getSearchLabel(resource: ResourceKey) {
+  if (resource === "courses") return "Buscar cursos";
+  if (resource === "classes") return "Buscar turmas";
+  return "Buscar registros";
 }
 
 function getDefaultFormState(resource: ResourceKey) {
@@ -119,6 +126,7 @@ function getDefaultFormState(resource: ResourceKey) {
 export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const store = useAppStore();
   const [search, setSearch] = useState("");
+  const [leadOrigin, setLeadOrigin] = useState<LeadOrigin | "all">("all");
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -198,6 +206,15 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   );
 
   const rows = config.rows as Array<{ id: string }>;
+  const visibleRows = resource === "leads" && leadOrigin !== "all"
+    ? rows.filter((row) => (row as Lead).origin === leadOrigin)
+    : rows;
+  const leadOrigins = useMemo(
+    () => resource === "leads"
+      ? Array.from(new Set(store.leads.map((lead) => lead.origin))).sort((left, right) => left.localeCompare(right, "pt-BR"))
+      : [],
+    [resource, store.leads]
+  );
   const canCreate = true;
   const pageTitle = getPageTitle(resource, config.title);
   const pageDescription = getPageDescription(resource, config.description);
@@ -264,7 +281,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
             }}
           >
             <Plus className="h-4 w-4" />
-            Novo Cadastro
+            {config.primaryActionLabel ?? "Novo cadastro"}
           </Button>
         ) : null}
       </div>
@@ -318,18 +335,47 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       )}
 
       <Panel className="p-6">
+        {resource === "leads" ? (
+          <div className="mb-6 border-b border-tk-line pb-5">
+            <p className="mb-3 text-sm font-semibold text-tk-ink" id="lead-origin-filter-label">Filtrar por origem</p>
+            <div className="flex flex-wrap gap-2" role="group" aria-labelledby="lead-origin-filter-label">
+              {[{ value: "all" as const, label: "Todas" }, ...leadOrigins.map((origin) => ({ value: origin, label: origin }))].map((option) => {
+                const pressed = leadOrigin === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    aria-pressed={pressed}
+                    onClick={() => setLeadOrigin(option.value)}
+                    className={cn(
+                      "rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent focus-visible:ring-offset-2",
+                      pressed ? "border-tk-accent bg-tk-accent text-white" : "border-tk-line bg-tk-surface text-tk-ink-muted hover:bg-tk-surface-2 hover:text-tk-ink"
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <h2 className="text-2xl font-semibold text-tk-brand">
-              {resource === "classes" ? "Listagem de Turmas Ativas" : resource === "students" ? "Gerenciar Usuários" : config.title}
+              {resource === "students" ? "Alunos cadastrados" : config.title}
             </h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-            <SearchField value={search} onChange={setSearch} placeholder={getSearchPlaceholder(resource)} />
-            {rows.length > 0 ? (
+            <SearchField
+              value={search}
+              onChange={setSearch}
+              placeholder={getSearchPlaceholder(resource)}
+              label={getSearchLabel(resource)}
+            />
+            {visibleRows.length > 0 ? (
               <Button
                 variant="outline"
-                onClick={() => exportToCSV(config.rows, config.columns as CsvColumn[], resource)}
+                onClick={() => exportToCSV(visibleRows, config.columns as CsvColumn[], resource)}
               >
                 <Download className="h-4 w-4" />
                 Exportar
@@ -338,8 +384,50 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
           </div>
         </div>
 
-        {rows.length ? (
-          <Table className="min-w-[860px]">
+        {visibleRows.length && resource === "instructors" ? (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3" data-testid="instructor-card-grid">
+            {(visibleRows as Instructor[]).map((instructor) => {
+              const courseCount = store.courses.filter((course) => instructor.courseIds.includes(course.id)).length;
+              const activeClassCount = store.classes.filter(
+                (trainingClass) => trainingClass.instructorId === instructor.id && trainingClass.status !== "Encerrada"
+              ).length;
+
+              return (
+                <article key={instructor.id} className="rounded-3xl border border-tk-line bg-tk-surface-2 p-5" aria-label={`Instrutor ${instructor.name}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <UserCell name={instructor.name} email={instructor.email} />
+                    <Badge variant={instructor.status === "Ativo" ? "success" : "danger"}>{instructor.status}</Badge>
+                  </div>
+                  <div className="mt-5">
+                    <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-tk-ink-muted">Área de atuação</p>
+                    <p className="mt-1 font-semibold text-tk-brand">{instructor.specialty || "Não informada"}</p>
+                  </div>
+                  <dl className="mt-5 grid grid-cols-2 gap-3">
+                    <div className="rounded-2xl bg-tk-surface p-3">
+                      <dt className="text-xs text-tk-ink-muted">Cursos</dt>
+                      <dd className="mt-1 text-xl font-extrabold text-tk-ink">{courseCount}</dd>
+                    </div>
+                    <div className="rounded-2xl bg-tk-surface p-3">
+                      <dt className="text-xs text-tk-ink-muted">Turmas ativas</dt>
+                      <dd className="mt-1 text-xl font-extrabold text-tk-ink">{activeClassCount}</dd>
+                    </div>
+                  </dl>
+                  <div className="mt-5 flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => config.onEdit(instructor)}>
+                      <Pencil className="h-4 w-4" /> Editar
+                    </Button>
+                    {config.onDelete ? (
+                      <IconButton label={`Excluir instrutor ${instructor.name}`} tone="danger" onClick={() => config.onDelete?.(instructor)}>
+                        <Trash2 className="h-4 w-4" />
+                      </IconButton>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : resource !== "instructors" ? (
+          <Table aria-label={config.title} className="min-w-[860px]">
             <TableHeader className="bg-tk-surface-2">
               <TableRow className="hover:bg-tk-surface-2">
                 {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
@@ -349,7 +437,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((row) => (
+              {visibleRows.map((row) => (
                 <TableRow key={row.id}>
                   {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
                     <TableCell key={`${row.id}-${column.key}`}>{column.render(row) as ReactNode}</TableCell>
@@ -375,6 +463,18 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                   </TableCell>
                 </TableRow>
               ))}
+              {visibleRows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={config.columns.length + 1} className="py-10 text-center">
+                    <p className="font-semibold text-tk-ink">Nenhum registro encontrado.</p>
+                    <p className="mt-2 text-sm text-tk-ink-muted">
+                      {search || resource === "leads"
+                        ? "Ajuste os filtros para consultar outros registros."
+                        : "Crie um novo item para iniciar a operação desta área."}
+                    </p>
+                  </TableCell>
+                </TableRow>
+              ) : null}
             </TableBody>
           </Table>
         ) : (
@@ -510,16 +610,19 @@ function IconButton({
 function SearchField({
   value,
   onChange,
-  placeholder
+  placeholder,
+  label,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  label: string;
 }) {
   return (
     <div className="relative min-w-0 sm:min-w-[320px]">
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
       <Input
+        aria-label={label}
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
         placeholder={placeholder}

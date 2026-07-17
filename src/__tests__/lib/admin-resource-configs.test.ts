@@ -1,4 +1,5 @@
 import { beforeEach, expect, test, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
 
 import { createAdminStoreFixture } from "../../../tests/fixtures/admin-store";
 import { buildResourceConfig } from "@/lib/admin-resource-configs";
@@ -354,6 +355,99 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
   });
 });
 
+test("course config matches the canonical catalog presentation and searches categories", () => {
+  const store = createAdminStoreFixture();
+  const config = buildResourceConfig("courses", store as never, createDeps() as never);
+
+  expect(config.title).toBe("Cursos");
+  expect(config.description).toBe("1 curso no catálogo · 1 publicado no site");
+  expect(config.primaryActionLabel).toBe("Novo curso");
+  expect(config.columns.map((column) => column.label)).toEqual([
+    "Curso",
+    "Categoria",
+    "Modalidade",
+    "Carga horária",
+    "Turmas ativas",
+    "Status",
+  ]);
+  expect(config.columns.find((column) => column.key === "activeClasses")?.render(store.courses[0] as never)).toBe(1);
+
+  const categorySearchConfig = buildResourceConfig(
+    "courses",
+    store as never,
+    { ...createDeps(), search: "eSocial" } as never
+  );
+  expect(categorySearchConfig.rows).toHaveLength(1);
+});
+
+test("blog config preserves editorial CRUD metadata and searches beyond the title", () => {
+  const store = createAdminStoreFixture();
+  const config = buildResourceConfig("blog", store as never, createDeps() as never);
+
+  expect(config.title).toBe("Blog");
+  expect(config.description).toBe("1 post no acervo · 1 publicado no site");
+  expect(config.primaryActionLabel).toBe("Novo post");
+  expect(config.columns.map((column) => column.label)).toEqual([
+    "Post",
+    "Categoria",
+    "Autor",
+    "Status",
+    "Atualização",
+  ]);
+  expect(config.onDelete).toBeTypeOf("function");
+  expect(config.columns.find((column) => column.key === "date")?.render(store.blogPosts[0] as never)).toBe("1 de jun. de 2026");
+
+  const authorSearch = buildResourceConfig(
+    "blog",
+    store as never,
+    { ...createDeps(), search: "Equipe Synkra" } as never
+  );
+  expect(authorSearch.rows).toHaveLength(1);
+
+  const categorySearch = buildResourceConfig(
+    "blog",
+    store as never,
+    { ...createDeps(), search: "eSocial" } as never
+  );
+  expect(categorySearch.rows).toHaveLength(1);
+});
+
+test("class config exposes schedule, modality, zero-safe occupancy and instructor", () => {
+  const store = createAdminStoreFixture();
+  store.classes.push({
+    ...store.classes[0],
+    id: "class-zero-capacity",
+    totalSeats: 0,
+    filledSeats: 0,
+    availableSeats: 0,
+  });
+  const config = buildResourceConfig("classes", store as never, createDeps() as never);
+
+  expect(config.title).toBe("Turmas");
+  expect(config.primaryActionLabel).toBe("Nova turma");
+  expect(config.columns.map((column) => column.label)).toEqual([
+    "Turma",
+    "Data",
+    "Modalidade",
+    "Ocupação",
+    "Instrutor",
+    "Status",
+  ]);
+
+  const occupancyColumn = config.columns.find((column) => column.key === "filledSeats");
+  expect(occupancyColumn?.exportValue?.(store.classes[1] as never)).toBe("0/0 (0%)");
+  render(occupancyColumn?.render(store.classes[1] as never));
+  expect(screen.getByRole("progressbar", { name: "Inscritos: 0 de 0" })).toHaveAttribute("aria-valuenow", "0");
+  expect(screen.getByText("0/—")).toBeInTheDocument();
+
+  const instructorSearchConfig = buildResourceConfig(
+    "classes",
+    store as never,
+    { ...createDeps(), search: "Ana Lima" } as never
+  );
+  expect(instructorSearchConfig.rows).toHaveLength(2);
+});
+
 test("class form narrows modality options to the selected course modalities", () => {
   const store = createAdminStoreFixture();
   store.courses = [
@@ -378,6 +472,51 @@ test("class form narrows modality options to the selected course modalities", ()
     { value: "Presencial", label: "Presencial" },
     { value: "Ao vivo online", label: "Ao vivo online" },
   ]);
+});
+
+test("students follow the canonical table and search name, CPF, or email", () => {
+  const store = createAdminStoreFixture();
+  const base = buildResourceConfig("students", store as never, createDeps() as never);
+
+  expect(base.title).toBe("Alunos");
+  expect(base.primaryActionLabel).toBe("Novo aluno");
+  expect(base.columns.map((column) => column.label)).toEqual([
+    "Aluno",
+    "Organização",
+    "Matrículas",
+    "Última atividade",
+  ]);
+  expect(base.columns.find((column) => column.key === "enrollments")?.render(store.students[0])).toBe("1");
+
+  for (const search of ["Maria", "111.222", "souza@example.com"]) {
+    const filtered = buildResourceConfig("students", store as never, { ...createDeps(), search } as never);
+    expect(filtered.rows.map((row) => row.id)).toEqual(["student-maria"]);
+  }
+  expect(buildResourceConfig("students", store as never, { ...createDeps(), search: "inexistente" } as never).rows).toEqual([]);
+});
+
+test("enrollments expose only supported payment and value data", () => {
+  const store = createAdminStoreFixture();
+  const config = buildResourceConfig("enrollments", store as never, createDeps() as never);
+
+  expect(config.title).toBe("Matrículas");
+  expect(config.primaryActionLabel).toBe("Nova matrícula");
+  expect(config.columns.map((column) => column.label)).toEqual([
+    "Aluno",
+    "Turma",
+    "Inscrição",
+    "Pagamento",
+    "Valor",
+    "Status",
+  ]);
+  expect(config.columns.find((column) => column.key === "value")?.render(store.enrollments[0])).toBe("R$ 1.200,00");
+
+  store.classes[0] = { ...store.classes[0], price: 0 };
+  store.courses[0] = { ...store.courses[0], price: 0 };
+  store.enrollments[0] = { ...store.enrollments[0], paymentMethod: null };
+  const unavailable = buildResourceConfig("enrollments", store as never, createDeps() as never);
+  expect(unavailable.columns.find((column) => column.key === "value")?.render(store.enrollments[0])).toBe("Informação indisponível");
+  expect(unavailable.columns.find((column) => column.key === "paymentMethod")?.render(store.enrollments[0])).toBe("Informação indisponível");
 });
 
 test("manual lead creation closes only after persistence and emits one success toast", async () => {

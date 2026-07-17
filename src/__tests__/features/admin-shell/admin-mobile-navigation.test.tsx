@@ -106,12 +106,20 @@ describe("AdminMobileDrawer (REC-306)", () => {
     render(<AdminMobileDrawer opened onOpenChange={vi.fn()} role="admin" />);
 
     // Itens que a barra inferior móvel (slice 0..5) não alcança.
-    for (const label of ["Inscrições", "Instrutores", "Blog", "Configurações"]) {
+    for (const label of ["Inscrições", "Instrutores", "Blog", "Páginas", "Configurações"]) {
       expect(screen.getByRole("link", { name: new RegExp(label, "i") })).toBeInTheDocument();
     }
-    // Total de 9 itens de navegação + "Catálogo de cursos".
+    // Todos os itens do canvas também ficam disponíveis no drawer.
     expect(screen.getByRole("link", { name: /Visão geral/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Catálogo de cursos/i })).toBeInTheDocument();
+  });
+
+  it("organiza os itens nos grupos do canvas", () => {
+    render(<AdminMobileDrawer opened onOpenChange={vi.fn()} role="admin" />);
+
+    for (const group of ["Visão geral", "Gestão", "Conteúdo", "Sistema"]) {
+      expect(screen.getByText(group, { selector: "p" })).toBeInTheDocument();
+    }
   });
 
   it("fecha o menu ao navegar por um item (clique)", () => {

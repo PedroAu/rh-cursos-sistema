@@ -401,7 +401,7 @@ test.describe("epica 3 — admin polish", () => {
     // A coluna de inscritos das turmas renderiza a barra de progresso (elemento React).
     const seatColumn = classConfig.columns.find((column) => column.key === "filledSeats");
     expect(seatColumn).toBeTruthy();
-    expect(seatColumn?.label).toBe("Inscritos");
+    expect(seatColumn?.label).toBe("Ocupação");
   });
 
   test("config de alunos expõe KPIs e tabela com avatar preservando o CSV", () => {

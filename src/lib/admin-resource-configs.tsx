@@ -130,6 +130,7 @@ export type ResourceStat = {
 export type ResourceConfig = {
   title: string;
   description: string;
+  primaryActionLabel?: string;
   rows: Array<{ id: string }>;
   /** Stats bento opcionais — substituem os cards genéricos quando presentes. */
   stats?: ResourceStat[];
@@ -167,6 +168,24 @@ function formatAdminDate(value?: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatEditorialDate(value?: string) {
+  if (!value) return "—";
+
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+  const date = dateOnly ? new Date(`${value}T12:00:00`) : new Date(value);
+  if (!Number.isFinite(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(date);
+}
+
+function isWithinLastDays(value: string, days: number, now = Date.now()) {
+  const timestamp = new Date(value).getTime();
+  if (!Number.isFinite(timestamp)) return false;
+
+  const elapsed = now - timestamp;
+  return elapsed >= 0 && elapsed <= days * 24 * 60 * 60 * 1000;
 }
 
 function getBadgeVariant(value: string) {
@@ -250,9 +269,17 @@ export function buildResourceConfig(
 
   switch (resource) {
     case "courses": {
-      const rows = store.courses.filter((item) =>
-        item.title.toLowerCase().includes(search.toLowerCase())
-      );
+      const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
+      const rows = store.courses.filter((item) => {
+        const categories = item.categories?.length
+          ? item.categories
+          : item.category
+            ? [item.category]
+            : [];
+        return [item.title, item.pathName, ...categories]
+          .filter(Boolean)
+          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
+      });
       const pathOptions =
         store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
       const categoryOptions =
@@ -274,8 +301,9 @@ export function buildResourceConfig(
       const completionRate = totalEnrollments > 0 ? Math.round((completedEnrollments / totalEnrollments) * 100) : 0;
 
       return {
-        title: "Gestão de cursos",
-        description: "Criar, editar, duplicar, ativar e organizar cursos da plataforma.",
+        title: "Cursos",
+        description: `${store.courses.length} ${store.courses.length === 1 ? "curso" : "cursos"} no catálogo · ${activeCourses} ${activeCourses === 1 ? "publicado" : "publicados"} no site`,
+        primaryActionLabel: "Novo curso",
         rows,
         stats: [
           {
@@ -305,8 +333,21 @@ export function buildResourceConfig(
         ],
         columns: [
           { key: "title", label: "Curso", render: (row: Course) => row.title },
-          { key: "pathName", label: "Trilha", render: (row: Course) => row.pathName },
+          {
+            key: "category",
+            label: "Categoria",
+            render: (row: Course) => row.categories?.[0] ?? row.category ?? row.pathName ?? "—",
+          },
           { key: "modality", label: "Modalidade", render: (row: Course) => <Badge variant="muted">{row.modality}</Badge> },
+          { key: "durationLabel", label: "Carga horária", render: (row: Course) => row.durationLabel || `${row.durationHours}h` },
+          {
+            key: "activeClasses",
+            label: "Turmas ativas",
+            render: (row: Course) => store.classes.filter(
+              (trainingClass) => trainingClass.courseId === row.id &&
+                (trainingClass.status === "Inscrições abertas" || trainingClass.status === "Poucas vagas")
+            ).length,
+          },
           { key: "status", label: "Status", render: (row: Course) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Course) => {
@@ -528,7 +569,10 @@ export function buildResourceConfig(
     case "classes": {
       const rows = store.classes.filter((item) => {
         const courseName = store.courses.find((c) => c.id === item.courseId)?.title ?? "";
-        return courseName.toLowerCase().includes(search.toLowerCase());
+        const instructorName = store.instructors.find((instructor) => instructor.id === item.instructorId)?.name ?? "";
+        const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
+        return [courseName, item.id, item.modality, instructorName]
+          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
       const selectedCourse = store.courses.find((c) => c.id === form.courseId);
@@ -570,8 +614,9 @@ export function buildResourceConfig(
       const occupancyRate = toOccupancyPercent(filledSeatsAll, totalSeatsAll);
 
       return {
-        title: "Gestão de turmas",
-        description: "Editar calendário, status, instrutores e vagas das turmas.",
+        title: "Turmas",
+        description: `${activeClasses} ${activeClasses === 1 ? "turma aberta" : "turmas abertas"} · ${occupancyRate}% de ocupação média`,
+        primaryActionLabel: "Nova turma",
         rows,
         stats: [
           {
@@ -601,9 +646,19 @@ export function buildResourceConfig(
         ],
         columns: [
           {
-            key: "course", label: "Curso",
-            render: (row: TrainingClass) =>
-              store.courses.find((course) => course.id === row.courseId)?.title ?? "--",
+            key: "class", label: "Turma",
+            render: (row: TrainingClass) => (
+              <div>
+                <div className="font-semibold text-tk-ink">
+                  {store.courses.find((course) => course.id === row.courseId)?.title ?? "Curso não localizado"}
+                </div>
+                <div className="mt-0.5 text-xs text-tk-ink-muted">{row.id}</div>
+              </div>
+            ),
+            exportValue: (row: TrainingClass) => {
+              const course = store.courses.find((item) => item.id === row.courseId)?.title ?? "Curso não localizado";
+              return `${course} · ${row.id}`;
+            },
           },
           {
             key: "date", label: "Data",
@@ -611,8 +666,18 @@ export function buildResourceConfig(
               new Intl.DateTimeFormat("pt-BR").format(new Date(row.startDate)),
           },
           {
-            key: "filledSeats", label: "Inscritos",
+            key: "modality", label: "Modalidade",
+            render: (row: TrainingClass) => row.modality,
+          },
+          {
+            key: "filledSeats", label: "Ocupação",
             render: (row: TrainingClass) => <SeatProgress filled={row.filledSeats} total={row.totalSeats} />,
+            exportValue: (row: TrainingClass) => `${row.filledSeats}/${row.totalSeats} (${toOccupancyPercent(row.filledSeats, row.totalSeats)}%)`,
+          },
+          {
+            key: "instructor", label: "Instrutor",
+            render: (row: TrainingClass) =>
+              store.instructors.find((instructor) => instructor.id === row.instructorId)?.name ?? "—",
           },
           { key: "status", label: "Status", render: (row: TrainingClass) => renderStatusBadge(row.status) },
         ],
@@ -690,8 +755,11 @@ export function buildResourceConfig(
     }
 
     case "students": {
+      const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
       const rows = store.students.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        [item.name, item.cpf, item.email].some((value) =>
+          value.toLocaleLowerCase("pt-BR").includes(normalizedSearch)
+        )
       );
       const enrollmentStatusOptions = [
         { value: "Pendente", label: "Pendente" },
@@ -708,8 +776,9 @@ export function buildResourceConfig(
       const certifiedStudents = store.students.filter((item) => item.certificateIssued).length;
 
       return {
-        title: "Gestão de alunos",
-        description: "Visualizar dados, curso, turma e status de inscrição.",
+        title: "Alunos",
+        description: "Localizar cadastros e compreender seus vínculos com matrículas.",
+        primaryActionLabel: "Novo aluno",
         rows,
         stats: [
           {
@@ -744,9 +813,28 @@ export function buildResourceConfig(
             render: (row: Student) => <UserCell name={row.name} email={row.email} />,
             exportValue: (row: Student) => `${row.name} <${row.email}>`,
           },
-          { key: "organization", label: "Empresa/órgão", render: (row: Student) => row.organization },
-          { key: "jobTitle", label: "Cargo", render: (row: Student) => row.jobTitle || "—" },
-          { key: "status", label: "Status", render: (row: Student) => renderStatusBadge(row.enrollmentStatus) },
+          { key: "organization", label: "Organização", render: (row: Student) => row.organization || "Informação indisponível" },
+          {
+            key: "enrollments",
+            label: "Matrículas",
+            render: (row: Student) => String(store.enrollments.filter((enrollment) =>
+              enrollment.email.toLocaleLowerCase("pt-BR") === row.email.toLocaleLowerCase("pt-BR") || enrollment.cpf === row.cpf
+            ).length),
+          },
+          {
+            key: "lastActivity",
+            label: "Última atividade",
+            render: (row: Student) => {
+              const enrollmentDates = store.enrollments
+                .filter((enrollment) =>
+                  enrollment.email.toLocaleLowerCase("pt-BR") === row.email.toLocaleLowerCase("pt-BR") || enrollment.cpf === row.cpf
+                )
+                .map((enrollment) => enrollment.createdAt)
+                .filter(Boolean)
+                .sort((left, right) => new Date(right).getTime() - new Date(left).getTime());
+              return formatAdminDate(enrollmentDates[0] ?? row.enrolledAt);
+            },
+          },
         ],
         onEdit: (row: Student) => {
           setEditingId(row.id);
@@ -828,6 +916,7 @@ export function buildResourceConfig(
       ];
 
       const newLeads = store.leads.filter((item) => item.status === "Novo").length;
+      const leadsLast30Days = store.leads.filter((item) => isWithinLastDays(item.createdAt, 30)).length;
       const inProgressLeads = store.leads.filter(
         (item) => item.status === "Em atendimento" || item.status === "Proposta enviada"
       ).length;
@@ -837,16 +926,17 @@ export function buildResourceConfig(
       return {
         title: "Gestão de leads",
         description: "Funil com origem, interesse e estágio comercial.",
+        primaryActionLabel: "Novo lead",
         rows,
         stats: [
           {
-            label: "Total de leads",
-            value: String(store.leads.length),
-            helper: "Contatos registrados no funil.",
+            label: "Leads nos últimos 30 dias",
+            value: String(leadsLast30Days),
+            helper: "Contatos recebidos no período.",
             icon: Users,
           },
           {
-            label: "Novos",
+            label: "Aguardando contato",
             value: String(newLeads),
             helper: "Ainda sem primeiro atendimento.",
             icon: UserCheck,
@@ -868,12 +958,23 @@ export function buildResourceConfig(
           {
             key: "name",
             label: "Lead",
-            render: (row: Lead) => <UserCell name={row.name} email={row.email} />,
-            exportValue: (row: Lead) => `${row.name} <${row.email}>`,
+            render: (row: Lead) => <span className="font-semibold text-tk-ink">{row.name}</span>,
+            exportValue: (row: Lead) => row.name,
           },
-          { key: "type", label: "Jornada", render: (row: Lead) => <Badge variant="default">{row.type}</Badge> },
+          {
+            key: "contact",
+            label: "Contato",
+            render: (row: Lead) => <UserCell name={row.email} email={row.phone || "Telefone não informado"} />,
+            exportValue: (row: Lead) => [row.email, row.phone].filter(Boolean).join(" • "),
+          },
           { key: "origin", label: "Origem", render: (row: Lead) => <Badge variant="muted">{row.origin}</Badge> },
           { key: "courseInterest", label: "Interesse", render: (row: Lead) => row.courseInterest },
+          {
+            key: "createdAt",
+            label: "Recebido",
+            render: (row: Lead) => formatAdminDate(row.createdAt),
+            exportValue: (row: Lead) => formatAdminDate(row.createdAt),
+          },
           { key: "status", label: "Status", render: (row: Lead) => renderStatusBadge(row.status) },
         ],
         onEdit: (row: Lead) => {
@@ -966,9 +1067,13 @@ export function buildResourceConfig(
     }
 
     case "enrollments": {
-      const rows = store.enrollments.filter((item) =>
-        item.studentName.toLowerCase().includes(search.toLowerCase())
-      );
+      const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
+      const rows = store.enrollments.filter((item) => {
+        const course = store.courses.find((candidate) => candidate.id === item.courseId)?.title ?? "";
+        const trainingClass = store.classes.find((candidate) => candidate.id === item.classId);
+        return [item.studentName, item.email, item.cpf, course, trainingClass?.modality ?? "", item.status]
+          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
+      });
       const isEligibleEnrollmentClass = (status: string) =>
         status === "Inscrições abertas" ||
         status === "Poucas vagas" ||
@@ -1027,8 +1132,9 @@ export function buildResourceConfig(
       const completedEnrollmentsTotal = store.enrollments.filter((item) => item.status === "Concluída").length;
 
       return {
-        title: "Gestão de inscrições",
-        description: "Acompanhar inscrição, curso, turma e forma de pagamento simulada.",
+        title: "Matrículas",
+        description: "Acompanhar aluno, turma, data, pagamento, valor e situação operacional.",
+        primaryActionLabel: "Nova matrícula",
         rows,
         stats: [
           {
@@ -1064,14 +1170,34 @@ export function buildResourceConfig(
             exportValue: (row: Enrollment) => `${row.studentName} <${row.email}>`,
           },
           {
-            key: "course", label: "Curso",
-            render: (row: Enrollment) =>
-              store.courses.find((course) => course.id === row.courseId)?.title ?? "--",
+            key: "class",
+            label: "Turma",
+            render: (row: Enrollment) => {
+              const trainingClass = store.classes.find((item) => item.id === row.classId);
+              const course = store.courses.find((item) => item.id === row.courseId);
+              if (!trainingClass) return "Informação indisponível";
+              return `${course?.title ?? "Curso não localizado"} • ${new Intl.DateTimeFormat("pt-BR").format(new Date(trainingClass.startDate))}`;
+            },
           },
+          { key: "createdAt", label: "Inscrição", render: (row: Enrollment) => formatAdminDate(row.createdAt) },
           {
             key: "paymentMethod",
             label: "Pagamento",
-            render: (row: Enrollment) => <Badge variant="muted">{row.paymentMethod}</Badge>,
+            render: (row: Enrollment) => row.paymentMethod
+              ? <Badge variant="muted">{row.paymentMethod}</Badge>
+              : "Informação indisponível",
+          },
+          {
+            key: "value",
+            label: "Valor",
+            render: (row: Enrollment) => {
+              const trainingClass = store.classes.find((item) => item.id === row.classId);
+              const course = store.courses.find((item) => item.id === row.courseId);
+              const value = trainingClass?.price || course?.price;
+              return typeof value === "number" && value > 0
+                ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+                : "Informação indisponível";
+            },
           },
           { key: "status", label: "Status", render: (row: Enrollment) => renderStatusBadge(row.status) },
         ],
@@ -1187,6 +1313,7 @@ export function buildResourceConfig(
       return {
         title: "Gestão de instrutores",
         description: "Criar, editar, vincular cursos e acompanhar especialidades.",
+        primaryActionLabel: "Novo instrutor",
         rows,
         stats: [
           {
@@ -1278,8 +1405,10 @@ export function buildResourceConfig(
     }
 
     case "blog": {
+      const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
       const rows = store.blogPosts.filter((item) =>
-        item.title.toLowerCase().includes(search.toLowerCase())
+        [item.title, item.author, item.category]
+          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch))
       );
       const categoryOptions = [
         { value: "Licitações", label: "Licitações" },
@@ -1306,8 +1435,9 @@ export function buildResourceConfig(
       );
 
       return {
-        title: "Gestão do blog",
-        description: "CRUD local para posts, categorias e status editoriais.",
+        title: "Blog",
+        description: `${store.blogPosts.length} ${store.blogPosts.length === 1 ? "post" : "posts"} no acervo · ${publishedPosts} ${publishedPosts === 1 ? "publicado" : "publicados"} no site`,
+        primaryActionLabel: "Novo post",
         rows,
         stats: [
           {
@@ -1340,6 +1470,7 @@ export function buildResourceConfig(
           { key: "category", label: "Categoria", render: (row: BlogPost) => <Badge variant="muted">{row.category}</Badge> },
           { key: "author", label: "Autor", render: (row: BlogPost) => row.author },
           { key: "status", label: "Status", render: (row: BlogPost) => renderStatusBadge(row.status) },
+          { key: "date", label: "Atualização", render: (row: BlogPost) => formatEditorialDate(row.date) },
         ],
         onEdit: (row: BlogPost) => {
           setEditingId(row.id);

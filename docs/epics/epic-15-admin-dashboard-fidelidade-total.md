@@ -1,6 +1,6 @@
 # Épica 15 — Admin Dashboard: Fidelidade Total (Trust Keith)
 
-**Status:** Em andamento — Fase 1 (Story 15.1, Dashboard) `Done` (fechada via `*close-story` @po em 2026-07-15, QA PASS após correção do REL-001 em `query-logging-middleware.ts`). Fases 15.2–15.8 (Cursos, Turmas, Matrículas, Alunos, Instrutores, Leads, Blog/Páginas/Configurações) permanecem **não criadas**, aguardando priorização de `@pm` antes de virarem stories.
+**Status:** Implementação completa — Ready for Review (2026-07-17). Stories 15.1–15.8 implementadas; gate final `PASS` 100/100 em `docs/qa/gates/epic15-complete-fidelity.yml`. Fechamento formal `Done` permanece condicionado ao merge, conforme lifecycle do `@po`.
 **PRD Source:** Auditoria de fidelidade ad-hoc (dashboard admin em produção vs. canvas Trust Keith)
 **Prioridade:** P2 (débito de design — dashboard admin nunca migrado para o novo DS)
 **Fonte:** Épica 14 (Redesign Trust Keith) excluiu explicitamente o redesign visual do admin do seu escopo (ver `docs/stories/2026-07-02-epic14-story1-3-admin-shell-resign.md`, linha "Redesign visual do admin — não é escopo desta epic"). Esta épica cobre essa lacuna.
@@ -19,11 +19,11 @@ Levar as telas do painel administrativo (`docs/design-system/RH Cursos Admin Das
 
 ## 📋 Acceptance Criteria (AC) da Épica
 
-- [ ] **AC-15.1** — Tela Dashboard (`/admin` ou equivalente) implementada conforme `docs/design/redesign/spec-admin-dashboard.md`, com fidelidade de estrutura, tokens, conteúdo e contrato de dados.
-- [ ] **AC-15.2** — Hooks de dados em tempo real já existentes (`useRealTimeMetrics`, `useAdminSearch`, `exportToCSV` — Épica 10) são reaproveitados, não recriados (IDS: REUSE > CREATE).
-- [ ] **AC-15.3** — Zero regressão: `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` verdes; nenhuma reintrodução de `@mantine/*`/`@emotion/*` (`npm run purge:gate`).
-- [ ] **AC-15.4** — Cobertura de teste de fidelidade visual para a tela Dashboard (novo spec Playwright, análogo a `tests/epic14-mantine-removal.smoke.spec.ts`).
-- [ ] **AC-15.5** — Demais telas do canvas (Cursos, Turmas, Matrículas, Alunos, Instrutores, Leads, Blog, Páginas, Configurações) explicitamente **fora de escopo** desta primeira story — ficam como fases futuras da épica (15.2+), cada uma com sua própria spec de fidelidade antes da implementação.
+- [x] **AC-15.1** — Dashboard implementado conforme `spec-admin-dashboard.md`.
+- [x] **AC-15.2** — Infraestrutura e CRUD existentes reaproveitados (IDS: REUSE > CREATE).
+- [x] **AC-15.3** — Lint, typecheck, unit, build e purge gate verdes.
+- [x] **AC-15.4** — Cobertura Playwright de fidelidade registrada em `test:epic15:fidelity`.
+- [x] **AC-15.5** — Cursos, Turmas, Matrículas, Alunos, Instrutores, Leads, Blog, Páginas e Configurações entregues nas fases 15.2–15.8.
 
 ---
 
@@ -48,14 +48,14 @@ Levar as telas do painel administrativo (`docs/design-system/RH Cursos Admin Das
 **Status:** Done
 **Arquivo:** `docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md`
 
-### Stories futuras (não criadas ainda)
-- 15.2 — Cursos
-- 15.3 — Turmas
-- 15.4 — Matrículas
-- 15.5 — Alunos
-- 15.6 — Instrutores
-- 15.7 — Leads
-- 15.8 — Blog / Páginas / Configurações
+### Stories em execução
+- 15.2 — Cursos — `docs/stories/2026-07-17-epic15-story2-cursos-fidelidade-total.md`
+- 15.3 — Turmas — `docs/stories/2026-07-17-epic15-story3-turmas-fidelidade-total.md`
+- 15.4 — Matrículas — `docs/stories/2026-07-17-epic15-story4-matriculas-fidelidade-total.md`
+- 15.5 — Alunos — `docs/stories/2026-07-17-epic15-story5-alunos-fidelidade-total.md`
+- 15.6 — Instrutores — `docs/stories/2026-07-17-epic15-story6-instrutores-fidelidade-total.md`
+- 15.7 — Leads — `docs/stories/2026-07-17-epic15-story7-leads-fidelidade-total.md`
+- 15.8 — Blog / Páginas / Configurações — `docs/stories/2026-07-17-epic15-story8-conteudo-configuracoes-fidelidade-total.md`
 
 ---
 
