@@ -19,14 +19,7 @@ import { slugify } from "@/lib/utils";
 import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { invokeFunction, isFunctionsConfigured, getStableClientIp } from "@/lib/supabase/functions-client";
-import {
-  getSessionToken,
-  clearSessionToken,
-  decodeSessionToken,
-  getSupabaseSession,
-  setSessionToken,
-  SESSION_ACTIVITY_SYNC_MS,
-} from "@/lib/supabase/session-token";
+import { SESSION_REFRESH_THRESHOLD_MS } from "@/lib/auth-session";
 import {
   fetchPublicBlogPostsFromSupabase,
   fetchPublicCatalogFromSupabase,
@@ -190,12 +183,6 @@ function clearLegacyStoredState() {
   }
 
   window.localStorage.removeItem(STORAGE_KEY);
-}
-
-function getAdminSessionTokenValue() {
-  const stored = getSessionToken();
-  if (stored) return stored;
-  return null;
 }
 
 function countConfirmedEnrollments(enrollments: Enrollment[], classId: string) {
@@ -388,7 +375,6 @@ function persistAdminMutation(
 
   return invokeFunction("admin-resources", {
     body: mutation,
-    sessionToken: getAdminSessionTokenValue() ?? undefined,
     ...(mutation.action === "delete" ? { keepalive: true } : {}),
   })
     .then(async (response) => {
@@ -421,13 +407,12 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
-async function fetchAdminLeads(sessionToken: string): Promise<Lead[]> {
+async function fetchAdminLeads(): Promise<Lead[]> {
   const response = await invokeFunction("admin-resources", {
     body: {
       resource: "leads",
       action: "list",
     },
-    sessionToken,
   });
 
   if (!response.ok) {
@@ -479,9 +464,9 @@ export function AppStoreProvider({
     clearLegacyStoredState();
   }, []);
 
-  // Reconciliação de sessão na inicialização: a sessão server-side do admin
-  // entra por prop; como fallback, reidratamos o payload do token HMAC salvo no
-  // browser para manter consistência com as Edge Functions existentes.
+  // Reconciliação de sessão na inicialização: a sessão admin server-side (cookie
+  // SSR httpOnly) entra por prop `initialSession`. REC-204 Fase B removeu o
+  // fallback do token HMAC em localStorage — sem sessão SSR, força-se novo login.
   useEffect(() => {
     if (initialSession) {
       setState((current) => {
@@ -498,33 +483,15 @@ export function AppStoreProvider({
       return;
     }
 
-    const decoded = decodeSessionToken(getSessionToken());
-
-    setState((current) => {
-      if (decoded) {
-        // Token válido: restauração otimista da sessão.
-        if (
-          current.currentSession?.role === decoded.role &&
-          current.currentSession?.email === decoded.email &&
-          current.currentSession?.name === decoded.name
-        ) {
-          return current;
-        }
-        return { ...current, currentSession: decoded };
-      }
-
-      // Sem token (ou malformado): se há sessão no state persistido, é estado
-      // inconsistente — limpar para forçar novo login.
-      if (current.currentSession) {
-        return { ...current, currentSession: null };
-      }
-      return current;
-    });
+    // Sem sessão SSR: qualquer sessão persistida em state é inconsistente.
+    setState((current) =>
+      current.currentSession ? { ...current, currentSession: null } : current
+    );
   }, [initialSession]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (!state.currentSession && !getSessionToken()) return;
+    if (!state.currentSession) return;
 
     let cancelled = false;
 
@@ -541,7 +508,6 @@ export function AppStoreProvider({
         if (cancelled) return;
 
         if (response.status === 401) {
-          clearSessionToken();
           setState((current) =>
             current.currentSession ? { ...current, currentSession: null } : current
           );
@@ -553,19 +519,11 @@ export function AppStoreProvider({
         const payload = (await response.json().catch(() => null)) as
           | {
               session?: CurrentSession;
-              token?: string | null;
             }
           | null;
 
         const nextSession = payload?.session ?? null;
         if (!nextSession) return;
-
-        // Preserva tokens reais já emitidos pelas Edge Functions administrativas.
-        // O GET /api/auth/session retorna o token HMAC do cookie SSR, que não pode
-        // substituir um token de sessão já pronto para `admin-resources`.
-        if (payload?.token && !getSessionToken()) {
-          setSessionToken(payload.token);
-        }
 
         setState((current) => {
           if (
@@ -597,7 +555,7 @@ export function AppStoreProvider({
       if (document.visibilityState === "visible") {
         void syncSession();
       }
-    }, SESSION_ACTIVITY_SYNC_MS);
+    }, SESSION_REFRESH_THRESHOLD_MS);
 
     return () => {
       cancelled = true;
@@ -653,11 +611,10 @@ export function AppStoreProvider({
       if (!active) return;
       // REC-206: o refetch de leads disparado por realtime também trafega
       // exclusivamente pelo BFF same-origin (admin-resources leads/list,
-      // HMAC via requireAdmin), nunca pelo cliente Supabase direto — este era
-      // o contrato duplicado de leitura de leads e foi removido.
-      const adminSessionToken = getAdminSessionTokenValue();
-      if (!adminSessionToken) return;
-      fetchAdminLeads(adminSessionToken)
+      // autorizado pela sessão SSR), nunca pelo cliente Supabase direto — este
+      // era o contrato duplicado de leitura de leads e foi removido.
+      if (stateRef.current.currentSession?.role !== "admin") return;
+      fetchAdminLeads()
         .then((updated) => {
           if (!active || !updated.length) return;
           setState((current) => ({ ...current, leads: mergeLeads(current.leads, updated) }));
@@ -733,11 +690,13 @@ export function AppStoreProvider({
         });
     }
 
-    // Lazy load admin data apenas quando há sessão ativa
-    const adminSessionToken = getAdminSessionTokenValue();
+    // Lazy load admin data apenas quando há sessão admin ativa (SSR).
+    // REC-204 Fase B: a autoridade é a sessão SSR (cookie httpOnly), não mais
+    // o token HMAC em localStorage; o BFF same-origin autoriza a leitura.
+    const isAdminSession = stateRef.current.currentSession?.role === "admin";
 
-    if (adminSessionToken) {
-      fetchAdminLeads(adminSessionToken)
+    if (isAdminSession) {
+      fetchAdminLeads()
         .then((leads) => {
           if (!active || !leads.length) return;
           setState((current) => ({ ...current, leads: mergeLeads(current.leads, leads) }));
@@ -745,60 +704,48 @@ export function AppStoreProvider({
         .catch(() => undefined);
     }
 
-    const stored = getSupabaseSession();
-    if (stored && supabase) {
-      supabase.auth
-        .setSession({
-          access_token: stored.access_token,
-          refresh_token: stored.refresh_token,
-        })
-        .then(({ error }) => {
-          if (!active || error || !supabase) return;
+    if (isAdminSession && supabase) {
+      // REC-206: a leitura de leads é servida exclusivamente pelo BFF
+      // same-origin (fetchAdminLeads, acima). As subscriptions realtime aqui
+      // apenas notificam mudanças sob RLS — o contrato duplicado de leitura via
+      // cliente Supabase direto foi removido. A consolidação do transporte
+      // realtime (WebSocket direto ao Supabase) permanece fora do escopo.
+      const leadSub = createRealtimeSubscription(
+        supabase,
+        "lead_changes",
+        "lead",
+        () => active,
+        scheduleLeadRefetch
+      );
 
-          // REC-206: a leitura de leads é servida exclusivamente pelo BFF
-          // same-origin (fetchAdminLeads, acima). A sessão Supabase Auth aqui
-          // habilita apenas as subscriptions realtime sob RLS — o contrato
-          // duplicado de leitura de leads via cliente Supabase direto foi
-          // removido. A consolidação do transporte realtime (WebSocket direto
-          // ao Supabase) permanece fora do escopo desta story.
-          const leadSub = createRealtimeSubscription(
-            supabase,
-            "lead_changes",
-            "lead",
-            () => active,
-            scheduleLeadRefetch
-          );
+      subscriptions.push(leadSub);
 
-          subscriptions.push(leadSub);
+      // O bootstrap administrativo contém também registros inativos.
+      // Um refetch público não pode substituir esse conjunto por uma
+      // visão RLS reduzida após eventos de inscrição/aluno.
+      if (bootstrapPublicData) {
+        // Mudanças em inscrição afetam a capacidade das turmas (vagas),
+        // por isso refetch do catálogo para reconciliar as contagens.
+        const enrollmentSub = createRealtimeSubscription(
+          supabase,
+          "inscricao_changes",
+          "inscricao",
+          () => active,
+          scheduleCatalogRefetch
+        );
 
-          // O bootstrap administrativo contém também registros inativos.
-          // Um refetch público não pode substituir esse conjunto por uma
-          // visão RLS reduzida após eventos de inscrição/aluno.
-          if (bootstrapPublicData) {
-            // Mudanças em inscrição afetam a capacidade das turmas (vagas),
-            // por isso refetch do catálogo para reconciliar as contagens.
-            const enrollmentSub = createRealtimeSubscription(
-              supabase,
-              "inscricao_changes",
-              "inscricao",
-              () => active,
-              scheduleCatalogRefetch
-            );
+        // Alterações em aluno podem refletir nas estatísticas do catálogo
+        // (total de alunos por curso).
+        const studentSub = createRealtimeSubscription(
+          supabase,
+          "aluno_changes",
+          "aluno",
+          () => active,
+          scheduleCatalogRefetch
+        );
 
-            // Alterações em aluno podem refletir nas estatísticas do catálogo
-            // (total de alunos por curso).
-            const studentSub = createRealtimeSubscription(
-              supabase,
-              "aluno_changes",
-              "aluno",
-              () => active,
-              scheduleCatalogRefetch
-            );
-
-            subscriptions.push(enrollmentSub, studentSub);
-          }
-        })
-        .catch(() => undefined);
+        subscriptions.push(enrollmentSub, studentSub);
+      }
     }
 
     return () => {
@@ -818,12 +765,11 @@ export function AppStoreProvider({
 
   const logout = useCallback<AppStoreValue["logout"]>(() => {
     logoutInProgressRef.current = true;
-    const accessToken = getSupabaseSession()?.access_token;
+    // REC-204 Fase B: sem token/sessão Supabase em localStorage. A revogação
+    // da sessão SSR (incluindo signout global) é feita server-side pela rota
+    // DELETE /api/auth/session, que limpa o cookie httpOnly e revoga no Supabase.
     const notifyLocalOnlyFallback = () => {
       toast.success("Sessão local encerrada.");
-      if (accessToken) {
-        toast.error("Não foi possível confirmar a revogação global da sessão.");
-      }
     };
 
     void (async () => {
@@ -837,7 +783,7 @@ export function AppStoreProvider({
             "x-forwarded-for": clientIp,
             "x-real-ip": clientIp
           },
-          body: JSON.stringify({ accessToken })
+          body: JSON.stringify({})
         });
 
         if (!response.ok) {
@@ -858,7 +804,6 @@ export function AppStoreProvider({
       } catch {
         notifyLocalOnlyFallback();
       } finally {
-        clearSessionToken();
         setState((current) => (current.currentSession ? { ...current, currentSession: null } : current));
       }
     })();
@@ -866,7 +811,6 @@ export function AppStoreProvider({
     if (supabase) {
       void supabase.auth.signOut().catch(() => undefined);
     }
-    clearSessionToken();
     setState((current) => ({ ...current, currentSession: null }));
   }, []);
 
@@ -1090,8 +1034,11 @@ export function AppStoreProvider({
   }, []);
 
   const createLead = useCallback<AppStoreValue["createLead"]>(async (payload) => {
-    const adminSessionToken = getAdminSessionTokenValue() ?? undefined;
-    const usedAdminMutation = Boolean(isFunctionsConfigured && adminSessionToken);
+    // REC-204 Fase B: a rota admin (admin-resources) é escolhida quando há
+    // sessão admin SSR ativa; o BFF same-origin autoriza via cookie httpOnly.
+    const usedAdminMutation = Boolean(
+      isFunctionsConfigured && stateRef.current.currentSession?.role === "admin"
+    );
     let confirmedLead: Pick<Lead, "id" | "createdAt" | "status"> | undefined;
 
     if (!isFunctionsConfigured && process.env.NODE_ENV === "production") {
@@ -1111,7 +1058,6 @@ export function AppStoreProvider({
               status: "Novo",
             },
           },
-          sessionToken: adminSessionToken,
         });
       } catch {
         throw new Error("Serviço indisponível no momento. A solicitação não foi enviada.");

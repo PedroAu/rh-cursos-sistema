@@ -76,8 +76,7 @@ export function corsHeaders(origin: string | null): Record<string, string> {
   return {
     "Access-Control-Allow-Origin": allowed ? origin! : fallbackOrigin,
     "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers":
-      "authorization, apikey, content-type, x-rh-session",
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type",
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Max-Age": "3600",
     Vary: "Origin",

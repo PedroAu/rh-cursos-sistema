@@ -1,21 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  cookieValue: undefined as string | undefined,
-  decodeSession: vi.fn(),
   readSSRSession: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
-    get: vi.fn(() => (mocks.cookieValue ? { value: mocks.cookieValue } : undefined)),
     getAll: vi.fn(() => []),
   })),
-}));
-
-vi.mock("@/lib/auth", () => ({
-  SESSION_COOKIE: "rh_cursos_demo_session",
-  decodeSession: (...args: unknown[]) => mocks.decodeSession(...args),
 }));
 
 vi.mock("@/lib/supabase/session", () => ({
@@ -23,47 +15,41 @@ vi.mock("@/lib/supabase/session", () => ({
   readSSRSession: (...args: unknown[]) => mocks.readSSRSession(...args),
 }));
 
-describe("getServerSession REC-204 rollout", () => {
+// REC-204 Fase B (cutover total): getServerSession resolve a sessão admin
+// EXCLUSIVAMENTE pela sessão Supabase SSR. O caminho legado (decodeSession do
+// cookie HMAC) e a allowlist de rollout foram removidos — sem fallback HMAC.
+describe("getServerSession — autoridade SSR exclusiva (REC-204 Fase B)", () => {
   beforeEach(() => {
     vi.resetModules();
-    process.env.SSR_AUTH_ROLLOUT_ACCOUNTS = "rollout@example.com";
-    mocks.cookieValue = undefined;
-    mocks.decodeSession.mockReset();
     mocks.readSSRSession.mockReset();
-    mocks.decodeSession.mockResolvedValue(null);
   });
 
-  it("uses SSR for an allowlisted account even when an old HMAC exists", async () => {
-    mocks.cookieValue = "legacy-token";
-    mocks.decodeSession.mockResolvedValue({
-      role: "admin",
-      email: "rollout@example.com",
-      name: "Old",
-    });
+  it("retorna a sessão quando há SSR ativa", async () => {
     mocks.readSSRSession.mockResolvedValue({
       status: "active",
       aal: "aal2",
       role: "admin",
-      email: "rollout@example.com",
+      email: "admin@example.com",
       name: "Fresh",
     });
 
     const { getServerSession } = await import("@/lib/server-session");
     await expect(getServerSession()).resolves.toEqual({
       role: "admin",
-      email: "rollout@example.com",
+      email: "admin@example.com",
       name: "Fresh",
     });
   });
 
-  it("fails closed when an allowlisted legacy account has no SSR session", async () => {
-    mocks.cookieValue = "legacy-token";
-    mocks.decodeSession.mockResolvedValue({
-      role: "admin",
-      email: "rollout@example.com",
-      name: "Old",
-    });
+  it("fecha (null) quando não há sessão SSR ativa — sem fallback HMAC", async () => {
     mocks.readSSRSession.mockResolvedValue({ status: "none" });
+
+    const { getServerSession } = await import("@/lib/server-session");
+    await expect(getServerSession()).resolves.toBeNull();
+  });
+
+  it("fecha (null) quando a sessão SSR ativa não tem papel resolvido", async () => {
+    mocks.readSSRSession.mockResolvedValue({ status: "active", role: null });
 
     const { getServerSession } = await import("@/lib/server-session");
     await expect(getServerSession()).resolves.toBeNull();

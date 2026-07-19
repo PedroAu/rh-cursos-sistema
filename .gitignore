@@ -5,6 +5,7 @@
 .env.local
 .env.*.local
 .env.backup-*
+.env.local.backup-*
 *.key
 *.pem
 

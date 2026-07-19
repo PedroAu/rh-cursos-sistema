@@ -9,7 +9,6 @@ import {
   adminResourceSchema,
   validateInput,
 } from '@/lib/validation';
-import { SESSION_COOKIE, getSessionSecret } from '@/lib/auth';
 
 /**
  * Execution Test - Ensures all utility functions are called and counted in coverage
@@ -105,20 +104,6 @@ describe('Direct Utility Execution', () => {
         password: 'password',
       });
       expect(result.success).toBe(true);
-    });
-
-    it('accesses auth session cookie', () => {
-      expect(SESSION_COOKIE).toBe('rh_cursos_demo_session');
-    });
-
-    it('gets session secret', () => {
-      // This might throw in production if secret not set, so we wrap it
-      try {
-        const secret = getSessionSecret();
-        expect(typeof secret).toBe('string');
-      } catch {
-        expect(true).toBe(true); // Expected in some environments
-      }
     });
   });
 });

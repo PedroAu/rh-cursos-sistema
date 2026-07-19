@@ -11,10 +11,12 @@ beforeAll(() => {
   });
 });
 
-describe("REC-204 Edge auth rollout", () => {
+// REC-204 Fase B: a autoridade única do Edge é `requireTrustedSsrAdmin`
+// (identidade SSR + service-role). O verificador HMAC (`requireAdmin`/
+// `decodeSession`/`getSessionToken`) foi removido — nenhum token HMAC autoriza.
+describe("REC-204 Fase B — Edge auth via SSR trusted identity", () => {
   beforeEach(() => {
     env.clear();
-    env.set("AUTH_SESSION_SECRET", "rec204-edge-test-secret-32-characters");
     env.set("SUPABASE_SERVICE_ROLE_KEY", "service-role-test-only");
   });
 
@@ -44,29 +46,6 @@ describe("REC-204 Edge auth rollout", () => {
       },
     });
     expect(requireTrustedSsrAdmin(spoofed)).toBeNull();
-  });
-
-  it("rejects HMAC from an allowlisted account and preserves HMAC outside it", async () => {
-    const { encodeSession, requireAdmin } = await import(edgeAuthModule);
-    env.set("SSR_AUTH_ROLLOUT_ACCOUNTS", "rollout@example.com");
-
-    const rolloutToken = await encodeSession({
-      role: "admin",
-      email: "rollout@example.com",
-      name: "Rollout",
-    });
-    const legacyToken = await encodeSession({
-      role: "admin",
-      email: "legacy@example.com",
-      name: "Legacy",
-    });
-
-    await expect(
-      requireAdmin(new Request("https://edge.test", { headers: { "x-rh-session": rolloutToken } }))
-    ).resolves.toBeNull();
-    await expect(
-      requireAdmin(new Request("https://edge.test", { headers: { "x-rh-session": legacyToken } }))
-    ).resolves.toMatchObject({ email: "legacy@example.com" });
   });
 
   it("rejects incomplete internal identity even with service-role credentials", async () => {

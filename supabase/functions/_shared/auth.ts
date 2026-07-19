@@ -1,7 +1,14 @@
-// Sessão admin assinada via HMAC-SHA256 (WebCrypto).
-// Portado de src/lib/auth.ts para o runtime Deno das Edge Functions.
-// Em vez de cookie httpOnly (que não cruza o domínio do frontend → supabase.co),
-// o token é devolvido no corpo e reenviado pelo header `x-rh-session`.
+// Identidade admin das Edge Functions.
+//
+// REC-204 Fase B (cutover total): a autoridade de sessão admin é a sessão
+// Supabase SSR encaminhada pelo BFF same-origin via `requireTrustedSsrAdmin`.
+// O verificador HMAC gêmeo (`decodeSession`/`requireAdmin`/`getSessionToken` +
+// leitura de `x-rh-session`) foi REMOVIDO — token HMAC legado não é mais aceito
+// em nenhuma rota de produção (retorna 401 em `admin-resources`).
+//
+// `encodeSession` permanece apenas porque a Edge Function `auth-session`
+// (deploy estático, fora do escopo desta story) ainda a consome; ela não é
+// autoridade em nenhum caminho protegido após o cutover.
 
 export type DashboardRole = "admin";
 
@@ -37,15 +44,6 @@ function toBase64Url(value: ArrayBuffer | string): string {
   return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
 }
 
-function fromBase64Url(value: string): string {
-  const normalized = value.replaceAll("-", "+").replaceAll("_", "/");
-  const padded = normalized.padEnd(
-    normalized.length + ((4 - (normalized.length % 4)) % 4),
-    "="
-  );
-  return atob(padded);
-}
-
 async function signPayload(payload: string): Promise<string> {
   const key = await crypto.subtle.importKey(
     "raw",
@@ -62,10 +60,6 @@ async function signPayload(payload: string): Promise<string> {
   return toBase64Url(signature);
 }
 
-function isDashboardRole(value: unknown): value is DashboardRole {
-  return value === "admin";
-}
-
 export async function encodeSession(
   session: AdminSession,
   ttlMs = SESSION_TTL_MS
@@ -73,32 +67,6 @@ export async function encodeSession(
   const payload = toBase64Url(JSON.stringify({ ...session, exp: Date.now() + ttlMs }));
   const signature = await signPayload(payload);
   return `${payload}.${signature}`;
-}
-
-export async function decodeSession(value?: string | null): Promise<AdminSession | null> {
-  if (!value) return null;
-
-  const [payload, signature] = value.split(".");
-  if (!payload || !signature) return null;
-
-  const expectedSignature = await signPayload(payload);
-  // Comparação em tempo constante para evitar timing attacks.
-  if (!timingSafeEqual(signature, expectedSignature)) return null;
-
-  try {
-    const parsed = JSON.parse(fromBase64Url(payload)) as Partial<AdminSession>;
-    if (!isDashboardRole(parsed.role) || !parsed.email || !parsed.name) return null;
-    if (typeof parsed.exp !== "number" || parsed.exp < Date.now()) return null;
-
-    return {
-      role: parsed.role,
-      email: parsed.email,
-      name: parsed.name,
-      exp: parsed.exp,
-    };
-  } catch {
-    return null;
-  }
 }
 
 function timingSafeEqual(a: string, b: string): boolean {
@@ -110,27 +78,9 @@ function timingSafeEqual(a: string, b: string): boolean {
   return mismatch === 0;
 }
 
-/** Lê o token de sessão do header `x-rh-session`. */
-export function getSessionToken(request: Request): string | null {
-  return request.headers.get("x-rh-session");
-}
-
-export async function requireAdmin(request: Request): Promise<AdminSession | null> {
-  const session = await decodeSession(getSessionToken(request));
-  if (session?.role !== "admin") return null;
-
-  // A conta em rollout nunca pode contornar o BFF usando HMAC direto no Edge.
-  const rolloutAccounts = new Set(
-    (Deno.env.get("SSR_AUTH_ROLLOUT_ACCOUNTS") ?? "")
-      .split(",")
-      .map((value) => value.trim().toLowerCase())
-      .filter(Boolean)
-  );
-  return rolloutAccounts.has(session.email.trim().toLowerCase()) ? null : session;
-}
-
 /**
- * Identidade SSR encaminhada pelo BFF same-origin durante REC-204.
+ * Identidade SSR encaminhada pelo BFF same-origin — autoridade única após o
+ * cutover REC-204 Fase B.
  *
  * O header de identidade sozinho nunca e confiavel: ele so e aceito quando
  * Authorization e apikey carregam a service-role ja existente, que permanece

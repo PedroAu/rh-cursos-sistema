@@ -123,7 +123,15 @@ const mocks = vi.hoisted(() => {
   return {
     supabaseConfigured: false,
     supabaseClient: {
-      channel: vi.fn(),
+      // REC-204 Fase B: com sessão admin (SSR), a store abre canais realtime
+      // pelo cliente browser. Stub encadeável channel().on().subscribe().
+      channel: vi.fn(() => {
+        const chainable = {
+          on: vi.fn(() => chainable),
+          subscribe: vi.fn(() => chainable),
+        };
+        return chainable;
+      }),
       removeChannel: vi.fn(),
       auth: {
         setSession: vi.fn(),
@@ -137,11 +145,6 @@ const mocks = vi.hoisted(() => {
     toastSuccess: vi.fn(),
     toastError: vi.fn(),
     fetchMock: vi.fn(),
-    clearSessionToken: vi.fn(),
-    setSessionToken: vi.fn<(token: string) => void>(),
-    getSessionToken: vi.fn<() => string | null>(() => null),
-    decodeSessionToken: vi.fn<(token: string | null) => CurrentSession | null>(() => null),
-    getSupabaseSession: vi.fn<() => { access_token: string; refresh_token: string } | null>(() => null),
     data: {
       courseCoverByPath: { "path-1": "/course.png" },
       defaultCourseCover: "/default-course.png",
@@ -206,15 +209,6 @@ vi.mock("@/lib/supabase/rh-cursos-api", () => ({
   fetchPublicCatalogFromSupabase: mocks.fetchPublicCatalog,
   fetchPublicBlogPostsFromSupabase: mocks.fetchPublicBlogPosts,
   isExplicitPublicTestBaselineEnabled: vi.fn(() => false),
-}));
-
-vi.mock("@/lib/supabase/session-token", () => ({
-  getSessionToken: mocks.getSessionToken,
-  clearSessionToken: mocks.clearSessionToken,
-  setSessionToken: mocks.setSessionToken,
-  decodeSessionToken: mocks.decodeSessionToken,
-  getSupabaseSession: mocks.getSupabaseSession,
-  SESSION_ACTIVITY_SYNC_MS: 5 * 60 * 1000,
 }));
 
 type Store = ReturnType<AppStoreModule["useAppStore"]>;
@@ -391,17 +385,6 @@ describe("AppStoreProvider and hooks", () => {
     mocks.toastError.mockClear();
     mocks.invokeFunction.mockClear();
     mocks.functionsConfigured = false;
-    mocks.clearSessionToken.mockClear();
-    mocks.setSessionToken.mockClear();
-    // mockClear preserva return values configurados por testes individuais;
-    // restaura os defaults para evitar vazamento entre casos (ex.: token HMAC
-    // do teste de hidratação REC-206).
-    mocks.getSessionToken.mockReset();
-    mocks.getSessionToken.mockReturnValue(null);
-    mocks.decodeSessionToken.mockReset();
-    mocks.decodeSessionToken.mockReturnValue(null);
-    mocks.getSupabaseSession.mockReset();
-    mocks.getSupabaseSession.mockReturnValue(null);
     mocks.supabaseConfigured = false;
     mocks.fetchPublicCatalog.mockReset();
     mocks.fetchPublicBlogPosts.mockReset();
@@ -436,7 +419,7 @@ describe("AppStoreProvider and hooks", () => {
 
     await waitFor(() => expect(harness.onStore).toHaveBeenCalled());
     expect(harness.store.currentSession).toEqual(session);
-    await waitFor(() => expect(mocks.setSessionToken).toHaveBeenCalledWith("renewed.token"));
+    // REC-204 Fase B: nenhum token HMAC é persistido no browser.
   });
 
   it("sets and clears the current session via provider actions", async () => {
@@ -466,7 +449,6 @@ describe("AppStoreProvider and hooks", () => {
         body: JSON.stringify({ accessToken: undefined }),
       }),
     ]);
-    expect(mocks.clearSessionToken).toHaveBeenCalled();
     expect(screen.getByTestId("session-email")).toHaveTextContent("none");
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
   });
@@ -488,7 +470,6 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(harness.store.currentSession).toEqual(session));
 
     mocks.fetchMock.mockClear();
-    mocks.setSessionToken.mockClear();
     mocks.fetchMock.mockImplementation((_input, init) => {
       if ((init as RequestInit | undefined)?.method === "DELETE") {
         return Promise.resolve(
@@ -525,58 +506,19 @@ describe("AppStoreProvider and hooks", () => {
         .filter(([, init]) => (init as RequestInit | undefined)?.method !== "GET")
         .every(([, init]) => (init as RequestInit | undefined)?.method === "DELETE")
     ).toBe(true);
-    expect(mocks.setSessionToken).not.toHaveBeenCalledWith("stale.token");
   });
 
-  it("warns when the logout falls back to local-only despite having an access token", async () => {
-    const harness = renderStore();
-    const session: CurrentSession = {
-      role: "admin",
-      email: "session@example.com",
-      name: "Session User",
-    };
-    mocks.getSupabaseSession.mockReturnValue({
-      access_token: "supabase-access-token",
-      refresh_token: "supabase-refresh-token",
-    });
-    mocks.fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ ok: true, mode: "local-only", revoked: false }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      })
-    );
-
-    await act(async () => {
-      harness.store.setSession(session);
-    });
-
-    await act(async () => {
-      harness.store.logout();
-    });
-
-    await waitFor(() => expect(findDeleteSessionCall()).toBeTruthy());
-    expect(findDeleteSessionCall()).toEqual([
-      "/api/auth/session",
-      expect.objectContaining({
-        method: "DELETE",
-        body: JSON.stringify({ accessToken: undefined }),
-      }),
-    ]);
-    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("Sessão local encerrada."));
-    await waitFor(() =>
-      expect(mocks.toastError).toHaveBeenCalledWith(
-        "Não foi possível confirmar a revogação global da sessão."
-      )
-    );
-  });
+  // REC-204 Fase B: o logout não depende mais de um access token do browser
+  // (removido do localStorage). A revogação global é server-side (signOutSSR na
+  // rota DELETE), então o cenário "despite having an access token" deixou de
+  // existir — teste removido junto com o caminho HMAC/token.
 
   it("hydrates admin leads on bootstrap exclusively through the same-origin BFF (REC-206)", async () => {
-    // REC-206: com sessão HMAC ativa, o reload administrativo hidrata os leads
-    // pelo contrato same-origin admin-resources leads/list — sem o caminho
-    // duplicado de leitura via cliente Supabase direto.
+    // REC-204 Fase B / REC-206: com sessão admin SSR ativa, o reload
+    // administrativo hidrata os leads pelo contrato same-origin admin-resources
+    // leads/list — sem token HMAC e sem leitura via cliente Supabase direto.
     mocks.functionsConfigured = true;
     mocks.supabaseConfigured = true;
-    mocks.getSessionToken.mockReturnValue("admin.hmac.token");
     const leadRow = {
       id: "lead-hydrated",
       nome: "Lead Hidratado",
@@ -604,15 +546,19 @@ describe("AppStoreProvider and hooks", () => {
     );
 
     // bootstrapPublicData=false isola o caminho administrativo (a hidratação
-    // de leads via BFF não depende do bootstrap público).
-    const harness = renderStore(null, undefined, false);
+    // de leads via BFF não depende do bootstrap público). A capacidade admin
+    // agora deriva do papel da sessão SSR, não de um token no localStorage.
+    const harness = renderStore(
+      { role: "admin", email: "admin@example.com", name: "Admin" },
+      undefined,
+      false
+    );
 
     await waitFor(() =>
       expect(harness.store.leads.some((lead) => lead.id === "lead-hydrated")).toBe(true)
     );
     expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
       body: { resource: "leads", action: "list" },
-      sessionToken: "admin.hmac.token",
     });
   });
 
@@ -638,7 +584,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("creates admin students with the canonical id returned by admin-resources", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     mocks.invokeFunction.mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true, data: { id: "student-db-1" } }), {
         status: 200,
@@ -664,7 +609,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("rejects admin student success without a canonical id", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     mocks.invokeFunction.mockResolvedValueOnce(
       new Response(JSON.stringify({ ok: true, data: {} }), {
         status: 200,
@@ -686,7 +630,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("creates admin leads with the canonical identity returned by admin-resources", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
       role: "admin",
       email: "admin@example.com",
@@ -723,7 +666,6 @@ describe("AppStoreProvider and hooks", () => {
           status: "Novo",
         },
       },
-      sessionToken: "payload.signature",
     });
     expect(mocks.invokeFunction).toHaveBeenCalledTimes(1);
     expect(harness.store.leads[0]).toMatchObject({
@@ -738,7 +680,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("uses the canonical admin lead id in subsequent status and delete mutations", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
       role: "admin",
       email: "admin@example.com",
@@ -779,11 +720,9 @@ describe("AppStoreProvider and hooks", () => {
         id: "lead-db-follow-up",
         status: "Em atendimento",
       },
-      sessionToken: "payload.signature",
     });
     expect(mocks.invokeFunction).toHaveBeenNthCalledWith(3, "admin-resources", {
       body: { resource: "leads", action: "delete", id: "lead-db-follow-up" },
-      sessionToken: "payload.signature",
       keepalive: true,
     });
   });
@@ -803,7 +742,6 @@ describe("AppStoreProvider and hooks", () => {
     ],
   ])("rejects an invalid admin success envelope (%s) without mutating lead state", async (_case, body) => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
       role: "admin",
       email: "admin@example.com",
@@ -830,7 +768,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("rejects admin lead network failures without mutating state or emitting toast", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
       role: "admin",
       email: "admin@example.com",
@@ -853,7 +790,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("rejects non-2xx admin lead responses with the safe server message", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore({
       role: "admin",
       email: "admin@example.com",
@@ -883,7 +819,6 @@ describe("AppStoreProvider and hooks", () => {
     "rejects public lead sync failures with status %s without mutating state or emitting toast",
     async (status) => {
       mocks.functionsConfigured = true;
-      mocks.getSessionToken.mockReturnValue(null);
       const harness = renderStore();
       const initialLeadCount = harness.store.leads.length;
       const payload = buildLeadPayload(harness.store);
@@ -906,7 +841,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("uses a safe fallback when the public lead sync returns a non-JSON error", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue(null);
     const harness = renderStore();
     const initialLeadCount = harness.store.leads.length;
     const payload = buildLeadPayload(harness.store);
@@ -930,7 +864,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("rejects network failures without mutating state or emitting toast", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue(null);
     const harness = renderStore();
     const initialLeadCount = harness.store.leads.length;
     const payload = buildLeadPayload(harness.store);
@@ -949,7 +882,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("does not mutate leads while the public request is pending", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue(null);
     const harness = renderStore();
     const initialLeadCount = harness.store.leads.length;
     const payload = buildLeadPayload(harness.store);
@@ -999,7 +931,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("preserves the complete admin model without starting the public bootstrap", async () => {
     mocks.supabaseConfigured = true;
-    mocks.getSupabaseSession.mockReturnValue(null);
     mocks.fetchPublicCatalog.mockResolvedValue({
       courses: [],
       classes: [],
@@ -1120,7 +1051,6 @@ describe("AppStoreProvider and hooks", () => {
     await waitFor(() => expect(harness.store.classes).toHaveLength(initialClassCount));
 
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     mocks.invokeFunction.mockResolvedValue(
       new Response(JSON.stringify({ ok: true, data: null }), {
         status: 200,
@@ -1142,7 +1072,6 @@ describe("AppStoreProvider and hooks", () => {
         id: enrollmentId,
       },
       keepalive: true,
-      sessionToken: "payload.signature",
     });
     await waitFor(() => expect(harness.store.enrollments).toHaveLength(0));
     await waitFor(() =>
@@ -1156,7 +1085,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("deletes an admin-created enrollment in the same session using the server-issued id", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     const harness = renderStore(
       {
         role: "admin",
@@ -1203,7 +1131,6 @@ describe("AppStoreProvider and hooks", () => {
         id: "enrollment-db-1",
       },
       keepalive: true,
-      sessionToken: "payload.signature",
     });
     await waitFor(() => expect(harness.store.enrollments).toHaveLength(0));
   });
@@ -1246,7 +1173,6 @@ describe("AppStoreProvider and hooks", () => {
 
   it("preserves the full modalities array when creating and editing courses", async () => {
     mocks.functionsConfigured = true;
-    mocks.getSessionToken.mockReturnValue("payload.signature");
     mocks.invokeFunction.mockResolvedValue(
       new Response(JSON.stringify({ ok: true, data: null }), {
         status: 200,
@@ -1295,7 +1221,6 @@ describe("AppStoreProvider and hooks", () => {
           modalities: ["Gravado", "Ao vivo online"],
         }),
       },
-      sessionToken: "payload.signature",
     });
   });
 
@@ -1322,47 +1247,12 @@ describe("AppStoreProvider and hooks", () => {
     expect(Number(screen.getByTestId("modality-chart-count").textContent)).toBeGreaterThanOrEqual(0);
   });
 
-  it("hydrates from the optimistic session token when no server session is provided", async () => {
-    const decodedSession: CurrentSession = {
-      role: "admin",
-      email: "token@example.com",
-      name: "Token User",
-    };
-    mocks.getSessionToken.mockReturnValue("payload.signature");
-    mocks.decodeSessionToken.mockReturnValue(decodedSession);
-    mocks.fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ session: decodedSession, token: "payload.signature" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      })
-    );
-
-    const harness = renderStore();
-
-    await waitFor(() => expect(harness.store.currentSession).toEqual(decodedSession));
-    expect(screen.getByTestId("session-email")).toHaveTextContent(decodedSession.email);
-  });
-
-  it("preserves an existing admin-resources token during session sync", async () => {
-    const decodedSession: CurrentSession = {
-      role: "admin",
-      email: "token@example.com",
-      name: "Token User",
-    };
-    mocks.getSessionToken.mockReturnValue("edge-session-token");
-    mocks.decodeSessionToken.mockReturnValue(decodedSession);
-    mocks.fetchMock.mockResolvedValue(
-      new Response(JSON.stringify({ session: decodedSession, token: "cookie-hmac-token" }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      })
-    );
-
-    renderStore();
-
-    await waitFor(() => expect(screen.getByTestId("session-email")).toHaveTextContent(decodedSession.email));
-    expect(mocks.setSessionToken).not.toHaveBeenCalled();
-  });
+  // REC-204 Fase B: a hidratação otimista a partir de um token HMAC em
+  // localStorage foi removida (D2 — sem localStorage). A sessão admin passa a
+  // vir exclusivamente do `initialSession` server-side (cookie SSR) e da
+  // revalidação via GET /api/auth/session. Os dois testes de "optimistic token"
+  // e "preserve admin-resources token during sync" foram removidos com o
+  // caminho HMAC.
 
   it("clears the optimistic session when the server reports expiration", async () => {
     const session: CurrentSession = {
@@ -1374,7 +1264,6 @@ describe("AppStoreProvider and hooks", () => {
 
     const harness = renderStore(session);
 
-    await waitFor(() => expect(mocks.clearSessionToken).toHaveBeenCalled());
     await waitFor(() => expect(harness.store.currentSession).toBeNull());
     expect(screen.getByTestId("session-email")).toHaveTextContent("none");
   });

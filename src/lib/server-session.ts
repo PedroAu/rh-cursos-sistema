@@ -2,18 +2,18 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-import { decodeSession, SESSION_COOKIE } from "@/lib/auth";
-import { isSsrAuthRolloutAccount } from "@/lib/supabase/auth-rollout";
 import { createSupabaseSSRClient, readSSRSession } from "@/lib/supabase/session";
 
+/**
+ * Sessão administrativa server-side.
+ *
+ * REC-204 Fase B (cutover total): a autoridade é EXCLUSIVAMENTE a sessão
+ * Supabase SSR. O verificador HMAC legado (`decodeSession` do cookie
+ * `rh_cursos_demo_session`) e a allowlist de rollout foram removidos — não há
+ * mais fallback para HMAC.
+ */
 export async function getServerSession() {
   const cookieStore = await cookies();
-  const token = cookieStore.get(SESSION_COOKIE)?.value;
-  const legacySession = await decodeSession(token);
-
-  if (legacySession && !isSsrAuthRolloutAccount(legacySession.email)) {
-    return legacySession;
-  }
 
   const ssrClient = createSupabaseSSRClient({
     getAll: () => cookieStore.getAll().map(({ name, value }) => ({ name, value })),
@@ -24,7 +24,7 @@ export async function getServerSession() {
   if (!ssrClient) return null;
 
   const session = await readSSRSession(ssrClient);
-  if (session.status !== "active" || !session.role || !isSsrAuthRolloutAccount(session.email)) {
+  if (session.status !== "active" || !session.role) {
     return null;
   }
 

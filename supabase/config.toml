@@ -382,7 +382,8 @@ deno_version = 2
 
 # Edge Functions do modelo híbrido (frontend estático + backend no Supabase).
 # verify_jwt = false: a autenticação é feita dentro de cada function
-# (validação de origin, rate-limit e, no admin, token HMAC via x-rh-session).
+# (validação de origin, rate-limit e, no admin, sessão SSR confiável via
+# requireTrustedSsrAdmin).
 [functions.leads]
 verify_jwt = false
 

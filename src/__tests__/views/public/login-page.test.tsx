@@ -7,8 +7,6 @@ import { LoginPage } from "@/views/public/Login";
 const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
   setSession: vi.fn(),
-  setSessionToken: vi.fn(),
-  setSupabaseSession: vi.fn(),
   toastSuccess: vi.fn(),
   pathname: "/login/aluno" as string,
   searchParams: new URLSearchParams()
@@ -34,25 +32,18 @@ vi.mock("@/lib/app-store", () => ({
   useAppStore: () => ({ setSession: mocks.setSession })
 }));
 
-vi.mock("@/lib/supabase/session-token", () => ({
-  setSessionToken: (...args: unknown[]) => mocks.setSessionToken(...args),
-  setSupabaseSession: (...args: unknown[]) => mocks.setSupabaseSession(...args)
-}));
-
-vi.mock("@/lib/supabase/client", () => ({
-  supabase: null
-}));
-
 vi.mock("sonner", () => ({
   toast: { success: (...args: unknown[]) => mocks.toastSuccess(...args) }
 }));
 
 function mockLoginResponse(role: DashboardRole) {
+  // REC-204 Fase B: o login SSR não devolve token HMAC nem sessão Supabase.
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: async () => ({
       session: { role, email: "user@test.com", name: "User" },
-      token: "hmac-token",
+      authMode: "ssr",
+      token: null,
       supabaseSession: null
     })
   }) as unknown as typeof fetch;
@@ -72,7 +63,6 @@ describe("LoginPage — destino deriva do papel server-side (REC-305)", () => {
   beforeEach(() => {
     mocks.navigate.mockReset();
     mocks.setSession.mockReset();
-    mocks.setSessionToken.mockReset();
     mocks.toastSuccess.mockReset();
     mocks.pathname = "/login/aluno";
     mocks.searchParams = new URLSearchParams();
@@ -135,14 +125,6 @@ describe("LoginPage — destino deriva do papel server-side (REC-305)", () => {
 
     await waitFor(() => expect(mocks.navigate).toHaveBeenCalledWith("/aluno"));
     expect(mocks.navigate).not.toHaveBeenCalledWith("/admin/leads");
-  });
-
-  it("persiste o token HMAC devolvido pelo servidor no login", async () => {
-    mockLoginResponse("student");
-    render(<LoginPage />);
-    await submitCredentials();
-
-    await waitFor(() => expect(mocks.setSessionToken).toHaveBeenCalledWith("hmac-token"));
   });
 });
 

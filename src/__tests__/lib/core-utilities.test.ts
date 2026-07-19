@@ -1,17 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 /**
  * Core Utility Tests for src/lib/
  * Tests pure utility functions: slugify, currency, formatDate, delay, cn
  * Tests validation: email, CPF, phone schemas
- * Tests auth: session encoding/decoding, secret management
  */
 
 // Import utilities from lib
 import { cn, slugify, currency, formatDate, delay } from '@/lib/utils';
 import { validateInput } from '@/lib/validation';
 import { loginSchema, enrollmentSchema, userProfileSchema, courseFilterSchema } from '@/lib/validation';
-import { getSessionSecret, SESSION_COOKIE } from '@/lib/auth';
 
 describe('Core Utilities Coverage - Part 2', () => {
   describe('cn - CSS Class Merger', () => {
@@ -355,34 +353,6 @@ describe('Core Utilities Coverage - Part 2', () => {
       if (!result.success) {
         expect(Object.keys(result.errors).length).toBeGreaterThan(0);
       }
-    });
-  });
-
-  describe('Auth - Session Cookie Name', () => {
-    it('uses consistent cookie name', () => {
-      expect(SESSION_COOKIE).toBe('rh_cursos_demo_session');
-    });
-
-    it('cookie name follows naming convention', () => {
-      expect(SESSION_COOKIE).toMatch(/^[a-z_]+$/);
-    });
-  });
-
-  describe('Auth - Secret Management', () => {
-    let originalEnv: NodeJS.ProcessEnv;
-
-    beforeEach(() => {
-      originalEnv = { ...process.env };
-    });
-
-    afterEach(() => {
-      process.env = originalEnv;
-    });
-
-    it('loads secret from environment', () => {
-      process.env.AUTH_SESSION_SECRET = 'test-secret-with-more-than-32-chars-at-least';
-      const secret = getSessionSecret();
-      expect(secret).toBe('test-secret-with-more-than-32-chars-at-least');
     });
   });
 

@@ -1,11 +1,13 @@
 // Edge Function: admin-resources
 // Substitui app/api/admin/resources/route.ts no deploy estático.
-// Exige sessão admin válida (token HMAC via header x-rh-session) e executa
-// mutações com service-role (ignora RLS). Soft-delete via deleted_at.
+// REC-204 Fase B: a autoridade é EXCLUSIVAMENTE a sessão Supabase SSR
+// encaminhada pelo BFF same-origin (`requireTrustedSsrAdmin`). Token HMAC
+// legado (`x-rh-session`) não é mais aceito — requisição só com ele → 401.
+// Mutações executam com service-role (ignora RLS). Soft-delete via deleted_at.
 
 import { handleOptions, jsonResponse, isOriginAllowed } from "../_shared/cors.ts";
 import { adminClient } from "../_shared/supabase.ts";
-import { requireAdmin, requireTrustedSsrAdmin } from "../_shared/auth.ts";
+import { requireTrustedSsrAdmin } from "../_shared/auth.ts";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "../_shared/rate-limit.ts";
 import { isLockdownActive, LOCKDOWN_RESPONSE_BODY } from "../_shared/lockdown.ts";
 import { AdminResourceError, isAdminResourceError } from "../_shared/admin-resource-errors.ts";
@@ -450,7 +452,7 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Origin not allowed" }, 403, request);
   }
 
-  const session = requireTrustedSsrAdmin(request) ?? await requireAdmin(request);
+  const session = requireTrustedSsrAdmin(request);
   if (!session) {
     return jsonResponse({ ok: false, error: "Não autorizado." }, 401, request);
   }

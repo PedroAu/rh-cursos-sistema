@@ -28,18 +28,20 @@ export const isFunctionsConfigured = Boolean(getFunctionsBaseUrl() && anonKey);
 type InvokeOptions = {
   method?: "POST" | "DELETE" | "GET";
   body?: unknown;
-  /** Header opcional de sessão (cookie HMAC) repassado para functions de admin. */
-  sessionToken?: string;
   keepalive?: boolean;
 };
 
 /**
  * Invoca uma Edge Function pelo nome (ex.: "leads", "enrollments").
  * Retorna a Response crua para o caller decidir o tratamento.
+ *
+ * REC-204 Fase B: a identidade admin trafega EXCLUSIVAMENTE pela sessão
+ * Supabase SSR (cookie httpOnly same-origin, resolvido pelo BFF em
+ * `/api/functions/*`). O header HMAC `x-rh-session` foi removido.
  */
 export async function invokeFunction(
   name: string,
-  { method = "POST", body, sessionToken, keepalive = false }: InvokeOptions = {}
+  { method = "POST", body, keepalive = false }: InvokeOptions = {}
 ): Promise<Response> {
   const useProxy = typeof window !== "undefined";
   const base = useProxy ? "" : getFunctionsBaseUrl();
@@ -54,17 +56,14 @@ export async function invokeFunction(
     apikey: anonKey,
   };
 
-  if (sessionToken) {
-    headers["x-rh-session"] = sessionToken;
-  }
-
   if (useProxy) {
     headers["x-rh-client-ip"] = getStableClientIp();
   }
 
-  // Sem credentials:"include" — a sessão admin trafega via header x-rh-session
-  // (localStorage), não por cookies. Evita a fricção de CORS com credenciais
-  // (cookies __cf_bm do Cloudflare) que bloqueava a resposta no browser.
+  // No proxy same-origin (`/api/functions/*`), a sessão admin SSR (cookie
+  // httpOnly) é enviada automaticamente pelo browser (credentials same-origin
+  // por padrão) e resolvida no servidor. Na chamada direta cross-origin ao
+  // Supabase, nenhum cookie é enviado — evita a fricção de CORS com credenciais.
   const url = useProxy ? `/api/functions/${name}` : `${base}/${name}`;
 
   return fetch(url, {

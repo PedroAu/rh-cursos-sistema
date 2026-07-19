@@ -16,8 +16,6 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "@/lib/router-compat";
 import { useAppStore } from "@/lib/app-store";
 import { getDefaultDashboardPath, isRolePathAllowed } from "@/lib/session-routing";
-import { clearSessionToken, setSessionToken, setSupabaseSession } from "@/lib/supabase/session-token";
-import { supabase } from "@/lib/supabase/client";
 import type { DashboardRole } from "@/lib/auth";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,8 +105,6 @@ export function LoginPage() {
 
       const data = (await response.json().catch(() => null)) as {
         session?: { role: DashboardRole; email: string; name: string };
-        token?: string | null;
-        supabaseSession?: { access_token: string; refresh_token: string } | null;
         mfaRequired?: boolean;
       } | null;
 
@@ -124,17 +120,9 @@ export function LoginPage() {
 
       if (!data?.session) throw new Error("Resposta de login inválida.");
 
-      if (data.token) setSessionToken(data.token);
-      else clearSessionToken();
-
-      if (data.supabaseSession && supabase) {
-        setSupabaseSession(data.supabaseSession);
-        await supabase.auth.setSession({
-          access_token: data.supabaseSession.access_token,
-          refresh_token: data.supabaseSession.refresh_token
-        });
-      }
-
+      // REC-204 Fase B: a sessão admin é o cookie SSR httpOnly emitido pela
+      // rota de login; nenhum token HMAC nem sessão Supabase é persistido no
+      // browser (localStorage removido).
       setSession(data.session);
       const nextDestination = isRolePathAllowed(data.session.role, nextPath ?? undefined)
         ? nextPath ?? getDefaultDashboardPath(data.session.role)

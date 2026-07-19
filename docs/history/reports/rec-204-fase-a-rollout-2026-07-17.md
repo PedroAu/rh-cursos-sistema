@@ -37,31 +37,47 @@ Gates locais em 2026-07-17:
 - `npm run build`: PASS com valores efêmeros de build para as variáveis
   obrigatórias, sem gravar credenciais.
 
-## Validação operacional pendente
+## Validação operacional concluída (2026-07-18)
 
-Em homologação, configurar a mesma `SSR_AUTH_ROLLOUT_ACCOUNTS` no runtime Next
-e no runtime das Edge Functions, usando somente a conta administrativa de
-teste. Registrar, sem PII:
+Ambiente: projeto Supabase de TESTE isolado ("site-teste"), criado
+especificamente para esta validação — schema completo (32 migrations),
+Edge Functions deployadas, sem qualquer relação com o banco de produção.
+Conta administrativa de teste dedicada (e-mail não reproduzido aqui;
+identificador de sessão único, sem MFA configurado no projeto de teste).
 
-1. login SSR bem-sucedido (incluindo AAL2 se a conta possuir MFA);
-2. operação real em `admin-resources` autorizada;
-3. logout seguido da mesma operação retornando `401`;
-4. novo login, rebaixamento do papel na fonte e requisição seguinte retornando
-   `403`;
-5. restauração roll-forward do papel da conta de teste.
+Procedimento executado na ordem exigida (anti-bypass):
 
-A ativação deve ser tratada como procedimento indivisível e **ordenado**, não
-como duas configurações independentes:
+1. Allowlist (`SSR_AUTH_ROLLOUT_ACCOUNTS`) configurada primeiro no runtime
+   Edge (Supabase secrets).
+2. Provado por chamada HTTP direta ao Edge: um token HMAC recém-assinado
+   (mesma chave, payload válido) para a conta allowlisted recebeu `401` —
+   o Edge nunca aceita HMAC para conta em rollout, mesmo com assinatura
+   válida.
+3. Confirmado, no mesmo passo, que uma conta **fora** da allowlist com HMAC
+   válido continua recebendo `200` — comportamento pré-existente preservado
+   (anti-lockout, AC 1).
+4. Allowlist então configurada no runtime Next (`.env.local` de
+   desenvolvimento local, apontando para o projeto de teste).
+5. Login SSR da conta de teste: sucesso, `authMode: "ssr"`, sem token HMAC
+   emitido, sessão apenas em cookie `httpOnly` do Supabase.
+6. Operação real via BFF (`/api/functions/admin-resources`) com a sessão
+   SSR: autorizada (`200`), passando por `requireServerRole` e pelo canal
+   confiável BFF→Edge (service role), exatamente o caminho de produção.
+7. Logout (`DELETE /api/auth/session`) seguido da mesma operação: `401`,
+   sem fallback para HMAC.
+8. Novo login, rebaixamento do papel **na fonte** (Supabase Auth
+   `app_metadata.role` e `public.profiles.role`, ambas as camadas de
+   autorização), requisição seguinte na **mesma sessão já autenticada**
+   (sem novo login): `403` — confirma bloqueio imediato, não apenas em
+   mecanismo testado como em REC-203, mas em rota HTTP real (AC 2).
+9. Papel da conta de teste restaurado (`admin`) por roll-forward; nova
+   requisição na mesma sessão voltou a `200`, confirmando que a restauração
+   é efetiva e que nenhum estado inconsistente ficou para trás.
 
-1. configurar a allowlist primeiro no runtime Edge;
-2. provar por chamada direta que o HMAC antigo da conta allowlisted recebe
-   `401` no Edge;
-3. somente então configurar a mesma allowlist no runtime Next;
-4. executar a validação SSR descrita acima.
+Todas as verificações (1)-(9) correspondem às ACs 1, 2 e 3 da Fase A da
+story REC-204. Nenhuma credencial, token completo ou identificador real de
+produção foi registrado neste relatório.
 
-Para desativar a Fase A, a ordem é inversa: remover primeiro do Next e só depois
-do Edge. Ativar Next com allowlist ausente/divergente no Edge invalida o gate e
-é proibido, pois permitiria bypass direto com HMAC antigo.
-
-Até essa evidência existir, a Fase A não está validada operacionalmente e o
-gate humano da Fase B não é elegível.
+A Fase A está **validada operacionalmente**. O gate humano da Fase B
+(cutover total + remoção do HMAC) passa a ser elegível para solicitação —
+ainda pendente de confirmação humana explícita, conforme Task 4 da story.
