@@ -2,6 +2,7 @@
 
 import { readdirSync, readFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { parse } from "yaml";
 
@@ -41,14 +42,24 @@ function walkFiles(dir, predicate, collector = []) {
   return collector;
 }
 
-function normalizeRoutePath(filePath, rootDir, suffixToRemove) {
+/**
+ * Converte segmentos dinâmicos do Next.js (`[name]`) para a sintaxe de path
+ * parameter do OpenAPI (`{name}`), tornando `/api/functions/[name]` e
+ * `/api/functions/{name}` equivalentes na comparação (REC-406, AC4). Também
+ * cobre catch-all (`[...slug]` → `{slug}`) para evitar falso drift futuro.
+ */
+export function normalizeDynamicSegments(path) {
+  return path.replace(/\[\.{0,3}([^\]]+)\]/g, "{$1}");
+}
+
+export function normalizeRoutePath(filePath, rootDir, suffixToRemove) {
   const relativePath = relative(rootDir, filePath).replaceAll("\\", "/");
   const withoutSuffix = relativePath.replace(suffixToRemove, "");
   const withoutFile = withoutSuffix.replace(/\/route\.ts$/, "");
-  return `/${withoutFile}`;
+  return normalizeDynamicSegments(`/${withoutFile}`);
 }
 
-function detectMethods(content) {
+export function detectMethods(content) {
   const methods = new Set();
 
   for (const match of content.matchAll(exportedMethodPattern)) {
@@ -64,7 +75,7 @@ function detectMethods(content) {
   return [...methods].sort();
 }
 
-function listCodeEndpoints() {
+export function listCodeEndpoints() {
   const endpoints = new Map();
 
   for (const filePath of walkFiles(appApiRoot, (path) => path.endsWith("route.ts"))) {
@@ -86,72 +97,94 @@ function listCodeEndpoints() {
   return endpoints;
 }
 
-const spec = readYaml(specPath);
-const codeEndpoints = listCodeEndpoints();
-const specEndpoints = new Map();
+/**
+ * Extrai o inventário path→métodos declarado na spec OpenAPI, normalizando
+ * qualquer segmento dinâmico para a mesma forma canônica do código.
+ */
+export function buildSpecEndpoints(spec) {
+  const specEndpoints = new Map();
 
-for (const [path, operations] of Object.entries(spec.paths ?? {})) {
-  const methods = Object.keys(operations ?? {})
-    .filter((method) => allowedMethods.has(method))
-    .sort();
-  specEndpoints.set(path, methods);
+  for (const [path, operations] of Object.entries(spec?.paths ?? {})) {
+    const methods = Object.keys(operations ?? {})
+      .filter((method) => allowedMethods.has(method))
+      .sort();
+    specEndpoints.set(normalizeDynamicSegments(path), methods);
+  }
+
+  return specEndpoints;
 }
 
-const missingFromSpec = [];
-const extraInSpec = [];
-const methodMismatches = [];
+/**
+ * Compara os inventários de código e spec, retornando as três categorias de
+ * divergência: paths ausentes na spec, paths excedentes na spec e diferenças de
+ * método por rota.
+ */
+export function diffEndpoints(codeEndpoints, specEndpoints) {
+  const missingFromSpec = [];
+  const extraInSpec = [];
+  const methodMismatches = [];
 
-for (const [path, methods] of codeEndpoints) {
-  if (!specEndpoints.has(path)) {
-    missingFromSpec.push(`${path} (${methods.map((method) => method.toUpperCase()).join(", ")})`);
-    continue;
-  }
+  for (const [path, methods] of codeEndpoints) {
+    if (!specEndpoints.has(path)) {
+      missingFromSpec.push(`${path} (${methods.map((method) => method.toUpperCase()).join(", ")})`);
+      continue;
+    }
 
-  const specMethods = specEndpoints.get(path) ?? [];
-  const missingMethods = methods.filter((method) => !specMethods.includes(method));
-  const extraMethods = specMethods.filter((method) => !methods.includes(method));
+    const specMethods = specEndpoints.get(path) ?? [];
+    const missingMethods = methods.filter((method) => !specMethods.includes(method));
+    const extraMethods = specMethods.filter((method) => !methods.includes(method));
 
-  if (missingMethods.length || extraMethods.length) {
-    methodMismatches.push({
-      path,
-      missingMethods,
-      extraMethods,
-    });
-  }
-}
-
-for (const [path, methods] of specEndpoints) {
-  if (!codeEndpoints.has(path)) {
-    extraInSpec.push(`${path} (${methods.map((method) => method.toUpperCase()).join(", ")})`);
-  }
-}
-
-if (missingFromSpec.length || extraInSpec.length || methodMismatches.length) {
-  console.error("❌ OpenAPI drift detectado.");
-
-  if (missingFromSpec.length) {
-    console.error(`\nRotas presentes no código e ausentes na spec:\n- ${missingFromSpec.join("\n- ")}`);
-  }
-
-  if (extraInSpec.length) {
-    console.error(`\nRotas presentes na spec e ausentes no código:\n- ${extraInSpec.join("\n- ")}`);
-  }
-
-  if (methodMismatches.length) {
-    console.error("\nDiferenças de método por rota:");
-    for (const mismatch of methodMismatches) {
-      const parts = [];
-      if (mismatch.missingMethods.length) {
-        parts.push(`faltando no spec: ${mismatch.missingMethods.map((method) => method.toUpperCase()).join(", ")}`);
-      }
-      if (mismatch.extraMethods.length) {
-        parts.push(`excesso no spec: ${mismatch.extraMethods.map((method) => method.toUpperCase()).join(", ")}`);
-      }
-      console.error(`- ${mismatch.path} (${parts.join("; ")})`);
+    if (missingMethods.length || extraMethods.length) {
+      methodMismatches.push({ path, missingMethods, extraMethods });
     }
   }
 
-  process.exit(1);
+  for (const [path, methods] of specEndpoints) {
+    if (!codeEndpoints.has(path)) {
+      extraInSpec.push(`${path} (${methods.map((method) => method.toUpperCase()).join(", ")})`);
+    }
+  }
+
+  return { missingFromSpec, extraInSpec, methodMismatches };
 }
 
-console.log(`✅ OpenAPI drift gate passou: ${codeEndpoints.size} rotas reconciliadas.`);
+function main() {
+  const spec = readYaml(specPath);
+  const codeEndpoints = listCodeEndpoints();
+  const specEndpoints = buildSpecEndpoints(spec);
+  const { missingFromSpec, extraInSpec, methodMismatches } = diffEndpoints(codeEndpoints, specEndpoints);
+
+  if (missingFromSpec.length || extraInSpec.length || methodMismatches.length) {
+    console.error("❌ OpenAPI drift detectado.");
+
+    if (missingFromSpec.length) {
+      console.error(`\nRotas presentes no código e ausentes na spec:\n- ${missingFromSpec.join("\n- ")}`);
+    }
+
+    if (extraInSpec.length) {
+      console.error(`\nRotas presentes na spec e ausentes no código:\n- ${extraInSpec.join("\n- ")}`);
+    }
+
+    if (methodMismatches.length) {
+      console.error("\nDiferenças de método por rota:");
+      for (const mismatch of methodMismatches) {
+        const parts = [];
+        if (mismatch.missingMethods.length) {
+          parts.push(`faltando no spec: ${mismatch.missingMethods.map((method) => method.toUpperCase()).join(", ")}`);
+        }
+        if (mismatch.extraMethods.length) {
+          parts.push(`excesso no spec: ${mismatch.extraMethods.map((method) => method.toUpperCase()).join(", ")}`);
+        }
+        console.error(`- ${mismatch.path} (${parts.join("; ")})`);
+      }
+    }
+
+    process.exit(1);
+  }
+
+  console.log(`✅ OpenAPI drift gate passou: ${codeEndpoints.size} rotas reconciliadas.`);
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+  main();
+}

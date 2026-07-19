@@ -26,6 +26,10 @@ tags:
     description: Captação de leads corporativos
   - name: Admin Resources
     description: Mutações administrativas autenticadas
+  - name: Admin Read Models
+    description: Leituras paginadas same-origin do painel administrativo
+  - name: Functions Proxy
+    description: BFF same-origin que encaminha para as Edge Functions
 paths:
   /api/auth/session:
     get:
@@ -153,6 +157,375 @@ paths:
                     ok: true
                     mode: local-only
                     revoked: false
+  /api/auth/ssr-session:
+    get:
+      tags: [Auth Session]
+      summary: Lê a sessão SSR Supabase atual sem expor tokens
+      description: >-
+        Rota aditiva de REC-202 (ADR-016 D2/D3). Lê a sessão Supabase dos cookies
+        httpOnly gerenciados por `@supabase/ssr` e devolve apenas identidade e
+        nível de garantia (`aal`). Nenhum access/refresh token é retornado no
+        corpo.
+      operationId: readSsrSession
+      security:
+        - supabaseSsrCookies: []
+      responses:
+        '200':
+          description: Sessão SSR válida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SsrSessionResponse'
+              examples:
+                admin:
+                  value:
+                    ok: true
+                    session:
+                      role: admin
+                      email: admin@rhcursos.com.br
+                      name: Administrador
+                    aal: aal2
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
+    post:
+      tags: [Auth Session]
+      summary: Autentica e emite a sessão SSR Supabase (fail-closed em MFA)
+      description: >-
+        Valida credenciais e, para papéis administrativos, exige AAL2
+        (fail-closed): nenhuma sessão é emitida sem MFA. Em sucesso, a sessão
+        vive apenas nos cookies httpOnly; o corpo devolve identidade e `aal`,
+        nunca tokens do Supabase.
+      operationId: signInSsrSession
+      security: []
+      x-rate-limit:
+        key: auth-ssr:{ip}
+        windowSeconds: 900
+        maxRequests: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SsrLoginRequest'
+            examples:
+              password:
+                summary: Login por senha
+                value:
+                  email: admin@rhcursos.com.br
+                  password: securepass123
+                  role: admin
+              withMfa:
+                summary: Segundo passo com código MFA
+                value:
+                  email: admin@rhcursos.com.br
+                  password: securepass123
+                  role: admin
+                  mfaCode: '123456'
+      responses:
+        '200':
+          description: Sessão SSR emitida em cookies httpOnly
+          headers:
+            Set-Cookie:
+              description: Cookies httpOnly de sessão Supabase (`@supabase/ssr`)
+              schema:
+                type: string
+            x-rh-dashboard-path:
+              description: Caminho padrão do dashboard para o papel autenticado
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SsrSessionResponse'
+              examples:
+                authenticated:
+                  value:
+                    ok: true
+                    session:
+                      role: admin
+                      email: admin@rhcursos.com.br
+                      name: Administrador
+                    aal: aal2
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          description: Credenciais inválidas ou MFA obrigatório/inválido (fail-closed)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ErrorResponse'
+                  - $ref: '#/components/schemas/MfaChallengeResponse'
+              examples:
+                invalidCredentials:
+                  value:
+                    ok: false
+                    error: Credenciais invalidas.
+                mfaRequired:
+                  value:
+                    ok: false
+                    mfaRequired: true
+                    factorId: totp-factor-id
+                    error: Verificacao MFA obrigatoria.
+                mfaFailed:
+                  value:
+                    ok: false
+                    mfaRequired: true
+                    error: Codigo MFA invalido ou expirado.
+        '403':
+          $ref: '#/components/responses/AccessDenied'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
+    delete:
+      tags: [Auth Session]
+      summary: Encerra a sessão SSR Supabase
+      description: >-
+        Sempre responde sucesso para o cliente. Quando a sessão SSR está
+        configurada, revoga a sessão do Supabase e limpa os cookies httpOnly.
+      operationId: signOutSsrSession
+      security:
+        - supabaseSsrCookies: []
+      responses:
+        '200':
+          description: Logout idempotente concluído
+          headers:
+            Set-Cookie:
+              description: Limpeza dos cookies httpOnly de sessão
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+              examples:
+                ok:
+                  value:
+                    ok: true
+  /api/functions/{name}:
+    parameters:
+      - $ref: '#/components/parameters/FunctionName'
+    get:
+      tags: [Functions Proxy]
+      summary: Encaminha um GET same-origin para a Edge Function nomeada
+      description: >-
+        Proxy BFF same-origin (REC-206/REC-204 Fase B) que reencaminha para
+        `/functions/v1/{name}`. Para `admin-resources`, a identidade admin é
+        resolvida server-side pela sessão Supabase SSR (cookie httpOnly) antes do
+        encaminhamento; o header HMAC foi removido. A resposta é repassada
+        integralmente da Edge Function upstream.
+      operationId: proxyFunctionGet
+      security:
+        - supabaseSsrCookies: []
+      responses:
+        '200':
+          $ref: '#/components/responses/FunctionProxyPassthrough'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '403':
+          $ref: '#/components/responses/SsrAccessDenied'
+        '503':
+          $ref: '#/components/responses/FunctionProxyUnavailable'
+    post:
+      tags: [Functions Proxy]
+      summary: Encaminha um POST same-origin para a Edge Function nomeada
+      description: >-
+        Igual ao GET, porém repassa o corpo da requisição. Usado pelo app para
+        `admin-resources`, `enrollments` e `leads`.
+      operationId: proxyFunctionPost
+      security:
+        - supabaseSsrCookies: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/FunctionProxyPassthrough'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '403':
+          $ref: '#/components/responses/SsrAccessDenied'
+        '503':
+          $ref: '#/components/responses/FunctionProxyUnavailable'
+    delete:
+      tags: [Functions Proxy]
+      summary: Encaminha um DELETE same-origin para a Edge Function nomeada
+      operationId: proxyFunctionDelete
+      security:
+        - supabaseSsrCookies: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          $ref: '#/components/responses/FunctionProxyPassthrough'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '403':
+          $ref: '#/components/responses/SsrAccessDenied'
+        '503':
+          $ref: '#/components/responses/FunctionProxyUnavailable'
+  /api/admin/courses:
+    get:
+      tags: [Admin Read Models]
+      summary: Lista paginada de cursos para o painel administrativo
+      description: >-
+        Read model same-origin (REC-304) autorizado server-side por
+        `requireAdminApi` (sessão SSR + `requireServerRole('admin')`). Busca
+        textual pelo título do curso.
+      operationId: listAdminCourses
+      security:
+        - supabaseSsrCookies: []
+      parameters:
+        - $ref: '#/components/parameters/AdminPage'
+        - $ref: '#/components/parameters/AdminPageSize'
+        - $ref: '#/components/parameters/AdminSearch'
+      responses:
+        '200':
+          description: Página de cursos autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminCourseListResponse'
+        '401':
+          $ref: '#/components/responses/AdminSessionInvalid'
+        '403':
+          $ref: '#/components/responses/AdminAccessDenied'
+        '500':
+          $ref: '#/components/responses/AdminListError'
+        '503':
+          $ref: '#/components/responses/AdminUnavailable'
+  /api/admin/classes:
+    get:
+      tags: [Admin Read Models]
+      summary: Lista paginada de turmas para o painel administrativo
+      description: >-
+        Read model same-origin (REC-304) autorizado por `requireAdminApi`. Busca
+        textual pelo título do curso da turma.
+      operationId: listAdminClasses
+      security:
+        - supabaseSsrCookies: []
+      parameters:
+        - $ref: '#/components/parameters/AdminPage'
+        - $ref: '#/components/parameters/AdminPageSize'
+        - $ref: '#/components/parameters/AdminSearch'
+      responses:
+        '200':
+          description: Página de turmas autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminClassListResponse'
+        '401':
+          $ref: '#/components/responses/AdminSessionInvalid'
+        '403':
+          $ref: '#/components/responses/AdminAccessDenied'
+        '500':
+          $ref: '#/components/responses/AdminListError'
+        '503':
+          $ref: '#/components/responses/AdminUnavailable'
+  /api/admin/instructors:
+    get:
+      tags: [Admin Read Models]
+      summary: Lista paginada de instrutores para o painel administrativo
+      description: >-
+        Read model same-origin (REC-304) autorizado por `requireAdminApi`. Busca
+        textual pelo nome do instrutor.
+      operationId: listAdminInstructors
+      security:
+        - supabaseSsrCookies: []
+      parameters:
+        - $ref: '#/components/parameters/AdminPage'
+        - $ref: '#/components/parameters/AdminPageSize'
+        - $ref: '#/components/parameters/AdminSearch'
+      responses:
+        '200':
+          description: Página de instrutores autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminInstructorListResponse'
+        '401':
+          $ref: '#/components/responses/AdminSessionInvalid'
+        '403':
+          $ref: '#/components/responses/AdminAccessDenied'
+        '500':
+          $ref: '#/components/responses/AdminListError'
+        '503':
+          $ref: '#/components/responses/AdminUnavailable'
+  /api/admin/students:
+    get:
+      tags: [Admin Read Models]
+      summary: Lista paginada de alunos para o painel administrativo
+      description: >-
+        Read model same-origin (REC-303) autorizado por `requireAdminApi`.
+        Filtra por turma, status e busca por nome/email.
+      operationId: listAdminStudents
+      security:
+        - supabaseSsrCookies: []
+      parameters:
+        - $ref: '#/components/parameters/AdminPage'
+        - $ref: '#/components/parameters/AdminPageSize'
+        - $ref: '#/components/parameters/AdminSearch'
+        - $ref: '#/components/parameters/AdminClassId'
+        - $ref: '#/components/parameters/AdminStatus'
+      responses:
+        '200':
+          description: Página de alunos autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminStudentListResponse'
+        '401':
+          $ref: '#/components/responses/AdminSessionInvalid'
+        '403':
+          $ref: '#/components/responses/AdminAccessDenied'
+        '500':
+          $ref: '#/components/responses/AdminListError'
+        '503':
+          $ref: '#/components/responses/AdminUnavailable'
+  /api/admin/enrollments:
+    get:
+      tags: [Admin Read Models]
+      summary: Lista paginada de inscrições para o painel administrativo
+      description: >-
+        Read model same-origin (REC-303) autorizado por `requireAdminApi`.
+        Filtra por turma, status e busca por nome/email.
+      operationId: listAdminEnrollments
+      security:
+        - supabaseSsrCookies: []
+      parameters:
+        - $ref: '#/components/parameters/AdminPage'
+        - $ref: '#/components/parameters/AdminPageSize'
+        - $ref: '#/components/parameters/AdminSearch'
+        - $ref: '#/components/parameters/AdminClassId'
+        - $ref: '#/components/parameters/AdminStatus'
+      responses:
+        '200':
+          description: Página de inscrições autorizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminEnrollmentListResponse'
+        '401':
+          $ref: '#/components/responses/AdminSessionInvalid'
+        '403':
+          $ref: '#/components/responses/AdminAccessDenied'
+        '500':
+          $ref: '#/components/responses/AdminListError'
+        '503':
+          $ref: '#/components/responses/AdminUnavailable'
   /api/enrollments:
     post:
       tags: [Enrollments]
@@ -479,6 +852,63 @@ components:
       in: header
       name: x-rh-session
       description: Token HMAC retornado por `/functions/v1/auth-session`
+    supabaseSsrCookies:
+      type: apiKey
+      in: cookie
+      name: sb-access-token
+      description: >-
+        Cookies httpOnly de sessão Supabase gerenciados por `@supabase/ssr`,
+        enviados automaticamente same-origin. Nenhum token é lido do corpo.
+  parameters:
+    FunctionName:
+      name: name
+      in: path
+      required: true
+      description: Nome da Edge Function alvo do proxy same-origin.
+      schema:
+        type: string
+        enum: [admin-resources, auth-session, enrollments, leads]
+    AdminPage:
+      name: page
+      in: query
+      required: false
+      description: Página (1-based). Valores inválidos caem para `1`.
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    AdminPageSize:
+      name: pageSize
+      in: query
+      required: false
+      description: Tamanho da página. Limitado a 100; padrão 20.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    AdminSearch:
+      name: search
+      in: query
+      required: false
+      description: Termo de busca textual sanitizado (máx. 120 caracteres).
+      schema:
+        type: string
+        maxLength: 120
+    AdminClassId:
+      name: classId
+      in: query
+      required: false
+      description: Filtra pela turma (`turma_id`).
+      schema:
+        type: string
+    AdminStatus:
+      name: status
+      in: query
+      required: false
+      description: Filtra por status de inscrição. Valores desconhecidos são ignorados.
+      schema:
+        $ref: '#/components/schemas/EnrollmentStatus'
   responses:
     SessionInvalid:
       description: Sessão ausente, inválida ou expirada
@@ -602,6 +1032,114 @@ components:
               value:
                 ok: false
                 error: Auth indisponivel.
+    SsrSessionInvalid:
+      description: Sessão SSR ausente, inválida ou expirada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid:
+              value:
+                ok: false
+                error: Sessao invalida ou expirada.
+    SsrAccessDenied:
+      description: Sessão SSR válida, porém sem papel administrativo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            denied:
+              value:
+                ok: false
+                error: Acesso não autorizado.
+    SsrAuthUnavailable:
+      description: Sessão SSR do Supabase não configurada no ambiente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            unavailable:
+              value:
+                ok: false
+                error: Auth indisponivel.
+    AdminSessionInvalid:
+      description: Sessão SSR administrativa ausente, inválida ou expirada
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalid:
+              value:
+                ok: false
+                error: Sessão inválida ou expirada.
+    AdminAccessDenied:
+      description: Usuário autenticado sem papel administrativo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            denied:
+              value:
+                ok: false
+                error: Acesso não autorizado.
+    AdminListError:
+      description: Erro interno ao consultar o read model administrativo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            listError:
+              value:
+                ok: false
+                error: Erro ao listar cursos.
+    AdminUnavailable:
+      description: Recurso indisponível (configuração ausente ou lockdown operacional)
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ErrorResponse'
+              - $ref: '#/components/schemas/LockdownResponse'
+          examples:
+            unavailable:
+              value:
+                ok: false
+                error: Recurso indisponível.
+            lockdown:
+              value:
+                ok: false
+                error: service_unavailable
+                reason: lockdown
+    FunctionProxyPassthrough:
+      description: >-
+        Resposta repassada integralmente pela Edge Function upstream. O status e
+        o corpo dependem do contrato da função nomeada (ver `/functions/v1/*`).
+      content:
+        application/json:
+          schema:
+            type: object
+            additionalProperties: true
+    FunctionProxyUnavailable:
+      description: Sessão SSR indisponível ou Supabase Functions não configurado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            ssrUnavailable:
+              value:
+                ok: false
+                error: Auth SSR indisponível.
+            functionsUnconfigured:
+              value:
+                ok: false
+                error: Supabase Functions não configurado.
   schemas:
     DashboardRole:
       type: string
@@ -902,3 +1440,276 @@ components:
           type: object
           additionalProperties: true
       required: [ok, skipped]
+    LockdownResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: false
+        error:
+          type: string
+          const: service_unavailable
+        reason:
+          type: string
+          const: lockdown
+      required: [ok, error, reason]
+    SsrLoginRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        role:
+          $ref: '#/components/schemas/DashboardRole'
+        mfaCode:
+          type: string
+          description: Código TOTP para o segundo passo (AAL2).
+      required: [email, password]
+    SsrSessionResponse:
+      type: object
+      additionalProperties: false
+      description: >-
+        Identidade da sessão SSR sem tokens. Os tokens Supabase permanecem
+        exclusivamente nos cookies httpOnly.
+      properties:
+        ok:
+          type: boolean
+          const: true
+        session:
+          $ref: '#/components/schemas/SessionPayload'
+        aal:
+          type: string
+          description: 'Nível de garantia de autenticação (ex.: `aal1`, `aal2`).'
+      required: [ok, session]
+    MfaChallengeResponse:
+      type: object
+      additionalProperties: false
+      description: Desafio MFA fail-closed; nenhuma sessão é emitida.
+      properties:
+        ok:
+          type: boolean
+          const: false
+        mfaRequired:
+          type: boolean
+          const: true
+        factorId:
+          type: string
+        error:
+          type: string
+      required: [ok, mfaRequired, error]
+    EnrollmentStatus:
+      type: string
+      enum: [Pendente, Aguardando pagamento, Confirmada, Cancelada, Concluída]
+    AdminListMeta:
+      type: object
+      additionalProperties: false
+      description: Metadados de paginação compartilhados pelos read models.
+      properties:
+        page:
+          type: integer
+          minimum: 1
+        pageSize:
+          type: integer
+          minimum: 1
+        total:
+          type: integer
+          minimum: 0
+      required: [page, pageSize, total]
+    AdminCourse:
+      type: object
+      description: Projeção de curso (`mapCourse`) consumida pelo painel admin.
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        pathId: { type: string }
+        pathName: { type: string }
+        category: { type: string }
+        categories:
+          type: array
+          items: { type: string }
+        modality: { type: string }
+        modalities:
+          type: array
+          items: { type: string }
+        durationLabel: { type: string }
+        durationHours: { type: number }
+        level: { type: string }
+        price: { type: number }
+        shortDescription: { type: string }
+        fullDescription: { type: string }
+        targetAudience:
+          type: array
+          items: { type: string }
+        objectives:
+          type: array
+          items: { type: string }
+        benefits:
+          type: array
+          items: { type: string }
+        instructorId: { type: string }
+        image: { type: string }
+        rating: { type: number }
+        studentsCount: { type: integer }
+        status: { type: string }
+        featured: { type: boolean }
+        nextClassId: { type: string }
+      required: [id, slug, title, status]
+    AdminTrainingClass:
+      type: object
+      description: Projeção de turma (`mapClass`).
+      properties:
+        id: { type: string }
+        courseId: { type: string }
+        startDate: { type: string }
+        endDate: { type: string }
+        time: { type: string }
+        modality: { type: string }
+        location: { type: string }
+        instructorId: { type: string }
+        totalSeats: { type: integer }
+        filledSeats: { type: integer }
+        availableSeats: { type: integer }
+        status: { type: string }
+        price: { type: number }
+        notes: { type: string }
+      required: [id, courseId, status]
+    AdminInstructor:
+      type: object
+      description: Projeção de instrutor (`mapInstructor`).
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        specialty: { type: string }
+        bio: { type: string }
+        education: { type: string }
+        photoUrl: { type: string }
+        courseIds:
+          type: array
+          items: { type: string }
+        rating: { type: number }
+        avatar: { type: string }
+        status:
+          type: string
+          enum: [Ativo, Inativo]
+      required: [id, name, status]
+    AdminStudent:
+      type: object
+      description: Projeção de aluno (`mapDbStudent`).
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        cpf: { type: string }
+        organization: { type: string }
+        jobTitle: { type: string }
+        courseId: { type: string }
+        classId: { type: string }
+        enrollmentStatus:
+          $ref: '#/components/schemas/EnrollmentStatus'
+        certificateIssued: { type: boolean }
+        enrolledAt: { type: string }
+        paymentMethod:
+          oneOf:
+            - type: string
+              enum: [Pix, Cartão, Boleto, Empenho]
+            - type: 'null'
+      required: [id, name, email, enrollmentStatus]
+    AdminEnrollment:
+      type: object
+      description: Projeção de inscrição (`mapDbEnrollment`).
+      properties:
+        id: { type: string }
+        studentName: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        cpf: { type: string }
+        organization: { type: string }
+        jobTitle: { type: string }
+        enrollmentType:
+          type: string
+          enum: [Pessoa física, Empresa, Órgão público]
+        paymentMethod:
+          oneOf:
+            - type: string
+              enum: [Pix, Cartão, Boleto, Empenho]
+            - type: 'null'
+        courseId: { type: string }
+        classId: { type: string }
+        status:
+          $ref: '#/components/schemas/EnrollmentStatus'
+        createdAt: { type: string }
+        notes: { type: string }
+      required: [id, studentName, email, status]
+    AdminCourseListResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminListMeta'
+        - type: object
+          properties:
+            ok:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminCourse'
+          required: [ok, data]
+    AdminClassListResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminListMeta'
+        - type: object
+          properties:
+            ok:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminTrainingClass'
+          required: [ok, data]
+    AdminInstructorListResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminListMeta'
+        - type: object
+          properties:
+            ok:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminInstructor'
+          required: [ok, data]
+    AdminStudentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminListMeta'
+        - type: object
+          properties:
+            ok:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminStudent'
+          required: [ok, data]
+    AdminEnrollmentListResponse:
+      allOf:
+        - $ref: '#/components/schemas/AdminListMeta'
+        - type: object
+          properties:
+            ok:
+              type: boolean
+              const: true
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/AdminEnrollment'
+          required: [ok, data]
