@@ -1,11 +1,7 @@
 import { cookies } from "next/headers";
 
-import { decodeSession } from "@/lib/auth";
+import { applyNoStore } from "@/lib/security-headers";
 import { requireServerRole } from "@/lib/supabase/authorize";
-import {
-  getSsrAuthRolloutAccounts,
-  isSsrAuthRolloutAccount,
-} from "@/lib/supabase/auth-rollout";
 import {
   createSupabaseSSRClient,
   isSupabaseSsrConfigured,
@@ -24,8 +20,7 @@ type RouteContext = {
   params: Promise<{ name: string }>;
 };
 
-type RolloutAuthorization =
-  | { mode: "legacy" }
+type AdminResourcesAuthorization =
   | { mode: "ssr"; userId: string; email: string }
   | { mode: "denied"; status: 401 | 403 | 503; error: string };
 
@@ -41,52 +36,43 @@ async function getCookieAdapter(): Promise<SsrCookieAdapter> {
   };
 }
 
-async function authorizeAdminResourcesRollout(request: Request): Promise<RolloutAuthorization> {
-  const rolloutAccounts = getSsrAuthRolloutAccounts();
-  if (rolloutAccounts.size === 0) return { mode: "legacy" };
-
-  const legacySession = await decodeSession(request.headers.get("x-rh-session") ?? undefined);
-
+/**
+ * REC-204 Fase B (cutover total): `admin-resources` é autorizado
+ * EXCLUSIVAMENTE pela sessão Supabase SSR (`requireServerRole`). A allowlist
+ * de rollout e o fallback HMAC (`x-rh-session`) foram removidos — sem sessão
+ * SSR admin válida, a requisição é negada (401/403), nunca cai para HMAC.
+ */
+async function authorizeAdminResources(): Promise<AdminResourcesAuthorization> {
   if (!isSupabaseSsrConfigured) {
-    return isSsrAuthRolloutAccount(legacySession?.email, rolloutAccounts)
-      ? { mode: "denied", status: 503, error: "Auth SSR indisponível." }
-      : { mode: "legacy" };
+    return { mode: "denied", status: 503, error: "Auth SSR indisponível." };
   }
 
   const ssrClient = createSupabaseSSRClient(await getCookieAdapter());
   if (!ssrClient) {
-    return isSsrAuthRolloutAccount(legacySession?.email, rolloutAccounts)
-      ? { mode: "denied", status: 503, error: "Auth SSR indisponível." }
-      : { mode: "legacy" };
+    return { mode: "denied", status: 503, error: "Auth SSR indisponível." };
   }
 
   const userResult = await ssrClient.auth.getUser();
   const ssrUserId = userResult.data.user?.id ?? null;
   const ssrEmail = userResult.data.user?.email ?? null;
-  if (isSsrAuthRolloutAccount(ssrEmail, rolloutAccounts)) {
-    const authorization = await requireServerRole(ssrClient, "admin");
-    if (!authorization.authorized) {
-      return {
-        mode: "denied",
-        status: authorization.reason === "unauthenticated" ? 401 : 403,
-        error:
-          authorization.reason === "unauthenticated"
-            ? "Sessão inválida ou expirada."
-            : "Acesso não autorizado.",
-      };
-    }
-    if (!ssrUserId) {
-      return { mode: "denied", status: 401, error: "Sessão inválida ou expirada." };
-    }
-    return { mode: "ssr", userId: ssrUserId, email: ssrEmail! };
+
+  const authorization = await requireServerRole(ssrClient, "admin");
+  if (!authorization.authorized) {
+    return {
+      mode: "denied",
+      status: authorization.reason === "unauthenticated" ? 401 : 403,
+      error:
+        authorization.reason === "unauthenticated"
+          ? "Sessão inválida ou expirada."
+          : "Acesso não autorizado.",
+    };
   }
 
-  // Uma conta em rollout nunca pode cair silenciosamente para o HMAC.
-  if (isSsrAuthRolloutAccount(legacySession?.email, rolloutAccounts)) {
-    return { mode: "denied", status: 401, error: "Sessão SSR obrigatória." };
+  if (!ssrUserId || !ssrEmail) {
+    return { mode: "denied", status: 401, error: "Sessão inválida ou expirada." };
   }
 
-  return { mode: "legacy" };
+  return { mode: "ssr", userId: ssrUserId, email: ssrEmail };
 }
 
 function getServerFunctionsBaseUrl(): string | null {
@@ -112,20 +98,20 @@ async function proxyRequest(request: Request, context: RouteContext) {
 
   const upstreamUrl = new URL(`${baseUrl.replace(/\/$/, "")}/${name}`);
   const body = request.method === "GET" ? undefined : await request.text();
-  const rolloutAuthorization =
-    name === "admin-resources"
-      ? await authorizeAdminResourcesRollout(request)
-      : ({ mode: "legacy" } as const);
 
-  if (rolloutAuthorization.mode === "denied") {
+  const adminAuthorization =
+    name === "admin-resources" ? await authorizeAdminResources() : null;
+
+  if (adminAuthorization?.mode === "denied") {
     return new Response(
-      JSON.stringify({ ok: false, error: rolloutAuthorization.error }),
+      JSON.stringify({ ok: false, error: adminAuthorization.error }),
       {
-        status: rolloutAuthorization.status,
+        status: adminAuthorization.status,
         headers: { "Content-Type": "application/json" },
       }
     );
   }
+
   const clientIp =
     request.headers.get("x-rh-client-ip") ??
     request.headers.get("x-forwarded-for") ??
@@ -135,7 +121,7 @@ async function proxyRequest(request: Request, context: RouteContext) {
   const headers = new Headers();
   const contentType = request.headers.get("content-type");
   if (contentType) headers.set("content-type", contentType);
-  if (rolloutAuthorization.mode === "ssr") {
+  if (adminAuthorization?.mode === "ssr") {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!serviceRoleKey) {
       return new Response(JSON.stringify({ ok: false, error: "Auth SSR indisponível." }), {
@@ -145,15 +131,13 @@ async function proxyRequest(request: Request, context: RouteContext) {
     }
     headers.set("authorization", `Bearer ${serviceRoleKey}`);
     headers.set("apikey", serviceRoleKey);
-    headers.set("x-rh-ssr-admin-id", rolloutAuthorization.userId);
-    headers.set("x-rh-ssr-admin-email", rolloutAuthorization.email);
+    headers.set("x-rh-ssr-admin-id", adminAuthorization.userId);
+    headers.set("x-rh-ssr-admin-email", adminAuthorization.email);
   } else {
     const authorization = request.headers.get("authorization");
     if (authorization) headers.set("authorization", authorization);
     const apikey = request.headers.get("apikey");
     if (apikey) headers.set("apikey", apikey);
-    const sessionToken = request.headers.get("x-rh-session");
-    if (sessionToken) headers.set("x-rh-session", sessionToken);
   }
   const origin = request.headers.get("origin") ?? new URL(request.url).origin;
   if (origin) headers.set("origin", origin);
@@ -179,14 +163,18 @@ async function proxyRequest(request: Request, context: RouteContext) {
   });
 }
 
+// REC-408: toda resposta do BFF autenticado é `no-store` (AC4), inclusive
+// 401/403/503 e a resposta do upstream — headers de cache do upstream não são
+// propagados (FORWARDED_HEADERS não inclui cache-control) e o contrato no-store
+// é fixado aqui, no ponto único de saída, sem alterar a autorização (AC7).
 export async function GET(request: Request, context: RouteContext) {
-  return proxyRequest(request, context);
+  return applyNoStore(await proxyRequest(request, context));
 }
 
 export async function POST(request: Request, context: RouteContext) {
-  return proxyRequest(request, context);
+  return applyNoStore(await proxyRequest(request, context));
 }
 
 export async function DELETE(request: Request, context: RouteContext) {
-  return proxyRequest(request, context);
+  return applyNoStore(await proxyRequest(request, context));
 }

@@ -133,7 +133,31 @@ describe("wrapSupabaseWithQueryLogging", () => {
       method: "select",
       table: "curso",
       status: "error",
-      errorMessage: "timeout"
+      // REC-408 (AC6): categoria sanitizada, não a mensagem bruta.
+      errorCategory: "timeout"
     });
+  });
+
+  it("nunca expõe a mensagem bruta do erro nem PII nas métricas (REC-408 AC6)", async () => {
+    const client = createFakeSupabaseClient(async () => {
+      throw new Error(
+        "duplicate key value: email=aluno.sintetico@example.test phone=+5511999998888 token=eyJhbGciOi.J.k"
+      );
+    });
+
+    wrapSupabaseWithQueryLogging(client as any, { logAllQueries: false, enableConsoleLogging: false });
+
+    await expect(client.from("aluno").insert({ nome: "Sintetico" })).rejects.toThrow();
+
+    const metrics = getQueryMetrics();
+    expect(metrics).toHaveLength(1);
+    const serialized = JSON.stringify(metrics[0]);
+    expect(serialized).not.toContain("aluno.sintetico@example.test");
+    expect(serialized).not.toContain("+5511999998888");
+    expect(serialized).not.toContain("eyJhbGciOi");
+    expect(serialized).not.toContain("duplicate key value");
+    // Apenas o rótulo seguro de categoria permanece.
+    expect(metrics[0].errorCategory).toBe("error");
+    expect(metrics[0]).toMatchObject({ method: "insert", table: "aluno", status: "error" });
   });
 });

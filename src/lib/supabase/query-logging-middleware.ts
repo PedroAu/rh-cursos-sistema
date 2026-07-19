@@ -18,8 +18,56 @@ interface QueryMetrics {
   duration: number;
   isSlow: boolean;
   status: "success" | "error";
-  errorMessage?: string;
+  /**
+   * REC-408: categoria sanitizada do erro (ex.: "timeout", "network",
+   * "server_error"). Nunca contém a mensagem bruta, payload, token, e-mail ou
+   * telefone — apenas um rótulo derivado do status/código/formato do erro (AC6).
+   */
+  errorCategory?: string;
   timestamp: string;
+}
+
+/**
+ * Deriva uma categoria segura a partir de um erro de query, sem emitir nenhum
+ * conteúdo textual bruto (mensagem, payload, parâmetros). Baseia-se apenas em
+ * status HTTP, SQLSTATE do PostgREST e padrões estruturais da mensagem — o
+ * texto original nunca sai (AC6).
+ */
+function classifyQueryError(error: unknown): string {
+  if (error === null || error === undefined) return "unknown";
+
+  if (typeof error === "object") {
+    const candidate =
+      (error as { status?: unknown }).status ?? (error as { statusCode?: unknown }).statusCode;
+    if (typeof candidate === "number") {
+      if (candidate === 401) return "unauthorized";
+      if (candidate === 403) return "forbidden";
+      if (candidate === 404) return "not_found";
+      if (candidate === 409) return "conflict";
+      if (candidate === 422) return "unprocessable";
+      if (candidate === 429) return "rate_limited";
+      if (candidate >= 500) return "server_error";
+      if (candidate >= 400) return "bad_request";
+    }
+
+    if ("code" in error) {
+      const code = String((error as { code?: unknown }).code ?? "");
+      if (/^08/.test(code)) return "connection";
+      if (/^23/.test(code)) return "integrity";
+      if (/^40/.test(code)) return "transaction";
+      if (/^53/.test(code)) return "resource_exhausted";
+      if (/^57/.test(code)) return "operator_intervention";
+      if (code) return "database_error";
+    }
+  }
+
+  const message = error instanceof Error ? error.message : typeof error === "string" ? error : "";
+  if (/timeout|ETIMEDOUT/i.test(message)) return "timeout";
+  if (/fetch failed|network|ECONNRESET|ECONNREFUSED|EAI_AGAIN|socket hang up/i.test(message)) {
+    return "network";
+  }
+
+  return "error";
 }
 
 /**
@@ -49,7 +97,7 @@ export function wrapSupabaseWithQueryLogging(
   function reportQuery(method: string, table: string, duration: number, error?: unknown) {
     const isSlow = duration > slowQueryThreshold;
     const status = error ? "error" : "success";
-    const errorMessage = error instanceof Error ? error.message : typeof error === "string" ? error : undefined;
+    const errorCategory = error ? classifyQueryError(error) : undefined;
 
     if (!error && !logAllQueries && !isSlow) return;
     if (Math.random() > samplingRate) return;
@@ -60,16 +108,16 @@ export function wrapSupabaseWithQueryLogging(
       duration,
       isSlow,
       status,
-      errorMessage,
+      errorCategory,
       timestamp: new Date().toISOString()
     });
 
     if (enableConsoleLogging) {
-      logQueryToConsole(method, table, duration, isSlow, status, errorMessage);
+      logQueryToConsole(method, table, duration, isSlow, status, errorCategory);
     }
 
     if (enableSentryLogging && error) {
-      captureFailedQuery(method, table, duration, errorMessage);
+      captureFailedQuery(method, table, duration, errorCategory);
       return;
     }
 
@@ -163,7 +211,7 @@ function captureFailedQuery(
   method: string,
   table: string,
   duration: number,
-  errorMessage?: string
+  errorCategory?: string
 ): void {
   if (!process.env.NEXT_PUBLIC_SENTRY_DSN) return;
 
@@ -175,7 +223,8 @@ function captureFailedQuery(
       method,
       table,
       duration: `${duration.toFixed(2)}ms`,
-      error: errorMessage ?? "unknown"
+      // Apenas a categoria sanitizada — nunca a mensagem bruta do erro (AC6).
+      errorCategory: errorCategory ?? "unknown"
     }
   });
 
@@ -194,12 +243,13 @@ function logQueryToConsole(
   duration: number,
   isSlow: boolean,
   status: "success" | "error",
-  errorMessage?: string
+  errorCategory?: string
 ): void {
   const durationStr = `${duration.toFixed(2)}ms`;
   const icon = status === "error" ? "❌" : isSlow ? "🐌" : "⚡";
   const color = status === "error" ? "color: red" : isSlow ? "color: orange" : "color: green";
-  const suffix = status === "error" && errorMessage ? ` (${errorMessage})` : "";
+  // Somente a categoria sanitizada é exibida — nunca a mensagem bruta (AC6).
+  const suffix = status === "error" && errorCategory ? ` (${errorCategory})` : "";
 
   console.log(
     `%c${icon} [QUERY] ${method.toUpperCase()} "${table}" - ${durationStr}${suffix}`,

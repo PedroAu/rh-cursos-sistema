@@ -2,18 +2,18 @@ status:
   branch: main
   modifiedFiles:
     - .aiox/project-status.yaml
+    - .env.example
+    - README.md
     - app/api/auth/session/route.ts
-    - '"docs/design-system/Agenda export.dc.html"'
-    - '"docs/design-system/RH Cursos Agenda.dc.html"'
-    - '"docs/design-system/RH Cursos Agenda.html"'
-  modifiedFilesTotalCount: 51
+    - app/api/functions/[name]/route.ts
+  modifiedFilesTotalCount: 21
   recentCommits:
-    - 'fix: reject unpersisted lead success [REC-302]'
-    - 'fix: isolate visual baseline SSR [REC-403]'
+    - 'docs: close REC-308 accessibility gate [Epic 17]'
+    - 'feat: complete admin Trust Keith fidelity [Epic 15]'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-14T19:31:18.103Z'
+  lastUpdate: '2026-07-17T20:33:54.977Z'
   isGitRepo: true
-timestamp: 1784057478106
+timestamp: 1784320434978
 ttl: 60
-gitFingerprint: 1783996413321.067:1784057148240.3372
+gitFingerprint: 1783996413321.067:1784319792501.61

@@ -97,6 +97,8 @@ describe("app/api/admin read model routes — fail-closed", () => {
     const { enrollments } = await importRoutes();
     const res = await enrollments.GET(new Request("https://x/api/admin/enrollments"));
     expect(res.status).toBe(401);
+    // REC-408 (AC4): negação administrativa (401) também é no-store.
+    expect(res.headers.get("Cache-Control")).toContain("no-store");
     expect(mocks.from).not.toHaveBeenCalled();
   });
 
@@ -127,6 +129,8 @@ describe("app/api/admin read model routes — fail-closed", () => {
     const { enrollments } = await importRoutes();
     const res = await enrollments.GET(new Request("https://x/api/admin/enrollments"));
     expect(res.status).toBe(200);
+    // REC-408 (AC4): dados administrativos autenticados são no-store.
+    expect(res.headers.get("Cache-Control")).toContain("no-store");
     const body = await res.json();
     expect(body.ok).toBe(true);
     expect(body.total).toBe(1);

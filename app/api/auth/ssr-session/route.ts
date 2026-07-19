@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 import { normalizeDashboardRole } from "@/lib/auth";
 import { checkRateLimit, clientIp, rateLimitConfigs } from "@/lib/rate-limit";
+import { applyNoStore } from "@/lib/security-headers";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
 import {
   createSupabaseSSRClient,
@@ -38,7 +39,20 @@ async function getCookieAdapter(): Promise<SsrCookieAdapter> {
   };
 }
 
+// REC-408: todo retorno da rota SSR de sessão é `no-store` (AC3).
 export async function POST(request: Request) {
+  return applyNoStore(await handlePost(request));
+}
+
+export async function GET() {
+  return applyNoStore(await handleGet());
+}
+
+export async function DELETE() {
+  return applyNoStore(await handleDelete());
+}
+
+async function handlePost(request: Request) {
   if (!isSupabaseSsrConfigured) {
     return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
   }
@@ -109,7 +123,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+async function handleGet() {
   if (!isSupabaseSsrConfigured) {
     return NextResponse.json({ ok: false, error: "Auth indisponivel." }, { status: 503 });
   }
@@ -131,7 +145,7 @@ export async function GET() {
   });
 }
 
-export async function DELETE() {
+async function handleDelete() {
   if (!isSupabaseSsrConfigured) {
     return NextResponse.json({ ok: true });
   }

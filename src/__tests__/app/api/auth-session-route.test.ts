@@ -113,6 +113,8 @@ describe("app/api/auth/session POST", () => {
     );
     expect(mocks.signInWithPassword).not.toHaveBeenCalled();
     expect(response.status).toBe(200);
+    // REC-408 (AC3): login bem-sucedido é no-store.
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
     await expect(response.json()).resolves.toMatchObject({
       ok: true,
       authMode: "ssr",
@@ -176,6 +178,8 @@ describe("app/api/auth/session POST", () => {
     expect(mocks.signInWithPassword).not.toHaveBeenCalled();
     expect(response.status).toBe(429);
     expect(response.headers.get("Retry-After")).toBe("60");
+    // REC-408 (AC3): resposta de rate limit também é no-store.
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
     await expect(response.json()).resolves.toEqual({
       ok: false,
       error: "Muitas tentativas. Tente novamente mais tarde.",
@@ -183,17 +187,9 @@ describe("app/api/auth/session POST", () => {
   });
 
   it("rejects a valid user when the requested portal role does not match metadata", async () => {
-    mocks.signInWithPassword.mockResolvedValue({
-      data: {
-        user: {
-          email: "student@rhcursos.test",
-          app_metadata: { role: "student" },
-          user_metadata: { name: "Student" },
-        },
-        session: null,
-      },
-      error: null,
-    });
+    // REC-204 Fase B: o login é 100% SSR; a checagem de papel ocorre em
+    // signInSSR, que devolve `unauthorized` no mismatch → 403.
+    mocks.signInSSR.mockResolvedValue({ status: "unauthorized", role: "student" });
 
     const { POST } = await import("../../../../app/api/auth/session/route");
     const response = await POST(
@@ -208,9 +204,11 @@ describe("app/api/auth/session POST", () => {
       })
     );
 
+    expect(mocks.signInWithPassword).not.toHaveBeenCalled();
     expect(response.status).toBe(403);
     await expect(response.json()).resolves.toEqual({
       ok: false,
+      authMode: "ssr",
       error: "Acesso nao autorizado.",
     });
   });

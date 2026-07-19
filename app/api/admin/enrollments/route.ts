@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { logger } from "@/lib/logger";
+import { applyNoStore } from "@/lib/security-headers";
 import { requireAdminApi } from "@/lib/supabase/admin-api-auth";
 import { listEnrollments, normalizeListParams } from "@/lib/supabase/admin-read-models";
 
@@ -12,7 +13,13 @@ import { listEnrollments, normalizeListParams } from "@/lib/supabase/admin-read-
  * filtros (turma, status, busca por nome/email) retornam dados autorizados.
  * O HMAC de produção permanece intocado — ver nota em `admin-api-auth.ts`.
  */
+// REC-408: dados administrativos autenticados são `no-store` (AC4), inclusive
+// as respostas de negação (401/403/503) devolvidas por `requireAdminApi` e o 500.
 export async function GET(request: Request) {
+  return applyNoStore(await handleGet(request));
+}
+
+async function handleGet(request: Request) {
   const guard = await requireAdminApi();
   if (!guard.ok) {
     return guard.response;

@@ -1,15 +1,9 @@
-# Headers de segurança ativos agora são aplicados no runtime via `middleware.ts`.
-# Este arquivo fica apenas como fallback documental/compatibilidade para assets
-# estáticos servidos fora do Worker principal.
-
-/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https: blob:; font-src 'self' https:; connect-src 'self' https://api.rhcursos.com.br https://*.supabase.co; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
-  X-Frame-Options: DENY
-  X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
-  Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), document-domain=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), sync-xhr=(), usb=(), vr=(), xr-spatial-tracking=()
+# REC-408: os headers de segurança e a Content-Security-Policy são emitidos
+# EXCLUSIVAMENTE no runtime pela fonte canônica `src/lib/security-headers.ts`
+# (aplicada por `middleware.ts`). Este arquivo NÃO declara mais uma CSP nem
+# demais headers de segurança para que não exista uma segunda política ativa
+# capaz de divergir da fonte canônica (AC1). Mantém-se apenas a regra de cache
+# de assets estáticos com hash imutável no nome, que não é política de segurança.
 
 # Assets do Next com hash no nome podem ser cacheados agressivamente.
 /_next/static/*

@@ -38,26 +38,27 @@ describe("app/api/functions/[name] route", () => {
 
     const { POST } = await import("../../../../app/api/functions/[name]/route");
 
+    // Função de passthrough (não-admin): sem autorização SSR, apenas repasse.
+    // REC-204 Fase B removeu o encaminhamento de `x-rh-session`.
     await POST(
-      new Request("http://localhost/api/functions/admin-resources", {
+      new Request("http://localhost/api/functions/leads", {
         method: "POST",
         headers: {
           "content-type": "application/json",
           authorization: "Bearer publishable",
           apikey: "publishable",
-          "x-rh-session": "session-token",
           "x-rh-client-ip": "198.51.100.10",
         },
-        body: JSON.stringify({ resource: "courses", action: "list" }),
+        body: JSON.stringify({ resource: "leads", action: "list" }),
       }),
-      { params: Promise.resolve({ name: "admin-resources" }) }
+      { params: Promise.resolve({ name: "leads" }) }
     );
 
     expect(fetchMock).toHaveBeenCalledWith(
-      new URL("https://server-functions.example.com/functions/v1/admin-resources"),
+      new URL("https://server-functions.example.com/functions/v1/leads"),
       expect.objectContaining({
         method: "POST",
-        body: JSON.stringify({ resource: "courses", action: "list" }),
+        body: JSON.stringify({ resource: "leads", action: "list" }),
         headers: expect.any(Headers),
       })
     );
@@ -65,7 +66,7 @@ describe("app/api/functions/[name] route", () => {
     const headers = fetchMock.mock.calls[0]?.[1]?.headers as Headers;
     expect(headers.get("authorization")).toBe("Bearer publishable");
     expect(headers.get("apikey")).toBe("publishable");
-    expect(headers.get("x-rh-session")).toBe("session-token");
+    expect(headers.has("x-rh-session")).toBe(false);
     expect(headers.get("origin")).toBe("http://localhost");
     expect(headers.get("x-forwarded-for")).toBe("198.51.100.10");
     expect(headers.get("x-real-ip")).toBe("198.51.100.10");
@@ -80,13 +81,15 @@ describe("app/api/functions/[name] route", () => {
 
     const { GET } = await import("../../../../app/api/functions/[name]/route");
 
-    await GET(new Request("http://localhost/api/functions/leads"), {
+    const response = await GET(new Request("http://localhost/api/functions/leads"), {
       params: Promise.resolve({ name: "leads" }),
     });
 
     expect(fetchMock.mock.calls[0]?.[0]).toEqual(
       new URL("https://project-ref.supabase.co/functions/v1/leads")
     );
+    // REC-408 (AC4): a resposta do BFF autenticado é no-store, sem propagar cache do upstream.
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
   });
 
   it("forwards DELETE requests to the upstream functions host", async () => {
@@ -98,24 +101,23 @@ describe("app/api/functions/[name] route", () => {
     const { DELETE } = await import("../../../../app/api/functions/[name]/route");
 
     await DELETE(
-      new Request("http://localhost/api/functions/admin-resources", {
+      new Request("http://localhost/api/functions/leads", {
         method: "DELETE",
         headers: {
           "content-type": "application/json",
           authorization: "Bearer publishable",
           apikey: "publishable",
-          "x-rh-session": "session-token",
         },
-        body: JSON.stringify({ resource: "students", action: "delete", id: "student-1" }),
+        body: JSON.stringify({ resource: "leads", action: "delete", id: "lead-1" }),
       }),
-      { params: Promise.resolve({ name: "admin-resources" }) }
+      { params: Promise.resolve({ name: "leads" }) }
     );
 
     expect(fetchMock).toHaveBeenCalledWith(
-      new URL("https://server-functions.example.com/functions/v1/admin-resources"),
+      new URL("https://server-functions.example.com/functions/v1/leads"),
       expect.objectContaining({
         method: "DELETE",
-        body: JSON.stringify({ resource: "students", action: "delete", id: "student-1" }),
+        body: JSON.stringify({ resource: "leads", action: "delete", id: "lead-1" }),
       })
     );
   });
@@ -133,6 +135,8 @@ describe("app/api/functions/[name] route", () => {
     );
 
     expect(response.status).toBe(503);
+    // REC-408 (AC4): erros do BFF (inclusive 503) também são no-store.
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
     const body = await response.json();
     expect(body).toEqual({ ok: false, error: "Supabase Functions não configurado." });
   });

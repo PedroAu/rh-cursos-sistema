@@ -47,14 +47,15 @@ const nextConfig = {
     ]
   },
   async headers() {
+    // REC-408: a Content-Security-Policy é emitida EXCLUSIVAMENTE pela fonte
+    // canônica `src/lib/security-headers.ts`, aplicada no runtime por
+    // `middleware.ts`. Nenhuma CSP é declarada aqui para que não exista uma
+    // segunda política concorrente/divergente (AC1). Os demais headers abaixo
+    // cobrem assets estáticos que o matcher do middleware exclui.
     return [
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com; frame-ancestors 'none';"
-          },
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload"

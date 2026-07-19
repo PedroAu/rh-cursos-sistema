@@ -10,13 +10,23 @@ export interface SecurityHeadersConfig {
   permissionsPolicy?: string;
 }
 
+// REC-408: fonte canônica única da CSP de produção. Cada origem externa tem um
+// consumidor rastreável no código:
+// - www.googletagmanager.com / www.google-analytics.com: Google Analytics 4,
+//   injetado condicionalmente por `app/layout.tsx` via `@next/third-parties`
+//   quando `NEXT_PUBLIC_GA_MEASUREMENT_ID` está definido (ver `src/lib/analytics.ts`).
+// - *.supabase.co / wss://*.supabase.co: cliente Supabase (dados + realtime).
+// `unsafe-eval` NÃO aparece em produção. `cdn.jsdelivr.net` e `api.rhcursos.com.br`
+// foram removidos por não terem nenhum consumidor no repositório (AC2 — nenhuma
+// origem sem consumidor rastreável; `api.rhcursos.com.br` removido na revisão
+// @architect/@qa de 2026-07-19 pelo mesmo critério).
 const PRODUCTION_CSP_DIRECTIVES = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net", // Only self + CDN for next.js
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' https:",
-    "connect-src 'self' https://api.rhcursos.com.br https://*.supabase.co wss://*.supabase.co",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -165,13 +175,27 @@ export function applySecurityHeaders(
 }
 
 /**
+ * REC-408: contrato canônico de cache para respostas sensíveis (auth/BFF/admin).
+ * Um único valor de `Cache-Control` garante que caches compartilhados não
+ * armazenem dados autenticados. Genérico sobre `Response` e `NextResponse` para
+ * cobrir tanto rotas que devolvem `NextResponse.json` quanto o proxy que devolve
+ * `Response` cru — inclusive respostas de erro (4xx/5xx) e redirects de sessão.
+ */
+export const NO_STORE_CACHE_CONTROL = "no-store, no-cache, must-revalidate, proxy-revalidate";
+
+export function applyNoStore<T extends Response>(response: T): T {
+  response.headers.set("Cache-Control", NO_STORE_CACHE_CONTROL);
+  response.headers.set("Pragma", "no-cache");
+  response.headers.set("Expires", "0");
+  return response;
+}
+
+/**
  * Additional security headers for API responses
  */
 export function applyApiSecurityHeaders(response: NextResponse): NextResponse {
-  // Prevent caching of sensitive data
-  response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-  response.headers.set("Pragma", "no-cache");
-  response.headers.set("Expires", "0");
+  // Prevent caching of sensitive data (fonte única: applyNoStore).
+  applyNoStore(response);
 
   // Additional headers
   response.headers.set("X-Content-Type-Options", "nosniff");
