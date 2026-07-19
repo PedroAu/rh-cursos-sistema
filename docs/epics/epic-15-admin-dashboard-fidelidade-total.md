@@ -1,6 +1,6 @@
 # Épica 15 — Admin Dashboard: Fidelidade Total (Trust Keith)
 
-**Status:** Implementação completa — Ready for Review (2026-07-17). Stories 15.1–15.8 implementadas; gate final `PASS` 100/100 em `docs/qa/gates/epic15-complete-fidelity.yml`. Fechamento formal `Done` permanece condicionado ao merge, conforme lifecycle do `@po`.
+**Status:** Complete (2026-07-19, fechada via `*close-story` @po) — Stories 15.1–15.8 `Done`, gate PASS 100/100 em `docs/qa/gates/epic15-complete-fidelity.yml`, commit `1f4980e` confirmado em `main`. lint/typecheck/build reverificados nesta sessão sem regressão antes do fechamento formal.
 **PRD Source:** Auditoria de fidelidade ad-hoc (dashboard admin em produção vs. canvas Trust Keith)
 **Prioridade:** P2 (débito de design — dashboard admin nunca migrado para o novo DS)
 **Fonte:** Épica 14 (Redesign Trust Keith) excluiu explicitamente o redesign visual do admin do seu escopo (ver `docs/stories/2026-07-02-epic14-story1-3-admin-shell-resign.md`, linha "Redesign visual do admin — não é escopo desta epic"). Esta épica cobre essa lacuna.

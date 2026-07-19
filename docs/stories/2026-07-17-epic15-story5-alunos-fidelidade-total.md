@@ -1,7 +1,7 @@
 # Story 15.5: Alunos — Fidelidade Total Trust Keith
 
 ## Status
-Ready for Review
+Done
 
 ## Epic
 Épica 15 — Admin Dashboard: Fidelidade Total (Trust Keith)

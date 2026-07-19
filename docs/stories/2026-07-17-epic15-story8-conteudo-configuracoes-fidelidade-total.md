@@ -1,7 +1,7 @@
 # Story 15.8: Blog, Páginas e Configurações — Fidelidade Total Trust Keith
 
 ## Status
-Ready for Review
+Done
 
 ## Epic
 Épica 15 — Admin Dashboard: Fidelidade Total (Trust Keith)
@@ -53,3 +53,4 @@ Ready for Review
 
 ## Change Log
 - 2026-07-17 — Implementação e integração concluídas pelo @dev.
+- 2026-07-19 — Fechamento formal via `*close-story` @po: gate PASS 100/100 (docs/qa/gates/epic15-complete-fidelity.yml) confirmado, commit 1f4980e verificado em main, lint/typecheck/build reverificados sem regressão. Status promovido para Done.
