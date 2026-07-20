@@ -138,9 +138,9 @@ Coordenador geral: **Pedro Augusto** (proprietário da conta administrativa e do
 
 | # | Ação | Origem | Severidade | Owner | Prazo |
 |---|---|---|---|---|---|
-| 1 | Exigir AAL2 (MFA) no login do app quando a conta possui fator MFA ativo — hoje `signInWithPassword` não checa AAL2 | SEC-104 (follow-up REC-002) | Alta | Pedro Augusto | 2026-08-16 |
+| 1 | ~~Exigir AAL2 (MFA) no login do app~~ — **RESOLVIDO em 2026-07-19**: verificado que `signInSSR()` já exige AAL2 fail-closed (D3/ADR-016) e, desde o cutover REC-204 Fase B, é o único caminho de login (`signInWithPassword` direto sem checagem de AAL foi removido). Confirmado por 24/24 testes + leitura de código, sem necessidade de código novo. | SEC-104 (follow-up REC-002) | Alta | Pedro Augusto | ~~2026-08-16~~ Fechado 2026-07-19 |
 | 2 | Tratar follow-up de REC-101 (revogação RPC pública) | SEC-107 | Alta | Pedro Augusto | 2026-08-16 |
-| 3 | Decidir status da Edge Function `auth-session` (decomissionar ou aplicar MFA) — hoje é login paralelo sem MFA, fora da autoridade SSR do REC-204 | SEC-204a (REC-204 revisão de segurança) | Alta | Pedro Augusto | 2026-08-16 |
+| 3 | ~~Decidir status da Edge Function `auth-session` (decomissionar ou aplicar MFA)~~ — **RESOLVIDO em 2026-07-19**: Edge Function `auth-session` DECOMISSIONADA (diretório `supabase/functions/auth-session/`, seção `[functions.auth-session]` do `config.toml`, referência de deploy em `deploy-functions.yml` e o emissor HMAC `encodeSession`/helpers em `_shared/auth.ts` removidos). Confirmado por grep que nenhum caminho de produção real consumia o endpoint (só `admin-resources` via `requireTrustedSsrAdmin`). `AUTH_SESSION_SECRET` fica órfão (remoção do cofre/env é ação de @devops). | SEC-204a (REC-204 revisão de segurança) | Alta | Pedro Augusto | ~~2026-08-16~~ Fechado 2026-07-19 |
 | 4 | Renovar ou resolver definitivamente as dependências vulneráveis cobertas pelo waiver de REC-407 | REC-407 waiver | Alta | Pedro Augusto | **2026-08-16 (data já comprometida no waiver original)** |
 | 5 | Adicionar ferramenta de secret-scan real ao CI (gitleaks ou trufflehog), substituindo o hook local não-bloqueante | Gap de G4 identificado nesta story | Alta | Pedro Augusto | 2026-08-16 |
 | 6 | Resolver a regressão de realtime do dashboard admin (subscriptions sem autenticação, RLS bloqueia cliente anon) — junto da consolidação do transporte realtime | REC-204 follow-up, ligado a REC-206 | Média | Pedro Augusto | 2026-08-30 |
@@ -151,6 +151,9 @@ Coordenador geral: **Pedro Augusto** (proprietário da conta administrativa e do
 | 11 | Ajustar `WeakSet` compartilhado em `logger.ts` `redact()` para não marcar DAG legítimo como `[Circular]` | REC-408 revisão | Baixa | — | Backlog, sem prazo fixo |
 | 12 | Decidir commit ou descarte dos 16 baselines PNG regenerados em `tests/baseline/` | REC-301 | Baixa | — | Backlog, sem prazo fixo |
 | 13 | Executar E2E smoke e acessibilidade contra ambiente com fixtures reais, e validar migration em homologação formal, antes do próximo deploy de produção | Gap de G4 identificado nesta story | Alta (bloqueia próximo deploy real) | Pedro Augusto | Antes do próximo deploy de produção |
+| 14 | Reescrever ou remover `tests/admin-crud.spec.ts` e `tests/api-contract.spec.ts` — ambos testam um fluxo de login com cookie HMAC forjado manualmente (`SESSION_COOKIE`/`buildAdminSessionToken` locais via `node:crypto`) que a app não aceita mais desde REC-204 Fase B; obsoletos e só não falham no CI por estarem gated atrás de `hasRealIntegrationEnv()`. Devem passar a exercitar autenticação SSR real ou ser removidos se o cenário não fizer mais sentido | Descoberta durante SEC-204a (decomissionamento auth-session) | Média | Pedro Augusto | 2026-08-30 |
+
+**Item 5 — CONCLUÍDO em 2026-07-19:** job `secret-scan` (gitleaks, via `gitleaks/gitleaks-action@v3.0.0`) adicionado a `.github/workflows/ci.yml`, rodando nos mesmos triggers do restante do pipeline (push em `develop`/`feature/**`, pull request para `main`/`develop`). Diferente do hook local (`.git/hooks/pre-commit`), que apenas avisa, este job **bloqueia** o CI se um segredo for detectado. Escaneia o diff/branch relevante do evento, não o histórico completo do repositório (saneamento de histórico completo é escopo separado do item 7 / REC-005, que segue em waiver).
 
 ## 5. Waiver formal de REC-005
 

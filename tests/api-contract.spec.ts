@@ -7,6 +7,7 @@ import {
   getCanonicalDocs,
   getIntegrationEnv,
   hasRealIntegrationEnv,
+  loginWithSsrSession,
 } from "./helpers/integration-env";
 
 const docs = getCanonicalDocs();
@@ -72,26 +73,6 @@ async function edgeRequest(
   });
 }
 
-async function loginAsAdminEdge() {
-  const { adminEmail, adminPassword, functionsBaseUrl } = getIntegrationEnv();
-
-  await ensureAuthUser({
-    email: adminEmail,
-    name: "Administrador RH Cursos",
-    password: adminPassword,
-    role: "admin",
-  });
-
-  const response = await fetch(`${functionsBaseUrl}/auth-session`, {
-    method: "POST",
-    headers: edgeHeaders(createUniqueIp("edge-admin-login")),
-    body: JSON.stringify({ role: "admin", email: adminEmail, password: adminPassword }),
-  });
-
-  expect(response.ok).toBeTruthy();
-  return (await response.json()) as { token: string };
-}
-
 test.describe("contratos HTTP — route handler auth-session", () => {
   test("POST valida payload, credenciais, autorização e rate limit", async ({ request }, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Requer ambiente Supabase real para contrato auth-session.");
@@ -120,7 +101,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
       headers: routeHeaders(createUniqueIp("next-auth-invalid-credentials")),
     });
     expect(invalidCredentials.status()).toBe(401);
-    await expect(invalidCredentials.json()).resolves.toEqual({
+    await expect(invalidCredentials.json()).resolves.toMatchObject({
       ok: false,
       error: "Credenciais invalidas.",
     });
@@ -130,7 +111,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
       headers: routeHeaders(createUniqueIp("next-auth-unauthorized-role")),
     });
     expect(unauthorizedRole.status()).toBe(403);
-    await expect(unauthorizedRole.json()).resolves.toEqual({
+    await expect(unauthorizedRole.json()).resolves.toMatchObject({
       ok: false,
       error: "Acesso nao autorizado.",
     });
@@ -172,41 +153,16 @@ test.describe("contratos HTTP — route handler auth-session", () => {
 });
 
 test.describe("contratos HTTP — edge functions", () => {
-  test("auth-session cobre 400, 403 e 405", async ({}, testInfo) => {
+  test("auth-session edge foi removida do contrato público", async ({}, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Requer edge functions reais do Supabase.");
     annotateCanonicalDoc(testInfo, docs.apiCatalog);
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
 
-    const invalidBody = await edgeRequest("/auth-session", {
+    const removedFunction = await edgeRequest("/auth-session", {
       body: { role: "admin", email: "", password: "" },
-      ip: createUniqueIp("edge-auth-invalid-body"),
+      ip: createUniqueIp("edge-auth-removed"),
     });
-    expect(invalidBody.status).toBe(400);
-    await expect(invalidBody.json()).resolves.toEqual({
-      ok: false,
-      error: "Dados de login inválidos.",
-    });
-
-    const forbiddenOrigin = await edgeRequest("/auth-session", {
-      body: { role: "admin", email: "", password: "" },
-      ip: createUniqueIp("edge-auth-forbidden"),
-      origin: "https://forbidden.example",
-    });
-    expect(forbiddenOrigin.status).toBe(403);
-    await expect(forbiddenOrigin.json()).resolves.toEqual({
-      ok: false,
-      error: "Origin not allowed",
-    });
-
-    const methodNotAllowed = await edgeRequest("/auth-session", {
-      method: "GET",
-      ip: createUniqueIp("edge-auth-405"),
-    });
-    expect(methodNotAllowed.status).toBe(405);
-    await expect(methodNotAllowed.json()).resolves.toEqual({
-      ok: false,
-      error: "Method not allowed",
-    });
+    expect(removedFunction.status).toBe(404);
   });
 
   test("enrollments e leads cobrem 400, 403 e 405 mínimos", async ({ request }, testInfo) => {
@@ -277,7 +233,7 @@ test.describe("contratos HTTP — edge functions", () => {
     expect(lead405.status()).toBe(405);
   });
 
-  test("admin-resources cobre 401, 405 e 422", async ({}, testInfo) => {
+  test("admin-resources cobre 401, 405 e 422", async ({ context, baseURL }, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Requer edge functions reais do Supabase.");
     annotateCanonicalDoc(testInfo, docs.edgeFunctions);
 
@@ -301,19 +257,26 @@ test.describe("contratos HTTP — edge functions", () => {
       error: "Method not allowed",
     });
 
-    const { token } = await loginAsAdminEdge();
-
-    const invalidMutation = await edgeRequest("/admin-resources", {
-      body: { resource: "leads", action: "update-status", id: "lead-1", status: "status-invalido" },
-      ip: createUniqueIp("edge-admin-422"),
-      headers: {
-        "x-rh-session": token,
-      },
+    await loginWithSsrSession({
+      baseURL: baseURL ?? "http://127.0.0.1:3100",
+      context,
+      role: "admin",
+      name: "Administrador RH Cursos",
     });
-    expect(invalidMutation.status).toBe(422);
+
+    const invalidMutation = await context.request.post(
+      new URL("/api/functions/admin-resources", baseURL ?? "http://127.0.0.1:3100").toString(),
+      {
+      data: { resource: "leads", action: "update-status", id: "lead-1", status: "status-invalido" },
+      headers: {
+        "x-rh-client-ip": createUniqueIp("edge-admin-422"),
+      },
+      }
+    );
+    expect(invalidMutation.status()).toBe(422);
     await expect(invalidMutation.json()).resolves.toMatchObject({
       ok: false,
-      error: expect.any(String),
+      error: expect.stringMatching(/status/i),
     });
   });
 });

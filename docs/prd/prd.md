@@ -87,6 +87,19 @@ The next major gap is role-based experience. The admin area is active and protec
 | Change | Date | Version | Description | Author |
 | --- | --- | --- | --- | --- |
 | Initial brownfield PRD draft | 2026-06-30 | 0.1 | Created validated context and initial requirements for public consulting, admin, student, and instructor expansion | Morgan |
+| Reconciliação de rastreabilidade (Story 18.1) | 2026-07-19 | 0.2 | Adicionada matriz canônica de rastreabilidade e nota de estado real do portfólio; nenhum requisito, decisão ou changelog histórico removido | `@analyst` |
+
+## Estado real do portfólio e rastreabilidade canônica (2026-07-19)
+
+> **Nota de reconciliação (Story 18.1 / Épica 18).** Este PRD descreve um **Epic 1 único** com Stories 1.1–1.6. O produto evoluiu além dessa decomposição (Épicas 2–17 em `docs/epics/`). Os **IDs FR1–FR16, NFR1–NFR10 e CR1–CR4 permanecem imutáveis** e continuam sendo a fonte canônica de requisitos. O estado real de atendimento de cada requisito, com links verificáveis a código, story e gate, está consolidado na matriz:
+>
+> - **Matriz canônica:** [`docs/prd/traceability-matrix.md`](./traceability-matrix.md)
+>
+> **Resumo do estado (30 requisitos):** 23 `ATENDIDO`, 5 `PARCIAL` (FR16, NFR4, NFR9, CR1, CR4 — convergem para a reconciliação pós-cutover Supabase SSR, escopo das Stories 18.2/18.3), 2 `DIFERIDO` (FR12, FR14 — fora do MVP por decisão deste PRD), 0 `NÃO ATENDIDO`.
+>
+> **Stories 1.2–1.6:** apenas a **Story 1.1** possui artefato formal (`docs/stories/1.1.story.md`, Done). As capacidades de 1.2–1.6 (consultoria, classificação de leads, portais de aluno/instrutor, hardening) existem no código e foram tocadas por épicas posteriores, mas **não possuem stories de substituição numeradas** — registradas como *gap de artefato formal* na §3 da matriz, para decisão do `@po`/`@pm`, sem equivalência por semelhança de nome.
+>
+> **Fontes ausentes** citadas na §Analysis Source (`docs/PHASE-B-PLAN.md` e outras) estão registradas com impacto e owner na §4 da matriz. Nenhum conteúdo desconhecido foi recriado (Article IV — No Invention).
 
 ## Requirements
 

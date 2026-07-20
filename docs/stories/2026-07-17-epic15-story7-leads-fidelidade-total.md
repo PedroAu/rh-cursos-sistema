@@ -10,11 +10,11 @@ Done
 **Como** administradora comercial, **quero** filtrar e operar leads conforme o canvas, **para** priorizar contatos sem perder contexto de origem e interesse.
 
 ## Acceptance Criteria
-- [ ] Cabeçalho “Leads” mostra contagem de 30 dias e aguardando contato com dados reais.
-- [ ] Chips de origem acessíveis filtram a tabela e expõem `aria-pressed`.
-- [ ] Tabela apresenta Lead, Contato, Origem, Interesse, Recebido, Status e Ações.
-- [ ] Exportação CSV neutralizada, CRUD e estados vazios continuam funcionais.
-- [ ] Testes cobrem corte de 30 dias, chips, exportação, empty state e responsividade.
+- [x] Cabeçalho “Leads” mostra contagem de 30 dias e aguardando contato com dados reais.
+- [x] Chips de origem acessíveis filtram a tabela e expõem `aria-pressed`.
+- [x] Tabela apresenta Lead, Contato, Origem, Interesse, Recebido, Status e Ações.
+- [x] Exportação CSV neutralizada, CRUD e estados vazios continuam funcionais.
+- [x] Testes cobrem corte de 30 dias, chips, exportação, empty state e responsividade.
 
 ## Tasks
 - [x] Reutilizar os builders de origem da Story 15.1 quando aplicável.
@@ -46,6 +46,7 @@ Codex (GPT-5)
 - Métricas calculadas com dados reais: recebidos nos últimos 30 dias e leads com status Novo aguardando contato.
 - Chips de origem com `aria-pressed`, grupo acessível e filtro aplicado à tabela e à exportação.
 - Colunas do canvas, estado vazio, CRUD e neutralização de fórmulas CSV preservados.
+- Reconciliação 18.3 (2026-07-19): waiver resolvido após execução em ambiente Supabase isolado; `npm run test:epic15:fidelity` passou 9/9 e os ACs foram reconciliados como aceitos. Status `Done` representa implementação e aceite formal.
 
 ### Change Log
 - 2026-07-17: implementação e testes da apresentação fiel de leads concluídos.

@@ -1,46 +1,28 @@
-import { loadEnvFile } from "node:process";
-import { createHmac, randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
+import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import {
   assertSafeWritableIntegrationEnv,
-  createUniqueIp,
-  ensureAuthUser,
   getIntegrationEnv,
+  loginWithSsrSession,
   resolveAvailableCheckoutTarget,
   resolveAvailableTrainingPath,
 } from "./helpers/integration-env";
-
-// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET/SUPABASE_*
-// reais via .env.local, mas este processo Node/Playwright não por padrão.
-try {
-  loadEnvFile(".env.local");
-} catch {
-  // Arquivo pode não existir em alguns ambientes (ex.: CI com secrets via env vars).
-}
 
 // Camada 2 do plano de testes: preenche e salva o formulário real de cada
 // recurso do admin (via a UI, campo a campo, seguindo o mesmo FieldConfig[]
 // declarado em admin-resource-configs.tsx) e confere que a criação some com
 // sucesso — sem cair no painel "Erros encontrados".
 //
-// A escrita passa pela Edge Function `admin-resources`, que exige uma sessão
-// real do Supabase Auth (não basta o cookie de demo-session que autentica só
-// a visualização SSR) — por isso o login aqui é feito de verdade pela UI,
-// com um usuário criado/garantido via service role (ensureAuthUser).
+// A escrita passa pelo BFF `/api/functions/admin-resources`, que resolve a
+// sessão Supabase SSR httpOnly e encaminha para a Edge Function sem token HMAC.
 //
 // Escopo: ciclo criar → excluir pela própria UI somente em projeto Supabase
 // explicitamente identificado como isolado. A guarda abaixo falha fechado;
 // produção nunca é aceita como fallback, ainda que o teste tenha cleanup.
 
 const MARKER = `[E2E] ${Date.now()}`;
-const SESSION_COOKIE = "rh_cursos_demo_session";
-const SESSION_SECRET = process.env.AUTH_SESSION_SECRET;
 const ADMIN_EMAIL = "e2e-admin-crud@rhcursos.test";
-const ADMIN_SESSION_CACHE_FILE = ".test-cache/admin-crud-session.json";
-const ADMIN_SESSION_CACHE_TTL_MS = 20 * 60 * 1000;
 
 test.beforeAll(() => {
   assertSafeWritableIntegrationEnv();
@@ -53,23 +35,6 @@ function slugifyForEmail(value: string) {
     .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "");
-}
-
-function buildAdminSessionToken(email: string) {
-  if (!SESSION_SECRET) {
-    throw new Error("AUTH_SESSION_SECRET não está configurado para os testes admin-crud.");
-  }
-
-  const payload = Buffer.from(
-    JSON.stringify({
-      role: "admin",
-      email,
-      name: "E2E Admin CRUD",
-      exp: Date.now() + 60 * 60 * 1000,
-    })
-  ).toString("base64url");
-  const signature = createHmac("sha256", SESSION_SECRET).update(payload).digest("base64url");
-  return `${payload}.${signature}`;
 }
 
 function buildUniqueEmail(label: string) {
@@ -85,104 +50,20 @@ function buildUniqueCpf(seed: string) {
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
 }
 
-async function readCachedAdminSessionToken(email: string) {
-  try {
-    const raw = await readFile(ADMIN_SESSION_CACHE_FILE, "utf8");
-    const cached = JSON.parse(raw) as { email?: string; token?: string; createdAt?: number };
-
-    if (
-      cached.email === email &&
-      typeof cached.token === "string" &&
-      typeof cached.createdAt === "number" &&
-      Date.now() - cached.createdAt < ADMIN_SESSION_CACHE_TTL_MS
-    ) {
-      return cached.token;
-    }
-  } catch {
-    // Cache ausente/legado: segue para reautenticar.
-  }
-
-  return null;
-}
-
-async function writeCachedAdminSessionToken(email: string, token: string) {
-  await mkdir(dirname(ADMIN_SESSION_CACHE_FILE), { recursive: true });
-  await writeFile(
-    ADMIN_SESSION_CACHE_FILE,
-    JSON.stringify({ email, token, createdAt: Date.now() }, null, 2),
-    "utf8"
-  );
-}
-
-async function loginAsAdmin(page: Page, email: string) {
-  const { adminPassword, functionsBaseUrl, publishableKey } = getIntegrationEnv();
-
-  await ensureAuthUser({
+async function loginAsAdmin(page: Page, email: string, baseURL?: string) {
+  await loginWithSsrSession({
+    baseURL: baseURL ?? "http://127.0.0.1:3100",
+    context: page.context(),
     email,
     name: "E2E Admin CRUD",
-    password: adminPassword,
     role: "admin",
   });
 
-  let sessionToken = await readCachedAdminSessionToken(email);
-
-  if (!sessionToken) {
-    const response = await fetch(`${functionsBaseUrl}/auth-session`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${publishableKey}`,
-        apikey: publishableKey,
-        Origin: "http://127.0.0.1:3100",
-        "Content-Type": "application/json",
-        "x-forwarded-for": createUniqueIp("admin-crud-auth"),
-        "x-real-ip": createUniqueIp("admin-crud-auth-real"),
-      },
-      body: JSON.stringify({
-        role: "admin",
-        email,
-        password: adminPassword,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Falha ao obter sessão admin real: ${response.status}`);
-    }
-
-    const session = (await response.json()) as { token?: string };
-    if (!session.token) {
-      throw new Error("auth-session não retornou token para o admin.");
-    }
-
-    sessionToken = session.token;
-    await writeCachedAdminSessionToken(email, sessionToken);
-  }
-
-  const token = buildAdminSessionToken(email);
-
-  await page.context().addCookies([
-    {
-      name: SESSION_COOKIE,
-      value: token,
-      domain: "127.0.0.1",
-      path: "/",
-    },
-  ]);
-
-  await page.addInitScript(
-    (storedToken) => {
-      window.localStorage.setItem("rh_cursos_admin_token", storedToken);
-      window.localStorage.removeItem("rh_cursos_supabase_session");
-      window.localStorage.removeItem("rhcursos-demo-store-v4");
-    },
-    sessionToken
-  );
-
   await page.goto("/admin");
-  await page.evaluate((storedToken) => {
-    window.localStorage.setItem("rh_cursos_admin_token", storedToken);
+  await page.evaluate(() => {
     window.localStorage.removeItem("rh_cursos_supabase_session");
     window.localStorage.removeItem("rhcursos-demo-store-v4");
-  }, sessionToken);
+  });
   await expect(page).toHaveURL(/\/admin/, { timeout: 15_000 });
 }
 
@@ -224,7 +105,7 @@ async function forceSelectValue(dialog: Locator, label: string, value: string) {
 }
 
 async function openCreateDialog(page: Page) {
-  await page.getByRole("button", { name: "Novo Cadastro" }).click();
+  await page.getByRole("button", { name: /^(Novo|Nova) / }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByRole("heading", { name: "Criar novo registro" })).toBeVisible();
   return dialog;
@@ -532,9 +413,9 @@ async function deleteRowByName(page: Page, name: string) {
 }
 
 test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () => {
-  test.beforeEach(async ({ page }) => {
+  test.beforeEach(async ({ page, baseURL }) => {
     const email = ADMIN_EMAIL;
-    await loginAsAdmin(page, email);
+    await loginAsAdmin(page, email, baseURL ?? undefined);
   });
 
   test("cursos: cria com todos os campos obrigatórios preenchidos e exclui", async ({ page }) => {

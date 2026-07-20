@@ -393,19 +393,19 @@ export function CourseDetailPage() {
 
                   <div className="mt-8 flex flex-wrap gap-2">
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
-                      <Clock3 className="h-4 w-4 text-tk-accent" />
+                      <Clock3 aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                       {course.durationLabel}
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
-                      <CalendarDays className="h-4 w-4 text-tk-accent" />
+                      <CalendarDays aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                       {selectedClass ? formatModalityLabel(selectedClass.modality, selectedClass.location) : formatCourseModalities(course)}
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
-                      <ShieldCheck className="h-4 w-4 text-tk-accent" />
+                      <ShieldCheck aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                       Certificado de {course.durationHours}h
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
-                      <UserRound className="h-4 w-4 text-tk-accent" />
+                      <UserRound aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                       Turmas reduzidas
                     </span>
                   </div>
@@ -427,7 +427,7 @@ export function CourseDetailPage() {
                     {highlightCards.map((item) => (
                       <div key={item.title} className="flex gap-3 rounded-[14px] border border-[var(--tk-border)] bg-tk-surface p-4">
                         <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
-                          <CheckCircle2 className="h-4 w-4" />
+                          <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
                         </span>
                         <div>
                           <div className="font-medium text-tk-ink">{item.title}</div>
@@ -450,7 +450,7 @@ export function CourseDetailPage() {
                       course.targetAudience.map((audience) => (
                         <div key={audience} className="flex items-start gap-3 text-sm leading-6 text-tk-ink">
                           <span className="mt-1 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-tk-brand">
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" />
                           </span>
                           <span>{audience}</span>
                         </div>
@@ -554,18 +554,18 @@ export function CourseDetailPage() {
                       </p>
                       <div className="mt-5 flex flex-wrap gap-2">
                         <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                          <UserRound className="h-4 w-4 text-tk-accent" />
+                          <UserRound aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                           {courseClasses.length} turmas abertas
                         </span>
                         {course.studentsCount > 0 ? (
                           <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                            <Star className="h-4 w-4 text-tk-accent" />
+                            <Star aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                             {course.studentsCount.toLocaleString("pt-BR")} alunos
                           </span>
                         ) : null}
                         {course.rating > 0 ? (
                           <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                            <ShieldCheck className="h-4 w-4 text-tk-accent" />
+                            <ShieldCheck aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                             Avaliação média {course.rating.toFixed(1)}/5
                           </span>
                         ) : null}
@@ -653,7 +653,7 @@ export function CourseDetailPage() {
                       className="object-cover"
                     />
                     <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(12,106,131,0.12),rgba(12,106,131,0.4))]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
                       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-tk-brand shadow-[0_12px_30px_-12px_rgba(0,0,0,0.4)]">
                         <Play className="h-9 w-9 fill-current" />
                       </div>
@@ -763,19 +763,19 @@ export function CourseDetailPage() {
                       <div className="grid gap-3 text-sm leading-6 text-tk-ink">
                         <div className="flex items-start gap-3">
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" />
                           </span>
                           <span>A pré-inscrição será analisada antes de qualquer confirmação de vaga.</span>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" />
                           </span>
                           <span>Atendimento comercial para proposta, grupo e compra corporativa.</span>
                         </div>
                         <div className="flex items-start gap-3">
                           <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
-                            <ShieldCheck className="h-3.5 w-3.5" />
+                            <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" />
                           </span>
                           <span>Escolha da turma preservada no envio da pré-inscrição.</span>
                         </div>
@@ -787,7 +787,7 @@ export function CourseDetailPage() {
                 <div className="rounded-[16px] border border-[var(--tk-border)] bg-tk-surface p-5">
                   <div className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--tk-accent-soft)] text-tk-brand">
-                      <TriangleAlert className="h-4 w-4" />
+                      <TriangleAlert aria-hidden="true" className="h-4 w-4" />
                     </span>
                     <div className="text-sm leading-6 text-tk-ink-muted">
                       <strong className="text-tk-ink">{sidebarCopy.guaranteeTitle}</strong> {sidebarCopy.guaranteeText}
@@ -800,7 +800,7 @@ export function CourseDetailPage() {
                   <div className="mt-1 text-sm leading-6 text-tk-ink-muted">{sidebarCopy.supportText}</div>
                   <Button asChild variant="outline" className="mt-4 w-full border-[var(--tk-border)] bg-white text-tk-ink">
                     <Link to="/falar-com-especialista">
-                      <MessageCircle className="h-4 w-4" />
+                      <MessageCircle aria-hidden="true" className="h-4 w-4" />
                       {sidebarCopy.supportCtaLabel}
                     </Link>
                   </Button>

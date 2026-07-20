@@ -1,10 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-import { createUniqueIp, ensureAuthUser, hasRealIntegrationEnv } from "./helpers/integration-env";
+import { loginWithSsrSession } from "./helpers/integration-env";
 
 // Modelo híbrido:
 // - páginas públicas seguem acessíveis por SSR/SSG;
-// - login usa rota interna `/api/auth/session`;
+// - login usa rota interna `/api/auth/ssr-session`;
 // - `/admin` exige sessão no servidor e redireciona antes de renderizar o painel;
 // - mutações administrativas continuam nas Edge Functions do Supabase.
 
@@ -27,21 +26,6 @@ const dynamicPaths = [
   "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
   "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
 ];
-
-async function issueSessionToken(role: "admin" | "instructor" | "student", ttlMs?: number) {
-  return encodeSession(
-    {
-      role,
-      email: `${role}@rhcursos.com.br`,
-      name: `Perfil ${role}`
-    },
-    ttlMs
-  );
-}
-
-function cookieHeader(token: string) {
-  return `${SESSION_COOKIE}=${token}`;
-}
 
 test.describe("rotas publicas", () => {
   for (const path of [...publicPaths, ...dynamicPaths]) {
@@ -90,64 +74,49 @@ test.describe("protecao server-side das areas autenticadas", () => {
     expect(instructorResponse.headers().location).toContain("/login?status=required&next=/instrutor");
   });
 
-  test("cada portal aceita apenas a role correspondente", async ({ request }) => {
-    const studentToken = await issueSessionToken("student");
-    const instructorToken = await issueSessionToken("instructor");
-    const adminToken = await issueSessionToken("admin");
-
-    const studentPortal = await request.get("/aluno", {
-      headers: { cookie: cookieHeader(studentToken) }
-    });
+  test("cada portal aceita apenas a role correspondente", async ({ context, baseURL }) => {
+    const origin = baseURL ?? "http://127.0.0.1:3100";
+    await loginWithSsrSession({ baseURL: origin, context, role: "student", name: "Perfil student" });
+    const studentPortal = await context.request.get("/aluno");
     expect(studentPortal.status()).toBe(200);
 
-    const instructorPortal = await request.get("/instrutor", {
-      headers: { cookie: cookieHeader(instructorToken) }
-    });
+    await context.request.delete("/api/auth/ssr-session");
+    await loginWithSsrSession({ baseURL: origin, context, role: "instructor", name: "Perfil instructor" });
+    const instructorPortal = await context.request.get("/instrutor");
     expect(instructorPortal.status()).toBe(200);
-
-    const blockedStudent = await request.get("/aluno", {
-      headers: { cookie: cookieHeader(instructorToken) },
-      maxRedirects: 0
-    });
+    const blockedStudent = await context.request.get("/aluno", { maxRedirects: 0 });
     expect(blockedStudent.status()).toBe(307);
 
-    const blockedInstructor = await request.get("/instrutor", {
-      headers: { cookie: cookieHeader(adminToken) },
-      maxRedirects: 0
-    });
+    await context.request.delete("/api/auth/ssr-session");
+    await loginWithSsrSession({ baseURL: origin, context, role: "admin", name: "Perfil admin" });
+    const blockedInstructor = await context.request.get("/instrutor", { maxRedirects: 0 });
     expect(blockedInstructor.status()).toBe(307);
   });
 
   test("/admin com sessao nao-admin falha fechado e redireciona para /login", async ({
     context,
     page,
-    request
+    baseURL
   }) => {
-    const token = await issueSessionToken("student");
-    const response = await request.get("/admin/", {
-      headers: { cookie: cookieHeader(token) },
-      maxRedirects: 0
+    await loginWithSsrSession({
+      baseURL: baseURL ?? "http://127.0.0.1:3100",
+      context,
+      role: "student",
+      name: "Perfil student"
     });
+    const response = await context.request.get("/admin/", { maxRedirects: 0 });
 
     expect(response.status()).toBe(307);
     expect(response.headers().location).toContain("/login?status=required&next=/admin");
-
-    await context.addCookies([
-      {
-        name: SESSION_COOKIE,
-        value: token,
-        url: "http://127.0.0.1:3100"
-      }
-    ]);
 
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/login\?status=required&next=\/admin/);
   });
 });
 
-test.describe("contrato da rota /api/auth/session", () => {
+test.describe("contrato da rota /api/auth/ssr-session", () => {
   test("GET sem sessao responde 401", async ({ request }) => {
-    const response = await request.get("/api/auth/session");
+    const response = await request.get("/api/auth/ssr-session");
 
     expect(response.status()).toBe(401);
     await expect(response.json()).resolves.toEqual({
@@ -156,85 +125,40 @@ test.describe("contrato da rota /api/auth/session", () => {
     });
   });
 
-  test("GET rejeita cookie adulterado com 401", async ({ request }) => {
-    const token = await issueSessionToken("admin");
-    const tamperedToken = `${token.slice(0, -1)}${token.endsWith("a") ? "b" : "a"}`;
-    const response = await request.get("/api/auth/session", {
-      headers: { cookie: cookieHeader(tamperedToken) }
+  test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ context, baseURL }) => {
+    const origin = baseURL ?? "http://127.0.0.1:3100";
+    await loginWithSsrSession({
+      baseURL: origin,
+      context,
+      role: "student",
+      name: "Perfil student"
     });
-
-    expect(response.status()).toBe(401);
-    await expect(response.json()).resolves.toEqual({
-      ok: false,
-      error: "Sessao invalida ou expirada."
-    });
-  });
-
-  test("GET com sessao nao-admin valida a sessao e preserva a role", async ({ context, page }) => {
-    test.skip(!hasRealIntegrationEnv(), "Validação de sessão real requer ambiente Supabase real.");
-    const credentials = await ensureAuthUser({
-      email: "student@rhcursos.com.br",
-      name: "Perfil student",
-      role: "student"
-    });
-    const loginResponse = await page.request.post("/api/auth/session", {
-      data: {
-        role: "student",
-        email: credentials.email,
-        password: credentials.password
-      },
-      headers: {
-        "cf-connecting-ip": createUniqueIp("next-auth-login-real"),
-        "x-forwarded-for": createUniqueIp("next-auth-login-real-forward"),
-        "x-real-ip": createUniqueIp("next-auth-login-real-real")
-      }
-    });
-    expect(loginResponse.status()).toBe(200);
-    const loginPayload = await loginResponse.json() as { token?: string | null };
-    expect(loginPayload.token).toBeTruthy();
-
-    await context.addCookies([
-      {
-        name: SESSION_COOKIE,
-        value: loginPayload.token!,
-        url: "http://127.0.0.1:3100"
-      }
-    ]);
-
-    await page.goto("/");
-    const sessionPayload = await page.evaluate(async () => {
-      const response = await fetch("/api/auth/session");
-      return {
-        status: response.status,
-        body: await response.json()
-      };
-    });
-
-    expect(sessionPayload.status).toBe(200);
-    expect(sessionPayload.body).toMatchObject({
+    const response = await context.request.get(new URL("/api/auth/ssr-session", origin).toString());
+    expect(response.status()).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
       ok: true,
       session: {
         role: "student",
-        email: "student@rhcursos.com.br",
+        email: "student-contract@rhcursos.test",
         name: "Perfil student"
       }
     });
   });
 
-  test("DELETE sem access token encerra apenas a sessao local e expira o cookie", async ({
-    request
+  test("DELETE encerra a sessao SSR e o GET subsequente falha fechado", async ({
+    context,
+    baseURL
   }) => {
-    const response = await request.delete("/api/auth/session", {
-      data: {}
+    await loginWithSsrSession({
+      baseURL: baseURL ?? "http://127.0.0.1:3100",
+      context,
+      role: "student",
+      name: "Perfil student"
     });
-
+    const response = await context.request.delete("/api/auth/ssr-session");
     expect(response.status()).toBe(200);
-    await expect(response.json()).resolves.toEqual({
-      ok: true,
-      mode: "local-only",
-      revoked: false
-    });
-    expect(response.headers()["set-cookie"]).toContain(`${SESSION_COOKIE}=`);
-    expect(response.headers()["set-cookie"].toLowerCase()).toContain("max-age=0");
+    await expect(response.json()).resolves.toEqual({ ok: true });
+    const read = await context.request.get("/api/auth/ssr-session");
+    expect(read.status()).toBe(401);
   });
 });

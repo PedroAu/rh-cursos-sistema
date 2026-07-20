@@ -1,101 +1,312 @@
 {
-  "generatedAt": "2026-07-09T12:20:38.527Z",
+  "generatedAt": "2026-07-20T01:10:00.280Z",
   "baseUrl": "http://127.0.0.1:3100",
-  "viewport": {
+  "publicViewport": {
     "width": 1180,
     "height": 2400
   },
+  "adminViewport": {
+    "width": 1360,
+    "height": 2400
+  },
   "outputDir": "/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity",
+  "verdictLegend": {
+    "PASS": "Rota e canvas comparados com sign-off manual de fidelidade.",
+    "CONCERNS": "Par disponível; requer revisão visual manual ou possui ressalvas.",
+    "FAIL": "Rota respondeu com status inválido.",
+    "NOT_ASSESSABLE": "Sem referência de canvas utilizável."
+  },
   "targets": [
     {
       "id": "home",
+      "epic": 14,
       "routePath": "/",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Home.dc.html",
       "routeScreenshot": "home-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Home.html and is no longer served from public/."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "home-canvas.png",
+      "canvasWarnings": [
+        "support.js",
+        "logoHorizontal_800X600.png"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): support.js, logoHorizontal_800X600.png.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     },
     {
       "id": "courses",
+      "epic": 14,
       "routePath": "/cursos",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Catálogo.dc.html",
       "routeScreenshot": "courses-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "No reference canvas asset exists in public/ for this route."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/cursos",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "courses-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     },
     {
       "id": "agenda",
+      "epic": 14,
       "routePath": "/agenda",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/Agenda export.dc.html",
       "routeScreenshot": "agenda-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "Historical canvas moved to docs/design/redesign/reference/canvases/RH Cursos Agenda.html and is no longer served from public/."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/agenda",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "agenda-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     },
     {
       "id": "in-company",
+      "epic": 14,
       "routePath": "/in-company",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos In-company.dc.html",
       "routeScreenshot": "in-company-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "No reference canvas asset exists in public/ for this route."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/in-company",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "in-company-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     },
     {
       "id": "about",
+      "epic": 14,
       "routePath": "/sobre",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Quem Somos.dc.html",
       "routeScreenshot": "about-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "No reference canvas asset exists in public/ for this route."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/sobre",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "about-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     },
     {
       "id": "blog",
+      "epic": 14,
       "routePath": "/blog",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Blog.dc.html",
       "routeScreenshot": "blog-route.png",
       "routeStatus": 200,
-      "canvasPaths": [],
-      "canvasScreenshots": [],
-      "canvasAvailable": false,
-      "canvasEvidence": [
-        {
-          "status": "unavailable",
-          "reason": "No reference canvas asset exists in public/ for this route."
-        }
+      "routeFinalUrl": "http://127.0.0.1:3100/blog",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "blog-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+      ]
+    },
+    {
+      "id": "login",
+      "epic": 14,
+      "routePath": "/login",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Login.dc.html",
+      "routeScreenshot": "login-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/login",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "login-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+      ]
+    },
+    {
+      "id": "course-detail",
+      "epic": 14,
+      "routePath": "/cursos",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Curso.dc.html",
+      "routeScreenshot": "course-detail-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/cursos",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "course-detail-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Rota real é dinâmica (/cursos/[slug]); captura usa a listagem como proxy. Defina EPIC14_FIDELITY_COURSE_PATH com um slug de fixture para comparar a página de detalhe.",
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+      ]
+    },
+    {
+      "id": "checkout",
+      "epic": 14,
+      "routePath": "/cursos",
+      "auth": "none",
+      "viewport": {
+        "width": 1180,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Checkout.dc.html",
+      "routeScreenshot": "checkout-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/cursos",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "checkout-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Rota real é dinâmica (/cursos/[slug]/checkout) e depende de fixture. Defina EPIC14_FIDELITY_CHECKOUT_PATH com um caminho válido para comparar o checkout.",
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+      ]
+    },
+    {
+      "id": "admin-dashboard",
+      "epic": 15,
+      "routePath": "/admin",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/RH Cursos Admin Dashboard.dc.html",
+      "routeScreenshot": "admin-dashboard-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/login?status=required&next=/admin",
+      "routeRedirected": true,
+      "routeError": null,
+      "canvasScreenshot": "admin-dashboard-canvas.png",
+      "canvasWarnings": [
+        "logoHorizontal_800X600.png",
+        "support.js"
+      ],
+      "canvasCriticalMissing": [],
+      "verdict": "CONCERNS",
+      "reasons": [
+        "Rota redirecionou para http://127.0.0.1:3100/login?status=required&next=/admin — não avaliável diretamente.",
+        "Auth SSR do admin fora do escopo desta story (Story 18.3).",
+        "Admin exige sessão SSR autenticada. Sem contrato de auth no harness a rota redireciona para /login — captura documenta o estado; a comparação real depende da Story 18.3.",
+        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
+        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
       ]
     }
-  ]
+  ],
+  "summary": {
+    "PASS": 0,
+    "CONCERNS": 10,
+    "FAIL": 0,
+    "NOT_ASSESSABLE": 0
+  }
 }

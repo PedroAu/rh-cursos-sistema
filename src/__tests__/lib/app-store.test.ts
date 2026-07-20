@@ -125,7 +125,7 @@ const mocks = vi.hoisted(() => {
     supabaseClient: {
       // REC-204 Fase B: com sessão admin (SSR), a store abre canais realtime
       // pelo cliente browser. Stub encadeável channel().on().subscribe().
-      channel: vi.fn(() => {
+      channel: vi.fn((_name: string) => {
         const chainable = {
           on: vi.fn(() => chainable),
           subscribe: vi.fn(() => chainable),
@@ -133,6 +133,11 @@ const mocks = vi.hoisted(() => {
         return chainable;
       }),
       removeChannel: vi.fn(),
+      // Follow-up REC-204 (post-mortem REC-502): antes de abrir os canais admin,
+      // a store autentica o realtime com um token efêmero via `realtime.setAuth`.
+      realtime: {
+        setAuth: vi.fn(),
+      },
       auth: {
         setSession: vi.fn(),
         signOut: vi.fn(() => Promise.resolve()),
@@ -388,6 +393,9 @@ describe("AppStoreProvider and hooks", () => {
     mocks.supabaseConfigured = false;
     mocks.fetchPublicCatalog.mockReset();
     mocks.fetchPublicBlogPosts.mockReset();
+    mocks.supabaseClient.channel.mockClear();
+    mocks.supabaseClient.removeChannel.mockClear();
+    mocks.supabaseClient.realtime.setAuth.mockClear();
   });
 
   afterEach(() => {
@@ -560,6 +568,126 @@ describe("AppStoreProvider and hooks", () => {
     expect(mocks.invokeFunction).toHaveBeenCalledWith("admin-resources", {
       body: { resource: "leads", action: "list" },
     });
+  });
+
+  it("authenticates the realtime channel with an ephemeral token before opening admin subscriptions", async () => {
+    // Follow-up REC-204 (post-mortem REC-502, item 6): as tabelas admin têm RLS
+    // `to authenticated`; o canal precisa apresentar um JWT válido obtido do BFF
+    // `/api/auth/realtime-token`. Só então as subscriptions autenticadas abrem.
+    mocks.functionsConfigured = true;
+    mocks.supabaseConfigured = true;
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ data: [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    mocks.fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url === "/api/auth/realtime-token") {
+        return Promise.resolve(
+          new Response(JSON.stringify({ accessToken: "rt-token", expiresAt: Date.now() + 3_600_000 }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          })
+        );
+      }
+      return Promise.resolve(new Response(null, { status: 204 }));
+    });
+
+    renderStore({ role: "admin", email: "admin@example.com", name: "Admin" }, undefined, false);
+
+    await waitFor(() =>
+      expect(mocks.supabaseClient.realtime.setAuth).toHaveBeenCalledWith("rt-token")
+    );
+
+    const channelNames = mocks.supabaseClient.channel.mock.calls.map(([name]) => name);
+    expect(channelNames).toContain("lead_changes");
+  });
+
+  it("fails closed and opens no authenticated subscription when the realtime token is denied", async () => {
+    // Fail-closed: 403 (sessão perdeu autorização) trata como se não houvesse
+    // sessão admin para o efeito — nenhum canal autenticado deve abrir.
+    mocks.functionsConfigured = true;
+    mocks.supabaseConfigured = true;
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ data: [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    mocks.fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url === "/api/auth/realtime-token") {
+        return Promise.resolve(
+          new Response(JSON.stringify({ ok: false, error: "Acesso nao autorizado." }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          })
+        );
+      }
+      return Promise.resolve(new Response(null, { status: 204 }));
+    });
+
+    renderStore({ role: "admin", email: "admin@example.com", name: "Admin" }, undefined, false);
+
+    await waitFor(() =>
+      expect(mocks.fetchMock).toHaveBeenCalledWith("/api/auth/realtime-token", expect.anything())
+    );
+    // Deixa o encadeamento de promises do fetch do token resolver.
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(mocks.supabaseClient.realtime.setAuth).not.toHaveBeenCalled();
+    const channelNames = mocks.supabaseClient.channel.mock.calls.map(([name]) => name);
+    expect(channelNames).not.toContain("lead_changes");
+  });
+
+  it("schedules a realtime token renewal before the access token expires", async () => {
+    // Renovação agendada com base em `expiresAt`, com margem antes da expiração.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-22T12:00:00.000Z"));
+    mocks.functionsConfigured = true;
+    mocks.supabaseConfigured = true;
+    mocks.invokeFunction.mockResolvedValue(
+      new Response(JSON.stringify({ data: [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+
+    let tokenCalls = 0;
+    mocks.fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url === "/api/auth/realtime-token") {
+        tokenCalls += 1;
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ accessToken: `rt-${tokenCalls}`, expiresAt: Date.now() + 120_000 }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
+        );
+      }
+      return Promise.resolve(new Response(null, { status: 204 }));
+    });
+
+    await act(async () => {
+      renderStore({ role: "admin", email: "admin@example.com", name: "Admin" }, undefined, false);
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    expect(mocks.supabaseClient.realtime.setAuth).toHaveBeenLastCalledWith("rt-1");
+
+    // expiresAt = agora + 120s; margem de 60s ⇒ renovação agendada em ~60s.
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(61_000);
+    });
+
+    expect(mocks.supabaseClient.realtime.setAuth).toHaveBeenLastCalledWith("rt-2");
   });
 
   it("creates leads through the provider and prepends them to state", async () => {

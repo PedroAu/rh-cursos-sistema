@@ -428,6 +428,49 @@ async function fetchAdminLeads(): Promise<Lead[]> {
   return Array.isArray(payload?.data) ? payload.data.map(mapLead) : [];
 }
 
+/**
+ * Follow-up REC-204 (item 6 do post-mortem REC-502): token efêmero de realtime.
+ *
+ * O cliente Supabase do browser é permanentemente `anon` desde o cutover Fase B
+ * (sessão SSR vive só em cookie httpOnly, ADR-016 D2). Para receber eventos
+ * `postgres_changes` das tabelas admin (`lead`/`aluno`/`inscricao`), cujas
+ * policies RLS exigem `authenticated`, o canal precisa apresentar um JWT válido.
+ * Este helper busca, sob demanda, o `access_token` de curta duração da sessão
+ * SSR pelo BFF same-origin `GET /api/auth/realtime-token`. O token é usado
+ * SOMENTE em memória (nunca storage) por quem chama.
+ */
+type RealtimeTokenResponse = { accessToken: string; expiresAt: number };
+type RealtimeTokenResult =
+  | ({ status: "ok" } & RealtimeTokenResponse)
+  | { status: "unauthorized" }
+  | { status: "transient" };
+
+async function fetchRealtimeToken(): Promise<RealtimeTokenResult> {
+  try {
+    const response = await fetch("/api/auth/realtime-token", {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store"
+    });
+
+    if (response.status === 401 || response.status === 403) return { status: "unauthorized" };
+    if (!response.ok) return { status: "transient" };
+
+    const payload = (await response.json().catch(() => null)) as Partial<RealtimeTokenResponse> | null;
+    if (!payload || typeof payload.accessToken !== "string" || typeof payload.expiresAt !== "number") {
+      return { status: "transient" };
+    }
+
+    return { status: "ok", accessToken: payload.accessToken, expiresAt: payload.expiresAt };
+  } catch {
+    return { status: "transient" };
+  }
+}
+
+// Margem de segurança para renovar o token antes da expiração real da sessão.
+const REALTIME_TOKEN_RENEWAL_MARGIN_MS = 60_000;
+const REALTIME_TOKEN_TRANSIENT_RETRY_MS = 15_000;
+
 function shouldUseLocalEnrollmentProxy() {
   if (typeof window === "undefined") return false;
 
@@ -576,6 +619,9 @@ export function AppStoreProvider({
     const client = supabase;
     const publicTestBaselineEnabled = isExplicitPublicTestBaselineEnabled();
 
+    // Timer de renovação do token efêmero de realtime (limpo no cleanup).
+    let realtimeTokenRenewalTimer: ReturnType<typeof setTimeout> | undefined;
+
     const scheduleCatalogRefetch = debounce(() => {
       if (!active) return;
       catalogFetchVersionRef.current += 1;
@@ -705,51 +751,86 @@ export function AppStoreProvider({
     }
 
     if (isAdminSession && supabase) {
-      // REC-206: a leitura de leads é servida exclusivamente pelo BFF
-      // same-origin (fetchAdminLeads, acima). As subscriptions realtime aqui
-      // apenas notificam mudanças sob RLS — o contrato duplicado de leitura via
-      // cliente Supabase direto foi removido. A consolidação do transporte
-      // realtime (WebSocket direto ao Supabase) permanece fora do escopo.
-      const leadSub = createRealtimeSubscription(
-        supabase,
-        "lead_changes",
-        "lead",
-        () => active,
-        scheduleLeadRefetch
-      );
+      // Follow-up REC-204 (post-mortem REC-502, item 6): as tabelas admin
+      // (`lead`/`inscricao`/`aluno`) têm RLS `to authenticated`. Como o cliente
+      // do browser é `anon` desde o cutover Fase B, o canal precisa apresentar
+      // um JWT válido via `realtime.setAuth` — obtido do BFF same-origin e usado
+      // apenas em memória. Sem token válido, NÃO abrimos os canais (fail-closed).
+      const scheduleRealtimeTokenRenewal = (expiresAt: number) => {
+        const delay = Math.max(expiresAt - Date.now() - REALTIME_TOKEN_RENEWAL_MARGIN_MS, 0);
+        realtimeTokenRenewalTimer = setTimeout(() => {
+          if (!active) return;
+          void fetchRealtimeToken().then((renewed) => {
+            if (!active) return;
+            if (renewed.status === "unauthorized") {
+              subscriptions.splice(0).forEach((channel) => client.removeChannel(channel));
+              return;
+            }
+            if (renewed.status === "transient") {
+              scheduleRealtimeTokenRenewal(Date.now() + REALTIME_TOKEN_TRANSIENT_RETRY_MS + REALTIME_TOKEN_RENEWAL_MARGIN_MS);
+              return;
+            }
+            client.realtime.setAuth(renewed.accessToken);
+            scheduleRealtimeTokenRenewal(renewed.expiresAt);
+          });
+        }, delay);
+      };
 
-      subscriptions.push(leadSub);
+      void fetchRealtimeToken().then((token) => {
+        // Fail-closed: sem token (401/403/erro) tratamos como se não houvesse
+        // sessão admin para este efeito — nenhum canal autenticado é aberto.
+        if (!active || token.status !== "ok") return;
 
-      // O bootstrap administrativo contém também registros inativos.
-      // Um refetch público não pode substituir esse conjunto por uma
-      // visão RLS reduzida após eventos de inscrição/aluno.
-      if (bootstrapPublicData) {
-        // Mudanças em inscrição afetam a capacidade das turmas (vagas),
-        // por isso refetch do catálogo para reconciliar as contagens.
-        const enrollmentSub = createRealtimeSubscription(
-          supabase,
-          "inscricao_changes",
-          "inscricao",
+        client.realtime.setAuth(token.accessToken);
+        scheduleRealtimeTokenRenewal(token.expiresAt);
+
+        // REC-206: a leitura de leads é servida exclusivamente pelo BFF
+        // same-origin (fetchAdminLeads, acima). As subscriptions realtime aqui
+        // apenas notificam mudanças sob RLS.
+        const leadSub = createRealtimeSubscription(
+          client,
+          "lead_changes",
+          "lead",
           () => active,
-          scheduleCatalogRefetch
+          scheduleLeadRefetch
         );
 
-        // Alterações em aluno podem refletir nas estatísticas do catálogo
-        // (total de alunos por curso).
-        const studentSub = createRealtimeSubscription(
-          supabase,
-          "aluno_changes",
-          "aluno",
-          () => active,
-          scheduleCatalogRefetch
-        );
+        subscriptions.push(leadSub);
 
-        subscriptions.push(enrollmentSub, studentSub);
-      }
+        // O bootstrap administrativo contém também registros inativos.
+        // Um refetch público não pode substituir esse conjunto por uma
+        // visão RLS reduzida após eventos de inscrição/aluno.
+        if (bootstrapPublicData) {
+          // Mudanças em inscrição afetam a capacidade das turmas (vagas),
+          // por isso refetch do catálogo para reconciliar as contagens.
+          const enrollmentSub = createRealtimeSubscription(
+            client,
+            "inscricao_changes",
+            "inscricao",
+            () => active,
+            scheduleCatalogRefetch
+          );
+
+          // Alterações em aluno podem refletir nas estatísticas do catálogo
+          // (total de alunos por curso).
+          const studentSub = createRealtimeSubscription(
+            client,
+            "aluno_changes",
+            "aluno",
+            () => active,
+            scheduleCatalogRefetch
+          );
+
+          subscriptions.push(enrollmentSub, studentSub);
+        }
+      });
     }
 
     return () => {
       active = false;
+      if (realtimeTokenRenewalTimer) {
+        clearTimeout(realtimeTokenRenewalTimer);
+      }
       // Cleanup todas as subscriptions
       subscriptions.forEach(channel => {
         client.removeChannel(channel);

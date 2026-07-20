@@ -305,6 +305,47 @@ paths:
                 ok:
                   value:
                     ok: true
+  /api/auth/realtime-token:
+    get:
+      tags: [Auth Session]
+      summary: Emite um token efêmero para autenticar o canal realtime do admin
+      description: >-
+        Follow-up de REC-204 (post-mortem REC-502, item 6). Desde o cutover Fase
+        B a sessão administrativa vive apenas nos cookies httpOnly (ADR-016 D2),
+        inacessíveis ao JS. As tabelas admin (`lead`/`aluno`/`inscricao`) têm RLS
+        `to authenticated`, então o cliente Supabase do browser (`anon`) nunca
+        recebe eventos `postgres_changes`. Esta rota BFF same-origin lê a sessão
+        SSR no servidor e devolve o `access_token` de curta duração da sessão
+        atual para uso SOMENTE em memória (`supabase.realtime.setAuth`), nunca em
+        storage. O `refresh_token` nunca é exposto. Fail-closed: sem sessão
+        administrativa válida, nenhum token é emitido.
+      operationId: getRealtimeToken
+      security:
+        - supabaseSsrCookies: []
+      x-rate-limit:
+        key: realtime-token:{ip}
+        windowSeconds: 60
+        maxRequests: 30
+      responses:
+        '200':
+          description: Token efêmero emitido para a sessão administrativa atual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealtimeTokenResponse'
+              examples:
+                token:
+                  value:
+                    accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    expiresAt: 1800000000000
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '403':
+          $ref: '#/components/responses/SsrAccessDenied'
+        '429':
+          $ref: '#/components/responses/GenericRateLimited'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
   /api/functions/{name}:
     parameters:
       - $ref: '#/components/parameters/FunctionName'
@@ -705,7 +746,8 @@ paths:
         windowSeconds: 60
         maxRequests: 30
       security:
-        - adminSessionHeader: []
+        - trustedBffServiceRoleBearer: []
+          trustedBffServiceRoleApiKey: []
       requestBody:
         required: true
         content:
@@ -770,76 +812,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /functions/v1/auth-session:
-    post:
-      tags: [Auth Session]
-      summary: Login por perfil via Edge Function
-      operationId: loginDashboardSessionEdge
-      x-runtime: supabase-edge-function
-      security: []
-      x-rate-limit:
-        key: auth:{ip}
-        windowSeconds: 900
-        maxRequests: 5
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-      responses:
-        '200':
-          description: Login concluído
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EdgeLoginResponse'
-        '400':
-          $ref: '#/components/responses/LoginInvalid'
-        '401':
-          $ref: '#/components/responses/CredentialsInvalid'
-        '403':
-          $ref: '#/components/responses/OriginNotAllowedOrAccessDenied'
-        '405':
-          $ref: '#/components/responses/MethodNotAllowed'
-        '429':
-          $ref: '#/components/responses/AuthRateLimited'
-        '500':
-          description: Erro interno na autenticação
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-              examples:
-                error:
-                  value:
-                    ok: false
-                    error: Erro na autenticacao.
-        '503':
-          $ref: '#/components/responses/AuthUnavailable'
-    delete:
-      tags: [Auth Session]
-      summary: Logout via Edge Function
-      operationId: logoutDashboardSessionEdge
-      x-runtime: supabase-edge-function
-      security: []
-      requestBody:
-        required: false
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogoutRequest'
-      responses:
-        '200':
-          description: Logout sempre retorna sucesso para o cliente
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/LogoutResponse'
-        '403':
-          $ref: '#/components/responses/OriginNotAllowed'
-        '405':
-          $ref: '#/components/responses/MethodNotAllowed'
 components:
   securitySchemes:
     sessionCookie:
@@ -847,11 +819,22 @@ components:
       in: cookie
       name: rh_cursos_demo_session
       description: Cookie HttpOnly emitido por `/api/auth/session`
-    adminSessionHeader:
+    trustedBffServiceRoleBearer:
+      type: http
+      scheme: bearer
+      description: >-
+        Header `authorization: Bearer <SUPABASE_SERVICE_ROLE_KEY>` usado
+        exclusivamente pelo BFF same-origin. Deve ser enviado em conjunto com
+        `apikey` contendo a mesma service-role key; browsers não chamam
+        `admin-resources` diretamente e nenhuma sessão HMAC é aceita.
+    trustedBffServiceRoleApiKey:
       type: apiKey
       in: header
-      name: x-rh-session
-      description: Token HMAC retornado por `/functions/v1/auth-session`
+      name: apikey
+      description: >-
+        Header `apikey: <SUPABASE_SERVICE_ROLE_KEY>` exigido por
+        `requireTrustedSsrAdmin` junto com `authorization` bearer da mesma
+        service-role key.
     supabaseSsrCookies:
       type: apiKey
       in: cookie
@@ -867,7 +850,7 @@ components:
       description: Nome da Edge Function alvo do proxy same-origin.
       schema:
         type: string
-        enum: [admin-resources, auth-session, enrollments, leads]
+        enum: [admin-resources, enrollments, leads]
     AdminPage:
       name: page
       in: query
@@ -1485,6 +1468,23 @@ components:
           type: string
           description: 'Nível de garantia de autenticação (ex.: `aal1`, `aal2`).'
       required: [ok, session]
+    RealtimeTokenResponse:
+      type: object
+      additionalProperties: false
+      description: >-
+        Token efêmero de realtime. Contém apenas o `access_token` de curta
+        duração da sessão SSR atual e sua expiração real. Nunca inclui
+        `refresh_token`; destinado a uso exclusivamente em memória no cliente.
+      properties:
+        accessToken:
+          type: string
+          description: JWT de acesso de curta duração da sessão SSR atual.
+        expiresAt:
+          type: integer
+          description: >-
+            Expiração real do token em epoch (milissegundos), derivada de
+            `expires_at` da sessão Supabase. Usada para agendar a renovação.
+      required: [accessToken, expiresAt]
     MfaChallengeResponse:
       type: object
       additionalProperties: false

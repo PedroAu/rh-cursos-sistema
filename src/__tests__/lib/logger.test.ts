@@ -100,4 +100,29 @@ describe("logger — redaction central (REC-408 AC5)", () => {
     const line = lastLine(infoSpy);
     expect(line).toContain("[Circular]");
   });
+
+  it("serializa DAG (mesmo objeto em ramos irmãos) sem marcar [Circular]", () => {
+    // Sem ciclo real: `shared` aparece em dois ramos irmãos. A detecção por
+    // caminho de recursão deve serializá-lo normalmente em AMBOS os ramos.
+    const shared = { label: "shared-node", n: 42 };
+    logger.info("dag", { a: shared, b: shared });
+
+    const line = lastLine(infoSpy);
+    expect(line).not.toContain("[Circular]");
+    // O nó compartilhado aparece serializado nas duas ocorrências.
+    const occurrences = line.split("shared-node").length - 1;
+    expect(occurrences).toBe(2);
+  });
+
+  it("marca [Circular] em ciclo indireto via ancestral", () => {
+    // Ciclo real indireto: parent -> child -> parent. A proteção não pode
+    // regredir com a detecção por caminho.
+    const parent: Record<string, unknown> = { name: "no-pii" };
+    const child: Record<string, unknown> = { name: "no-pii-child", parent };
+    parent.child = child;
+
+    expect(() => logger.info("indirect-cycle", { parent })).not.toThrow();
+    const line = lastLine(infoSpy);
+    expect(line).toContain("[Circular]");
+  });
 });

@@ -3,6 +3,8 @@
  * Ensures all required security variables are configured correctly
  */
 
+import { logger } from "@/lib/logger";
+
 function validateEnvironment(): void {
   // O app agora roda em modelo híbrido (SSG para páginas públicas e SSR para
   // rotas protegidas do admin). Variáveis NEXT_PUBLIC_* continuam sendo
@@ -43,7 +45,14 @@ function validateEnvironment(): void {
   }
 
   if (isProduction && !process.env.AUTH_SESSION_SECRET) {
-    errors.push("🔴 CRITICAL: AUTH_SESSION_SECRET must be set in production");
+    // Rebaixado de CRITICAL para aviso informativo: desde REC-204 (cutover
+    // HMAC→SSR) o runtime Next.js/BFF não usa mais AUTH_SESSION_SECRET. Após
+    // SEC-204a (decomissionamento da Edge Function auth-session, 2026-07-19) o
+    // segredo não tem mais nenhum consumidor em runtime — sua ausência não deve
+    // falhar o boot do Next. Remoção do cofre/env é ação futura de @devops.
+    warnings.push(
+      "ℹ️ INFO: AUTH_SESSION_SECRET sem consumidor em runtime desde SEC-204a (auth-session decomissionada); pode ser removido do cofre/env por @devops"
+    );
   }
 
   // ============================================
@@ -77,9 +86,7 @@ function validateEnvironment(): void {
   }
 
   if (warnings.length > 0) {
-    console.warn("\n⚠️ ENVIRONMENT VALIDATION WARNINGS:\n");
-    warnings.forEach(warn => console.warn(warn));
-    console.warn("");
+    warnings.forEach(warn => logger.warn("environment validation warning", { warning: warn }));
   }
 
   if (errors.length === 0 && warnings.length === 0) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, type ReactNode } from "react";
+import { Suspense, useEffect, useState, type ReactNode } from "react";
 
 import type { DashboardRole } from "@/lib/auth";
 import { DashboardShell } from "@/components/layout/dashboard-shell";
@@ -57,6 +57,12 @@ export function DashboardPageShell({
   bootstrapPublicData?: boolean;
   children: ReactNode;
 }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <AppStoreProvider
       initialSession={initialSession}
@@ -64,7 +70,19 @@ export function DashboardPageShell({
       bootstrapPublicData={bootstrapPublicData}
     >
       <Suspense fallback={null}>
-        <DashboardShell role={role}>{children}</DashboardShell>
+        <DashboardShell role={role}>
+          {mounted ? (
+            children
+          ) : (
+            <div
+              aria-busy="true"
+              className="rounded-3xl border border-tk-line bg-tk-surface p-8 text-tk-ink-muted"
+              data-testid="dashboard-hydration-fallback"
+            >
+              Carregando painel…
+            </div>
+          )}
+        </DashboardShell>
       </Suspense>
     </AppStoreProvider>
   );

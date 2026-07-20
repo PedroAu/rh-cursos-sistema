@@ -10,11 +10,11 @@ Done
 **Como** administradora, **quero** gerir alunos conforme o canvas, **para** localizar cadastros e compreender seu vínculo com matrículas.
 
 ## Acceptance Criteria
-- [ ] Cabeçalho “Alunos”, contagens reais, busca e “Novo aluno” seguem `Admin — Alunos`.
-- [ ] Tabela apresenta Aluno, E-mail, Organização, Matrículas, Última atividade e Ações quando sustentados pelos dados.
-- [ ] Busca cobre nome, CPF e e-mail sem regredir o CRUD atual.
-- [ ] Empty state, tabela responsiva e controles são acessíveis por teclado.
-- [ ] Testes cobrem busca, renderização, criação/edição e overflow.
+- [x] Cabeçalho “Alunos”, contagens reais, busca e “Novo aluno” seguem `Admin — Alunos`.
+- [x] Tabela apresenta Aluno, E-mail, Organização, Matrículas, Última atividade e Ações quando sustentados pelos dados.
+- [x] Busca cobre nome, CPF e e-mail sem regredir o CRUD atual.
+- [x] Empty state, tabela responsiva e controles são acessíveis por teclado.
+- [x] Testes cobrem busca, renderização, criação/edição e overflow.
 
 ## Tasks
 - [x] Adaptar apresentação de `students`.
@@ -46,6 +46,7 @@ Codex — Dex (`@dev`)
 - Busca cobre nome, CPF e e-mail.
 - Matrículas e última atividade são derivadas somente dos relacionamentos existentes por CPF/e-mail.
 - CRUD, empty state, controles de teclado e overflow responsivo permanecem no fluxo compartilhado.
+- Reconciliação 18.3 (2026-07-19): waiver resolvido após execução em ambiente Supabase isolado; `npm run test:epic15:fidelity` passou 9/9 e os ACs foram reconciliados como aceitos. Status `Done` representa implementação e aceite formal.
 
 ### Change Log
 - 2026-07-17: apresentação canônica, busca ampliada, relacionamentos derivados e cobertura unitária implementados.

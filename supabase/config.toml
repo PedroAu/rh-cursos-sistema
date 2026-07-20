@@ -390,9 +390,6 @@ verify_jwt = false
 [functions.enrollments]
 verify_jwt = false
 
-[functions.auth-session]
-verify_jwt = false
-
 [functions.admin-resources]
 verify_jwt = false
 

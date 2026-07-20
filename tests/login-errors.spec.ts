@@ -5,6 +5,7 @@ import {
   getCanonicalDocs,
   getIntegrationEnv,
   hasRealIntegrationEnv,
+  loginWithSsrSession,
 } from "./helpers/integration-env";
 
 // A suíte mistura contrato real para o caminho feliz e cenários controlados
@@ -42,30 +43,45 @@ test.describe("mensagens de erro do login", () => {
 
     await expect(page).toHaveURL(/\/cursos$/);
     await expect
-      .poll(() =>
-        page.evaluate(() => window.localStorage.getItem("rh_cursos_admin_token"))
+      .poll(async () =>
+        page.evaluate(async () => {
+          const response = await fetch("/api/auth/session", {
+            method: "GET",
+            headers: { Accept: "application/json" },
+            credentials: "include",
+          });
+
+          return {
+            status: response.status,
+            body: await response.json(),
+          };
+        })
       )
-      .toMatch(/\./);
+      .toMatchObject({
+        status: 200,
+        body: {
+          ok: true,
+          authMode: "ssr",
+          session: {
+            role: "admin",
+            email: adminEmail,
+          },
+        },
+      });
   });
 
-  test("logout encerra a sessão e volta a bloquear /admin", async ({ page }, testInfo) => {
+  test("logout encerra a sessão e volta a bloquear /admin", async ({ page, baseURL }, testInfo) => {
     test.skip(!hasRealIntegrationEnv(), "Fluxo real de logout requer ambiente Supabase real.");
     annotateCanonicalDoc(testInfo, getCanonicalDocs().authSession);
-    const { adminEmail, adminPassword } = getIntegrationEnv();
-
-    await ensureAuthUser({
-      email: adminEmail,
-      name: "Administrador RH Cursos",
-      password: adminPassword,
+    await loginWithSsrSession({
+      baseURL: baseURL ?? "http://127.0.0.1:3100",
+      context: page.context(),
       role: "admin",
+      name: "Administrador RH Cursos",
     });
-
-    await page.goto("/login?next=/admin");
-    await page.getByLabel("E-mail").fill(adminEmail);
-    await page.getByLabel("Senha").fill(adminPassword);
-    await clickEntrar(page);
-
+    await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin/);
+    await expect(page.getByRole("button", { name: "Sair" })).toBeVisible();
     const logoutResponsePromise = page.waitForResponse((response) =>
       response.url().includes("/api/auth/session") &&
       response.request().method() === "DELETE"

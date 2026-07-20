@@ -59,7 +59,6 @@ jobs:
         run: |
           supabase functions deploy leads --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy enrollments --project-ref "$SUPABASE_PROJECT_REF"
-          supabase functions deploy auth-session --project-ref "$SUPABASE_PROJECT_REF"
           supabase functions deploy admin-resources --project-ref "$SUPABASE_PROJECT_REF"
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
@@ -68,5 +67,5 @@ jobs:
       - name: Summary
         run: |
           echo "✅ Edge Functions publicadas no Supabase!"
-          echo "  leads, enrollments, auth-session, admin-resources"
+          echo "  leads, enrollments, admin-resources"
           echo "  Commit: ${{ github.sha }}"

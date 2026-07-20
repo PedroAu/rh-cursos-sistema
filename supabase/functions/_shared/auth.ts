@@ -6,9 +6,9 @@
 // leitura de `x-rh-session`) foi REMOVIDO — token HMAC legado não é mais aceito
 // em nenhuma rota de produção (retorna 401 em `admin-resources`).
 //
-// `encodeSession` permanece apenas porque a Edge Function `auth-session`
-// (deploy estático, fora do escopo desta story) ainda a consome; ela não é
-// autoridade em nenhum caminho protegido após o cutover.
+// SEC-204a (2026-07-19): o emissor HMAC (`encodeSession` e helpers correlatos)
+// foi REMOVIDO junto com a Edge Function `auth-session`, seu último consumidor.
+// Não há mais nenhum caminho que assine ou aceite tokens HMAC.
 
 export type DashboardRole = "admin";
 
@@ -20,54 +20,6 @@ export type AdminSession = {
   /** Epoch ms de expiração da sessão assinada. */
   exp?: number;
 };
-
-export const SESSION_TTL_MS = 30 * 60 * 1000;
-
-export function getSessionSecret(): string {
-  const secret = Deno.env.get("AUTH_SESSION_SECRET");
-
-  if (!secret) {
-    throw new Error("AUTH_SESSION_SECRET é obrigatório nas Edge Functions.");
-  }
-
-  if (secret.length < 32) {
-    throw new Error("AUTH_SESSION_SECRET deve ter ao menos 32 caracteres.");
-  }
-
-  return secret;
-}
-
-function toBase64Url(value: ArrayBuffer | string): string {
-  const binary =
-    typeof value === "string" ? value : String.fromCharCode(...new Uint8Array(value));
-
-  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
-}
-
-async function signPayload(payload: string): Promise<string> {
-  const key = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(getSessionSecret()),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-  const signature = await crypto.subtle.sign(
-    "HMAC",
-    key,
-    new TextEncoder().encode(payload)
-  );
-  return toBase64Url(signature);
-}
-
-export async function encodeSession(
-  session: AdminSession,
-  ttlMs = SESSION_TTL_MS
-): Promise<string> {
-  const payload = toBase64Url(JSON.stringify({ ...session, exp: Date.now() + ttlMs }));
-  const signature = await signPayload(payload);
-  return `${payload}.${signature}`;
-}
 
 function timingSafeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

@@ -247,3 +247,22 @@ Finding `medium`: SEC-107 (gap de validação HTTP real, não bloqueante para o 
 **Veredito:** CONCERNS. A revogação está tecnicamente sólida e comprovada a nível de banco; a contenção do vetor de escrita não controlada de PII (FND-02) está efetiva. Recomendo: (1) prosseguir tratando REC-101 como contida; (2) executar o teste HTTP real via PostgREST antes de fechar G1/G2 para reabertura de catálogo/pré-inscrição pública.
 
 — Quinn, guardião da qualidade 🛡️
+
+### SEC-107 resolvido — validação HTTP real (2026-07-19)
+
+Chamada HTTP real via PostgREST executada contra projeto Supabase de teste isolado (`site-teste`, ref `rajjoakjkmmzcwtabuxx`, schema idêntico via as mesmas migrations aplicadas em produção):
+
+```
+POST /rest/v1/rpc/registrar_inscricao_publica
+Authorization: Bearer <anon key>
+apikey: <anon key>
+Content-Type: application/json
+
+{"p_nome_completo":"Teste Sintetico", ...todos os 11 parâmetros nomeados...}
+```
+
+**Resposta:** `HTTP 401` — `{"code":"42501","message":"permission denied for function registrar_inscricao_publica"}`.
+
+Isso confirma, via chamada HTTP real (não apenas `has_function_privilege()` a nível de banco), que `anon` é rejeitado pelo PostgREST antes mesmo da execução do corpo da função — exatamente o gap que o finding `SEC-107` apontava. AC1 passa a ser **PASS** (não mais CONCERNS). Não há mudança de código nesta verificação — é evidência adicional sobre a migration já existente.
+
+— Verificado por `@aiox-master` (Orion), 2026-07-19

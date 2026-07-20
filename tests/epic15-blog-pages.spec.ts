@@ -1,18 +1,10 @@
-import { loadEnvFile } from "node:process";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-
-try {
-  loadEnvFile(".env.local");
-} catch {
-  // O segredo pode ser fornecido diretamente pelo ambiente de CI.
-}
+import { loginWithSsrSession } from "@tests/helpers/integration-env";
 
 async function loginAsAdmin(context: import("@playwright/test").BrowserContext, baseURL: string) {
-  const token = await encodeSession({ role: "admin", email: "admin@rhcursos.com.br", name: "Admin E2E" });
-  await context.addCookies([{ name: SESSION_COOKIE, value: token, url: baseURL }]);
+  await loginWithSsrSession({ baseURL, context, name: "Admin E2E" });
 }
 
 test.describe("epic 15.8 — Blog e Páginas", () => {

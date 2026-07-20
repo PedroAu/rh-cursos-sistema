@@ -1,16 +1,5 @@
-import { loadEnvFile } from "node:process";
 import { expect, test, type Page } from "@playwright/test";
-import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
-
-// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET real via
-// .env.local, mas este processo Node/Playwright não — sem isto, encodeSession()
-// assina com o fallback inseguro, o servidor rejeita a assinatura e todo
-// cookie de sessão cai silenciosamente para /login sem erro visível.
-try {
-  loadEnvFile(".env.local");
-} catch {
-  // Arquivo pode não existir em alguns ambientes (ex.: CI com secrets via env vars).
-}
+import { loginWithSsrSession } from "./helpers/integration-env";
 
 // Crawl de fumaça: visita cada rota conhecida do app (pública, portal e admin)
 // e falha se a página cair no error boundary ("Algo deu errado") ou disparar
@@ -59,14 +48,6 @@ const portalPaths: Array<{ path: string; role: "student" | "instructor" }> = [
   { path: "/instrutor", role: "instructor" }
 ];
 
-async function issueSessionToken(role: "admin" | "instructor" | "student") {
-  return encodeSession({
-    role,
-    email: `${role}@rhcursos.com.br`,
-    name: `Perfil ${role}`
-  });
-}
-
 async function crawl(page: Page, path: string, options: { expectAuthenticated?: boolean } = {}) {
   const consoleErrors: string[] = [];
   const pageErrors: string[] = [];
@@ -114,15 +95,13 @@ test.describe("smoke crawl — páginas públicas", () => {
 });
 
 test.describe("smoke crawl — admin", () => {
-  test.beforeEach(async ({ context }) => {
-    const token = await issueSessionToken("admin");
-    await context.addCookies([
-      {
-        name: SESSION_COOKIE,
-        value: token,
-        url: test.info().project.use.baseURL as string
-      }
-    ]);
+  test.beforeEach(async ({ context, baseURL }) => {
+    await loginWithSsrSession({
+      baseURL: baseURL ?? "http://127.0.0.1:3100",
+      context,
+      role: "admin",
+      name: "Perfil admin"
+    });
   });
 
   for (const path of adminPaths) {
@@ -134,15 +113,13 @@ test.describe("smoke crawl — admin", () => {
 
 test.describe("smoke crawl — portais aluno/instrutor", () => {
   for (const { path, role } of portalPaths) {
-    test(`${path} carrega sem erro`, async ({ page, context }) => {
-      const token = await issueSessionToken(role);
-      await context.addCookies([
-        {
-          name: SESSION_COOKIE,
-          value: token,
-          url: test.info().project.use.baseURL as string
-        }
-      ]);
+    test(`${path} carrega sem erro`, async ({ page, context, baseURL }) => {
+      await loginWithSsrSession({
+        baseURL: baseURL ?? "http://127.0.0.1:3100",
+        context,
+        role,
+        name: `Perfil ${role}`
+      });
 
       await crawl(page, path, { expectAuthenticated: true });
     });

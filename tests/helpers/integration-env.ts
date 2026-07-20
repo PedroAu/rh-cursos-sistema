@@ -2,7 +2,7 @@ import { loadEnvFile } from "node:process";
 import { randomBytes } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
-import type { Page, TestInfo } from "@playwright/test";
+import type { BrowserContext, Page, TestInfo } from "@playwright/test";
 import { assertSafeWritableIntegrationEnv as assertSafeWritableIntegrationEnvValues } from "./safe-writable-env";
 
 type IntegrationEnv = {
@@ -14,7 +14,7 @@ type IntegrationEnv = {
   supabaseUrl: string;
 };
 
-type AuthRole = "admin" | "student";
+type AuthRole = "admin" | "student" | "instructor";
 
 const FALLBACK_ADMIN_PASSWORD = "SenhaForte#2026";
 const FALLBACK_STUDENT_PASSWORD = "AlunoForte#2026";
@@ -216,6 +216,63 @@ export async function ensureAuthUser(options: {
   if (!data.user) throw new Error(`Não foi possível criar o usuário ${options.email}.`);
 
   return { email: options.email, password };
+}
+
+/**
+ * Autentica um contexto Playwright pelo mesmo endpoint Supabase SSR usado pelo
+ * produto. O cookie fica no cookie jar do BrowserContext (httpOnly), sem
+ * expor/persistir access ou refresh tokens no browser.
+ */
+export async function loginWithSsrSession(options: {
+  baseURL: string;
+  context: BrowserContext;
+  email?: string;
+  name?: string;
+  role?: AuthRole;
+}) {
+  const role = options.role ?? "admin";
+  const email = options.email ?? `${role}-contract@rhcursos.test`;
+  const credentials = await ensureAuthUser({
+    email,
+    name: options.name ?? `E2E ${role}`,
+    role,
+  });
+  const response = await options.context.request.post(
+    new URL("/api/auth/ssr-session", options.baseURL).toString(),
+    {
+      data: {
+        email: credentials.email,
+        password: credentials.password,
+        role,
+      },
+      headers: {
+        "cf-connecting-ip": createUniqueIp(`epic15-${role}-ssr`),
+        "x-forwarded-for": createUniqueIp(`epic15-${role}-ssr-forwarded`),
+        "x-real-ip": createUniqueIp(`epic15-${role}-ssr-real`),
+      },
+    }
+  );
+
+  if (!response.ok()) {
+    throw new Error(
+      `Falha fechada ao autenticar fixture ${role} via SSR: ${response.status()} ${await response.text()}`
+    );
+  }
+
+  const payload = (await response.json()) as {
+    aal?: string;
+    ok?: boolean;
+    session?: { email?: string; role?: string };
+  };
+  if (
+    payload.ok !== true ||
+    payload.session?.email !== credentials.email ||
+    payload.session?.role !== role
+  ) {
+    throw new Error("Resposta SSR não confirmou a identidade esperada da fixture E2E.");
+  }
+
+  return payload;
 }
 
 export async function cleanupEnrollmentArtifacts(email: string) {

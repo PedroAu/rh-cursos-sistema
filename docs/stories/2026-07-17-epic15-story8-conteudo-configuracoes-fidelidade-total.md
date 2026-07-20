@@ -10,12 +10,12 @@ Done
 **Como** administradora, **quero** gerir conteúdo institucional e preferências em telas fiéis ao canvas, **para** manter a presença digital e a operação com uma linguagem única.
 
 ## Acceptance Criteria
-- [ ] Blog segue `Admin — Blog`, preservando CRUD, autor, status, atualização e ações.
-- [ ] Rota `Páginas do site` existe, lista somente páginas reais conhecidas e não oferece edição falsa.
-- [ ] Configurações segue o grid do canvas com Dados da empresa, Notificações e Equipe de acesso.
-- [ ] Persistência local existente é mantida; nenhuma integração ou permissão inexistente é simulada.
-- [ ] Navegação lateral inclui Páginas e todos os grupos/itens do canvas sem quebrar o mobile drawer.
-- [ ] Testes cobrem as três telas, navegação, persistência, acessibilidade e responsividade.
+- [x] Blog segue `Admin — Blog`, preservando CRUD, autor, status, atualização e ações.
+- [x] Rota `Páginas do site` existe, lista somente páginas reais conhecidas e não oferece edição falsa.
+- [x] Configurações segue o grid do canvas com Dados da empresa, Notificações e Equipe de acesso.
+- [x] Persistência local existente é mantida; nenhuma integração ou permissão inexistente é simulada.
+- [x] Navegação lateral inclui Páginas e todos os grupos/itens do canvas sem quebrar o mobile drawer.
+- [x] Testes cobrem as três telas, navegação, persistência, acessibilidade e responsividade.
 
 ## Tasks
 - [x] Adaptar Blog e Configurações.
@@ -35,6 +35,7 @@ Done
 - Configurações preserva `rhc:admin-settings` e remove integrações/permissões simuladas.
 - Navegação desktop/drawer agrupada e sincronizada; gate WCAG 2.1 A/AA da tela Páginas verde.
 - Gates globais: lint, typecheck, 729/729 unitários, build, purge, bundle e 8/8 Playwright verdes.
+- Reconciliação 18.3 (2026-07-19): waiver resolvido após execução em ambiente Supabase isolado; `npm run test:epic15:fidelity` passou 9/9 e os ACs foram reconciliados como aceitos. Status `Done` representa implementação e aceite formal.
 
 ## File List
 - `app/admin/paginas/page.tsx`

@@ -176,9 +176,17 @@ function validateMutation(mutation: AdminMutation): string | null {
 
     return null;
   } catch (err) {
-    if (err && typeof err === "object" && "errors" in err) {
-      const issues = (err as { errors: Array<{ message: string }> }).errors;
-      return issues.map((i) => i.message).join("; ");
+    if (err && typeof err === "object" && ("issues" in err || "errors" in err)) {
+      const issues =
+        "issues" in err
+          ? (err as { issues: Array<{ message: string; path?: Array<string | number> }> }).issues
+          : (err as { errors: Array<{ message: string; path?: Array<string | number> }> }).errors;
+      return issues
+        .map((issue) => {
+          const path = issue.path?.join(".");
+          return path ? `${path}: ${issue.message}` : issue.message;
+        })
+        .join("; ");
     }
     return "Payload inválido.";
   }

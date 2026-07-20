@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "validatedAt": "2026-07-19",
+  "validator": "@po (Pax)",
+  "epic": 18,
+  "decision": "GO",
+  "epicStatus": "Done",
+  "codeRabbit": "disabled",
+  "clickUp": "unavailable",
+  "stories": [
+    {
+      "id": "18.1",
+      "file": "docs/stories/2026-07-19-epic18-story1-rastreabilidade-portfolio.md",
+      "decision": "GO",
+      "score": 9.5,
+      "confidence": "high",
+      "status": "Done",
+      "executionBlocked": false
+    },
+    {
+      "id": "18.2",
+      "file": "docs/stories/2026-07-19-epic18-story2-auditoria-redesign.md",
+      "decision": "GO",
+      "score": 9.0,
+      "confidence": "high",
+      "status": "Done",
+      "executionBlocked": false
+    },
+    {
+      "id": "18.3",
+      "file": "docs/stories/2026-07-19-epic18-story3-restaurar-gates.md",
+      "decision": "GO_CONDITIONAL",
+      "score": 9.5,
+      "confidence": "high",
+      "status": "Done",
+      "executionBlocked": false,
+      "blockedBy": []
+    }
+  ]
+}

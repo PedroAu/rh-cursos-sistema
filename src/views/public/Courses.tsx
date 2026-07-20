@@ -218,7 +218,7 @@ export function CoursesPage() {
 
             <div className="flex flex-wrap items-center gap-4" data-testid="ui-courses-filters">
               <div role="search" className="relative w-full max-w-[360px]">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
+                <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-tk-ink-muted" />
                 <Input
                   ref={searchRef}
                   type="search"
@@ -339,17 +339,17 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
         <div className="space-y-2 text-[0.82rem] text-tk-ink-muted">
           {isOpenClass ? (
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-[15px] w-[15px]" />
+              <CalendarDays aria-hidden="true" className="h-[15px] w-[15px]" />
               <span>{formatCatalogDate(entry.trainingClass!.startDate)}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <CalendarDays className="h-[15px] w-[15px]" />
+              <CalendarDays aria-hidden="true" className="h-[15px] w-[15px]" />
               <span>Sem turma aberta · {formatCourseModalities(entry.course)}</span>
             </div>
           )}
           <div className="flex items-center gap-2">
-            <Clock3 className="h-[15px] w-[15px]" />
+            <Clock3 aria-hidden="true" className="h-[15px] w-[15px]" />
             <span>{isOpenClass ? `${entry.trainingClass!.modality} · ${entry.course.durationLabel}` : `${formatCourseModalities(entry.course)} · ${entry.course.durationLabel}`}</span>
           </div>
         </div>

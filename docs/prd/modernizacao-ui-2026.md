@@ -27,11 +27,15 @@ Features de produto bloqueadas (**certificados**, **portal do aluno/instrutor**)
 
 Todo requisito deste PRD traça a um destes artefatos verificados:
 
-- `docs/diagnosis/form-audit-2026-06-04.md` — diagnóstico de formulários admin (13 problemas).
-- `docs/diagnosis/implementation-summary-2026-06-04.md` — registro de correções já aplicadas no admin.
-- `docs/design/apple-hig-application-plan-2026-05-26.md` — auditoria do runtime + plano P0→P5.
-- `docs/stories/2026-06-04-publication-readiness-portal-scope.md` — recorte de escopo de publicação.
+- `docs/diagnosis/form-audit-2026-06-04.md` — diagnóstico de formulários admin (13 problemas). **[AUSENTE no worktree em 2026-07-19 — ver nota de reconciliação abaixo]**
+- `docs/diagnosis/implementation-summary-2026-06-04.md` — registro de correções já aplicadas no admin. **[AUSENTE no worktree em 2026-07-19]**
+- `docs/design/apple-hig-application-plan-2026-05-26.md` — auditoria do runtime + plano P0→P5. **[AUSENTE no worktree em 2026-07-19]**
+- `docs/stories/2026-06-04-publication-readiness-portal-scope.md` — recorte de escopo de publicação. **[AUSENTE no worktree em 2026-07-19]**
 - Verificação direta do código (2026-06-09) — ver §2.
+
+> **Nota de reconciliação (Story 18.1 / Épica 18, 2026-07-19).** As quatro fontes documentais citadas acima **não existem mais no worktree auditado** (SHA `b86d07e`). Isso é registrado com impacto e owner na §4 de [`docs/prd/traceability-matrix.md`](./traceability-matrix.md); nenhum conteúdo foi recriado (Article IV — No Invention). Os requisitos deste PRD (Épicas 1–6, todas `COMPLETE`) **não são reescritos** — apenas a ausência de baseline é declarada.
+>
+> **Supersessão de identidade visual:** o redesign posterior consolidou a identidade **Trust Keith** (`--tk-*`, Épicas 14–15) como **canônica**. O redesign **Executive Precision** (Épica 7) é **histórico/supersedido** e suas fontes `docs/design/executive-precision/` também estão ausentes. Detalhe em [`docs/prd/traceability-matrix.md#5-supersessão-do-redesign-executive-precision--trust-keith`](./traceability-matrix.md). Esta nota é documental e **não altera a implementação visual**.
 
 ---
 

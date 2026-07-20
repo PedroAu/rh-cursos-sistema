@@ -29,9 +29,12 @@ export const isSupabaseSsrConfigured = Boolean(supabaseUrl && supabaseAnonKey);
  * Supabase (expiração do JWT + refresh token), não por um TTL assinado local.
  */
 export function buildSsrCookieOptions(): CookieOptions {
+  const isLocalE2E =
+    process.env.E2E_LOCAL_SUPABASE === "1" && process.env.VERCEL_ENV !== "production";
+
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.NODE_ENV === "production" && !isLocalE2E,
     sameSite: "lax",
     path: "/"
   };

@@ -105,24 +105,35 @@ function redact(value: unknown, seen: WeakSet<object>, depth = 0): unknown {
 
   if (value instanceof Error) {
     if (seen.has(value)) return CIRCULAR;
+    // `seen` rastreia o caminho de recursão atual, não todos os nós já vistos:
+    // remove-se o nó ao sair do ramo para não marcar um DAG legítimo (mesmo
+    // objeto em ramos irmãos) como [Circular]. Ciclo real (nó que referencia
+    // a si mesmo ou um ancestral) continua barrado.
     seen.add(value);
-    return serializeError(value, seen, depth);
+    try {
+      return serializeError(value, seen, depth);
+    } finally {
+      seen.delete(value);
+    }
   }
 
   if (type === "object") {
     if (seen.has(value as object)) return CIRCULAR;
     if (depth >= MAX_DEPTH) return "[Truncated]";
     seen.add(value as object);
+    try {
+      if (Array.isArray(value)) {
+        return value.map((item) => redact(item, seen, depth + 1));
+      }
 
-    if (Array.isArray(value)) {
-      return value.map((item) => redact(item, seen, depth + 1));
+      const out: Record<string, unknown> = {};
+      for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
+        out[key] = isSensitiveKey(key) ? REDACTED : redact(val, seen, depth + 1);
+      }
+      return out;
+    } finally {
+      seen.delete(value as object);
     }
-
-    const out: Record<string, unknown> = {};
-    for (const [key, val] of Object.entries(value as Record<string, unknown>)) {
-      out[key] = isSensitiveKey(key) ? REDACTED : redact(val, seen, depth + 1);
-    }
-    return out;
   }
 
   return REDACTED;

@@ -10,11 +10,11 @@ Done
 **Como** administradora, **quero** visualizar e gerir turmas conforme o canvas Trust Keith, **para** acompanhar agenda, modalidade, ocupação e status numa única visão.
 
 ## Acceptance Criteria
-- [ ] Cabeçalho “Turmas”, resumo dinâmico e ação “Nova turma” correspondem à tela `Admin — Turmas`.
-- [ ] Tabela exibe Turma, Data, Modalidade, Ocupação, Instrutor, Status e Ações com dados reais.
-- [ ] Indicador de ocupação reutiliza `SeatProgress`/`toOccupancyPercent` e trata capacidade zero.
-- [ ] CRUD e validações existentes continuam funcionais; estados vazio e responsivo são acessíveis.
-- [ ] Testes cobrem colunas, ocupação, criação/edição e fidelidade responsiva.
+- [x] Cabeçalho “Turmas”, resumo dinâmico e ação “Nova turma” correspondem à tela `Admin — Turmas`.
+- [x] Tabela exibe Turma, Data, Modalidade, Ocupação, Instrutor, Status e Ações com dados reais.
+- [x] Indicador de ocupação reutiliza `SeatProgress`/`toOccupancyPercent` e trata capacidade zero.
+- [x] CRUD e validações existentes continuam funcionais; estados vazio e responsivo são acessíveis.
+- [x] Testes cobrem colunas, ocupação, criação/edição e fidelidade responsiva.
 
 ## Tasks
 - [x] Adaptar apresentação de `classes` sem duplicar o domínio.
@@ -31,6 +31,7 @@ Done
 - Apresentação de Turmas alinhada ao canvas com título, resumo dinâmico, CTA e colunas de agenda, modalidade, ocupação e instrutor.
 - `SeatProgress` e `toOccupancyPercent` foram reutilizados, inclusive para capacidade zero e exportação CSV.
 - Testes unitários específicos e Playwright foram adicionados. Gates globais verdes: 729/729 unitários, lint, typecheck, build e 8/8 Playwright da Épica 15.
+- Reconciliação 18.3 (2026-07-19): waiver resolvido após execução em ambiente Supabase isolado; `npm run test:epic15:fidelity` passou 9/9 e os ACs foram reconciliados como aceitos. Status `Done` representa implementação e aceite formal.
 
 ## Change Log
 - 2026-07-17 — Implementação e integração concluídas pelo @dev.

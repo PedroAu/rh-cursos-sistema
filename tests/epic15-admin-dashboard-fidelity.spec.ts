@@ -1,29 +1,28 @@
-import { loadEnvFile } from "node:process";
 import { expect, test } from "@playwright/test";
 
-import { SESSION_COOKIE, encodeSession } from "@/lib/auth";
+import { loginWithSsrSession } from "@tests/helpers/integration-env";
 import { attachRuntimeErrorProbe } from "@tests/helpers/runtime-errors";
 
-// O servidor de teste (`next start`) carrega AUTH_SESSION_SECRET via
-// .env.local automaticamente, mas este processo Playwright não — sem isso,
-// encodeSession() assina com o fallback inseguro e o cookie nunca bate com
-// o segredo real do servidor (mesmo problema resolvido em admin-crud.spec.ts).
-try {
-  loadEnvFile(".env.local");
-} catch {
-  // Arquivo pode não existir em alguns ambientes (ex.: CI com secrets via env vars).
-}
-
 // Story 15.1 — regressão de fidelidade do Dashboard admin (Trust Keith).
-// Autentica via cookie de sessão (mesmo padrão de tests/route-auth.spec.ts)
-// para evitar depender de credenciais reais do Supabase Auth.
+// Autentica pelo contrato Supabase SSR vigente; os tokens permanecem somente
+// nos cookies httpOnly geridos pelo BrowserContext.
 
 async function loginAsAdmin(context: import("@playwright/test").BrowserContext, baseURL: string) {
-  const token = await encodeSession({ role: "admin", email: "admin@rhcursos.com.br", name: "Admin E2E" });
-  await context.addCookies([{ name: SESSION_COOKIE, value: token, url: baseURL }]);
+  await loginWithSsrSession({ baseURL, context, name: "Admin E2E" });
 }
 
 test.describe("epic 15 — admin dashboard fidelidade total", () => {
+  test("falha fechado quando as credenciais SSR são inválidas", async ({ context, baseURL }) => {
+    const response = await context.request.post(
+      new URL("/api/auth/ssr-session", baseURL ?? "http://127.0.0.1:3100").toString(),
+      { data: { email: "admin-contract@rhcursos.test", password: "credencial-invalida", role: "admin" } }
+    );
+
+    expect(response.status()).toBe(401);
+    await expect(response.json()).resolves.toMatchObject({ ok: false });
+    expect(await context.cookies()).toEqual([]);
+  });
+
   test("Visão geral renderiza cabeçalho, KPIs e cards do canvas sem erro de runtime", async ({ context, page, baseURL }) => {
     await loginAsAdmin(context, baseURL ?? "http://127.0.0.1:3100");
     const runtimeErrors = attachRuntimeErrorProbe(page);

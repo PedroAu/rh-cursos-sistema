@@ -180,6 +180,26 @@ function formatEditorialDate(value?: string) {
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(date);
 }
 
+function formatDateOnlyPtBR(value?: string) {
+  if (!value) return "—";
+
+  const dateOnly = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T)/);
+  if (!dateOnly) return formatEditorialDate(value);
+
+  const [, year, month, day] = dateOnly;
+  const date = new Date(`${year}-${month}-${day}T12:00:00.000Z`);
+  if (
+    !Number.isFinite(date.getTime()) ||
+    date.getUTCFullYear() !== Number(year) ||
+    date.getUTCMonth() !== Number(month) - 1 ||
+    date.getUTCDate() !== Number(day)
+  ) {
+    return "—";
+  }
+
+  return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(date);
+}
+
 function isWithinLastDays(value: string, days: number, now = Date.now()) {
   const timestamp = new Date(value).getTime();
   if (!Number.isFinite(timestamp)) return false;
@@ -662,8 +682,7 @@ export function buildResourceConfig(
           },
           {
             key: "date", label: "Data",
-            render: (row: TrainingClass) =>
-              new Intl.DateTimeFormat("pt-BR").format(new Date(row.startDate)),
+            render: (row: TrainingClass) => formatDateOnlyPtBR(row.startDate),
           },
           {
             key: "modality", label: "Modalidade",
@@ -1102,7 +1121,7 @@ export function buildResourceConfig(
         )
         .map((item) => ({
           value: item.id,
-          label: `${store.courses.find((course) => course.id === item.courseId)?.title ?? "Curso"} • ${new Intl.DateTimeFormat("pt-BR").format(new Date(item.startDate))}`,
+          label: `${store.courses.find((course) => course.id === item.courseId)?.title ?? "Curso"} • ${formatDateOnlyPtBR(item.startDate)}`,
         }));
       const enrollmentTypeOptions = [
         { value: "Pessoa física", label: "Pessoa física" },
@@ -1176,7 +1195,7 @@ export function buildResourceConfig(
               const trainingClass = store.classes.find((item) => item.id === row.classId);
               const course = store.courses.find((item) => item.id === row.courseId);
               if (!trainingClass) return "Informação indisponível";
-              return `${course?.title ?? "Curso não localizado"} • ${new Intl.DateTimeFormat("pt-BR").format(new Date(trainingClass.startDate))}`;
+              return `${course?.title ?? "Curso não localizado"} • ${formatDateOnlyPtBR(trainingClass.startDate)}`;
             },
           },
           { key: "createdAt", label: "Inscrição", render: (row: Enrollment) => formatAdminDate(row.createdAt) },
