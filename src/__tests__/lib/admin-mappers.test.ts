@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { courseToUpsert } from "../../../supabase/functions/_shared/admin-mappers";
+import {
+  courseToUpsert,
+  resolveUniqueCourseSlug,
+} from "../../../supabase/functions/_shared/admin-mappers";
 
 describe("courseToUpsert", () => {
   it("persists every selected modality while keeping the primary legacy field coherent", () => {
@@ -124,5 +127,21 @@ describe("courseToUpsert", () => {
 
     expect(payload.trilha_id).toBe("path-gestao-publica");
     expect(payload.trilha_nome).toBe("Gestão Pública");
+  });
+
+  it("generates a unique slug for a new course when the title already exists", () => {
+    expect(
+      resolveUniqueCourseSlug(null, "eSocial na prática", "course-new", [
+        { id: "course-1", slug: "esocial-na-pratica" },
+      ])
+    ).toBe("esocial-na-pratica-2");
+  });
+
+  it("keeps the existing slug when editing the same course", () => {
+    expect(
+      resolveUniqueCourseSlug("esocial-na-pratica", "eSocial na prática", "course-1", [
+        { id: "course-1", slug: "esocial-na-pratica" },
+      ])
+    ).toBe("esocial-na-pratica");
   });
 });

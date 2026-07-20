@@ -11,6 +11,36 @@ function slugify(value: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+export type CourseSlugCandidate = {
+  id: string | null;
+  slug: string | null;
+};
+
+export function resolveUniqueCourseSlug(
+  requestedSlug: string | null | undefined,
+  title: string | null | undefined,
+  currentCourseId: string | null | undefined,
+  existingCourses: CourseSlugCandidate[] | null | undefined
+): string {
+  const baseSlug = slugify(requestedSlug || title || "novo-curso") || "novo-curso";
+  const normalizedCurrentId = currentCourseId ?? null;
+  const existingSlugs = new Set(
+    (existingCourses ?? [])
+      .filter((course) => course.id !== normalizedCurrentId)
+      .map((course) => course.slug)
+      .filter((slug): slug is string => typeof slug === "string" && slug.length > 0)
+  );
+
+  if (!existingSlugs.has(baseSlug)) return baseSlug;
+
+  for (let suffix = 2; suffix < 1000; suffix += 1) {
+    const candidate = `${baseSlug}-${suffix}`;
+    if (!existingSlugs.has(candidate)) return candidate;
+  }
+
+  return `${baseSlug}-${Date.now()}`;
+}
+
 type Modality = "Ao vivo online" | "Presencial" | "In company" | "Híbrido" | "Gravado";
 
 export function toDbModality(value: Modality): string {

@@ -20,6 +20,7 @@ import {
   classToUpsert,
   courseToUpsert,
   instructorToUpsert,
+  resolveUniqueCourseSlug,
   toDbPaymentMethod,
   toDbStudentType,
   toDbEnrollmentStatus,
@@ -140,6 +141,24 @@ async function resolveTrilhaNome(supabase: ReturnType<typeof adminClient>, trilh
   if (error) throw error;
 
   return (data?.[0]?.nome as string | undefined) ?? null;
+}
+
+async function resolveCourseSlugForUpsert(
+  supabase: ReturnType<typeof adminClient>,
+  payload: Record<string, unknown>
+) {
+  const { data, error } = await supabase
+    .from("curso")
+    .select("id,slug")
+    .is("deleted_at", null);
+  if (error) throw error;
+
+  return resolveUniqueCourseSlug(
+    typeof payload.slug === "string" ? payload.slug : null,
+    typeof payload.title === "string" ? payload.title : null,
+    typeof payload.id === "string" ? payload.id : null,
+    data
+  );
 }
 
 function validateMutation(mutation: AdminMutation): string | null {
@@ -368,7 +387,8 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
   const p = mutation.payload;
   if (mutation.resource === "courses") {
     const trilhaNome = await resolveTrilhaNome(supabase, p.pathId);
-    const { error } = await supabase.from("curso").upsert(courseToUpsert(p, trilhaNome ?? ""));
+    const slug = await resolveCourseSlugForUpsert(supabase, p);
+    const { error } = await supabase.from("curso").upsert(courseToUpsert({ ...p, slug }, trilhaNome ?? ""));
     if (error) throw error;
   } else if (mutation.resource === "classes") {
     const resolvedCourseId = await resolveCourseIdOrThrow(supabase, String(p.courseId ?? ""));
