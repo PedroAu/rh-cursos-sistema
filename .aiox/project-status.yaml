@@ -1,19 +1,14 @@
 status:
   branch: main
-  modifiedFiles:
-    - .aiox/project-status.yaml
-    - .github/workflows/ci.yml
-    - .github/workflows/deploy-functions.yml
-    - artifacts/epic14-fidelity/about-route.png
-    - artifacts/epic14-fidelity/agenda-route.png
-  modifiedFilesTotalCount: 82
+  modifiedFiles: []
+  modifiedFilesTotalCount: 0
   recentCommits:
+    - 'fix: close Epic 18 gates and SSR auth cleanup'
     - 'docs: close Epic 15 via *close-story @po [Epic 15]'
-    - 'docs: close Epic 17 - post-mortem and G5 declared CONCERNS [REC-502]'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-20T03:13:21.452Z'
+  lastUpdate: '2026-07-20T11:54:28.124Z'
   isGitRepo: true
-timestamp: 1784517201453
+timestamp: 1784548468130
 ttl: 60
-gitFingerprint: 1783996413321.067:1784515945568.3066
+gitFingerprint: 1783996413321.067:1784548049815.3735
