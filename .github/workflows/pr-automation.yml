@@ -28,18 +28,20 @@ jobs:
               deletions: context.payload.pull_request.deletions,
             };
             
-            const summary = `## 📊 Quality Summary
-
-- **Files Changed:** ${prInfo.files_changed}
-- **Additions:** +${prInfo.additions}
-- **Deletions:** -${prInfo.deletions}
-
-### CI Status
-- ✅ Lint
-- ✅ TypeCheck
-- ✅ Tests
-- ✅ Build
-
-Ready for review!`;
+            const summary = [
+              '## 📊 Quality Summary',
+              '',
+              `- **Files Changed:** ${prInfo.files_changed}`,
+              `- **Additions:** +${prInfo.additions}`,
+              `- **Deletions:** -${prInfo.deletions}`,
+              '',
+              '### CI Status',
+              '- ✅ Lint',
+              '- ✅ TypeCheck',
+              '- ✅ Tests',
+              '- ✅ Build',
+              '',
+              'Ready for review!',
+            ].join('\n');
             
             core.info(summary);

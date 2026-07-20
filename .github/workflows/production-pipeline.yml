@@ -70,9 +70,11 @@ jobs:
             done < <(git diff --name-only -z "$BEFORE_SHA" "$CURRENT_SHA")
           fi
 
-          echo "database=$database" >> "$GITHUB_OUTPUT"
-          echo "functions=$functions" >> "$GITHUB_OUTPUT"
-          echo "frontend=$frontend" >> "$GITHUB_OUTPUT"
+          {
+            echo "database=$database"
+            echo "functions=$functions"
+            echo "frontend=$frontend"
+          } >> "$GITHUB_OUTPUT"
 
   ci:
     uses: ./.github/workflows/ci.yml
