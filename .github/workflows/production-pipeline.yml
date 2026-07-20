@@ -79,6 +79,8 @@ jobs:
 
   ci:
     uses: ./.github/workflows/ci.yml
+    with:
+      production_safe_smoke: true
     secrets:
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
