@@ -904,7 +904,7 @@ export function buildResourceConfig(
 
     case "leads": {
       const rows = store.leads.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        String(item.name ?? "").toLowerCase().includes(search.toLowerCase())
       );
       const leadTypeOptions = [
         { value: "Curso", label: "Curso" },
@@ -1315,7 +1315,7 @@ export function buildResourceConfig(
 
     case "instructors": {
       const rows = store.instructors.filter((item) =>
-        item.name.toLowerCase().includes(search.toLowerCase())
+        String(item.name ?? "").toLowerCase().includes(search.toLowerCase())
       );
       const courseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const instructorStatusOptions = [
