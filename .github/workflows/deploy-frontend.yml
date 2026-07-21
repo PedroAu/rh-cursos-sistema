@@ -15,8 +15,6 @@ on:
         required: true
       NEXT_PUBLIC_APP_URL:
         required: true
-      SUPABASE_SERVICE_ROLE_KEY:
-        required: true
 
 concurrency:
   group: deploy-frontend-production
