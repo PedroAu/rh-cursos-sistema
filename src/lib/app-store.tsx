@@ -253,7 +253,7 @@ function restoreDeletedItem<T extends { id: string }>(
 }
 
 function leadNaturalKey(lead: Lead) {
-  return `${lead.name.trim().toLowerCase()}|${lead.email.trim().toLowerCase()}`;
+  return `${String(lead.name ?? "").trim().toLowerCase()}|${String(lead.email ?? "").trim().toLowerCase()}`;
 }
 
 function mergeLeads(current: Lead[], incoming: Lead[]) {
