@@ -15,6 +15,8 @@ export interface SecurityHeadersConfig {
 // - www.googletagmanager.com / www.google-analytics.com: Google Analytics 4,
 //   injetado condicionalmente por `app/layout.tsx` via `@next/third-parties`
 //   quando `NEXT_PUBLIC_GA_MEASUREMENT_ID` está definido (ver `src/lib/analytics.ts`).
+// - static.cloudflareinsights.com / cloudflareinsights.com: beacon do Cloudflare
+//   Workers Analytics, injetado pela plataforma no runtime de produção.
 // - *.supabase.co / wss://*.supabase.co: cliente Supabase (dados + realtime).
 // `unsafe-eval` NÃO aparece em produção. `cdn.jsdelivr.net` e `api.rhcursos.com.br`
 // foram removidos por não terem nenhum consumidor no repositório (AC2 — nenhuma
@@ -22,11 +24,11 @@ export interface SecurityHeadersConfig {
 // @architect/@qa de 2026-07-19 pelo mesmo critério).
 const PRODUCTION_CSP_DIRECTIVES = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+    "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://static.cloudflareinsights.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' https:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://cloudflareinsights.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
