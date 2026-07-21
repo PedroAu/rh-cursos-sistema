@@ -114,11 +114,8 @@ export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
   // Permissions Policy (formerly Feature Policy)
   permissionsPolicy: [
     "accelerometer=()",
-    "ambient-light-sensor=()",
     "autoplay=()",
-    "battery=()",
     "camera=()",
-    "document-domain=()",
     "encrypted-media=()",
     "fullscreen=()",
     "geolocation=()",
@@ -126,12 +123,10 @@ export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
     "magnetometer=()",
     "microphone=()",
     "midi=()",
-    "navigation-override=()",
     "payment=()",
     "picture-in-picture=()",
     "sync-xhr=()",
     "usb=()",
-    "vr=()",
     "xr-spatial-tracking=()",
   ].join(", "),
 };
