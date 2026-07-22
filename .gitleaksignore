@@ -1,0 +1,44 @@
+# Historical findings reviewed after credential rotation (2026-07-22).
+# These fingerprints refer to removed/redacted documentation, fixtures, and
+# generated Storybook artifacts. New findings remain blocking.
+05db7c1cb4a95a7671577adf23f531eadd06c4c3:.claude/settings.json:curl-auth-header:22
+05db7c1cb4a95a7671577adf23f531eadd06c4c3:.claude/settings.json:curl-auth-header:23
+05db7c1cb4a95a7671577adf23f531eadd06c4c3:.claude/settings.json:curl-auth-header:24
+2150afc5f542780be49f3a292be2645f78498e1e:docs/api/openapi.yaml:generic-api-key:339
+2150afc5f542780be49f3a292be2645f78498e1e:public/api-docs.html:generic-api-key:232
+4d5e7fdbcab7d1845fe969f42d839d1f67b517d1:.env.security:generic-api-key:28
+531e3ebabf0c777d3f1afaf183a1981e200974bf:docs/DEPLOYMENT.md:generic-api-key:68
+531e3ebabf0c777d3f1afaf183a1981e200974bf:docs/QUICK-START.md:generic-api-key:52
+531e3ebabf0c777d3f1afaf183a1981e200974bf:docs/QUICK-START.md:generic-api-key:53
+531e3ebabf0c777d3f1afaf183a1981e200974bf:docs/QUICK-START.md:generic-api-key:57
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:50
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:53
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:74
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:75
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:76
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:77
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:curl-auth-header:79
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:52
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:68
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:70
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:71
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:72
+666db4ef6fa87f95da56d03a61c0ec268bcab62b:.claude/settings.json:generic-api-key:82
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:50
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:53
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:74
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:75
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:76
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:77
+883a9d914ff1ba402ef5b8a0947e3e97bccb5729:.claude/settings.json:curl-auth-header:79
+9ee0b76f85e9255f42ee3b438ef7a4e5f276df86:src/__tests__/lib/auth.test.ts:generic-api-key:31
+b735d750faf3a046f7326e3c03ac7c6f1df4468e:storybook-static/3356.b6493c59.iframe.bundle.js:generic-api-key:2
+b735d750faf3a046f7326e3c03ac7c6f1df4468e:storybook-static/5679.b2b6366f.iframe.bundle.js.map:sourcegraph-access-token:1
+cc20ba4373e09121df61ef4ff43e8097c2c8c262:.aiox-core/development/tasks/qa-security-checklist.md:generic-api-key:492
+e401c404cb8d77d5d44653b78cf1d74877cc6a0c:docs/api/auth-session.md:generic-api-key:67
+e401c404cb8d77d5d44653b78cf1d74877cc6a0c:docs/api/auth-session.md:generic-api-key:170
+e401c404cb8d77d5d44653b78cf1d74877cc6a0c:docs/api/edge-functions.md:generic-api-key:442
+e401c404cb8d77d5d44653b78cf1d74877cc6a0c:docs/api/edge-functions.md:generic-api-key:512
+f2cb359c5e5050e5049ef795010df65d2e8fde1b:storybook-static/281.21cdf29e.iframe.bundle.js.map:sourcegraph-access-token:1
+f2cb359c5e5050e5049ef795010df65d2e8fde1b:storybook-static/356.ac5cae1a.iframe.bundle.js:generic-api-key:2
+f5aefbf5ba332846e51a8adebc9fd6fdad955bad:PHASE_2_STATUS.md:curl-auth-header:243
