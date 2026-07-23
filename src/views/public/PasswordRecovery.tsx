@@ -16,7 +16,16 @@ import { PASSWORD_MIN_LENGTH } from "@/lib/password-recovery";
 
 const emailSchema = z.object({ email: z.string().trim().email("Informe um e-mail válido.") });
 const passwordSchema = z
-  .object({ password: z.string().min(PASSWORD_MIN_LENGTH, `A senha deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`), confirmation: z.string() })
+  .object({
+    password: z
+      .string()
+      .min(PASSWORD_MIN_LENGTH, `A senha deve ter pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`)
+      .regex(/[a-z]/, "A senha deve conter uma letra minúscula.")
+      .regex(/[A-Z]/, "A senha deve conter uma letra maiúscula.")
+      .regex(/\d/, "A senha deve conter um número.")
+      .regex(/[^A-Za-z0-9]/, "A senha deve conter um caractere especial."),
+    confirmation: z.string()
+  })
   .refine((values) => values.password === values.confirmation, { path: ["confirmation"], message: "As senhas não coincidem." });
 
 type EmailValues = z.infer<typeof emailSchema>;
@@ -49,7 +58,8 @@ export function PasswordRecoveryPage() {
       if (!response.ok) throw new Error(data?.error || "update");
       navigate("/login?status=password-updated");
     } catch (submissionError) {
-      setError(submissionError instanceof Error && submissionError.message === "Sessão de recuperação inválida." ? submissionError.message : "Não foi possível atualizar a senha. Solicite um novo link.");
+      const message = submissionError instanceof Error ? submissionError.message : "";
+      setError(message && message !== "update" ? message : "Não foi possível atualizar a senha. Solicite um novo link.");
     } finally { setIsSubmitting(false); }
   };
 
