@@ -144,6 +144,10 @@ async function proxyRequest(request: Request, context: RouteContext) {
 
   headers.set("x-forwarded-for", clientIp);
   headers.set("x-real-ip", clientIp);
+  // Preserve the BFF-resolved client bucket across the Supabase gateway. The
+  // gateway may replace forwarded IP headers with its own edge IP, which would
+  // otherwise collapse every authenticated admin into one rate-limit bucket.
+  headers.set("x-rh-client-ip", clientIp);
 
   const upstream = await fetch(upstreamUrl, {
     method: request.method,

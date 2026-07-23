@@ -485,7 +485,7 @@ Deno.serve(async (request) => {
     return jsonResponse({ ok: false, error: "Não autorizado." }, 401, request);
   }
 
-  const ip = clientIp(request);
+  const ip = request.headers.get("x-rh-client-ip") ?? clientIp(request);
   const rate = await checkRateLimit(`admin:${session.email}:${ip}`, rateLimitConfigs.admin);
   if (!rate.allowed) {
     return jsonResponse(

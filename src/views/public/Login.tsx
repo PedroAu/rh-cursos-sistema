@@ -168,6 +168,10 @@ export function LoginPage() {
             <div className="mb-5 rounded-lg border border-tk-accent/25 bg-tk-accent-soft px-4 py-3 text-sm text-tk-brand-hover">
               Faça login para acessar {nextPath ?? "a área restrita"}.
             </div>
+          ) : status === "password-updated" ? (
+            <div role="status" className="mb-5 rounded-lg border border-tk-success/25 bg-tk-success/10 px-4 py-3 text-sm text-tk-ink">
+              Senha atualizada. Entre novamente com a nova senha.
+            </div>
           ) : null}
 
           <form
@@ -225,6 +229,14 @@ export function LoginPage() {
                 Manter conectado
               </label>
             </div>
+
+            <button
+              type="button"
+              className="-mt-2 justify-self-end text-body-small font-semibold text-tk-accent-strong hover:text-tk-accent"
+              onClick={() => navigate("/recuperar-senha")}
+            >
+              Esqueci minha senha
+            </button>
 
             {mfaRequired ? (
               <FormField label="Código de autenticação" required>

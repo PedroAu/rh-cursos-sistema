@@ -30,7 +30,7 @@ export const isSupabaseSsrConfigured = Boolean(supabaseUrl && supabaseAnonKey);
  */
 export function buildSsrCookieOptions(): CookieOptions {
   const isLocalE2E =
-    process.env.E2E_LOCAL_SUPABASE === "1" && process.env.VERCEL_ENV !== "production";
+    process.env.E2E_LOCAL_SUPABASE === "1" || process.env.PLAYWRIGHT_EXTERNAL_SERVER === "1";
 
   return {
     httpOnly: true,

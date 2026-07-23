@@ -39,7 +39,12 @@ function timingSafeEqual(a: string, b: string): boolean {
  * exclusivamente no servidor. Nenhum segredo adicional e introduzido.
  */
 export function requireTrustedSsrAdmin(request: Request): AdminSession | null {
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  // Supabase reserves the `SUPABASE_*` namespace for runtime-managed values.
+  // `EDGE_SERVICE_ROLE_KEY` is an explicit deployment secret used when the
+  // runtime-managed value is stale or unavailable (for example in an isolated
+  // test project); production keeps the automatic fallback.
+  const serviceRoleKey =
+    Deno.env.get("EDGE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const authorization = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
   const apiKey = request.headers.get("apikey") ?? "";
   const userId = request.headers.get("x-rh-ssr-admin-id")?.trim() ?? "";

@@ -128,7 +128,7 @@ describe("LoginPage — destino deriva do papel server-side (REC-305)", () => {
   });
 });
 
-describe("LoginPage — recovery enganoso removido (REC-305 / Article IV)", () => {
+describe("LoginPage — recuperação de senha real", () => {
   beforeEach(() => {
     mocks.navigate.mockReset();
     mocks.toastSuccess.mockReset();
@@ -136,12 +136,13 @@ describe("LoginPage — recovery enganoso removido (REC-305 / Article IV)", () =
     mocks.searchParams = new URLSearchParams();
   });
 
-  it("nao renderiza mais o botao falso 'Esqueci minha senha'", () => {
+  it("oferece recuperação real e navega para a tela segura", () => {
     render(<LoginPage />);
-    expect(screen.queryByRole("button", { name: /Esqueci minha senha/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Esqueci minha senha/i }));
+    expect(mocks.navigate).toHaveBeenCalledWith("/recuperar-senha");
   });
 
-  it("nunca dispara o toast de falso sucesso de recuperacao", () => {
+  it("não dispara toast de sucesso sem resposta do servidor", () => {
     render(<LoginPage />);
     expect(mocks.toastSuccess).not.toHaveBeenCalled();
   });

@@ -8,7 +8,8 @@ import { createClient, type SupabaseClient } from "https://esm.sh/@supabase/supa
 // das Edge Functions. SUPABASE_SERVICE_ROLE_KEY precisa ser definida via secret.
 const supabaseUrl = Deno.env.get("SUPABASE_URL");
 const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
-const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+const serviceRoleKey =
+  Deno.env.get("EDGE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && anonKey);
 export function anonClient(): SupabaseClient {

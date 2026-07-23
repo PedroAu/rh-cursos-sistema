@@ -187,6 +187,8 @@ paths:
                     aal: aal2
         '401':
           $ref: '#/components/responses/SsrSessionInvalid'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
         '503':
           $ref: '#/components/responses/SsrAuthUnavailable'
     post:
@@ -344,6 +346,131 @@ paths:
           $ref: '#/components/responses/SsrAccessDenied'
         '429':
           $ref: '#/components/responses/GenericRateLimited'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
+  /api/auth/password-recovery:
+    post:
+      tags: [Auth Session]
+      summary: Solicita um link de recuperação de senha
+      description: >-
+        Envia as instruções pelo Supabase Auth. A resposta é uniforme para
+        evitar enumeração de contas; a rota aplica rate limit por endereço IP.
+      operationId: requestPasswordRecovery
+      security: []
+      x-rate-limit:
+        key: password-recovery:{ip}
+        windowSeconds: 900
+        maxRequests: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRecoveryRequest'
+      responses:
+        '200':
+          description: Solicitação aceita sem revelar se a conta existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordRecoveryResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '503':
+          $ref: '#/components/responses/AuthUnavailable'
+  /api/auth/password-update:
+    post:
+      tags: [Auth Session]
+      summary: Atualiza a senha na sessão de recuperação
+      description: >-
+        Exige uma sessão Supabase SSR válida criada pelo callback de recuperação,
+        valida a força da senha e encerra a sessão após a troca.
+      operationId: updatePassword
+      security:
+        - supabaseSsrCookies: []
+      x-rate-limit:
+        key: password-update:{ip}
+        windowSeconds: 900
+        maxRequests: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordUpdateRequest'
+      responses:
+        '200':
+          description: Senha atualizada e sessão local encerrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
+  /api/auth/password-recovery/session:
+    post:
+      tags: [Auth Session]
+      summary: Converte o token hash de recuperação em sessão SSR
+      description: >-
+        Recebe os tokens presentes no fragmento do link padrão do Supabase,
+        grava a sessão em cookies httpOnly e nunca devolve os tokens ao cliente.
+      operationId: establishPasswordRecoverySession
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRecoverySessionRequest'
+      responses:
+        '200':
+          description: Sessão de recuperação estabelecida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
+        '503':
+          $ref: '#/components/responses/SsrAuthUnavailable'
+  /api/auth/password-recovery/confirm:
+    post:
+      tags: [Auth Session]
+      summary: Confirma o código de recuperação e cria sessão SSR
+      description: Aceita o código PKCE ou token hash do e-mail de recuperação.
+      operationId: confirmPasswordRecovery
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordRecoveryConfirmRequest'
+      responses:
+        '200':
+          description: Sessão de recuperação estabelecida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkResponse'
+        '400':
+          $ref: '#/components/responses/LoginInvalid'
+        '401':
+          $ref: '#/components/responses/SsrSessionInvalid'
+        '429':
+          $ref: '#/components/responses/AuthRateLimited'
         '503':
           $ref: '#/components/responses/SsrAuthUnavailable'
   /api/functions/{name}:
@@ -1186,6 +1313,53 @@ components:
         role:
           $ref: '#/components/schemas/DashboardRole'
       required: [email, password, role]
+    PasswordRecoveryRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        email:
+          type: string
+          format: email
+      required: [email]
+    PasswordRecoveryResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok:
+          type: boolean
+          const: true
+        message:
+          type: string
+      required: [ok, message]
+    PasswordUpdateRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        password:
+          type: string
+          minLength: 12
+        confirmation:
+          type: string
+          minLength: 12
+      required: [password, confirmation]
+    PasswordRecoverySessionRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+      required: [accessToken, refreshToken]
+    PasswordRecoveryConfirmRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        code:
+          type: string
+        tokenHash:
+          type: string
+      minProperties: 1
     LogoutRequest:
       type: object
       additionalProperties: false
