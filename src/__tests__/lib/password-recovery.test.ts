@@ -15,6 +15,15 @@ describe("password recovery helpers", () => {
   });
 
   it("monta callback usando a origem quando não há URL configurada", () => {
-    expect(getRecoveryRedirectUrl("https://app.example")).toBe("https://app.example/auth/confirm?next=/recuperar-senha");
+    const configured = process.env.NEXT_PUBLIC_APP_URL;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    try {
+      expect(getRecoveryRedirectUrl("https://app.example")).toBe(
+        "https://app.example/auth/confirm?next=/recuperar-senha"
+      );
+    } finally {
+      if (configured === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+      else process.env.NEXT_PUBLIC_APP_URL = configured;
+    }
   });
 });
