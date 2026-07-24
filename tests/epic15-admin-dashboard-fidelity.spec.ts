@@ -14,7 +14,7 @@ async function loginAsAdmin(context: import("@playwright/test").BrowserContext, 
 test.describe("epic 15 — admin dashboard fidelidade total", () => {
   test("falha fechado quando as credenciais SSR são inválidas", async ({ context, baseURL }) => {
     const response = await context.request.post(
-      new URL("/api/auth/ssr-session", baseURL ?? "http://127.0.0.1:3100").toString(),
+      new URL("/api/auth/session", baseURL ?? "http://127.0.0.1:3100").toString(),
       { data: { email: "admin-contract@rhcursos.test", password: "credencial-invalida", role: "admin" } }
     );
 

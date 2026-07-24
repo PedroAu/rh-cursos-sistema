@@ -16,8 +16,7 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 - **Formato:** todas as respostas são JSON.
 - **Envelope de resposta:** `{ "ok": boolean, ... }`. Em erro: `{ "ok": false, "error": string }`.
 - **Autenticação:**
-  - `POST`/`DELETE /api/auth/session` usam cookie HttpOnly assinado (`SESSION_COOKIE`) no runtime Next.
-  - `GET`/`POST`/`DELETE /api/auth/ssr-session` usam a sessão Supabase em cookies httpOnly (`@supabase/ssr`); nenhum access/refresh token trafega no corpo, e papéis admin exigem AAL2 (MFA fail-closed).
+  - `GET`/`POST`/`DELETE /api/auth/session` usam a sessão Supabase em cookies httpOnly (`@supabase/ssr`); nenhum access/refresh token trafega no corpo, e papéis admin exigem AAL2 (MFA fail-closed).
   - `GET /api/admin/*` (read models paginados) são autorizados server-side pela sessão SSR (`requireAdminApi` → `requireServerRole('admin')`).
   - `GET`/`POST`/`DELETE /api/functions/{name}` é o proxy BFF same-origin: para `admin-resources` a identidade admin vem da sessão SSR (o header HMAC foi removido); demais funções são repassadas à Edge Function upstream.
   - `POST /functions/v1/admin-resources` é interno ao BFF: aceita somente a identidade SSR encaminhada server-side com a credencial `service_role`; HMAC legado é rejeitado.
@@ -33,9 +32,6 @@ Documentação dos endpoints da plataforma. A API é dividida em duas camadas:
 | `GET` | `/api/auth/session` | Sincronizar sessão autenticada e rotacionar token quando necessário | [auth-session](auth-session.md) |
 | `POST` | `/api/auth/session` | Login por perfil (`admin`, `student`, `instructor`) | [auth-session](auth-session.md) |
 | `DELETE` | `/api/auth/session` | Logout (revoga sessões) | [auth-session](auth-session.md) |
-| `GET` | `/api/auth/ssr-session` | Ler sessão SSR Supabase (sem tokens no corpo) | [openapi.yaml](openapi.yaml) |
-| `POST` | `/api/auth/ssr-session` | Autenticar e emitir sessão SSR (AAL2 fail-closed) | [openapi.yaml](openapi.yaml) |
-| `DELETE` | `/api/auth/ssr-session` | Encerrar sessão SSR | [openapi.yaml](openapi.yaml) |
 | `GET` | `/api/auth/realtime-token` | Emitir token efêmero de realtime para sessão admin SSR | [openapi.yaml](openapi.yaml) |
 | `GET` | `/api/admin/courses` | Listar cursos (paginado, busca por título) | [openapi.yaml](openapi.yaml) |
 | `GET` | `/api/admin/classes` | Listar turmas (paginado, busca por curso) | [openapi.yaml](openapi.yaml) |

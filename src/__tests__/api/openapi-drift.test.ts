@@ -130,7 +130,7 @@ describe("superfície real", () => {
     for (const resource of ["classes", "courses", "enrollments", "instructors", "students"]) {
       expect(code.get(`/api/admin/${resource}`)).toEqual(["get"]);
     }
-    expect(code.get("/api/auth/ssr-session")).toEqual(["delete", "get", "post"]);
+    expect(code.has("/api/auth/ssr-session")).toBe(false);
   });
 
   it("passa o gate anti-drift com a spec versionada", () => {

@@ -3,7 +3,7 @@ import { loginWithSsrSession } from "./helpers/integration-env";
 
 // Modelo híbrido:
 // - páginas públicas seguem acessíveis por SSR/SSG;
-// - login usa rota interna `/api/auth/ssr-session`;
+// - login usa rota interna `/api/auth/session`;
 // - `/admin` exige sessão no servidor e redireciona antes de renderizar o painel;
 // - mutações administrativas continuam nas Edge Functions do Supabase.
 
@@ -80,14 +80,14 @@ test.describe("protecao server-side das areas autenticadas", () => {
     const studentPortal = await context.request.get("/aluno");
     expect(studentPortal.status()).toBe(200);
 
-    await context.request.delete("/api/auth/ssr-session");
+    await context.request.delete("/api/auth/session");
     await loginWithSsrSession({ baseURL: origin, context, role: "instructor", name: "Perfil instructor" });
     const instructorPortal = await context.request.get("/instrutor");
     expect(instructorPortal.status()).toBe(200);
     const blockedStudent = await context.request.get("/aluno", { maxRedirects: 0 });
     expect(blockedStudent.status()).toBe(307);
 
-    await context.request.delete("/api/auth/ssr-session");
+    await context.request.delete("/api/auth/session");
     await loginWithSsrSession({ baseURL: origin, context, role: "admin", name: "Perfil admin" });
     const blockedInstructor = await context.request.get("/instrutor", { maxRedirects: 0 });
     expect(blockedInstructor.status()).toBe(307);
@@ -114,9 +114,9 @@ test.describe("protecao server-side das areas autenticadas", () => {
   });
 });
 
-test.describe("contrato da rota /api/auth/ssr-session", () => {
+test.describe("contrato da rota /api/auth/session", () => {
   test("GET sem sessao responde 401", async ({ request }) => {
-    const response = await request.get("/api/auth/ssr-session");
+    const response = await request.get("/api/auth/session");
 
     expect(response.status()).toBe(401);
     await expect(response.json()).resolves.toEqual({
@@ -133,7 +133,7 @@ test.describe("contrato da rota /api/auth/ssr-session", () => {
       role: "student",
       name: "Perfil student"
     });
-    const response = await context.request.get(new URL("/api/auth/ssr-session", origin).toString());
+    const response = await context.request.get(new URL("/api/auth/session", origin).toString());
     expect(response.status()).toBe(200);
     await expect(response.json()).resolves.toMatchObject({
       ok: true,
@@ -155,10 +155,10 @@ test.describe("contrato da rota /api/auth/ssr-session", () => {
       role: "student",
       name: "Perfil student"
     });
-    const response = await context.request.delete("/api/auth/ssr-session");
+    const response = await context.request.delete("/api/auth/session");
     expect(response.status()).toBe(200);
-    await expect(response.json()).resolves.toEqual({ ok: true });
-    const read = await context.request.get("/api/auth/ssr-session");
+    await expect(response.json()).resolves.toMatchObject({ ok: true, mode: "global", revoked: true });
+    const read = await context.request.get("/api/auth/session");
     expect(read.status()).toBe(401);
   });
 });

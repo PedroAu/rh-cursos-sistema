@@ -423,12 +423,12 @@ Header: `Retry-After: <seconds>`
 
 ## Fluxo de Autenticação Administrativo
 
-1. **Login:** frontend usa `POST /api/auth/ssr-session`; cookies Supabase são `httpOnly`.
+1. **Login:** frontend usa `POST /api/auth/session`; cookies Supabase são `httpOnly`.
 2. **Autorização:** o BFF lê a sessão SSR e exige papel `admin` no servidor.
 3. **Requisições admin:** o browser chama `/api/functions/admin-resources` same-origin.
 4. **Encaminhamento:** o BFF usa `service_role` e headers internos de identidade SSR.
 5. **Validação:** `admin-resources` aceita apenas `requireTrustedSsrAdmin`; HMAC legado falha com `401`.
-6. **Logout:** frontend usa `DELETE /api/auth/ssr-session`.
+6. **Logout:** frontend usa `DELETE /api/auth/session`.
 
 ---
 
@@ -463,7 +463,7 @@ Header: `Retry-After: <seconds>`
 | Sintoma | Causa provável | Solução |
 |---------|---------------|---------|
 | `403 Origin not allowed` | Frontend rodando em origin não listada na allowlist | Adicione a origin em `EXTRA_ALLOWED_ORIGINS` ou `ALLOW_LOCALHOST=true` para dev |
-| `401 Não autorizado` (admin-resources) | Chamada fora do BFF ou identidade SSR ausente | Autentique em `/api/auth/ssr-session` e use o proxy same-origin |
+| `401 Não autorizado` (admin-resources) | Chamada fora do BFF ou identidade SSR ausente | Autentique em `/api/auth/session` e use o proxy same-origin |
 | `429 rate limit exceeded` (outros) | Threshold de requisições atingido | Aguarde `Retry-After` |
 | Rate limit sempre passa | `SUPABASE_SERVICE_ROLE_KEY` não configurada | Rate limit cai no fallback in-memory (por isolate, reiniciado a cada cold start) |
 | Audit log falha silenciosamente | Tabela `admin_audit_log` ausente ou permissão insuficiente | Verifique se a migration que cria `admin_audit_log` foi aplicada; `adminClient()` usa service_role |

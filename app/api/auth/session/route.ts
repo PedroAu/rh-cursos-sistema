@@ -174,7 +174,17 @@ async function handleDelete(request: Request) {
   let mode: "global" | "local-only" = "local-only";
   let revoked = false;
 
-  if (accessToken && supabaseAdmin) {
+  if (isSupabaseSsrConfigured) {
+    const ssrClient = createSupabaseSSRClient(await getSsrCookieAdapter());
+    if (ssrClient) {
+      // A sessão SSR já contém o refresh token no servidor; não é necessário
+      // expor access_token ao browser para solicitar logout global.
+      revoked = (await signOutSSR(ssrClient)) === true;
+      if (revoked) mode = "global";
+    }
+  }
+
+  if (!revoked && accessToken && supabaseAdmin) {
     const rate = await checkRateLimit(
       `auth-logout-global:${clientIp(request)}`,
       rateLimitConfigs.authGlobalLogout
@@ -220,10 +230,6 @@ async function handleDelete(request: Request) {
   }
 
   const response = NextResponse.json({ ok: true, mode, revoked });
-  if (isSupabaseSsrConfigured) {
-    const ssrClient = createSupabaseSSRClient(await getSsrCookieAdapter());
-    if (ssrClient) await signOutSSR(ssrClient);
-  }
   return clearLegacySessionCookie(response);
 }
 

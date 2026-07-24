@@ -5,6 +5,7 @@ import {
   buildSsrCookieOptions,
   readSSRSession,
   signInSSR,
+  signOutSSR,
 } from '@/lib/supabase/session';
 
 /**
@@ -171,6 +172,20 @@ describe('readSSRSession', () => {
     const { client } = makeClient({ getUserUser: null });
     const read = await readSSRSession(client);
     expect(read).toMatchObject({ status: 'none' });
+  });
+});
+
+describe('signOutSSR', () => {
+  it('solicita revogação global sem expor tokens ao cliente', async () => {
+    const { client } = makeClient();
+    await expect(signOutSSR(client)).resolves.toBe(true);
+    expect(client.auth.signOut).toHaveBeenCalledWith({ scope: 'global' });
+  });
+
+  it('retorna false quando o Supabase não consegue revogar a sessão', async () => {
+    const { client } = makeClient();
+    client.auth.signOut = vi.fn().mockResolvedValue({ error: { message: 'unavailable' } });
+    await expect(signOutSSR(client)).resolves.toBe(false);
   });
 });
 

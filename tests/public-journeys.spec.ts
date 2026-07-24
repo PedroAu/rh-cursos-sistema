@@ -192,7 +192,7 @@ test.describe("epica 4 — jornadas publicas", () => {
     await expect(page.getByRole("heading", { name: "Bem-vindo de volta" })).toBeVisible();
     await expect(page.getByLabel("E-mail")).toBeVisible();
     await expect(page.getByLabel("Senha")).toBeVisible();
-    await expect(page.getByLabel("Manter conectado")).toBeChecked();
+    await expect(page.getByLabel("Manter conectado")).toHaveCount(0);
     await expect(page.getByRole("banner")).toHaveCount(0);
   });
 

@@ -34,9 +34,7 @@ test.describe("epic 14 smoke — mantine removal", () => {
 
     await expect(page.getByRole("heading", { name: "Bem-vindo de volta" })).toBeVisible();
     await expect(page.getByLabel("E-mail")).toBeVisible();
-    await expect(page.getByLabel("Manter conectado")).toBeChecked();
-    await page.getByText("Manter conectado").click();
-    await expect(page.getByLabel("Manter conectado")).not.toBeChecked();
+    await expect(page.getByLabel("Manter conectado")).toHaveCount(0);
     expect(runtimeErrors).toEqual([]);
   });
 

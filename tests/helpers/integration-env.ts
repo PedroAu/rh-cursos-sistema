@@ -238,7 +238,7 @@ export async function loginWithSsrSession(options: {
     role,
   });
   const response = await options.context.request.post(
-    new URL("/api/auth/ssr-session", options.baseURL).toString(),
+    new URL("/api/auth/session", options.baseURL).toString(),
     {
       data: {
         email: credentials.email,

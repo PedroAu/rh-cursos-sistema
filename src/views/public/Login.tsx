@@ -10,7 +10,6 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "@/lib/router-compat";
@@ -65,7 +64,6 @@ export function LoginPage() {
   const { setSession } = useAppStore();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [remember, setRemember] = useState(true);
   const [mfaRequired, setMfaRequired] = useState(false);
   const [mfaCode, setMfaCode] = useState("");
   const status = searchParams.get("status");
@@ -98,7 +96,6 @@ export function LoginPage() {
           role: loginRole,
           email: values.email,
           password: values.password,
-          remember,
           ...(mfaRequired ? { mfaCode } : {}),
         })
       });
@@ -222,13 +219,6 @@ export function LoginPage() {
                 </FormField>
               )}
             />
-
-            <div className="-mt-0.5 flex items-center gap-2">
-              <Checkbox id="login-remember" checked={remember} onCheckedChange={setRemember} />
-              <label htmlFor="login-remember" className="cursor-pointer text-body-small text-tk-ink-muted">
-                Manter conectado
-              </label>
-            </div>
 
             <button
               type="button"

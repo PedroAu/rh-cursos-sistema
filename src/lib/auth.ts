@@ -9,8 +9,6 @@ export type DemoSession = {
   name: string;
   /** Epoch ms de expiração da sessão assinada. */
   exp?: number;
-  /** Se true, a sessão foi emitida com TTL longo ("Manter conectado"). */
-  remember?: boolean;
 };
 
 export function getCookieOptions(ttlMs = SESSION_TTL_MS) {

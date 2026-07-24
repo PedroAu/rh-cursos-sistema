@@ -2,11 +2,12 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { applySecurityHeaders } from "@/lib/security-headers";
+import { updateSupabaseSession } from "@/lib/supabase/middleware";
 
 const CANONICAL_HOST = "www.rhcursos.com.br";
 const APEX_HOST = "rhcursos.com.br";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase();
   const { pathname } = request.nextUrl;
 
@@ -31,7 +32,7 @@ export function middleware(request: NextRequest) {
     return applySecurityHeaders(NextResponse.redirect(redirectUrl, 308));
   }
 
-  return applySecurityHeaders(NextResponse.next());
+  return applySecurityHeaders(await updateSupabaseSession(request));
 }
 
 export const config = {
