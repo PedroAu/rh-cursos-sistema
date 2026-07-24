@@ -617,7 +617,9 @@ export function AppStoreProvider({
     let active = true;
     const subscriptions: ReturnType<typeof supabase.channel>[] = [];
     const client = supabase;
-    const publicTestBaselineEnabled = isExplicitPublicTestBaselineEnabled();
+    const publicTestBaselineEnabled =
+      isExplicitPublicTestBaselineEnabled() ||
+      document.cookie.includes("rh_cursos_public_test_baseline=1");
 
     // Timer de renovação do token efêmero de realtime (limpo no cleanup).
     let realtimeTokenRenewalTimer: ReturnType<typeof setTimeout> | undefined;

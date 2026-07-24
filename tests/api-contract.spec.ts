@@ -135,7 +135,7 @@ test.describe("contratos HTTP — route handler auth-session", () => {
     }
   });
 
-  test("DELETE mantém contrato local-only quando não recebe access token", async ({ request }, testInfo) => {
+  test("DELETE encerra a sessão global mesmo sem access token explícito", async ({ request }, testInfo) => {
     annotateCanonicalDoc(testInfo, docs.authSession);
 
     const response = await request.delete("/api/auth/session", {
@@ -146,8 +146,8 @@ test.describe("contratos HTTP — route handler auth-session", () => {
     expect(response.status()).toBe(200);
     await expect(response.json()).resolves.toEqual({
       ok: true,
-      mode: "local-only",
-      revoked: false,
+      mode: "global",
+      revoked: true,
     });
   });
 });

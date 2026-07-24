@@ -595,9 +595,11 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
   test("turmas: cria vinculada a um curso existente e exclui", async ({ page }) => {
     // Data futura pouco provável de colidir com turma real — usada depois
     // para localizar a linha, já que turma não tem campo de nome único.
-    const startDate = "2027-03-15";
-    const startDateLabel = "15/03/2027";
-    const endDate = "2027-03-16";
+    const day = String((Date.now() % 20) + 1).padStart(2, "0");
+    const nextDay = String(Number(day) + 1).padStart(2, "0");
+    const startDate = `2027-03-${day}`;
+    const startDateLabel = `${day}/03/2027`;
+    const endDate = `2027-03-${nextDay}`;
     await page.goto("/admin/turmas");
 
     const dialog = await openCreateDialog(page);

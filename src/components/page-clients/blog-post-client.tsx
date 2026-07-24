@@ -6,7 +6,7 @@ import { BlogPostPage } from "@/views/public/BlogPost";
 
 export function BlogPostClient({ initialData }: { initialData?: AppStoreInitialData }) {
   return (
-    <PublicPageShell initialData={initialData}>
+    <PublicPageShell initialData={initialData} bootstrapPublicData={false}>
       <BlogPostPage />
     </PublicPageShell>
   );

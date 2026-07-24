@@ -45,6 +45,7 @@ async function prepareStableCapture(routeName: string, page: import("@playwright
     window.localStorage.clear();
     window.sessionStorage.clear();
     window.localStorage.setItem(storageKey, "1");
+    document.cookie = `${storageKey}=1; path=/`;
   }, publicTestBaselineStorageKey);
 
   await page.goto(routes.find((route) => route.name === routeName)?.path ?? "/", { waitUntil: "domcontentloaded" });
@@ -71,7 +72,7 @@ async function prepareStableCapture(routeName: string, page: import("@playwright
     await page.getByRole("heading", { name: "Últimos artigos", exact: true }).waitFor({ state: "visible" });
     await expect(page.getByText(/\d+ publicações · atualizado toda semana/i)).toBeVisible();
     await expect(page.getByText("Nenhum artigo encontrado", { exact: true })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Ler artigo" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: /Ler artigo/ }).first()).toBeVisible();
   }
 
   await page.waitForTimeout(800);

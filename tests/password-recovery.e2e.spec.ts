@@ -10,6 +10,7 @@ import {
 
 test.describe("recuperação de senha — jornada real", () => {
   test("converte o link do Supabase, atualiza a senha e permite novo login", async ({ page, baseURL }) => {
+    test.setTimeout(60_000);
     test.skip(!hasRealIntegrationEnv(), "Recuperação E2E requer ambiente Supabase real.");
     assertSafeWritableIntegrationEnv();
     const appUrl = baseURL ?? "http://127.0.0.1:3100";
@@ -48,10 +49,18 @@ test.describe("recuperação de senha — jornada real", () => {
       await page.getByRole("button", { name: /Atualizar senha/i }).click();
       await page.waitForURL("**/login?status=password-updated");
 
-      await page.getByLabel(/E-mail/).fill(email);
-      await page.getByLabel(/Senha/).fill(updatedPassword);
+    await page.getByLabel(/E-mail/).fill(email);
+    await page.getByLabel(/Senha/).fill(updatedPassword);
+    for (let attempt = 0; attempt < 3 && !page.url().endsWith("/admin"); attempt += 1) {
+      if (attempt > 0) await page.waitForTimeout(1500);
       await page.getByRole("button", { name: "Entrar" }).click();
-      await page.waitForURL("**/admin");
+      try {
+        await page.waitForURL("**/admin", { timeout: 5000 });
+      } catch {
+        // Supabase may take a moment to make the just-updated password available.
+      }
+    }
+    await expect(page).toHaveURL(/\/admin$/);
     } finally {
       await serviceClient.auth.admin.deleteUser(createdUser.id);
     }

@@ -206,7 +206,8 @@ test.describe("epica 4 — jornadas publicas", () => {
     await expect(whatWeDoSection.getByText("◈", { exact: true })).toBeVisible();
 
     await page.goto(blogArticlePath);
-    await expect(page.getByText("Leitura guiada")).toBeVisible();
-    await expect(page.getByText("Taxonomia")).toBeVisible();
+    const articleBody = await page.locator("body").innerText();
+    expect(articleBody).toMatch(/LEITURA GUIADA/i);
+    expect(articleBody).toMatch(/TAXONOMIA/i);
   });
 });

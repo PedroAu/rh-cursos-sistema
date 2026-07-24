@@ -434,6 +434,12 @@ async function fetchPublicBlogPosts(client: RhCursosClient | null, forcePublicTe
 }
 
 export function fetchPublicCatalogFromSupabase() {
+  if (
+    isExplicitPublicTestBaselineEnabled() ||
+    (typeof document !== "undefined" && document.cookie.includes(`${PUBLIC_TEST_BASELINE_COOKIE_NAME}=1`))
+  ) {
+    return fetchPublicCatalog(null, true);
+  }
   return fetchPublicCatalog(supabase);
 }
 
@@ -473,6 +479,12 @@ export const fetchPublicCatalogServerState = cache(async function fetchPublicCat
 });
 
 export function fetchPublicBlogPostsFromSupabase() {
+  if (
+    isExplicitPublicTestBaselineEnabled() ||
+    (typeof document !== "undefined" && document.cookie.includes(`${PUBLIC_TEST_BASELINE_COOKIE_NAME}=1`))
+  ) {
+    return Promise.resolve(publicTestBaselineBlogPosts);
+  }
   return fetchPublicBlogPosts(supabase);
 }
 

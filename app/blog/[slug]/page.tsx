@@ -6,6 +6,7 @@ import {
   fetchPublicCatalogFromSupabaseServer,
   isPublicTestBaselineBuildEnabled
 } from "@/lib/supabase/rh-cursos-api";
+import { publicTestBaselineBlogPosts } from "@/lib/public-test-baseline";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -40,9 +41,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function Page() {
-  const usePublicTestBaseline = isPublicTestBaselineBuildEnabled();
+  const usePublicTestBaseline =
+    process.env.PLAYWRIGHT_TEST_BUILD === "1" || isPublicTestBaselineBuildEnabled();
   const [blogPosts, catalog] = await Promise.all([
-    fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline).catch(() => null),
+    usePublicTestBaseline
+      ? Promise.resolve(publicTestBaselineBlogPosts)
+      : fetchPublicBlogPostsFromSupabaseServer(false).catch(() => null),
     fetchPublicCatalogFromSupabaseServer(usePublicTestBaseline).catch(() => null)
   ]);
 

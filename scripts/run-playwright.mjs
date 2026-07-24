@@ -76,7 +76,11 @@ async function main() {
   const sharedEnv = {
     ...env,
     ...(useTestBuild
-      ? { NEXT_DIST_DIR: ".next-playwright", PLAYWRIGHT_TEST_BUILD: "1" }
+      ? {
+          NEXT_DIST_DIR: ".next-playwright",
+          PLAYWRIGHT_TEST_BUILD: "1",
+          NEXT_PUBLIC_PLAYWRIGHT_TEST_BASELINE: "1"
+        }
       : {}),
     PLAYWRIGHT_BASE_URL: baseURL,
     PLAYWRIGHT_EXTERNAL_SERVER: "1",

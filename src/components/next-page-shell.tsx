@@ -10,13 +10,15 @@ import type { CurrentSession } from "@/types";
 
 export function PublicPageShell({
   children,
-  initialData
+  initialData,
+  bootstrapPublicData = true
 }: {
   children: ReactNode;
   initialData?: AppStoreInitialData;
+  bootstrapPublicData?: boolean;
 }) {
   return (
-    <AppStoreProvider initialData={initialData}>
+    <AppStoreProvider initialData={initialData} bootstrapPublicData={bootstrapPublicData}>
       <Suspense fallback={null}>
         <PublicLayout>{children}</PublicLayout>
       </Suspense>
