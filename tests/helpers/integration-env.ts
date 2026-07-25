@@ -54,9 +54,9 @@ function isPlaceholderValue(value: string) {
 }
 
 function ensureEnvLoaded() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.SUPABASE_URL) {
+  for (const envFile of [".env.local", ".env.e2e.local"]) {
     try {
-      loadEnvFile(".env.local");
+      loadEnvFile(envFile);
     } catch {
       // O arquivo pode não existir em alguns ambientes; a validação abaixo cobre isso.
     }
