@@ -661,6 +661,14 @@ function RenderField({
         return { ...current, courseId: value, classId: "" };
       }
 
+      // Builders such as modules emit functional updates so a blur/focus
+      // transition or a batched React update can never apply an older snapshot
+      // over the text the administrator just entered.
+      if (field.type === "modules" && typeof value === "function") {
+        const currentModules = (current[field.key] as ModuleValue[]) || [];
+        return { ...current, [field.key]: (value as (items: ModuleValue[]) => ModuleValue[])(currentModules) };
+      }
+
       return { ...current, [field.key]: value };
     });
   };
@@ -844,7 +852,7 @@ function FieldShell({
   children: ReactNode;
 }) {
   return (
-    <label className="grid gap-2 text-sm font-medium text-tk-ink">
+    <div className="grid gap-2 text-sm font-medium text-tk-ink">
       <span>
         {label}
         {required ? <span className="ml-1 text-tk-error">*</span> : null}
@@ -852,7 +860,7 @@ function FieldShell({
       {children}
       {hint ? <span className="text-xs leading-5 text-tk-ink-muted">{hint}</span> : null}
       {error ? <span className="text-xs text-tk-error">{error}</span> : null}
-    </label>
+    </div>
   );
 }
 
@@ -1057,7 +1065,7 @@ function ModulesBuilderLite({
 }: {
   label: string;
   value: ModuleValue[];
-  onChange: (value: ModuleValue[]) => void;
+  onChange: (value: ModuleValue[] | ((current: ModuleValue[]) => ModuleValue[])) => void;
   hint?: string;
   error?: string;
 }) {
@@ -1071,7 +1079,7 @@ function ModulesBuilderLite({
               <IconButton
                 label={`Remover módulo ${moduleIndex + 1}`}
                 tone="danger"
-                onClick={() => onChange(value.filter((_, index) => index !== moduleIndex))}
+                onClick={() => onChange((current) => current.filter((_, index) => index !== moduleIndex))}
               >
                 <X className="h-4 w-4" />
               </IconButton>
@@ -1080,31 +1088,31 @@ function ModulesBuilderLite({
             <Input
               placeholder="Ex.: Introdução à legislação"
               value={module.title}
-              onChange={(event) => {
-                const next = [...value];
-                next[moduleIndex] = { ...module, title: event.currentTarget.value };
-                onChange(next);
-              }}
+              onChange={(event) => onChange((current) => {
+                const next = [...current];
+                next[moduleIndex] = { ...next[moduleIndex], title: event.currentTarget.value };
+                return next;
+              })}
             />
 
             <Textarea
               placeholder="Resumo do conteúdo e objetivo do módulo"
               value={module.description}
-              onChange={(event) => {
-                const next = [...value];
-                next[moduleIndex] = { ...module, description: event.currentTarget.value };
-                onChange(next);
-              }}
+              onChange={(event) => onChange((current) => {
+                const next = [...current];
+                next[moduleIndex] = { ...next[moduleIndex], description: event.currentTarget.value };
+                return next;
+              })}
             />
 
             <Input
               placeholder="Ex.: 8 horas"
               value={module.duration}
-              onChange={(event) => {
-                const next = [...value];
-                next[moduleIndex] = { ...module, duration: event.currentTarget.value };
-                onChange(next);
-              }}
+              onChange={(event) => onChange((current) => {
+                const next = [...current];
+                next[moduleIndex] = { ...next[moduleIndex], duration: event.currentTarget.value };
+                return next;
+              })}
             />
 
             <div className="border-t border-tk-line pt-3">
@@ -1115,25 +1123,27 @@ function ModulesBuilderLite({
                     <Input
                       placeholder="Ex.: Casos reais, checklist e boas práticas"
                       value={topic}
-                      onChange={(event) => {
-                        const next = [...value];
-                        const nextTopics = [...module.topics];
+                      onChange={(event) => onChange((current) => {
+                        const next = [...current];
+                        const nextTopics = [...(next[moduleIndex]?.topics ?? [])];
                         nextTopics[topicIndex] = event.currentTarget.value;
-                        next[moduleIndex] = { ...module, topics: nextTopics };
-                        onChange(next);
-                      }}
+                        next[moduleIndex] = { ...next[moduleIndex], topics: nextTopics };
+                        return next;
+                      })}
                     />
                     <IconButton
                       label={`Remover tópico ${topicIndex + 1} do módulo ${moduleIndex + 1}`}
                       tone="danger"
-                      onClick={() => {
-                        const next = [...value];
+                      onClick={() => onChange((current) => {
+                        const next = [...current];
+                        const currentModule = next[moduleIndex];
+                        if (!currentModule) return next;
                         next[moduleIndex] = {
-                          ...module,
-                          topics: module.topics.filter((_, index) => index !== topicIndex)
+                          ...currentModule,
+                          topics: currentModule.topics.filter((_, index) => index !== topicIndex)
                         };
-                        onChange(next);
-                      }}
+                        return next;
+                      })}
                     >
                       <X className="h-4 w-4" />
                     </IconButton>
@@ -1145,11 +1155,13 @@ function ModulesBuilderLite({
                 variant="outline"
                 size="sm"
                 className="mt-3 w-full"
-                onClick={() => {
-                  const next = [...value];
-                  next[moduleIndex] = { ...module, topics: [...module.topics, ""] };
-                  onChange(next);
-                }}
+                onClick={() => onChange((current) => {
+                  const next = [...current];
+                  const currentModule = next[moduleIndex];
+                  if (!currentModule) return next;
+                  next[moduleIndex] = { ...currentModule, topics: [...currentModule.topics, ""] };
+                  return next;
+                })}
               >
                 <Plus className="h-4 w-4" />
                 Adicionar tópico
@@ -1162,9 +1174,10 @@ function ModulesBuilderLite({
           type="button"
           variant="outline"
           className="w-full"
-          onClick={() =>
-            onChange([...value, { title: "", description: "", topics: [""], duration: "" }])
-          }
+          onClick={() => onChange((current) => [
+            ...current,
+            { title: "", description: "", topics: [""], duration: "" }
+          ])}
         >
           <Plus className="h-4 w-4" />
           Adicionar módulo

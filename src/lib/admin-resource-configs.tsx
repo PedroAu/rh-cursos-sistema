@@ -56,6 +56,9 @@ function str(value: unknown): string {
   if (typeof value === "number") return String(value);
   return "";
 }
+function lower(value: unknown): string {
+  return String(value ?? "").toLocaleLowerCase("pt-BR");
+}
 function optStr(value: unknown): string | undefined {
   const result = str(value);
   return result ? result : undefined;
@@ -298,10 +301,22 @@ export function buildResourceConfig(
             : [];
         return [item.title, item.pathName, ...categories]
           .filter(Boolean)
-          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
+          .some((value) => lower(value).includes(normalizedSearch));
       });
-      const pathOptions =
-        store.trainingPaths?.map((p: TrainingPath) => ({ value: p.id, label: p.name })) || [];
+      // The admin SSR catalog normally supplies `trainingPaths`. During a
+      // transient catalog refresh, preserve paths already referenced by the
+      // loaded courses instead of rendering an empty select and forcing the
+      // operator to abandon the form.
+      const pathOptions = Array.from(
+        new Map(
+          [
+            ...(store.trainingPaths ?? []).map((path: TrainingPath) => ({ value: path.id, label: path.name })),
+            ...store.courses
+              .filter((course) => course.pathId && course.pathName)
+              .map((course) => ({ value: course.pathId, label: course.pathName }))
+          ].map((option) => [option.value, option] as const)
+        ).values()
+      );
       const categoryOptions =
         store.courseCategories?.length
           ? store.courseCategories
@@ -580,7 +595,7 @@ export function buildResourceConfig(
         const instructorName = store.instructors.find((instructor) => instructor.id === item.instructorId)?.name ?? "";
         const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
         return [courseName, item.id, item.modality, instructorName]
-          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
+          .some((value) => lower(value).includes(normalizedSearch));
       });
       const courseOptions = store.courses.map((c) => ({ value: c.id, label: c.title }));
       const selectedCourse = store.courses.find((c) => c.id === form.courseId);
@@ -755,7 +770,7 @@ export function buildResourceConfig(
       const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
       const rows = store.students.filter((item) =>
         [item.name, item.cpf, item.email].some((value) =>
-          value.toLocaleLowerCase("pt-BR").includes(normalizedSearch)
+          lower(value).includes(normalizedSearch)
         )
       );
       const activeStudents = store.students.filter(
@@ -1057,7 +1072,7 @@ export function buildResourceConfig(
         const course = store.courses.find((candidate) => candidate.id === item.courseId)?.title ?? "";
         const trainingClass = store.classes.find((candidate) => candidate.id === item.classId);
         return [item.studentName, item.email, item.cpf, course, trainingClass?.modality ?? "", item.status]
-          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch));
+          .some((value) => lower(value).includes(normalizedSearch));
       });
       const isEligibleEnrollmentClass = (status: string) =>
         status === "Inscrições abertas" ||
@@ -1393,7 +1408,7 @@ export function buildResourceConfig(
       const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
       const rows = store.blogPosts.filter((item) =>
         [item.title, item.author, item.category]
-          .some((value) => value.toLocaleLowerCase("pt-BR").includes(normalizedSearch))
+          .some((value) => lower(value).includes(normalizedSearch))
       );
       const categoryOptions = [
         { value: "Licitações", label: "Licitações" },
