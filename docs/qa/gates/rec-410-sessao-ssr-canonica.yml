@@ -1,0 +1,36 @@
+schema: 1
+story: 'REC-410'
+story_title: 'Sessão SSR canônica, renovação e logout'
+gate: PASS
+status_reason: 'Todos os critérios funcionais e de segurança foram verificados; os gates automatizados e o E2E auth/session/logout no Supabase isolado passaram. O File List foi reconciliado no follow-up QA.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-24T12:58:48Z'
+top_issues: []
+waiver:
+  active: false
+quality_score: 100
+evidence:
+  tests_reviewed: 792
+  risks_identified: 0
+  trace:
+    ac_covered: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Cookies SSR httpOnly, fail-closed por papel e ausência de tokens no corpo/storage; logout remoto com fallback local.'
+  performance:
+    status: PASS
+    notes: 'Middleware mantém renovação SSR sem alterar o contrato público nem introduzir polling adicional.'
+  reliability:
+    status: PASS
+    notes: 'Falhas de refresh/revogação são tratadas sem 500 e sem impedir limpeza local.'
+  maintainability:
+    status: PASS
+    notes: 'Endpoint canônico, documentação e testes reconciliados; baseline de testes isolado por build.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Adicionar assertivas de resposta aos DELETE de cleanup nos testes E2E de roles.'
+      refs: ['tests/route-auth.spec.ts']
+      suggested_owner: 'dev'

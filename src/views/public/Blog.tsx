@@ -11,7 +11,10 @@ import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
-import { isExplicitPublicTestBaselineEnabled } from "@/lib/supabase/rh-cursos-api";
+import {
+  isClientPublicTestBaselineEnabled,
+  isExplicitPublicTestBaselineEnabled
+} from "@/lib/supabase/rh-cursos-api";
 import { publicTestBaselineBlogPosts } from "@/lib/public-test-baseline";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import type { BlogPost } from "@/types";
@@ -112,7 +115,7 @@ export function BlogPage() {
   const { blogPosts, createLead } = useAppStore();
   const publicBaselineEnabled =
     isExplicitPublicTestBaselineEnabled() ||
-    (typeof document !== "undefined" && document.cookie.includes("rh_cursos_public_test_baseline=1"));
+    isClientPublicTestBaselineEnabled();
   const effectiveBlogPosts = blogPosts.length || !publicBaselineEnabled ? blogPosts : publicTestBaselineBlogPosts;
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") || "");

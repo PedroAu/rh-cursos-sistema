@@ -187,6 +187,13 @@ describe('signOutSSR', () => {
     client.auth.signOut = vi.fn().mockResolvedValue({ error: { message: 'unavailable' } });
     await expect(signOutSSR(client)).resolves.toBe(false);
   });
+
+  it('retorna false quando a revogação rejeita', async () => {
+    const { client } = makeClient();
+    client.auth.signOut = vi.fn().mockRejectedValue(new Error('network'));
+
+    await expect(signOutSSR(client)).resolves.toBe(false);
+  });
 });
 
 describe('buildSsrCookieOptions — atributos SSR (D2)', () => {

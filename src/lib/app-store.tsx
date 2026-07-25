@@ -23,6 +23,7 @@ import { SESSION_REFRESH_THRESHOLD_MS } from "@/lib/auth-session";
 import {
   fetchPublicBlogPostsFromSupabase,
   fetchPublicCatalogFromSupabase,
+  isClientPublicTestBaselineEnabled,
   isExplicitPublicTestBaselineEnabled
 } from "@/lib/supabase/rh-cursos-api";
 import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
@@ -619,7 +620,7 @@ export function AppStoreProvider({
     const client = supabase;
     const publicTestBaselineEnabled =
       isExplicitPublicTestBaselineEnabled() ||
-      document.cookie.includes("rh_cursos_public_test_baseline=1");
+      isClientPublicTestBaselineEnabled();
 
     // Timer de renovação do token efêmero de realtime (limpo no cleanup).
     let realtimeTokenRenewalTimer: ReturnType<typeof setTimeout> | undefined;

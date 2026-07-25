@@ -225,6 +225,10 @@ export async function readSSRSession(client: SupabaseClient): Promise<SsrSession
 
 /** Encerra a sessão SSR, limpando os cookies httpOnly do Supabase. */
 export async function signOutSSR(client: SupabaseClient): Promise<boolean> {
-  const { error } = await client.auth.signOut({ scope: "global" });
-  return !error;
+  try {
+    const { error } = await client.auth.signOut({ scope: "global" });
+    return !error;
+  } catch {
+    return false;
+  }
 }

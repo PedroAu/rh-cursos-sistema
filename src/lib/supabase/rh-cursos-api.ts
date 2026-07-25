@@ -146,6 +146,13 @@ export function isExplicitPublicTestBaselineEnabled() {
   }
 }
 
+export function isClientPublicTestBaselineEnabled() {
+  if (!isPublicTestBaselineBuildEnabled() || typeof document === "undefined") return false;
+  return document.cookie
+    .split(";")
+    .some((cookie) => cookie.trim() === `${PUBLIC_TEST_BASELINE_COOKIE_NAME}=1`);
+}
+
 function shouldUsePublicTestBaseline() {
   return (
     isExplicitPublicTestBaselineEnabled() ||
@@ -436,7 +443,7 @@ async function fetchPublicBlogPosts(client: RhCursosClient | null, forcePublicTe
 export function fetchPublicCatalogFromSupabase() {
   if (
     isExplicitPublicTestBaselineEnabled() ||
-    (typeof document !== "undefined" && document.cookie.includes(`${PUBLIC_TEST_BASELINE_COOKIE_NAME}=1`))
+    isClientPublicTestBaselineEnabled()
   ) {
     return fetchPublicCatalog(null, true);
   }
@@ -481,7 +488,7 @@ export const fetchPublicCatalogServerState = cache(async function fetchPublicCat
 export function fetchPublicBlogPostsFromSupabase() {
   if (
     isExplicitPublicTestBaselineEnabled() ||
-    (typeof document !== "undefined" && document.cookie.includes(`${PUBLIC_TEST_BASELINE_COOKIE_NAME}=1`))
+    isClientPublicTestBaselineEnabled()
   ) {
     return Promise.resolve(publicTestBaselineBlogPosts);
   }
