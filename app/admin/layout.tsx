@@ -6,6 +6,7 @@ import { getServerSession } from "@/lib/server-session";
 import {
   fetchAdminBlogPostsFromSupabaseServer,
   fetchAdminCatalogFromSupabaseServer,
+  fetchPublicCatalogFromSupabaseServer,
 } from "@/lib/supabase/rh-cursos-api";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -15,10 +16,14 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect("/login?status=required&next=/admin");
   }
 
-  const [catalog, blogPosts] = await Promise.all([
+  const [adminCatalog, blogPosts] = await Promise.all([
     fetchAdminCatalogFromSupabaseServer().catch(() => null),
     fetchAdminBlogPostsFromSupabaseServer().catch(() => null),
   ]);
+  // The admin read model includes optional/private projections. If one of
+  // those projections is unavailable, keep the real public catalog available
+  // to the course/class forms instead of rendering an empty catalog.
+  const catalog = adminCatalog ?? await fetchPublicCatalogFromSupabaseServer().catch(() => null);
   const initialData = catalog
     ? {
         courses: catalog.courses,
