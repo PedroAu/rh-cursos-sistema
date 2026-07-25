@@ -72,7 +72,7 @@ async function fillText(dialog: Locator, label: string, value: string) {
 }
 
 async function waitForSelectOptions(dialog: Locator, label: string, minimumCount: number) {
-  const select = dialog.getByLabel(label);
+  const select = dialog.getByLabel(label).first();
   await expect
     .poll(async () => {
       return select.locator("option").count();
@@ -429,7 +429,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillSelectByIndex(dialog, "Nível");
     await fillSelectByIndex(dialog, "Status");
     await fillSelectByIndex(dialog, "Curso destaque");
-    await fillText(dialog, "Carga horária", "8h");
+    await fillText(dialog, "Carga horária", "8");
     await fillText(dialog, "Preço (R$)", "990");
     await fillText(dialog, "Descrição curta", "Descrição curta gerada pelo teste E2E de admin.");
     await fillText(
@@ -455,7 +455,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillSelectByIndex(dialog, "Nível");
     await fillSelectByIndex(dialog, "Status");
     await fillSelectByIndex(dialog, "Curso destaque");
-    await fillText(dialog, "Carga horária", "8h");
+    await fillText(dialog, "Carga horária", "8");
     await fillText(dialog, "Preço (R$)", "990");
     await fillText(dialog, "Descrição curta", "Curso de teste validando categorias sugeridas e novas.");
     await fillText(
@@ -495,7 +495,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await fillSelectByIndex(dialog, "Nível");
     await fillSelectByIndex(dialog, "Status");
     await fillSelectByIndex(dialog, "Curso destaque");
-    await fillText(dialog, "Carga horária", "12h");
+    await fillText(dialog, "Carga horária", "12");
     await fillText(dialog, "Preço (R$)", "1490");
     await fillText(dialog, "Descrição curta", "Curso de teste validando persistência de módulos.");
     await fillText(
@@ -728,8 +728,6 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
       await fillText(dialog, "Nome", name);
       await fillText(dialog, "E-mail", email);
       await fillText(dialog, "Empresa / órgão", "Órgão E2E");
-      await forceSelectValue(dialog, "Status", "Pendente");
-
       const result = await saveAndExpectSuccess(page, dialog, {
         resource: "students",
         action: "create",

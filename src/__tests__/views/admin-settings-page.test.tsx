@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { AdminSettingsPage } from "@/views/admin/AdminSettingsPage";
@@ -29,24 +29,17 @@ describe("AdminSettingsPage (Story 15.8)", () => {
     expect(screen.getByText("A gestão de permissões não está disponível neste painel.")).toBeInTheDocument();
   });
 
-  it("salva dados e notificações no armazenamento local existente", () => {
-    const { unmount } = render(<AdminSettingsPage />);
-    const companyName = screen.getByRole("textbox", { name: "Nome da empresa" });
-    fireEvent.change(companyName, { target: { value: "RH Cursos Atualizada" } });
-    fireEvent.click(screen.getByRole("switch", { name: "Relatório mensal" }));
-    fireEvent.click(screen.getByRole("button", { name: "Salvar alterações" }));
-    unmount();
-
+  it("não oferece salvamento local enganoso", () => {
     render(<AdminSettingsPage />);
-    expect(screen.getByRole("textbox", { name: "Nome da empresa" })).toHaveValue("RH Cursos Atualizada");
-    expect(screen.getByRole("switch", { name: "Relatório mensal" })).toBeChecked();
+    expect(screen.queryByRole("button", { name: "Salvar alterações" })).not.toBeInTheDocument();
+    expect(screen.getByText(/Não há edição local persistente/)).toBeInTheDocument();
   });
 
   it("mantém controles acessíveis e a equipe somente leitura", () => {
     render(<AdminSettingsPage />);
 
     expect(screen.getByRole("list", { name: "Equipe de acesso" })).toBeInTheDocument();
-    expect(screen.getAllByRole("switch")).toHaveLength(3);
-    expect(screen.getByLabelText("Selecionar logotipo")).toHaveAttribute("type", "file");
+    expect(screen.queryAllByRole("switch")).toHaveLength(0);
+    expect(screen.queryByLabelText("Selecionar logotipo")).not.toBeInTheDocument();
   });
 });

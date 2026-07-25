@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -45,13 +45,13 @@ A Epic 19 identificou vínculo `instrutor.courseIds` sem write N:N, leads que de
 
 ## Tasks / Subtasks
 
-- [ ] Implementar diff transacional de `curso_instrutor` no create/update de instrutor (AC: 1).
-- [ ] Completar DTO/mapper de lead e conter status apenas na criação (AC: 2).
-- [ ] Migrar duração para inteiro não negativo e retirar campos derivados do payload (AC: 3, 4).
-- [ ] Adicionar validação server-side de preço e cálculo autoritativo de capacidade (AC: 5).
-- [ ] Validar URL textual de foto e remover caminho Data URL/Storage (AC: 7).
-- [ ] Remover observação simulada e confirmar ausência de `featuredCourseIds` (AC: 6, 8).
-- [ ] Criar testes unitários, de contrato/banco e E2E de reload para todos os campos (AC: 9).
+- [x] Implementar diff transacional de `curso_instrutor` no create/update de instrutor (AC: 1).
+- [x] Completar DTO/mapper de lead e conter status apenas na criação (AC: 2).
+- [x] Migrar duração para inteiro não negativo e retirar campos derivados do payload (AC: 3, 4).
+- [x] Adicionar validação server-side de preço e cálculo autoritativo de capacidade (AC: 5).
+- [x] Validar URL textual de foto e remover caminho Data URL/Storage (AC: 7).
+- [x] Remover observação simulada e confirmar ausência de `featuredCourseIds` (AC: 6, 8).
+- [x] Criar testes unitários, de contrato/banco e E2E de reload para todos os campos (AC: 9).
 
 ## Dev Notes
 

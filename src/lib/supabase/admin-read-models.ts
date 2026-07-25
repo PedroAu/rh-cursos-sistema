@@ -241,11 +241,61 @@ export async function listStudents(
   client: SupabaseClient,
   params: AdminListParams
 ): Promise<AdminListResult<Student>> {
-  const { rows, total } = await queryEnrollmentRows(client, params);
+  const from = (params.page - 1) * params.pageSize;
+  const to = from + params.pageSize - 1;
+  let query = client
+    .from("aluno")
+    .select("id,nome_completo,email,cpf,telefone,cargo,orgao,tipo_aluno,created_at", { count: "exact" })
+    .order("created_at", { ascending: false });
+  const isFilter = (query as unknown as { is?: (column: string, value: null) => typeof query }).is;
+  if (typeof isFilter === "function") query = isFilter.call(query, "deleted_at", null);
+  if (params.search) {
+    query = query.or(`nome_completo.ilike.%${params.search}%,email.ilike.%${params.search}%`);
+  }
+  const { data, error, count } = await query.range(from, to);
+  if (error) throw error;
+
+  const studentRows = (data ?? []) as Array<{
+    id: string; nome_completo: string | null; email: string | null; cpf: string | null;
+    telefone: string | null; cargo: string | null; orgao: string | null;
+    tipo_aluno: "PF" | "PJ" | "Servidor" | null; created_at: string;
+  }>;
+  const ids = studentRows.map((row) => row.id);
+  const enrollmentsByStudent = new Map<string, EnrollmentJoinedRow>();
+  if (ids.length) {
+    const { data: enrollmentRows, error: enrollmentError } = await client
+      .from("inscricao")
+      .select(ENROLLMENT_SELECT)
+      .in("aluno_id", ids)
+      .order("created_at", { ascending: false });
+    if (enrollmentError) throw enrollmentError;
+    for (const row of (enrollmentRows as unknown as EnrollmentJoinedRow[]) ?? []) {
+      if (!enrollmentsByStudent.has(row.aluno_id)) enrollmentsByStudent.set(row.aluno_id, row);
+    }
+  }
+
   return {
-    data: rows.map(mapDbStudent),
+    data: studentRows.map((row) => {
+      const enrollment = enrollmentsByStudent.get(row.id);
+      if (enrollment) return mapDbStudent(enrollment);
+      return {
+        id: row.id,
+        name: row.nome_completo ?? "",
+        email: row.email ?? "",
+        phone: row.telefone ?? "",
+        cpf: row.cpf ?? "",
+        organization: row.orgao ?? "",
+        jobTitle: row.cargo ?? "",
+        courseId: "",
+        classId: "",
+        enrollmentStatus: "Pendente" as const,
+        certificateIssued: false,
+        enrolledAt: row.created_at,
+        paymentMethod: null,
+      };
+    }),
     page: params.page,
     pageSize: params.pageSize,
-    total,
+    total: count ?? 0,
   };
 }

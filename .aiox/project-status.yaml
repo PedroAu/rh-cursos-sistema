@@ -1,19 +1,19 @@
 status:
   branch: main
   modifiedFiles:
-    - .aiox/project-status.yaml
-    - docs/epics/epic-10-admin-dashboard-optimization.md
-    - docs/epics/epic-16-integridade-catalogo-producao.md
-    - docs/epics/epic-17-recuperacao-sev0-seguranca-integridade.md
-    - docs/epics/epic-18-consolidacao-produto-redesign-governanca.md
-  modifiedFilesTotalCount: 25
+    - src/__tests__/app/api/admin-read-models-route.test.ts
+    - src/__tests__/lib/admin-mappers.test.ts
+    - src/__tests__/lib/admin-resource-configs.test.ts
+    - src/__tests__/lib/app-store.test.ts
+    - src/__tests__/views/admin-settings-page.test.tsx
+  modifiedFilesTotalCount: 17
   recentCommits:
-    - 'fix: stabilize public SSR baselines [REC-410]'
-    - 'feat: consolidate canonical SSR auth session [REC-410]'
+    - 'docs: approve epic 19 stories for execution [Epic 19]'
+    - 'docs: define admin contract integrity epic [Epic 19]'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-25T00:49:02.550Z'
+  lastUpdate: '2026-07-25T01:44:13.542Z'
   isGitRepo: true
-timestamp: 1784940542555
+timestamp: 1784943853544
 ttl: 60
-gitFingerprint: 1783996413321.067:1784940537779.84
+gitFingerprint: 1783996413321.067:1784943726656.254

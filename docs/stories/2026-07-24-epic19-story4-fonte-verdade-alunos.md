@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -43,11 +43,11 @@ O read model parte de `inscricao INNER JOIN aluno`, fazendo alunos sem inscriç�
 
 ## Tasks / Subtasks
 
-- [ ] Auditar read model e query base de alunos, identificando joins e agregados atuais (AC: 1, 2, 6).
-- [ ] Alterar leitura para `aluno` com agregados de inscrição sem N+1 (AC: 1, 2, 6).
-- [ ] Remover `enrollmentStatus` do formulário/DTO de aluno e exibir derivação readonly (AC: 3).
-- [ ] Implementar create/update parcial e proteção contra `undefined → null`/defaults destrutivos (AC: 4, 5).
-- [ ] Integrar resposta canônica da Story 19.2 e atualizar testes de reload/PII (AC: 5, 7).
+- [x] Auditar read model e query base de alunos, identificando joins e agregados atuais (AC: 1, 2, 6).
+- [x] Alterar leitura para `aluno` com agregados de inscrição sem N+1 (AC: 1, 2, 6).
+- [x] Remover `enrollmentStatus` do formulário/DTO de aluno e exibir derivação readonly (AC: 3).
+- [x] Implementar create/update parcial e proteção contra `undefined → null`/defaults destrutivos (AC: 4, 5).
+- [x] Integrar resposta canônica da Story 19.2 e atualizar testes de reload/PII (AC: 5, 7).
 
 ## Dev Notes
 

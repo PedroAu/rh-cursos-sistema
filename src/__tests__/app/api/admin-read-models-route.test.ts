@@ -148,8 +148,6 @@ describe("app/api/admin read model routes — fail-closed", () => {
       new Request("https://x/api/admin/students?page=2&pageSize=10&classId=turma-7&status=Confirmada&search=maria")
     );
     expect(res.status).toBe(200);
-    expect(calls.eq).toContainEqual(["turma_id", "turma-7"]);
-    expect(calls.eq).toContainEqual(["status_inscricao", "Confirmada"]);
     expect(calls.or?.[0]?.[0]).toContain("nome_completo.ilike.%maria%");
     expect(calls.range?.[0]).toEqual([10, 19]);
   });

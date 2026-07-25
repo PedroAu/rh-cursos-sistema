@@ -107,12 +107,11 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     "level",
     "status",
     "featured",
-    "durationLabel",
+    "durationHours",
     "price",
     "image",
     "targetAudience",
     "categories",
-    "featuredCourseIds",
     "shortDescription",
     "fullDescription",
     "objectives",
@@ -126,7 +125,6 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     price: "number",
     targetAudience: "array",
     categories: "array",
-    featuredCourseIds: "multiselect",
     shortDescription: "textarea",
     fullDescription: "textarea",
     objectives: "array",
@@ -140,12 +138,11 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     level: true,
     status: true,
     featured: false,
-    durationLabel: true,
+    durationHours: true,
     price: true,
     image: false,
     targetAudience: false,
     categories: false,
-    featuredCourseIds: false,
     shortDescription: true,
     fullDescription: true,
     objectives: false,
@@ -167,7 +164,7 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     featured: {
       hint: "Deixe como Não no cadastro inicial, a menos que o curso vá entrar em destaque.",
     },
-    durationLabel: { placeholder: "Ex.: 16h" },
+    durationHours: { placeholder: "Ex.: 16" },
     price: {
       placeholder: "1290",
       hint: "Informe o valor total em reais, sem símbolo de moeda.",
@@ -183,9 +180,6 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     categories: {
       placeholder: "Ex.: Licitações e Contratos",
       hint: "Use categorias que ajudem a encontrar o curso no catálogo.",
-    },
-    featuredCourseIds: {
-      hint: "Vincule cursos que complementam esta oferta.",
     },
     shortDescription: {
       placeholder: "Ex.: Curso prático para equipes que precisam revisar contratos com segurança.",
@@ -231,12 +225,11 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
     instructorId: "select",
   });
 
-  expectFieldKeys(configs.students, ["name", "email", "organization", "enrollmentStatus"]);
+  expectFieldKeys(configs.students, ["name", "email", "organization"]);
   expectFieldTypes(configs.students, {
     name: "text",
     email: "text",
     organization: "text",
-    enrollmentStatus: "select",
   });
 
   expectFieldKeys(configs.leads, [
@@ -327,7 +320,7 @@ test("AdminResourcePage configs cover all 7 resource field contracts", () => {
   expectFieldTypes(configs.instructors, {
     name: "text",
     education: "textarea",
-    photoUrl: "file",
+    photoUrl: "text",
     bio: "textarea",
     courseIds: "multiselect",
     status: "select",

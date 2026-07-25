@@ -166,9 +166,9 @@ function validateMutation(mutation: AdminMutation): string | null {
     if (mutation.action === "list") return null;
 
     if (mutation.action === "create") {
-      if (mutation.resource === "students") studentSchema.parse(mutation.payload);
-      else if (mutation.resource === "enrollments") enrollmentCreateSchema.parse(mutation.payload);
-      else if (mutation.resource === "leads") leadSchema.parse(mutation.payload);
+      if (mutation.resource === "students") mutation.payload = studentSchema.parse(mutation.payload);
+      else if (mutation.resource === "enrollments") mutation.payload = enrollmentCreateSchema.parse(mutation.payload);
+      else if (mutation.resource === "leads") mutation.payload = leadSchema.parse(mutation.payload);
       else throw new Error("create action not supported for resource");
       return null;
     }
@@ -185,13 +185,13 @@ function validateMutation(mutation: AdminMutation): string | null {
     }
 
     const p = mutation.payload;
-    if (mutation.resource === "courses") courseSchema.parse(p);
-    else if (mutation.resource === "classes") classSchema.parse(p);
-    else if (mutation.resource === "students") studentSchema.parse(p);
-    else if (mutation.resource === "leads") leadSchema.parse(p);
+    if (mutation.resource === "courses") mutation.payload = courseSchema.parse(p);
+    else if (mutation.resource === "classes") mutation.payload = classSchema.parse(p);
+    else if (mutation.resource === "students") mutation.payload = studentSchema.parse(p);
+    else if (mutation.resource === "leads") mutation.payload = leadSchema.parse(p);
     else if (mutation.resource === "enrollments") enrollmentStatusSchema.parse(p);
-    else if (mutation.resource === "instructors") instructorSchema.parse(p);
-    else if (mutation.resource === "blog") blogPostSchema.parse(p);
+    else if (mutation.resource === "instructors") mutation.payload = instructorSchema.parse(p);
+    else if (mutation.resource === "blog") mutation.payload = blogPostSchema.parse(p);
 
     return null;
   } catch (err) {
@@ -251,9 +251,9 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
         tipo_aluno: toDbStudentType(payload.enrollmentType ?? "Pessoa física"),
       };
 
-      if (existingId) {
-        const { error } = await supabase.from("aluno").update(row).eq("id", existingId);
-        if (error) throw error;
+    if (existingId) {
+        // Existing e-mail identifies the student to reuse; it is not permission
+        // to overwrite PII with partial or stale admin-form values.
         return { skipped: false, data: { id: existingId } };
       }
 
@@ -269,7 +269,7 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
         String(payload.classId ?? ""),
         String(payload.courseId ?? "")
       );
-      const { data: enrollmentId, error } = await supabase.rpc("registrar_inscricao_publica", {
+      const { data: enrollmentResult, error } = await supabase.rpc("admin_criar_inscricao", {
         p_nome_completo: payload.studentName,
         p_email: payload.email,
         p_cpf: payload.cpf,
@@ -281,9 +281,10 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
         p_tipo_inscricao: payload.enrollmentType ?? "Pessoa física",
         p_forma_pagamento: toDbPaymentMethod(payload.paymentMethod ?? "Pix"),
         p_observacoes: payload.notes ?? "",
+        p_status: toDbEnrollmentStatus(payload.status ?? "Aguardando pagamento"),
       });
       if (error) throw error;
-      return { skipped: false, data: { id: enrollmentId } };
+      return { skipped: false, data: enrollmentResult };
     }
 
     if (mutation.resource === "leads") {
@@ -388,45 +389,60 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
   if (mutation.resource === "courses") {
     const trilhaNome = await resolveTrilhaNome(supabase, p.pathId);
     const slug = await resolveCourseSlugForUpsert(supabase, p);
-    const { error } = await supabase.from("curso").upsert(courseToUpsert({ ...p, slug }, trilhaNome ?? ""));
+    const { data, error } = await supabase.from("curso").upsert(courseToUpsert({ ...p, slug }, trilhaNome ?? "")).select("*").single();
     if (error) throw error;
+    return { skipped: false, data };
   } else if (mutation.resource === "classes") {
     const resolvedCourseId = await resolveCourseIdOrThrow(supabase, String(p.courseId ?? ""));
     const resolvedInstructorId = p.instructorId
       ? await resolveInstructorId(supabase, String(p.instructorId ?? ""))
       : undefined;
-    const { error } = await supabase.from("turma").upsert(
+    const { data, error } = await supabase.from("turma").upsert(
       classToUpsert({
         ...p,
         courseId: resolvedCourseId,
         instructorId: resolvedInstructorId ?? null,
       })
-    );
+    ).select("*").single();
     if (error) throw error;
+    return { skipped: false, data };
   } else if (mutation.resource === "students") {
-    const { error } = await supabase
-      .from("aluno")
-      .update({
-        nome_completo: p.name,
-        email: p.email,
-        orgao: p.organization,
-      })
-      .eq("id", (p.id as string) ?? "");
+    const id = String(p.id ?? "");
+    if (!id) throw new AdminResourceError("ID do aluno é obrigatório.", 422);
+    const update: Record<string, unknown> = {};
+    const fields: Array<[string, string]> = [
+      ["name", "nome_completo"], ["email", "email"], ["organization", "orgao"],
+      ["cpf", "cpf"], ["phone", "telefone"], ["jobTitle", "cargo"], ["enrollmentType", "tipo_aluno"],
+    ];
+    for (const [source, target] of fields) {
+      if (p[source] !== undefined) update[target] = target === "tipo_aluno" ? toDbStudentType(String(p[source])) : p[source];
+    }
+    const { data, error } = await supabase.from("aluno").update(update).eq("id", id).select("*").single();
     if (error) throw error;
+    return { skipped: false, data };
   } else if (mutation.resource === "instructors") {
-    const { error } = await supabase.from("instrutor").upsert(instructorToUpsert(p));
+    const { data, error } = await supabase.from("instrutor").upsert(instructorToUpsert(p)).select("*").single();
     if (error) throw error;
+    if (Array.isArray(p.courseIds)) {
+      const { error: syncError } = await supabase.rpc("admin_sync_instrutor_cursos", {
+        p_instrutor_id: data.id,
+        p_curso_ids: p.courseIds,
+      });
+      if (syncError) throw syncError;
+    }
+    return { skipped: false, data };
   } else if (mutation.resource === "blog") {
     const relatedCourseId = p.relatedCourseId
       ? await resolveCourseId(supabase, String(p.relatedCourseId))
       : undefined;
-    const { error } = await supabase.from("post_blog").upsert(
+    const { data, error } = await supabase.from("post_blog").upsert(
       blogPostToUpsert({
         ...p,
         relatedCourseId: relatedCourseId ?? null,
       })
-    );
+    ).select("*").single();
     if (error) throw error;
+    return { skipped: false, data };
   } else if (mutation.resource === "leads") {
     const update: Record<string, unknown> = {
       nome: p.name,
@@ -439,15 +455,21 @@ async function applyMutation(mutation: AdminMutation): Promise<{ skipped: boolea
       modalidade_preferida: p.preferredModality,
       objetivo_treinamento: p.trainingObjective,
       desafios_principais: p.mainChallenges,
+      tipo: p.type === "Consultoria" ? "Mentoria" : p.type === "Orçamento" ? "Orcamento" : p.type,
+      tema_treinamento: p.trainingTheme,
+      curso_id: p.courseId ?? null,
     };
     if (typeof p.status === "string") {
       update.status_crm = toDbLeadStatus(p.status);
     }
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("lead")
       .update(update)
-      .eq("id", (p.id as string) ?? "");
+      .eq("id", (p.id as string) ?? "")
+      .select("*")
+      .single();
     if (error) throw error;
+    return { skipped: false, data };
   }
 
   return { skipped: false };

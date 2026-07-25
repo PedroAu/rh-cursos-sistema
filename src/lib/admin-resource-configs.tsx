@@ -307,7 +307,6 @@ export function buildResourceConfig(
           ? store.courseCategories
           : deriveCourseCategoriesFromCourses(store.courses);
       const modalityOptions = COURSE_MODALITY_OPTIONS;
-      const featuredCourseOptions = store.courses.map((course) => ({ value: course.id, label: course.title }));
       const statusOptions = COURSE_STATUS_OPTIONS;
 
       const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
@@ -376,7 +375,7 @@ export function buildResourceConfig(
             title: row.title,
             pathId: row.pathId,
             modalities: row.modalities?.length ? row.modalities : [row.modality],
-            durationLabel: row.durationLabel,
+            durationHours: row.durationHours ?? 0,
             price: String(row.price),
             status: row.status,
             shortDescription: row.shortDescription,
@@ -385,7 +384,6 @@ export function buildResourceConfig(
             level: row.level,
             targetAudience: row.targetAudience || [],
             categories: row.categories?.length ? row.categories : row.category ? [row.category] : [],
-            featuredCourseIds: row.featuredCourseIds || [],
             featured: row.featured ? "Sim" : "Não",
             objectives: row.objectives || [],
             benefits: row.benefits || [],
@@ -423,8 +421,7 @@ export function buildResourceConfig(
               pathId: str(form.pathId),
               modality: (modalities[0] ?? "Ao vivo online") as Course["modality"],
               modalities: modalities as Course["modality"][],
-              durationLabel: str(form.durationLabel),
-              durationHours: Number(str(form.durationLabel).replace(/\D/g, "") || 8),
+              durationHours: Number(form.durationHours || 0),
               price: Number(form.price || 0),
               status: str(form.status) as Course["status"],
               shortDescription: str(form.shortDescription),
@@ -435,7 +432,6 @@ export function buildResourceConfig(
               category: categories[0],
               categories,
               featured: form.featured === "Sim",
-              featuredCourseIds: strArr(form.featuredCourseIds),
               objectives,
               benefits,
               modules,
@@ -498,11 +494,11 @@ export function buildResourceConfig(
             hint: "Deixe como Não no cadastro inicial, a menos que o curso vá entrar em destaque.",
           },
           {
-            key: "durationLabel",
+            key: "durationHours",
             label: "Carga horária",
-            type: "text",
+            type: "number",
             required: true,
-            placeholder: "Ex.: 16h",
+            placeholder: "Ex.: 16",
           },
           {
             key: "price",
@@ -536,14 +532,6 @@ export function buildResourceConfig(
             required: false,
             placeholder: "Ex.: Licitações e Contratos",
             hint: "Use categorias que ajudem a encontrar o curso no catálogo.",
-          },
-          {
-            key: "featuredCourseIds",
-            label: "Cursos destaque relacionados",
-            type: "multiselect",
-            options: featuredCourseOptions,
-            required: false,
-            hint: "Vincule cursos que complementam esta oferta.",
           },
           {
             key: "shortDescription",
@@ -613,14 +601,6 @@ export function buildResourceConfig(
         { value: "Em breve", label: "Em breve" },
       ];
       const instructorOptions = store.instructors.map((i) => ({ value: i.id, label: i.name }));
-      const confirmedEnrollments = editingId
-        ? store.enrollments.filter(
-            (item) =>
-              item.classId === editingId &&
-              (item.status === "Confirmada" || item.status === "Aguardando pagamento" || item.status === "Concluída")
-          ).length
-        : 0;
-
       const activeClasses = store.classes.filter(
         (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
       ).length;
@@ -742,8 +722,6 @@ export function buildResourceConfig(
               instructorId: optStr(form.instructorId),
               totalSeats,
               manualFilledSeats,
-              filledSeats: Math.min(totalSeats, confirmedEnrollments + manualFilledSeats),
-              availableSeats: Math.max(0, totalSeats - (confirmedEnrollments + manualFilledSeats)),
               price: numOrUndef(form.price) ?? 0,
             });
             setOpen(false);
@@ -780,14 +758,6 @@ export function buildResourceConfig(
           value.toLocaleLowerCase("pt-BR").includes(normalizedSearch)
         )
       );
-      const enrollmentStatusOptions = [
-        { value: "Pendente", label: "Pendente" },
-        { value: "Aguardando pagamento", label: "Aguardando pagamento" },
-        { value: "Confirmada", label: "Confirmada" },
-        { value: "Cancelada", label: "Cancelada" },
-        { value: "Concluída", label: "Concluída" },
-      ];
-
       const activeStudents = store.students.filter(
         (item) => item.enrollmentStatus === "Confirmada" || item.enrollmentStatus === "Concluída"
       ).length;
@@ -861,7 +831,6 @@ export function buildResourceConfig(
             name: row.name,
             email: row.email,
             organization: row.organization,
-            enrollmentStatus: row.enrollmentStatus,
           });
           setValidationErrors([]);
           setOpen(true);
@@ -877,14 +846,12 @@ export function buildResourceConfig(
                 name: str(form.name),
                 email: str(form.email),
                 organization: str(form.organization),
-                enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
               });
             } else {
               await store.createStudent({
                 name: str(form.name),
                 email: str(form.email),
                 organization: str(form.organization),
-                enrollmentStatus: str(form.enrollmentStatus) as Student["enrollmentStatus"],
               });
             }
             setOpen(false);
@@ -897,7 +864,6 @@ export function buildResourceConfig(
           { key: "name", label: "Nome", type: "text", required: true },
           { key: "email", label: "E-mail", type: "text", required: true },
           { key: "organization", label: "Empresa / órgão", type: "text", required: true },
-          { key: "enrollmentStatus", label: "Status", type: "select", options: enrollmentStatusOptions, required: true },
         ],
       };
     }
@@ -1415,7 +1381,7 @@ export function buildResourceConfig(
           { key: "phone", label: "Telefone", type: "text" },
           { key: "specialty", label: "Especialidade", type: "text" },
           { key: "education", label: "Formação", type: "textarea" },
-          { key: "photoUrl", label: "Foto do professor", type: "file" },
+          { key: "photoUrl", label: "URL da foto do professor", type: "text", placeholder: "https://..." },
           { key: "bio", label: "Biografia", type: "textarea" },
           { key: "courseIds", label: "Cursos vinculados", type: "multiselect", options: courseOptions },
           { key: "status", label: "Status", type: "select", options: instructorStatusOptions, required: true },

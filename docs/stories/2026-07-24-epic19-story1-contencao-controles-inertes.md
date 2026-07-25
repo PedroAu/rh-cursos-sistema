@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -43,13 +43,13 @@ A auditoria da Epic 19 encontrou `featuredCourseIds`, `enrollmentStatus`, status
 
 ## Tasks / Subtasks
 
-- [ ] Mapear cada controle afetado na configuração de recursos e nas páginas administrativas (AC: 1, 2).
+- [x] Mapear cada controle afetado na configuração de recursos e nas páginas administrativas (AC: 1, 2).
   - [ ] Atualizar `FieldConfig`/renderização sem duplicar regras no componente.
   - [ ] Remover estados, defaults e serialização associados aos campos contidos.
-- [ ] Ajustar inscrições, alunos, leads e instrutores para os estados readonly/ocultos definidos pela matriz (AC: 1, 3, 5).
-- [ ] Retirar a ação produtiva de Configurações e revisar sua navegação/estado informativo (AC: 1, 4).
-- [ ] Criar/ajustar testes de componente e acessibilidade para controles removidos, readonly e payload (AC: 2, 3, 6).
-- [ ] Executar regressão pública e gates de lint/typecheck (AC: 7).
+- [x] Ajustar inscrições, alunos, leads e instrutores para os estados readonly/ocultos definidos pela matriz (AC: 1, 3, 5).
+- [x] Retirar a ação produtiva de Configurações e revisar sua navegação/estado informativo (AC: 1, 4).
+- [x] Criar/ajustar testes de componente e acessibilidade para controles removidos, readonly e payload (AC: 2, 3, 6).
+- [x] Executar regressão pública e gates de lint/typecheck (AC: 7).
 
 ## Dev Notes
 

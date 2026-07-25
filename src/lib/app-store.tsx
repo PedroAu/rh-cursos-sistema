@@ -20,12 +20,7 @@ import { company } from "@/lib/company";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { invokeFunction, isFunctionsConfigured, getStableClientIp } from "@/lib/supabase/functions-client";
 import { SESSION_REFRESH_THRESHOLD_MS } from "@/lib/auth-session";
-import {
-  fetchPublicBlogPostsFromSupabase,
-  fetchPublicCatalogFromSupabase,
-  isClientPublicTestBaselineEnabled,
-  isExplicitPublicTestBaselineEnabled
-} from "@/lib/supabase/rh-cursos-api";
+import * as rhCursosApi from "@/lib/supabase/rh-cursos-api";
 import { mapLead, type LeadRow } from "@/lib/supabase/mappers";
 import { enrollmentReceiptSchema } from "@/lib/validation";
 import type {
@@ -121,7 +116,7 @@ const ARRAY_STATE_KEYS = [
   "courseCategories"
 ] as const satisfies readonly (keyof AppStoreInitialData)[];
 
-type PublicCatalogSnapshot = Awaited<ReturnType<typeof fetchPublicCatalogFromSupabase>>;
+type PublicCatalogSnapshot = Awaited<ReturnType<typeof rhCursosApi.fetchPublicCatalogFromSupabase>>;
 
 function sanitizeInitialData(initialData?: AppStoreInitialData): AppStoreInitialData | undefined {
   if (!initialData) return initialData;
@@ -325,11 +320,11 @@ function buildStudentRecord(
     email: payload.email,
     phone: payload.phone ?? fallback?.phone ?? "",
     cpf: payload.cpf ?? fallback?.cpf ?? "",
-    organization: payload.organization,
+    organization: payload.organization ?? fallback?.organization ?? "",
     jobTitle: payload.jobTitle ?? fallback?.jobTitle ?? "",
     courseId: payload.courseId ?? fallback?.courseId ?? "",
     classId: payload.classId ?? fallback?.classId ?? "",
-    enrollmentStatus: payload.enrollmentStatus ?? fallback?.enrollmentStatus ?? "Pendente",
+    enrollmentStatus: fallback?.enrollmentStatus ?? "Pendente",
     certificateIssued: fallback?.certificateIssued ?? false,
     enrolledAt: fallback?.enrolledAt ?? new Date().toISOString(),
     paymentMethod: payload.paymentMethod ?? fallback?.paymentMethod ?? "Pix",
@@ -388,7 +383,7 @@ function persistAdminMutation(
         throw new Error(message);
       }
       if (successMessage) toast.success(successMessage);
-      const body = (await response.json().catch(() => null)) as { data?: { id?: string } } | null;
+      const body = (await response.json().catch(() => null)) as { data?: { id?: string; [key: string]: unknown } } | null;
       return body?.data;
     })
     .catch((error) => {
@@ -618,9 +613,16 @@ export function AppStoreProvider({
     let active = true;
     const subscriptions: ReturnType<typeof supabase.channel>[] = [];
     const client = supabase;
-    const publicTestBaselineEnabled =
-      isExplicitPublicTestBaselineEnabled() ||
-      isClientPublicTestBaselineEnabled();
+    let clientPublicTestBaselineEnabled = false;
+    try {
+      const candidate = (rhCursosApi as typeof rhCursosApi & {
+        isClientPublicTestBaselineEnabled?: () => boolean;
+      }).isClientPublicTestBaselineEnabled;
+      clientPublicTestBaselineEnabled = typeof candidate === "function" && candidate();
+    } catch {
+      // Older test doubles may omit this optional guard.
+    }
+    const publicTestBaselineEnabled = rhCursosApi.isExplicitPublicTestBaselineEnabled() || clientPublicTestBaselineEnabled;
 
     // Timer de renovação do token efêmero de realtime (limpo no cleanup).
     let realtimeTokenRenewalTimer: ReturnType<typeof setTimeout> | undefined;
@@ -630,7 +632,7 @@ export function AppStoreProvider({
       catalogFetchVersionRef.current += 1;
       const fetchVersion = catalogFetchVersionRef.current;
 
-      fetchPublicCatalogFromSupabase()
+      rhCursosApi.fetchPublicCatalogFromSupabase()
         .then((updated) => {
           if (!active || !updated || fetchVersion !== catalogFetchVersionRef.current) return;
           setState((current) => ({
@@ -648,7 +650,7 @@ export function AppStoreProvider({
 
     const scheduleBlogRefetch = debounce(() => {
       if (!active) return;
-      fetchPublicBlogPostsFromSupabase()
+      rhCursosApi.fetchPublicBlogPostsFromSupabase()
         .then((updated) => {
           if (!active || !updated) return;
           setState((current) => ({ ...current, blogPosts: updated }));
@@ -673,8 +675,8 @@ export function AppStoreProvider({
 
     if (bootstrapPublicData) {
       Promise.all([
-        fetchPublicCatalogFromSupabase(),
-        fetchPublicBlogPostsFromSupabase()
+        rhCursosApi.fetchPublicCatalogFromSupabase(),
+        rhCursosApi.fetchPublicBlogPostsFromSupabase()
       ])
         .then(([catalog, blogPosts]) => {
           if (!active) return;
@@ -1016,7 +1018,6 @@ export function AppStoreProvider({
           cpf: payload.cpf,
           organization: payload.organization,
           jobTitle: payload.jobTitle,
-          enrollmentStatus: payload.status ?? "Confirmada",
           courseId: payload.courseId,
           classId: payload.classId,
           paymentMethod: payload.paymentMethod,
@@ -1027,7 +1028,7 @@ export function AppStoreProvider({
           enrolledAt: new Date().toISOString(),
         }
       );
-      const enrollment = buildEnrollmentRecord(payload, result?.id);
+      const enrollment = buildEnrollmentRecord(payload, result?.id, "Aguardando pagamento");
       const nextEnrollments = [enrollment, ...current.enrollments];
 
       return {
@@ -1190,7 +1191,28 @@ export function AppStoreProvider({
       ...current,
       leads: current.leads.map((lead) => (lead.id === payload.id ? { ...lead, ...payload } : lead))
     }));
-    return persistAdminMutation({ resource: "leads", action: "upsert", payload }, "Lead atualizado.").then(() => undefined);
+    return persistAdminMutation({
+      resource: "leads",
+      action: "upsert",
+      payload: {
+        id: payload.id,
+        name: payload.name,
+        email: payload.email,
+        phone: payload.phone,
+        type: payload.type,
+        courseInterest: payload.courseInterest,
+        courseId: payload.courseId,
+        origin: payload.origin,
+        status: payload.status,
+        organization: payload.organization,
+        teamSize: payload.teamSize,
+        preferredModality: payload.preferredModality,
+        trainingObjective: payload.trainingObjective,
+        trainingTheme: payload.trainingTheme,
+        mainChallenges: payload.mainChallenges,
+        message: payload.message,
+      },
+    }, "Lead atualizado.").then(() => undefined);
   }, []);
 
   const upsertCourse = useCallback<AppStoreValue["upsertCourse"]>(async (course) => {
@@ -1251,13 +1273,36 @@ export function AppStoreProvider({
           nextClassId: course.nextClassId ?? snapshot.classes[0]?.id ?? ""
         } as Course);
 
-    await persistAdminMutation(
-      { resource: "courses", action: "upsert", payload: nextCourse },
+    const persisted = await persistAdminMutation(
+      { resource: "courses", action: "upsert", payload: {
+        id: course.id,
+        title: nextCourse.title,
+        pathId: nextCourse.pathId,
+        modality: nextCourse.modality,
+        modalities: nextCourse.modalities ?? [nextCourse.modality],
+        level: nextCourse.level,
+        status: nextCourse.status,
+        featured: nextCourse.featured,
+        durationHours: nextCourse.durationHours,
+        durationLabel: `${nextCourse.durationHours ?? 0}h`,
+        price: nextCourse.price,
+        shortDescription: nextCourse.shortDescription,
+        fullDescription: nextCourse.fullDescription,
+        image: nextCourse.image,
+        targetAudience: nextCourse.targetAudience,
+        categories: nextCourse.categories,
+        objectives: nextCourse.objectives,
+        benefits: nextCourse.benefits,
+        modules: nextCourse.modules,
+      } },
       course.id ? "Curso editado." : "Curso criado no admin."
     );
+    const canonicalCourse = typeof persisted?.id === "string" && persisted.id.trim()
+      ? { ...nextCourse, id: persisted.id.trim() }
+      : nextCourse;
     setState((current) => ({
       ...current,
-      courses: upsertCollection(current.courses, Boolean(exists), nextCourse)
+      courses: upsertCollection(current.courses, Boolean(exists), canonicalCourse)
     }));
   }, []);
 
@@ -1330,13 +1375,29 @@ export function AppStoreProvider({
       ...deriveClassCapacity(baseClass, snapshot.enrollments)
     };
 
-    await persistAdminMutation(
-      { resource: "classes", action: "upsert", payload: nextClass },
+    const persisted = await persistAdminMutation(
+      { resource: "classes", action: "upsert", payload: {
+        id: trainingClass.id,
+        courseId: nextClass.courseId,
+        startDate: nextClass.startDate,
+        endDate: nextClass.endDate,
+        time: nextClass.time,
+        modality: nextClass.modality,
+        location: nextClass.location,
+        instructorId: nextClass.instructorId || undefined,
+        totalSeats: nextClass.totalSeats,
+        manualFilledSeats: nextClass.manualFilledSeats,
+        price: nextClass.price,
+        status: nextClass.status,
+      } },
       trainingClass.id ? "Turma editada." : "Turma criada."
     );
+    const canonicalClass = typeof persisted?.id === "string" && persisted.id.trim()
+      ? { ...nextClass, id: persisted.id.trim() }
+      : nextClass;
     setState((current) => ({
       ...current,
-      classes: upsertCollection(current.classes, Boolean(exists), nextClass)
+      classes: upsertCollection(current.classes, Boolean(exists), canonicalClass)
     }));
   }, []);
 
@@ -1394,13 +1455,27 @@ export function AppStoreProvider({
           status: instructor.status ?? "Ativo"
         } as Instructor);
 
-    await persistAdminMutation(
-      { resource: "instructors", action: "upsert", payload: nextInstructor },
+    const persisted = await persistAdminMutation(
+      { resource: "instructors", action: "upsert", payload: {
+        id: instructor.id,
+        name: nextInstructor.name,
+        email: nextInstructor.email,
+        phone: nextInstructor.phone,
+        specialty: nextInstructor.specialty,
+        bio: nextInstructor.bio,
+        education: nextInstructor.education,
+        photoUrl: nextInstructor.photoUrl,
+        status: nextInstructor.status,
+        courseIds: nextInstructor.courseIds ?? [],
+      } },
       instructor.id ? "Instrutor editado." : "Instrutor criado."
     );
+    const canonicalInstructor = typeof persisted?.id === "string" && persisted.id.trim()
+      ? { ...nextInstructor, id: persisted.id.trim() }
+      : nextInstructor;
     setState((current) => ({
       ...current,
-      instructors: upsertCollection(current.instructors, Boolean(exists), nextInstructor)
+      instructors: upsertCollection(current.instructors, Boolean(exists), canonicalInstructor)
     }));
   }, []);
 
@@ -1427,15 +1502,19 @@ export function AppStoreProvider({
     }
   }, []);
 
-  const updateStudent = useCallback<AppStoreValue["updateStudent"]>((student) => {
+  const updateStudent = useCallback<AppStoreValue["updateStudent"]>(async (student) => {
+    await persistAdminMutation({ resource: "students", action: "upsert", payload: student }, "Aluno atualizado.");
     setState((current) => ({
       ...current,
       students: current.students.map((item) => (item.id === student.id ? { ...item, ...student } : item))
     }));
-    return persistAdminMutation({ resource: "students", action: "upsert", payload: student }, "Aluno atualizado.").then(() => undefined);
   }, []);
 
-  const updateEnrollmentStatus = useCallback<AppStoreValue["updateEnrollmentStatus"]>((id, status) => {
+  const updateEnrollmentStatus = useCallback<AppStoreValue["updateEnrollmentStatus"]>(async (id, status) => {
+    await persistAdminMutation(
+      { resource: "enrollments", action: "update-status", id, status },
+      "Status da inscrição atualizado."
+    );
     setState((current) => {
       const enrollments = current.enrollments.map((item) => (item.id === id ? { ...item, status } : item));
 
@@ -1448,10 +1527,6 @@ export function AppStoreProvider({
         }))
       };
     });
-    return persistAdminMutation(
-      { resource: "enrollments", action: "update-status", id, status },
-      "Status da inscrição atualizado."
-    ).then(() => undefined);
   }, []);
 
   const upsertBlogPost = useCallback<AppStoreValue["upsertBlogPost"]>(async (post) => {
@@ -1475,14 +1550,29 @@ export function AppStoreProvider({
           relatedCourseId: post.relatedCourseId ?? ""
         } as BlogPost);
 
-    await persistAdminMutation(
-      { resource: "blog", action: "upsert", payload: nextPost },
+    const persisted = await persistAdminMutation(
+      { resource: "blog", action: "upsert", payload: {
+        id: post.id,
+        title: nextPost.title,
+        summary: nextPost.summary,
+        content: nextPost.content,
+        category: nextPost.category,
+        tags: nextPost.tags,
+        author: nextPost.author,
+        readingTime: nextPost.readingTime,
+        status: nextPost.status,
+        image: nextPost.image,
+        relatedCourseId: nextPost.relatedCourseId,
+      } },
       post.id ? "Post atualizado." : "Post publicado."
     );
+    const canonicalPost = typeof persisted?.id === "string" && persisted.id.trim()
+      ? { ...nextPost, id: persisted.id.trim() }
+      : nextPost;
     startTransition(() => {
       setState((current) => ({
         ...current,
-        blogPosts: upsertCollection(current.blogPosts, Boolean(exists), nextPost)
+        blogPosts: upsertCollection(current.blogPosts, Boolean(exists), canonicalPost)
       }));
     });
   }, []);

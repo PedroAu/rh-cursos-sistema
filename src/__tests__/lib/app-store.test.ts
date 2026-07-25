@@ -335,8 +335,7 @@ function buildStudentPayload(): Parameters<Store["createStudent"]>[0] {
     name: "Aluno Teste",
     email: "aluno.teste@example.com",
     organization: "Órgão Teste",
-    enrollmentStatus: "Pendente",
-  } satisfies Pick<Student, "name" | "email" | "organization" | "enrollmentStatus">;
+  } satisfies Pick<Student, "name" | "email" | "organization">;
 }
 
 function findDeleteSessionCall() {

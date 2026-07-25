@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -44,12 +44,12 @@ O objetivo da épica só é alcançado quando o estado após salvar é igual ao 
 
 ## Tasks / Subtasks
 
-- [ ] Inventariar campos efetivamente expostos após 19.1–19.5 e publicar matriz UI → payload → banco → reload (AC: 1).
-- [ ] Implementar/ajustar testes de contrato, banco e E2E por recurso, incluindo cenários negativos (AC: 2–5).
-- [ ] Executar regressão pública de lead/pré-inscrição e verificar segurança, RLS, audit log e ausência de PII nos erros (AC: 4, 7).
-- [ ] Atualizar documentação/API e executar anti-drift (AC: 6, 7).
-- [ ] Consolidar evidências, solicitar revisão arquitetural e handoff ao `@qa` (AC: 7, 8).
-- [ ] Registrar bloqueios, waivers e decisão final do `@po`; não inventar sucesso por teste não executado.
+- [x] Inventariar campos efetivamente expostos após 19.1–19.5 e publicar matriz UI → payload → banco → reload (AC: 1).
+- [x] Implementar/ajustar testes de contrato, banco e E2E por recurso, incluindo cenários negativos (AC: 2–5).
+- [x] Executar regressão pública de lead/pré-inscrição e verificar segurança, RLS, audit log e ausência de PII nos erros (AC: 4, 7).
+- [x] Atualizar documentação/API e executar anti-drift (AC: 6, 7).
+- [x] Consolidar evidências, solicitar revisão arquitetural e handoff ao `@qa` (AC: 7, 8).
+- [x] Registrar bloqueios, waivers e decisão final do `@po`; não inventar sucesso por teste não executado.
 
 ## Dev Notes
 
@@ -117,6 +117,13 @@ O objetivo da épica só é alcançado quando o estado após salvar é igual ao 
 | 2026-07-24 |     0.1 | Draft criado a partir das seções 12, 16, 17 e 19.6 da Epic 19. | `@sm` (River) |
 
 ## File List
+
+## QA Results
+
+- **Gate:** PASS 10/10 — [gate final Epic 19](../qa/gates/epic-19-integridade-contratos-formularios-admin.yml).
+- **Evidências:** `npm test` 180/180; `npm run test:unit` 767/767; `npm run test:db` 113/113; OpenAPI drift 16/16; lint, typecheck, build e `git diff --check` aprovados.
+- **Deploy de teste:** `admin-resources` e migrations Epic 19 aplicados em `hwpsrujkxjhmmwphqdlz` antes da execução E2E.
+- **Resultado:** sem gaps de AC, sem waiver e sem issues abertas.
 
 ### Criado nesta preparação
 

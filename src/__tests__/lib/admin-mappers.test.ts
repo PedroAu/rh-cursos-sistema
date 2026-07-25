@@ -98,7 +98,7 @@ describe("courseToUpsert", () => {
     expect(payload).not.toHaveProperty("total_alunos");
   });
 
-  it("maps the student counter only when an explicit trusted caller supplies it", () => {
+  it("does not accept a client-provided student counter", () => {
     const payload = courseToUpsert(
       {
         title: "Curso importado",
@@ -110,7 +110,7 @@ describe("courseToUpsert", () => {
       "Departamento Pessoal"
     );
 
-    expect(payload.total_alunos).toBe(42);
+    expect(payload.total_alunos).toBeUndefined();
   });
 
   it("ignores a stale pathName from the client payload and uses the server-resolved trilha name [Story 17.4]", () => {

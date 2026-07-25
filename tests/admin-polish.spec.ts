@@ -58,7 +58,7 @@ test.describe("epica 3 — admin polish", () => {
     expect(courseConfig.fields.find((field) => field.key === "benefits")?.type).toBe("array");
     expect(courseConfig.fields.find((field) => field.key === "modules")?.type).toBe("modules");
     expect(courseConfig.fields.find((field) => field.key === "pathId")?.type).toBe("select");
-    expect(courseConfig.fields.find((field) => field.key === "featuredCourseIds")?.type).toBe("multiselect");
+    expect(courseConfig.fields.find((field) => field.key === "featuredCourseIds")).toBeUndefined();
 
     expect(classConfig.fields.find((field) => field.key === "courseId")?.type).toBe("select");
     expect(classConfig.fields.find((field) => field.key === "instructorId")?.type).toBe("select");
@@ -115,12 +115,11 @@ test.describe("epica 3 — admin polish", () => {
       "level",
       "status",
       "featured",
-      "durationLabel",
+      "durationHours",
       "price",
       "image",
       "targetAudience",
       "categories",
-      "featuredCourseIds",
       "shortDescription",
       "fullDescription",
       "objectives",
@@ -134,7 +133,6 @@ test.describe("epica 3 — admin polish", () => {
       price: "number",
       targetAudience: "array",
       categories: "array",
-      featuredCourseIds: "multiselect",
       shortDescription: "textarea",
       fullDescription: "textarea",
       objectives: "array",
@@ -167,12 +165,11 @@ test.describe("epica 3 — admin polish", () => {
       instructorId: "select",
     });
 
-    expectFieldKeys(configs.students, ["name", "email", "organization", "enrollmentStatus"]);
+    expectFieldKeys(configs.students, ["name", "email", "organization"]);
     expectFieldTypes(configs.students, {
       name: "text",
       email: "text",
       organization: "text",
-      enrollmentStatus: "select",
     });
 
     expectFieldKeys(configs.leads, [
@@ -263,7 +260,7 @@ test.describe("epica 3 — admin polish", () => {
     expectFieldTypes(configs.instructors, {
       name: "text",
       education: "textarea",
-      photoUrl: "file",
+      photoUrl: "text",
       bio: "textarea",
       courseIds: "multiselect",
       status: "select",

@@ -162,7 +162,7 @@ export function courseToUpsert(p: AnyPayload, trilhaNome: string): AnyPayload {
     objetivos: p.objectives ?? [],
     beneficios: p.benefits ?? [],
     publico_alvo: p.targetAudience ?? [],
-    carga_horaria: p.durationHours ?? Number(String(p.durationLabel ?? "").replace(/\D/g, "") || 8),
+    carga_horaria: Number.isInteger(p.durationHours) ? p.durationHours : 0,
     modalidade: toDbModality((p.modality as Modality | undefined) ?? modalities[0]),
     modalidades: modalities.map((value) => toDbModality(value)),
     nivel: toDbLevel(p.level ?? "Básico"),
@@ -174,14 +174,8 @@ export function courseToUpsert(p: AnyPayload, trilhaNome: string): AnyPayload {
     status: toDbCourseStatus(p.status ?? "Ativo"),
     destaque: p.featured ?? false,
     imagem_capa: p.image,
-    rating: p.rating ?? 0,
+    // rating is derived/managed by the database and never accepted from a form.
   };
-
-  // total_alunos is maintained by enrollment triggers. Omitting it from ordinary
-  // admin saves prevents a stale form payload from overwriting the aggregate.
-  if (typeof p.studentsCount === "number") {
-    payload.total_alunos = p.studentsCount;
-  }
 
   return payload;
 }
@@ -196,7 +190,7 @@ export function classToUpsert(p: AnyPayload): AnyPayload {
     horario: p.time,
     local: p.location,
     vagas_total: p.totalSeats ?? 30,
-    vagas_preenchidas: p.filledSeats ?? 0,
+    vagas_preenchidas: p.manualFilledSeats ?? 0,
     preco_turma: p.price ?? 0,
     modalidade: toDbModality(p.modality ?? "Ao vivo online"),
     status: toDbClassStatus(p.status ?? "Inscrições abertas"),
@@ -214,7 +208,6 @@ export function instructorToUpsert(p: AnyPayload): AnyPayload {
     foto_url: p.photoUrl,
     formacao: p.education,
     especialidade: p.specialty,
-    rating: p.rating ?? 0,
     status: p.status ?? "Ativo",
   };
 }

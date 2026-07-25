@@ -61,8 +61,15 @@ export function validateCourse(
     }
   }
 
-  if (!str(form.durationLabel).trim()) {
-    addError(errors, "durationLabel", "Carga horária é obrigatória");
+  if (form.durationHours !== undefined) {
+    const durationValue = form.durationHours;
+    if (!str(durationValue).trim()) {
+      addError(errors, "durationHours", "Carga horária é obrigatória");
+    } else if (Number.isNaN(Number(durationValue)) || Number(durationValue) < 0) {
+      addError(errors, "durationHours", "Carga horária deve ser um número válido (>= 0)");
+    }
+  } else if (!str(form.durationLabel).trim()) {
+    addError(errors, "durationHours", "Carga horária é obrigatória");
   }
 
   if (!str(form.price).trim()) {
@@ -234,10 +241,6 @@ export function validateStudent(form: Record<string, unknown>): ValidationResult
     addError(errors, "organization", "Empresa/órgão é obrigatório");
   }
 
-  if (!str(form.enrollmentStatus).trim()) {
-    addError(errors, "enrollmentStatus", "Status é obrigatório");
-  }
-
   return {
     valid: errors.length === 0,
     errors
@@ -351,6 +354,11 @@ export function validateInstructor(form: Record<string, unknown>): ValidationRes
 
   if (str(form.email).trim() && !isValidEmail(str(form.email))) {
     addError(errors, "email", "Email inválido");
+  }
+
+  const photoUrl = str(form.photoUrl).trim();
+  if (photoUrl && !/^https?:\/\//i.test(photoUrl)) {
+    addError(errors, "photoUrl", "Informe uma URL HTTP(S); upload de arquivo não está disponível.");
   }
 
   return {

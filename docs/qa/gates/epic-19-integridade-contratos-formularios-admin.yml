@@ -1,0 +1,46 @@
+schema: 1
+epic: 'EPIC-19'
+epic_title: 'Integridade dos Contratos dos Formulários Administrativos'
+gate: PASS
+status_reason: 'Stories 19.1–19.6 implementadas e verificadas contra o banco isolado, Edge Function publicada no projeto de teste e regressão completa concluída sem falhas.'
+reviewer: 'Quinn (Test Architect)'
+updated: '2026-07-25T02:00:00Z'
+top_issues: []
+waiver:
+  active: false
+quality_score: 100
+evidence:
+  unit_tests: 767
+  e2e_tests: 180
+  database_tests: 113
+  api_drift_routes: 16
+  commands:
+    - 'npm run lint'
+    - 'npm run typecheck'
+    - 'npm run test:unit'
+    - 'npm run test:db'
+    - 'npm test'
+    - 'npm run docs:api:check-drift'
+    - 'npm run build'
+  trace:
+    stories: ['19.1', '19.2', '19.3', '19.4', '19.5', '19.6']
+    ac_gaps: []
+nfr_validation:
+  security:
+    status: PASS
+    notes: 'Mutations administrativas continuam atrás de sessão SSR/admin, schemas strict/allowlist, service-role somente no servidor e RLS/grants validados.'
+  data_integrity:
+    status: PASS
+    notes: 'Inscrição administrativa usa RPC transacional com reserva atômica de vaga, retorno canônico e preservação de PII; campos derivados não são aceitos como fonte de verdade.'
+  reliability:
+    status: PASS
+    notes: 'AppStore reconcilia IDs canônicos e só atualiza estado após persistência; falhas mantêm o formulário aberto e não exibem sucesso falso.'
+  maintainability:
+    status: PASS
+    notes: 'Contratos, migrações, testes, documentação e anti-drift estão reconciliados no mesmo estado verificado.'
+recommendations:
+  immediate: []
+  future:
+    - action: 'Promover a mesma migration e Edge Function para produção somente após aprovação do release.'
+      refs: ['supabase/migrations/20260724150000_epic19_admin_enrollment_rpc.sql', 'supabase/functions/admin-resources/index.ts']
+      suggested_owner: 'devops'

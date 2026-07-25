@@ -41,6 +41,7 @@ const courseLevelEnum = z.enum([
 ]);
 
 export const courseSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Nome do curso é obrigatório"),
   pathId: z.string().min(1, "Trilha é obrigatória"),
   modality: modalityEnum.optional(),
@@ -48,8 +49,10 @@ export const courseSchema = z.object({
   level: courseLevelEnum,
   status: z.enum(["Ativo", "Inativo", "Destaque", "Em breve", "Rascunho", "Arquivado"]),
   featured: z.boolean().optional(),
-  featuredCourseIds: z.array(z.string()).optional(),
-  durationLabel: z.string().min(1, "Carga horária é obrigatória"),
+  durationHours: z.number().int().nonnegative("Carga horária deve ser >= 0"),
+  // Compatibilidade durante o rollout: versões antigas da Edge Function ainda
+  // exigem o rótulo textual, enquanto o contrato canônico usa horas numéricas.
+  durationLabel: z.string().optional(),
   price: z.number({ invalid_type_error: "Preço deve ser um número" }).min(0, "Preço deve ser >= 0"),
   shortDescription: z.string().min(1, "Descrição curta é obrigatória"),
   fullDescription: z.string().min(1, "Descrição completa é obrigatória"),
@@ -68,9 +71,10 @@ export const courseSchema = z.object({
       })
     )
     .optional(),
-});
+}).strict();
 
 export const classSchema = z.object({
+  id: z.string().optional(),
   courseId: z.string().min(1, "Curso é obrigatório"),
   startDate: z.string().min(1, "Data de início é obrigatória"),
   endDate: z.string().min(1, "Data final é obrigatória"),
@@ -81,17 +85,22 @@ export const classSchema = z.object({
   location: z.string().optional(),
   totalSeats: z.number().int().min(0, "Quantidade de vagas deve ser >= 0"),
   manualFilledSeats: z.number().int().min(0, "Vagas manuais deve ser >= 0").optional(),
-  filledSeats: z.number().int().min(0).optional(),
-  availableSeats: z.number().int().min(0).optional(),
-});
+  price: z.number({ invalid_type_error: "Preço deve ser um número" }).nonnegative("Preço deve ser >= 0").optional(),
+}).strict();
 
 export const studentSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Nome é obrigatório"),
   email: emailSchema,
-  organization: z.string().min(1, "Empresa/órgão é obrigatório"),
-});
+  organization: z.string().optional(),
+  cpf: z.string().optional(),
+  phone: z.string().optional(),
+  jobTitle: z.string().optional(),
+  enrollmentType: z.enum(["Pessoa física", "Empresa", "Órgão público"]).optional(),
+}).strict();
 
 export const leadSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Nome é obrigatório"),
   email: emailSchema,
   phone: z.string().optional(),
@@ -106,7 +115,8 @@ export const leadSchema = z.object({
   trainingObjective: z.string().optional(),
   trainingTheme: z.string().optional(),
   mainChallenges: z.string().optional(),
-});
+  message: z.string().optional(),
+}).strict();
 
 const enrollmentStatusEnum = z.enum([
   "Pendente",
@@ -121,6 +131,7 @@ export const enrollmentStatusSchema = z.object({
 });
 
 export const enrollmentCreateSchema = z.object({
+  id: z.string().optional(),
   studentName: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(100, "Nome não pode ter mais de 100 caracteres"),
   email: emailSchema,
   cpf: cpfSchema,
@@ -132,21 +143,27 @@ export const enrollmentCreateSchema = z.object({
   enrollmentType: z.enum(["Pessoa física", "Empresa", "Órgão público"]).default("Pessoa física"),
   paymentMethod: z.enum(["Pix", "Cartão", "Boleto", "Empenho"]).default("Pix"),
   notes: z.string().max(500, "Notas não podem ter mais de 500 caracteres").default(""),
-});
+  status: z.enum(["Pendente", "Aguardando pagamento", "Confirmada", "Cancelada", "Concluída"]).optional(),
+}).strict();
 
 export const instructorSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Nome é obrigatório"),
   email: z.union([z.literal(""), emailSchema]).optional(),
   phone: z.string().optional(),
   specialty: z.string().optional(),
   bio: z.string().optional(),
   education: z.string().optional(),
-  photoUrl: z.string().optional(),
+  photoUrl: z.union([
+    z.literal(""),
+    z.string().url("Foto deve ser uma URL HTTP(S) válida").refine((value) => /^https?:\/\//i.test(value), "Foto deve usar HTTP(S)"),
+  ]).optional(),
   status: z.enum(["Ativo", "Inativo"]),
   courseIds: z.array(z.string()).optional(),
-});
+}).strict();
 
 export const blogPostSchema = z.object({
+  id: z.string().optional(),
   title: z.string().min(1, "Título é obrigatório"),
   category: z.enum([
     "Licitações",
@@ -167,7 +184,7 @@ export const blogPostSchema = z.object({
   tags: z.array(z.string()).optional(),
   readingTime: z.string().optional(),
   relatedCourseId: z.string().optional(),
-});
+}).strict();
 
 export const leadStatusUpdateSchema = z.object({
   status: z.enum(["Novo", "Em atendimento", "Proposta enviada", "Convertido", "Perdido"]),

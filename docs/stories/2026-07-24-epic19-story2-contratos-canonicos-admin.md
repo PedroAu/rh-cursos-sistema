@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -43,12 +43,12 @@ O dispatcher `admin-resources` recebe objetos genéricos, os schemas Zod fazem p
 
 ## Tasks / Subtasks
 
-- [ ] Inventariar schemas, mappers, dispatcher e consumidores atuais por recurso (AC: 1, 3).
-- [ ] Definir DTOs allowlist de create/update e respostas canônicas, excluindo campos derivados (AC: 1, 3, 4).
-- [ ] Encaminhar o objeto validado ao mapper/RPC e normalizar erros de validação (AC: 2, 6).
-- [ ] Ajustar AppStore e página genérica para reconciliar somente a resposta persistida (AC: 4, 5, 6).
-- [ ] Criar testes unitários/contratuais para transforms Zod, unknown fields, respostas e falhas (AC: 2–7).
-- [ ] Solicitar revisão arquitetural antes do handoff das stories dependentes.
+- [x] Inventariar schemas, mappers, dispatcher e consumidores atuais por recurso (AC: 1, 3).
+- [x] Definir DTOs allowlist de create/update e respostas canônicas, excluindo campos derivados (AC: 1, 3, 4).
+- [x] Encaminhar o objeto validado ao mapper/RPC e normalizar erros de validação (AC: 2, 6).
+- [x] Ajustar AppStore e página genérica para reconciliar somente a resposta persistida (AC: 4, 5, 6).
+- [x] Criar testes unitários/contratuais para transforms Zod, unknown fields, respostas e falhas (AC: 2–7).
+- [x] Solicitar revisão arquitetural antes do handoff das stories dependentes.
 
 ## Dev Notes
 

@@ -46,8 +46,8 @@ export type EnrollmentReceipt = {
 export type LeadPayload = Omit<Lead, "id" | "createdAt" | "status"> & {
   status?: Lead["status"];
 };
-export type StudentPayload = Pick<Student, "name" | "email" | "organization" | "enrollmentStatus"> &
-  Partial<Pick<Student, "phone" | "cpf" | "jobTitle" | "courseId" | "classId" | "paymentMethod">>;
+export type StudentPayload = Pick<Student, "name" | "email"> &
+  Partial<Pick<Student, "organization" | "phone" | "cpf" | "jobTitle" | "courseId" | "classId" | "paymentMethod">>;
 export type AdminEnrollmentPayload = Pick<
   Enrollment,
   "studentName" | "email" | "phone" | "cpf" | "organization" | "jobTitle" | "enrollmentType" | "paymentMethod" | "courseId" | "classId" | "notes"

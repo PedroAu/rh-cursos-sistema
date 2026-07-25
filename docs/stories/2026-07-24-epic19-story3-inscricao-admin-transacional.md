@@ -2,7 +2,7 @@
 
 ## Status
 
-Ready
+Done
 
 ## Executor Assignment
 
@@ -43,12 +43,12 @@ A inscrição admin reutiliza a RPC de pré-inscrição pública, cuja semântic
 
 ## Tasks / Subtasks
 
-- [ ] Modelar o contrato administrativo e revisar a migration/schema vigente (AC: 1, 2, 3).
-- [ ] Criar operação transacional aditiva, com reserva de vaga e rollback completo (AC: 1, 4).
-- [ ] Implementar retorno canônico distinto para ID e código de confirmação (AC: 3).
-- [ ] Reusar aluno por e-mail com update parcial seguro e sem apagar PII (AC: 5).
-- [ ] Integrar dispatcher/AppStore e liberar o campo de pagamento apenas no mesmo cutover (AC: 6).
-- [ ] Criar testes pgTAP/concorrência e regressão da RPC pública (AC: 4, 7).
+- [x] Modelar o contrato administrativo e revisar a migration/schema vigente (AC: 1, 2, 3).
+- [x] Criar operação transacional aditiva, com reserva de vaga e rollback completo (AC: 1, 4).
+- [x] Implementar retorno canônico distinto para ID e código de confirmação (AC: 3).
+- [x] Reusar aluno por e-mail com update parcial seguro e sem apagar PII (AC: 5).
+- [x] Integrar dispatcher/AppStore e liberar o campo de pagamento apenas no mesmo cutover (AC: 6).
+- [x] Criar testes pgTAP/concorrência e regressão da RPC pública (AC: 4, 7).
 
 ## Dev Notes
 

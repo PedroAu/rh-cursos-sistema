@@ -1,18 +1,13 @@
 "use client";
 
-import { Bell, Building2, Save, ShieldCheck, Upload } from "lucide-react";
+import { Bell, Building2, ShieldCheck } from "lucide-react";
 import type { ReactNode } from "react";
-import { useRef, useState } from "react";
-import { toast } from "sonner";
+import { useMemo } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
 import {
   type AdminSettings,
   loadAdminSettings,
-  saveAdminSettings
 } from "@/features/admin/settings/model/admin-settings";
 import { cn } from "@/lib/utils";
 
@@ -32,33 +27,16 @@ const notificationCopy: Record<keyof AdminSettings["notifications"], { title: st
 };
 
 export function AdminSettingsPage() {
-  const [settings, setSettings] = useState<AdminSettings>(() => loadAdminSettings());
-
-  function updateIdentity<K extends keyof AdminSettings["identity"]>(key: K, value: AdminSettings["identity"][K]) {
-    setSettings((current) => ({ ...current, identity: { ...current.identity, [key]: value } }));
-  }
-
-  function toggleNotification(key: keyof AdminSettings["notifications"], value: boolean) {
-    setSettings((current) => ({ ...current, notifications: { ...current.notifications, [key]: value } }));
-  }
-
-  function handleSave() {
-    saveAdminSettings(settings);
-    toast.success("Configurações salvas localmente.");
-  }
+  const settings = useMemo<AdminSettings>(() => loadAdminSettings(), []);
 
   return (
     <div className="mx-auto max-w-[1440px] space-y-7">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <header>
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-tk-accent-strong">Administração</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-tk-brand md:text-4xl">Configurações</h1>
-          <p className="mt-2 text-base text-tk-ink-muted">Gerencie os dados e as preferências do painel.</p>
+          <p className="mt-2 text-base text-tk-ink-muted">Preferências institucionais e notificações são informativas neste painel.</p>
         </div>
-        <Button onClick={handleSave} className="sm:self-center">
-          <Save className="h-4 w-4" />
-          Salvar alterações
-        </Button>
       </header>
 
       <div className="grid gap-6 xl:grid-cols-2">
@@ -68,33 +46,9 @@ export function AdminSettingsPage() {
           description="Informações institucionais exibidas nos canais da RH Cursos."
           className="xl:row-span-2"
         >
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <Input
-                label="Nome da empresa"
-                value={settings.identity.siteName}
-                onChange={(event) => updateIdentity("siteName", event.currentTarget.value)}
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <Input
-                label="Descrição institucional"
-                value={settings.identity.tagline}
-                onChange={(event) => updateIdentity("tagline", event.currentTarget.value)}
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <Input
-                label="E-mail de contato"
-                type="email"
-                value={settings.identity.contactEmail}
-                onChange={(event) => updateIdentity("contactEmail", event.currentTarget.value)}
-              />
-            </div>
-          </div>
-          <div className="mt-6 border-t border-tk-line pt-6">
-            <LogoUpload value={settings.identity.logo} onChange={(value) => updateIdentity("logo", value)} />
-          </div>
+          <p className="rounded-2xl bg-tk-surface-2 px-4 py-3 text-sm leading-6 text-tk-ink-muted">
+            A identidade institucional é mantida pelo catálogo e pela configuração de implantação. Não há edição local persistente neste painel.
+          </p>
         </SettingsCard>
 
         <SettingsCard
@@ -104,17 +58,13 @@ export function AdminSettingsPage() {
         >
           <div className="divide-y divide-tk-line">
             {(Object.keys(notificationCopy) as Array<keyof AdminSettings["notifications"]>).map((key) => (
-              <label key={key} className="flex cursor-pointer items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
+              <div key={key} className="flex items-start justify-between gap-4 py-4 first:pt-0 last:pb-0">
                 <span>
                   <span className="block font-semibold text-tk-ink">{notificationCopy[key].title}</span>
                   <span className="mt-1 block text-sm leading-6 text-tk-ink-muted">{notificationCopy[key].description}</span>
                 </span>
-                <Switch
-                  checked={settings.notifications[key]}
-                  onCheckedChange={(value) => toggleNotification(key, value)}
-                  aria-label={notificationCopy[key].title}
-                />
-              </label>
+                <span className="rounded-full bg-tk-surface-2 px-3 py-1 text-xs font-semibold text-tk-ink-muted">Informativo</span>
+              </div>
             ))}
           </div>
         </SettingsCard>
@@ -165,54 +115,5 @@ function SettingsCard({ icon, title, description, children, className }: {
       </div>
       {children}
     </section>
-  );
-}
-
-function LogoUpload({ value, onChange }: { value: string | null; onChange: (value: string | null) => void }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-4">
-        <div
-          role="img"
-          aria-label="Pré-visualização do logotipo"
-          className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-tk-brand font-extrabold text-white"
-          style={{
-            backgroundColor: value ? "var(--tk-surface)" : "var(--tk-brand)",
-            backgroundImage: value ? `url(${value})` : undefined,
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "contain"
-          }}
-        >
-          {value ? null : "RH"}
-        </div>
-        <div>
-          <p className="font-semibold text-tk-ink">Logotipo</p>
-          <p className="text-sm text-tk-ink-muted">Imagem usada na identificação da empresa.</p>
-        </div>
-      </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        aria-label="Selecionar logotipo"
-        className="sr-only"
-        onChange={(event) => {
-          const file = event.currentTarget.files?.[0];
-          if (!file) return;
-          const reader = new FileReader();
-          reader.onload = () => {
-            if (typeof reader.result === "string") onChange(reader.result);
-          };
-          reader.readAsDataURL(file);
-        }}
-      />
-      <Button variant="outline" type="button" onClick={() => inputRef.current?.click()}>
-        <Upload className="h-4 w-4" />
-        Alterar logo
-      </Button>
-    </div>
   );
 }
