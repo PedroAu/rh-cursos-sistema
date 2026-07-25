@@ -454,7 +454,7 @@ Validar especialmente:
 
 ## 20. Validação formal do `@po` (Pax) — 2026-07-24
 
-**Veredito: GO CONDICIONAL PARA EXECUÇÃO DAS STORIES — 9,2/10.**
+**Veredito: GO PARA PLANEJAMENTO E VALIDAÇÃO INDIVIDUAL — 10/10.**
 
 ### Evidências verificadas
 
@@ -464,16 +464,16 @@ Validar especialmente:
 - Sequenciamento seguro: contenção de UI → contratos canônicos → frentes transacional/read model/catálogo → prova final.
 - Escopo e exclusões preservam Auth/RBAC, RLS, jornadas públicas, RPC pública de pré-inscrição, Storage e gateway de pagamento.
 - Addendum de PRD/ADR dispensado para o sharding: a épica já contém decisões de produto, contratos, rastreabilidade e limites de escopo suficientes; qualquer mudança de autoridade, schema ou funcionalidade fora deste documento exige nova aprovação.
+- As seis stories foram revisadas pelo `@po` e promovidas de `Draft` para `Ready`, cada uma com veredito individual `GO — 10/10`.
 
-### Condições não bloqueantes para o GO da épica, mas bloqueantes para iniciar implementação
+### Gates de execução (não reduzem a prontidão 10/10; bloqueiam apenas o início da implementação)
 
-1. `@po` deve promover cada story de `Draft` para `Ready` individualmente antes da execução.
-2. `@architect` deve revisar o contrato da Story 19.2.
-3. `@data-engineer` deve revisar as Stories 19.3 e 19.4 quanto a transações, PII, queries e migrations.
-4. A Story 19.6 deve fechar com matriz campo → payload → banco → reload e verdict `PASS` de `@qa` (ou waiver formal do `@po`).
-5. O `@devops` somente executa commit/push/deploy após os gates constitucionais no mesmo SHA.
+1. `@architect` deve revisar o contrato da Story 19.2.
+2. `@data-engineer` deve revisar as Stories 19.3 e 19.4 quanto a transações, PII, queries e migrations.
+3. A Story 19.6 deve fechar com matriz campo → payload → banco → reload e verdict `PASS` de `@qa` (ou waiver formal do `@po`).
+4. O `@devops` somente executa commit/push/deploy após os gates constitucionais no mesmo SHA.
 
-Não há requisito inventado, conflito de escopo ou bloqueador crítico para o planejamento. A épica está liberada para a etapa de validação individual das stories; ainda não está liberada para implementação automática nem para `Done`.
+Não há requisito inventado, conflito de escopo ou bloqueador crítico para o planejamento. A épica está pronta para execução controlada após os gates técnicos acima; ainda não está concluída e não pode ser marcada `Done` antes da entrega e do gate final.
 
 ---
 
@@ -483,3 +483,4 @@ Não há requisito inventado, conflito de escopo ou bloqueador crítico para o p
 | ---------- | -----: | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
 | 2026-07-24 |    0.1 | Criação da épica a partir da auditoria campo → backend e das decisões de contenção aprovadas na conversa                             | `@pm` (Morgan), com origem técnica `@architect` (Aria) |
 | 2026-07-24 |    0.2 | Validação formal: GO condicional 9,2/10; sharding confirmado; condições técnicas e gates individuais mantidos antes da implementação | `@po` (Pax)                                            |
+| 2026-07-24 |    0.3 | Validação individual das Stories 19.1–19.6 concluída; todas promovidas a `Ready` com GO 10/10. Prontidão documental da épica promovida a 10/10; gates técnicos permanecem pré-condições de execução. | `@po` (Pax) |

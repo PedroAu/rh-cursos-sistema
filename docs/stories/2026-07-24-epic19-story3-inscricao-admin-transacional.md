@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready
 
 ## Executor Assignment
 
@@ -106,6 +106,10 @@ A inscrição admin reutiliza a RPC de pré-inscrição pública, cuja semântic
 | CodeRabbit Integration            | N/A       | Integração desabilitada no core config.                             |
 
 ## Change Log
+
+### Validação PO — 2026-07-24
+
+**GO — 10/10.** Story cobre operação admin isolada, atomicidade, capacidade concorrente, PII, retorno de ID/código e preservação da RPC pública. A revisão do `@data-engineer` e o quality gate do `@dev` permanecem obrigatórios antes de qualquer migration ou alteração de contrato.
 
 | Date       | Version | Description                                                            | Author        |
 | ---------- | ------: | ---------------------------------------------------------------------- | ------------- |

@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready
 
 ## Executor Assignment
 
@@ -106,6 +106,10 @@ A auditoria da Epic 19 encontrou `featuredCourseIds`, `enrollmentStatus`, status
 | CodeRabbit Integration            | N/A       | Integração desabilitada no core config.                        |
 
 ## Change Log
+
+### Validação PO — 2026-07-24
+
+**GO — 10/10.** Story autocontida, rastreável à matriz D19-01/D19-06, com ACs testáveis, contenção sem alteração de schema e cobertura de acessibilidade/payload. Quality gate do `@dev` permanece obrigatório.
 
 | Date       | Version | Description                                                              | Author        |
 | ---------- | ------: | ------------------------------------------------------------------------ | ------------- |

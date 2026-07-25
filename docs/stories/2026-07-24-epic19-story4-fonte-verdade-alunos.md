@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready
 
 ## Executor Assignment
 
@@ -103,6 +103,10 @@ O read model parte de `inscricao INNER JOIN aluno`, fazendo alunos sem inscriç�
 | CodeRabbit Integration            | N/A       | Integração desabilitada no core config.                    |
 
 ## Change Log
+
+### Validação PO — 2026-07-24
+
+**GO — 10/10.** Story define fonte `aluno`, agregações derivadas, semântica parcial sem apagar PII, autorização/paginação e testes de reload. A revisão do `@data-engineer` permanece gate obrigatório para read model, queries e proteção de dados.
 
 | Date       | Version | Description                                                         | Author        |
 | ---------- | ------: | ------------------------------------------------------------------- | ------------- |

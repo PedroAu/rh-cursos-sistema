@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready
 
 ## Executor Assignment
 
@@ -109,6 +109,10 @@ A Epic 19 identificou vínculo `instrutor.courseIds` sem write N:N, leads que de
 | CodeRabbit Integration            | N/A       | Integração desabilitada no core config.                           |
 
 ## Change Log
+
+### Validação PO — 2026-07-24
+
+**GO — 10/10.** Story fecha os campos de catálogo, leads, instrutores e turmas sem inventar Storage ou relações novas; ACs cobrem N:N, validação server-side, derivados, URL e regressão pública. Quality gate arquitetural permanece obrigatório.
 
 | Date       | Version | Description                                                                               | Author        |
 | ---------- | ------: | ----------------------------------------------------------------------------------------- | ------------- |

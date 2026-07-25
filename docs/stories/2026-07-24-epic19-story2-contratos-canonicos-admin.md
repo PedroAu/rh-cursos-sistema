@@ -2,7 +2,7 @@
 
 ## Status
 
-Draft
+Ready
 
 ## Executor Assignment
 
@@ -105,6 +105,10 @@ O dispatcher `admin-resources` recebe objetos genéricos, os schemas Zod fazem p
 | CodeRabbit Integration            | N/A       | Integração desabilitada no core config.                      |
 
 ## Change Log
+
+### Validação PO — 2026-07-24
+
+**GO — 10/10.** Story autocontida, com DTOs allowlist, parse efetivo, resposta canônica, reconciliação do AppStore e regressão pública explicitamente testáveis. A revisão técnica do `@architect` é gate obrigatório antes da implementação.
 
 | Date       | Version | Description                                                             | Author        |
 | ---------- | ------: | ----------------------------------------------------------------------- | ------------- |
