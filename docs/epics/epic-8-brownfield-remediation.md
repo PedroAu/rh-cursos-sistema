@@ -174,6 +174,12 @@ Adicionalmente:
 
 #### Tarefas / Subtarefas
 
+> **Checklist histórico não canônico:** as listas de Phase A–D abaixo
+> preservam o plano original e, por isso, não foram reescritas retroativamente.
+> O fechamento verificável e a classificação de lacunas estão na seção
+> `Execução Atual` e na Story `EP-8.final`, ambas canônicas para o status
+> `DONE`. Checkbox aberto nesta parte histórica não representa tarefa ativa.
+
 **Error Boundaries (D-2.1):**
 - [ ] Create `app/error.tsx` with error fallback UI
 - [ ] Create `app/global-error.tsx` for root errors

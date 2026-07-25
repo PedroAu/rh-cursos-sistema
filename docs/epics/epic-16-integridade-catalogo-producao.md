@@ -18,11 +18,14 @@ Eliminar as fontes de dados fictícios ("mock") do caminho de renderização de 
 
 ## 📋 Acceptance Criteria (AC) da Épica
 
-- [ ] **AC-16.1** — Nenhuma página pública ou de checkout renderiza dados de `src/lib/mock-public-data.ts` em produção, seja por merge de catálogo ou por fallback de estado.
-- [ ] **AC-16.2** — Catálogo vazio ou erro de query propaga um estado explícito ("vazio"/"erro") na UI pública, em vez de substituir silenciosamente por dados fictícios.
-- [ ] **AC-16.3** — `mock-public-data.ts` permanece utilizável apenas em testes unitários/Storybook, nunca importado por código de página (`app/**/page.tsx`) ou pela store client-side (`app-store.tsx`) em build de produção.
-- [ ] **AC-16.4** — Decisão documentada e implementada sobre a estratégia de `generateStaticParams` do catálogo de cursos: build de produção falha/alerta explicitamente se não conseguir buscar o catálogo real, ou as rotas migram para renderização dinâmica — com justificativa registrada.
-- [ ] **AC-16.5** — Zero regressão: `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` verdes.
+- [x] **AC-16.1** — Nenhuma página pública ou de checkout renderiza dados de `src/lib/mock-public-data.ts` em produção, seja por merge de catálogo ou por fallback de estado.
+- [x] **AC-16.2** — Catálogo vazio ou erro de query propaga um estado explícito ("vazio"/"erro") na UI pública, em vez de substituir silenciosamente por dados fictícios.
+- [x] **AC-16.3** — `mock-public-data.ts` permanece utilizável apenas em testes unitários/Storybook, nunca importado por código de página (`app/**/page.tsx`) ou pela store client-side (`app-store.tsx`) em build de produção.
+- [x] **AC-16.4** — Decisão documentada e implementada sobre a estratégia de `generateStaticParams` do catálogo de cursos: build de produção falha/alerta explicitamente se não conseguir buscar o catálogo real, ou as rotas migram para renderização dinâmica — com justificativa registrada.
+- [x] **AC-16.5** — Zero regressão: `npm run lint`, `npm run typecheck`, `npm run test:unit`, `npm run build` verdes.
+
+> Reconciliação documental: itens marcados a partir do gate `PASS` da Story
+> 16.1, que registra `AC1`–`AC10` como `met` e os gates constitucionais verdes.
 
 ---
 

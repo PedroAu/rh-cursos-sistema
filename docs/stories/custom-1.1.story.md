@@ -73,6 +73,12 @@ frontmatter:
 
 ---
 
+> **Nota de reconciliação (2026-07-24):** esta é uma story histórica,
+> posteriormente absorvida e supersedida pelas Épicas 14, 15 e 18. As listas
+> de fases abaixo preservam o plano original e não são o controle canônico do
+> status `Done`; itens remanescentes foram reclassificados nos fechamentos
+> posteriores, sem representar trabalho ativo desta story.
+
 ---
 
 ## 🔄 **CHECKPOINT — Phase 1 & 2 Complete (50% of story)**

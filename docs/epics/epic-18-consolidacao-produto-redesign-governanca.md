@@ -90,16 +90,21 @@ Verificação executada em 2026-07-19:
 
 ## Critérios de sucesso da épica
 
-- [ ] 100% de FR1–FR16, NFR1–NFR10 e CR1–CR4 classificados como `ATENDIDO`, `PARCIAL`, `DIFERIDO` ou `NÃO ATENDIDO`, sempre com evidência e owner.
-- [ ] Toda épica 1–17 aponta para uma fonte vigente ou registra explicitamente que a fonte é histórica/ausente.
-- [ ] Stories 1.2–1.6 possuem mapeamento formal para stories entregues ou permanecem declaradas como gaps, sem inferência silenciosa.
-- [ ] Executive Precision está documentado como histórico/supersedido, sem duas identidades visuais concorrentes declaradas canônicas.
-- [ ] Todas as rotas cobertas pelas Épicas 14 e 15 possuem canvas/spec/referência identificada ou exceção formal justificada.
-- [ ] A auditoria de fidelidade gera, no mínimo, pares rota × referência no mesmo viewport e um manifesto que não aceite `canvasAvailable: false` como PASS de fidelidade.
-- [ ] `test:epic14:fidelity` e `test:epic15:fidelity` executam testes reais, reportam quantidade maior que zero e propagam falha corretamente.
-- [ ] `docs:api:check-drift`, lint, typecheck, unit, build, a11y, purge e bundle passam no mesmo commit de fechamento.
+- [x] 100% de FR1–FR16, NFR1–NFR10 e CR1–CR4 classificados como `ATENDIDO`, `PARCIAL`, `DIFERIDO` ou `NÃO ATENDIDO`, sempre com evidência e owner.
+- [x] Toda épica 1–17 aponta para uma fonte vigente ou registra explicitamente que a fonte é histórica/ausente.
+- [x] Stories 1.2–1.6 possuem mapeamento formal para stories entregues ou permanecem declaradas como gaps, sem inferência silenciosa.
+- [x] Executive Precision está documentado como histórico/supersedido, sem duas identidades visuais concorrentes declaradas canônicas.
+- [x] Todas as rotas cobertas pelas Épicas 14 e 15 possuem canvas/spec/referência identificada ou exceção formal justificada.
+- [x] A auditoria de fidelidade gera, no mínimo, pares rota × referência no mesmo viewport e um manifesto que não aceite `canvasAvailable: false` como PASS de fidelidade.
+- [x] `test:epic14:fidelity` e `test:epic15:fidelity` executam testes reais, reportam quantidade maior que zero e propagam falha corretamente.
+- [x] `docs:api:check-drift`, lint, typecheck, unit, build, a11y, purge e bundle passam no mesmo commit de fechamento.
 - [x] Nenhuma story permanece `Done` com ACs abertos sem waiver explícito e justificativa verificável.
-- [ ] O índice de stories e o PRD informam data de atualização e escopo coerentes com o repositório atual.
+- [x] O índice de stories e o PRD informam data de atualização e escopo coerentes com o repositório atual.
+
+> Reconciliação documental: os critérios acima foram marcados a partir das
+> Stories 18.1–18.3 `Done` e do fechamento `GO 9.5/10` registrado na 18.3. A
+> marcação representa a evidência daquele fechamento; não afirma nova execução
+> de gates nesta revisão documental.
 
 ---
 
@@ -218,12 +223,12 @@ assignment_basis: "executor-assignment: code_general"
 
 ## Definition of Done
 
-- [ ] Stories 18.1–18.3 criadas pelo `@sm`, validadas pelo `@po` e concluídas por seus executores autorizados.
-- [ ] Critérios de sucesso desta épica atendidos ou formalmente waived com owner e prazo.
-- [ ] Matriz de rastreabilidade e relatório de redesign versionados.
-- [ ] Gates automatizados executados no mesmo SHA e evidência anexada ao QA gate.
-- [ ] PRD, índice de stories, épicas afetadas e documentação OpenAPI coerentes.
-- [ ] Nenhuma regressão funcional, de acessibilidade, segurança, bundle ou deploy.
+- [x] Stories 18.1–18.3 criadas pelo `@sm`, validadas pelo `@po` e concluídas por seus executores autorizados.
+- [x] Critérios de sucesso desta épica atendidos ou formalmente waived com owner e prazo.
+- [x] Matriz de rastreabilidade e relatório de redesign versionados.
+- [x] Gates automatizados executados no mesmo SHA e evidência anexada ao QA gate.
+- [x] PRD, índice de stories, épicas afetadas e documentação OpenAPI coerentes.
+- [x] Nenhuma regressão funcional, de acessibilidade, segurança, bundle ou deploy.
 - [x] Verdict final emitido pelo `@qa`; transição para `Done` decidida pelo `@po`.
 
 ## Handoff para `@sm`

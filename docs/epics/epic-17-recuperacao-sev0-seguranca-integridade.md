@@ -292,6 +292,11 @@ Escala inicial: `S` até um dia de esforço focado; `M` entre um e dois dias; `L
 
 ## 7. Acceptance Criteria da épica
 
+> **Registro histórico:** os checkboxes abaixo preservam o baseline criado no
+> início do incidente e não são mais o controle canônico de fechamento. A
+> reconciliação final está na tabela ao fim desta seção e no REC-502. Essa
+> preservação evita reescrever retroativamente o plano original.
+
 ### Contenção e credenciais
 
 - [ ] **AC-17.01** — Todos os tokens, senhas, sessões e segredos identificados como expostos são rejeitados em teste negativo sanitizado.
@@ -329,6 +334,18 @@ Escala inicial: `S` até um dia de esforço focado; `M` entre um e dois dias; `L
 - [ ] **AC-17.21** — `npm run lint`, `npm run typecheck`, `npm test` e `npm run build` passam, além dos gates direcionados de banco, contrato, E2E, acessibilidade e secret scan.
 - [ ] **AC-17.22** — Cobertura representa o código elegível real e não diminui após a adoção do baseline.
 - [ ] **AC-17.23** — Smoke pós-deploy, alertas e métricas de erro/abuso estão ativos sem PII como label.
+
+### Reconciliação canônica no encerramento G5
+
+| Resultado | Critérios | Evidência/decisão |
+|---|---|---|
+| ✅ Atendidos | AC-17.01–17.02, AC-17.04–17.20 e AC-17.22 | Stories REC correspondentes `Done`, com gates PASS/CONCERNS aceitos e consolidação REC-502 |
+| ⚠️ Parcial com waiver | AC-17.03 | HEAD saneado e credenciais rotacionadas; limpeza destrutiva de branches/tags (REC-005) waived |
+| ⚠️ Parcial operacional | AC-17.21 e AC-17.23 | E2E com fixtures reais, homologação e smoke/observabilidade pós-deploy exigem infraestrutura real |
+
+**Owner das exceções:** Pedro Augusto. **Mitigação:** checklist obrigatório
+antes do próximo deploy real, conforme REC-502 §4 item 13. Portanto, nenhum
+AC permanece sem classificação, owner ou tratamento.
 
 ---
 
@@ -438,7 +455,17 @@ Não são evidências suficientes:
 
 ## 12. Definition of Done do programa
 
-A épica só pode mudar para `Done` quando:
+A épica foi encerrada como `G5 CONCERNS`, conforme REC-502. A lista original
+abaixo permanece como baseline histórico; sua reconciliação canônica é:
+
+- ⚠️ Stories P0 encerradas com PASS/CONCERNS aceito; REC-005 possui waiver explícito.
+- ✅ Stories P1 necessárias a G3/G4 encerradas.
+- ✅ AC-17.01 a AC-17.23 atendidos ou classificados com owner e mitigação.
+- ✅ Nenhuma exceção para segredo ativo, PII/service role pública, grant perigoso, checkout falso ou autoridade HMAC.
+- ⚠️ G0–G4 consolidados; G5 encerrado com `CONCERNS`, não PASS puro.
+- ✅ File Lists, documentação, runbook, post-mortem e backlog residual reconciliados/aprovados.
+
+Checklist original preservado para auditoria:
 
 - [ ] Todas as stories P0 estão `Done` com veredito PASS de `@qa`.
 - [ ] Stories P1 necessárias a G3/G4 estão `Done`.

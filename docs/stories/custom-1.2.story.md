@@ -65,6 +65,12 @@ frontmatter:
 
 ---
 
+> **Nota de reconciliação (2026-07-24):** esta é uma story histórica,
+> posteriormente absorvida e supersedida pelas Épicas 14, 15 e 18. As listas
+> de fases abaixo preservam o plano original e não são o controle canônico do
+> status `Done`; budgets e gates vigentes estão nos artefatos de fechamento
+> posteriores.
+
 ## 📋 Story Statement
 
 Como desenvolvedor,  

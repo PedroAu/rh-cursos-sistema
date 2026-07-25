@@ -141,21 +141,25 @@ Otimizar o painel administrativo para melhorar a experiência do usuário admin,
 
 ## 📝 Known Limitations & Future Work
 
+> Os itens desta seção não pertencem aos acceptance criteria da EP-10.1 e
+> não condicionam o status `COMPLETE` da épica. São oportunidades futuras que
+> exigem story própria antes de qualquer implementação.
+
 ### Phase 2 (Advanced Filter — separate story)
-- [ ] Filter component (status, date range, instructor)
-- [ ] Preset filters (active courses, high enrollment, etc.)
-- [ ] Filter persistence (URL params)
+- Filter component (status, date range, instructor)
+- Preset filters (active courses, high enrollment, etc.)
+- Filter persistence (URL params)
 
 ### Performance Monitoring (Epic 11+)
-- [ ] Lighthouse CI in PR workflow
-- [ ] Monitor Supabase subscription connection status
-- [ ] Alert if metrics load exceeds 2s
+- Lighthouse CI in PR workflow
+- Monitor Supabase subscription connection status
+- Alert if metrics load exceeds 2s
 
 ### Scalability (Future Phase)
-- [ ] Pagination for 100+ courses
-- [ ] Virtual scrolling for large lists
-- [ ] Batch export support (>10k records)
-- [ ] Advanced filter UI + presets
+- Pagination for 100+ courses
+- Virtual scrolling for large lists
+- Batch export support (>10k records)
+- Advanced filter UI + presets
 
 ---
 
