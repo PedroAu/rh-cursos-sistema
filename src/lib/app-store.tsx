@@ -376,14 +376,9 @@ function persistAdminMutation(
     .then(async (response) => {
       if (!response.ok) {
         if (response.status === 401) {
-          // A server-rendered admin page can outlive its httpOnly Supabase
-          // session. Keep the BFF fail-closed and send the operator through
-          // the normal login flow instead of leaving a broken save dialog.
-          if (typeof window !== "undefined") {
-            const next = `${window.location.pathname}${window.location.search}`;
-            window.location.assign(`/login?status=required&next=${encodeURIComponent(next)}`);
-          }
-          const message = "Sua sessão administrativa expirou. Faça login novamente para salvar.";
+          // Keep the BFF fail-closed, but do not navigate away from an open
+          // form. The operator can copy the data, reauthenticate, and retry.
+          const message = "Sua sessão administrativa expirou. Faça login novamente e tente salvar outra vez.";
           toast.error(message);
           throw new Error(message);
         }
