@@ -26,6 +26,7 @@
     "test": "npm run typecheck && node scripts/build-playwright-app.mjs && node scripts/run-playwright-test-build.mjs",
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "e2e:configure-supabase": "node scripts/configure-e2e-supabase.mjs",
     "test:e2e:smoke": "node scripts/run-playwright.mjs --project=functional",
     "test:visual": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional",
     "test:visual:update": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional --update-snapshots",

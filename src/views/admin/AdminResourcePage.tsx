@@ -840,12 +840,14 @@ function RenderField({
 
 function FieldShell({
   label,
+  labelFor,
   required,
   hint,
   error,
   children
 }: {
   label: string;
+  labelFor?: string;
   required?: boolean;
   hint?: string;
   error?: string;
@@ -853,10 +855,17 @@ function FieldShell({
 }) {
   return (
     <div className="grid gap-2 text-sm font-medium text-tk-ink">
-      <span>
-        {label}
-        {required ? <span className="ml-1 text-tk-error">*</span> : null}
-      </span>
+      {labelFor ? (
+        <label htmlFor={labelFor}>
+          {label}
+          {required ? <span className="ml-1 text-tk-error">*</span> : null}
+        </label>
+      ) : (
+        <span>
+          {label}
+          {required ? <span className="ml-1 text-tk-error">*</span> : null}
+        </span>
+      )}
       {children}
       {hint ? <span className="text-xs leading-5 text-tk-ink-muted">{hint}</span> : null}
       {error ? <span className="text-xs text-tk-error">{error}</span> : null}
@@ -881,9 +890,12 @@ function NativeSelectField({
   hint?: string;
   error?: string;
 }) {
+  const id = useId();
+
   return (
-    <FieldShell label={label} required={required} hint={hint} error={error}>
+    <FieldShell label={label} labelFor={id} required={required} hint={hint} error={error}>
       <select
+        id={id}
         value={value}
         onChange={(event) => onChange(event.currentTarget.value)}
         className={cn(

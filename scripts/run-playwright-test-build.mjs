@@ -1,4 +1,10 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { loadEnvFile } from "node:process";
+
+if (existsSync(".env.e2e.local")) {
+  loadEnvFile(".env.e2e.local");
+}
 
 const child = spawn(
   process.execPath,
