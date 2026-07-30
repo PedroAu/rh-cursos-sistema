@@ -48,14 +48,14 @@ Levar as telas do painel administrativo (`docs/design-system/RH Cursos Admin Das
 **Status:** Done
 **Arquivo:** `docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md`
 
-### Stories em execução
-- 15.2 — Cursos — `docs/stories/2026-07-17-epic15-story2-cursos-fidelidade-total.md`
-- 15.3 — Turmas — `docs/stories/2026-07-17-epic15-story3-turmas-fidelidade-total.md`
-- 15.4 — Matrículas — `docs/stories/2026-07-17-epic15-story4-matriculas-fidelidade-total.md`
-- 15.5 — Alunos — `docs/stories/2026-07-17-epic15-story5-alunos-fidelidade-total.md`
-- 15.6 — Instrutores — `docs/stories/2026-07-17-epic15-story6-instrutores-fidelidade-total.md`
-- 15.7 — Leads — `docs/stories/2026-07-17-epic15-story7-leads-fidelidade-total.md`
-- 15.8 — Blog / Páginas / Configurações — `docs/stories/2026-07-17-epic15-story8-conteudo-configuracoes-fidelidade-total.md`
+### Stories concluídas
+- 15.2 — Cursos — `docs/stories/2026-07-17-epic15-story2-cursos-fidelidade-total.md` — `Done`
+- 15.3 — Turmas — `docs/stories/2026-07-17-epic15-story3-turmas-fidelidade-total.md` — `Done`
+- 15.4 — Matrículas — `docs/stories/2026-07-17-epic15-story4-matriculas-fidelidade-total.md` — `Done`
+- 15.5 — Alunos — `docs/stories/2026-07-17-epic15-story5-alunos-fidelidade-total.md` — `Done`
+- 15.6 — Instrutores — `docs/stories/2026-07-17-epic15-story6-instrutores-fidelidade-total.md` — `Done`
+- 15.7 — Leads — `docs/stories/2026-07-17-epic15-story7-leads-fidelidade-total.md` — `Done`
+- 15.8 — Blog / Páginas / Configurações — `docs/stories/2026-07-17-epic15-story8-conteudo-configuracoes-fidelidade-total.md` — `Done`
 
 ---
 
@@ -69,4 +69,4 @@ Levar as telas do painel administrativo (`docs/design-system/RH Cursos Admin Das
 ---
 
 **Created:** 2026-07-13
-**Owner:** @ux-design-expert (Uma) — proposta; requer validação de @po e priorização de @pm antes de entrar em execução.
+**Owner:** @ux-design-expert (Uma) — proposta validada e encerrada por @po em 2026-07-19.

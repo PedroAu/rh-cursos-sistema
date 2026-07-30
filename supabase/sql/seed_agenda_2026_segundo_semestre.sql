@@ -8,6 +8,11 @@
 -- inscrições acidentais. Ajuste vagas_total/preenchidas no painel antes de
 -- publicar cada turma.
 --
+-- EXECUÇÃO EXCLUSIVAMENTE MANUAL: este arquivo não é migration nem seed
+-- automático do Supabase. Ele apenas insere IDs ainda inexistentes; em caso
+-- de conflito, preserva integralmente os dados operacionais já configurados
+-- no painel administrativo.
+--
 -- A versão "area privada" possui preços e uma grade de setembro diferentes;
 -- ela não foi misturada a este seed. O curso de IA na execução orçamentária
 -- aparece na agenda, mas não possui ementa específica na pasta Cursos; por
@@ -16,7 +21,7 @@
 begin;
 
 -- -------------------------------------------------------------------------
--- Trilhas referenciadas pelos cursos (upsert para o seed ser autocontido)
+-- Trilhas referenciadas pelos cursos (inserção idempotente e não destrutiva)
 -- -------------------------------------------------------------------------
 insert into public.trilha
   (id, codigo, nome, nome_curto, slug, descricao, icone, ordem, ativa)
@@ -27,15 +32,7 @@ values
   ('path-comunicacao', 'T04', 'Comunicação Institucional, Redação & Atendimento ao Cidadão', 'Comunicação & Atendimento', 'comunicacao-institucional-redacao-atendimento-ao-cidadao', 'Comunicação clara e eficiente, do atendimento ao cidadão à redação oficial, oratória, mídias digitais e conformidade com LAI/LGPD.', 'MessageSquareText', 4, true),
   ('path-auditoria', 'T05', 'Auditoria, Contabilidade Pública & Gestão Tributária', 'Auditoria & Tributária', 'auditoria-contabilidade-publica-gestao-tributaria', 'Domínio técnico em contabilidade pública, obrigações acessórias, Tesouro Gerencial, SIAFI e auditoria governamental.', 'ClipboardCheck', 5, true),
   ('path-tech', 'T06', 'Tecnologia, Dados, Processos & Inovação', 'Tecnologia & Inovação', 'tecnologia-dados-processos-inovacao', 'Ferramentas digitais, análise de dados, modelagem de processos, inteligência artificial e governança para transformação digital.', 'BarChart3', 6, true)
-on conflict (id) do update set
-  codigo = excluded.codigo,
-  nome = excluded.nome,
-  nome_curto = excluded.nome_curto,
-  slug = excluded.slug,
-  descricao = excluded.descricao,
-  icone = excluded.icone,
-  ordem = excluded.ordem,
-  ativa = excluded.ativa;
+on conflict (id) do nothing;
 
 -- -------------------------------------------------------------------------
 -- Instrutores identificados na agenda e nos materiais dos cursos
@@ -133,14 +130,7 @@ values
     'Ativo',
     null
   )
-on conflict (id) do update set
-  nome = excluded.nome,
-  email = excluded.email,
-  bio = excluded.bio,
-  formacao = excluded.formacao,
-  especialidade = excluded.especialidade,
-  status = excluded.status,
-  deleted_at = null;
+on conflict (id) do nothing;
 
 -- -------------------------------------------------------------------------
 -- Cursos: ementas resumidas dos documentos encontrados no Dropbox
@@ -347,26 +337,7 @@ values
     'Departamento Pessoal, Folha de Pagamento & eSocial', 3990.90, 'Ativo', true,
     '/images/courses/departamento-pessoal-esocial.jpg', null
   )
-on conflict (id) do update set
-  titulo = excluded.titulo,
-  slug = excluded.slug,
-  descricao_curta = excluded.descricao_curta,
-  descricao = excluded.descricao,
-  ementa = excluded.ementa,
-  objetivos = excluded.objetivos,
-  beneficios = excluded.beneficios,
-  publico_alvo = excluded.publico_alvo,
-  carga_horaria = excluded.carga_horaria,
-  modalidade = excluded.modalidade,
-  nivel = excluded.nivel,
-  categoria = excluded.categoria,
-  trilha_id = excluded.trilha_id,
-  trilha_nome = excluded.trilha_nome,
-  preco_base = excluded.preco_base,
-  status = excluded.status,
-  destaque = excluded.destaque,
-  imagem_capa = excluded.imagem_capa,
-  deleted_at = null;
+on conflict (id) do nothing;
 
 insert into public.curso_instrutor (curso_id, instrutor_id, principal)
 values
@@ -384,8 +355,7 @@ values
   ('course-2026-especialista-folha', 'inst-2026-jose-carlos', true),
   ('course-2026-retencao-tributaria', 'inst-2026-israel-oliveira', true),
   ('course-2026-dp-completo-publica', 'inst-2026-ester-lima', true)
-on conflict (curso_id, instrutor_id) do update set
-  principal = excluded.principal;
+on conflict (curso_id, instrutor_id) do nothing;
 
 -- -------------------------------------------------------------------------
 -- Turmas da agenda geral (agosto a dezembro de 2026)
@@ -416,20 +386,7 @@ values
   ('class-2026-1208-dp-completo', 'course-2026-dp-completo-publica', 'inst-2026-ester-lima', '2026-12-08', '2026-12-11', '08:30 às 17:00', 'São Paulo/SP', 0, 0, 3990.90, 'Presencial', 'EmBreve', 'Agenda geral 2026; turma presencial.', null),
   ('class-2026-1215-relacoes', 'course-2026-relacoes-feedback', 'inst-2026-suely-cobucci', '2026-12-15', '2026-12-18', '08:30 às 12:30', 'Brasília/DF', 0, 0, 1990.90, 'Presencial', 'EmBreve', 'Agenda geral 2026; turma presencial.', null),
   ('class-2026-1216-esocial', 'course-2026-esocial-s13-publico', 'inst-2026-ester-lima', '2026-12-16', '2026-12-18', '08:30 às 17:00', 'São Paulo/SP', 0, 0, 2990.90, 'Presencial', 'EmBreve', 'Agenda geral 2026; turma presencial.', null)
-on conflict (id) do update set
-  curso_id = excluded.curso_id,
-  instrutor_id = excluded.instrutor_id,
-  data_inicio = excluded.data_inicio,
-  data_fim = excluded.data_fim,
-  horario = excluded.horario,
-  local = excluded.local,
-  vagas_total = excluded.vagas_total,
-  vagas_preenchidas = excluded.vagas_preenchidas,
-  preco_turma = excluded.preco_turma,
-  modalidade = excluded.modalidade,
-  status = excluded.status,
-  observacoes = excluded.observacoes,
-  deleted_at = null;
+on conflict (id) do nothing;
 
 commit;
 

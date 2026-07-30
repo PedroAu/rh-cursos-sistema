@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const targetRef = process.argv[2]?.trim();
@@ -104,5 +104,8 @@ const configured = Object.entries(values).reduce(
 );
 
 writeFileSync(targetEnvPath, configured, { encoding: "utf8", mode: 0o600 });
+// `mode` só é aplicado na criação; reafirma a permissão ao sobrescrever um
+// arquivo que já pudesse existir com uma máscara mais permissiva.
+chmodSync(targetEnvPath, 0o600);
 console.log(`✅ Ambiente E2E isolado configurado para ${targetUrl}.`);
 console.log("As credenciais ficaram apenas em .env.e2e.local (ignorado pelo Git).");
