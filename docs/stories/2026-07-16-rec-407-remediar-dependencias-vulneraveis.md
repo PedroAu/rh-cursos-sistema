@@ -179,6 +179,14 @@ npm audit
 
 Nenhuma mudança de dependência foi aplicada (nenhum bump seguro disponível), portanto o resultado `npm audit` "depois" é idêntico ao "antes": 8 vulnerabilidades (6 low, 2 moderate), todas cobertas por exceção documentada.
 
+### Follow-up de remediação — 2026-07-30
+
+- Atualizadas as cadeias de produção para `next@16.2.12` e `@opennextjs/cloudflare@1.20.2`; os overrides de `postcss` e `sharp` removem as cópias vulneráveis internas do Next.js.
+- Atualizado o minificador transitivo do OpenNext para a linha corrigida; o patch versionado em `patches/@opennextjs+aws+4.1.0.patch` adapta os dois imports nomeados exigidos pela nova API e é reaplicado por `patch-package` a cada instalação.
+- Migrado o Storybook do builder Webpack para `@storybook/nextjs-vite` via automigração oficial, com Vite 8 e imports de tipos atualizados.
+- Atualizados `chrome-launcher` e `minimatch` por overrides compatíveis. O resultado final de `npm audit` e `npm audit --omit=dev` é zero vulnerabilidades em todas as severidades.
+- Revalidados com sucesso: lint, typecheck, suíte `npm test`, build Cloudflare, build do Storybook e Lighthouse CI para `/`, `/cursos` e `/login`.
+
 ## Dependências
 
 - **Entrada:** REC-401 (Done) — pipeline CI/CD encadeado, pré-requisito organizacional da Onda 5.
@@ -196,6 +204,7 @@ Nenhuma mudança de dependência foi aplicada (nenhum bump seguro disponível), 
 | 2026-07-16 | 0.1 | Draft criado a partir de FND-16/NFR-06, Onda 5, com levantamento completo de `npm audit` e avaliação de cada advisory. | @dev |
 | 2026-07-16 | 1.0 | **Ready → InProgress → InReview.** Levantamento concluído: 8 advisories (6 low, 2 moderate), nenhum com correção segura disponível hoje. Ambas as cadeias documentadas como exceção temporária datada e justificada (elliptic sem versão corrigida upstream, dev-only; postcss interno fixado pelo próprio `next`, sem release estável disponível). Gates locais (lint, typecheck, vitest 601/601) executados como baseline sem alteração de dependências. Relatório sanitizado criado. | @dev |
 | 2026-07-16 | 1.1 | **InReview → Done.** Gate PASS (90/100) com waiver formal até 2026-08-16 emitido por `@qa` após reexecução independente de `npm audit` (idêntico) e revisão da decisão de rejeitar `npm audit fix --force`. | @qa (Quinn) |
+| 2026-07-30 | 1.2 | Follow-up concluído: atualização de dependências, migração oficial do Storybook para Vite e patch versionado do OpenNext eliminaram todos os advisories; `npm audit` e `npm audit --omit=dev` retornam zero vulnerabilidades. | @devops (Gage) |
 
 ## File List
 
@@ -206,7 +215,14 @@ Nenhuma mudança de dependência foi aplicada (nenhum bump seguro disponível), 
 
 ### Modificado
 
-- Nenhum arquivo de dependência (`package.json`/`package-lock.json`) foi alterado — nenhum bump seguro estava disponível para os 8 advisories identificados.
+- `package.json` e `package-lock.json`
+- `.storybook/main.ts` e `.storybook/preview.tsx`
+- `src/**/*.stories.tsx` e `src/components/storybook/decorators.tsx`
+- `docs/stories/2026-07-16-rec-407-remediar-dependencias-vulneraveis.md`
+
+### Adicionado
+
+- `patches/@opennextjs+aws+4.1.0.patch`
 
 ## Dev Agent Record
 

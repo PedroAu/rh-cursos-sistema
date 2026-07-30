@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { ClassCard } from "./class-card";
 import { mockClass, mockClassLowSeats, mockCourse, mockInstructor } from "@/components/storybook/mock-data";

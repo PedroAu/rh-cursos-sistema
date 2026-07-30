@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { PublicLayout } from "./public-layout";
 import { withAppStore } from "@/components/storybook/decorators";

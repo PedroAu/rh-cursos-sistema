@@ -1,4 +1,4 @@
-import type { Decorator } from "@storybook/nextjs";
+import type { Decorator } from "@storybook/nextjs-vite";
 
 import { QuoteModalProvider } from "@/components/in-company/quote-modal";
 import { AppStoreProvider } from "@/lib/app-store";

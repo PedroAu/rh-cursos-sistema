@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { useQuoteModal } from "./quote-modal";
 import { withAppStore } from "@/components/storybook/decorators";

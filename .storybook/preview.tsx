@@ -1,4 +1,4 @@
-import type { Decorator, Preview } from "@storybook/nextjs";
+import type { Decorator, Preview } from "@storybook/nextjs-vite";
 
 import "../src/styles/globals.css";
 

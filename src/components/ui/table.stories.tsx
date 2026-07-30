@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./table";
 import { StatusBadge } from "@/components/common/status-badge";

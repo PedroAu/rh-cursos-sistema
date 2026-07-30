@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { BlogPostClient } from "./blog-post-client";
 import { CourseDetailClient } from "./course-detail-client";

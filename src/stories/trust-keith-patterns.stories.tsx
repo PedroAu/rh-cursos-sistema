@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { CheckCircle2 } from "lucide-react";
 
 import { CourseCard, FeatureListItem, PaperCard, SectionHeading, StatBlock, Testimonial } from "@/components/patterns";

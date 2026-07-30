@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { TestimonialCard } from "./testimonial-card";
 import { mockTestimonial } from "@/components/storybook/mock-data";

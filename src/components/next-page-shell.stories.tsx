@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/nextjs";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 
 import { DashboardPageShell, PublicPageShell } from "./next-page-shell";
 import { mockStoreInitialData } from "@/components/storybook/mock-data";

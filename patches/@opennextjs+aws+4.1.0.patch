@@ -1,0 +1,15 @@
+diff --git a/node_modules/@opennextjs/aws/dist/minimize-js.js b/node_modules/@opennextjs/aws/dist/minimize-js.js
+index 45957cf..38ec7df 100644
+--- a/node_modules/@opennextjs/aws/dist/minimize-js.js
++++ b/node_modules/@opennextjs/aws/dist/minimize-js.js
+@@ -4,8 +4,8 @@
+ // @ts-nocheck
+ import fs from "node:fs/promises";
+ import path from "node:path";
+-import minify from "@node-minify/core";
+-import terser from "@node-minify/terser";
++import { minify } from "@node-minify/core";
++import { terser } from "@node-minify/terser";
+ const failed_files = [];
+ let total_files = 0;
+ const options = {};
