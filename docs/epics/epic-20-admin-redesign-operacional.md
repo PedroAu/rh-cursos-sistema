@@ -41,6 +41,7 @@ Esta épica não reabre as Épicas 14, 15, 18 ou 19. A Épica 15 permanece como 
 | 20.3 | Ações do dashboard e integração com formulários existentes | Done | Playwright |
 | 20.4 | Fidelidade responsiva, acessibilidade e reduced motion | Done | axe + visual |
 | 20.5 | Gate final, build e readiness para deploy | Done | devops gate |
+| 20.6 | Logo institucional e correção cromática da navegação lateral | Pending | visual + a11y |
 
 ## 5. Critérios de aceite da épica
 
@@ -65,3 +66,7 @@ Fora de escopo: novo backend, novos campos de negócio, gateway de pagamento, al
 - Gates complementares: unit 768 testes; Epic 15 10/10; Epic 20 2/2; a11y 9/9; visual 8/8; bundle, purge, CSS e design-system aprovados.
 - Correções de dívida encontradas no gate: confirmação de exclusão nos testes CRUD, overflow mobile da paginação e hexadecimais diretos em checkout/detalhe substituídos por tokens.
 - Branch local: `codex/epic-20-admin-redesign`. Push, PR e deploy não foram executados; a próxima ação autorizada é o handoff explícito para `@devops`.
+
+### Observação visual registrada para a Story 20.6
+
+O canvas usa uma navegação lateral clara (`var(--tk-lightest-grey, #fafafa)`), itens em `var(--tk-ink)` e estado ativo em `var(--tk-accent-soft)`/`var(--tk-brand)`. A implementação atual ainda usa a paleta escura hardcoded (`#0e4666` no fundo e `#ffe09b` no ativo) na sidebar desktop, no drawer mobile e na navegação inferior. Isso explica a divergência percebida: não é um problema do token global, mas uma decisão visual legada da shell administrativa que não foi alinhada ao canvas.

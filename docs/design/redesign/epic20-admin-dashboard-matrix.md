@@ -16,6 +16,7 @@ O arquivo recebido tem 1.515 linhas. O canvas versionado antes da Épica 20 tem 
 | `has*Detail` | painel de detalhe genérico por recurso | Exibir colunas/domínio existentes; relações só quando já carregadas |
 | `.adm-pager` | componente de paginação com 5/10/25 | Resetar página em busca/filtro e manter `aria-label` |
 | `prefers-reduced-motion` | tokens/classes atuais + testes | Não importar o `styles.css` do canvas para produção |
+| Logo e shell lateral (`.adm-side`, `.adm-item`) | Story 20.6: assets locais + `AdminSidebar`/drawer/bottom nav | Alinhar a shell à superfície clara e aos tokens do canvas; remover a paleta escura legada hardcoded |
 
 ## Gaps conhecidos do baseline
 
@@ -23,4 +24,3 @@ O arquivo recebido tem 1.515 linhas. O canvas versionado antes da Épica 20 tem 
 - `AdminResourcePage` já possui Dialog de CRUD e ações de editar/excluir, porém não tinha paginação, detalhe e confirmação centralizados.
 - Read models paginados existem no backend, mas a tela genérica ainda trabalha sobre as coleções do `AppStore`.
 - A navegação mobile foi corrigida na REC-306 e deve ser preservada.
-
