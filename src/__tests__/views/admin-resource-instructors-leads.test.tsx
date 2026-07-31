@@ -94,4 +94,33 @@ describe("AdminResourcePage — instrutores e leads", () => {
     expect(screen.getByText("Nenhum registro encontrado.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Exportar" })).not.toBeInTheDocument();
   });
+
+  test("pagina recursos, abre detalhe real e exige confirmação antes de excluir", () => {
+    const store = createStore();
+    store.instructors = Array.from({ length: 6 }, (_, index) => ({
+      ...store.instructors[0],
+      id: `instructor-${index + 1}`,
+      name: `Instrutor ${index + 1}`,
+      email: `instrutor-${index + 1}@example.test`,
+    }));
+    mocks.useAppStore.mockReturnValue(store);
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
+
+    render(<AdminResourcePage resource="instructors" />);
+
+    expect(screen.getByText("Mostrando 1–5 de 6")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Página 2" }));
+    expect(screen.getByText("Mostrando 6–6 de 6")).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "Instrutor Instrutor 6" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Ver detalhes de Instrutor 6" }));
+    expect(screen.getByRole("heading", { name: "Instrutores · instructor-6" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Voltar para a lista" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Excluir instrutor Instrutor 6" }));
+    expect(window.confirm).toHaveBeenCalledWith("Excluir instrutores instructor-6? Esta ação não pode ser desfeita.");
+    expect(store.deleteInstructor).not.toHaveBeenCalled();
+
+    vi.unstubAllGlobals();
+  });
 });

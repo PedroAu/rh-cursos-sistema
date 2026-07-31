@@ -398,6 +398,7 @@ async function deleteRowByName(page: Page, name: string) {
   const rowName = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const row = page.getByRole("row", { name: rowName });
   await expect(row).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: /^Excluir item/ }).click();
 
   await expect
@@ -623,6 +624,7 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await pageSearchField(page).fill(courseTitle);
     const row = page.getByRole("row", { name: new RegExp(startDateLabel) });
     await expect(row).toBeVisible();
+    page.once("dialog", (dialog) => dialog.accept());
     await row.getByRole("button", { name: /^Excluir item/ }).click();
     await expect(row).toBeHidden();
   });

@@ -81,11 +81,11 @@ export function AdminDashboardPage() {
           <Link to="/" className="text-sm font-semibold text-tk-brand hover:text-tk-brand-hover">
             Ver site →
           </Link>
-          <Button type="button" variant="outline" size="sm">
-            Novo curso
+          <Button asChild variant="outline" size="sm">
+            <Link to="/admin/cursos?action=create">Novo curso</Link>
           </Button>
-          <Button type="button" variant="primary" size="sm">
-            Nova turma
+          <Button asChild variant="primary" size="sm">
+            <Link to="/admin/turmas?action=create">Nova turma</Link>
           </Button>
         </div>
       </div>
