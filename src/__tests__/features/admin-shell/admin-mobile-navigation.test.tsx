@@ -105,6 +105,8 @@ describe("AdminMobileDrawer (REC-306)", () => {
   it("expõe todos os itens de navegação admin, inclusive os ausentes na barra inferior", () => {
     render(<AdminMobileDrawer opened onOpenChange={vi.fn()} role="admin" />);
 
+    expect(screen.getByAltText("RH Cursos")).toBeInTheDocument();
+
     // Itens que a barra inferior móvel (slice 0..5) não alcança.
     for (const label of ["Inscrições", "Instrutores", "Blog", "Páginas", "Configurações"]) {
       expect(screen.getByRole("link", { name: new RegExp(label, "i") })).toBeInTheDocument();

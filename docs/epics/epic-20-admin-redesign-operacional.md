@@ -41,7 +41,7 @@ Esta épica não reabre as Épicas 14, 15, 18 ou 19. A Épica 15 permanece como 
 | 20.3 | Ações do dashboard e integração com formulários existentes | Done | Playwright |
 | 20.4 | Fidelidade responsiva, acessibilidade e reduced motion | Done | axe + visual |
 | 20.5 | Gate final, build e readiness para deploy | Done | devops gate |
-| 20.6 | Logo institucional e correção cromática da navegação lateral | Pending | visual + a11y |
+| 20.6 | Logo institucional e correção cromática da navegação lateral | Done | visual + a11y |
 
 ## 5. Critérios de aceite da épica
 
