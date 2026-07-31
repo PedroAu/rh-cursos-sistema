@@ -630,6 +630,10 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
   });
 
   test("instrutores: cria só com os campos obrigatórios e exclui", async ({ page }) => {
+    // A criação passa pela Edge Function e a leitura seguinte pelo PostgREST.
+    // O polling já prevê até 60s de consistência; o timeout padrão do teste
+    // (30s) não pode interrompê-lo antes.
+    test.setTimeout(75_000);
     const name = `${MARKER} instrutor`;
     await page.goto("/admin/instrutores");
 
