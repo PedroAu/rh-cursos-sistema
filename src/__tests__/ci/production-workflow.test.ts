@@ -2,11 +2,58 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
+import { parse } from "yaml";
 
 const workflowsDirectory = resolve(process.cwd(), ".github/workflows");
 
 function readWorkflow(name: string) {
   return readFileSync(resolve(workflowsDirectory, name), "utf8");
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function asRecord(value: unknown, label: string): Record<string, unknown> {
+  if (!isRecord(value)) {
+    throw new Error(`${label} deve ser um objeto YAML`);
+  }
+  return value;
+}
+
+function requiredString(value: unknown, label: string): string {
+  if (typeof value !== "string") throw new Error(`${label} deve ser uma string`);
+  return value;
+}
+
+function readWorkflowObject(name: string): Record<string, unknown> {
+  return asRecord(parse(readWorkflow(name)), `workflow ${name}`);
+}
+
+function readJob(workflow: Record<string, unknown>, jobName: string): Record<string, unknown> {
+  const jobs = asRecord(workflow.jobs, "jobs");
+  return asRecord(jobs[jobName], `job ${jobName}`);
+}
+
+type IsolatedE2eRunContext = {
+  productionSafeSmoke: boolean | undefined;
+  eventName: string;
+  headRepository: string | undefined;
+  repository: string;
+};
+
+function runsIsolatedE2e({
+  productionSafeSmoke,
+  eventName,
+  headRepository,
+  repository,
+}: IsolatedE2eRunContext): boolean {
+  return productionSafeSmoke !== true
+    && (eventName !== "pull_request" || headRepository === repository);
+}
+
+function normalizeExpression(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
 }
 
 function readTopLevelBlock(source: string, key: string) {
@@ -81,6 +128,52 @@ describe("REC-401 production delivery graph", () => {
     expect(production).toContain("needs.deploy-functions.result == 'success'");
     expect(production).toContain("needs.deploy-functions.result == 'skipped'");
     expect(production).not.toContain("continue-on-error");
+  });
+
+  it("keeps write-enabled isolated E2E out of the production smoke workflow", () => {
+    const productionWorkflow = readWorkflowObject("production-pipeline.yml");
+    const ciWorkflow = readWorkflowObject("ci.yml");
+    const productionCiJob = readJob(productionWorkflow, "ci");
+    const isolatedE2eJob = readJob(ciWorkflow, "e2e-integration");
+    const productionSmokeJob = readJob(ciWorkflow, "e2e-production-smoke");
+    const ciInputs = asRecord(productionCiJob.with, "jobs.ci.with");
+
+    expect(ciInputs.production_safe_smoke).toBe(true);
+    expect(normalizeExpression(requiredString(isolatedE2eJob.if, "jobs.e2e-integration.if")))
+      .toBe(
+        "inputs.production_safe_smoke != true && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)"
+      );
+    expect(requiredString(isolatedE2eJob.environment, "jobs.e2e-integration.environment"))
+      .toBe("e2e");
+    expect(normalizeExpression(requiredString(productionSmokeJob.if, "jobs.e2e-production-smoke.if")))
+      .toBe("inputs.production_safe_smoke == true");
+    expect(requiredString(productionSmokeJob.environment, "jobs.e2e-production-smoke.environment"))
+      .toBe("production");
+
+    expect(runsIsolatedE2e({
+      productionSafeSmoke: true,
+      eventName: "push",
+      headRepository: undefined,
+      repository: "PedroAu/rh-cursos-sistema",
+    })).toBe(false);
+    expect(runsIsolatedE2e({
+      productionSafeSmoke: false,
+      eventName: "push",
+      headRepository: undefined,
+      repository: "PedroAu/rh-cursos-sistema",
+    })).toBe(true);
+    expect(runsIsolatedE2e({
+      productionSafeSmoke: undefined,
+      eventName: "pull_request",
+      headRepository: "PedroAu/rh-cursos-sistema",
+      repository: "PedroAu/rh-cursos-sistema",
+    })).toBe(true);
+    expect(runsIsolatedE2e({
+      productionSafeSmoke: undefined,
+      eventName: "pull_request",
+      headRepository: "fork-owner/rh-cursos-sistema",
+      repository: "PedroAu/rh-cursos-sistema",
+    })).toBe(false);
   });
 
   it("passes only the secrets declared by each reusable workflow", () => {
