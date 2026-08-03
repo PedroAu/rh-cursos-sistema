@@ -31,7 +31,8 @@ Supabase. No real charge is created by the E2E checkout specs.
 
 The CI seeds the following dedicated fixture into the isolated E2E Supabase
 project before Playwright starts. The job uses `upsert` only by its fixed E2E
-IDs, so it never alters operational or manual agenda records:
+IDs and the minimum columns required by both supported schemas, so it never
+alters operational or manual agenda records:
 
 ```text
 curso-e2e-atualizacao-esocial
