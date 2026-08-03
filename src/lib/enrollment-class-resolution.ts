@@ -5,8 +5,12 @@ const OPEN_CLASS_STATUSES = new Set<TrainingClass["status"]>([
   "Poucas vagas",
 ]);
 
+export function isTrainingClassSoldOut(trainingClass: Pick<TrainingClass, "availableSeats">) {
+  return trainingClass.availableSeats <= 0;
+}
+
 export function isEnrollmentClassOpen(trainingClass: Pick<TrainingClass, "status" | "availableSeats">) {
-  return OPEN_CLASS_STATUSES.has(trainingClass.status) && trainingClass.availableSeats > 0;
+  return OPEN_CLASS_STATUSES.has(trainingClass.status) && !isTrainingClassSoldOut(trainingClass);
 }
 
 export function getOpenEnrollmentClasses(classes: TrainingClass[], courseId: string) {

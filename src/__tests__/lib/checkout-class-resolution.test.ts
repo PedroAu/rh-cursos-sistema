@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getOpenEnrollmentClasses,
   isEnrollmentClassOpen,
+  isTrainingClassSoldOut,
   resolveDisplayPrice,
   resolveOpenEnrollmentClassId,
 } from "@/lib/enrollment-class-resolution";
@@ -38,6 +39,7 @@ describe("checkout class resolution", () => {
     const fullClass = { ...openClass, id: "class-full", availableSeats: 0 };
 
     expect(isEnrollmentClassOpen(fullClass)).toBe(false);
+    expect(isTrainingClassSoldOut(fullClass)).toBe(true);
     expect(getOpenEnrollmentClasses([fullClass, openClass], "course-1")).toEqual([openClass]);
   });
 

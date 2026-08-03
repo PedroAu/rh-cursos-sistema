@@ -32,7 +32,7 @@ import { Input } from "@/components/ui/input";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
-import { resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
+import { isTrainingClassSoldOut, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
 import type { Course, Instructor, TrainingClass } from "@/types";
@@ -98,6 +98,14 @@ function formatPlace(trainingClass: TrainingClass) {
 }
 
 function createSpotMeta(trainingClass: TrainingClass) {
+  if (isTrainingClassSoldOut(trainingClass)) {
+    return {
+      bgClass: "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)]",
+      colorClass: "text-white",
+      label: "Esgotada"
+    };
+  }
+
   if (trainingClass.status === "Poucas vagas") {
     return {
       bgClass: "bg-[color:color-mix(in_srgb,var(--tk-error)_72%,black)]",
@@ -735,7 +743,9 @@ export function AgendaPage() {
                               </p>
                             </div>
                             <Button asChild size="sm" className="min-w-[130px]">
-                              <Link to={`/cursos/${entry.course.slug}`}>Inscrever-se →</Link>
+                              <Link to={`/cursos/${entry.course.slug}`}>
+                                {isTrainingClassSoldOut(entry.trainingClass) ? "Ver curso →" : "Inscrever-se →"}
+                              </Link>
                             </Button>
                           </div>
                         </Card>

@@ -3,6 +3,7 @@ import { Link } from "@/lib/router-compat";
 
 import { StatusBadge } from "@/components/common/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { isTrainingClassSoldOut } from "@/lib/enrollment-class-resolution";
 import { formatDate } from "@/lib/utils";
 import type { Course, Instructor, TrainingClass } from "@/types";
 
@@ -15,6 +16,7 @@ export function ClassCard({
   course: Course;
   instructor?: Instructor;
 }) {
+  const soldOut = isTrainingClassSoldOut(trainingClass);
   const [month, day] = new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "short"
@@ -24,7 +26,9 @@ export function ClassCard({
     .split(" ");
 
   const urgencyLabel =
-    trainingClass.status === "Poucas vagas"
+    soldOut
+      ? "Esgotada"
+      : trainingClass.status === "Poucas vagas"
       ? "Últimas vagas"
       : trainingClass.status === "Inscrições abertas"
         ? "Vagas abertas"
@@ -48,18 +52,18 @@ export function ClassCard({
                 <span className="inline-flex rounded-full bg-tk-accent-soft px-3 py-1 text-[11px] font-bold uppercase tracking-[0.08em] text-tk-brand-hover">
                   {trainingClass.modality}
                 </span>
-                <StatusBadge status={trainingClass.status} />
+                <StatusBadge status={soldOut ? "Esgotada" : trainingClass.status} />
               </div>
               <h3 className="max-w-2xl font-tk-display text-[1.45rem] font-bold leading-tight tracking-[var(--tk-tracking-display)] text-tk-ink">
                 {course.title}
               </h3>
             </div>
 
-          <div className="flex items-center gap-2 text-right text-sm font-bold text-tk-success">
-              {trainingClass.status === "Poucas vagas" ? (
+          <div className={`flex items-center gap-2 text-right text-sm font-bold ${soldOut ? "text-tk-error" : "text-tk-success"}`}>
+              {trainingClass.status === "Poucas vagas" && !soldOut ? (
                 <TriangleAlert className="h-4 w-4 text-warning" />
               ) : (
-                <span className="h-2.5 w-2.5 rounded-full bg-tk-success" />
+                <span className={`h-2.5 w-2.5 rounded-full ${soldOut ? "bg-tk-error" : "bg-tk-success"}`} />
               )}
               <span>{urgencyLabel}</span>
             </div>
@@ -91,12 +95,18 @@ export function ClassCard({
             >
               Ver curso
             </Link>
-            <Link
-              to={`/cursos/${course.slug}/checkout?classId=${trainingClass.id}`}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-tk-accent px-5 text-sm font-bold text-white transition hover:bg-tk-brand"
-            >
-              Inscrever-se
-            </Link>
+            {soldOut ? (
+              <span className="inline-flex min-h-11 items-center justify-center rounded-md bg-tk-ink-muted px-5 text-sm font-bold text-white" aria-disabled="true">
+                Esgotada
+              </span>
+            ) : (
+              <Link
+                to={`/cursos/${course.slug}/checkout?classId=${trainingClass.id}`}
+                className="inline-flex min-h-11 items-center justify-center rounded-md bg-tk-accent px-5 text-sm font-bold text-white transition hover:bg-tk-brand"
+              >
+                Inscrever-se
+              </Link>
+            )}
           </div>
         </CardContent>
       </div>
