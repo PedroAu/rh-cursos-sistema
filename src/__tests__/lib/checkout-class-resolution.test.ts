@@ -2,7 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   getOpenEnrollmentClasses,
+  getDisplayableEnrollmentClasses,
+  isEnrollmentClassDisplayable,
   isEnrollmentClassOpen,
+  isTrainingClassSoldOut,
   resolveDisplayPrice,
   resolveOpenEnrollmentClassId,
 } from "@/lib/enrollment-class-resolution";
@@ -38,7 +41,22 @@ describe("checkout class resolution", () => {
     const fullClass = { ...openClass, id: "class-full", availableSeats: 0 };
 
     expect(isEnrollmentClassOpen(fullClass)).toBe(false);
+    expect(isTrainingClassSoldOut(fullClass)).toBe(true);
     expect(getOpenEnrollmentClasses([fullClass, openClass], "course-1")).toEqual([openClass]);
+  });
+
+  it("keeps sold-out and coming-soon classes visible without making them checkout targets", () => {
+    const fullClass = { ...openClass, id: "class-full", availableSeats: 0 };
+    const comingSoonClass = { ...openClass, id: "class-soon", status: "Em breve" as const };
+
+    expect(getDisplayableEnrollmentClasses([closedClass, fullClass, comingSoonClass], "course-1")).toEqual([
+      fullClass,
+      comingSoonClass,
+    ]);
+    expect(isEnrollmentClassDisplayable(fullClass)).toBe(true);
+    expect(isEnrollmentClassDisplayable(comingSoonClass)).toBe(true);
+    expect(isEnrollmentClassOpen(fullClass)).toBe(false);
+    expect(isEnrollmentClassOpen(comingSoonClass)).toBe(false);
   });
 
   it("replaces a requested closed class with the first open class", () => {

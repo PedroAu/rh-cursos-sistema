@@ -49,7 +49,7 @@ export const courseSchema = z.object({
   level: courseLevelEnum,
   status: z.enum(["Ativo", "Inativo", "Destaque", "Em breve", "Rascunho", "Arquivado"]),
   featured: z.boolean().optional(),
-  durationHours: z.number().int().nonnegative("Carga horária deve ser >= 0"),
+  durationHours: z.number().int().positive("Carga horária deve ser maior que zero"),
   // Compatibilidade durante o rollout: versões antigas da Edge Function ainda
   // exigem o rótulo textual, enquanto o contrato canônico usa horas numéricas.
   durationLabel: z.string().optional(),

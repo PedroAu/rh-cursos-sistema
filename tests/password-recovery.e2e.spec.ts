@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import {
   assertSafeWritableIntegrationEnv,
+  createUniqueIp,
   createServiceRoleClient,
   createUniqueEmail,
   ensureAuthUser,
@@ -29,6 +30,13 @@ test.describe("recuperação de senha — jornada real", () => {
     if (!createdUser) throw new Error("Usuário E2E de recuperação não foi encontrado.");
 
     try {
+      // O servidor de teste executa toda a suíte em um único host. Isolar este
+      // cenário do bucket de rate limit de autenticação evita que tentativas de
+      // outros fluxos de UI afetem a confirmação da nova senha.
+      await page.setExtraHTTPHeaders({
+        "x-forwarded-for": createUniqueIp("password-recovery-login"),
+      });
+
       const generated = await serviceClient.auth.admin.generateLink({
         type: "recovery",
         email: credentials.email,
@@ -49,18 +57,17 @@ test.describe("recuperação de senha — jornada real", () => {
       await page.getByRole("button", { name: /Atualizar senha/i }).click();
       await page.waitForURL("**/login?status=password-updated");
 
-    await page.getByLabel(/E-mail/).fill(email);
-    await page.getByLabel(/Senha/).fill(updatedPassword);
-    for (let attempt = 0; attempt < 3 && !page.url().endsWith("/admin"); attempt += 1) {
-      if (attempt > 0) await page.waitForTimeout(1500);
+      await page.getByLabel(/E-mail/).fill(email);
+      await page.getByLabel(/Senha/).fill(updatedPassword);
+      const loginResponse = page.waitForResponse(
+        (response) =>
+          new URL(response.url()).pathname === "/api/auth/session" &&
+          response.request().method() === "POST"
+      );
       await page.getByRole("button", { name: "Entrar" }).click();
-      try {
-        await page.waitForURL("**/admin", { timeout: 5000 });
-      } catch {
-        // Supabase may take a moment to make the just-updated password available.
-      }
-    }
-    await expect(page).toHaveURL(/\/admin$/);
+      expect((await loginResponse).ok()).toBe(true);
+      await page.waitForURL("**/admin");
+      await expect(page).toHaveURL(/\/admin$/);
     } finally {
       await serviceClient.auth.admin.deleteUser(createdUser.id);
     }

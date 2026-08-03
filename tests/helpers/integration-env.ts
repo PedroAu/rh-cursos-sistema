@@ -314,7 +314,9 @@ export async function resolveAvailableCheckoutTargets(limit = 10): Promise<Check
   const supabase = createPublishableClient();
 
   const { data: classes, error: classesError } = await supabase
-    .from("turma")
+    // A UI pública lê a projeção que já exclui soft-deleted. Consultar a
+    // tabela base aqui selecionava turmas antigas sem CTA no catálogo.
+    .from("turma_publica")
     .select("id,curso_id,data_inicio,horario,modalidade,local,status,vagas_restantes")
     .order("data_inicio", { ascending: true });
 
@@ -331,8 +333,9 @@ export async function resolveAvailableCheckoutTargets(limit = 10): Promise<Check
   const { data: courses, error: coursesError } = await supabase
     .from("curso")
     .select("id,slug,titulo")
+    .is("deleted_at", null)
     .in("id", courseIds)
-    .in("status", ["Ativo", "Destaque"]);
+    .in("status", ["Ativo", "Destaque", "EmBreve"]);
 
   if (coursesError) throw coursesError;
 
@@ -376,6 +379,17 @@ export async function resolveAvailableCheckoutTarget() {
   return target;
 }
 
+export async function openAvailableCheckout(page: Page) {
+  const target = await resolveAvailableCheckoutTarget();
+
+  await page.goto(`${target.coursePath}/checkout?classId=${target.classId}`, {
+    waitUntil: "domcontentloaded",
+  });
+  await page.getByRole("heading", { name: "Enviar pré-inscrição" }).waitFor({ state: "visible" });
+
+  return target;
+}
+
 export async function resolveAvailableTrainingPath(): Promise<TrainingPathTarget> {
   const supabase = createServiceRoleClient();
   const { data, error } = await supabase
@@ -398,10 +412,19 @@ export async function resolveUsableCheckoutTarget(page: Page, limit = 10) {
   const attempts: string[] = [];
 
   for (const target of targets) {
-    await page.goto(target.coursePath, { waitUntil: "networkidle" });
+    // O App Store mantém polling de sessão e subscriptions Realtime. Portanto,
+    // `networkidle` não é uma condição confiável para saber se o CTA renderizou.
+    // A navegação termina ao carregar o DOM e a disponibilidade é confirmada
+    // explicitamente pelo botão que este helper precisa exercitar.
+    await page.goto(target.coursePath, { waitUntil: "domcontentloaded" });
 
     const button = page.getByRole("button", { name: "Enviar pré-inscrição" }).first();
-    if ((await button.count()) === 0) {
+    const isVisible = await button
+      .waitFor({ state: "visible", timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!isVisible) {
       attempts.push(`${target.coursePath} (CTA ausente)`);
       continue;
     }

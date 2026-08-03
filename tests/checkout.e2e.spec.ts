@@ -7,8 +7,8 @@ import {
   createUniqueEmail,
   getCanonicalDocs,
   hasRealIntegrationEnv,
+  openAvailableCheckout,
   resolveAvailableCheckoutTarget,
-  resolveUsableCheckoutTarget,
 } from "./helpers/integration-env";
 
 function createUniqueCpf() {
@@ -39,9 +39,7 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      await resolveUsableCheckoutTarget(page);
-      await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
-      await expect(page).toHaveURL(/\/checkout/);
+      await openAvailableCheckout(page);
       await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
       await expect(page.getByText("valor de referência")).toBeVisible();
       await expect(page.getByLabel(/número do cartão/i)).toHaveCount(0);
@@ -116,8 +114,7 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
 
   test("falha de persistência preserva os dados e não navega", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Pré-inscrição requer ambiente Supabase real.");
-    await resolveUsableCheckoutTarget(page);
-    await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
+    await openAvailableCheckout(page);
     await fillPersonalForm(page);
     await page.getByText(
       "Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição."
@@ -142,8 +139,7 @@ test.describe("pré-inscrição pública — contrato verdadeiro", () => {
 
   test("solicitação de empresa exige organização e responsável sem persistir", async ({ page }) => {
     test.skip(!hasRealIntegrationEnv(), "Pré-inscrição requer ambiente Supabase real.");
-    await resolveUsableCheckoutTarget(page);
-    await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
+    await openAvailableCheckout(page);
     await page.getByRole("button", { name: "Empresa" }).click();
     await page.getByLabel("Telefone").fill("61999990000");
     await page.getByLabel("E-mail").fill("contato@empresa.com.br");

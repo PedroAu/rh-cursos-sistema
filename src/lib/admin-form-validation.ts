@@ -61,15 +61,10 @@ export function validateCourse(
     }
   }
 
-  if (form.durationHours !== undefined) {
-    const durationValue = form.durationHours;
-    if (!str(durationValue).trim()) {
-      addError(errors, "durationHours", "Carga horária é obrigatória");
-    } else if (Number.isNaN(Number(durationValue)) || Number(durationValue) < 0) {
-      addError(errors, "durationHours", "Carga horária deve ser um número válido (>= 0)");
-    }
-  } else if (!str(form.durationLabel).trim()) {
+  if (!str(form.durationHours).trim()) {
     addError(errors, "durationHours", "Carga horária é obrigatória");
+  } else if (Number.isNaN(Number(form.durationHours)) || Number(form.durationHours) <= 0) {
+    addError(errors, "durationHours", "Carga horária deve ser um número válido maior que zero");
   }
 
   if (!str(form.price).trim()) {

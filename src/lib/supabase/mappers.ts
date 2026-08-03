@@ -302,11 +302,16 @@ function fromDbBlogCategory(value: string): BlogPost["category"] {
 }
 
 export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes: ClassRow[]): Course {
-  const primaryInstructor = joins.find((item) => item.curso_id === row.id && item.principal) ??
-    joins.find((item) => item.curso_id === row.id);
+  const courseInstructorRelations = joins
+    .filter((item) => item.curso_id === row.id)
+    .sort((left, right) => right.created_at.localeCompare(left.created_at));
   const nextClass = classes
     .filter((item) => item.curso_id === row.id)
     .sort((a, b) => a.data_inicio.localeCompare(b.data_inicio))[0];
+  // A próxima turma é a fonte mais precisa para o instrutor público. Sem uma
+  // turma configurada, usamos o vínculo de instrutor mais recente, evitando
+  // que a ordem incidental do retorno do banco defina a página pública.
+  const primaryInstructor = courseInstructorRelations[0];
   const modalities = fromDbModalities(row);
 
   if (!row.trilha_nome && row.trilha_id && !(row.trilha_id in trainingPathNames)) {
@@ -333,7 +338,7 @@ export function mapCourse(row: CourseRow, joins: CourseInstructorRow[], classes:
     objectives: asStringArray(row.objetivos),
     benefits: asStringArray(row.beneficios),
     modules: asModules(row.ementa),
-    instructorId: primaryInstructor?.instrutor_id ?? "",
+    instructorId: nextClass?.instrutor_id ?? primaryInstructor?.instrutor_id ?? "",
     image: row.imagem_capa ?? courseCoverByPath[row.trilha_id ?? ""] ?? defaultCourseCover,
     rating: Number(row.rating),
     studentsCount: row.total_alunos,

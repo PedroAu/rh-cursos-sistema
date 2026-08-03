@@ -5,8 +5,8 @@ import {
   createServiceRoleClient,
   createUniqueEmail,
   hasRealIntegrationEnv,
+  openAvailableCheckout,
   resolveAvailableTrainingPath,
-  resolveUsableCheckoutTarget,
 } from "./helpers/integration-env";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
@@ -121,14 +121,11 @@ test.describe("epica 4 — jornadas publicas", () => {
     assertSafeWritableIntegrationEnv();
     const enrollmentEmail = createUniqueEmail("public-journey");
     const enrollmentCpf = createUniqueCpf();
-    await resolveUsableCheckoutTarget(page);
+    await openAvailableCheckout(page);
 
     await cleanupEnrollmentArtifacts(enrollmentEmail);
 
     try {
-      await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
-      await expect(page).toHaveURL(/\/checkout/);
-      await page.waitForLoadState("networkidle");
       await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
       await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 

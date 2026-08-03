@@ -17,7 +17,7 @@ const validCourse: Record<string, string> = {
   title: 'Curso de DP',
   pathId: 'path-1',
   modality: 'Ao vivo online',
-  durationLabel: '8h',
+  durationHours: '8',
   price: '1000',
   level: 'Básico',
   status: 'Ativo',
@@ -70,6 +70,12 @@ describe('validateCourse', () => {
   it('accepts a zero price', () => {
     const result = validateCourse({ ...validCourse, price: '0' });
     expect(getErrorMessage(result.errors, 'price')).toBeUndefined();
+  });
+
+  it('requires a positive durationHours as the only duration source of truth', () => {
+    expect(getErrorMessage(validateCourse({ ...validCourse, durationHours: '0' }).errors, 'durationHours')).toContain('maior que zero');
+    expect(getErrorMessage(validateCourse({ ...validCourse, durationHours: '' }).errors, 'durationHours')).toContain('obrigatória');
+    expect(getErrorMessage(validateCourse({ ...validCourse, durationHours: undefined, durationLabel: '8h' }).errors, 'durationHours')).toContain('obrigatória');
   });
 
   it('rejects malformed JSON in categories', () => {

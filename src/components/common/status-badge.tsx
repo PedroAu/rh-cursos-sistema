@@ -9,7 +9,7 @@ export function StatusBadge({ status }: { status: string }) {
     return <Badge variant="warning">{status}</Badge>;
   }
 
-  if (/cancel|encerr|perdido|inativo|arquivado/i.test(status)) {
+  if (/cancel|encerr|esgot|perdido|inativo|arquivado/i.test(status)) {
     return <Badge variant="danger">{status}</Badge>;
   }
 

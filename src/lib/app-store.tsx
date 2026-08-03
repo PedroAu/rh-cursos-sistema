@@ -723,6 +723,17 @@ export function AppStoreProvider({
               scheduleCatalogRefetch
             );
 
+            // Turmas mudam a disponibilidade, o status e o instrutor exibidos
+            // na agenda e no detalhe do curso. O refetch atômico do catálogo
+            // evita mesclar um payload parcial com os dados derivados.
+            const classSub = createRealtimeSubscription(
+              supabase,
+              "turma_changes",
+              "turma",
+              () => active,
+              scheduleCatalogRefetch
+            );
+
             const courseContentSub = createRealtimeSubscription(
               supabase,
               "curso_public_content_changes",
@@ -731,7 +742,7 @@ export function AppStoreProvider({
               scheduleCatalogRefetch
             );
 
-            subscriptions.push(courseSub, blogSub, instructorSub, courseContentSub);
+            subscriptions.push(courseSub, blogSub, instructorSub, classSub, courseContentSub);
           }
         })
         .catch((error) => {
