@@ -314,7 +314,9 @@ export async function resolveAvailableCheckoutTargets(limit = 10): Promise<Check
   const supabase = createPublishableClient();
 
   const { data: classes, error: classesError } = await supabase
-    .from("turma")
+    // A UI pública lê a projeção que já exclui soft-deleted. Consultar a
+    // tabela base aqui selecionava turmas antigas sem CTA no catálogo.
+    .from("turma_publica")
     .select("id,curso_id,data_inicio,horario,modalidade,local,status,vagas_restantes")
     .order("data_inicio", { ascending: true });
 
@@ -331,8 +333,9 @@ export async function resolveAvailableCheckoutTargets(limit = 10): Promise<Check
   const { data: courses, error: coursesError } = await supabase
     .from("curso")
     .select("id,slug,titulo")
+    .is("deleted_at", null)
     .in("id", courseIds)
-    .in("status", ["Ativo", "Destaque"]);
+    .in("status", ["Ativo", "Destaque", "EmBreve"]);
 
   if (coursesError) throw coursesError;
 
