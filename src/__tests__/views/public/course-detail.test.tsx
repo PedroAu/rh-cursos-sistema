@@ -200,6 +200,37 @@ describe("CourseDetailPage", () => {
     );
   });
 
+  it("exibe turma esgotada sem oferecer pré-inscrição", () => {
+    mockStore.classes = [{ ...mockStore.classes[0], availableSeats: 0, filledSeats: 20, totalSeats: 20 }];
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getAllByText("Esgotada")).not.toHaveLength(0);
+    expect(screen.getByText("Turma esgotada")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /enviar pré-inscrição/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /manifestar interesse/i })).toHaveAttribute("href", "/falar-com-especialista");
+  });
+
+  it("mostra uma turma em breve e direciona para manifestação de interesse", () => {
+    mockStore.classes = [{ ...mockStore.classes[0], status: "Em breve" }];
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getAllByText("Turma nova")).not.toHaveLength(0);
+    expect(screen.getByRole("link", { name: /manifestar interesse/i })).toBeInTheDocument();
+  });
+
+  it("mostra o nível do curso e não exibe rating público", () => {
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getByText("Nível Básico")).toBeInTheDocument();
+    expect(screen.queryByText(/Avaliação média/i)).not.toBeInTheDocument();
+  });
+
   describe("prova social sem dado fabricado [Épica 17 · Story 17.2]", () => {
     const originalCourse = mockStore.courses[0];
     const originalTestimonials = mockStore.testimonials;

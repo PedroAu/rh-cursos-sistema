@@ -5,6 +5,14 @@ const OPEN_CLASS_STATUSES = new Set<TrainingClass["status"]>([
   "Poucas vagas",
 ]);
 
+// Visibilidade pública e elegibilidade para pré-inscrição são conceitos
+// distintos. Uma turma ainda pode orientar a decisão do visitante mesmo sem
+// vagas ou antes da abertura das inscrições.
+const DISPLAYABLE_CLASS_STATUSES = new Set<TrainingClass["status"]>([
+  ...OPEN_CLASS_STATUSES,
+  "Em breve",
+]);
+
 export function isTrainingClassSoldOut(trainingClass: Pick<TrainingClass, "availableSeats">) {
   return trainingClass.availableSeats <= 0;
 }
@@ -13,9 +21,19 @@ export function isEnrollmentClassOpen(trainingClass: Pick<TrainingClass, "status
   return OPEN_CLASS_STATUSES.has(trainingClass.status) && !isTrainingClassSoldOut(trainingClass);
 }
 
+export function isEnrollmentClassDisplayable(trainingClass: Pick<TrainingClass, "status">) {
+  return DISPLAYABLE_CLASS_STATUSES.has(trainingClass.status);
+}
+
 export function getOpenEnrollmentClasses(classes: TrainingClass[], courseId: string) {
   return classes
     .filter((trainingClass) => trainingClass.courseId === courseId && isEnrollmentClassOpen(trainingClass))
+    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
+}
+
+export function getDisplayableEnrollmentClasses(classes: TrainingClass[], courseId: string) {
+  return classes
+    .filter((trainingClass) => trainingClass.courseId === courseId && isEnrollmentClassDisplayable(trainingClass))
     .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
 }
 

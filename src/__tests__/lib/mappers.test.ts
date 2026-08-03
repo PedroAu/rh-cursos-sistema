@@ -121,6 +121,23 @@ describe("Supabase mappers", () => {
     expect(course.modalities).toEqual(["Ao vivo online"]);
   });
 
+  it("uses the next class instructor before falling back to the most recent course link", () => {
+    const course = mapCourse(
+      courseRow,
+      [
+        { ...courseInstructorRow, instrutor_id: "inst-old", created_at: "2026-05-01T10:00:00Z" },
+        { ...courseInstructorRow, id: "join-new", instrutor_id: "inst-new", principal: false, created_at: "2026-06-01T10:00:00Z" },
+      ],
+      [{ ...classRow, instrutor_id: "inst-next" }]
+    );
+
+    expect(course.instructorId).toBe("inst-next");
+    expect(mapCourse(courseRow, [
+      { ...courseInstructorRow, instrutor_id: "inst-old", created_at: "2026-05-01T10:00:00Z" },
+      { ...courseInstructorRow, id: "join-new", instrutor_id: "inst-new", principal: false, created_at: "2026-06-01T10:00:00Z" },
+    ], []).instructorId).toBe("inst-new");
+  });
+
   it("preserves every modalidade returned by the database", () => {
     const course = mapCourse(
       { ...courseRow, modalidade: "Presencial", modalidades: ["Presencial", "Online", "Gravado"] },

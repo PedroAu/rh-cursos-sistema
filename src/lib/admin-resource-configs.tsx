@@ -760,7 +760,13 @@ export function buildResourceConfig(
             hint: "Vazio = usa o preço do curso. Preencha só se esta turma tiver um valor diferente.",
           },
           { key: "status", label: "Status", type: "select", options: classStatusOptions, required: true },
-          { key: "instructorId", label: "Instrutor", type: "select", options: instructorOptions },
+          {
+            key: "instructorId",
+            label: "Instrutor",
+            type: "select",
+            options: instructorOptions,
+            hint: "Selecione o instrutor antes de publicar: sem vínculo, a página pública não exibe um instrutor específico.",
+          },
           { key: "location", label: "Local", type: "text" },
         ],
       };

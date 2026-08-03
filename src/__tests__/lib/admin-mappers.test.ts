@@ -113,6 +113,22 @@ describe("courseToUpsert", () => {
     expect(payload.total_alunos).toBeUndefined();
   });
 
+  it("persists durationHours as the sole course duration value", () => {
+    const payload = courseToUpsert(
+      {
+        title: "Curso com duração",
+        pathId: "path-dp",
+        level: "Básico",
+        status: "Ativo",
+        durationHours: 16,
+        durationLabel: "valor antigo que não deve definir a duração",
+      },
+      "Departamento Pessoal"
+    );
+
+    expect(payload.carga_horaria).toBe(16);
+  });
+
   it("ignores a stale pathName from the client payload and uses the server-resolved trilha name [Story 17.4]", () => {
     const payload = courseToUpsert(
       {

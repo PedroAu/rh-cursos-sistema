@@ -429,6 +429,25 @@ describe("AppStoreProvider and hooks", () => {
     // REC-204 Fase B: nenhum token HMAC é persistido no browser.
   });
 
+  it("subscribes to turma changes so public availability is refreshed in real time", async () => {
+    mocks.supabaseConfigured = true;
+    mocks.fetchPublicCatalog.mockResolvedValue({
+      courses: mockCourses,
+      classes: mockClasses,
+      instructors: mocks.data.mockInstructors,
+      trainingPaths: mocks.data.trainingPaths,
+      coursePublicContents: [],
+      courseCategories: [],
+    });
+    mocks.fetchPublicBlogPosts.mockResolvedValue([]);
+
+    renderStore();
+
+    await waitFor(() => {
+      expect(mocks.supabaseClient.channel).toHaveBeenCalledWith("turma_changes");
+    });
+  });
+
   it("sets and clears the current session via provider actions", async () => {
     const harness = renderStore();
     const session: CurrentSession = {

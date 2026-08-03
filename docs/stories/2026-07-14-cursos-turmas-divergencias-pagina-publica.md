@@ -64,20 +64,20 @@ quality_gate_tools:
 14. Testes cobrem: elegibilidade de turma (`enrollment-class-resolution` incluindo "Em breve" e 0 vagas), instrutor primário determinístico (`mappers`), e `durationHours > 0` na validação. Baselines de UI governance do CourseDetail atualizados para nível exibido e rating removido.
 
 ## Tasks / Subtasks
-- [ ] Turmas "Em breve" e esgotadas na página (AC1, AC2)
-  - [ ] Ajustar `OPEN_CLASS_STATUSES`/`isEnrollmentClassOpen` em `enrollment-class-resolution.ts`.
-  - [ ] Novo estado "Esgotada" em `getSpotMeta` e tratamento de CTA em `CourseDetail.tsx`.
-  - [ ] Testes de `getOpenEnrollmentClasses` cobrindo os dois casos.
-- [ ] Instrutor determinístico + chip correto (AC3)
-  - [ ] Tornar `primaryInstructor` determinístico em `mappers.ts` (nextClass → mais recente).
+- [x] Turmas "Em breve" e esgotadas na página (AC1, AC2)
+  - [x] Ajustar `OPEN_CLASS_STATUSES`/`isEnrollmentClassOpen` em `enrollment-class-resolution.ts`.
+  - [x] Novo estado "Esgotada" em `getSpotMeta` e tratamento de CTA em `CourseDetail.tsx`.
+  - [x] Testes de `getOpenEnrollmentClasses` cobrindo os dois casos.
+- [x] Instrutor determinístico + chip correto (AC3)
+  - [x] Tornar `primaryInstructor` determinístico em `mappers.ts` (nextClass → mais recente).
   - [x] ~~Corrigir/remover chip "turmas ministradas"~~ — já resolvido pela Story 17.2 (relabelado para "turmas abertas").
-  - [ ] Aviso de turma sem instrutor no form.
-- [ ] Exibir nível (AC4)
-  - [ ] Chip de `course.level` no hero; remover/condicionar texto fixo.
-- [ ] Carga horária fonte única (AC5)
-  - [ ] Campo `durationHours` no form; derivar `durationLabel`.
-  - [ ] Validação `> 0` client + server.
-- [ ] Remover rating da página (AC6)
+  - [x] Aviso de turma sem instrutor no form.
+- [x] Exibir nível (AC4)
+  - [x] Chip de `course.level` no hero; remover/condicionar texto fixo.
+- [x] Carga horária fonte única (AC5)
+  - [x] Campo `durationHours` no form; derivar `durationLabel`.
+  - [x] Validação `> 0` client + server.
+- [x] Remover rating da página (AC6)
 - [ ] Testes e baselines (AC7)
 
 ## Dev Notes
@@ -127,3 +127,20 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 |---|---|---|---|
 | 2026-07-14 | 0.1 | Story criada a partir da análise de divergências entre formulários de curso/turma e a página pública. Decisões de produto travadas: "Em breve" exibido, instrutor inferido determinístico, rating removido da página. Categorias multi-valor foram isoladas em story separada (ADR-015 Fase 3) por exigirem migration. Draft aguardando validação @po. | @architect (Aria) |
 | 2026-07-15 | 1.0 | **NO-GO inicial (~5,5/10) → correções aplicadas → GO; Draft → Ready.** Grounding técnico verificado no código real; checklist de 10 pontos identificou ausência de Estimativa, Dependências e Riscos/Rollback — corrigidos nesta entrada. Dois achados de conteúdo, não só de forma: (1) AC3 item 6 ("chip turmas ministradas") já estava resolvido pela Story 17.2 (Épica 17, commit `a992597`), que relabelou o chip para "turmas abertas" antes desta validação — task marcada como já resolvida, sem duplicar trabalho; (2) AC6 (remover chip de rating) conflitava com a decisão já implementada pela 17.2 de manter o chip condicional a `rating > 0`. Decisão @po (usuário consultado): **esta story sobrescreve a 17.2 e remove o chip incondicionalmente** — AC6 atualizado para deixar isso explícito, e a Dependências documenta a sobreposição de arquivo para quem for implementar não reabrir a 17.2. Bloqueadores documentais: 0. | @po (Pax) |
+| 2026-08-03 | 1.1 | Implementados AC1–AC6: visibilidade de turmas separada de elegibilidade de checkout; estados Em breve/Esgotada no detalhe público; CTA sem checkout sem vaga; assinatura Realtime de `turma`; instrutor da próxima turma com fallback determinístico; nível e duração canônica; rating removido. `npm run test:unit` (778), `npm run typecheck`, `npm run lint`, `npm run build` e gates OpenAPI passaram. `npm run test:e2e:smoke` executou, mas não pode validar os casos com escrita sem o Environment Supabase isolado da REC-409; AC7 permanece aberto. | @dev (Dex) |
+
+## File List
+
+- `src/lib/enrollment-class-resolution.ts`
+- `src/views/public/CourseDetail.tsx`
+- `src/lib/supabase/mappers.ts`
+- `src/lib/admin-resource-configs.tsx`
+- `src/lib/admin-form-validation.ts`
+- `src/lib/app-store.tsx`
+- `supabase/functions/_shared/admin-validation.ts`
+- `src/__tests__/lib/checkout-class-resolution.test.ts`
+- `src/__tests__/lib/mappers.test.ts`
+- `src/__tests__/lib/admin-form-validation.test.ts`
+- `src/__tests__/lib/admin-mappers.test.ts`
+- `src/__tests__/lib/app-store.test.ts`
+- `src/__tests__/views/public/course-detail.test.tsx`

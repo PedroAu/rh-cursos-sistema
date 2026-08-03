@@ -21,7 +21,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
 import { useAppStore } from "@/lib/app-store";
-import { getOpenEnrollmentClasses } from "@/lib/enrollment-class-resolution";
+import {
+  getDisplayableEnrollmentClasses,
+  isEnrollmentClassOpen,
+  isTrainingClassSoldOut,
+} from "@/lib/enrollment-class-resolution";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
 import { cn, currency } from "@/lib/utils";
 import type { Course, Instructor, Testimonial, TrainingClass } from "@/types";
@@ -81,6 +85,13 @@ function formatCourseModalities(course: Course) {
 }
 
 function getSpotMeta(trainingClass: TrainingClass) {
+  if (isTrainingClassSoldOut(trainingClass)) {
+    return {
+      label: "Esgotada",
+      className: "bg-[color:color-mix(in_srgb,var(--tk-error)_18%,white)] text-tk-error"
+    };
+  }
+
   if (trainingClass.status === "Poucas vagas") {
     return {
       label: "Últimas vagas",
@@ -104,6 +115,10 @@ function getSpotMeta(trainingClass: TrainingClass) {
 function getUrgencyLabel(trainingClass?: TrainingClass) {
   if (!trainingClass) {
     return "Sem turma aberta";
+  }
+
+  if (isTrainingClassSoldOut(trainingClass)) {
+    return "Turma esgotada";
   }
 
   if (trainingClass.status === "Poucas vagas") {
@@ -242,14 +257,14 @@ export function CourseDetailPage() {
       return [];
     }
 
-    return getOpenEnrollmentClasses(classes, course.id);
+    return getDisplayableEnrollmentClasses(classes, course.id);
   }, [classes, course]);
 
   const instructor = instructors.find((item) => item.id === course?.instructorId);
   const courseContent = course ? coursePublicContents.find((item) => item.courseId === course.id && item.published) : undefined;
   const selectedClass = courseClasses.find((item) => item.id === selectedClassId) ?? courseClasses[0];
   const nextClass = courseClasses[0];
-  const openClassesCount = courseClasses.filter((item) => item.status !== "Encerrada").length;
+  const openClassesCount = courseClasses.filter(isEnrollmentClassOpen).length;
   const highlightCards = course ? buildHighlightCards(course, courseContent).slice(0, 6) : [];
   const faqItems = course ? buildFaqItems(course, selectedClass, courseContent) : [];
   const testimonial = course ? buildTestimonial(course, testimonials, courseContent) : null;
@@ -348,8 +363,9 @@ export function CourseDetailPage() {
     secondaryLabel: courseContent?.corporateCta?.secondaryLabel ?? "Solicitar proposta",
     secondaryHref: courseContent?.corporateCta?.secondaryHref ?? "/in-company#quote-form"
   };
-  const primaryCtaLabel = selectedClass ? "Enviar pré-inscrição →" : "Manifestar interesse →";
-  const primaryCtaHref = selectedClass ? startCheckoutHref : "/falar-com-especialista";
+  const canStartEnrollment = Boolean(selectedClass && isEnrollmentClassOpen(selectedClass));
+  const primaryCtaLabel = canStartEnrollment ? "Enviar pré-inscrição →" : "Manifestar interesse →";
+  const primaryCtaHref = canStartEnrollment ? startCheckoutHref : "/falar-com-especialista";
 
   return (
     <>
@@ -403,6 +419,10 @@ export function CourseDetailPage() {
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
                       <ShieldCheck aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                       Certificado de {course.durationHours}h
+                    </span>
+                    <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
+                      <ShieldCheck aria-hidden="true" className="h-4 w-4 text-tk-accent" />
+                      Nível {course.level}
                     </span>
                     <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-tk-surface px-4 py-2 text-sm font-medium text-tk-ink">
                       <UserRound aria-hidden="true" className="h-4 w-4 text-tk-accent" />
@@ -459,10 +479,12 @@ export function CourseDetailPage() {
                       <p className="text-sm text-tk-ink-muted">Público-alvo não especificado.</p>
                     )}
                   </div>
-                  <p className="mt-4 max-w-[68ch] text-sm leading-6 text-tk-ink-muted">
-                    Não é necessário conhecimento prévio da temática do curso. Partimos do essencial e avançamos até os pontos
-                    mais controversos.
-                  </p>
+                  {course.level === "Básico" ? (
+                    <p className="mt-4 max-w-[68ch] text-sm leading-6 text-tk-ink-muted">
+                      Não é necessário conhecimento prévio da temática do curso. Partimos do essencial e avançamos até os pontos
+                      mais controversos.
+                    </p>
+                  ) : null}
                 </section>
 
                 <section aria-labelledby="programa">
@@ -561,12 +583,6 @@ export function CourseDetailPage() {
                           <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
                             <Star aria-hidden="true" className="h-4 w-4 text-tk-accent" />
                             {course.studentsCount.toLocaleString("pt-BR")} alunos
-                          </span>
-                        ) : null}
-                        {course.rating > 0 ? (
-                          <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
-                            <ShieldCheck aria-hidden="true" className="h-4 w-4 text-tk-accent" />
-                            Avaliação média {course.rating.toFixed(1)}/5
                           </span>
                         ) : null}
                       </div>
@@ -672,7 +688,9 @@ export function CourseDetailPage() {
                     <div className="mt-6 text-caption font-semibold uppercase tracking-[0.06em] text-tk-ink-muted">
                       {sidebarCopy.nextClassesLabel}
                     </div>
-                    <div className="mt-1 text-caption text-tk-ink-muted">{openClassesCount} turmas abertas no calendário</div>
+                    <div className="mt-1 text-caption text-tk-ink-muted">
+                      {openClassesCount} {openClassesCount === 1 ? "turma aberta" : "turmas abertas"} no calendário
+                    </div>
                     <div className="mt-3 grid gap-2" role="radiogroup" aria-label="Escolha a turma">
                       {courseClasses.length ? (
                         courseClasses.map((trainingClass) => {
@@ -732,7 +750,7 @@ export function CourseDetailPage() {
                       </div>
                     ) : null}
 
-                    {selectedClass ? (
+                    {canStartEnrollment ? (
                       <Button
                         size="lg"
                         className="mt-5 w-full bg-tk-brand text-white hover:bg-tk-brand-hover hover:text-white"
