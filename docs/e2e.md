@@ -38,3 +38,21 @@ curso-pratico-de-atualizacao-do-esocial-novo-leiaute-1-3-para-orgaos-publicos
 Login tests intentionally avoid real credentials. Full authenticated admin E2E
 coverage requires seeded Supabase test users and is outside the current local
 fixture scope.
+
+## CI environment isolation
+
+The GitHub Actions E2E job uses the `e2e` Environment only for internal pull
+requests and pushes. It is skipped for forks, so untrusted code never receives
+test-project credentials.
+
+The job validates these controls before Playwright starts:
+
+- `E2E_ALLOW_DATABASE_WRITES=1` and `E2E_TARGET_KIND=isolated-test`;
+- `E2E_SUPABASE_PROJECT_REF` differs from `E2E_PRODUCTION_PROJECT_REF`;
+- the Supabase and Functions URLs belong to the declared E2E project;
+- the Supabase credentials are not placeholders.
+
+Configure the `e2e` Environment with the E2E Supabase URL, Functions URL,
+publishable key, service-role key, and session secret. Store the two project
+refs as Environment variables, never as application code. The CI serializes
+this job because all future write-capable tests share the same isolated target.

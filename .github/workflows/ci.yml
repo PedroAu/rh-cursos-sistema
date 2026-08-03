@@ -7,18 +7,26 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     name: Lint, test, and build
     runs-on: ubuntu-latest
     env:
-      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
-      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-      ASAAS_BASE_URL: ${{ secrets.ASAAS_BASE_URL }}
-      ASAAS_API_KEY: ${{ secrets.ASAAS_API_KEY }}
-      ASAAS_USER_AGENT: ${{ secrets.ASAAS_USER_AGENT }}
-      ASAAS_WEBHOOK_AUTH_TOKEN: ${{ secrets.ASAAS_WEBHOOK_AUTH_TOKEN }}
+      # Quality checks must never receive production credentials.
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_key
+      SUPABASE_SERVICE_ROLE_KEY: ci_service_role_placeholder_key
+      ASAAS_BASE_URL: https://api-sandbox.asaas.com/v3
+      ASAAS_API_KEY: ci_asaas_placeholder_key
+      ASAAS_USER_AGENT: rh-cursos-ci
+      ASAAS_WEBHOOK_AUTH_TOKEN: ci_asaas_webhook_placeholder_token
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,3 +42,47 @@ jobs:
 
       - name: Run deployment checks
         run: npm run deploy:check
+
+  e2e:
+    name: E2E against isolated Supabase
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    environment:
+      name: e2e
+      deployment: false
+    concurrency:
+      group: e2e-supabase-isolated
+      cancel-in-progress: false
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL: ${{ secrets.E2E_SUPABASE_FUNCTIONS_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.E2E_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      AUTH_SESSION_SECRET: ${{ secrets.E2E_AUTH_SESSION_SECRET }}
+      E2E_ALLOW_DATABASE_WRITES: '1'
+      E2E_TARGET_KIND: isolated-test
+      E2E_SUPABASE_PROJECT_REF: ${{ vars.E2E_SUPABASE_PROJECT_REF }}
+      E2E_PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate isolated E2E target
+        run: npm run test:e2e:env
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E suite
+        run: npm run test:e2e
