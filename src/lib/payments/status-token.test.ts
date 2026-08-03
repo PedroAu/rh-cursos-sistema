@@ -36,7 +36,9 @@ describe("payment status token", () => {
 
   it("rejects tokens with an invalid signature", () => {
     const token = createPaymentStatusToken("pay_123");
-    const forged = `${token.slice(0, -1)}x`;
+    const [payload, signature] = token.split(".");
+    const forgedSignature = `${signature[0] === "A" ? "B" : "A"}${signature.slice(1)}`;
+    const forged = `${payload}.${forgedSignature}`;
 
     expect(verifyPaymentStatusToken(forged, "pay_123")).toEqual({
       ok: false,
