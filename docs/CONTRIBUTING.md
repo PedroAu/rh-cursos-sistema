@@ -337,8 +337,14 @@ describe('validateCourse', () => {
 ```bash
 npm test             # Full suite (E2E + visual + a11y)
 npm run test:e2e:smoke  # Quick smoke tests
+npm run test:e2e:public # Smoke público, sem mutações no Supabase
 npm run test:a11y    # Accessibility audit
 ```
+
+Os E2E que escrevem no banco só podem rodar com o Environment GitHub `e2e`,
+associado a um projeto Supabase isolado. Consulte
+[E2E isolado no CI](guides/e2e-isolated-supabase-ci.md) antes de configurar ou
+alterar esses segredos.
 
 **Writing E2E tests:**
 ```typescript

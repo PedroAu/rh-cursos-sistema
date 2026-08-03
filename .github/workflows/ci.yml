@@ -65,9 +65,76 @@ jobs:
       - run: npm ci
       - run: npm run test:coverage
 
-  # Lane 3 — Production build + accessibility gate (Axe-core) + E2E smoke.
-  e2e:
-    name: Build & A11y & E2E
+  # Lane 3 — Public build and read-only browser checks. No production or
+  # integration credentials are available to ordinary PR validation.
+  e2e-public:
+    name: Build & A11y
+    if: inputs.production_safe_smoke != true
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_placeholder_key
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      AUTH_SESSION_SECRET: ci-auth-session-secret-placeholder-32
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      # O baseline Playwright elimina dependências de dados remotos nesta lane.
+      - name: Build deterministic Playwright baseline
+        run: node scripts/build-playwright-app.mjs
+      - name: Accessibility gate (Axe-core WCAG 2.1 A/AA)
+        run: npm run test:a11y:baseline
+
+  # Lane 3b — Full E2E (including the public crawl) against the dedicated
+  # Supabase test project. This job
+  # is intentionally unavailable to fork PRs: GitHub does not expose secrets
+  # there, and pull_request_target would expose credentials to untrusted code.
+  e2e-integration:
+    name: E2E Integration (isolated Supabase)
+    if: >-
+      github.event_name != 'workflow_call' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    environment: e2e
+    concurrency:
+      group: e2e-supabase-isolated
+      cancel-in-progress: false
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL: ${{ secrets.E2E_SUPABASE_FUNCTIONS_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.E2E_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_ROLE_KEY }}
+      AUTH_SESSION_SECRET: ${{ secrets.E2E_AUTH_SESSION_SECRET }}
+      E2E_ALLOW_DATABASE_WRITES: '1'
+      E2E_TARGET_KIND: isolated-test
+      E2E_SUPABASE_PROJECT_REF: ${{ vars.E2E_SUPABASE_PROJECT_REF }}
+      E2E_PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Full E2E suite with isolated writes
+        run: npm run test:e2e:smoke
+
+  # Lane 3c — The production pipeline invokes this reusable workflow with an
+  # explicit opt-in. It remains read-only and never receives E2E write flags.
+  e2e-production-smoke:
+    name: Production-safe smoke
+    if: inputs.production_safe_smoke == true
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -82,15 +149,8 @@ jobs:
       - run: npm run build
       - name: Accessibility gate (Axe-core WCAG 2.1 A/AA)
         run: npm run test:a11y
-      - name: E2E smoke
-        run: |
-          if [[ "${PRODUCTION_SAFE_SMOKE}" == "true" ]]; then
-            node scripts/run-playwright.mjs tests/smoke-crawl.spec.ts --grep "páginas públicas" --project=functional
-          else
-            npm run test:e2e:smoke
-          fi
-        env:
-          PRODUCTION_SAFE_SMOKE: ${{ inputs.production_safe_smoke }}
+      - name: Public E2E smoke (read-only)
+        run: npm run test:e2e:public
 
   # Lane 4 — API docs lint/build/drift gate.
   docs-api:
