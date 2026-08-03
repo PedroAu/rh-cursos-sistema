@@ -131,6 +131,7 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 | 2026-08-03 | 1.2 | Corrigida a descoberta de checkout no E2E: a navegação não usa mais `networkidle`, instável com polling e Realtime; ela espera o DOM e o CTA visível. A jornada pública também aguarda apenas os elementos necessários. Validação final depende da CI com Supabase isolado. | @dev (Dex) |
 | 2026-08-03 | 1.3 | Corrigida a fonte da fixture E2E de checkout: usa `turma_publica` e os mesmos filtros públicos de curso, evitando selecionar turma soft-deleted que não produz CTA. Validação final depende da CI com Supabase isolado. | @dev (Dex) |
 | 2026-08-03 | 1.4 | Os cenários de pré-inscrição agora iniciam pela rota canônica `/checkout?classId=` de uma turma pública elegível, em vez de duplicar o teste do CTA no detalhe. Isso mantém o E2E focado em persistência e preserva a cobertura do CTA nos testes unitários de `CourseDetail`. | @dev (Dex) |
+| 2026-08-03 | 1.5 | O cenário E2E de recuperação de senha passa a usar um bucket de rate limit exclusivo e verifica a resposta do novo login antes do redirecionamento, removendo retentativas opacas. Validação final depende da CI com Supabase isolado. | @dev (Dex) |
 
 ## File List
 
@@ -148,4 +149,6 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 - `src/__tests__/lib/app-store.test.ts`
 - `src/__tests__/views/public/course-detail.test.tsx`
 - `tests/helpers/integration-env.ts`
+- `tests/checkout.e2e.spec.ts`
 - `tests/public-journeys.spec.ts`
+- `tests/password-recovery.e2e.spec.ts`
