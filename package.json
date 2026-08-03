@@ -21,6 +21,7 @@
     "test": "node ./scripts/run-vitest.mjs run",
     "test:watch": "node ./scripts/run-vitest.mjs",
     "test:e2e": "playwright test",
+    "test:e2e:env": "node scripts/verify-e2e-environment.mjs",
     "sync:skills:codex": "node .aiox-core/infrastructure/scripts/codex-skills-sync/bootstrap.js",
     "sync:skills:codex:check": "node .aiox-core/infrastructure/scripts/codex-skills-sync/bootstrap.js --dry-run",
     "sync:skills:codex:global": "node .aiox-core/infrastructure/scripts/codex-skills-sync/bootstrap.js --skills-dir \"$HOME/.codex/skills\"",

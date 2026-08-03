@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { E2E_COURSE_SLUG, E2E_COURSE_TITLE } from "./fixtures";
 
-// Real, pre-rendered course slug (confirmed to exist in SSG output).
+// Dedicated fixture seeded into the isolated Supabase project before this suite.
 // NOTE: this specific course's price is "Sob consulta", so its detail-page
 // CTA is "Falar com especialista" -> /especialista, NOT a link to
 // /inscricao/<slug>. There is therefore no real in-app link from this
@@ -8,8 +9,7 @@ import { test, expect } from "@playwright/test";
 // directly by URL for that last hop and assert that the rest of the
 // real link path (home -> catalog -> course detail) works as a user would
 // actually click it.
-const COURSE_SLUG =
-  "curso-pratico-de-atualizacao-do-esocial-novo-leiaute-1-3-para-orgaos-publicos";
+const COURSE_SLUG = E2E_COURSE_SLUG;
 
 test.describe("enrollment flow navigation", () => {
   test("user can reach the course detail page via real links from home", async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe("enrollment flow navigation", () => {
       .click();
     await expect(page).toHaveURL(`/cursos/${COURSE_SLUG}`);
     await expect(
-      page.getByRole("heading", { level: 1, name: /Curso Prático de Atualização do eSocial/i }),
+      page.getByRole("heading", { level: 1, name: E2E_COURSE_TITLE }),
     ).toBeVisible();
   });
 

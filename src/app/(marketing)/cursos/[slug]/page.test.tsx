@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import CourseDetailPage, { generateStaticParams } from "@/app/(marketing)/cursos/[slug]/page";
 import { renderWithProviders } from "@/test/test-utils";
 
@@ -47,6 +47,15 @@ vi.mock("@/lib/public-data", () => ({
 }));
 
 describe("CourseDetailPage", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-07-01T12:00:00.000Z"));
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders the wireframe sections with UI structure and commercial sidebar", async () => {
     renderWithProviders(
       await CourseDetailPage({ params: Promise.resolve({ slug: "dp-estrategico" }) }),

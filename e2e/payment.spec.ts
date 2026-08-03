@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { E2E_COURSE_SLUG } from "./fixtures";
 
-const COURSE_SLUG =
-  "curso-pratico-de-atualizacao-do-esocial-novo-leiaute-1-3-para-orgaos-publicos";
+const COURSE_SLUG = E2E_COURSE_SLUG;
 
 test.describe("Pix/Boleto checkout", () => {
   test.beforeEach(async ({ page }) => {
