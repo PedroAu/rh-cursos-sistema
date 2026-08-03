@@ -29,10 +29,10 @@ jobs:
       ASAAS_WEBHOOK_AUTH_TOKEN: ci_asaas_webhook_placeholder_token
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -67,10 +67,10 @@ jobs:
       E2E_PRODUCTION_PROJECT_REF: ${{ vars.PRODUCTION_SUPABASE_PROJECT_REF }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
@@ -80,6 +80,9 @@ jobs:
 
       - name: Validate isolated E2E target
         run: npm run test:e2e:env
+
+      - name: Seed isolated E2E fixture
+        run: node scripts/seed-e2e-supabase.mjs
 
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium

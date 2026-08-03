@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { E2E_COURSE_SLUG } from "./fixtures";
 
-const COURSE_SLUG =
-  "curso-pratico-de-atualizacao-do-esocial-novo-leiaute-1-3-para-orgaos-publicos";
+const COURSE_SLUG = E2E_COURSE_SLUG;
 
 const routes: Array<{ name: string; path: string }> = [
   { name: "home", path: "/" },
