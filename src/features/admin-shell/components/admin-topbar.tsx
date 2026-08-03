@@ -15,7 +15,7 @@ export function AdminTopbar({
   role: DashboardRole;
 }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-40 flex h-[72px] items-center gap-3 border-b border-[#d9dee7] bg-white/96 px-4 backdrop-blur-md sm:px-5 lg:left-[248px] lg:px-6">
+    <header className="fixed inset-x-0 top-0 z-40 flex h-[72px] items-center gap-3 border-b border-tk-line bg-tk-surface/96 px-4 backdrop-blur-md sm:px-5 lg:left-[248px] lg:px-6">
       <Button
         variant="ghost"
         size="icon"

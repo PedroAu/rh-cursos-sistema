@@ -14,7 +14,7 @@ export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
   return (
     <nav
       aria-label="Navegação administrativa"
-      className="fixed inset-x-0 bottom-0 z-[120] border-t border-[#d5dae2] bg-white/98 px-2 pt-2 shadow-lg lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-[120] border-t border-tk-line bg-tk-surface px-2 pt-2 shadow-lg lg:hidden"
       style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.4rem)" }}
     >
       <div className="grid grid-cols-5 gap-1.5">
@@ -32,7 +32,7 @@ export function AdminBottomNavigation({ role }: { role: DashboardRole }) {
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex min-h-[68px] flex-col items-center justify-center gap-1.5 rounded-2xl",
-                isActive ? "bg-[#0e4666] text-white" : "text-[#5f6876]"
+                isActive ? "bg-tk-accent-soft text-tk-brand" : "text-tk-ink-muted"
               )}
             >
               <Icon size={17} />

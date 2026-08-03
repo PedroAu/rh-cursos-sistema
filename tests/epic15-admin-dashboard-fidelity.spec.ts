@@ -35,8 +35,8 @@ test.describe("epic 15 — admin dashboard fidelidade total", () => {
     // ("Nenhum lead ... nos últimos 30 dias."), que também contém a frase.
     await expect(page.getByText(/,\s*\d{1,2}\s+de\s+\S+\s+de\s+\d{4}\s+·\s+últimos 30 dias/)).toBeVisible();
     await expect(page.getByRole("link", { name: "Ver site →" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Novo curso" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Nova turma" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Novo curso" })).toHaveAttribute("href", "/admin/cursos?action=create");
+    await expect(page.getByRole("link", { name: "Nova turma" })).toHaveAttribute("href", "/admin/turmas?action=create");
 
     await expect(page.getByText("Matrículas no mês", { exact: true })).toBeVisible();
     await expect(page.getByText("Leads novos", { exact: true })).toBeVisible();
@@ -62,6 +62,23 @@ test.describe("epic 15 — admin dashboard fidelidade total", () => {
     const allChip = page.getByRole("button", { name: "Todas", exact: true });
     await expect(allChip).toBeVisible();
     await expect(allChip).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("ações do dashboard abrem os formulários administrativos reais", async ({ context, page, baseURL }) => {
+    await loginAsAdmin(context, baseURL ?? "http://127.0.0.1:3100");
+    await page.goto("/admin");
+
+    await page.getByRole("link", { name: "Novo curso" }).click();
+    await expect(page).toHaveURL(/\/admin\/cursos\?action=create/);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Criar novo registro" })).toBeVisible();
+
+    await page.getByRole("button", { name: "Fechar" }).click();
+    await page.goto("/admin");
+    await page.getByRole("link", { name: "Nova turma" }).click();
+    await expect(page).toHaveURL(/\/admin\/turmas\?action=create/);
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Criar novo registro" })).toBeVisible();
   });
 
   test("responsivo <1024px reaproveita navegação inferior sem overflow horizontal na página", async ({ context, page, baseURL }) => {

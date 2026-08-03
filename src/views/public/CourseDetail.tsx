@@ -357,7 +357,7 @@ export function CourseDetailPage() {
         <div className="mx-auto max-w-[1180px] overflow-hidden rounded-[20px] border border-[var(--tk-border)] bg-[var(--tk-surface)] shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)]">
           <div className="grid min-w-0 xl:grid-cols-[minmax(0,1fr)_372px]">
             <div className="min-w-0">
-              <header className="border-b border-[var(--tk-border)] bg-[radial-gradient(circle_at_50%_-10%,#f7f9fc_30%,#ebf3ff_130%)] px-4 py-10 sm:px-8 sm:py-11 lg:px-10 lg:py-14">
+              <header className="border-b border-[var(--tk-border)] bg-[var(--tk-gradient-soft)] px-4 py-10 sm:px-8 sm:py-11 lg:px-10 lg:py-14">
                 <div className="max-w-[660px]">
                   <div className="mb-5 flex items-center gap-2 text-caption text-tk-ink-muted">
                     <Link to="/" className="hover:text-tk-ink">
@@ -597,7 +597,7 @@ export function CourseDetailPage() {
                       <div className="min-w-0 flex-1">
                         <div className="mb-3 flex gap-1" aria-label={`Avaliação ${testimonial.rating} de 5`}>
                           {Array.from({ length: testimonial.rating }).map((_, index) => (
-                            <Star key={`star-${index}`} aria-hidden="true" className="h-4 w-4 fill-[#e8a33d] text-[#e8a33d]" />
+                            <Star key={`star-${index}`} aria-hidden="true" className="h-4 w-4 fill-tk-accent text-tk-accent" />
                           ))}
                         </div>
                         <blockquote id="depoimento" className="font-tk-serif text-[1.05rem] font-normal leading-7 text-tk-ink">

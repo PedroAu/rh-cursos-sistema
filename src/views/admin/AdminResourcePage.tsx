@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, Download, Eye, Pencil, Plus, Search, Trash2, Upload, X } from "lucide-react";
 import { isValidElement, useEffect, useId, useMemo, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -127,6 +127,9 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const store = useAppStore();
   const [search, setSearch] = useState("");
   const [leadOrigin, setLeadOrigin] = useState<LeadOrigin | "all">("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -134,6 +137,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
   const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
   const [formSnapshot, setFormSnapshot] = useState("");
   const previousOpenRef = useRef(open);
+  const [createAction, setCreateAction] = useState(false);
 
   useEffect(() => {
     if (open && !previousOpenRef.current) {
@@ -151,6 +155,17 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     () => serializeFormSnapshot(form) !== formSnapshot,
     [form, formSnapshot]
   );
+
+  useEffect(() => {
+    setPage(1);
+    setDetailId(null);
+  }, [leadOrigin, resource, search]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("action") === "create") {
+      setCreateAction(true);
+    }
+  }, []);
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
     if (nextOpen) {
@@ -215,6 +230,28 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
       : [],
     [resource, store.leads]
   );
+  const pageCount = Math.max(1, Math.ceil(visibleRows.length / pageSize));
+  const pagedRows = useMemo(
+    () => visibleRows.slice((page - 1) * pageSize, page * pageSize),
+    [page, pageSize, visibleRows]
+  );
+  const detailRow = detailId ? visibleRows.find((row) => row.id === detailId) ?? null : null;
+
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount);
+    if (detailId && !detailRow) setDetailId(null);
+  }, [detailId, detailRow, page, pageCount]);
+
+  useEffect(() => {
+    if (!createAction || open) return;
+
+    setEditingId(null);
+    setForm(getDefaultFormState(resource));
+    setValidationErrors([]);
+    setOpen(true);
+
+    setCreateAction(false);
+  }, [createAction, open, resource]);
   const canCreate = true;
   const pageTitle = getPageTitle(resource, config.title);
   const pageDescription = getPageDescription(resource, config.description);
@@ -226,6 +263,13 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  function handleDelete(row: { id: string }) {
+    const label = `${pageTitle.toLocaleLowerCase("pt-BR")} ${row.id}`;
+    if (!window.confirm(`Excluir ${label}? Esta ação não pode ser desfeita.`)) return;
+    config.onDelete?.(row);
+    if (detailId === row.id) setDetailId(null);
   }
 
   function getFieldSpan(field: FieldConfig) {
@@ -334,6 +378,16 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         </div>
       )}
 
+      {detailRow ? (
+        <ResourceDetail
+          title={`${pageTitle} · ${detailRow.id}`}
+          columns={config.columns as Array<{ key: string; label: string; render: (row: unknown) => ReactNode }>}
+          row={detailRow}
+          onBack={() => setDetailId(null)}
+          onEdit={() => config.onEdit(detailRow)}
+        />
+      ) : null}
+
       <Panel className="p-6">
         {resource === "leads" ? (
           <div className="mb-6 border-b border-tk-line pb-5">
@@ -385,8 +439,9 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         </div>
 
         {visibleRows.length && resource === "instructors" ? (
+          <>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3" data-testid="instructor-card-grid">
-            {(visibleRows as Instructor[]).map((instructor) => {
+            {(pagedRows as Instructor[]).map((instructor) => {
               const courseCount = store.courses.filter((course) => instructor.courseIds.includes(course.id)).length;
               const activeClassCount = store.classes.filter(
                 (trainingClass) => trainingClass.instructorId === instructor.id && trainingClass.status !== "Encerrada"
@@ -413,11 +468,14 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                     </div>
                   </dl>
                   <div className="mt-5 flex justify-end gap-2">
+                    <Button variant="ghost" onClick={() => setDetailId(instructor.id)} aria-label={`Ver detalhes de ${instructor.name}`}>
+                      <Eye className="h-4 w-4" /> Detalhes
+                    </Button>
                     <Button variant="outline" onClick={() => config.onEdit(instructor)}>
                       <Pencil className="h-4 w-4" /> Editar
                     </Button>
                     {config.onDelete ? (
-                      <IconButton label={`Excluir instrutor ${instructor.name}`} tone="danger" onClick={() => config.onDelete?.(instructor)}>
+                      <IconButton label={`Excluir instrutor ${instructor.name}`} tone="danger" onClick={() => handleDelete(instructor)}>
                         <Trash2 className="h-4 w-4" />
                       </IconButton>
                     ) : null}
@@ -426,7 +484,20 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               );
             })}
           </div>
+          <ResourcePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            total={visibleRows.length}
+            onPageChange={setPage}
+            onPageSizeChange={(nextSize) => {
+              setPageSize(nextSize);
+              setPage(1);
+            }}
+          />
+          </>
         ) : resource !== "instructors" ? (
+          <>
           <Table aria-label={config.title} className="min-w-[860px]">
             <TableHeader className="bg-tk-surface-2">
               <TableRow className="hover:bg-tk-surface-2">
@@ -437,13 +508,19 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {visibleRows.map((row) => (
+              {pagedRows.map((row) => (
                 <TableRow key={row.id}>
                   {(config.columns as Array<{ key: string; label: string; render: (row: unknown) => unknown }>).map((column) => (
                     <TableCell key={`${row.id}-${column.key}`}>{column.render(row) as ReactNode}</TableCell>
                   ))}
                   <TableCell>
                     <div className="flex justify-end gap-2">
+                      <IconButton
+                        label={`Ver detalhes do item ${row.id}`}
+                        onClick={() => setDetailId(row.id)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </IconButton>
                       <IconButton
                         label={`Editar item ${row.id}`}
                         onClick={() => config.onEdit(row)}
@@ -454,7 +531,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
                         <IconButton
                           label={`Excluir item ${row.id}`}
                           tone="danger"
-                          onClick={() => config.onDelete?.(row)}
+                          onClick={() => handleDelete(row)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </IconButton>
@@ -477,6 +554,18 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
               ) : null}
             </TableBody>
           </Table>
+          <ResourcePagination
+            page={page}
+            pageCount={pageCount}
+            pageSize={pageSize}
+            total={visibleRows.length}
+            onPageChange={setPage}
+            onPageSizeChange={(nextSize) => {
+              setPageSize(nextSize);
+              setPage(1);
+            }}
+          />
+          </>
         ) : (
           <div className="rounded-2xl bg-tk-surface-2 p-8 text-center">
             <p className="font-semibold text-tk-ink">Nenhum registro encontrado.</p>
@@ -579,6 +668,102 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
 
 function Panel({ children, className }: { children: ReactNode; className?: string }) {
   return <section className={cn("rounded-3xl border border-tk-line bg-tk-surface shadow-tk-card", className)}>{children}</section>;
+}
+
+function ResourceDetail({
+  title,
+  columns,
+  row,
+  onBack,
+  onEdit
+}: {
+  title: string;
+  columns: Array<{ key: string; label: string; render: (row: unknown) => ReactNode }>;
+  row: unknown;
+  onBack: () => void;
+  onEdit: () => void;
+}) {
+  return (
+    <Panel className="overflow-hidden">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-tk-line px-6 py-5">
+        <div>
+          <button
+            type="button"
+            onClick={onBack}
+            className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-tk-ink-muted hover:text-tk-brand"
+          >
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /> Voltar para a lista
+          </button>
+          <h2 className="text-2xl font-bold text-tk-ink">{title}</h2>
+        </div>
+        <Button variant="outline" onClick={onEdit}>
+          <Pencil className="h-4 w-4" aria-hidden="true" /> Editar
+        </Button>
+      </div>
+      <dl className="grid gap-4 p-6 sm:grid-cols-2 xl:grid-cols-3">
+        {columns.map((column) => (
+          <div key={column.key} className="rounded-2xl bg-tk-surface-2 p-4">
+            <dt className="text-xs font-bold uppercase tracking-[0.12em] text-tk-ink-muted">{column.label}</dt>
+            <dd className="mt-2 text-sm font-semibold text-tk-ink">{column.render(row)}</dd>
+          </div>
+        ))}
+      </dl>
+    </Panel>
+  );
+}
+
+function ResourcePagination({
+  page,
+  pageCount,
+  pageSize,
+  total,
+  onPageChange,
+  onPageSizeChange
+}: {
+  page: number;
+  pageCount: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+}) {
+  const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
+  const to = Math.min(page * pageSize, total);
+
+  return (
+    <div role="navigation" className="flex min-w-0 flex-wrap items-center justify-between gap-4 overflow-hidden border-t border-tk-line px-2 pt-4 text-sm text-tk-ink-muted" aria-label="Paginação">
+      <span>Mostrando {from}–{to} de {total}</span>
+      <div className="flex min-w-0 max-w-full flex-wrap items-center gap-3">
+        <label className="flex items-center gap-2">
+          Por página
+          <select
+            aria-label="Itens por página"
+            value={pageSize}
+            onChange={(event) => onPageSizeChange(Number(event.target.value))}
+            className="rounded-lg border border-tk-line bg-tk-surface px-2 py-1.5 text-tk-ink"
+          >
+            {[5, 10, 25].map((size) => <option key={size} value={size}>{size}</option>)}
+          </select>
+        </label>
+        <div className="flex max-w-full flex-wrap items-center gap-1" role="group" aria-label="Páginas">
+          <button type="button" aria-label="Página anterior" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="h-8 min-w-8 rounded-lg px-2 hover:bg-tk-surface-2 disabled:opacity-40">‹</button>
+          {Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => (
+            <button
+              key={number}
+              type="button"
+              aria-label={`Página ${number}`}
+              aria-current={number === page ? "page" : undefined}
+              onClick={() => onPageChange(number)}
+              className={cn("h-8 min-w-8 rounded-lg px-2 font-semibold hover:bg-tk-surface-2", number === page && "bg-tk-brand text-white hover:bg-tk-brand")}
+            >
+              {number}
+            </button>
+          ))}
+          <button type="button" aria-label="Próxima página" disabled={page >= pageCount} onClick={() => onPageChange(page + 1)} className="h-8 min-w-8 rounded-lg px-2 hover:bg-tk-surface-2 disabled:opacity-40">›</button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function IconButton({

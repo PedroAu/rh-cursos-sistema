@@ -344,7 +344,7 @@ export function CourseCheckoutPage() {
     <section className="bg-[var(--tk-surface-2)] py-8 sm:py-10">
       <div className="mx-auto max-w-[1180px] px-4 sm:px-8 lg:px-10">
         <div className="overflow-hidden rounded-[20px] border border-tk-line bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)]">
-          <header className="border-b border-tk-line bg-[radial-gradient(circle_at_50%_-20%,#f7f9fc_30%,#ebf3ff_130%)] px-6 py-8 md:px-10">
+          <header className="border-b border-tk-line bg-[var(--tk-gradient-soft)] px-6 py-8 md:px-10">
             <div className="mx-auto max-w-[1100px]">
               <div className="mb-5 flex flex-wrap items-center gap-2 text-caption text-tk-ink-muted">
                 <Link to="/">Home</Link>
@@ -405,7 +405,7 @@ export function CourseCheckoutPage() {
                       >
                         <span
                           className={cn(
-                            "h-4 w-4 shrink-0 rounded-full border-2 shadow-[inset_0_0_0_2.5px_#fff]",
+                            "h-4 w-4 shrink-0 rounded-full border-2 shadow-[inset_0_0_0_2.5px_var(--tk-surface)]",
                             checked ? "border-tk-brand bg-tk-brand" : "border-tk-line bg-white",
                           )}
                         />
@@ -415,7 +415,7 @@ export function CourseCheckoutPage() {
                             {trainingClass.modality} · {trainingClass.time}
                           </span>
                         </span>
-                        <span className="rounded-full bg-[#e6f4ef] px-2.5 py-1 text-[11px] font-semibold text-tk-success">
+                        <span className="rounded-full bg-tk-accent-soft px-2.5 py-1 text-[11px] font-semibold text-tk-success">
                           Solicitações abertas
                         </span>
                       </button>
@@ -547,14 +547,14 @@ export function CourseCheckoutPage() {
                     <span>Autorizo o uso dos dados enviados e o contato sobre esta pré-inscrição.</span>
                   </label>
                   {fieldErrors.acceptedTerms ? (
-                    <div className="mt-3 rounded-lg border border-[#f7ccd2] bg-[#fdeef0] px-3 py-2 text-sm text-tk-error" role="alert">
+                    <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-tk-error" role="alert">
                       {fieldErrors.acceptedTerms}
                     </div>
                   ) : null}
                 </div>
 
                 {submitError ? (
-                  <div className="mt-4 rounded-lg border border-[#f7ccd2] bg-[#fdeef0] px-4 py-3 text-sm text-tk-error" role="alert">
+                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-tk-error" role="alert">
                     {submitError}
                   </div>
                 ) : null}
@@ -596,7 +596,7 @@ export function CourseCheckoutPage() {
                 </div>
               </div>
 
-              <div className="flex gap-3 rounded-2xl border border-[#bfe0e9] bg-tk-accent-soft px-5 py-4 text-sm leading-6 text-tk-ink-muted">
+              <div className="flex gap-3 rounded-2xl border border-tk-accent bg-tk-accent-soft px-5 py-4 text-sm leading-6 text-tk-ink-muted">
                 <ClipboardCheck className="mt-0.5 h-5 w-5 shrink-0 text-tk-brand" aria-hidden="true" />
                 <p>
                   <strong className="text-tk-ink">Esta é uma solicitação.</strong> O envio não confirma vaga nem gera cobrança.

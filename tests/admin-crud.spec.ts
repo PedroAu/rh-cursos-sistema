@@ -398,6 +398,7 @@ async function deleteRowByName(page: Page, name: string) {
   const rowName = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const row = page.getByRole("row", { name: rowName });
   await expect(row).toBeVisible();
+  page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: /^Excluir item/ }).click();
 
   await expect
@@ -593,12 +594,9 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
   });
 
   test("turmas: cria vinculada a um curso existente e exclui", async ({ page }) => {
-    // Data futura pouco provável de colidir com turma real — usada depois
-    // para localizar a linha, já que turma não tem campo de nome único.
     const day = String((Date.now() % 20) + 1).padStart(2, "0");
     const nextDay = String(Number(day) + 1).padStart(2, "0");
     const startDate = `2027-03-${day}`;
-    const startDateLabel = `${day}/03/2027`;
     const endDate = `2027-03-${nextDay}`;
     await page.goto("/admin/turmas");
 
@@ -618,16 +616,27 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     // sempre para não depender de qual modalidade o curso sorteado tem.
     await fillText(dialog, "Local", "Sala virtual (E2E)");
 
-    await saveAndExpectSuccess(page, dialog);
+    const { id } = await saveAndExpectSuccess(page, dialog, {
+      resource: "classes",
+      action: "upsert",
+      requireId: true,
+    });
 
     await pageSearchField(page).fill(courseTitle);
-    const row = page.getByRole("row", { name: new RegExp(startDateLabel) });
+    const row = page.locator("tr").filter({
+      has: page.getByRole("button", { name: `Excluir item ${id}` }),
+    });
     await expect(row).toBeVisible();
+    page.once("dialog", (dialog) => dialog.accept());
     await row.getByRole("button", { name: /^Excluir item/ }).click();
     await expect(row).toBeHidden();
   });
 
   test("instrutores: cria só com os campos obrigatórios e exclui", async ({ page }) => {
+    // A criação passa pela Edge Function e a leitura seguinte pelo PostgREST.
+    // O polling já prevê até 60s de consistência; o timeout padrão do teste
+    // (30s) não pode interrompê-lo antes.
+    test.setTimeout(75_000);
     const name = `${MARKER} instrutor`;
     await page.goto("/admin/instrutores");
 
