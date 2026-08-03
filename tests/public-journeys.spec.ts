@@ -128,7 +128,6 @@ test.describe("epica 4 — jornadas publicas", () => {
     try {
       await page.getByRole("button", { name: "Enviar pré-inscrição" }).first().click();
       await expect(page).toHaveURL(/\/checkout/);
-      await page.waitForLoadState("networkidle");
       await expect(page.getByRole("heading", { name: "Enviar pré-inscrição" })).toBeVisible();
       await page.getByRole("button", { name: "Enviar pré-inscrição →" }).click();
 

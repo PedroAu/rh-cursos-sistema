@@ -398,10 +398,19 @@ export async function resolveUsableCheckoutTarget(page: Page, limit = 10) {
   const attempts: string[] = [];
 
   for (const target of targets) {
-    await page.goto(target.coursePath, { waitUntil: "networkidle" });
+    // O App Store mantém polling de sessão e subscriptions Realtime. Portanto,
+    // `networkidle` não é uma condição confiável para saber se o CTA renderizou.
+    // A navegação termina ao carregar o DOM e a disponibilidade é confirmada
+    // explicitamente pelo botão que este helper precisa exercitar.
+    await page.goto(target.coursePath, { waitUntil: "domcontentloaded" });
 
     const button = page.getByRole("button", { name: "Enviar pré-inscrição" }).first();
-    if ((await button.count()) === 0) {
+    const isVisible = await button
+      .waitFor({ state: "visible", timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!isVisible) {
       attempts.push(`${target.coursePath} (CTA ausente)`);
       continue;
     }
