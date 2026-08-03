@@ -130,6 +130,7 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 | 2026-08-03 | 1.1 | Implementados AC1–AC6: visibilidade de turmas separada de elegibilidade de checkout; estados Em breve/Esgotada no detalhe público; CTA sem checkout sem vaga; assinatura Realtime de `turma`; instrutor da próxima turma com fallback determinístico; nível e duração canônica; rating removido. `npm run test:unit` (778), `npm run typecheck`, `npm run lint`, `npm run build` e gates OpenAPI passaram. `npm run test:e2e:smoke` executou, mas não pode validar os casos com escrita sem o Environment Supabase isolado da REC-409; AC7 permanece aberto. | @dev (Dex) |
 | 2026-08-03 | 1.2 | Corrigida a descoberta de checkout no E2E: a navegação não usa mais `networkidle`, instável com polling e Realtime; ela espera o DOM e o CTA visível. A jornada pública também aguarda apenas os elementos necessários. Validação final depende da CI com Supabase isolado. | @dev (Dex) |
 | 2026-08-03 | 1.3 | Corrigida a fonte da fixture E2E de checkout: usa `turma_publica` e os mesmos filtros públicos de curso, evitando selecionar turma soft-deleted que não produz CTA. Validação final depende da CI com Supabase isolado. | @dev (Dex) |
+| 2026-08-03 | 1.4 | Os cenários de pré-inscrição agora iniciam pela rota canônica `/checkout?classId=` de uma turma pública elegível, em vez de duplicar o teste do CTA no detalhe. Isso mantém o E2E focado em persistência e preserva a cobertura do CTA nos testes unitários de `CourseDetail`. | @dev (Dex) |
 
 ## File List
 

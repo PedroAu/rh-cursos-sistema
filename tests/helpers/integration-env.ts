@@ -379,6 +379,17 @@ export async function resolveAvailableCheckoutTarget() {
   return target;
 }
 
+export async function openAvailableCheckout(page: Page) {
+  const target = await resolveAvailableCheckoutTarget();
+
+  await page.goto(`${target.coursePath}/checkout?classId=${target.classId}`, {
+    waitUntil: "domcontentloaded",
+  });
+  await page.getByRole("heading", { name: "Enviar pré-inscrição" }).waitFor({ state: "visible" });
+
+  return target;
+}
+
 export async function resolveAvailableTrainingPath(): Promise<TrainingPathTarget> {
   const supabase = createServiceRoleClient();
   const { data, error } = await supabase
