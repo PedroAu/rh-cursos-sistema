@@ -29,12 +29,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
 import { isTrainingClassSoldOut, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { Link, useSearchParams } from "@/lib/router-compat";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency, parseDate } from "@/lib/utils";
 import type { Course, Instructor, TrainingClass } from "@/types";
 
 type AgendaMode = "Online" | "Presencial";
@@ -142,7 +142,7 @@ function buildAgendaEntries(courses: Course[], classes: TrainingClass[], instruc
         return null;
       }
 
-      const date = new Date(trainingClass.startDate);
+      const date = parseDate(trainingClass.startDate);
       const mode = normalizeAgendaMode(trainingClass);
       const spot = createSpotMeta(trainingClass);
 
@@ -209,6 +209,7 @@ export function AgendaPage() {
   const [sort, setSort] = useState<SortMode>((params.get("sort") as SortMode) || "data");
   const [view, setView] = useState<AgendaView>((params.get("view") as AgendaView) || "lista");
   const searchRef = useRef<HTMLInputElement>(null);
+  const debouncedQuery = useDebouncedValue(query);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -244,7 +245,7 @@ export function AgendaPage() {
   );
 
   const filteredEntries = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = debouncedQuery.trim().toLowerCase();
     const next = agendaEntries.filter((entry) => {
       const matchesQuery =
         !normalizedQuery ||
@@ -280,7 +281,7 @@ export function AgendaPage() {
     }
 
     return next;
-  }, [agendaEntries, area, city, mode, query, sort]);
+  }, [agendaEntries, area, city, debouncedQuery, mode, sort]);
 
   const [calendarDate, setCalendarDate] = useState(() => {
     if (filteredEntries[0]) {
@@ -293,8 +294,8 @@ export function AgendaPage() {
   useEffect(() => {
     const next = new URLSearchParams();
 
-    if (query.trim()) {
-      next.set("q", query.trim());
+    if (debouncedQuery.trim()) {
+      next.set("q", debouncedQuery.trim());
     }
 
     if (mode) {
@@ -318,7 +319,7 @@ export function AgendaPage() {
     }
 
     setParams(next);
-  }, [area, city, mode, query, setParams, sort, view]);
+  }, [area, city, debouncedQuery, mode, setParams, sort, view]);
 
   useEffect(() => {
     if (!filteredEntries.length) {
@@ -332,7 +333,6 @@ export function AgendaPage() {
     }
   }, [calendarDate, filteredEntries]);
 
-  const loading = useSimulatedLoading([query, mode, area, city, sort, view], 350);
   const hasActiveFilters = Boolean(query || mode || area || city || sort !== "data");
 
   const activeChips = [
@@ -576,16 +576,14 @@ export function AgendaPage() {
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 xl:px-10">
           <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-tk-ink">
-              <strong className="font-semibold">{loading ? "..." : filteredEntries.length}</strong> {formatResultsLabel(filteredEntries.length)}
+              <strong className="font-semibold">{filteredEntries.length}</strong> {formatResultsLabel(filteredEntries.length)}
             </p>
             <Link to="/cursos" className="text-sm font-medium text-tk-accent-strong transition hover:text-tk-brand-hover">
               Ver catálogo completo →
             </Link>
           </div>
 
-          {loading ? (
-            <div className="py-16 text-center text-tk-ink-muted">Atualizando agenda...</div>
-          ) : filteredEntries.length ? (
+          {filteredEntries.length ? (
             view === "calendario" ? (
               <section>
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

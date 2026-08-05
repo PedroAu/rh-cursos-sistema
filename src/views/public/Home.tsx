@@ -15,7 +15,7 @@ import { Chip } from "@/components/ui/chip";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
 import { Link } from "@/lib/router-compat";
-import { cn } from "@/lib/utils";
+import { cn, parseDate } from "@/lib/utils";
 
 type JourneyCard = {
   badge: string;
@@ -120,7 +120,7 @@ const testimonials = [
 ] as const;
 
 function getClassDateParts(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
 
   return {
     day: new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date),
@@ -150,7 +150,7 @@ export function HomePage() {
   const sectionContainerClass = "mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]";
 
   const upcomingClasses = [...classes]
-    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime())
+    .sort((left, right) => parseDate(left.startDate).getTime() - parseDate(right.startDate).getTime())
     .slice(0, 3)
     .map((trainingClass) => ({
       ...trainingClass,

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { SeatProgress } from "@/components/admin/seat-progress";
 import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
+import { parseDate } from "@/lib/utils";
 import { toOccupancyPercent } from "@/lib/occupancy";
 import {
   COURSE_LEVEL_OPTIONS,
@@ -159,9 +160,12 @@ type ConfigDeps = {
 
 import React from "react";
 
-function normalizeDateTimeForStorage(value?: string, fallbackHour = "09:00:00.000Z") {
-  if (!value) return new Date().toISOString();
-  return `${value}T${fallbackHour}`;
+function normalizeDateForStorage(value?: string) {
+  // `turma.data_inicio`/`data_fim` are PostgreSQL `date` columns. Keep these
+  // values date-only; appending a UTC time makes the browser reinterpret the
+  // business date in the user's timezone and can display the previous day.
+  if (!value) return new Date().toISOString().slice(0, 10);
+  return value.slice(0, 10);
 }
 
 function formatAdminDate(value?: string) {
@@ -261,8 +265,8 @@ function deriveEnrollmentOperationalStatus(
   }
 
   const now = Date.now();
-  const startsAt = new Date(trainingClass.startDate).getTime();
-  const endsAt = new Date(trainingClass.endDate).getTime();
+  const startsAt = parseDate(trainingClass.startDate).getTime();
+  const endsAt = parseDate(trainingClass.endDate).getTime();
 
   if (enrollment.status === "Confirmada") {
     if (endsAt < now) return "Confirmada em turma encerrada. Revisar conclusão.";
@@ -327,7 +331,7 @@ export function buildResourceConfig(
       const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
       const enrolledStudents = store.students.length;
       const upcomingClasses = store.classes.filter((item) => {
-        const startsAt = new Date(item.startDate).getTime();
+        const startsAt = parseDate(item.startDate).getTime();
         return startsAt >= Date.now();
       }).length;
       const completedEnrollments = store.enrollments.filter((item) => item.status === "Concluída").length;
@@ -620,7 +624,7 @@ export function buildResourceConfig(
         (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
       ).length;
       const startingClasses = store.classes.filter((item) => {
-        const startsAt = new Date(item.startDate).getTime();
+        const startsAt = parseDate(item.startDate).getTime();
         const now = Date.now();
         return startsAt >= now && startsAt <= now + 30 * 86400_000;
       }).length;
@@ -728,8 +732,8 @@ export function buildResourceConfig(
             await store.upsertClass({
               id: editingId ?? undefined,
               courseId: str(form.courseId),
-              startDate: normalizeDateTimeForStorage(str(form.startDate)),
-              endDate: normalizeDateTimeForStorage(str(form.endDate), "18:00:00.000Z"),
+              startDate: normalizeDateForStorage(str(form.startDate)),
+              endDate: normalizeDateForStorage(str(form.endDate)),
               time: str(form.time),
               modality: str(form.modality) as TrainingClass["modality"],
               status: str(form.status) as TrainingClass["status"],

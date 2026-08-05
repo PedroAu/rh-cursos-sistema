@@ -27,26 +27,26 @@ import {
   isTrainingClassSoldOut,
 } from "@/lib/enrollment-class-resolution";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency, parseDate } from "@/lib/utils";
 import type { Course, Instructor, Testimonial, TrainingClass } from "@/types";
 
 const MONTH_SHORT_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"] as const;
 
 function formatDateShort(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
   const day = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date);
 
   return `${day} ${MONTH_SHORT_LABELS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatMonthYearShort(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
   return `${MONTH_SHORT_LABELS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatDateRange(trainingClass: TrainingClass) {
-  const start = new Date(trainingClass.startDate);
-  const end = new Date(trainingClass.endDate);
+  const start = parseDate(trainingClass.startDate);
+  const end = parseDate(trainingClass.endDate);
   const sameMonth = start.getMonth() === end.getMonth();
   const sameYear = start.getFullYear() === end.getFullYear();
 

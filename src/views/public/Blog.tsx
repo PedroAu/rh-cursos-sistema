@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
 import {
   isClientPublicTestBaselineEnabled,
@@ -125,14 +125,31 @@ export function BlogPage() {
   const [newsletterName, setNewsletterName] = useState("");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+  const debouncedQuery = useDebouncedValue(query);
+
+  useEffect(() => {
+    if (effectiveBlogPosts.length > 0) {
+      setIsInitialLoading(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setIsInitialLoading(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [effectiveBlogPosts.length]);
 
   useEffect(() => {
     const params: Record<string, string> = {};
-    if (query) params.q = query;
+    if (debouncedQuery) params.q = debouncedQuery;
     if (category !== "Todos") params.category = category;
+
+    if ((searchParams.get("q") ?? "") === (params.q ?? "") && (searchParams.get("category") ?? "") === (params.category ?? "")) {
+      return;
+    }
+
     setSearchParams(params);
-  }, [category, query, setSearchParams]);
+  }, [category, debouncedQuery, searchParams, setSearchParams]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -151,7 +168,7 @@ export function BlogPage() {
   );
 
   const filteredPosts = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = debouncedQuery.trim().toLowerCase();
 
     return publishedPosts.filter((post) => {
       const displayCategory = normalizeBlogCategory(post.category);
@@ -161,9 +178,9 @@ export function BlogPage() {
 
       return matchesCategory && matchesQuery;
     });
-  }, [category, publishedPosts, query]);
+  }, [category, debouncedQuery, publishedPosts]);
 
-  const isEditorialDefault = !query.trim() && category === "Todos";
+  const isEditorialDefault = !debouncedQuery.trim() && category === "Todos";
   const featuredPost = isEditorialDefault
     ? publishedPosts.find((post) => post.slug === curatedFeaturedSlug) ?? filteredPosts[0]
     : filteredPosts[0];
@@ -185,7 +202,6 @@ export function BlogPage() {
         })),
     [publishedPosts]
   );
-  const loading = useSimulatedLoading([query, category]);
   const visibleCount = isEditorialDefault ? 9 : filteredPosts.length;
 
   const submitNewsletter = async () => {
@@ -356,13 +372,14 @@ export function BlogPage() {
 
       <section className="pb-16">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
-          {loading ? (
+          {isInitialLoading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="h-[420px] animate-pulse rounded-[24px] bg-tk-surface-2" />
               ))}
             </div>
-          ) : gridPosts.length ? (
+          ) : filteredPosts.length ? (
+            gridPosts.length ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {gridPosts.map((post) => {
                 const presentation = getPresentation(post);
@@ -392,6 +409,7 @@ export function BlogPage() {
                 );
               })}
             </div>
+            ) : null
           ) : (
             <Card className="rounded-[24px] border-tk-line bg-tk-surface">
               <CardContent className="p-10 text-center">

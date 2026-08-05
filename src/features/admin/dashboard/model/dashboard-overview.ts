@@ -1,6 +1,7 @@
 import type { Course, Enrollment, Lead, TrainingClass } from "@/types";
 import { formatRelativeTime } from "@/features/admin/dashboard/model/dashboard-activity";
 import { toOccupancyPercent } from "@/lib/occupancy";
+import { parseDate } from "@/lib/utils";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MONTH_ABBREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
@@ -69,7 +70,7 @@ export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiIn
 
   const turmasAbertas = classes.filter((item) => item.status === "Inscrições abertas");
   const turmasProximas = turmasAbertas.filter((item) => {
-    const t = new Date(item.startDate).getTime();
+    const t = parseDate(item.startDate).getTime();
     return !Number.isNaN(t) && t >= now && t - now <= 45 * DAY_MS;
   }).length;
 
@@ -180,13 +181,13 @@ type UpcomingClassInput = {
 export function buildUpcomingClasses({ classes, courses }: UpcomingClassInput, now: number = Date.now(), limit = 4): UpcomingClassCard[] {
   return classes
     .filter((item) => {
-      const t = new Date(item.startDate).getTime();
+    const t = parseDate(item.startDate).getTime();
       return !Number.isNaN(t) && t >= now && item.status !== "Encerrada";
     })
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    .sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime())
     .slice(0, limit)
     .map((item) => {
-      const start = new Date(item.startDate);
+    const start = parseDate(item.startDate);
       const course = courses.find((entry) => entry.id === item.courseId);
       const occupancyPct = toOccupancyPercent(item.filledSeats, item.totalSeats);
       const availableSeats = Math.max(item.availableSeats, 0);

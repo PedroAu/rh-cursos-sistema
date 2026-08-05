@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { cn, slugify, currency, formatDate, delay } from '@/lib/utils';
+import { cn, slugify, currency, formatDate, parseDate, delay } from '@/lib/utils';
 
 describe('Utils', () => {
   describe('cn', () => {
@@ -122,6 +122,21 @@ describe('Utils', () => {
   });
 
   describe('formatDate', () => {
+    it('keeps a date-only value on the requested calendar day', () => {
+      const result = formatDate('2026-08-10');
+
+      expect(result).toContain('10');
+      expect(result).toContain('2026');
+    });
+
+    it('parses date-only values as local calendar parts', () => {
+      const result = parseDate('2026-08-10');
+
+      expect(result.getFullYear()).toBe(2026);
+      expect(result.getMonth()).toBe(7);
+      expect(result.getDate()).toBe(10);
+    });
+
     it('should format ISO date string', () => {
       const result = formatDate('2024-01-15T10:30:00Z');
       expect(result).toContain('15');

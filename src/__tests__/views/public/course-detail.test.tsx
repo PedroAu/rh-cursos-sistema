@@ -51,8 +51,8 @@ const mockStore = {
     {
       id: "class-1",
       courseId: "course-1",
-      startDate: "2026-08-12T00:00:00.000Z",
-      endDate: "2026-08-13T00:00:00.000Z",
+      startDate: "2026-08-12",
+      endDate: "2026-08-13",
       time: "19:00 às 22:00",
       location: "Online ao vivo",
       modality: "Ao vivo online",
@@ -134,8 +134,8 @@ describe("CourseDetailPage", () => {
       {
         id: "class-1",
         courseId: "course-1",
-        startDate: "2026-08-12T00:00:00.000Z",
-        endDate: "2026-08-13T00:00:00.000Z",
+        startDate: "2026-08-12",
+        endDate: "2026-08-13",
         time: "19:00 às 22:00",
         location: "Online ao vivo",
         modality: "Ao vivo online",
@@ -185,6 +185,14 @@ describe("CourseDetailPage", () => {
     render(<CourseDetailPage />);
 
     expect(screen.getByText("120 alunos")).toBeInTheDocument();
+  });
+
+  it("mantém a data civil da turma sem recuar um dia por causa do fuso", () => {
+    mocks.params = new URLSearchParams("");
+
+    render(<CourseDetailPage />);
+
+    expect(screen.getByText("12–13 Ago 2026")).toBeInTheDocument();
   });
 
   it("mostra CTA de interesse quando não há turma aberta", async () => {

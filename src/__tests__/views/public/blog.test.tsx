@@ -77,17 +77,17 @@ describe("BlogPage 'Em alta esta semana'", () => {
   it("mostra o título real do post de destino, nunca um título hardcoded divergente", () => {
     render(<BlogPage />);
 
-    const trendingLink = screen.getByRole("link", {
-      name: /Pesquisa de preços: como montar uma que resiste ao TCU/i
-    });
+    const trendingLink = screen
+      .getAllByRole("link", { name: /Pesquisa de preços: como montar uma que resiste ao TCU/i })
+      .find((link) => link.getAttribute("href") === "/blog/pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu");
+    expect(trendingLink).toBeDefined();
     expect(trendingLink).toHaveAttribute(
       "href",
       "/blog/pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu"
     );
 
-    expect(
-      screen.getByRole("link", { name: /RIPD: quando deixa de ser opcional/i })
-    ).toHaveAttribute("href", "/blog/ripd-quando-deixa-de-ser-opcional");
+    const ripdLinks = screen.getAllByRole("link", { name: /RIPD: quando deixa de ser opcional/i });
+    expect(ripdLinks.some((link) => link.getAttribute("href") === "/blog/ripd-quando-deixa-de-ser-opcional")).toBe(true);
   });
 
   it("nunca aponta para post inexistente ou não publicado", () => {
