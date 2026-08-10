@@ -3,7 +3,7 @@ import { COURSE_LEVEL_OPTIONS, COURSE_MODALITY_OPTIONS, COURSE_STATUS_OPTIONS } 
 const VALID_COURSE_STATUSES = new Set<string>(COURSE_STATUS_OPTIONS.map((option) => option.value));
 const VALID_COURSE_MODALITIES = new Set<string>(COURSE_MODALITY_OPTIONS.map((option) => option.value));
 const VALID_COURSE_LEVELS = new Set<string>(COURSE_LEVEL_OPTIONS.map((option) => option.value));
-const ADMIN_VARCHAR_240_MAX_LENGTH = 240;
+export const ADMIN_VARCHAR_240_MAX_LENGTH = 240;
 
 export type ValidationError = {
   field: string;

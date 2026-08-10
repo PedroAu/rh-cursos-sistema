@@ -45,7 +45,7 @@ Os logs da Edge Function `admin-resources` registraram SQLSTATE `22001` (`value 
 - Logs de produção identificaram SQLSTATE `22001` em três POSTs para `admin-resources`.
 - A causa foi a ausência de limite de 240 caracteres nos contratos client-side e server-side.
 - O erro de listener assíncrono não é emitido pelo código da aplicação; não há listeners `chrome.runtime`/`browser.runtime` no repositório.
-- A suíte E2E teve uma execução com 183/184 aprovados e o cenário intermitente passou isoladamente; a segunda execução foi bloqueada por indisponibilidade externa do Supabase (Cloudflare 521/DNS `ENOTFOUND`), não por falha do código alterado.
+- A suíte E2E teve uma execução intermediária com 183/184 aprovados e indisponibilidade externa do Supabase; no gate final local, com o Supabase restaurado, `npm test` passou com 184/184 cenários.
 
 ### File List
 
@@ -60,4 +60,4 @@ Os logs da Edge Function `admin-resources` registraram SQLSTATE `22001` (`value 
 
 - Valores com 241 caracteres são rejeitados antes da chamada de persistência; valores com 240 permanecem válidos.
 - Validação server-side usa Zod e preserva a resposta 422 de payload inválido da Edge Function.
-- Testes unitários (43/43), lint, typecheck e build passaram. O E2E funcional depende do Supabase externo, que apresentou indisponibilidade durante a segunda execução.
+- Testes unitários, lint, typecheck, build e o gate E2E final (184/184) passaram.

@@ -29,10 +29,14 @@ test("treats a class end date as inclusive through the end of the local day", ()
     startDate: "2026-07-10",
     endDate: "2026-07-11",
   };
-  const duringLastDay = new Date(2026, 6, 11, 18).getTime();
+  const lastMillisecond = new Date(2026, 6, 11, 23, 59, 59, 999).getTime();
+  const nextDayStart = new Date(2026, 6, 12, 0, 0, 0, 0).getTime();
 
-  expect(deriveEnrollmentOperationalStatus(enrollment, trainingClass, duringLastDay)).toBe(
+  expect(deriveEnrollmentOperationalStatus(enrollment, trainingClass, lastMillisecond)).toBe(
     "Confirmada em turma em andamento."
+  );
+  expect(deriveEnrollmentOperationalStatus(enrollment, trainingClass, nextDayStart)).toBe(
+    "Confirmada em turma encerrada. Revisar conclusão."
   );
 });
 

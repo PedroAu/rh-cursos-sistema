@@ -129,6 +129,10 @@ vi.mock("@/components/common/testimonial-card", () => ({
 }));
 
 describe("CourseDetailPage", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   beforeEach(() => {
     mockStore.classes = [
       {
@@ -188,6 +192,7 @@ describe("CourseDetailPage", () => {
   });
 
   it("mantém a data civil da turma sem recuar um dia por causa do fuso", () => {
+    vi.stubEnv("TZ", "America/Sao_Paulo");
     mocks.params = new URLSearchParams("");
 
     render(<CourseDetailPage />);

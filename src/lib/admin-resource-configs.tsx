@@ -26,6 +26,7 @@ import {
   COURSE_STATUS_OPTIONS,
 } from "@/lib/domain/course-enums";
 import {
+  ADMIN_VARCHAR_240_MAX_LENGTH,
   validateBlogPost,
   validateClass,
   validateCourse,
@@ -472,7 +473,7 @@ export function buildResourceConfig(
             label: "Nome do curso",
             type: "text",
             required: true,
-            maxLength: 240,
+            maxLength: ADMIN_VARCHAR_240_MAX_LENGTH,
             placeholder: "Ex.: Gestão de contratos administrativos",
           },
           {
@@ -631,9 +632,11 @@ export function buildResourceConfig(
       ).length;
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
+      const startingWindowEnd = new Date(todayStart);
+      startingWindowEnd.setDate(startingWindowEnd.getDate() + 30);
       const startingClasses = store.classes.filter((item) => {
         const startsAt = parseDate(item.startDate).getTime();
-        return startsAt >= todayStart.getTime() && startsAt <= todayStart.getTime() + 30 * 86400_000;
+        return startsAt >= todayStart.getTime() && startsAt <= startingWindowEnd.getTime();
       }).length;
       const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
       const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
@@ -1070,14 +1073,14 @@ export function buildResourceConfig(
           { key: "email", label: "E-mail", type: "text", required: true },
           { key: "phone", label: "Telefone", type: "text" },
           { key: "type", label: "Jornada comercial", type: "select", options: leadTypeOptions, required: true },
-          { key: "courseInterest", label: "Interesse principal", type: "text", required: true, maxLength: 240 },
+          { key: "courseInterest", label: "Interesse principal", type: "text", required: true, maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "origin", label: "Origem", type: "select", options: originOptions, required: true },
           { key: "status", label: "Status", type: "select", options: leadStatusOptions, required: true },
           { key: "organization", label: "Empresa/Órgão", type: "text" },
           { key: "teamSize", label: "Tamanho da equipe", type: "number" },
           { key: "preferredModality", label: "Modalidade preferida", type: "text" },
           { key: "trainingObjective", label: "Objetivo do treinamento", type: "textarea" },
-          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea", maxLength: 240 },
+          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea", maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "mainChallenges", label: "Desafios principais", type: "textarea" },
         ],
       };
@@ -1531,7 +1534,7 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "title", label: "Título", type: "text", required: true, maxLength: 240 },
+          { key: "title", label: "Título", type: "text", required: true, maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "category", label: "Categoria", type: "select", options: categoryOptions, required: true },
           { key: "author", label: "Autor", type: "text", required: true },
           { key: "status", label: "Status", type: "select", options: blogStatusOptions, required: true },
