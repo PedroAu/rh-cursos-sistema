@@ -38,6 +38,12 @@ describe('validateCourse', () => {
     expect(getErrorMessage(result.errors, 'title')).toBe('Nome do curso é obrigatório');
   });
 
+  it('enforces the database title limit', () => {
+    expect(validateCourse({ ...validCourse, title: 'x'.repeat(240) }).valid).toBe(true);
+    const result = validateCourse({ ...validCourse, title: 'x'.repeat(241) });
+    expect(getErrorMessage(result.errors, 'title')).toContain('240 caracteres');
+  });
+
   it('flags a missing training path', () => {
     const result = validateCourse({ ...validCourse, pathId: '' });
     expect(getErrorMessage(result.errors, 'pathId')).toBeDefined();
@@ -214,6 +220,18 @@ describe('validateLead', () => {
     expect(result.valid).toBe(false);
     expect(result.errors.length).toBeGreaterThanOrEqual(4);
   });
+
+  it('enforces database limits for lead text fields', () => {
+    const base = {
+      name: 'Ana', email: 'ana@example.com', type: 'Curso', courseInterest: 'x'.repeat(240),
+      origin: 'Site', status: 'Novo', trainingTheme: 'x'.repeat(240),
+    };
+    expect(validateLead(base).valid).toBe(true);
+    expect(getErrorMessage(validateLead({ ...base, courseInterest: 'x'.repeat(241) }).errors, 'courseInterest'))
+      .toContain('240 caracteres');
+    expect(getErrorMessage(validateLead({ ...base, trainingTheme: 'x'.repeat(241) }).errors, 'trainingTheme'))
+      .toContain('240 caracteres');
+  });
 });
 
 describe('validateEnrollment', () => {
@@ -294,6 +312,12 @@ describe('validateBlogPost', () => {
   it('rejects content shorter than 100 characters', () => {
     const result = validateBlogPost({ ...validPost, content: 'curto' });
     expect(getErrorMessage(result.errors, 'content')).toContain('100 caracteres');
+  });
+
+  it('enforces the database title limit', () => {
+    expect(validateBlogPost({ ...validPost, title: 'x'.repeat(240) }).valid).toBe(true);
+    const result = validateBlogPost({ ...validPost, title: 'x'.repeat(241) });
+    expect(getErrorMessage(result.errors, 'title')).toContain('240 caracteres');
   });
 });
 

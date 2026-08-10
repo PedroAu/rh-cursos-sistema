@@ -930,6 +930,7 @@ function RenderField({
         hint={field.hint}
         onChange={(event) => updateField(event.currentTarget.value)}
         error={error}
+        maxLength={field.maxLength}
         aria-required={field.required || undefined}
       />
     );
@@ -1018,6 +1019,7 @@ function RenderField({
       hint={field.hint}
       onChange={(event) => updateField(event.currentTarget.value)}
       error={error}
+      maxLength={field.maxLength}
       aria-required={field.required || undefined}
     />
   );

@@ -4,6 +4,8 @@
 import { z } from "https://esm.sh/zod@4.4.3";
 
 const emailSchema = z.string().min(1, "Email é obrigatório").email("Email inválido");
+const adminVarchar240 = (label: string) =>
+  z.string().max(240, `${label} não pode ter mais de 240 caracteres`);
 
 const cpfSchema = z
   .string()
@@ -42,7 +44,7 @@ const courseLevelEnum = z.enum([
 
 export const courseSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(1, "Nome do curso é obrigatório"),
+  title: z.string().min(1, "Nome do curso é obrigatório").max(240, "Nome do curso não pode ter mais de 240 caracteres"),
   pathId: z.string().min(1, "Trilha é obrigatória"),
   modality: modalityEnum.optional(),
   modalities: z.array(modalityEnum).min(1, "Selecione pelo menos uma modalidade"),
@@ -105,7 +107,7 @@ export const leadSchema = z.object({
   email: emailSchema,
   phone: z.string().optional(),
   type: z.enum(["Curso", "InCompany", "Consultoria", "Newsletter", "Orçamento", "Contato"]),
-  courseInterest: z.string().min(1, "Interesse principal é obrigatório"),
+  courseInterest: z.string().min(1, "Interesse principal é obrigatório").max(240, "Interesse principal não pode ter mais de 240 caracteres"),
   courseId: z.string().optional(),
   origin: z.enum(["Site", "WhatsApp", "Blog", "Indicação", "LinkedIn", "Consultoria", "Especialista", "Orçamento In Company", "Contato", "Newsletter"]),
   status: z.enum(["Novo", "Em atendimento", "Proposta enviada", "Convertido", "Perdido"]),
@@ -113,7 +115,7 @@ export const leadSchema = z.object({
   teamSize: z.number().int().positive().optional(),
   preferredModality: z.string().optional(),
   trainingObjective: z.string().optional(),
-  trainingTheme: z.string().optional(),
+  trainingTheme: adminVarchar240("Tema do treinamento").optional(),
   mainChallenges: z.string().optional(),
   message: z.string().optional(),
 }).strict();
@@ -164,7 +166,7 @@ export const instructorSchema = z.object({
 
 export const blogPostSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(1, "Título é obrigatório"),
+  title: z.string().min(1, "Título é obrigatório").max(240, "Título não pode ter mais de 240 caracteres"),
   category: z.enum([
     "Licitações",
     "LGPD",

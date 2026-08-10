@@ -113,6 +113,7 @@ export type FieldConfig = {
   placeholder?: string;
   hint?: string;
   required?: boolean;
+  maxLength?: number;
   section?: string;
 };
 
@@ -467,6 +468,7 @@ export function buildResourceConfig(
             label: "Nome do curso",
             type: "text",
             required: true,
+            maxLength: 240,
             placeholder: "Ex.: Gestão de contratos administrativos",
           },
           {
@@ -1063,14 +1065,14 @@ export function buildResourceConfig(
           { key: "email", label: "E-mail", type: "text", required: true },
           { key: "phone", label: "Telefone", type: "text" },
           { key: "type", label: "Jornada comercial", type: "select", options: leadTypeOptions, required: true },
-          { key: "courseInterest", label: "Interesse principal", type: "text", required: true },
+          { key: "courseInterest", label: "Interesse principal", type: "text", required: true, maxLength: 240 },
           { key: "origin", label: "Origem", type: "select", options: originOptions, required: true },
           { key: "status", label: "Status", type: "select", options: leadStatusOptions, required: true },
           { key: "organization", label: "Empresa/Órgão", type: "text" },
           { key: "teamSize", label: "Tamanho da equipe", type: "number" },
           { key: "preferredModality", label: "Modalidade preferida", type: "text" },
           { key: "trainingObjective", label: "Objetivo do treinamento", type: "textarea" },
-          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea" },
+          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea", maxLength: 240 },
           { key: "mainChallenges", label: "Desafios principais", type: "textarea" },
         ],
       };
@@ -1524,7 +1526,7 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "title", label: "Título", type: "text", required: true },
+          { key: "title", label: "Título", type: "text", required: true, maxLength: 240 },
           { key: "category", label: "Categoria", type: "select", options: categoryOptions, required: true },
           { key: "author", label: "Autor", type: "text", required: true },
           { key: "status", label: "Status", type: "select", options: blogStatusOptions, required: true },

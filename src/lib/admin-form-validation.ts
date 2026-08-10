@@ -3,6 +3,7 @@ import { COURSE_LEVEL_OPTIONS, COURSE_MODALITY_OPTIONS, COURSE_STATUS_OPTIONS } 
 const VALID_COURSE_STATUSES = new Set<string>(COURSE_STATUS_OPTIONS.map((option) => option.value));
 const VALID_COURSE_MODALITIES = new Set<string>(COURSE_MODALITY_OPTIONS.map((option) => option.value));
 const VALID_COURSE_LEVELS = new Set<string>(COURSE_LEVEL_OPTIONS.map((option) => option.value));
+const ADMIN_VARCHAR_240_MAX_LENGTH = 240;
 
 export type ValidationError = {
   field: string;
@@ -30,6 +31,12 @@ function addError(errors: ValidationError[], field: string, message: string) {
   errors.push({ field, message });
 }
 
+function addMaxLengthError(errors: ValidationError[], field: string, value: unknown, label: string) {
+  if (str(value).length > ADMIN_VARCHAR_240_MAX_LENGTH) {
+    addError(errors, field, `${label} não pode ter mais de ${ADMIN_VARCHAR_240_MAX_LENGTH} caracteres`);
+  }
+}
+
 function hasSelectedValue(value: unknown): boolean {
   if (Array.isArray(value)) {
     return value.some((item) => String(item).trim().length > 0);
@@ -47,6 +54,7 @@ export function validateCourse(
   if (!str(form.title).trim()) {
     addError(errors, "title", "Nome do curso é obrigatório");
   }
+  addMaxLengthError(errors, "title", form.title, "Nome do curso");
 
   if (!str(form.pathId).trim()) {
     addError(errors, "pathId", "Selecione uma trilha");
@@ -262,6 +270,8 @@ export function validateLead(form: Record<string, unknown>): ValidationResult {
   if (!str(form.courseInterest).trim()) {
     addError(errors, "courseInterest", "Informe o interesse principal");
   }
+  addMaxLengthError(errors, "courseInterest", form.courseInterest, "Interesse principal");
+  addMaxLengthError(errors, "trainingTheme", form.trainingTheme, "Tema do treinamento");
 
   if (!str(form.origin).trim()) {
     addError(errors, "origin", "Selecione uma origem");
@@ -368,6 +378,7 @@ export function validateBlogPost(form: Record<string, unknown>): ValidationResul
   if (!str(form.title).trim()) {
     addError(errors, "title", "Título é obrigatório");
   }
+  addMaxLengthError(errors, "title", form.title, "Título");
 
   if (!str(form.category).trim()) {
     addError(errors, "category", "Selecione uma categoria");
