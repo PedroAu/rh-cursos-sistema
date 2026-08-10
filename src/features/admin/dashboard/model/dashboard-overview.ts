@@ -48,6 +48,7 @@ type OverviewKpiInput = {
 /** As 4 métricas do canvas Trust Keith (AC2, spec §3/§6) — substituem os KPIs herdados da Épica 10. */
 export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiInput, now: number = Date.now()): OverviewKpi[] {
   const nowDate = new Date(now);
+  const todayStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime();
   const monthStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1).getTime();
   const prevMonthStart = new Date(nowDate.getFullYear(), nowDate.getMonth() - 1, 1).getTime();
 
@@ -71,7 +72,7 @@ export function buildOverviewKpis({ classes, enrollments, leads }: OverviewKpiIn
   const turmasAbertas = classes.filter((item) => item.status === "Inscrições abertas");
   const turmasProximas = turmasAbertas.filter((item) => {
     const t = parseDate(item.startDate).getTime();
-    return !Number.isNaN(t) && t >= now && t - now <= 45 * DAY_MS;
+    return !Number.isNaN(t) && t >= todayStart && t - todayStart <= 45 * DAY_MS;
   }).length;
 
   // Turmas com totalSeats=0 são excluídas do denominador: incluí-las
@@ -179,15 +180,18 @@ type UpcomingClassInput = {
 
 /** Turmas ordenadas por proximidade de início, com fallback de lista vazia (AC4, §5, §6, §8.1). */
 export function buildUpcomingClasses({ classes, courses }: UpcomingClassInput, now: number = Date.now(), limit = 4): UpcomingClassCard[] {
+  const nowDate = new Date(now);
+  const todayStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate()).getTime();
+
   return classes
     .filter((item) => {
-    const t = parseDate(item.startDate).getTime();
-      return !Number.isNaN(t) && t >= now && item.status !== "Encerrada";
+      const t = parseDate(item.startDate).getTime();
+      return !Number.isNaN(t) && t >= todayStart && item.status !== "Encerrada";
     })
     .sort((a, b) => parseDate(a.startDate).getTime() - parseDate(b.startDate).getTime())
     .slice(0, limit)
     .map((item) => {
-    const start = parseDate(item.startDate);
+      const start = parseDate(item.startDate);
       const course = courses.find((entry) => entry.id === item.courseId);
       const occupancyPct = toOccupancyPercent(item.filledSeats, item.totalSeats);
       const availableSeats = Math.max(item.availableSeats, 0);

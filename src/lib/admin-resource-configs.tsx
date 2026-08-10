@@ -254,9 +254,10 @@ function renderStatusBadge(value: string) {
   return <Badge variant={getBadgeVariant(value)}>{value}</Badge>;
 }
 
-function deriveEnrollmentOperationalStatus(
+export function deriveEnrollmentOperationalStatus(
   enrollment: Enrollment,
-  trainingClass?: TrainingClass
+  trainingClass?: TrainingClass,
+  now = Date.now()
 ) {
   if (enrollment.status === "Cancelada") return "Cancelada pelo atendimento.";
   if (enrollment.status === "Concluída") return "Concluída e pronta para pós-curso.";
@@ -265,9 +266,10 @@ function deriveEnrollmentOperationalStatus(
     return `${enrollment.status} com turma não localizada.`;
   }
 
-  const now = Date.now();
   const startsAt = parseDate(trainingClass.startDate).getTime();
-  const endsAt = parseDate(trainingClass.endDate).getTime();
+  const endDate = parseDate(trainingClass.endDate);
+  endDate.setHours(23, 59, 59, 999);
+  const endsAt = endDate.getTime();
 
   if (enrollment.status === "Confirmada") {
     if (endsAt < now) return "Confirmada em turma encerrada. Revisar conclusão.";
@@ -331,9 +333,11 @@ export function buildResourceConfig(
 
       const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
       const enrolledStudents = store.students.length;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
       const upcomingClasses = store.classes.filter((item) => {
         const startsAt = parseDate(item.startDate).getTime();
-        return startsAt >= Date.now();
+        return startsAt >= todayStart.getTime();
       }).length;
       const completedEnrollments = store.enrollments.filter((item) => item.status === "Concluída").length;
       const totalEnrollments = store.enrollments.length;
@@ -625,10 +629,11 @@ export function buildResourceConfig(
       const activeClasses = store.classes.filter(
         (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
       ).length;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
       const startingClasses = store.classes.filter((item) => {
         const startsAt = parseDate(item.startDate).getTime();
-        const now = Date.now();
-        return startsAt >= now && startsAt <= now + 30 * 86400_000;
+        return startsAt >= todayStart.getTime() && startsAt <= todayStart.getTime() + 30 * 86400_000;
       }).length;
       const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
       const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);

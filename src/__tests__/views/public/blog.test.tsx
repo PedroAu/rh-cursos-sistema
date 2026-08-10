@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { render, screen } from "@/__tests__/utils";
+import { act, fireEvent, render, screen } from "@/__tests__/utils";
 import { BlogPage } from "@/views/public/Blog";
 import type { BlogPost } from "@/types";
 
@@ -73,6 +73,15 @@ vi.mock("@/lib/app-store", () => ({
   useAppStore: () => mockStore
 }));
 
+beforeEach(() => {
+  mocks.params = new URLSearchParams();
+  mocks.setSearchParams.mockReset();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe("BlogPage 'Em alta esta semana'", () => {
   it("mostra o título real do post de destino, nunca um título hardcoded divergente", () => {
     render(<BlogPage />);
@@ -97,5 +106,22 @@ describe("BlogPage 'Em alta esta semana'", () => {
     expect(
       screen.queryByRole("link", { name: /Indicadores que a alta gestão realmente acompanha/i })
     ).not.toBeInTheDocument();
+  });
+
+  it("adota a busca do histórico sem regravar a URL com o debounce local pendente", () => {
+    vi.useFakeTimers();
+    mocks.params = new URLSearchParams("q=licitacoes");
+    const { rerender } = render(<BlogPage />);
+    const input = screen.getByRole("textbox", { name: "Buscar por tema ou palavra-chave" });
+
+    fireEvent.change(input, { target: { value: "digitacao local" } });
+    act(() => vi.advanceTimersByTime(200));
+
+    mocks.params = new URLSearchParams("q=historico");
+    rerender(<BlogPage />);
+    expect(input).toHaveValue("historico");
+
+    act(() => vi.advanceTimersByTime(300));
+    expect(mocks.setSearchParams).not.toHaveBeenCalled();
   });
 });

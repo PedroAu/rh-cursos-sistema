@@ -2,7 +2,7 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { createAdminStoreFixture } from "../../../tests/fixtures/admin-store";
-import { buildResourceConfig } from "@/lib/admin-resource-configs";
+import { buildResourceConfig, deriveEnrollmentOperationalStatus } from "@/lib/admin-resource-configs";
 
 const mocks = vi.hoisted(() => ({
   toastSuccess: vi.fn(),
@@ -19,6 +19,21 @@ vi.mock("sonner", () => ({
 beforeEach(() => {
   mocks.toastSuccess.mockReset();
   mocks.toastError.mockReset();
+});
+
+test("treats a class end date as inclusive through the end of the local day", () => {
+  const store = createAdminStoreFixture();
+  const enrollment = { ...store.enrollments[0], status: "Confirmada" as const };
+  const trainingClass = {
+    ...store.classes[0],
+    startDate: "2026-07-10",
+    endDate: "2026-07-11",
+  };
+  const duringLastDay = new Date(2026, 6, 11, 18).getTime();
+
+  expect(deriveEnrollmentOperationalStatus(enrollment, trainingClass, duringLastDay)).toBe(
+    "Confirmada em turma em andamento."
+  );
 });
 
 function createDeps() {

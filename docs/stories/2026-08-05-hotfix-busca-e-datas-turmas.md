@@ -35,8 +35,9 @@ Usuários relatam dois defeitos no site público: a busca mostra um carregamento
 
 - Busca pública: debounce de 300 ms, URL sincronizada somente após a pausa e loading preservado apenas no bootstrap inicial do blog.
 - Datas: `parseDate` trata valores `YYYY-MM-DD` como datas civis locais; o formulário administrativo persiste somente a parte da data.
+- Revisão pré-push: timestamps completos preservam o instante original; filtros futuros usam o início do dia civil; o fim da turma é inclusivo até 23:59:59.999; e histórico/deep links do blog sincronizam sem sobrescrever a URL nem divergir na hidratação.
 - Snapshot da hero da Home atualizado para refletir as datas corretas (20/08 e 27/08, em vez de 19/08 e 26/08).
-- Validações: `npm run lint`, `npm run typecheck`, `npm run test:unit` (80 arquivos/788 testes) e `npm test` (184/184 testes).
+- Validações finais: `npm run lint`, `npm run typecheck`, `npm run test:unit` (79 arquivos/791 testes) e `npm test` (184/184 testes).
 
 ### File List
 
@@ -55,6 +56,8 @@ Usuários relatam dois defeitos no site público: a busca mostra um carregamento
 - `src/components/agenda/class-card.tsx`
 - `src/components/courses/course-card.tsx`
 - `src/__tests__/hooks/use-debounced-value.test.tsx`
+- `src/__tests__/lib/admin-resource-configs.test.ts`
+- `src/__tests__/lib/dashboard-overview.test.ts`
 - `src/__tests__/lib/utils.test.ts`
 - `src/__tests__/views/public/blog.test.tsx`
 - `src/__tests__/views/public/course-detail.test.tsx`
@@ -64,3 +67,4 @@ Usuários relatam dois defeitos no site público: a busca mostra um carregamento
 
 - 2026-08-05: Story criada para os dois hotfixes de produção.
 - 2026-08-05: Implementados hotfixes, testes e atualização do snapshot de datas.
+- 2026-08-10: Incorporados ajustes da revisão pré-push e revalidados unitários, build e E2E completos.

@@ -137,6 +137,12 @@ describe('Utils', () => {
       expect(result.getDate()).toBe(10);
     });
 
+    it('preserves the instant represented by timestamps with time or offset', () => {
+      const timestamp = '2026-08-10T23:30:00-07:00';
+
+      expect(parseDate(timestamp).getTime()).toBe(new Date(timestamp).getTime());
+    });
+
     it('should format ISO date string', () => {
       const result = formatDate('2024-01-15T10:30:00Z');
       expect(result).toContain('15');

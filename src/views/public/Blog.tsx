@@ -98,6 +98,12 @@ function normalizeBlogCategory(category: BlogPost["category"]) {
   return aliases[category] ?? "Todos";
 }
 
+function normalizeCategoryParam(value: string | null): (typeof canvasCategories)[number] {
+  return canvasCategories.includes(value as (typeof canvasCategories)[number])
+    ? value as (typeof canvasCategories)[number]
+    : "Todos";
+}
+
 function getPresentation(post: BlogPost) {
   return categoryPresentation[post.category] ?? {
     glyph: "•",
@@ -118,15 +124,19 @@ export function BlogPage() {
     isClientPublicTestBaselineEnabled();
   const effectiveBlogPosts = blogPosts.length || !publicBaselineEnabled ? blogPosts : publicTestBaselineBlogPosts;
   const [searchParams, setSearchParams] = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [category, setCategory] = useState<(typeof canvasCategories)[number]>(
-    (searchParams.get("category") as (typeof canvasCategories)[number]) || "Todos"
-  );
+  const searchParamsKey = searchParams.toString();
+  const urlQuery = searchParams.get("q") ?? "";
+  const urlCategory = normalizeCategoryParam(searchParams.get("category"));
+  // Keep the server and first client render deterministic; URL state is
+  // applied by the synchronization effect immediately after hydration.
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<(typeof canvasCategories)[number]>("Todos");
   const [newsletterName, setNewsletterName] = useState("");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+  const syncingFromUrlRef = useRef(false);
   const debouncedQuery = useDebouncedValue(query);
 
   useEffect(() => {
@@ -140,16 +150,30 @@ export function BlogPage() {
   }, [effectiveBlogPosts.length]);
 
   useEffect(() => {
+    syncingFromUrlRef.current = true;
+    setQuery(urlQuery);
+    setCategory(urlCategory);
+  }, [searchParamsKey, urlCategory, urlQuery]);
+
+  useEffect(() => {
+    if (syncingFromUrlRef.current) {
+      if (debouncedQuery !== urlQuery || category !== urlCategory) {
+        return;
+      }
+
+      syncingFromUrlRef.current = false;
+    }
+
     const params: Record<string, string> = {};
     if (debouncedQuery) params.q = debouncedQuery;
     if (category !== "Todos") params.category = category;
 
-    if ((searchParams.get("q") ?? "") === (params.q ?? "") && (searchParams.get("category") ?? "") === (params.category ?? "")) {
+    if (urlQuery === (params.q ?? "") && (urlCategory === "Todos" ? "" : urlCategory) === (params.category ?? "")) {
       return;
     }
 
     setSearchParams(params);
-  }, [category, debouncedQuery, searchParams, setSearchParams]);
+  }, [category, debouncedQuery, setSearchParams, urlCategory, urlQuery]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),

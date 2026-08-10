@@ -8,7 +8,7 @@ describe("useDebouncedValue", () => {
   afterEach(() => vi.useRealTimers());
 
   it("keeps the previous value until the user pauses", () => {
-    const { result, rerender } = renderHook(({ value }) => useDebouncedValue(value, 300), {
+    const { result, rerender } = renderHook(({ value }) => useDebouncedValue(value), {
       initialProps: { value: "" }
     });
 

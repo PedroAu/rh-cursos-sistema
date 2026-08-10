@@ -128,6 +128,16 @@ describe("buildOverviewKpis — corte de 30/45 dias e divisão por zero", () => 
     expect(turmasKpi?.helper).toContain("1 inicia em até 45 dias");
   });
 
+  it("inclui uma turma que começa no dia civil atual mesmo depois do meio-dia", () => {
+    const lateToday = new Date(2026, 6, 13, 18).getTime();
+    const classes = [makeClass({ id: "c-today", startDate: "2026-07-13" })];
+
+    const kpis = buildOverviewKpis({ classes, enrollments: [], leads: [] }, lateToday);
+    const turmasKpi = kpis.find((kpi) => kpi.key === "turmas");
+
+    expect(turmasKpi?.helper).toContain("1 inicia em até 45 dias");
+  });
+
   it("exclui turmas com totalSeats=0 do cálculo, sem diluir a ocupação das demais", () => {
     const classes = [
       makeClass({ id: "c-zero", totalSeats: 0, filledSeats: 0 }),
@@ -180,6 +190,15 @@ describe("buildLeadOriginChips e buildRecentLeadRows — corte de 30 dias e fall
 });
 
 describe("buildUpcomingClasses — ordenação por proximidade e fallback vazio", () => {
+  it("mantém turmas do dia atual na lista durante todo o dia civil", () => {
+    const lateToday = new Date(2026, 6, 13, 18).getTime();
+    const classes = [makeClass({ id: "c-today", startDate: "2026-07-13" })];
+
+    const upcoming = buildUpcomingClasses({ classes, courses: [makeCourse({})] }, lateToday);
+
+    expect(upcoming.map((item) => item.id)).toEqual(["c-today"]);
+  });
+
   it("ordena turmas futuras da mais próxima para a mais distante e ignora turmas encerradas/passadas", () => {
     const classes = [
       makeClass({ id: "c-far", startDate: isoDaysAhead(20) }),
