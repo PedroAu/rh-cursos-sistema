@@ -336,7 +336,12 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
 
       <div className="flex flex-1 flex-col gap-[14px] p-[20px_22px_24px]">
         <h3 className="font-tk-display text-[1.25rem] font-bold leading-[1.25] tracking-[-0.01em] text-tk-ink">
-          {entry.course.title}
+          <Link
+            to={`/cursos/${entry.course.slug}`}
+            className="transition-colors hover:text-tk-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent-strong focus-visible:ring-offset-2"
+          >
+            {entry.course.title}
+          </Link>
         </h3>
 
         <div className="space-y-2 text-[0.82rem] text-tk-ink-muted">

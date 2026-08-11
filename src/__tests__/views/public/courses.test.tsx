@@ -100,6 +100,8 @@ describe("CoursesPage", () => {
     expect(screen.getByText("Curso com turma")).toBeInTheDocument();
     expect(screen.getByText("Curso sem turma")).toBeInTheDocument();
     expect(screen.getByText("Sem turma aberta")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Curso com turma" })).toHaveAttribute("href", "/cursos/curso-com-turma");
+    expect(screen.getByRole("link", { name: "Curso sem turma" })).toHaveAttribute("href", "/cursos/curso-sem-turma");
     expect(screen.getByRole("link", { name: /ver detalhes/i })).toHaveAttribute("href", "/cursos/curso-sem-turma");
     expect(screen.getByRole("link", { name: /ver turma/i })).toHaveAttribute("href", "/cursos/curso-com-turma");
     expect(screen.queryByText("Curso oculto")).not.toBeInTheDocument();
