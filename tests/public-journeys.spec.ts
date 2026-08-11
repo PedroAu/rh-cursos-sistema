@@ -100,7 +100,7 @@ test.describe("epica 4 — jornadas publicas", () => {
 
     try {
       await page.goto("/cursos");
-      const detailsLink = page.locator(`a[href="/cursos/${slug}"]`).first();
+      const detailsLink = page.getByRole("link", { name: "Ver detalhes →" });
       await expect(page.getByText(getPublicCourseName(title), { exact: true })).toBeVisible();
       await expect(page.getByText("Sem turma aberta").first()).toBeVisible();
       await expect(detailsLink).toHaveText("Ver detalhes →");

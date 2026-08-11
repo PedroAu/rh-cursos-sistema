@@ -197,8 +197,10 @@ export function CoursesPage() {
 
   useEffect(() => {
     if (paramsQuery === debouncedQuery && paramsCategory === activeCategory) return;
+    if (query !== paramsQuery) return;
+    if (query !== debouncedQuery) return;
     syncParams(debouncedQuery, activeCategory);
-  }, [activeCategory, debouncedQuery, paramsCategory, paramsQuery, syncParams]);
+  }, [activeCategory, debouncedQuery, paramsCategory, paramsQuery, query, syncParams]);
 
   const clearFilters = () => {
     setQuery("");
