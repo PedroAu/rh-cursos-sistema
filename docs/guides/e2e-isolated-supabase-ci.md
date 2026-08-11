@@ -66,3 +66,16 @@ qualquer divergência.
   foi configurado como produção e não deve receber permissão de escrita.
 - O arquivo local `.env.e2e.local` continua sendo a alternativa de
   desenvolvimento local e é ignorado pelo Git.
+
+## Validação local
+
+Para reproduzir a lane de integração sem tocar produção, inicie o projeto
+Supabase local e execute o gate com as chaves emitidas por `supabase status`.
+O helper deve receber a chave JWT `ANON_KEY` local como publishable/anon key;
+`E2E_SUPABASE_PROJECT_REF=local` e um valor sentinela diferente da produção
+mantêm a guarda de escrita fail-closed.
+
+O estado validado em 2026-08-11 foi `npm test` com 184/184 testes, incluindo
+CRUD administrativo, jornadas públicas, autenticação, smoke crawl, WCAG,
+teclado, contraste e baselines visuais desktop/mobile. Essa evidência local
+não substitui a primeira execução da lane remota no Environment `e2e`.

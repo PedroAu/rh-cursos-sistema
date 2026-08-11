@@ -33,12 +33,28 @@ export function currency(value: number) {
   }).format(value);
 }
 
+/**
+ * Parses a business date without allowing the browser timezone to move it to
+ * the previous/next calendar day. Database `date` columns are represented as
+ * YYYY-MM-DD, not as instants in time.
+ */
+export function parseDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+
+  if (!match) {
+    return new Date(value);
+  }
+
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day), 12);
+}
+
 export function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {
     day: "2-digit",
     month: "short",
     year: "numeric"
-  }).format(new Date(date));
+  }).format(parseDate(date));
 }
 
 export function delay(ms: number) {

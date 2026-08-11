@@ -9,6 +9,7 @@ import { AppToaster } from "@/components/ui/toaster";
 import { GA_MEASUREMENT_ID } from "@/lib/analytics";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
+import { organizationJsonLd, SITE_URL } from "@/lib/seo";
 
 const inter = Inter({
   display: "swap",
@@ -34,9 +35,16 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "RH Cursos & Soluções",
   description:
     "Cursos, consultoria e treinamento empresarial para desenvolvimento profissional, órgãos públicos e empresas.",
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true }
+  },
   icons: {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -54,9 +62,12 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const organizationSchema = JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c");
+
   return (
     <html lang="pt-BR" className={`${inter.variable} ${fraunces.variable} ${merriweather.variable}`}>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationSchema }} />
         <ErrorBoundary>{children}</ErrorBoundary>
         <AppToaster />
         {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}

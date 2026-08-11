@@ -442,9 +442,9 @@ async function fetchPublicBlogPosts(client: RhCursosClient | null, forcePublicTe
 
 export function fetchPublicCatalogFromSupabase() {
   if (
-    isPublicTestBaselineBuildEnabled() ||
     isExplicitPublicTestBaselineEnabled() ||
-    isClientPublicTestBaselineEnabled()
+    isClientPublicTestBaselineEnabled() ||
+    (isPublicTestBaselineBuildEnabled() && shouldUsePublicTestBaseline())
   ) {
     return fetchPublicCatalog(null, true);
   }
@@ -488,9 +488,9 @@ export const fetchPublicCatalogServerState = cache(async function fetchPublicCat
 
 export function fetchPublicBlogPostsFromSupabase() {
   if (
-    isPublicTestBaselineBuildEnabled() ||
     isExplicitPublicTestBaselineEnabled() ||
-    isClientPublicTestBaselineEnabled()
+    isClientPublicTestBaselineEnabled() ||
+    (isPublicTestBaselineBuildEnabled() && shouldUsePublicTestBaseline())
   ) {
     return Promise.resolve(publicTestBaselineBlogPosts);
   }

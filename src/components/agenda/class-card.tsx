@@ -4,7 +4,7 @@ import { Link } from "@/lib/router-compat";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { isTrainingClassSoldOut } from "@/lib/enrollment-class-resolution";
-import { formatDate } from "@/lib/utils";
+import { formatDate, parseDate } from "@/lib/utils";
 import type { Course, Instructor, TrainingClass } from "@/types";
 
 export function ClassCard({
@@ -21,7 +21,7 @@ export function ClassCard({
     day: "2-digit",
     month: "short"
   })
-    .format(new Date(trainingClass.startDate))
+    .format(parseDate(trainingClass.startDate))
     .replace(".", "")
     .split(" ");
 
@@ -41,7 +41,7 @@ export function ClassCard({
           <span className="font-tk-display text-5xl font-bold leading-none tracking-[var(--tk-tracking-display)]">{day}</span>
           <span className="mt-2 font-tk-display text-xl font-bold uppercase tracking-[var(--tk-tracking-display)]">{month}</span>
           <span className="mt-2 text-base text-white/80">
-            {new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(new Date(trainingClass.startDate))}
+            {new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(parseDate(trainingClass.startDate))}
           </span>
         </div>
 

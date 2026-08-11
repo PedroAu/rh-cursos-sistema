@@ -37,6 +37,26 @@ function toTipoAluno(type: EnrollmentInput["enrollmentType"]): "PF" | "PJ" | "Se
   return "PF";
 }
 
+async function resolveEnrollmentConfirmationCode(
+  adminSupabase: ReturnType<typeof createSupabaseServerClient>,
+  rawEnrollmentId: string,
+) {
+  if (!adminSupabase || typeof adminSupabase.from !== "function") {
+    return rawEnrollmentId;
+  }
+
+  // Compatibilidade com projetos que ainda têm a versão legada da RPC, que
+  // retornava `inscricao.id` em vez de `codigo_confirmacao`.
+  const { data, error } = await adminSupabase
+    .from("inscricao")
+    .select("codigo_confirmacao")
+    .eq("id", rawEnrollmentId)
+    .maybeSingle();
+  if (error) throw error;
+
+  return data?.codigo_confirmacao ?? rawEnrollmentId;
+}
+
 // REC-205: adaptador de cookies somente-leitura para a sessão SSR (REC-202).
 // A rota de inscrição nunca emite/renova sessão, então `setAll` é no-op — a
 // autoridade de sessão SSR continua sendo exclusivamente a rota de auth.
@@ -200,9 +220,11 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
+    const confirmationCode = await resolveEnrollmentConfirmationCode(adminSupabase, enrollmentId);
+
     const receipt = enrollmentReceiptSchema.safeParse({
       ok: true,
-      enrollmentId,
+      enrollmentId: confirmationCode,
       classId: resolvedClassId,
     });
     if (!receipt.success) {

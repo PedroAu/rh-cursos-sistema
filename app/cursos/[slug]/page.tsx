@@ -8,6 +8,7 @@ import {
   isServerPublicTestBaselineEnabled,
   PUBLIC_TEST_BASELINE_COOKIE_NAME
 } from "@/lib/supabase/rh-cursos-api";
+import { buildCourseJsonLd, getCourseMetaDescription, getPublicCourseName, SITE_URL } from "@/lib/seo";
 
 // Renderização dinâmica: o catálogo é editado via admin e precisa refletir o
 // estado real do banco a cada request, sem "assar" cursos/turmas em páginas
@@ -52,12 +53,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `${course.title} | RH Cursos`,
-    description: course.shortDescription
+    title: `${getPublicCourseName(course.title)} | RH Cursos`,
+    description: getCourseMetaDescription(course),
+    alternates: { canonical: `/cursos/${course.slug}` },
+    openGraph: {
+      title: `${getPublicCourseName(course.title)} | RH Cursos`,
+      description: getCourseMetaDescription(course),
+      url: `${SITE_URL}/cursos/${course.slug}/`,
+      type: "website"
+    }
   };
 }
 
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
   const usePublicTestBaseline = await getPublicTestBaselineEnabled();
   const [catalogState, testimonials] = await Promise.all([
     fetchPublicCatalogServerState(usePublicTestBaseline),
@@ -71,18 +80,36 @@ export default async function Page() {
     throw catalogState.error;
   }
 
+  const course = catalogState.catalog.courses.find((item) => item.slug === slug);
+  const courseContent = course
+    ? catalogState.catalog.coursePublicContents.find((item) => item.courseId === course.id)
+    : undefined;
+  const courseJsonLd = course
+    ? buildCourseJsonLd(course, catalogState.catalog.classes, courseContent)
+    : null;
+
   // Sem fallback para mockCatalog: se o curso não existir no catálogo real,
   // `courses` chega vazio e `CourseDetailPage` já renderiza o estado
   // "Curso não encontrado" existente (AC2), sem dado fictício exibido.
   return (
-    <CourseDetailClient
-      initialData={{
-        courses: catalogState.catalog.courses,
-        classes: catalogState.catalog.classes,
-        instructors: catalogState.catalog.instructors,
-        coursePublicContents: catalogState.catalog.coursePublicContents,
-        testimonials: testimonials ?? []
-      }}
-    />
+    <>
+      {courseJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([courseJsonLd.course, courseJsonLd.faq]).replace(/</g, "\\u003c")
+          }}
+        />
+      ) : null}
+      <CourseDetailClient
+        initialData={{
+          courses: catalogState.catalog.courses,
+          classes: catalogState.catalog.classes,
+          instructors: catalogState.catalog.instructors,
+          coursePublicContents: catalogState.catalog.coursePublicContents,
+          testimonials: testimonials ?? []
+        }}
+      />
+    </>
   );
 }

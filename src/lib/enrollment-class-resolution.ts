@@ -1,4 +1,5 @@
 import type { TrainingClass } from "@/types";
+import { parseDate } from "@/lib/utils";
 
 const OPEN_CLASS_STATUSES = new Set<TrainingClass["status"]>([
   "Inscrições abertas",
@@ -28,13 +29,13 @@ export function isEnrollmentClassDisplayable(trainingClass: Pick<TrainingClass, 
 export function getOpenEnrollmentClasses(classes: TrainingClass[], courseId: string) {
   return classes
     .filter((trainingClass) => trainingClass.courseId === courseId && isEnrollmentClassOpen(trainingClass))
-    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
+    .sort((left, right) => parseDate(left.startDate).getTime() - parseDate(right.startDate).getTime());
 }
 
 export function getDisplayableEnrollmentClasses(classes: TrainingClass[], courseId: string) {
   return classes
     .filter((trainingClass) => trainingClass.courseId === courseId && isEnrollmentClassDisplayable(trainingClass))
-    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime());
+    .sort((left, right) => parseDate(left.startDate).getTime() - parseDate(right.startDate).getTime());
 }
 
 /**

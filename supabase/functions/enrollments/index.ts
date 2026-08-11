@@ -147,9 +147,19 @@ Deno.serve(async (request) => {
 
     if (error) throw error;
 
+    // Compatibilidade com projetos que ainda têm a versão legada da RPC, que
+    // retornava `inscricao.id` em vez de `codigo_confirmacao`.
+    const { data: enrollmentRow, error: enrollmentLookupError } = await adminClient()
+      .from("inscricao")
+      .select("codigo_confirmacao")
+      .eq("id", enrollmentId)
+      .maybeSingle();
+    if (enrollmentLookupError) throw enrollmentLookupError;
+    const confirmationCode = enrollmentRow?.codigo_confirmacao ?? enrollmentId;
+
     const receipt = enrollmentReceiptSchema.safeParse({
       ok: true,
-      enrollmentId,
+      enrollmentId: confirmationCode,
       classId: resolvedClassId,
     });
     if (!receipt.success) {

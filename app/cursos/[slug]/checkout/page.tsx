@@ -5,6 +5,7 @@ import {
   fetchPublicCatalogServerState,
   fetchPublicTestimonialsFromSupabaseServer,
 } from "@/lib/supabase/rh-cursos-api";
+import { getPublicCourseName, SITE_URL } from "@/lib/seo";
 
 // Renderização dinâmica: mesmo racional de app/cursos/[slug]/page.tsx
 // (Story 16.1, AC7) — a pré-inscrição precisa refletir turmas/vagas reais a cada
@@ -41,8 +42,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   return {
-    title: `Pré-inscrição • ${course.title} | RH Cursos`,
-    description: `Envie uma solicitação de pré-inscrição para ${course.title}.`,
+    title: `Pré-inscrição • ${getPublicCourseName(course.title)} | RH Cursos`,
+    description: `Envie uma solicitação de pré-inscrição para ${getPublicCourseName(course.title)}.`,
+    alternates: { canonical: `/cursos/${course.slug}/checkout` },
+    openGraph: {
+      title: `Pré-inscrição • ${getPublicCourseName(course.title)} | RH Cursos`,
+      description: `Envie uma solicitação de pré-inscrição para ${getPublicCourseName(course.title)}.`,
+      url: `${SITE_URL}/cursos/${course.slug}/checkout/`,
+      type: "website"
+    }
   };
 }
 

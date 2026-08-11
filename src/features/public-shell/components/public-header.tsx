@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 import { UserRound } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,6 @@ import { PublicMobileNavigation } from "@/features/public-shell/components/publi
 import { publicNavItems } from "@/features/public-shell/config/public-navigation";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
-import { useLocation } from "@/lib/router-compat";
 import { getDefaultDashboardPath } from "@/lib/session-routing";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +18,7 @@ function isItemActive(pathname: string, to: string) {
 }
 
 export function PublicHeader() {
-  const location = useLocation();
+  const pathname = usePathname() ?? "/";
   const { currentSession } = useAppStore();
   const navOrder = ["/cursos", "/consultoria", "/agenda", "/in-company", "/sobre", "/blog"];
   const primaryNavItems = navOrder
@@ -38,7 +38,7 @@ export function PublicHeader() {
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Navegacao principal">
           {primaryNavItems.map((item) => {
-            const active = isItemActive(location.pathname, item.to);
+            const active = isItemActive(pathname, item.to);
 
             return (
               <NextLink

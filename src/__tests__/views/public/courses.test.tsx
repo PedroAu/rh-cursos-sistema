@@ -13,7 +13,7 @@ const mockStore = {
     {
       id: "course-open",
       slug: "curso-com-turma",
-      title: "Curso com turma",
+      title: "eSocial Leiaute 1.3",
       pathId: "path-1",
       pathName: "Departamento Pessoal",
       category: "Departamento Pessoal",
@@ -28,7 +28,7 @@ const mockStore = {
     {
       id: "course-no-class",
       slug: "curso-sem-turma",
-      title: "Curso sem turma",
+      title: "DP na Prática (CLT)",
       pathId: "path-2",
       pathName: "Gestão Pública",
       category: "Gestão Pública",
@@ -97,9 +97,11 @@ describe("CoursesPage", () => {
   it("lista curso elegível mesmo sem turma aberta e oculta curso não elegível", () => {
     render(<CoursesPage />);
 
-    expect(screen.getByText("Curso com turma")).toBeInTheDocument();
-    expect(screen.getByText("Curso sem turma")).toBeInTheDocument();
+    expect(screen.getByText("Curso de eSocial Leiaute 1.3")).toBeInTheDocument();
+    expect(screen.getByText("Curso de Departamento Pessoal na Prática (CLT)")).toBeInTheDocument();
     expect(screen.getByText("Sem turma aberta")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Curso de eSocial Leiaute 1.3" })).toHaveAttribute("href", "/cursos/curso-com-turma");
+    expect(screen.getByRole("link", { name: "Curso de Departamento Pessoal na Prática (CLT)" })).toHaveAttribute("href", "/cursos/curso-sem-turma");
     expect(screen.getByRole("link", { name: /ver detalhes/i })).toHaveAttribute("href", "/cursos/curso-sem-turma");
     expect(screen.getByRole("link", { name: /ver turma/i })).toHaveAttribute("href", "/cursos/curso-com-turma");
     expect(screen.queryByText("Curso oculto")).not.toBeInTheDocument();

@@ -51,3 +51,8 @@ uma regressão da Epic 20.
 - `package.json`
 - `docs/CONTRIBUTING.md`
 - `docs/guides/e2e-isolated-supabase-ci.md`
+
+## Validação local
+
+- 2026-08-11: o ambiente Supabase local isolado foi iniciado com `supabase start`, as migrations e Edge Functions locais ficaram disponíveis, e `npm test` passou com 184/184 testes.
+- O gate local não fecha os três itens remotos abaixo: criação do Environment `e2e` no GitHub, sincronização do projeto Supabase remoto de teste e primeira execução remota verde com encaminhamento ao QA.

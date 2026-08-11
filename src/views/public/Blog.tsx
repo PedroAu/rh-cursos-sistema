@@ -8,8 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
 import {
   isClientPublicTestBaselineEnabled,
@@ -98,6 +98,12 @@ function normalizeBlogCategory(category: BlogPost["category"]) {
   return aliases[category] ?? "Todos";
 }
 
+function normalizeCategoryParam(value: string | null): (typeof canvasCategories)[number] {
+  return canvasCategories.includes(value as (typeof canvasCategories)[number])
+    ? value as (typeof canvasCategories)[number]
+    : "Todos";
+}
+
 function getPresentation(post: BlogPost) {
   return categoryPresentation[post.category] ?? {
     glyph: "•",
@@ -118,21 +124,56 @@ export function BlogPage() {
     isClientPublicTestBaselineEnabled();
   const effectiveBlogPosts = blogPosts.length || !publicBaselineEnabled ? blogPosts : publicTestBaselineBlogPosts;
   const [searchParams, setSearchParams] = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") || "");
-  const [category, setCategory] = useState<(typeof canvasCategories)[number]>(
-    (searchParams.get("category") as (typeof canvasCategories)[number]) || "Todos"
-  );
+  const searchParamsKey = searchParams.toString();
+  const urlQuery = searchParams.get("q") ?? "";
+  const urlCategory = normalizeCategoryParam(searchParams.get("category"));
+  // Keep the server and first client render deterministic; URL state is
+  // applied by the synchronization effect immediately after hydration.
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<(typeof canvasCategories)[number]>("Todos");
   const [newsletterName, setNewsletterName] = useState("");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmittingNewsletter, setIsSubmittingNewsletter] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const searchRef = useRef<HTMLInputElement>(null);
+  const syncingFromUrlRef = useRef(false);
+  const debouncedQuery = useDebouncedValue(query);
 
   useEffect(() => {
+    if (effectiveBlogPosts.length > 0) {
+      setIsInitialLoading(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => setIsInitialLoading(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [effectiveBlogPosts.length]);
+
+  useEffect(() => {
+    syncingFromUrlRef.current = true;
+    setQuery(urlQuery);
+    setCategory(urlCategory);
+  }, [searchParamsKey, urlCategory, urlQuery]);
+
+  useEffect(() => {
+    if (syncingFromUrlRef.current) {
+      if (debouncedQuery !== urlQuery || category !== urlCategory) {
+        return;
+      }
+
+      syncingFromUrlRef.current = false;
+    }
+
     const params: Record<string, string> = {};
-    if (query) params.q = query;
+    if (debouncedQuery) params.q = debouncedQuery;
     if (category !== "Todos") params.category = category;
+
+    if (urlQuery === (params.q ?? "") && (urlCategory === "Todos" ? "" : urlCategory) === (params.category ?? "")) {
+      return;
+    }
+
     setSearchParams(params);
-  }, [category, query, setSearchParams]);
+  }, [category, debouncedQuery, setSearchParams, urlCategory, urlQuery]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -151,7 +192,7 @@ export function BlogPage() {
   );
 
   const filteredPosts = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = debouncedQuery.trim().toLowerCase();
 
     return publishedPosts.filter((post) => {
       const displayCategory = normalizeBlogCategory(post.category);
@@ -161,9 +202,9 @@ export function BlogPage() {
 
       return matchesCategory && matchesQuery;
     });
-  }, [category, publishedPosts, query]);
+  }, [category, debouncedQuery, publishedPosts]);
 
-  const isEditorialDefault = !query.trim() && category === "Todos";
+  const isEditorialDefault = !debouncedQuery.trim() && category === "Todos";
   const featuredPost = isEditorialDefault
     ? publishedPosts.find((post) => post.slug === curatedFeaturedSlug) ?? filteredPosts[0]
     : filteredPosts[0];
@@ -185,7 +226,6 @@ export function BlogPage() {
         })),
     [publishedPosts]
   );
-  const loading = useSimulatedLoading([query, category]);
   const visibleCount = isEditorialDefault ? 9 : filteredPosts.length;
 
   const submitNewsletter = async () => {
@@ -226,7 +266,7 @@ export function BlogPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <SectionEyebrow>Conteúdo · Análises · Prática</SectionEyebrow>
           <h1 className="mt-5 max-w-[12ch] font-tk-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
-            A norma explicada de um jeito que você <em className="italic">usa</em>
+            Blog: a norma explicada de um jeito que você <em className="italic">usa</em>
           </h1>
           <p className="mt-4 max-w-[60ch] font-tk-serif text-[1.16rem] font-normal leading-[1.45] text-tk-ink-muted">
             Análises práticas de licitações, LGPD, compliance e gestão pública: escritas por quem aplica essas normas
@@ -356,13 +396,14 @@ export function BlogPage() {
 
       <section className="pb-16">
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]">
-          {loading ? (
+          {isInitialLoading ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="h-[420px] animate-pulse rounded-[24px] bg-tk-surface-2" />
               ))}
             </div>
-          ) : gridPosts.length ? (
+          ) : filteredPosts.length ? (
+            gridPosts.length ? (
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
               {gridPosts.map((post) => {
                 const presentation = getPresentation(post);
@@ -392,6 +433,7 @@ export function BlogPage() {
                 );
               })}
             </div>
+            ) : null
           ) : (
             <Card className="rounded-[24px] border-tk-line bg-tk-surface">
               <CardContent className="p-10 text-center">

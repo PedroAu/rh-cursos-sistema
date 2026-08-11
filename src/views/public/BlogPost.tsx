@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import { Link, useParams } from "@/lib/router-compat";
 import { usePathname } from "next/navigation";

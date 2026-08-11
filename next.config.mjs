@@ -79,6 +79,10 @@ const nextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()"
+          },
+          {
+            key: "Content-Signal",
+            value: "search=yes, ai-input=yes, ai-train=no"
           }
         ]
       }

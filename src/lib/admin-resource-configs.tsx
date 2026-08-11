@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { SeatProgress } from "@/components/admin/seat-progress";
 import { UserCell } from "@/components/admin/user-cell";
 import { useAppStore } from "@/lib/app-store";
+import { parseDate } from "@/lib/utils";
 import { toOccupancyPercent } from "@/lib/occupancy";
 import {
   COURSE_LEVEL_OPTIONS,
@@ -25,6 +26,7 @@ import {
   COURSE_STATUS_OPTIONS,
 } from "@/lib/domain/course-enums";
 import {
+  ADMIN_VARCHAR_240_MAX_LENGTH,
   validateBlogPost,
   validateClass,
   validateCourse,
@@ -112,6 +114,7 @@ export type FieldConfig = {
   placeholder?: string;
   hint?: string;
   required?: boolean;
+  maxLength?: number;
   section?: string;
 };
 
@@ -159,9 +162,12 @@ type ConfigDeps = {
 
 import React from "react";
 
-function normalizeDateTimeForStorage(value?: string, fallbackHour = "09:00:00.000Z") {
-  if (!value) return new Date().toISOString();
-  return `${value}T${fallbackHour}`;
+function normalizeDateForStorage(value?: string) {
+  // `turma.data_inicio`/`data_fim` are PostgreSQL `date` columns. Keep these
+  // values date-only; appending a UTC time makes the browser reinterpret the
+  // business date in the user's timezone and can display the previous day.
+  if (!value) return new Date().toISOString().slice(0, 10);
+  return value.slice(0, 10);
 }
 
 function formatAdminDate(value?: string) {
@@ -249,9 +255,10 @@ function renderStatusBadge(value: string) {
   return <Badge variant={getBadgeVariant(value)}>{value}</Badge>;
 }
 
-function deriveEnrollmentOperationalStatus(
+export function deriveEnrollmentOperationalStatus(
   enrollment: Enrollment,
-  trainingClass?: TrainingClass
+  trainingClass?: TrainingClass,
+  now = Date.now()
 ) {
   if (enrollment.status === "Cancelada") return "Cancelada pelo atendimento.";
   if (enrollment.status === "Concluída") return "Concluída e pronta para pós-curso.";
@@ -260,9 +267,10 @@ function deriveEnrollmentOperationalStatus(
     return `${enrollment.status} com turma não localizada.`;
   }
 
-  const now = Date.now();
-  const startsAt = new Date(trainingClass.startDate).getTime();
-  const endsAt = new Date(trainingClass.endDate).getTime();
+  const startsAt = parseDate(trainingClass.startDate).getTime();
+  const endDate = parseDate(trainingClass.endDate);
+  endDate.setHours(23, 59, 59, 999);
+  const endsAt = endDate.getTime();
 
   if (enrollment.status === "Confirmada") {
     if (endsAt < now) return "Confirmada em turma encerrada. Revisar conclusão.";
@@ -326,9 +334,11 @@ export function buildResourceConfig(
 
       const activeCourses = store.courses.filter((item) => item.status === "Ativo" || item.status === "Destaque").length;
       const enrolledStudents = store.students.length;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
       const upcomingClasses = store.classes.filter((item) => {
-        const startsAt = new Date(item.startDate).getTime();
-        return startsAt >= Date.now();
+        const startsAt = parseDate(item.startDate).getTime();
+        return startsAt >= todayStart.getTime();
       }).length;
       const completedEnrollments = store.enrollments.filter((item) => item.status === "Concluída").length;
       const totalEnrollments = store.enrollments.length;
@@ -463,6 +473,7 @@ export function buildResourceConfig(
             label: "Nome do curso",
             type: "text",
             required: true,
+            maxLength: ADMIN_VARCHAR_240_MAX_LENGTH,
             placeholder: "Ex.: Gestão de contratos administrativos",
           },
           {
@@ -619,10 +630,13 @@ export function buildResourceConfig(
       const activeClasses = store.classes.filter(
         (item) => item.status === "Inscrições abertas" || item.status === "Poucas vagas"
       ).length;
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const startingWindowEnd = new Date(todayStart);
+      startingWindowEnd.setDate(startingWindowEnd.getDate() + 30);
       const startingClasses = store.classes.filter((item) => {
-        const startsAt = new Date(item.startDate).getTime();
-        const now = Date.now();
-        return startsAt >= now && startsAt <= now + 30 * 86400_000;
+        const startsAt = parseDate(item.startDate).getTime();
+        return startsAt >= todayStart.getTime() && startsAt <= startingWindowEnd.getTime();
       }).length;
       const totalSeatsAll = store.classes.reduce((sum, item) => sum + item.totalSeats, 0);
       const filledSeatsAll = store.classes.reduce((sum, item) => sum + item.filledSeats, 0);
@@ -728,8 +742,8 @@ export function buildResourceConfig(
             await store.upsertClass({
               id: editingId ?? undefined,
               courseId: str(form.courseId),
-              startDate: normalizeDateTimeForStorage(str(form.startDate)),
-              endDate: normalizeDateTimeForStorage(str(form.endDate), "18:00:00.000Z"),
+              startDate: normalizeDateForStorage(str(form.startDate)),
+              endDate: normalizeDateForStorage(str(form.endDate)),
               time: str(form.time),
               modality: str(form.modality) as TrainingClass["modality"],
               status: str(form.status) as TrainingClass["status"],
@@ -1059,14 +1073,14 @@ export function buildResourceConfig(
           { key: "email", label: "E-mail", type: "text", required: true },
           { key: "phone", label: "Telefone", type: "text" },
           { key: "type", label: "Jornada comercial", type: "select", options: leadTypeOptions, required: true },
-          { key: "courseInterest", label: "Interesse principal", type: "text", required: true },
+          { key: "courseInterest", label: "Interesse principal", type: "text", required: true, maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "origin", label: "Origem", type: "select", options: originOptions, required: true },
           { key: "status", label: "Status", type: "select", options: leadStatusOptions, required: true },
           { key: "organization", label: "Empresa/Órgão", type: "text" },
           { key: "teamSize", label: "Tamanho da equipe", type: "number" },
           { key: "preferredModality", label: "Modalidade preferida", type: "text" },
           { key: "trainingObjective", label: "Objetivo do treinamento", type: "textarea" },
-          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea" },
+          { key: "trainingTheme", label: "Tema do treinamento", type: "textarea", maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "mainChallenges", label: "Desafios principais", type: "textarea" },
         ],
       };
@@ -1520,7 +1534,7 @@ export function buildResourceConfig(
           }
         },
         fields: [
-          { key: "title", label: "Título", type: "text", required: true },
+          { key: "title", label: "Título", type: "text", required: true, maxLength: ADMIN_VARCHAR_240_MAX_LENGTH },
           { key: "category", label: "Categoria", type: "select", options: categoryOptions, required: true },
           { key: "author", label: "Autor", type: "text", required: true },
           { key: "status", label: "Status", type: "select", options: blogStatusOptions, required: true },

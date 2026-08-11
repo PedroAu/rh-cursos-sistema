@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 
-import { useLocation } from "@/lib/router-compat";
 import { cn } from "@/lib/utils";
 
 const footerColumns = [
@@ -40,8 +40,8 @@ function isActive(pathname: string, to: string) {
 }
 
 export function PublicFooter() {
-  const location = useLocation();
-  const isAboutPage = location.pathname.startsWith("/sobre");
+  const pathname = usePathname() ?? "/";
+  const isAboutPage = pathname.startsWith("/sobre");
 
   return (
     <footer className="border-t border-tk-line bg-tk-surface-2 px-6 py-14 md:px-10 md:pb-10">
@@ -75,7 +75,7 @@ export function PublicFooter() {
               </p>
               <div className="space-y-2.5">
                 {column.items.map((item) => {
-                  const active = isActive(location.pathname, item.to);
+                  const active = isActive(pathname, item.to);
 
                   return (
                     <NextLink

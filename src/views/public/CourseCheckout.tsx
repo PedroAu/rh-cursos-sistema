@@ -16,7 +16,7 @@ import {
 import { formatCPF, formatPhone } from "@/lib/format";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
 import { fetchPublicClassesFromSupabase } from "@/lib/supabase/rh-cursos-api";
-import { cn } from "@/lib/utils";
+import { cn, parseDate } from "@/lib/utils";
 import type { TrainingClass } from "@/types";
 
 const PRE_ENROLLMENT_RECEIPT_STORAGE_KEY = "__latest_pre_enrollment_receipt__";
@@ -65,7 +65,7 @@ function formatClassLabel(trainingClass: TrainingClass) {
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }).format(new Date(trainingClass.startDate));
+  }).format(parseDate(trainingClass.startDate));
 }
 
 function Stepper() {

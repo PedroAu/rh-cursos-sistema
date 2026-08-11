@@ -1,3 +1,5 @@
+"use client";
+
 import { Send, ShieldCheck, Users } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";

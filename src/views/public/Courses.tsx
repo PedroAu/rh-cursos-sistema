@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CalendarDays, Clock3, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,13 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Chip } from "@/components/ui/chip";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
-import { useSimulatedLoading } from "@/hooks/use-simulated-loading";
 import { useAppStore } from "@/lib/app-store";
+import { getPublicCourseName } from "@/lib/seo";
 import { getOpenEnrollmentClasses, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { PUBLIC_COURSE_STATUSES } from "@/lib/domain/course-enums";
 import { Link, useSearchParams } from "@/lib/router-compat";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency, parseDate } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
 
 type CatalogEntry = {
@@ -87,7 +88,7 @@ function formatCatalogDate(value: string) {
     day: "2-digit",
     month: "short",
     year: "numeric"
-  }).format(new Date(value)).replace(".", "");
+  }).format(parseDate(value)).replace(".", "");
 }
 
 function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
@@ -110,8 +111,8 @@ function buildCatalogEntries(courses: Course[], classes: TrainingClass[]) {
       } satisfies CatalogEntry;
     })
     .sort((left, right) => {
-      const leftDate = left.trainingClass ? new Date(left.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
-      const rightDate = right.trainingClass ? new Date(right.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
+      const leftDate = left.trainingClass ? parseDate(left.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
+      const rightDate = right.trainingClass ? parseDate(right.trainingClass.startDate).getTime() : Number.POSITIVE_INFINITY;
 
       if (leftDate !== rightDate) {
         return leftDate - rightDate;
@@ -132,14 +133,17 @@ function formatCourseModalities(course: Course) {
 export function CoursesPage() {
   const { courses, classes } = useAppStore();
   const [params, setParams] = useSearchParams();
-  const [query, setQuery] = useState(params.get("q") ?? "");
+  const paramsQuery = params.get("q") ?? "";
+  const paramsCategory = params.get("category") ?? "";
+  const [query, setQuery] = useState(paramsQuery);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const activeCategory = params.get("category") ?? "";
+  const activeCategory = paramsCategory;
+  const debouncedQuery = useDebouncedValue(query);
 
   useEffect(() => {
-    setQuery(params.get("q") ?? "");
-  }, [params]);
+    setQuery(paramsQuery);
+  }, [paramsQuery]);
 
   useHotkey(
     (event) => event.key === "/" && !["INPUT", "TEXTAREA"].includes((event.target as HTMLElement).tagName),
@@ -156,7 +160,7 @@ export function CoursesPage() {
   );
 
   const filteredEntries = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = debouncedQuery.trim().toLowerCase();
 
     return catalogEntries.filter((entry) => {
       const matchesQuery =
@@ -175,11 +179,9 @@ export function CoursesPage() {
       const matchesCategory = !activeCategory || entry.category === activeCategory;
       return matchesQuery && matchesCategory;
     });
-  }, [activeCategory, catalogEntries, query]);
+  }, [activeCategory, catalogEntries, debouncedQuery]);
 
-  const loading = useSimulatedLoading([query, activeCategory]);
-
-  const syncParams = (nextQuery: string, nextCategory: string) => {
+  const syncParams = useCallback((nextQuery: string, nextCategory: string) => {
     const next = new URLSearchParams();
 
     if (nextQuery.trim()) {
@@ -191,7 +193,14 @@ export function CoursesPage() {
     }
 
     setParams(next);
-  };
+  }, [setParams]);
+
+  useEffect(() => {
+    if (paramsQuery === debouncedQuery && paramsCategory === activeCategory) return;
+    if (query !== paramsQuery) return;
+    if (query !== debouncedQuery) return;
+    syncParams(debouncedQuery, activeCategory);
+  }, [activeCategory, debouncedQuery, paramsCategory, paramsQuery, query, syncParams]);
 
   const clearFilters = () => {
     setQuery("");
@@ -208,7 +217,7 @@ export function CoursesPage() {
                 Cursos abertos · Agenda 2026
               </Badge>
               <h1 className="max-w-[20ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.5rem] lg:text-[2.75rem]">
-                Cursos para aplicar a norma <em className="italic text-tk-accent-strong">na prática</em>
+                Cursos com certificado para aplicar a norma <em className="italic text-tk-accent-strong">na prática</em>
               </h1>
               <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
                 Turmas presenciais e online ao vivo, com certificação e conteúdo atualizado às exigências legais e regulatórias{" "}
@@ -226,7 +235,6 @@ export function CoursesPage() {
                   onChange={(event) => {
                     const nextValue = event.target.value;
                     setQuery(nextValue);
-                    syncParams(nextValue, activeCategory);
                   }}
                   aria-label="Buscar no catálogo"
                   placeholder="Buscar por tema, área ou palavra-chave"
@@ -268,9 +276,7 @@ export function CoursesPage() {
             </div>
           ) : null}
 
-          {loading ? (
-            <div className="py-16 text-center text-tk-ink-muted">Atualizando catálogo...</div>
-          ) : filteredEntries.length ? (
+          {filteredEntries.length ? (
             <div className="grid gap-[22px] md:grid-cols-2 xl:grid-cols-3">
               {filteredEntries.map((entry) => (
                 <CatalogSessionCard key={`${entry.course.id}-${entry.trainingClass?.id ?? "sem-turma"}`} entry={entry} />
@@ -333,7 +339,12 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
 
       <div className="flex flex-1 flex-col gap-[14px] p-[20px_22px_24px]">
         <h3 className="font-tk-display text-[1.25rem] font-bold leading-[1.25] tracking-[-0.01em] text-tk-ink">
-          {entry.course.title}
+          <Link
+            to={`/cursos/${entry.course.slug}`}
+            className="transition-colors hover:text-tk-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent-strong focus-visible:ring-offset-2"
+          >
+            {getPublicCourseName(entry.course.title)}
+          </Link>
         </h3>
 
         <div className="space-y-2 text-[0.82rem] text-tk-ink-muted">

@@ -21,7 +21,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { LoadingBlocks } from "@/components/common/loading-blocks";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, parseDate } from "@/lib/utils";
 import { useAppStore } from "@/lib/app-store";
 import type { TrainingClass } from "@/types";
 
@@ -56,7 +56,7 @@ export function CalendarView({
   const classesForDate = (date: Date) =>
     filteredClasses.filter(
       (trainingClass) =>
-        format(new Date(trainingClass.startDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+        format(parseDate(trainingClass.startDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
     );
 
   const visibleClasses = selectedDate ? classesForDate(selectedDate) : filteredClasses;

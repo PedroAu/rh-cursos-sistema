@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CheckCircle2, Star } from "lucide-react";
 
 import { FeatureListItem } from "@/components/patterns/feature-list-item";
@@ -14,8 +15,9 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { useAppStore } from "@/lib/app-store";
 import { company } from "@/lib/company";
+import { getPublicCourseName } from "@/lib/seo";
 import { Link } from "@/lib/router-compat";
-import { cn } from "@/lib/utils";
+import { cn, parseDate } from "@/lib/utils";
 
 type JourneyCard = {
   badge: string;
@@ -120,7 +122,7 @@ const testimonials = [
 ] as const;
 
 function getClassDateParts(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
 
   return {
     day: new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date),
@@ -147,16 +149,27 @@ function formatHeroMode(modality: string, location: string) {
 export function HomePage() {
   const { classes, courses } = useAppStore();
   const reduceMotion = useReducedMotion();
+  const [motionReady, setMotionReady] = useState(false);
   const sectionContainerClass = "mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]";
 
+  useEffect(() => {
+    setMotionReady(true);
+  }, []);
+
+  const shouldAnimateTestimonials = motionReady && reduceMotion === false;
+
   const upcomingClasses = [...classes]
-    .sort((left, right) => new Date(left.startDate).getTime() - new Date(right.startDate).getTime())
+    .sort((left, right) => parseDate(left.startDate).getTime() - parseDate(right.startDate).getTime())
     .slice(0, 3)
-    .map((trainingClass) => ({
-      ...trainingClass,
-      courseTitle: courses.find((course) => course.id === trainingClass.courseId)?.title ?? "Curso RH Cursos",
-      modeLabel: formatHeroMode(trainingClass.modality, trainingClass.location)
-    }));
+    .map((trainingClass) => {
+      const course = courses.find((item) => item.id === trainingClass.courseId);
+
+      return {
+        ...trainingClass,
+        courseTitle: course ? getPublicCourseName(course.title) : "Próxima turma",
+        modeLabel: formatHeroMode(trainingClass.modality, trainingClass.location)
+      };
+    });
 
   return (
     <div className="bg-tk-surface-2 pb-16 md:pb-24">
@@ -167,13 +180,12 @@ export function HomePage() {
               Educação corporativa desde 2007
             </Badge>
             <h1 className="mt-5 max-w-[16ch] font-tk-display text-[2.4rem] font-bold leading-[1.06] tracking-[-0.02em] text-tk-ink sm:max-w-[18ch] sm:text-[2.75rem] lg:max-w-[16ch] lg:text-display-hero">
-              Conhecimento que <span className="italic text-[var(--rh-teal-deep)]">liberta da dependência</span> para
-              decidir e agir com segurança.
+              Cursos e treinamentos para o setor público e privado
             </h1>
             <p className="mt-5 max-w-[56ch] font-tk-serif text-base font-normal leading-[1.55] text-tk-ink-muted sm:text-subheading lg:text-subheading-lg">
-              Cursos, treinamentos in company e consultoria para transformar conhecimento técnico em autonomia, clareza e
-              aplicação no mundo real. Para organizações dos setores público e privado que precisam formar equipes
-              capazes de entender, decidir e executar com confiança.
+              A RH Cursos &amp; Soluções oferece cursos presenciais e online, treinamentos in company e consultoria em eSocial,
+              Departamento Pessoal, licitações e contratos, contabilidade pública e gestão — para órgãos públicos e empresas
+              de todo o Brasil, desde 2007.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
@@ -384,14 +396,8 @@ export function HomePage() {
       <section className="bg-tk-surface pb-16 lg:pb-[88px]">
         <div className={sectionContainerClass}>
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.company}
-                initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 18 }}
-                whileInView={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.45 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
-              >
+            {testimonials.map((testimonial, index) => {
+              const content = (
                 <Testimonial
                   quote={testimonial.quote}
                   name="Participante"
@@ -399,8 +405,24 @@ export function HomePage() {
                   company={testimonial.company}
                   initials={testimonial.initials}
                 />
-              </motion.div>
-            ))}
+              );
+
+              if (!shouldAnimateTestimonials) {
+                return <div key={testimonial.company}>{content}</div>;
+              }
+
+              return (
+                <motion.div
+                  key={testimonial.company}
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.45 }}
+                  transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: index * 0.08 }}
+                >
+                  {content}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>

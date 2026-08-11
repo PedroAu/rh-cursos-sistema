@@ -6,7 +6,7 @@ import { Link } from "@/lib/router-compat";
 import { StatusBadge } from "@/components/common/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuoteModal } from "@/components/in-company/quote-modal";
-import { cn } from "@/lib/utils";
+import { cn, parseDate } from "@/lib/utils";
 import type { Course, TrainingClass } from "@/types";
 
 type CourseCardProps = {
@@ -66,7 +66,7 @@ export function CourseCard({ course, nextClass, compact = false }: CourseCardPro
           {nextClass ? (
             <div className="rounded-md bg-tk-accent-soft px-3 py-2 text-xs font-semibold text-tk-brand">
               Próxima turma:{" "}
-              {new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(new Date(nextClass.startDate))}
+              {new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(parseDate(nextClass.startDate))}
             </div>
           ) : null}
         </div>

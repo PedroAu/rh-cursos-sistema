@@ -20,6 +20,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { trackEvent } from "@/lib/analytics";
+import { getPublicCourseName } from "@/lib/seo";
 import { useAppStore } from "@/lib/app-store";
 import {
   getDisplayableEnrollmentClasses,
@@ -27,26 +28,26 @@ import {
   isTrainingClassSoldOut,
 } from "@/lib/enrollment-class-resolution";
 import { Link, useNavigate, useParams, useSearchParams } from "@/lib/router-compat";
-import { cn, currency } from "@/lib/utils";
+import { cn, currency, parseDate } from "@/lib/utils";
 import type { Course, Instructor, Testimonial, TrainingClass } from "@/types";
 
 const MONTH_SHORT_LABELS = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"] as const;
 
 function formatDateShort(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
   const day = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(date);
 
   return `${day} ${MONTH_SHORT_LABELS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatMonthYearShort(value: string) {
-  const date = new Date(value);
+  const date = parseDate(value);
   return `${MONTH_SHORT_LABELS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
 function formatDateRange(trainingClass: TrainingClass) {
-  const start = new Date(trainingClass.startDate);
-  const end = new Date(trainingClass.endDate);
+  const start = parseDate(trainingClass.startDate);
+  const end = parseDate(trainingClass.endDate);
   const sameMonth = start.getMonth() === end.getMonth();
   const sameYear = start.getFullYear() === end.getFullYear();
 
@@ -199,7 +200,7 @@ function buildFaqItems(course: Course, selectedClass?: TrainingClass, content?: 
     {
       question: "Como faço minha inscrição?",
       answer: selectedClass
-        ? `Clique em "Enviar pré-inscrição", selecione a turma e envie a solicitação. O pedido para o curso "${course.title}" seguirá para análise sem perder o contexto da turma escolhida.`
+        ? `Clique em "Enviar pré-inscrição", selecione a turma e envie a solicitação. O pedido para o ${getPublicCourseName(course.title)} seguirá para análise sem perder o contexto da turma escolhida.`
         : `Este curso ainda não tem turma aberta. Clique em "Manifestar interesse" para falar com a equipe e receber a próxima agenda.`
     },
     {
@@ -251,6 +252,7 @@ export function CourseDetailPage() {
   const slugParam = Array.isArray(slug) ? slug[0] : slug;
   const querySlug = params.get("slug") ?? "";
   const course = courses.find((item) => item.slug === (slugParam || querySlug));
+  const publicCourseName = course ? getPublicCourseName(course.title) : "";
 
   const courseClasses = useMemo(() => {
     if (!course) {
@@ -400,7 +402,7 @@ export function CourseDetailPage() {
                   </div>
 
                   <h1 className="mt-5 max-w-[20ch] font-tk-display text-[2.3rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.7rem] lg:text-[3.3rem]">
-                    {course.title}
+                    {publicCourseName}
                   </h1>
 
                   <p className="mt-4 max-w-[58ch] font-tk-serif text-[1.05rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.15rem] lg:text-[1.2rem]">
@@ -543,7 +545,7 @@ export function CourseDetailPage() {
                       <div className="relative h-28 w-28 overflow-hidden rounded-full border border-[var(--tk-border)] bg-[var(--tk-surface-2)]">
                         {portrait.source ? (
                           portrait.isImage ? (
-                            <Image src={portrait.source} alt={instructor?.name ?? course.title} fill sizes="112px" className="object-cover" />
+                            <Image src={portrait.source} alt={instructor?.name ?? publicCourseName} fill sizes="112px" className="object-cover" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center font-tk-display text-2xl font-bold text-tk-brand">
                               {portrait.source}
@@ -602,7 +604,7 @@ export function CourseDetailPage() {
                           <div className="h-20 w-20 overflow-hidden rounded-full">
                             <Image
                               src={course.image}
-                              alt={course.title}
+                              alt={publicCourseName}
                               width={80}
                               height={80}
                               className="h-full w-full object-cover"
@@ -663,7 +665,7 @@ export function CourseDetailPage() {
                   <div className="relative h-[180px] w-full">
                     <Image
                       src={course.image || "/images/hero-rh-cursos.jpg"}
-                      alt={course.title}
+                      alt={publicCourseName}
                       fill
                       sizes="(min-width: 1280px) 372px, 100vw"
                       className="object-cover"

@@ -8,6 +8,7 @@ import {
   openAvailableCheckout,
   resolveAvailableTrainingPath,
 } from "./helpers/integration-env";
+import { getPublicCourseName } from "../src/lib/seo";
 
 const blogArticlePath = "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial";
 
@@ -99,8 +100,10 @@ test.describe("epica 4 — jornadas publicas", () => {
 
     try {
       await page.goto("/cursos");
-      const detailsLink = page.locator(`a[href="/cursos/${slug}"]`).first();
-      await expect(page.getByText(title, { exact: true })).toBeVisible();
+      const detailsLink = page
+        .locator(`a[href="/cursos/${slug}"]`)
+        .filter({ hasText: "Ver detalhes →" });
+      await expect(page.getByText(getPublicCourseName(title), { exact: true })).toBeVisible();
       await expect(page.getByText("Sem turma aberta").first()).toBeVisible();
       await expect(detailsLink).toHaveText("Ver detalhes →");
 
