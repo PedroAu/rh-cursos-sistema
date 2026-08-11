@@ -1,5 +1,9 @@
 # Story REC-409 — Recuperação segura de senha
 
+## Status
+
+Done
+
 ## Objetivo
 
 Permitir que usuários solicitem um link de recuperação por e-mail, validem o callback do Supabase e definam uma nova senha sem depender de localhost.

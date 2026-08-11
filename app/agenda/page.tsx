@@ -1,7 +1,15 @@
+import { cookies } from "next/headers";
 import type { Metadata } from "next";
 
 import { PublicPageShell } from "@/components/next-page-shell";
 import { AgendaPage } from "@/features/public/agenda/agenda-page";
+import {
+  fetchPublicCatalogServerState,
+  isServerPublicTestBaselineEnabled,
+  PUBLIC_TEST_BASELINE_COOKIE_NAME
+} from "@/lib/supabase/rh-cursos-api";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Agenda de Cursos e Treinamentos Presenciais e Online | RH Cursos",
@@ -16,9 +24,29 @@ export const metadata: Metadata = {
   }
 };
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const usePublicTestBaseline = isServerPublicTestBaselineEnabled(
+    cookieStore.get(PUBLIC_TEST_BASELINE_COOKIE_NAME)?.value
+  );
+  const catalogState = await fetchPublicCatalogServerState(usePublicTestBaseline);
+
+  if (catalogState.status === "unavailable") {
+    console.error("Falha ao carregar catálogo público na rota /agenda:", catalogState.error);
+    throw catalogState.error;
+  }
+
   return (
-    <PublicPageShell>
+    <PublicPageShell
+      initialData={{
+        courses: catalogState.catalog.courses,
+        classes: catalogState.catalog.classes,
+        instructors: catalogState.catalog.instructors,
+        trainingPaths: catalogState.catalog.trainingPaths,
+        coursePublicContents: catalogState.catalog.coursePublicContents,
+        courseCategories: catalogState.catalog.courseCategories
+      }}
+    >
       <AgendaPage />
     </PublicPageShell>
   );

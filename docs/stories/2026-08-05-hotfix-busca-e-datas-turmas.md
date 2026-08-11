@@ -1,6 +1,6 @@
 # Hotfix — busca pública e datas de turmas
 
-**Status:** Ready for Review  
+**Status:** Done
 **Tipo:** Bugfix de produção  
 **Prioridade:** Alta
 
@@ -68,3 +68,4 @@ Usuários relatam dois defeitos no site público: a busca mostra um carregamento
 - 2026-08-05: Story criada para os dois hotfixes de produção.
 - 2026-08-05: Implementados hotfixes, testes e atualização do snapshot de datas.
 - 2026-08-10: Incorporados ajustes da revisão pré-push e revalidados unitários, build e E2E completos.
+- 2026-08-11: Revalidação integral local isolada: `npm test` (184/184), com buscas, datas civis e baselines públicos verdes.

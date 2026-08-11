@@ -1,15 +1,30 @@
 status:
   branch: codex/hotfixes-no-payments
   modifiedFiles:
+    - app/agenda/page.tsx
+    - app/blog/page.tsx
+    - docs/guides/e2e-isolated-supabase-ci.md
+    - docs/stories/2026-07-14-cursos-turmas-divergencias-pagina-publica.md
+    - docs/stories/2026-07-23-rec-409-recuperacao-de-senha.md
+    - docs/stories/2026-08-03-rec-409-isolar-e2e-supabase-ci.md
+    - docs/stories/2026-08-05-hotfix-busca-e-datas-turmas.md
+    - docs/stories/index.md
+    - package.json
+    - scripts/generate-story-index.mjs
+    - tests/ui-governance.spec.ts-snapshots/home-hero-governance-functional-darwin.png
+    - tests/ui-governance.spec.ts-snapshots/home-page-governance-functional-darwin.png
+    - tests/ui-governance.spec.ts-snapshots/home-page-mobile-governance-functional-darwin.png
     - .aiox/project-status.yaml
-  modifiedFilesTotalCount: 1
+  modifiedFilesTotalCount: 14
   recentCommits:
+    - 'fix: expose robots route for crawlers [Story 2026-08-11]'
+    - 'fix: stabilize public catalog journeys [Story 2026-08-11]'
+    - 'chore: refresh AIOX project status'
     - 'test(visual): refresh public page baselines [Story 2026-08-11]'
-    - 'feat: improve technical SEO and public discovery [Story 2026-08-11]'
-  currentEpic: null
-  currentStory: null
-  lastUpdate: '2026-08-11T14:49:08.479Z'
+  currentEpic: 'Epic 17 (REC-*)'
+  currentStory: docs/stories/2026-08-03-rec-409-isolar-e2e-supabase-ci.md
+  lastUpdate: '2026-08-11T16:01:14.000Z'
   isGitRepo: true
-timestamp: 1786459748480
+timestamp: 1786464079000
 ttl: 60
 gitFingerprint: 1786373931183.512:1786459722191.9814

@@ -1,7 +1,7 @@
 # Story: Corrigir divergências entre formulários de curso/turma e a página pública do curso
 
 ## Status
-Ready
+Done
 
 ## Executor Assignment
 executor: "@dev"
@@ -78,7 +78,7 @@ quality_gate_tools:
   - [x] Campo `durationHours` no form; derivar `durationLabel`.
   - [x] Validação `> 0` client + server.
 - [x] Remover rating da página (AC6)
-- [ ] Testes e baselines (AC7)
+- [x] Testes e baselines (AC7)
 
 ## Dev Notes
 
@@ -121,6 +121,10 @@ tests/ui-governance.spec.ts-snapshots/ (baselines CourseDetail)
 ### Testing
 - Unit (Vitest): `npm run test:unit`. E2E (Playwright): `npm run test:e2e:smoke`.
 - Gate (@architect): typecheck, lint, test:unit, build, test:e2e:smoke.
+
+### Validação final
+
+- 2026-08-11: `npm test` passou em ambiente Supabase local isolado (184/184), incluindo os baselines públicos desktop/mobile e a rota de detalhe de curso.
 
 ## Change Log
 | Date | Version | Description | Author |

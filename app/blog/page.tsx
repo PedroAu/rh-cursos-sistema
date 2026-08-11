@@ -5,7 +5,6 @@ import { PublicPageShell } from "@/components/next-page-shell";
 import { BlogPage } from "@/features/public/blog/blog-page";
 import {
   fetchPublicBlogPostsFromSupabaseServer,
-  isPublicTestBaselineBuildEnabled,
   isServerPublicTestBaselineEnabled,
   PUBLIC_TEST_BASELINE_COOKIE_NAME
 } from "@/lib/supabase/rh-cursos-api";
@@ -27,9 +26,9 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const cookieStore = await cookies();
-  const usePublicTestBaseline =
-    isPublicTestBaselineBuildEnabled() ||
-    isServerPublicTestBaselineEnabled(cookieStore.get(PUBLIC_TEST_BASELINE_COOKIE_NAME)?.value);
+  const usePublicTestBaseline = isServerPublicTestBaselineEnabled(
+    cookieStore.get(PUBLIC_TEST_BASELINE_COOKIE_NAME)?.value
+  );
   const blogPosts = await fetchPublicBlogPostsFromSupabaseServer(usePublicTestBaseline).catch(() => null);
 
   return (
