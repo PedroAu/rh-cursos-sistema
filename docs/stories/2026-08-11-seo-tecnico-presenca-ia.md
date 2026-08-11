@@ -42,7 +42,7 @@ Done
 - `app/contato/page.tsx`
 - `app/falar-com-especialista/page.tsx`
 - `app/inscricao-confirmada/page.tsx`
-- `app/robots.ts`
+- `app/robots.txt/route.ts`
 - `app/sitemap.ts`
 - `public/llms.txt`
 - `next.config.mjs`
