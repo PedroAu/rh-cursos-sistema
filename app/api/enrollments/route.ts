@@ -41,7 +41,9 @@ async function resolveEnrollmentConfirmationCode(
   adminSupabase: ReturnType<typeof createSupabaseServerClient>,
   rawEnrollmentId: string,
 ) {
-  if (!adminSupabase) return rawEnrollmentId;
+  if (!adminSupabase || typeof adminSupabase.from !== "function") {
+    return rawEnrollmentId;
+  }
 
   // Compatibilidade com projetos que ainda têm a versão legada da RPC, que
   // retornava `inscricao.id` em vez de `codigo_confirmacao`.
