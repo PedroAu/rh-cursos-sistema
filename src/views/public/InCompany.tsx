@@ -275,7 +275,7 @@ export function InCompanyPage() {
             <div>
               <SectionEyebrow>Treinamento in-company · Para organizações</SectionEyebrow>
               <h1 className="mt-5 max-w-[11ch] font-tk-display text-[2.85rem] font-bold leading-[0.98] tracking-[var(--tk-tracking-display)] text-tk-ink md:text-[3.75rem]">
-                A capacitação vai até a <em className="italic">sua</em> equipe
+                Treinamento in company sob medida para sua equipe
               </h1>
               <p className="mt-5 max-w-[48ch] font-tk-serif text-[1.22rem] font-normal leading-[1.45] text-tk-ink-muted">
                 Programas sob medida, no seu contexto operacional, com o seu calendário e os seus casos reais: do

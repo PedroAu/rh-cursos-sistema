@@ -44,7 +44,7 @@ describe("REC-301 public pre-enrollment contract", () => {
   });
 
   it("removes checkout and simulated-payment claims from public entry points", () => {
-    expect(checkoutRoute).toContain('title: `Pré-inscrição • ${course.title} | RH Cursos`');
+    expect(checkoutRoute).toContain('title: `Pré-inscrição • ${getPublicCourseName(course.title)} | RH Cursos`');
     expect(checkoutRoute).not.toContain('title: `Checkout •');
     expect(courseDetail).not.toContain("conclua o checkout guiado");
     expect(courseDetail).not.toContain("até 6x sem juros");

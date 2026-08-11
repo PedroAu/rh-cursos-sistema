@@ -81,6 +81,15 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=()"
           }
         ]
+      },
+      {
+        source: "/robots.txt",
+        headers: [
+          {
+            key: "Content-Signal",
+            value: "search=yes, ai-input=yes"
+          }
+        ]
       }
     ];
   }

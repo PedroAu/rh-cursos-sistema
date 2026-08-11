@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useAppStore } from "@/lib/app-store";
+import { getPublicCourseName } from "@/lib/seo";
 import { isTrainingClassSoldOut, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { Link, useSearchParams } from "@/lib/router-compat";
 import { cn, currency, parseDate } from "@/lib/utils";
@@ -657,7 +658,7 @@ export function AgendaPage() {
                               {entry.modeLabel}
                             </span>
                             <span className="line-clamp-2 text-[11.5px] font-semibold leading-[1.25] text-tk-ink">
-                              {entry.course.title}
+                              {getPublicCourseName(entry.course.title)}
                             </span>
                             {count > 1 ? (
                               <span className="mt-auto text-[11px] text-tk-ink-muted">+{count - 1} turma{count - 1 === 1 ? "" : "s"}</span>
@@ -704,7 +705,7 @@ export function AgendaPage() {
                               <span>{entry.category}</span>
                             </div>
                             <h3 className="mb-2 font-tk-display text-[1.25rem] font-bold leading-[1.25] tracking-[-0.01em] text-tk-ink">
-                              {entry.course.title}
+                              {getPublicCourseName(entry.course.title)}
                             </h3>
                             <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs text-tk-ink-muted">
                               <span className="inline-flex items-center gap-2">

@@ -266,7 +266,7 @@ export function BlogPage() {
         <div className="mx-auto w-[min(var(--tk-container),calc(100%-24px))] py-14 md:w-[min(var(--tk-container),calc(100%-40px))] md:py-16">
           <SectionEyebrow>Conteúdo · Análises · Prática</SectionEyebrow>
           <h1 className="mt-5 max-w-[12ch] font-tk-display text-[2.7rem] font-bold leading-[1.02] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
-            A norma explicada de um jeito que você <em className="italic">usa</em>
+            Blog: a norma explicada de um jeito que você <em className="italic">usa</em>
           </h1>
           <p className="mt-4 max-w-[60ch] font-tk-serif text-[1.16rem] font-normal leading-[1.45] text-tk-ink-muted">
             Análises práticas de licitações, LGPD, compliance e gestão pública: escritas por quem aplica essas normas

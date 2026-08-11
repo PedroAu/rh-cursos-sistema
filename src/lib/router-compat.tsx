@@ -3,8 +3,8 @@
 "use client";
 
 import NextLink from "next/link";
-import { useParams as useNextParams, usePathname, useRouter, useSearchParams as useNextSearchParams } from "next/navigation";
-import { createElement, useCallback, type AnchorHTMLAttributes, type ReactNode } from "react";
+import { useParams as useNextParams, usePathname, useRouter } from "next/navigation";
+import { createElement, useCallback, useEffect, useState, type AnchorHTMLAttributes, type ReactNode } from "react";
 
 const NAVIGATION_STATE_STORAGE_KEY = "__router_compat_navigation_state__";
 
@@ -82,7 +82,7 @@ export function useNavigate() {
 
 export function useLocation() {
   const pathname = usePathname();
-  const params = useNextSearchParams();
+  const [params] = useSearchParams();
   const search = params.toString() ? `?${params.toString()}` : "";
   let state = typeof window !== "undefined" ? window.history.state : null;
 
@@ -113,12 +113,16 @@ export function useParams() {
 export function useSearchParams(): [URLSearchParams, (next: URLSearchParams | Record<string, string>) => void] {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useNextSearchParams();
-  const current = new URLSearchParams(params.toString());
+  const [current, setCurrent] = useState(() => new URLSearchParams());
+
+  useEffect(() => {
+    setCurrent(new URLSearchParams(window.location.search));
+  }, [pathname]);
 
   const setParams = useCallback((next: URLSearchParams | Record<string, string>) => {
     const normalized = next instanceof URLSearchParams ? next : new URLSearchParams(next);
     const query = normalized.toString();
+    setCurrent(normalized);
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   }, [pathname, router]);
 

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useHotkey } from "@/hooks/use-hotkey";
 import { useAppStore } from "@/lib/app-store";
+import { getPublicCourseName } from "@/lib/seo";
 import { getOpenEnrollmentClasses, resolveDisplayPrice } from "@/lib/enrollment-class-resolution";
 import { PUBLIC_COURSE_STATUSES } from "@/lib/domain/course-enums";
 import { Link, useSearchParams } from "@/lib/router-compat";
@@ -214,7 +215,7 @@ export function CoursesPage() {
                 Cursos abertos · Agenda 2026
               </Badge>
               <h1 className="max-w-[20ch] font-tk-display text-[2.25rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink sm:text-[2.5rem] lg:text-[2.75rem]">
-                Cursos para aplicar a norma <em className="italic text-tk-accent-strong">na prática</em>
+                Cursos com certificado para aplicar a norma <em className="italic text-tk-accent-strong">na prática</em>
               </h1>
               <p className="max-w-[58ch] font-tk-serif text-[1.125rem] font-normal leading-[1.45] text-tk-ink-muted sm:text-[1.25rem] lg:text-[1.35rem]">
                 Turmas presenciais e online ao vivo, com certificação e conteúdo atualizado às exigências legais e regulatórias{" "}
@@ -340,7 +341,7 @@ function CatalogSessionCard({ entry }: { entry: CatalogEntry }) {
             to={`/cursos/${entry.course.slug}`}
             className="transition-colors hover:text-tk-accent-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent-strong focus-visible:ring-offset-2"
           >
-            {entry.course.title}
+            {getPublicCourseName(entry.course.title)}
           </Link>
         </h3>
 

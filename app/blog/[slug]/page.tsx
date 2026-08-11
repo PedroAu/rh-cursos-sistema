@@ -7,6 +7,7 @@ import {
   isPublicTestBaselineBuildEnabled
 } from "@/lib/supabase/rh-cursos-api";
 import { publicTestBaselineBlogPosts } from "@/lib/public-test-baseline";
+import { SITE_URL } from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -36,7 +37,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: `${post.title} | RH Cursos`,
-    description: post.summary
+    description: post.summary,
+    alternates: { canonical: `/blog/${post.slug}` },
+    openGraph: {
+      title: `${post.title} | RH Cursos`,
+      description: post.summary,
+      url: `${SITE_URL}/blog/${post.slug}/`,
+      type: "article"
+    }
   };
 }
 

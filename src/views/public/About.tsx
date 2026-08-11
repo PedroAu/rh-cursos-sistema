@@ -1,3 +1,5 @@
+"use client";
+
 import { Check, Diamond, Gem, Scale, Section, SquareDashedMousePointer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -138,12 +140,12 @@ export function AboutPage() {
             Documento institucional · Desde 2007
           </Badge>
           <h1 className="mt-5 max-w-[10ch] font-tk-display text-[2.75rem] font-bold leading-[1.03] tracking-[-0.03em] text-tk-ink md:text-[3rem]">
-            Transformando vidas por meio do <em className="italic">conhecimento</em>
+            Quem somos: capacitação e consultoria desde 2007
           </h1>
           <p className="mt-4 max-w-[62ch] font-tk-serif text-[1.14rem] font-normal leading-[1.45] text-tk-ink-muted">
             A RH Cursos &amp; Soluções é uma empresa brasileira de educação corporativa, consultoria e treinamento
-            empresarial, sediada em Brasília – DF, especializada na capacitação de servidores públicos e profissionais
-            do setor privado.
+            empresarial, fundada em 2007, com sede em Águas Claras, Brasília – DF, e atuação nacional na capacitação
+            de servidores públicos e profissionais do setor privado. CNPJ: 08.703.044/0001-90.
           </p>
         </div>
       </section>
