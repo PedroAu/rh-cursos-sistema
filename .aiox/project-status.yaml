@@ -1,19 +1,15 @@
 status:
-  branch: main
+  branch: codex/hotfixes-no-payments
   modifiedFiles:
     - .aiox/project-status.yaml
-    - package.json
-    - scripts/build-playwright-app.mjs
-    - scripts/run-playwright-test-build.mjs
-    - src/lib/supabase/rh-cursos-api.ts
-  modifiedFilesTotalCount: 8
+  modifiedFilesTotalCount: 1
   recentCommits:
-    - 'fix: keep admin form open on expired session'
-    - 'fix: handle expired admin sessions when saving'
+    - 'test(visual): refresh public page baselines [Story 2026-08-11]'
+    - 'feat: improve technical SEO and public discovery [Story 2026-08-11]'
   currentEpic: null
   currentStory: null
-  lastUpdate: '2026-07-29T15:40:09.350Z'
+  lastUpdate: '2026-08-11T14:49:08.479Z'
   isGitRepo: true
-timestamp: 1785339609352
+timestamp: 1786459748480
 ttl: 60
-gitFingerprint: 1783996413321.067:1785335969998.9836
+gitFingerprint: 1786373931183.512:1786459722191.9814
