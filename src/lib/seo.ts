@@ -24,14 +24,21 @@ export const organizationJsonLd = {
  * apresentação para manter a intenção de busca explícita.
  */
 export function getPublicCourseName(title: string) {
-  const expanded = title.trim().replace(/\bDP\b/gi, "Departamento Pessoal");
+  const expanded = title
+    .trim()
+    .replace(/\bDP\b/gi, "Departamento Pessoal")
+    .replace(/^Curso de Prático\b/i, "Curso Prático")
+    .replace(/^Curso de Completo\b/i, "Curso Completo");
 
   if (/^curso\s+de\b/i.test(expanded)) {
     return expanded;
   }
 
   if (/^curso\b/i.test(expanded)) {
-    return expanded.replace(/^curso\b/i, "Curso de");
+    // Preserve natural constructions such as "Curso Prático" and
+    // "Curso Completo". Replacing every leading "Curso" with "Curso de"
+    // creates titles grammatically weaker for SEO and for the page H1.
+    return expanded;
   }
 
   return `Curso de ${expanded}`;
@@ -87,6 +94,102 @@ function courseInstanceJsonLd(trainingClass: TrainingClass) {
   }
 
   return instance;
+}
+
+function eventLocationJsonLd(course: Course, trainingClass: TrainingClass) {
+  const courseUrl = `${SITE_URL}/cursos/${course.slug}/`;
+  const virtualLocation = {
+    "@type": "VirtualLocation",
+    url: courseUrl
+  };
+
+  if (trainingClass.modality === "Ao vivo online" || trainingClass.modality === "Gravado") {
+    return {
+      eventAttendanceMode: "https://schema.org/OnlineEventAttendanceMode",
+      location: virtualLocation
+    };
+  }
+
+  const physicalLocation = trainingClass.location
+    ? {
+        "@type": "Place",
+        name: trainingClass.location,
+        address: trainingClass.location
+      }
+    : undefined;
+
+  if (trainingClass.modality === "Híbrido") {
+    return {
+      eventAttendanceMode: "https://schema.org/MixedEventAttendanceMode",
+      location: physicalLocation ? [physicalLocation, virtualLocation] : virtualLocation
+    };
+  }
+
+  return {
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    ...(physicalLocation ? { location: physicalLocation } : {})
+  };
+}
+
+/**
+ * Converte as turmas públicas futuras em eventos Schema.org.
+ * `today` é injetável para manter o filtro determinístico nos testes.
+ */
+export function buildAgendaEventJsonLd(
+  courses: Course[],
+  classes: TrainingClass[],
+  today: string | Date = new Date()
+) {
+  const todayKey = typeof today === "string" ? today.slice(0, 10) : today.toISOString().slice(0, 10);
+  const coursesById = new Map(courses.map((course) => [course.id, course]));
+
+  return classes
+    .filter((trainingClass) => trainingClass.status !== "Encerrada" && trainingClass.startDate.slice(0, 10) >= todayKey)
+    .map((trainingClass) => {
+      const course = coursesById.get(trainingClass.courseId);
+
+      if (!course) {
+        return null;
+      }
+
+      const locationData = eventLocationJsonLd(course, trainingClass);
+      const price = trainingClass.price > 0 ? trainingClass.price : course.price;
+      const event: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        name: getPublicCourseName(course.title),
+        description: expandDepartmentPersonal(course.shortDescription || course.fullDescription),
+        startDate: trainingClass.startDate,
+        eventStatus: "https://schema.org/EventScheduled",
+        organizer: {
+          "@type": "Organization",
+          name: organizationJsonLd.name,
+          url: organizationJsonLd.url
+        },
+        url: `${SITE_URL}/cursos/${course.slug}/`,
+        ...locationData
+      };
+
+      if (trainingClass.endDate) {
+        event.endDate = trainingClass.endDate;
+      }
+
+      if (course.image) {
+        event.image = course.image.startsWith("http") ? course.image : `${SITE_URL}${course.image.startsWith("/") ? "" : "/"}${course.image}`;
+      }
+
+      if (price > 0) {
+        event.offers = {
+          "@type": "Offer",
+          price,
+          priceCurrency: "BRL",
+          url: `${SITE_URL}/cursos/${course.slug}/`
+        };
+      }
+
+      return event;
+    })
+    .filter((event): event is Record<string, unknown> => Boolean(event));
 }
 
 export function getCourseFaqItems(course: Course, content?: CoursePublicContent, trainingClass?: TrainingClass) {

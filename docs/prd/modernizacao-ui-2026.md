@@ -3,7 +3,7 @@
 **Tipo:** Brownfield PRD
 **Autor:** @pm (Morgan) + @po (Pax)
 **Data:** 2026-06-09
-**Status:** Aprovado para sharding em épicos
+**Status:** Implementação encerrada; PRD aprovado e rastreabilidade reconciliada
 **Escopo de publicação:** Site público + Admin (portal de aluno/instrutor **fora** do escopo atual)
 
 ---
@@ -36,6 +36,10 @@ Todo requisito deste PRD traça a um destes artefatos verificados:
 > **Nota de reconciliação (Story 18.1 / Épica 18, 2026-07-19).** As quatro fontes documentais citadas acima **não existem mais no worktree auditado** (SHA `b86d07e`). Isso é registrado com impacto e owner na §4 de [`docs/prd/traceability-matrix.md`](./traceability-matrix.md); nenhum conteúdo foi recriado (Article IV — No Invention). Os requisitos deste PRD (Épicas 1–6, todas `COMPLETE`) **não são reescritos** — apenas a ausência de baseline é declarada.
 >
 > **Supersessão de identidade visual:** o redesign posterior consolidou a identidade **Trust Keith** (`--tk-*`, Épicas 14–15) como **canônica**. O redesign **Executive Precision** (Épica 7) é **histórico/supersedido** e suas fontes `docs/design/executive-precision/` também estão ausentes. Detalhe em [`docs/prd/traceability-matrix.md#5-supersessão-do-redesign-executive-precision--trust-keith`](./traceability-matrix.md). Esta nota é documental e **não altera a implementação visual**.
+
+## 1.4 Estado de implementação — 2026-08-12
+
+As Épicas 1–6 de modernização foram implementadas e reconciliadas com a matriz canônica. Os gates locais atuais estão verdes: lint, typecheck, 796 testes unitários, build, drift OpenAPI em 16 rotas e suíte integral com 184/184 testes em Supabase isolado. A identidade Trust Keith permanece canônica; FR12/FR14 continuam fora do MVP. Pendências externas (migration remota e primeiro E2E em GitHub) permanecem documentadas na matriz e não foram simuladas como concluídas.
 
 ---
 

@@ -89,17 +89,23 @@ The next major gap is role-based experience. The admin area is active and protec
 | Initial brownfield PRD draft | 2026-06-30 | 0.1 | Created validated context and initial requirements for public consulting, admin, student, and instructor expansion | Morgan |
 | Reconciliação de rastreabilidade (Story 18.1) | 2026-07-19 | 0.2 | Adicionada matriz canônica de rastreabilidade e nota de estado real do portfólio; nenhum requisito, decisão ou changelog histórico removido | `@analyst` |
 
-## Estado real do portfólio e rastreabilidade canônica (2026-07-19)
+## Estado real do portfólio e rastreabilidade canônica (2026-08-12)
 
 > **Nota de reconciliação (Story 18.1 / Épica 18).** Este PRD descreve um **Epic 1 único** com Stories 1.1–1.6. O produto evoluiu além dessa decomposição (Épicas 2–17 em `docs/epics/`). Os **IDs FR1–FR16, NFR1–NFR10 e CR1–CR4 permanecem imutáveis** e continuam sendo a fonte canônica de requisitos. O estado real de atendimento de cada requisito, com links verificáveis a código, story e gate, está consolidado na matriz:
 >
 > - **Matriz canônica:** [`docs/prd/traceability-matrix.md`](./traceability-matrix.md)
 >
-> **Resumo do estado (30 requisitos):** 23 `ATENDIDO`, 5 `PARCIAL` (FR16, NFR4, NFR9, CR1, CR4 — convergem para a reconciliação pós-cutover Supabase SSR, escopo das Stories 18.2/18.3), 2 `DIFERIDO` (FR12, FR14 — fora do MVP por decisão deste PRD), 0 `NÃO ATENDIDO`.
+> **Resumo do estado (30 requisitos):** 28 `ATENDIDO`, 0 `PARCIAL`, 2 `DIFERIDO` (FR12, FR14 — fora do MVP por decisão deste PRD) e 0 `NÃO ATENDIDO`. A matriz canônica registra as evidências atuais e mantém separados os gaps de artefato formal das Stories 1.2–1.6.
 >
 > **Stories 1.2–1.6:** apenas a **Story 1.1** possui artefato formal (`docs/stories/1.1.story.md`, Done). As capacidades de 1.2–1.6 (consultoria, classificação de leads, portais de aluno/instrutor, hardening) existem no código e foram tocadas por épicas posteriores, mas **não possuem stories de substituição numeradas** — registradas como *gap de artefato formal* na §3 da matriz, para decisão do `@po`/`@pm`, sem equivalência por semelhança de nome.
 >
 > **Fontes ausentes** citadas na §Analysis Source (`docs/PHASE-B-PLAN.md` e outras) estão registradas com impacto e owner na §4 da matriz. Nenhum conteúdo desconhecido foi recriado (Article IV — No Invention).
+
+## Validação da implementação — 2026-08-12
+
+O estado local de implementação está verde nos gates reproduzíveis: `npm run lint`, `npm run typecheck`, `npm run test:unit` (796/796), `npm run build`, `npm run docs:api:check-drift` (16 rotas) e `npm test` (184/184 em Supabase isolado). As duas entregas mais recentes — conteúdo SEO/títulos públicos e JSON-LD de eventos da agenda — estão registradas nas stories de 12/08 e no índice regenerado de stories.
+
+Permanecem explicitamente fora do MVP FR12 e FR14. A aplicação remota da migration editorial depende da reconciliação do histórico remoto Supabase, e a primeira execução do E2E em GitHub depende do ambiente externo descrito na REC-409; esses pontos estão documentados como pendências operacionais, sem alteração remota aplicada nesta rodada.
 
 ## Requirements
 
