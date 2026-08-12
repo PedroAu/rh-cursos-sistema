@@ -3,8 +3,6 @@
 -- no formato raso da primeira carga (até cinco módulos). Conteúdo editorial já
 -- mais completo permanece preservado.
 
-begin;
-
 -- Corrige construções públicas que geravam "Curso de Prático" e "Curso de Completo".
 update public.curso as c
 set titulo = v.titulo,
@@ -362,5 +360,3 @@ set hero_subtitle = case
       else public.curso_public_content.faq_items
     end,
     updated_at = now();
-
-commit;

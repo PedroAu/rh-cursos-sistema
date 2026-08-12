@@ -3,7 +3,7 @@
 **Owner de produto:** `@pm` (Morgan)
 **Autor da reconciliação:** `@analyst` (Story 18.1)
 **Data de geração:** 2026-08-12
-**Baseline Git (HEAD):** `25e35e5` (branch `codex/hotfixes-no-payments`)
+**Baseline Git (HEAD):** `80d3879` (branch `codex/hotfixes-no-payments`)
 **Working tree auditado:** alterações locais de SEO, JSON-LD de agenda, stories 12/08 e migration editorial; nenhuma alteração remota aplicada.
 **Fontes primárias:** `docs/prd/prd.md`, `docs/prd/modernizacao-ui-2026.md`, `docs/epics/`, `docs/stories/`, `docs/qa/gates/`, verificação direta do worktree e gates executados em 2026-08-12.
 **Regra de classificação (Article IV — No Invention):** só é `ATENDIDO` o requisito com link verificável para código, story ou gate real. Sem evidência verificável → `PARCIAL`, `DIFERIDO` ou `NÃO ATENDIDO`. Nunca `ATENDIDO` por inferência ou por semelhança de nome.
@@ -148,7 +148,7 @@
 | `docs/diagnosis/implementation-summary-2026-06-04.md` | PRD modernização §1.3 | **AUSENTE** | Registro de correções admin não verificável | `@pm` |
 | `docs/design/apple-hig-application-plan-2026-05-26.md` | PRD modernização §1.3 | **AUSENTE** | Plano P0→P5 (auditoria de runtime) não verificável | `@ux-design-expert` |
 | `docs/stories/2026-06-04-publication-readiness-portal-scope.md` | PRD modernização §1.3 e §4.1 | **AUSENTE** | Recorte de escopo de publicação (portais fora de escopo) não verificável como artefato | `@po` |
-| `supabase/functions/auth-session/index.ts` | documentação histórica e contratos anteriores | **REMOVIDO POR DECISÃO ARQUITETURAL** | Endpoint legado não faz parte da superfície vigente; OpenAPI foi reconciliada | `docs:stories/2026-07-19-epic18-story3-restaurar-gates.md`; `npm run docs:api:check-drift` PASS | `@dev` |
+| `supabase/functions/auth-session/index.ts` | documentação histórica e contratos anteriores | **REMOVIDO POR DECISÃO ARQUITETURAL** | Endpoint legado não faz parte da superfície vigente; OpenAPI reconciliada (`docs/stories/2026-07-19-epic18-story3-restaurar-gates.md`; `npm run docs:api:check-drift` PASS) | `@dev` |
 
 **Fontes citadas que EXISTEM** (confirmadas, sem ação): `docs/history/reports/BROWNFIELD-DISCOVERY-COMPLETE.md`, `docs/ARCHITECTURE.md`, `docs/architecture/system-architecture.md`, `docs/architecture/TECHNICAL-DEBT-REPORT.md`, `docs/database/SCHEMA.md`, `docs/api/openapi.yaml`, `docs/design/redesign/spec-admin-dashboard.md`, `docs/qa/gates/1.1-public-positioning-and-journey-clarity.yml`.
 

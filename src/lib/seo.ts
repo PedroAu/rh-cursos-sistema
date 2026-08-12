@@ -140,7 +140,10 @@ export function buildAgendaEventJsonLd(
   classes: TrainingClass[],
   today: string | Date = new Date()
 ) {
-  const todayKey = typeof today === "string" ? today.slice(0, 10) : today.toISOString().slice(0, 10);
+  // Brasil não observa horário de verão desde 2019: offset fixo de -03:00 evita
+  // que o filtro de "hoje" avance um dia cedo demais em relação a UTC no fim da tarde/noite.
+  const todayKey =
+    typeof today === "string" ? today.slice(0, 10) : new Date(today.getTime() - 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const coursesById = new Map(courses.map((course) => [course.id, course]));
 
   return classes
