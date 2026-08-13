@@ -33,6 +33,8 @@
     "test:visual": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional",
     "test:visual:update": "node scripts/run-playwright.mjs ui-governance.spec.ts --project=functional --update-snapshots",
     "test:epic14:fidelity:capture": "node scripts/capture-epic14-fidelity.mjs",
+    "fidelity:references": "node scripts/build-fidelity-references.mjs",
+    "fidelity:specs": "node scripts/build-fidelity-specs.mjs",
     "test:epic14:fidelity": "node scripts/run-playwright.mjs epic5-search-motion.spec.ts epic14-mantine-removal.smoke.spec.ts --project=functional",
     "test:epic15:fidelity": "node scripts/run-playwright.mjs epic15-admin-dashboard-fidelity.spec.ts epic15-blog-pages.spec.ts --project=functional",
     "test:epic20:fidelity": "node scripts/run-playwright.mjs epic20-admin-evolution.spec.ts --project=functional",

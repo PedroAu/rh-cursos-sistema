@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "reviewer": "@aiox-master",
+  "date": "2026-08-12",
+  "evidence": "artifacts/epic14-fidelity/manifest.json",
+  "routes": {
+    "home": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "home-route.png + home-canvas.png" },
+    "courses": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "courses-route.png + courses-canvas.png" },
+    "course-detail": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "course-detail-route.png + course-detail-canvas.png" },
+    "checkout": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "checkout-route.png + checkout-canvas.png" },
+    "agenda": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "agenda-route.png + agenda-canvas.png" },
+    "in-company": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "in-company-route.png + in-company-canvas.png" },
+    "about": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "about-route.png + about-canvas.png" },
+    "blog": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "blog-route.png + blog-canvas.png" },
+    "login": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "login-route.png + login-canvas.png" },
+    "admin-dashboard": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-dashboard-route.png + admin-dashboard-canvas.png" },
+    "admin-cursos": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-cursos-route.png + admin-cursos-canvas.png" },
+    "admin-turmas": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-turmas-route.png + admin-turmas-canvas.png" },
+    "admin-matriculas": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-matriculas-route.png + admin-matriculas-canvas.png" },
+    "admin-alunos": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-alunos-route.png + admin-alunos-canvas.png" },
+    "admin-instrutores": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-instrutores-route.png + admin-instrutores-canvas.png" },
+    "admin-leads": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-leads-route.png + admin-leads-canvas.png" },
+    "admin-blog": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-blog-route.png + admin-blog-canvas.png" },
+    "admin-paginas": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-paginas-route.png + admin-paginas-canvas.png" },
+    "admin-configuracoes": { "by": "@aiox-master", "date": "2026-08-12", "evidence": "admin-configuracoes-route.png + admin-configuracoes-canvas.png" }
+  }
+}

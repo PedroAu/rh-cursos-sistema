@@ -16,7 +16,7 @@ type ErrorFallbackProps = {
 /**
  * UI de fallback amigável para error boundaries (ver `app/error.tsx`).
  *
- * Renderiza dentro do root layout, portanto os tokens de design (`--ea-*`) e o
+ * Renderiza dentro do root layout, portanto os tokens de design (`--rh-*`) e o
  * Tailwind estão disponíveis. Para o boundary de último recurso — quando o
  * próprio root layout falha — use `app/global-error.tsx`, que é auto-contido.
  */

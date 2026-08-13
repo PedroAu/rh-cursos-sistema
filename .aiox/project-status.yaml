@@ -1,29 +1,14 @@
 status:
   branch: codex/hotfixes-no-payments
-  modifiedFiles:
-    - .aiox/project-status.yaml
-    - app/agenda/page.tsx
-    - docs/prd/modernizacao-ui-2026.md
-    - docs/prd/prd.md
-    - docs/prd/traceability-matrix.md
-    - docs/stories/index.md
-    - scripts/generate-story-index.mjs
-    - src/__tests__/lib/seo.test.ts
-    - src/lib/seo.ts
-    - docs/stories/2026-08-12-event-jsonld-agenda.md
-    - docs/stories/2026-08-12-seo-conteudo-cursos.md
-    - supabase/migrations/20260812090000_expand_seo_course_content.sql
-  modifiedFilesTotalCount: 12
+  modifiedFiles: []
+  modifiedFilesTotalCount: 0
   recentCommits:
-    - 'fix(enrollment): preserve receipt compatibility [Story 2026-08-11]'
-    - 'fix(enrollment): normalize public receipt code [Story 2026-08-11]'
-    - 'test(e2e): scope public course detail link [Story 2026-08-11]'
-    - 'fix: close public validation gate [Story 2026-08-11]'
-    - 'fix: expose robots route for crawlers [Story 2026-08-11]'
-  currentEpic: Project / brownfield SEO and agenda
-  currentStory: docs/stories/2026-08-12-event-jsonld-agenda.md
-  lastUpdate: '2026-08-12T14:31:31.000Z'
+    - 'fix: resolve pre-push fidelity findings'
+    - 'fix(seo): address CodeRabbit review on agenda/course-SEO PR'
+  currentEpic: null
+  currentStory: null
+  lastUpdate: '2026-08-14T11:35:12.125Z'
   isGitRepo: true
-timestamp: 1786545091000
+timestamp: 1786707312126
 ttl: 60
-gitFingerprint: 1786476813196.8728:1786492047625.9397
+gitFingerprint: 1786476813196.8728:1786634593588.2412

@@ -1,7 +1,7 @@
 # Auth Security Audit — EP-11.4
 
-Date: 2026-06-24  
-Scope owner: `@dev` / Subagente 1  
+Date: 2026-06-24
+Scope owner: `@dev` / Subagente 1
 Decision: `WAIVED`
 
 ## Scope reviewed

@@ -20,63 +20,63 @@
 @layer base {
   :root {
     color-scheme: light;
-    --ea-color-primary: var(--tk-brand);
-    --ea-color-deep-navy: var(--tk-ink);
-    --ea-color-on-primary: #ffffff;
-    --ea-color-on-primary-container: var(--tk-accent-soft);
-    --ea-color-prestige-gold: var(--tk-accent);
-    --ea-color-secondary-container: var(--tk-accent-soft);
-    --ea-color-secondary-fixed-dim: var(--tk-accent);
-    --ea-color-on-secondary-container: var(--tk-ink);
-    --ea-color-success-green: #007a36; /* AA: era #008a3d (4.47:1 com branco) */
-    --ea-color-error: #ba1a1a;
-    --ea-color-surface: #f5f5f7;
-    --ea-color-background: #f5f5f7;
-    --ea-color-surface-muted: #f2f2f7;
-    --ea-color-surface-container-lowest: #ffffff;
-    --ea-color-surface-container-low: #ffffff;
-    --ea-color-surface-container: #e9e9ec;
-    --ea-color-surface-container-high: #d8d8de;
-    --ea-color-on-surface: #1d1d1f;
-    --ea-color-text-main: #1d1d1f;
-    --ea-color-text-muted: #515154;
-    --ea-color-outline: #6e6e73;
-    --ea-color-outline-variant: #d2d2d7;
-    --ea-font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", system-ui, sans-serif;
+    --rh-color-primary: var(--tk-brand);
+    --rh-color-deep-navy: var(--tk-ink);
+    --rh-color-on-primary: #ffffff;
+    --rh-color-on-primary-container: var(--tk-accent-soft);
+    --rh-color-prestige-gold: var(--tk-accent);
+    --rh-color-secondary-container: var(--tk-accent-soft);
+    --rh-color-secondary-fixed-dim: var(--tk-accent);
+    --rh-color-on-secondary-container: var(--tk-ink);
+    --rh-color-success-green: #007a36; /* AA: era #008a3d (4.47:1 com branco) */
+    --rh-color-error: #ba1a1a;
+    --rh-color-surface: #f5f5f7;
+    --rh-color-background: #f5f5f7;
+    --rh-color-surface-muted: #f2f2f7;
+    --rh-color-surface-container-lowest: #ffffff;
+    --rh-color-surface-container-low: #ffffff;
+    --rh-color-surface-container: #e9e9ec;
+    --rh-color-surface-container-high: #d8d8de;
+    --rh-color-on-surface: #1d1d1f;
+    --rh-color-text-main: #1d1d1f;
+    --rh-color-text-muted: #515154;
+    --rh-color-outline: #6e6e73;
+    --rh-color-outline-variant: #d2d2d7;
+    --rh-font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", system-ui, sans-serif;
     /* Base legada — sobrescrita pelo :root de Executive Precision (var(--m3-font-display)/Montserrat). */
-    --ea-font-display: -apple-system, BlinkMacSystemFont, var(--ea-font-sans);
-    --ea-radius-default: var(--m3-radius-default);
-    --ea-radius-lg: var(--m3-radius-lg);
-    --ea-radius-xl: var(--m3-radius-lg);
-    --ea-radius-2xl: var(--m3-radius-lg);
-    --ea-container-max: 1280px;
-    --ea-gutter: var(--m3-gutter);
-    --ea-section-padding: var(--m3-section-padding-lg);
-    --ea-shadow-soft: 0 8px 22px rgba(0, 23, 54, 0.07);
-    --ea-shadow-card: 0 18px 42px rgba(0, 23, 54, 0.14);
-    --ea-shadow-level-1: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --ea-focus: var(--tk-focus);
-    --ea-focus-ring: rgba(77, 101, 255, 0.22);
-    --ea-button-radius: var(--ea-radius-lg);
-    --ea-button-primary-bg: var(--ea-color-primary);
-    --ea-button-primary-fg: var(--ea-color-on-primary);
-    --ea-button-primary-hover: var(--ea-color-deep-navy);
-    --ea-button-secondary-bg: var(--ea-color-accent);
-    --ea-button-secondary-fg: var(--tk-surface);
-    --ea-button-secondary-border: transparent;
-    --ea-button-secondary-hover: var(--ea-color-warning);
-    --ea-button-ghost-fg: var(--ea-color-primary);
-    --ea-button-ghost-border: rgba(0, 43, 91, 0.2);
-    --ea-button-ghost-bg: #ffffff;
-    --ea-button-ghost-hover-bg: var(--ea-color-surface-muted);
-    --ea-card-border: var(--ea-color-separator);
-    --ea-card-bg: var(--ea-color-surface-raised);
-    --ea-card-accent: var(--ea-color-primary);
-    --ea-chip-bg: var(--ea-color-control);
-    --ea-chip-fg: var(--ea-color-label);
-    --ea-chip-border: var(--ea-color-separator);
-    --ea-control-radius: var(--ea-radius-lg);
-    --ea-footer-bg: var(--ea-color-primary);
+    --rh-font-display: -apple-system, BlinkMacSystemFont, var(--rh-font-sans);
+    --rh-radius-default: var(--m3-radius-default);
+    --rh-radius-lg: var(--m3-radius-lg);
+    --rh-radius-xl: var(--m3-radius-lg);
+    --rh-radius-2xl: var(--m3-radius-lg);
+    --rh-container-max: 1280px;
+    --rh-gutter: var(--m3-gutter);
+    --rh-section-padding: var(--m3-section-padding-lg);
+    --rh-shadow-soft: 0 8px 22px rgba(0, 23, 54, 0.07);
+    --rh-shadow-card: 0 18px 42px rgba(0, 23, 54, 0.14);
+    --rh-shadow-level-1: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --rh-focus: var(--tk-focus);
+    --rh-focus-ring: rgba(77, 101, 255, 0.22);
+    --rh-button-radius: var(--rh-radius-lg);
+    --rh-button-primary-bg: var(--rh-color-primary);
+    --rh-button-primary-fg: var(--rh-color-on-primary);
+    --rh-button-primary-hover: var(--rh-color-deep-navy);
+    --rh-button-secondary-bg: var(--rh-color-accent);
+    --rh-button-secondary-fg: var(--tk-surface);
+    --rh-button-secondary-border: transparent;
+    --rh-button-secondary-hover: var(--rh-color-warning);
+    --rh-button-ghost-fg: var(--rh-color-primary);
+    --rh-button-ghost-border: rgba(0, 43, 91, 0.2);
+    --rh-button-ghost-bg: #ffffff;
+    --rh-button-ghost-hover-bg: var(--rh-color-surface-muted);
+    --rh-card-border: var(--rh-color-separator);
+    --rh-card-bg: var(--rh-color-surface-raised);
+    --rh-card-accent: var(--rh-color-primary);
+    --rh-chip-bg: var(--rh-color-control);
+    --rh-chip-fg: var(--rh-color-label);
+    --rh-chip-border: var(--rh-color-separator);
+    --rh-control-radius: var(--rh-radius-lg);
+    --rh-footer-bg: var(--rh-color-primary);
 
     /* Executive Precision source palette (Epic 7, EP-0.1). */
     --m3-surface: #f9f9fc;
@@ -181,35 +181,35 @@
      * Executive Precision promove estes tokens no bloco :root abaixo (EP-6.3).
      * Matriz de contraste: docs/design/tokens-cor-superficie.md
      */
-    --ea-color-label: var(--ea-color-text-main);            /* texto principal */
-    --ea-color-secondary-label: var(--ea-color-text-muted); /* texto de apoio, metadata */
-    --ea-color-separator: var(--ea-color-outline-variant);  /* divisores, bordas sutis */
-    --ea-color-surface-raised: var(--ea-color-surface-container-lowest); /* cards, painéis */
-    --ea-color-control: var(--ea-color-surface-container);  /* chips, inputs, segmentados */
-    --ea-color-accent: var(--ea-color-prestige-gold);       /* ação/destaque institucional */
-    --ea-color-success: var(--ea-color-success-green);
-    --ea-color-warning: #7a5600; /* AA: warning textual/interativo; era #d6aa45 (1.94:1 com branco) */
-    --ea-color-danger: var(--ea-color-error);
+    --rh-color-label: var(--rh-color-text-main);            /* texto principal */
+    --rh-color-secondary-label: var(--rh-color-text-muted); /* texto de apoio, metadata */
+    --rh-color-separator: var(--rh-color-outline-variant);  /* divisores, bordas sutis */
+    --rh-color-surface-raised: var(--rh-color-surface-container-lowest); /* cards, painéis */
+    --rh-color-control: var(--rh-color-surface-container);  /* chips, inputs, segmentados */
+    --rh-color-accent: var(--rh-color-prestige-gold);       /* ação/destaque institucional */
+    --rh-color-success: var(--rh-color-success-green);
+    --rh-color-warning: #7a5600; /* AA: warning textual/interativo; era #d6aa45 (1.94:1 com branco) */
+    --rh-color-danger: var(--rh-color-error);
 
     /* Typography scale */
-    --ea-font-size-micro: 0.625rem;    /* 10px — micro labels */
-    --ea-font-size-badge: 0.6875rem;   /* 11px — badges, chips */
-    --ea-font-size-label: 0.75rem;     /* 12px — eyebrows, labels */
-    --ea-font-size-sm: 0.875rem;       /* 14px — body small */
-    --ea-font-size-base: 1rem;         /* 16px — body */
-    --ea-font-size-lead: 1.125rem;     /* 18px — lead paragraphs */
-    --ea-font-size-card: 1.625rem;     /* 26px — card titles */
-    --ea-font-size-feature: 1.5625rem; /* 25px — feature card titles */
-    --ea-font-size-article: 1.5rem;    /* 24px — article/section card titles */
-    --ea-font-size-stat: 1.75rem;      /* 28px — stat numbers */
-    --ea-font-size-quote: 1.875rem;    /* 30px — quotes base */
-    --ea-font-size-h2-compact: 2rem;   /* 32px — h2 compact sections */
-    --ea-font-size-h1-mobile: 2.125rem;/* 34px — h1 mobile */
-    --ea-font-size-h2: 2.25rem;        /* 36px — section headings / blockquote md */
-    --ea-font-size-section: 2.375rem;  /* 38px — primary section headings */
-    --ea-font-size-h1-alt: 2.5rem;     /* 40px — alternate page headings */
-    --ea-font-size-display: 2.75rem;   /* 44px — display section / h1 mobile large */
-    --ea-font-size-hero: 3.5rem;       /* 56px — hero headlines */
+    --rh-font-size-micro: 0.625rem;    /* 10px — micro labels */
+    --rh-font-size-badge: 0.6875rem;   /* 11px — badges, chips */
+    --rh-font-size-label: 0.75rem;     /* 12px — eyebrows, labels */
+    --rh-font-size-sm: 0.875rem;       /* 14px — body small */
+    --rh-font-size-base: 1rem;         /* 16px — body */
+    --rh-font-size-lead: 1.125rem;     /* 18px — lead paragraphs */
+    --rh-font-size-card: 1.625rem;     /* 26px — card titles */
+    --rh-font-size-feature: 1.5625rem; /* 25px — feature card titles */
+    --rh-font-size-article: 1.5rem;    /* 24px — article/section card titles */
+    --rh-font-size-stat: 1.75rem;      /* 28px — stat numbers */
+    --rh-font-size-quote: 1.875rem;    /* 30px — quotes base */
+    --rh-font-size-h2-compact: 2rem;   /* 32px — h2 compact sections */
+    --rh-font-size-h1-mobile: 2.125rem;/* 34px — h1 mobile */
+    --rh-font-size-h2: 2.25rem;        /* 36px — section headings / blockquote md */
+    --rh-font-size-section: 2.375rem;  /* 38px — primary section headings */
+    --rh-font-size-h1-alt: 2.5rem;     /* 40px — alternate page headings */
+    --rh-font-size-display: 2.75rem;   /* 44px — display section / h1 mobile large */
+    --rh-font-size-hero: 3.5rem;       /* 56px — hero headlines */
 
   }
 
@@ -219,62 +219,62 @@
    * base legada acima por ordem de origem, preservando o render das fases 0-5.
    */
   :root {
-    --ea-font-sans: var(--m3-font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-    --ea-font-display: var(--m3-font-display), var(--ea-font-sans);
-    --ea-container-max: var(--m3-container-max);
-    --ea-color-primary: var(--tk-brand);
-    --ea-color-deep-navy: var(--tk-ink);
-    --ea-color-on-primary: var(--m3-on-primary);
-    --ea-color-on-primary-container: var(--tk-accent-soft);
-    --ea-color-prestige-gold: var(--tk-accent);
-    --ea-color-secondary-container: var(--tk-accent-soft);
-    --ea-color-secondary-fixed-dim: var(--tk-accent);
-    --ea-color-on-secondary-container: var(--tk-ink);
-    --ea-color-surface: var(--m3-surface);
-    --ea-color-background: var(--m3-background);
-    --ea-color-surface-muted: var(--m3-surface-container-low);
-    --ea-color-surface-container-lowest: var(--m3-surface-container-lowest);
-    --ea-color-surface-container-low: var(--m3-surface-container-low);
-    --ea-color-surface-container: var(--m3-surface-container);
-    --ea-color-surface-container-high: var(--m3-surface-container-high);
-    --ea-color-on-surface: var(--m3-on-surface);
-    --ea-color-text-main: var(--m3-on-surface);
-    --ea-color-text-muted: var(--m3-on-surface-variant);
-    --ea-color-outline: var(--m3-outline);
-    --ea-color-outline-variant: var(--m3-outline-variant);
-    --ea-color-label: var(--m3-on-surface);
-    --ea-color-secondary-label: var(--m3-on-surface-variant);
-    --ea-color-separator: var(--m3-outline-variant);
-    --ea-color-surface-raised: var(--m3-surface-container-lowest);
-    --ea-color-control: var(--m3-surface-container);
-    --ea-color-accent: var(--tk-accent);
-    --ea-color-success: var(--m3-success-text);
-    --ea-color-warning: var(--m3-warning-text);
-    --ea-color-danger: var(--m3-error);
-    --ea-shadow-soft: var(--ea-shadow-level-1);
-    --ea-shadow-card: 0 8px 20px rgba(0, 67, 100, 0.1);
-    --ea-focus: var(--tk-focus);
-    --ea-focus-ring: rgba(77, 101, 255, 0.2);
-    --ea-button-radius: var(--tk-radius-button);
-    --ea-button-primary-bg: var(--tk-cta);
-    --ea-button-primary-fg: var(--tk-surface);
-    --ea-button-primary-hover: var(--tk-cta-hover);
-    --ea-button-secondary-bg: transparent;
-    --ea-button-secondary-fg: var(--tk-brand);
-    --ea-button-secondary-border: var(--tk-brand);
-    --ea-button-secondary-hover: var(--tk-accent-soft);
-    --ea-button-ghost-fg: var(--tk-brand);
-    --ea-button-ghost-border: var(--tk-brand);
-    --ea-button-ghost-bg: transparent;
-    --ea-button-ghost-hover-bg: var(--tk-accent-soft);
-    --ea-card-border: var(--tk-line);
-    --ea-card-bg: var(--tk-surface);
-    --ea-card-accent: var(--tk-brand);
-    --ea-chip-bg: var(--tk-accent-soft);
-    --ea-chip-fg: var(--tk-brand);
-    --ea-chip-border: transparent;
-    --ea-control-radius: var(--m3-radius-default);
-    --ea-footer-bg: var(--tk-brand);
+    --rh-font-sans: var(--m3-font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --rh-font-display: var(--m3-font-display), var(--rh-font-sans);
+    --rh-container-max: var(--m3-container-max);
+    --rh-color-primary: var(--tk-brand);
+    --rh-color-deep-navy: var(--tk-ink);
+    --rh-color-on-primary: var(--m3-on-primary);
+    --rh-color-on-primary-container: var(--tk-accent-soft);
+    --rh-color-prestige-gold: var(--tk-accent);
+    --rh-color-secondary-container: var(--tk-accent-soft);
+    --rh-color-secondary-fixed-dim: var(--tk-accent);
+    --rh-color-on-secondary-container: var(--tk-ink);
+    --rh-color-surface: var(--m3-surface);
+    --rh-color-background: var(--m3-background);
+    --rh-color-surface-muted: var(--m3-surface-container-low);
+    --rh-color-surface-container-lowest: var(--m3-surface-container-lowest);
+    --rh-color-surface-container-low: var(--m3-surface-container-low);
+    --rh-color-surface-container: var(--m3-surface-container);
+    --rh-color-surface-container-high: var(--m3-surface-container-high);
+    --rh-color-on-surface: var(--m3-on-surface);
+    --rh-color-text-main: var(--m3-on-surface);
+    --rh-color-text-muted: var(--m3-on-surface-variant);
+    --rh-color-outline: var(--m3-outline);
+    --rh-color-outline-variant: var(--m3-outline-variant);
+    --rh-color-label: var(--m3-on-surface);
+    --rh-color-secondary-label: var(--m3-on-surface-variant);
+    --rh-color-separator: var(--m3-outline-variant);
+    --rh-color-surface-raised: var(--m3-surface-container-lowest);
+    --rh-color-control: var(--m3-surface-container);
+    --rh-color-accent: var(--tk-accent);
+    --rh-color-success: var(--m3-success-text);
+    --rh-color-warning: var(--m3-warning-text);
+    --rh-color-danger: var(--m3-error);
+    --rh-shadow-soft: var(--rh-shadow-level-1);
+    --rh-shadow-card: 0 8px 20px rgba(0, 67, 100, 0.1);
+    --rh-focus: var(--tk-focus);
+    --rh-focus-ring: rgba(77, 101, 255, 0.2);
+    --rh-button-radius: var(--tk-radius-button);
+    --rh-button-primary-bg: var(--tk-cta);
+    --rh-button-primary-fg: var(--tk-surface);
+    --rh-button-primary-hover: var(--tk-cta-hover);
+    --rh-button-secondary-bg: transparent;
+    --rh-button-secondary-fg: var(--tk-brand);
+    --rh-button-secondary-border: var(--tk-brand);
+    --rh-button-secondary-hover: var(--tk-accent-soft);
+    --rh-button-ghost-fg: var(--tk-brand);
+    --rh-button-ghost-border: var(--tk-brand);
+    --rh-button-ghost-bg: transparent;
+    --rh-button-ghost-hover-bg: var(--tk-accent-soft);
+    --rh-card-border: var(--tk-line);
+    --rh-card-bg: var(--tk-surface);
+    --rh-card-accent: var(--tk-brand);
+    --rh-chip-bg: var(--tk-accent-soft);
+    --rh-chip-fg: var(--tk-brand);
+    --rh-chip-border: transparent;
+    --rh-control-radius: var(--m3-radius-default);
+    --rh-footer-bg: var(--tk-brand);
   }
 
   /*
@@ -318,26 +318,26 @@
   }
 
   h1 {
-    font-size: clamp(var(--ea-font-size-h1-mobile), 4vw, var(--ea-font-size-display));
+    font-size: clamp(var(--rh-font-size-h1-mobile), 4vw, var(--rh-font-size-display));
     line-height: 1.1;
     font-weight: 800;
     letter-spacing: 0;
   }
 
   h2 {
-    font-size: clamp(var(--ea-font-size-h2), 3vw, var(--ea-font-size-section));
+    font-size: clamp(var(--rh-font-size-h2), 3vw, var(--rh-font-size-section));
     line-height: 1.15;
     font-weight: 700;
   }
 
   h3 {
-    font-size: var(--ea-font-size-article);
+    font-size: var(--rh-font-size-article);
     line-height: 1.2;
     font-weight: 700;
   }
 
   h4 {
-    font-size: var(--ea-font-size-lead);
+    font-size: var(--rh-font-size-lead);
     line-height: 1.25;
     font-weight: 700;
   }
@@ -351,7 +351,7 @@
   }
 
   :focus-visible {
-    outline: 3px solid var(--ea-focus);
+    outline: 3px solid var(--rh-focus);
     outline-offset: 3px;
   }
 
@@ -384,16 +384,16 @@
 
 @layer components {
   .page-section {
-    padding-bottom: var(--ea-section-padding);
-    padding-top: var(--ea-section-padding);
+    padding-bottom: var(--rh-section-padding);
+    padding-top: var(--rh-section-padding);
   }
 
   .surface-card {
     @apply relative overflow-hidden border text-label-primary transition-all duration-300;
-    background-color: var(--ea-card-bg);
-    border-color: var(--ea-card-border);
+    background-color: var(--rh-card-bg);
+    border-color: var(--rh-card-border);
     border-radius: var(--m3-radius-lg);
-    box-shadow: var(--ea-shadow-level-1);
+    box-shadow: var(--rh-shadow-level-1);
   }
 
   .surface-card[data-accent="top"]::before {
@@ -403,12 +403,12 @@
     inset-inline: 0;
     position: absolute;
     top: 0;
-    background: var(--ea-card-accent);
+    background: var(--rh-card-accent);
   }
 
   .eyebrow {
     @apply inline-flex items-center gap-2 border border-outline-variant bg-white px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-prestige-gold;
-    border-radius: var(--ea-radius-default);
+    border-radius: var(--rh-radius-default);
   }
 
   .eyebrow::before {
@@ -418,12 +418,12 @@
 
   .section-panel {
     @apply border border-separator bg-surface-raised p-8 shadow-soft md:p-10;
-    border-radius: var(--ea-radius-xl);
+    border-radius: var(--rh-radius-xl);
   }
 
   .tone-panel {
     @apply border;
-    border-radius: var(--ea-radius-xl);
+    border-radius: var(--rh-radius-xl);
     background-color: rgba(0, 23, 54, 0.04);
     border-color: rgba(0, 23, 54, 0.1);
   }
@@ -439,7 +439,7 @@
   .ea-container {
     margin-left: auto;
     margin-right: auto;
-    max-width: var(--ea-container-max);
+    max-width: var(--rh-container-max);
     padding-left: 2rem;
     padding-right: 2rem;
     width: 100%;
@@ -451,10 +451,10 @@
 
   .ea-card {
     @apply border transition-all duration-300;
-    background-color: var(--ea-card-bg);
-    border-color: var(--ea-card-border);
+    background-color: var(--rh-card-bg);
+    border-color: var(--rh-card-border);
     border-radius: var(--m3-radius-lg);
-    box-shadow: var(--ea-shadow-level-1);
+    box-shadow: var(--rh-shadow-level-1);
   }
 
   .ea-card-hover {
@@ -463,10 +463,10 @@
 
   .ea-chip {
     @apply inline-flex items-center border px-4 py-2 text-label-bold font-semibold transition;
-    background-color: var(--ea-chip-bg);
-    border-color: var(--ea-chip-border);
+    background-color: var(--rh-chip-bg);
+    border-color: var(--rh-chip-border);
     border-radius: var(--m3-radius-full);
-    color: var(--ea-chip-fg);
+    color: var(--rh-chip-fg);
   }
 
   .ea-chip-active {
@@ -475,12 +475,12 @@
 
   .ea-input {
     @apply w-full border border-outline-variant bg-white px-4 py-3 text-sm outline-none transition focus:ring-2;
-    border-radius: var(--ea-control-radius);
+    border-radius: var(--rh-control-radius);
   }
 
   .ea-input:focus {
-    border-color: var(--ea-focus);
-    --tw-ring-color: var(--ea-focus-ring);
+    border-color: var(--rh-focus);
+    --tw-ring-color: var(--rh-focus-ring);
   }
 
   .rh-hero-shell {
@@ -509,7 +509,7 @@
   .rh-hero-title {
     margin-top: 1rem;
     max-width: 32rem;
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: clamp(2.1rem, 4vw, 3.15rem);
     line-height: 1.05;
     font-weight: 800;
@@ -625,7 +625,7 @@
   }
 
   .rh-metric-value {
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: 1.65rem;
     line-height: 1;
     font-weight: 700;
@@ -671,7 +671,7 @@
   .rh-faq-shell h2,
   .rh-final-cta h2 {
     margin-top: 0.55rem;
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: clamp(1.9rem, 3vw, 2.5rem);
     line-height: 1.12;
     font-weight: 800;
@@ -727,7 +727,7 @@
 
   .rh-problem-card h3 {
     margin-top: 1.1rem;
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: 1.15rem;
     line-height: 1.2;
     font-weight: 700;
@@ -802,7 +802,7 @@
 
   .rh-path-card h3 {
     margin-top: 1rem;
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: 1.22rem;
     line-height: 1.2;
     font-weight: 700;
@@ -933,14 +933,14 @@
     justify-content: center;
     border-radius: 0.35rem;
     background: #0b4a70;
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: 1rem;
     font-weight: 700;
     color: #ffffff;
   }
 
   .rh-process-card h3 {
-    font-family: var(--font-montserrat), var(--ea-font-display);
+    font-family: var(--font-montserrat), var(--rh-font-display);
     font-size: 1.05rem;
     color: #0d2a43;
   }
