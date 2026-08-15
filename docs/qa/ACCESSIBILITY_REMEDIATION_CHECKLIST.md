@@ -368,5 +368,5 @@ If fix doesn't work:
 ---
 
 *Checklist created by Quinn (QA Agent) — 2026-06-29*
-*Reference:** `docs/qa/ACCESSIBILITY_AUDIT_REPORT.md`
-*Status:** Ready for Implementation
+**Reference:** `docs/qa/ACCESSIBILITY_AUDIT_REPORT.md`
+**Status:** Ready for Implementation

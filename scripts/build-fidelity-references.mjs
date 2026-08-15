@@ -16,7 +16,6 @@ const sources = [
   ["RH Cursos Login.dc.html", "login.html"],
   ["RH Cursos Curso.dc.html", "course-detail.html"],
   ["RH Cursos Checkout.dc.html", "checkout.html"],
-  ["RH Cursos Admin Dashboard.dc.html", "admin-dashboard.html"],
 ];
 
 const adminScreens = [
@@ -47,6 +46,13 @@ function dataUri(path) {
   return `data:${mime};base64,${readFileSync(path).toString("base64")}`;
 }
 
+const logoDataUri = dataUri(LOGO_PATH);
+const DESIGN_LINKS = {
+  "RH Cursos Login.dc.html": "login.html",
+  "RH Cursos Home.dc.html": "home.html",
+  "RH Cursos Catálogo.dc.html": "courses.html",
+};
+
 const ADMIN_SCREENS = new Set(adminScreens);
 
 function placeholderValue(expression, adminScreen = null) {
@@ -68,20 +74,18 @@ function placeholderValue(expression, adminScreen = null) {
   if (/status|st$/.test(key) && adminScreen === "instrutores") return "Ativo";
   if (/^(hot|isactive)$/.test(key)) return "1";
   if (path.endsWith(".q")) return "Como funciona a inscrição?";
-  if (/^(on|pressed|checked|done|linedone|expanded|open|isopen|isstep|islist|iscal|notdone|current|sent|remember|visible|show)/.test(key)) {
-    if (/^(empty|no|not|hidden|disabled|sent|showerror|noleads|notdone|iscal|isstep1|isstep2)$/.test(key)) return "false";
-    return "1";
-  }
-  if (/^(aria|empty|hidden|remember|disabled)$/.test(key)) return "false";
+  if (/^(empty|no|not|hidden|disabled|sent|showerror|noleads|notdone|iscal|isstep1|isstep2|aria)$/.test(key)) return "false";
+  if (/^(on|pressed|checked|done|linedone|expanded|open|isopen|isstep|islist|current|remember|visible|show)/.test(key)) return "1";
   if (/day/.test(key)) return "18";
   if (/month/.test(key)) return "AGO";
   if (/date|time/.test(key)) return "18 de agosto de 2026";
   if (/price|valor|amount/.test(key)) return "R$ 1.200";
-  if (/count|total|number|n$|vagas|spots|turmas|horas|pct|percent/.test(key)) return "12";
+  if (/count|total|number|n$|vagas|spots|turmas|horas|pct|percent|courses?$/.test(key)) return "12";
   if (/mode/.test(key)) return "Online";
   if (/status|st$/.test(key)) return "Aberta";
   if (/email/.test(key)) return "contato@rhcursos.com.br";
   if (/phone|whats/.test(key)) return "(31) 99999-0000";
+  if (/brandname/.test(key)) return "RH Cursos & Soluções";
   if (/title|name|label|cat|category|author|role|org|company|institution|course|l\.name/.test(key)) return "Referência RH Cursos";
   if (/^(query|search)$/.test(key)) return "";
   if (/avatar/.test(path)) return "";
@@ -116,7 +120,7 @@ function transformCustomConditionals(html, adminScreen = null) {
 function hydrateReferenceComponents(html) {
   return html.replace(/<span\s+data-reference-component\b([^>]*)><\/span>/gi, (_, attributes) => {
     const label = attributes.match(/(?:label|placeholder|aria-label)=["']([^"']+)["']/i)?.[1];
-    const avatar = /(?:avatar|size=["']sm["'])/i.test(attributes);
+    const avatar = /(?:avatar|size=["'](?:sm|md)["'])/i.test(attributes);
     return `<span data-reference-component${attributes}>${label ?? (avatar ? "MR" : "—")}</span>`;
   });
 }
@@ -147,15 +151,23 @@ function resolveConditionalBlocks(html) {
     });
   }
 
-  const topLevel = nodes
-    .filter((node) => !nodes.some((parent) => parent !== node && parent.start < node.start && parent.end > node.end))
-    .sort((a, b) => a.start - b.start);
-  const childrenOf = (parent) => nodes
-    .filter((node) => node.start > parent.openEnd && node.end < parent.closeStart && !nodes.some((middle) => middle !== node && middle !== parent && middle.start > parent.start && middle.end < parent.end && middle.start < node.start && middle.end > node.end))
-    .sort((a, b) => a.start - b.start);
+  const roots = [];
+  const parentStack = [];
+  for (const node of nodes.sort((a, b) => a.start - b.start)) {
+    while (parentStack.length && node.start >= parentStack.at(-1).closeStart) parentStack.pop();
+    if (parentStack.length) {
+      const parent = parentStack.at(-1);
+      parent.children ??= [];
+      parent.children.push(node);
+    } else {
+      roots.push(node);
+    }
+    node.children ??= [];
+    parentStack.push(node);
+  }
 
   const renderRange = (start, end, parent = null) => {
-    const children = parent ? childrenOf(parent) : topLevel.filter((node) => node.start >= start && node.end <= end);
+    const children = (parent ? parent.children : roots).filter((node) => node.start >= start && node.end <= end);
     let cursor = start;
     let output = "";
     for (const node of children) {
@@ -171,7 +183,7 @@ function resolveConditionalBlocks(html) {
   return renderRange(0, html.length);
 }
 
-function normalizeCustomMarkup(html, adminScreen = null) {
+function normalizeCustomMarkup(html, adminScreen = null, referenceTitle = "") {
   let normalized = html
     .replace(/<script\s+src=["']\.\/support\.js["']\s*><\/script>/gi, "")
     .replace(/<script\s+src=["'][^"']*_ds\/trust-keith[^"']*_ds_bundle\.js["']\s*><\/script>/gi, "")
@@ -188,14 +200,14 @@ function normalizeCustomMarkup(html, adminScreen = null) {
     .replace(/<\/x-dc>/gi, "</div>")
     .replace(/<helmet>/gi, "<div data-reference-head>")
     .replace(/<\/helmet>/gi, "</div>")
-    .replace(/<img\s+([^>]*?)src=["']uploads\/logoHorizontal_800X600\.png["']([^>]*)>/gi, (_, before, after) => `<img ${before}src="${dataUri(LOGO_PATH)}"${after}>`)
-    .replace(/<img\s+([^>]*?)src=["']\.\/uploads\/logoHorizontal_800X600\.png["']([^>]*)>/gi, (_, before, after) => `<img ${before}src="${dataUri(LOGO_PATH)}"${after}>`);
+    .replace(/<img\s+([^>]*?)src=["'](?:\.\/)?uploads\/logoHorizontal_800X600\.png["']([^>]*)>/gi, (_, before, after) => `<img ${before}src="${logoDataUri}"${after}>`);
 
   normalized = transformCustomConditionals(normalized, adminScreen);
   normalized = hydratePlaceholders(normalized, adminScreen);
   normalized = hydrateReferenceComponents(normalized);
   normalized = normalized
-    .replace(/\s+(?:onClick|onclick|onChange|onchange|oninput|style-hover)="[^"]*"/gi, "")
+    .replace(/\s+on[a-z][a-z0-9:-]*="[^"]*"/gi, "")
+    .replace(/\s+style-hover="[^"]*"/gi, "")
     .replace(/\s+data-cur="0"/gi, "")
     .replace(/\s+aria-current="(?:false|0)?"/gi, "")
     .replace(/style="#([0-9a-f]{3,8})"/gi, 'style="background:#$1"')
@@ -217,11 +229,19 @@ function normalizeCustomMarkup(html, adminScreen = null) {
     .replace(/(<select\b[^>]*class=["'][^"']*\brh-fsel\b[^"']*["'][^>]*)\s+data-on=["'][^"']*["']/gi, '$1 data-on="1"')
     .replace(/(<select\b[^>]*class=["'][^"']*\brh-fsel\b[^>]*?)\s+value=["'][^"']*["']/gi, "$1")
     .replace(/\s+data-i="Referência"/gi, ' data-i="1"')
+    .replace(/\bhref=["']([^"']+\.dc\.html)["']/gi, (_, href) => `href="${DESIGN_LINKS[href] ?? "#"}"`)
+    .replace(/\bclass="([^"']*\brh-modetag\b[^"']*?)\brh-mode-([^"'\s]+)([^"']*)"/gi, (_, before, mode, after) => `class="${before}rh-mode-${mode.toLowerCase()}${after}"`)
+    .replace(/\s+defaultValue=["'][^"']*["']/gi, "")
+    .replace(/(<select\s+id=["']uf-select["'][^>]*>\s*<option\b[^>]*value=["']["'][^>]*)(>)/i, "$1 selected$2")
+    .replace(/<input\b([^>]*\bplaceholder=["']Cupom de desconto["'][^>]*)>/gi, (_, attributes) => /\baria-label=/i.test(attributes) ? `<input${attributes}>` : `<input${attributes} aria-label="Cupom de desconto">`)
+    .replace(/<button(?![^>]*\btype=)([^>]*)>/gi, '<button type="button"$1>')
     .replace(/--tk-text-display(?![-a-z])/g, "--tk-text-display-large")
     .replace(/<html(?![^>]*\blang=)/i, '<html lang="pt-BR"');
+  normalized = normalized.replace(/©\s*2026\s*RH Cursos\. Todos os direitos reservados\./gi, "© 2026 RH Cursos &amp; Soluções. Todos os direitos reservados.");
 
   const referenceCss = `<style data-reference-inline-css>\n${inlineDesignSystemCss()}\n.reference-screen-hidden{display:none!important}\n[data-reference-document]{display:block}\n.rh-wrap{width:min(1120px,calc(100% - 48px))}.rh-journeys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.rh-consult{display:grid;grid-template-columns:1fr 1fr;gap:24px}.rh-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.rh-jlink{display:inline-flex;align-items:center}\n</style>`;
-  normalized = normalized.replace(/<\/head>/i, `${referenceCss}</head>`);
+  const titleMarkup = referenceTitle && !/<title\b/i.test(normalized) ? `<title>${referenceTitle}</title>` : "";
+  normalized = normalized.replace(/<\/head>/i, `${titleMarkup}${referenceCss}</head>`);
   if (adminScreen) {
     normalized = normalized.replace(/<body([^>]*)>/i, `<body$1 data-reference-admin-screen="${adminScreen}">`);
   }
@@ -248,7 +268,11 @@ function buildReference(sourceName, outputName, adminScreen = null) {
       .replace(/<helmet>[\s\S]*?<\/helmet>/i, "");
     source = source.replace(/<dc-import\b[^>]*><\/dc-import>/i, sections);
   }
-  const html = normalizeCustomMarkup(source, adminScreen);
+  const referenceTitle = outputName
+    .replace(/\.html$/i, "")
+    .replace(/-/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const html = normalizeCustomMarkup(source, adminScreen, referenceTitle);
   const unresolved = (html.match(/\{\{/g) ?? []).length;
   const forbiddenAssets = ["support.js", "_ds_bundle.js", "_ds/", "uploads/logoHorizontal_800X600.png"];
   const remainingAssets = forbiddenAssets.filter((asset) => html.includes(asset));
@@ -279,13 +303,16 @@ function validateOutput() {
       /\{\{/,
       /support\.js|_ds_bundle\.js|_ds\//,
       /uploads\/logoHorizontal_800X600\.png/,
-      /\s(?:onClick|onclick|onChange|onchange|oninput|style-hover)=/i,
+      /\son[a-z][a-z0-9:-]*=/i,
+      /\sstyle-hover=/i,
+      /\.dc\.html["']/i,
       /style="(?:#[0-9a-f]{3,8}|Referência)"/i,
       /data-(?:cur|on|hot|status|done|open)="Referência"/i,
       /aria-current="(?:Referência|1)"/i,
       /data-reference-loop/,
       /data-reference-condition/,
       /<span\s+data-reference-component\b[^>]*><\/span>/i,
+      /<title>\s*<\/title>/i,
     ];
     if (invalidPatterns.some((pattern) => pattern.test(html))) {
       throw new Error(`Referência não autocontida: ${file}`);

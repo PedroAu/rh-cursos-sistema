@@ -14,7 +14,7 @@ Solicitação de treinamento corporativo.
 
 - Renderizar dados do catálogo/SSR/API do ambiente de execução; nenhum dado de `src/lib/mock-public-data.ts` pode ser usado como evidência de fidelidade.
 - Para esta rota estática, a captura não depende das fixtures dinâmicas de curso ou checkout; a fidelidade de dados deve vir do contrato real da própria rota.
-
+- A referência visual é estática e autocontida; a rota de produção continua sendo validada contra o contrato SSR/API real, não contra os dados do canvas.
 - Estados de carregamento, vazio e erro permanecem cobertos pelos testes funcionais existentes.
 
 ## Adaptações deliberadas
@@ -30,7 +30,7 @@ Solicitação de treinamento corporativo.
 
 ## Critérios de aceite
 
-- [ ] Rota responde HTTP 200 no ambiente de captura.
-- [ ] Referência não contém `{{ ... }}`, `support.js`, ativos hashados ou requests de ativo ausente.
-- [ ] Screenshot da rota e do canvas é produzido pelo harness no mesmo viewport.
-- [ ] Revisão visual manual registrada em `docs/qa/fidelity-signoff.md`.
+- [x] Rota responde HTTP 200 no ambiente de captura.
+- [x] Referência não contém `{{ ... }}`, `support.js`, ativos hashados ou requests de ativo ausente.
+- [x] Screenshot da rota e do canvas é produzido pelo harness no mesmo viewport.
+- [x] Revisão visual manual registrada em `docs/qa/fidelity-signoff.md`.

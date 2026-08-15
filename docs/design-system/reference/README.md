@@ -8,7 +8,7 @@ npm run fidelity:references
 
 O gerador remove o runtime do design-tool, inclui os tokens CSS, incorpora a logo
 como data URI, hidrata os placeholders com fixtures determinísticas de apresentação
-e exporta as dez telas admin como arquivos isolados. O comando falha se permanecer
+e exporta as nove referências públicas e dez telas admin como arquivos isolados. O comando falha se permanecer
 `{{ ... }}`, `support.js`, caminho `_ds/`, a URL relativa de upload, handlers inline,
 declarações CSS malformadas, marcadores de estado sem valor reconhecido (incluindo
 `checked`, `aria-pressed` e `data-hot`) ou componentes de referência vazios.

@@ -16,7 +16,7 @@
 
 ## 🔴 HIGH
 
-#### [FIDELITY-T1] Restaurar referência de canvas quebrada (F-CANVAS-05)
+### [FIDELITY-T1] Restaurar referência de canvas quebrada (F-CANVAS-05)
 - **Source**: Análise de débito técnico — `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §4
 - **Priority**: 🔴 HIGH *(reclassificado de Média por decisão @po — ver Nota de Decisão abaixo)*
 - **Effort**: Não estimado — depende de escolha entre versionar assets vs. reexportar canvas estático hidratado
@@ -34,7 +34,7 @@
 
 ## 🟡 MEDIUM
 
-#### [FIDELITY-T2] Escrever specs públicas para registrar intenção (F-SPEC-01)
+### [FIDELITY-T2] Escrever specs públicas para registrar intenção (F-SPEC-01)
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §5.3, §6 Estágio 2
 - **Priority**: 🟡 MEDIUM
 - **Effort**: Preenchimento do template validado em `docs/design/redesign/admin-specs/` — não é criação de método
@@ -49,7 +49,7 @@
 - **Acceptance**: F-SPEC-01 encerrado
 - **Depende de**: [FIDELITY-T1]
 
-#### [FIDELITY-T3] Exportar canvas isolado e escrever specs admin (F-SPEC-04)
+### [FIDELITY-T3] Exportar canvas isolado e escrever specs admin (F-SPEC-04)
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §6 Estágio 2
 - **Priority**: 🟡 MEDIUM
 - **Effort**: Não estimado
@@ -63,7 +63,7 @@
 - **Acceptance**: F-SPEC-04 encerrado, telas saem de NOT_ASSESSABLE
 - **Depende de**: [FIDELITY-T1]
 
-#### [FIDELITY-T4] Implementar contrato de auth no harness de captura (F-AUTH-03)
+### [FIDELITY-T4] Implementar contrato de auth no harness de captura (F-AUTH-03)
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §5.2, §6 Estágio 1
 - **Priority**: 🟡 MEDIUM
 - **Effort**: Baixo — reaproveitar mecanismo SSR já validado na Story 18.3
@@ -77,7 +77,7 @@
 - **Acceptance**: F-AUTH-03 encerrado para o harness de captura
 - **Depende de**: [FIDELITY-T1]
 
-#### [FIDELITY-T5] Fixture de slug real com guarda anti-mock (F-CAP-02)
+### [FIDELITY-T5] Fixture de slug real com guarda anti-mock (F-CAP-02)
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §5.1, §6 Estágio 1
 - **Priority**: 🟡 MEDIUM
 - **Effort**: Baixo — variáveis `EPIC14_FIDELITY_COURSE_PATH` e `EPIC14_FIDELITY_CHECKOUT_PATH` já estão implementadas; falta só o dado
@@ -94,7 +94,7 @@
 
 ---
 
-#### [FIDELITY-T7] Formalizar critério de PASS por sign-off manual por rota
+### [FIDELITY-T7] Formalizar critério de PASS por sign-off manual por rota
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §6 Estágio 3, ação 8 — decisão de produto tomada por `@po` em 2026-08-12
 - **Priority**: 🟡 MEDIUM
 - **Effort**: Não estimado — definir formato do registro de sign-off (ex.: checklist por rota em `docs/qa/`) e processo de aprovação
@@ -112,7 +112,7 @@
 
 ## 🟢 LOW
 
-#### [FIDELITY-T6] Resolver drift de tokens legados (F-TK-01)
+### [FIDELITY-T6] Resolver drift de tokens legados (F-TK-01)
 - **Source**: `docs/design/redesign/ANALYSIS-debito-prova-fidelidade.md` §6 Estágio 3
 - **Priority**: 🟢 LOW
 - **Effort**: Não estimado

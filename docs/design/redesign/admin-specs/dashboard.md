@@ -13,7 +13,7 @@ Visão operacional com indicadores, atividades recentes e atalhos administrativo
 
 ## Regiões visuais e componentes
 
-- Shell administrativo, conteúdo principal e ações da tela.
+- KPIs operacionais; leads recentes; próximas turmas; distribuição de leads por origem e atalhos administrativos.
 - O shell compartilhado mantém sidebar, logo, navegação ativa, contexto do usuário e área principal.
 - Os loops de dados da tela devem renderizar linhas/cards reais no estado de referência; estados vazios só aparecem quando a consulta correspondente não retorna registros.
 
@@ -36,7 +36,7 @@ Visão operacional com indicadores, atividades recentes e atalhos administrativo
 
 ## Critérios de aceite
 
-- [ ] Sessão admin confirmada por `/api/auth/session`.
-- [ ] Rota responde HTTP 200 e não redireciona.
-- [ ] Canvas isolado não contém placeholders ou requests de ativo ausente.
-- [ ] Screenshot pareado e revisão visual registrados em `docs/qa/fidelity-signoff.md`.
+- [x] Sessão admin confirmada por `/api/auth/session`.
+- [x] Rota responde HTTP 200 e não redireciona.
+- [x] Canvas isolado não contém placeholders ou requests de ativo ausente.
+- [x] Screenshot pareado e revisão visual registrados em `docs/qa/fidelity-signoff.md`.

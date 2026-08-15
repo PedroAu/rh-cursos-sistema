@@ -50,5 +50,5 @@ GPT-5
 | --- | --- |
 | 2026-08-12 | Story criada para dados estruturados de eventos na agenda pública. |
 | 2026-08-12 | JSON-LD de eventos implementado, testado e validado em build. |
-| 2026-08-12 | Story fechada por @po (`*close-story`). Sem PR/commit ainda — arquivos aguardando push via @devops. |
+| 2026-08-12 | Story fechada por @po (`*close-story`). Entrega rastreada no PR #13. |
 | 2026-08-12 | PR #13 (feat(seo): JSON-LD de eventos na agenda + conteúdo editorial de cursos) aberto — https://github.com/PedroAu/rh-cursos-sistema/pull/13. Aguardando merge. |

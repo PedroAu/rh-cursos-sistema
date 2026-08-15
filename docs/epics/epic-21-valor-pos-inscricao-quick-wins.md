@@ -60,7 +60,7 @@ Este epic cobre exclusivamente a **Onda A**. As Ondas B (ciclo de reputação: N
 **Status:** Draft — a criar via `@sm *draft`
 **AC:**
 - [ ] Botão "Adicionar ao calendário" na página de detalhe da turma/agenda
-- [ ] Arquivo `.ics` válido (RFC 5545) gerado com `startDate`, `time`, `location`, `modality` de `TrainingClass`
+- [ ] Arquivo `.ics` válido conforme RFC 5545, com `DTSTART`, `DTEND` calculado a partir da duração, `UID` estável por turma, `LOCATION`, `DESCRIPTION` e `SUMMARY` derivados de `TrainingClass`, escape de CR/LF, vírgula e ponto-e-vírgula, timezone documentado e testes para campos ausentes/bordas.
 - [ ] Sem envio de e-mail automático nesta story — bloqueado por decisão de infraestrutura (ver §6, resposta 6)
 
 ### Story EP-21.3: Ementa em PDF com captura de e-mail
@@ -70,7 +70,8 @@ Este epic cobre exclusivamente a **Onda A**. As Ondas B (ciclo de reputação: N
 **AC:**
 - [ ] Formulário de e-mail na página de curso antes de liberar o PDF
 - [ ] Geração ou servir PDF de ementa por curso
-- [ ] Lead capturado registrado no mesmo pipeline de leads existente (`admin-resource-configs.tsx` / `leads`)
+- [ ] Lead capturado registrado no mesmo pipeline de leads existente (`admin-resource-configs.tsx` / `leads`), com consentimento explícito, base legal e texto de privacidade exibidos antes do envio.
+- [ ] Retenção, exclusão sob solicitação e minimização de dados documentadas; endpoint protegido por rate limit, validação de origem e controles anti-abuso.
 - [ ] Evento de analytics (`trackEvent`) disparado na captura, alinhado ao padrão de `inscricao_cta`/`lead_enviado`
 
 ---

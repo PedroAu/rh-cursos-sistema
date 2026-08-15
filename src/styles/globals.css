@@ -42,13 +42,14 @@
     --rh-color-text-muted: #515154;
     --rh-color-outline: #6e6e73;
     --rh-color-outline-variant: #d2d2d7;
-    --rh-font-sans: -apple-system, BlinkMacSystemFont, var(--font-inter), "Segoe UI", system-ui, sans-serif;
+    --rh-font-sans: -apple-system, blinkmacsystemfont, var(--font-inter), "Segoe UI", system-ui, sans-serif;
     /* Base legada — sobrescrita pelo :root de Executive Precision (var(--m3-font-display)/Montserrat). */
-    --rh-font-display: -apple-system, BlinkMacSystemFont, var(--rh-font-sans);
+    --rh-font-display: -apple-system, blinkmacsystemfont, var(--rh-font-sans);
     --rh-radius-default: var(--m3-radius-default);
     --rh-radius-lg: var(--m3-radius-lg);
     --rh-radius-xl: var(--m3-radius-lg);
     --rh-radius-2xl: var(--m3-radius-lg);
+    --rh-radius-3xl: var(--m3-radius-lg);
     --rh-container-max: 1280px;
     --rh-gutter: var(--m3-gutter);
     --rh-section-padding: var(--m3-section-padding-lg);
@@ -219,8 +220,9 @@
    * base legada acima por ordem de origem, preservando o render das fases 0-5.
    */
   :root {
-    --rh-font-sans: var(--m3-font-body), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --rh-font-sans: var(--m3-font-body), -apple-system, blinkmacsystemfont, "Segoe UI", system-ui, sans-serif;
     --rh-font-display: var(--m3-font-display), var(--rh-font-sans);
+    --rh-radius-3xl: var(--m3-radius-lg);
     --rh-container-max: var(--m3-container-max);
     --rh-color-primary: var(--tk-brand);
     --rh-color-deep-navy: var(--tk-ink);
@@ -297,6 +299,7 @@
 
   * {
     @apply border-border;
+
   }
 
   html {
@@ -305,6 +308,7 @@
 
   body {
     @apply bg-background font-sans text-text-main antialiased;
+
     min-height: 100vh;
     line-height: 1.5;
   }
@@ -314,6 +318,7 @@
   h3,
   h4 {
     @apply font-display text-foreground;
+
     text-wrap: balance;
   }
 
@@ -348,6 +353,7 @@
 
   ::selection {
     @apply bg-accent text-white;
+
   }
 
   :focus-visible {
@@ -390,6 +396,7 @@
 
   .surface-card {
     @apply relative overflow-hidden border text-label-primary transition-all duration-300;
+
     background-color: var(--rh-card-bg);
     border-color: var(--rh-card-border);
     border-radius: var(--m3-radius-lg);
@@ -408,21 +415,25 @@
 
   .eyebrow {
     @apply inline-flex items-center gap-2 border border-outline-variant bg-white px-3 py-1.5 text-label font-bold uppercase tracking-[0.05em] text-prestige-gold;
+
     border-radius: var(--rh-radius-default);
   }
 
   .eyebrow::before {
     content: "";
     @apply h-1.5 w-1.5 rounded-full bg-accent;
+
   }
 
   .section-panel {
     @apply border border-separator bg-surface-raised p-8 shadow-soft md:p-10;
+
     border-radius: var(--rh-radius-xl);
   }
 
   .tone-panel {
     @apply border;
+
     border-radius: var(--rh-radius-xl);
     background-color: rgba(0, 23, 54, 0.04);
     border-color: rgba(0, 23, 54, 0.1);
@@ -447,10 +458,12 @@
 
   .ea-label {
     @apply text-label font-bold uppercase tracking-[0.05em] text-prestige-gold;
+
   }
 
   .ea-card {
     @apply border transition-all duration-300;
+
     background-color: var(--rh-card-bg);
     border-color: var(--rh-card-border);
     border-radius: var(--m3-radius-lg);
@@ -459,10 +472,12 @@
 
   .ea-card-hover {
     @apply hover:-translate-y-1 hover:border-prestige-gold hover:shadow-card;
+
   }
 
   .ea-chip {
     @apply inline-flex items-center border px-4 py-2 text-label-bold font-semibold transition;
+
     background-color: var(--rh-chip-bg);
     border-color: var(--rh-chip-border);
     border-radius: var(--m3-radius-full);
@@ -471,10 +486,12 @@
 
   .ea-chip-active {
     @apply border-deep-navy bg-deep-navy text-white;
+
   }
 
   .ea-input {
     @apply w-full border border-outline-variant bg-white px-4 py-3 text-sm outline-none transition focus:ring-2;
+
     border-radius: var(--rh-control-radius);
   }
 
@@ -1116,6 +1133,7 @@
 
   .skip-link {
     @apply fixed left-4 top-4 z-[100] -translate-y-20 rounded-lg bg-white px-4 py-3 text-sm font-bold text-tk-brand shadow-card transition;
+
   }
 
   .skip-link:focus {

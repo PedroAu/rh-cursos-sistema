@@ -4,7 +4,7 @@
 **Autor:** @analyst (Atlas)
 **Data:** 2026-08-12
 **Branch:** `codex/hotfixes-no-payments`
-**Fontes:** `AUDIT-epic18-story2-fidelity.md` (SHA `b86d07e`, 2026-07-19), `MATRIX-rota-canvas-spec.md`, `artifacts/epic14-fidelity/manifest.json`, `scripts/capture-epic14-fidelity.mjs`, `docs/design-system/*.dc.html`
+**Fontes:** `AUDIT-epic18-story2-fidelity.md` (SHA `b86d07e`, 2026-07-19), Story 18.3 (`docs/stories/2026-07-19-epic18-story3-restaurar-gates.md`), `npm run test:epic15:fidelity`, `MATRIX-rota-canvas-spec.md`, `artifacts/epic14-fidelity/manifest.json`, `scripts/capture-epic14-fidelity.mjs`, `docs/design-system/*.dc.html`
 
 ---
 
@@ -158,7 +158,7 @@ A segunda opção (export estático hidratado) é preferível: elimina a depend�
 
 ### Estágio 3 — Definir e aplicar o critério de PASS
 
-8. Formalizar o que constitui PASS. Hoje o harness, por decisão de projeto, nunca afirma PASS sozinho — o que é correto, mas deixa o estado terminal indefinido. Duas opções: sign-off manual documentado por rota (rastreável, não automatizável) ou diff perceptual com threshold acordado por região (automatizável, exige calibração). A escolha é decisão de produto.
+8. Formalizar o que constitui PASS. Decisão de produto registrada em `docs/qa/fidelity-signoff.md`: sign-off manual documentado por rota é o critério terminal; o harness apenas aplica esse registro quando a evidência corresponde ao digest do canvas. Diff perceptual automatizado não faz parte do gate, porque exigiria calibração por região antes de ser confiável.
 9. Cobrir as 7 rotas em EXCEÇÃO, priorizando as do funil comercial (`/contato`, `/falar-com-especialista`, `/inscricao-confirmada`).
 10. Resolver F-TK-01 consolidando ou removendo os tokens legados `--ea-*` de `src/styles/globals.css`.
 

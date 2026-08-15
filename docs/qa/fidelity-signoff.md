@@ -4,7 +4,7 @@
 **Revisor técnico:** `@aiox-master` (Orion)
 **Manifesto:** `artifacts/epic14-fidelity/manifest.json`
 **Registro consumido pelo harness:** `docs/qa/fidelity-signoff.json`
-**Comando:** `npm run fidelity:references && npm run fidelity:specs && NEXT_DIST_DIR=.next-playwright EPIC14_FIDELITY_COURSE_PATH=/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico EPIC14_FIDELITY_CHECKOUT_PATH=/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico/checkout node scripts/capture-epic14-fidelity.mjs`
+**Comando:** `npm run fidelity:references && npm run fidelity:specs && E2E_ADMIN_EMAIL="$E2E_ADMIN_EMAIL" ADMIN_PASSWORD="$ADMIN_PASSWORD" NEXT_DIST_DIR=.next-playwright EPIC14_FIDELITY_COURSE_PATH=/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico EPIC14_FIDELITY_CHECKOUT_PATH=/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico/checkout node scripts/capture-epic14-fidelity.mjs` (credenciais carregadas de `.env.e2e.local`)
 
 ## Critério de aprovação
 
@@ -13,8 +13,9 @@ fora da rota solicitada; (3) possui referência no mesmo viewport; (4) o canvas 
 faz requests ausentes; (5) não contém placeholders do export; e (6) o screenshot
 pareado foi revisado visualmente contra a intenção registrada na spec.
 
-O harness injeta o sign-off explícito do JSON nos alvos correspondentes. Uma nova captura
-sem esse registro, ou com evidência inválida, volta a `CONCERNS` automaticamente.
+O harness injeta o sign-off explícito do JSON nos alvos correspondentes. Warnings de sub-recursos
+não críticos são não-fatais; somente ausência de recurso crítico produz `NOT_ASSESSABLE`. Uma nova
+captura sem sign-off volta a `CONCERNS`; sign-off inválido ou com digest divergente nunca é aplicado.
 
 ## Rotas com canvas — revisão técnica concluída
 

@@ -18,7 +18,7 @@ const config: Config = {
     },
     extend: {
       colors: {
-        // Existing EA tokens (keep as-is)
+        // Existing RH semantic tokens (keep as-is)
         background: "var(--rh-color-background)",
         foreground: "var(--rh-color-on-surface)",
         primary: {
@@ -107,7 +107,7 @@ const config: Config = {
         lg: "var(--rh-radius-lg)",
         xl: "var(--rh-radius-xl)",
         "2xl": "var(--rh-radius-2xl)",
-        "3xl": "var(--rh-radius-2xl)",
+        "3xl": "var(--rh-radius-3xl)",
         ...tokens.borderRadius,
       },
       boxShadow: {

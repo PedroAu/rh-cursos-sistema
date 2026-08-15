@@ -13,6 +13,8 @@ import { loadEnvFile } from "node:process";
 import { pathToFileURL } from "node:url";
 
 import { chromium } from "playwright";
+import { createHash } from "node:crypto";
+import { ADMIN_VIEWPORT, PUBLIC_VIEWPORT } from "./fidelity-constants.mjs";
 
 if (existsSync(".env.e2e.local")) loadEnvFile(".env.e2e.local");
 
@@ -48,8 +50,11 @@ const SIGNOFF_PATH = join(REPO_ROOT, "docs", "qa", "fidelity-signoff.json");
 
 // ADR-014 D6 ratifies 1180px for the public canvases; the admin dashboard
 // canvas / spec-admin-dashboard.md use a 1360px reference width.
-const PUBLIC_VIEWPORT = { width: 1180, height: 2400 };
-const ADMIN_VIEWPORT = { width: 1360, height: 2400 };
+const KNOWN_TARGET_IDS = new Set([
+  "home", "courses", "agenda", "in-company", "about", "blog", "login", "course-detail", "checkout",
+  "admin-dashboard", "admin-cursos", "admin-turmas", "admin-matriculas", "admin-alunos", "admin-instrutores",
+  "admin-leads", "admin-blog", "admin-paginas", "admin-configuracoes",
+]);
 
 const OUTPUT_DIR = process.env.EPIC14_FIDELITY_OUT_DIR
   ? join(REPO_ROOT, process.env.EPIC14_FIDELITY_OUT_DIR)
@@ -127,7 +132,7 @@ const auditTargets = [
   {
     id: "course-detail",
     epic: 14,
-    routePath: process.env.EPIC14_FIDELITY_COURSE_PATH ?? "/cursos",
+    routePath: process.env.EPIC14_FIDELITY_COURSE_PATH,
     canvasFile: "course-detail.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
@@ -138,7 +143,7 @@ const auditTargets = [
   {
     id: "checkout",
     epic: 14,
-    routePath: process.env.EPIC14_FIDELITY_CHECKOUT_PATH ?? "/cursos",
+    routePath: process.env.EPIC14_FIDELITY_CHECKOUT_PATH,
     canvasFile: "checkout.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
@@ -172,8 +177,12 @@ function loadManualSignoffs() {
   if (!existsSync(SIGNOFF_PATH)) return new Map();
   try {
     const payload = JSON.parse(readFileSync(SIGNOFF_PATH, "utf8"));
+    if (!payload.routes || typeof payload.routes !== "object" || Array.isArray(payload.routes)) {
+      throw new Error("Campo routes ausente ou inválido.");
+    }
     const entries = Object.entries(payload.routes ?? {});
     for (const [targetId, signoff] of entries) {
+      if (!KNOWN_TARGET_IDS.has(targetId)) throw new Error(`Target de sign-off desconhecido: ${targetId}.`);
       if (
         !signoff ||
         typeof signoff !== "object" ||
@@ -302,8 +311,8 @@ async function captureRoute(context, baseUrl, target) {
       "course-nova-lei-licitacoes",
     ];
     const mockDetected = mockSignatures.some((signature) => `${target.routePath} ${visibleText}`.toLowerCase().includes(signature));
-    if (mockDetected) throw new Error(`Guarda anti-mock acionada para ${target.routePath}.`);
     await page.screenshot({ path: filePath, fullPage: true });
+    if (mockDetected) throw new Error(`Guarda anti-mock acionada para ${target.routePath}.`);
     const finalUrl = page.url();
     const redirected = new URL(finalUrl).pathname !== new URL(url).pathname;
     return { status, finalUrl, redirected, screenshot: `${target.id}-route.png` };
@@ -384,6 +393,10 @@ function shortAsset(url) {
   }
 }
 
+function canvasDigest(canvasFile) {
+  return createHash("sha256").update(readFileSync(join(REFERENCE_DIR, canvasFile))).digest("hex");
+}
+
 function computeVerdict(target, route, canvas) {
   const reasons = [];
 
@@ -446,7 +459,7 @@ async function main() {
   const manualSignoffs = loadManualSignoffs();
   for (const target of auditTargets) {
     const signoff = manualSignoffs.get(target.id);
-    if (signoff) target.manualSignoff = signoff;
+    if (signoff && signoff.canvasDigest === canvasDigest(target.canvasFile)) target.manualSignoff = signoff;
   }
 
   const filesToKeep = [];

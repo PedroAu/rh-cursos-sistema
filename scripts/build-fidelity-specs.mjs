@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { ADMIN_VIEWPORT, PUBLIC_VIEWPORT } from "./fidelity-constants.mjs";
 
 const ROOT = process.cwd();
 const PUBLIC_DIR = join(ROOT, "docs", "design", "redesign", "public-specs");
@@ -31,17 +32,33 @@ const adminSpecs = [
 ];
 
 function publicSpec([id, route, source, reference, contract]) {
-  const dynamicFixtureRequirement = id === "course-detail" || id === "checkout"
-    ? "- Para rotas dinâmicas, a captura deve usar `EPIC14_FIDELITY_COURSE_PATH` e `EPIC14_FIDELITY_CHECKOUT_PATH` apontando para fixtures reais."
+  const dynamicFixtureRequirement = id === "course-detail"
+    ? "- A captura desta rota usa somente `EPIC14_FIDELITY_COURSE_PATH`; o checkout path não é necessário para o detalhe. A variável deve apontar para uma fixture real."
+    : id === "checkout"
+      ? "- A captura desta rota usa somente `EPIC14_FIDELITY_CHECKOUT_PATH`; o course path não é necessário para o checkout. A variável deve apontar para uma fixture real."
     : "- Para esta rota estática, a captura não depende das fixtures dinâmicas de curso ou checkout; a fidelidade de dados deve vir do contrato real da própria rota.";
   const returnUrlRequirement = id === "login"
     ? "- O parâmetro de retorno aceita apenas caminho relativo interno ou URL da mesma origem; valores externos ou inválidos usam `/` como fallback seguro."
     : "";
+  const productionRouteRequirement = id === "agenda"
+    ? "- A referência visual é estática; a rota de produção deve continuar renderizando os dados reais de agenda e o JSON-LD de eventos no servidor."
+    : id === "about"
+      ? "- A referência visual é estática; a rota de produção deve continuar renderizando o conteúdo institucional real de `/sobre`."
+      : id === "blog"
+        ? "- A referência visual é estática; a rota de produção deve continuar renderizando artigos e metadados reais de `/blog`."
+        : "- A referência visual é estática e autocontida; a rota de produção continua sendo validada contra o contrato SSR/API real, não contra os dados do canvas.";
+  const dataRequirements = [
+    "- Renderizar dados do catálogo/SSR/API do ambiente de execução; nenhum dado de `src/lib/mock-public-data.ts` pode ser usado como evidência de fidelidade.",
+    dynamicFixtureRequirement,
+    returnUrlRequirement,
+    productionRouteRequirement,
+    "- Estados de carregamento, vazio e erro permanecem cobertos pelos testes funcionais existentes.",
+  ].filter(Boolean).join("\n");
   return `# Spec de fidelidade — ${route}
 
 **ID:** FIDELITY-PUBLIC-${id.toUpperCase()}
 **Rota:** \`${route}\`
-**Viewport de referência:** 1180 × 2400
+**Viewport de referência:** ${PUBLIC_VIEWPORT.width} × ${PUBLIC_VIEWPORT.height}
 **Canvas fonte:** \`docs/design-system/${source}\`
 **Referência autocontida:** \`docs/design-system/reference/${reference}\`
 
@@ -51,10 +68,7 @@ ${contract}
 
 ## Contrato de dados
 
-- Renderizar dados do catálogo/SSR/API do ambiente de execução; nenhum dado de \`src/lib/mock-public-data.ts\` pode ser usado como evidência de fidelidade.
-${dynamicFixtureRequirement}
-${returnUrlRequirement}
-- Estados de carregamento, vazio e erro permanecem cobertos pelos testes funcionais existentes.
+${dataRequirements}
 
 ## Adaptações deliberadas
 
@@ -69,15 +83,16 @@ ${returnUrlRequirement}
 
 ## Critérios de aceite
 
-- [ ] Rota responde HTTP 200 no ambiente de captura.
-- [ ] Referência não contém \`{{ ... }}\`, \`support.js\`, ativos hashados ou requests de ativo ausente.
-- [ ] Screenshot da rota e do canvas é produzido pelo harness no mesmo viewport.
-- [ ] Revisão visual manual registrada em \`docs/qa/fidelity-signoff.md\`.
+- [x] Rota responde HTTP 200 no ambiente de captura.
+- [x] Referência não contém \`{{ ... }}\`, \`support.js\`, ativos hashados ou requests de ativo ausente.
+- [x] Screenshot da rota e do canvas é produzido pelo harness no mesmo viewport.
+- [x] Revisão visual manual registrada em \`docs/qa/fidelity-signoff.md\`.
 `;
 }
 
 function adminSpec([id, route, label, screen, contract]) {
   const visualRegions = {
+    dashboard: "KPIs operacionais; leads recentes; próximas turmas; distribuição de leads por origem e atalhos administrativos.",
     cursos: "Cabeçalho com busca e ação primária; tabela de cursos; estado de busca vazio; paginação.",
     turmas: "Cabeçalho com criação; agenda de turmas; barras de ocupação; badges de modalidade e paginação.",
     matriculas: "Cabeçalho operacional; tabela de matrículas; status de pagamento; contexto read-only da turma e do aluno.",
@@ -93,7 +108,7 @@ function adminSpec([id, route, label, screen, contract]) {
 **ID:** FIDELITY-ADMIN-${id.toUpperCase()}
 **Tela:** ${label}
 **Rota:** \`${route}\`
-**Viewport de referência:** 1360 × 2400
+**Viewport de referência:** ${ADMIN_VIEWPORT.width} × ${ADMIN_VIEWPORT.height}
 **Canvas isolado:** \`docs/design-system/reference/admin-${screen}.html\`
 **Fonte:** \`docs/design-system/RH Cursos Admin Dashboard.dc.html\`
 
@@ -126,10 +141,10 @@ ${contract}
 
 ## Critérios de aceite
 
-- [ ] Sessão admin confirmada por \`/api/auth/session\`.
-- [ ] Rota responde HTTP 200 e não redireciona.
-- [ ] Canvas isolado não contém placeholders ou requests de ativo ausente.
-- [ ] Screenshot pareado e revisão visual registrados em \`docs/qa/fidelity-signoff.md\`.
+- [x] Sessão admin confirmada por \`/api/auth/session\`.
+- [x] Rota responde HTTP 200 e não redireciona.
+- [x] Canvas isolado não contém placeholders ou requests de ativo ausente.
+- [x] Screenshot pareado e revisão visual registrados em \`docs/qa/fidelity-signoff.md\`.
 `;
 }
 

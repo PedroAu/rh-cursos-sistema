@@ -207,9 +207,9 @@ const doc = `# Tokens de Cor e Superfície — Camada Semântica
 
 | Camada | Onde | Papel |
 |--------|------|-------|
-| **Paleta atual** | \`--rh-color-*\` (valores hex) | Cores brutas da marca/Material atual |
-| **Paleta Executive Precision** | \`--m3-*\` (valores hex) | Fonte canônica do frontmatter de \`docs/design/executive-precision/DESIGN.md\` |
-| **Semântica** | \`--rh-color-label\`, \`--rh-color-surface-raised\`, ... | Papel funcional; referencia uma paleta via \`var()\` |
+| **Paleta atual** | \`--tk-brand\`, \`--tk-accent\`, ... | Aliases e valores da paleta Trust Keith vigente; podem resolver para valores literais ou outros tokens |
+| **Paleta Executive Precision** | \`--m3-*\` | Referências históricas de Material 3 preservadas para compatibilidade; não são a identidade visual canônica |
+| **Semântica** | \`--rh-color-*\`, \`--rh-*\` | Papéis funcionais; referenciam a paleta vigente via \`var()\`, sem duplicar a camada de paleta |
 
 O tema Executive Precision é ativado por rota/layout com
 \`data-theme="executive"\` no contêiner que envolve a rota. Esta story apenas
