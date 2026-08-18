@@ -32,6 +32,7 @@ const routes = [
 ];
 const publicTestBaselineStorageKey = "rh_cursos_public_test_baseline";
 const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3100";
+const shouldPersistVisualBaselines = process.env.UPDATE_VISUAL_BASELINES === "1";
 
 async function prepareStableCapture(routeName: string, page: import("@playwright/test").Page) {
   await page.context().addCookies([
@@ -85,13 +86,16 @@ test.describe("baseline visual — rotas públicas", () => {
       // crítico da rota antes de capturar.
       await prepareStableCapture(route.name, page);
 
-      // Salva o screenshot como artefato de baseline versionado em
-      // tests/baseline/. NÃO comparamos (D6) — apenas registramos o estado.
-      const outDir = join(process.cwd(), "tests/baseline");
-      mkdirSync(outDir, { recursive: true });
-      const filePath = join(outDir, `${route.name}-${testInfo.project.name}.png`);
-
-      const screenshot = await page.screenshot({ fullPage: true, path: filePath });
+      // Persiste o baseline versionado somente em atualizações explícitas;
+      // execuções normais apenas anexam a captura ao relatório.
+      const screenshotPath = shouldPersistVisualBaselines
+        ? (() => {
+            const outDir = join(process.cwd(), "tests/baseline");
+            mkdirSync(outDir, { recursive: true });
+            return join(outDir, [route.name, testInfo.project.name].join("-") + ".png");
+          })()
+        : undefined;
+      const screenshot = await page.screenshot({ fullPage: true, path: screenshotPath });
 
       // Também anexa ao relatório HTML para consulta rápida.
       await testInfo.attach(`visual-${route.name}-${testInfo.project.name}.png`, {

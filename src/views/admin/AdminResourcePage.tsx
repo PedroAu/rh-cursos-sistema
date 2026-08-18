@@ -729,6 +729,14 @@ function ResourcePagination({
 }) {
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1;
   const to = Math.min(page * pageSize, total);
+  const pageItems: Array<number | "ellipsis-start" | "ellipsis-end"> =
+    pageCount <= 7
+      ? Array.from({ length: pageCount }, (_, index) => index + 1)
+      : page <= 4
+        ? [1, 2, 3, 4, 5, "ellipsis-end", pageCount]
+        : page >= pageCount - 3
+          ? [1, "ellipsis-start", pageCount - 4, pageCount - 3, pageCount - 2, pageCount - 1, pageCount]
+          : [1, "ellipsis-start", page - 1, page, page + 1, "ellipsis-end", pageCount];
 
   return (
     <div role="navigation" className="flex min-w-0 flex-wrap items-center justify-between gap-4 overflow-hidden border-t border-tk-line px-2 pt-4 text-sm text-tk-ink-muted" aria-label="Paginação">
@@ -747,18 +755,24 @@ function ResourcePagination({
         </label>
         <div className="flex max-w-full flex-wrap items-center gap-1" role="group" aria-label="Páginas">
           <button type="button" aria-label="Página anterior" disabled={page <= 1} onClick={() => onPageChange(page - 1)} className="h-8 min-w-8 rounded-lg px-2 hover:bg-tk-surface-2 disabled:opacity-40">‹</button>
-          {Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => (
-            <button
-              key={number}
-              type="button"
-              aria-label={`Página ${number}`}
-              aria-current={number === page ? "page" : undefined}
-              onClick={() => onPageChange(number)}
-              className={cn("h-8 min-w-8 rounded-lg px-2 font-semibold hover:bg-tk-surface-2", number === page && "bg-tk-brand text-white hover:bg-tk-brand")}
-            >
-              {number}
-            </button>
-          ))}
+          {pageItems.map((item) =>
+            typeof item === "number" ? (
+              <button
+                key={item}
+                type="button"
+                aria-label={`Página ${item}`}
+                aria-current={item === page ? "page" : undefined}
+                onClick={() => onPageChange(item)}
+                className={cn("h-8 min-w-8 rounded-lg px-2 font-semibold hover:bg-tk-surface-2", item === page && "bg-tk-brand text-white hover:bg-tk-brand")}
+              >
+                {item}
+              </button>
+            ) : (
+              <span key={item} aria-hidden="true" className="px-1 text-tk-ink-muted">
+                …
+              </span>
+            )
+          )}
           <button type="button" aria-label="Próxima página" disabled={page >= pageCount} onClick={() => onPageChange(page + 1)} className="h-8 min-w-8 rounded-lg px-2 hover:bg-tk-surface-2 disabled:opacity-40">›</button>
         </div>
       </div>

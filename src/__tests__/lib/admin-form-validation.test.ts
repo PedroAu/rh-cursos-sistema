@@ -84,6 +84,14 @@ describe('validateCourse', () => {
     expect(getErrorMessage(validateCourse({ ...validCourse, durationHours: undefined, durationLabel: '8h' }).errors, 'durationHours')).toContain('obrigatória');
   });
 
+  it('rejects non-finite duration values', () => {
+    for (const durationHours of ['Infinity', '-Infinity', 'NaN']) {
+      const result = validateCourse({ ...validCourse, durationHours });
+      expect(result.valid).toBe(false);
+      expect(getErrorMessage(result.errors, 'durationHours')).toContain('número válido');
+    }
+  });
+
   it('rejects malformed JSON in categories', () => {
     const result = validateCourse({ ...validCourse, categories: '{not json' });
     expect(getErrorMessage(result.errors, 'categories')).toBe('Formato inválido nas categorias');

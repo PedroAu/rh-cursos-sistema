@@ -16,6 +16,7 @@ import { Chip } from "@/components/ui/chip";
 import { useAppStore } from "@/lib/app-store";
 import { company, getCompanyYears } from "@/lib/company";
 import { getPublicCourseName } from "@/lib/seo";
+import { isEnrollmentClassOpen } from "@/lib/enrollment-class-resolution";
 import { Link } from "@/lib/router-compat";
 import { cn, parseDate } from "@/lib/utils";
 
@@ -160,7 +161,9 @@ export function HomePage() {
 
   const shouldAnimateTestimonials = motionReady && reduceMotion === false;
 
-  const upcomingClasses = [...classes]
+  const upcomingClasses = classes
+    .filter(isEnrollmentClassOpen)
+    .slice()
     .sort((left, right) => parseDate(left.startDate).getTime() - parseDate(right.startDate).getTime())
     .slice(0, 3)
     .map((trainingClass) => {
@@ -261,7 +264,7 @@ export function HomePage() {
                   })
                 ) : (
                   <Card variant="glass" className="border-[color:var(--rh-paper-line)] bg-tk-surface/80">
-                    <p className="text-sm font-semibold text-tk-ink">Nenhuma turma agendada no momento.</p>
+                    <p className="text-sm font-semibold text-tk-ink">Nenhuma turma aberta no momento.</p>
                     <p className="mt-1 text-caption text-tk-ink-muted">Consulte a agenda completa para ver novas aberturas.</p>
                     <Button asChild variant="tertiary" className="mt-3 w-fit">
                       <Link to="/agenda">Ver agenda completa →</Link>

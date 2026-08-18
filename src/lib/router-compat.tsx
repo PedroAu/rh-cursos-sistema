@@ -3,7 +3,7 @@
 "use client";
 
 import NextLink from "next/link";
-import { useParams as useNextParams, usePathname, useRouter } from "next/navigation";
+import { useParams as useNextParams, usePathname, useRouter, useSearchParams as useNextSearchParams } from "next/navigation";
 import { createElement, useCallback, useEffect, useState, type AnchorHTMLAttributes, type ReactNode } from "react";
 
 const NAVIGATION_STATE_STORAGE_KEY = "__router_compat_navigation_state__";
@@ -113,11 +113,13 @@ export function useParams() {
 export function useSearchParams(): [URLSearchParams, (next: URLSearchParams | Record<string, string>) => void] {
   const router = useRouter();
   const pathname = usePathname();
-  const [current, setCurrent] = useState(() => new URLSearchParams());
+  const nextSearchParams = useNextSearchParams();
+  const nextSearch = nextSearchParams.toString();
+  const [current, setCurrent] = useState(() => new URLSearchParams(nextSearch));
 
   useEffect(() => {
-    setCurrent(new URLSearchParams(window.location.search));
-  }, [pathname]);
+    setCurrent(new URLSearchParams(nextSearch));
+  }, [nextSearch, pathname]);
 
   const setParams = useCallback((next: URLSearchParams | Record<string, string>) => {
     const normalized = next instanceof URLSearchParams ? next : new URLSearchParams(next);

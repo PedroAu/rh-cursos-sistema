@@ -71,7 +71,7 @@ export function validateCourse(
 
   if (!str(form.durationHours).trim()) {
     addError(errors, "durationHours", "Carga horária é obrigatória");
-  } else if (Number.isNaN(Number(form.durationHours)) || Number(form.durationHours) <= 0) {
+  } else if (!Number.isFinite(Number(form.durationHours)) || Number(form.durationHours) <= 0) {
     addError(errors, "durationHours", "Carga horária deve ser um número válido maior que zero");
   }
 

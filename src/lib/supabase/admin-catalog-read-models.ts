@@ -50,7 +50,7 @@ const CLASS_SELECT =
 const INSTRUCTOR_SELECT =
   "id,nome,email,telefone,bio,foto_url,formacao,especialidade,rating,status";
 
-const COURSE_INSTRUCTOR_SELECT = "id,curso_id,instrutor_id,principal";
+const COURSE_INSTRUCTOR_SELECT = "id,curso_id,instrutor_id,principal,created_at";
 
 /**
  * Busca sanitizada de forma fail-safe: remove caracteres do operador PostgREST

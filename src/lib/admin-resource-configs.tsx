@@ -81,6 +81,14 @@ function numOrUndef(value: unknown): number | undefined {
   const parsed = Number(value);
   return Number.isNaN(parsed) ? undefined : parsed;
 }
+function resolveDurationHours(course: Course): number {
+  if (Number.isFinite(course.durationHours) && course.durationHours > 0) {
+    return course.durationHours;
+  }
+
+  const legacyHours = Number.parseFloat(course.durationLabel.match(/[-+]?[\d,.]+/)?.[0]?.replace(",", ".") ?? "");
+  return Number.isFinite(legacyHours) && legacyHours > 0 ? legacyHours : 0;
+}
 function modulesArr(value: unknown): CourseModule[] {
   return Array.isArray(value) ? (value as CourseModule[]) : [];
 }
@@ -172,6 +180,10 @@ function normalizeDateForStorage(value?: string) {
 
 function formatAdminDate(value?: string) {
   if (!value) return "—";
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return formatDateOnlyPtBR(value);
+  }
 
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "medium",
@@ -400,7 +412,7 @@ export function buildResourceConfig(
             title: row.title,
             pathId: row.pathId,
             modalities: row.modalities?.length ? row.modalities : [row.modality],
-            durationHours: row.durationHours ?? 0,
+            durationHours: resolveDurationHours(row),
             price: String(row.price),
             status: row.status,
             shortDescription: row.shortDescription,
