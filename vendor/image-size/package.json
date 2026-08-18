@@ -1,0 +1,8 @@
+{
+  "name": "image-size",
+  "version": "2.0.3-rh-safe",
+  "description": "Bounded image dimension reader for Storybook's Next.js Vite adapter",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT"
+}

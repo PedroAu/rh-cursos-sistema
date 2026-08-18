@@ -130,6 +130,10 @@
     "minimatch": "10.2.5",
     "@node-minify/core": "10.5.0",
     "@node-minify/terser": "10.5.0",
+    "image-size": "file:vendor/image-size",
+    "lighthouse": "13.4.1",
+    "puppeteer-core": "25.8.0",
+    "@puppeteer/browsers": "3.2.1",
     "next": {
       "sharp": "0.35.2"
     }
