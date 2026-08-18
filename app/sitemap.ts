@@ -19,9 +19,13 @@ const staticRoutes = [
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [catalog, blogPosts] = await Promise.all([
-    fetchPublicCatalogFromSupabaseServer().catch(() => null),
-    fetchPublicBlogPostsFromSupabaseServer().catch(() => null)
+    fetchPublicCatalogFromSupabaseServer(),
+    fetchPublicBlogPostsFromSupabaseServer()
   ]);
+
+  if (!catalog || !blogPosts) {
+    throw new Error("Dados públicos indisponíveis para gerar o sitemap.");
+  }
 
   const pages: MetadataRoute.Sitemap = staticRoutes.map((path) => ({
     url: `${SITE_URL}${path === "/" ? "/" : `${path}/`}`,
@@ -35,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8
   })) ?? [];
 
-  const posts = blogPosts?.map((post) => ({
+  const posts = blogPosts.map((post) => ({
     url: `${SITE_URL}/blog/${post.slug}/`,
     lastModified: post.date,
     changeFrequency: "monthly" as const,

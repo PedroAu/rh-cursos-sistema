@@ -20,12 +20,14 @@ const publicPaths = [
   "/inscricao-confirmada"
 ];
 
-// Páginas dinâmicas (SSG) — slugs reais presentes no export. Se os dados de
-// catálogo mudarem, atualizar para slugs existentes em out/cursos e out/blog.
-const dynamicPaths = [
-  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
-  "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
-];
+// O catálogo de produção e o baseline determinístico têm slugs diferentes;
+// em ambos os casos a rota deve apontar para conteúdo realmente publicado.
+const dynamicPaths = process.env.PLAYWRIGHT_TEST_BUILD === "1"
+  ? [
+      "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
+      "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
+    ]
+  : ["/cursos/curso-de-auditoria-da-folha-de-pagamento"];
 
 test.describe("rotas publicas", () => {
   for (const path of [...publicPaths, ...dynamicPaths]) {

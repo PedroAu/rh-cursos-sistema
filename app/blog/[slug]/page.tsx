@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { BlogPostClient } from "@/components/page-clients/blog-post-client";
 import {
@@ -48,15 +49,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
   const usePublicTestBaseline =
     process.env.PLAYWRIGHT_TEST_BUILD === "1" || isPublicTestBaselineBuildEnabled();
   const [blogPosts, catalog] = await Promise.all([
     usePublicTestBaseline
       ? Promise.resolve(publicTestBaselineBlogPosts)
-      : fetchPublicBlogPostsFromSupabaseServer(false).catch(() => null),
+      : fetchPublicBlogPostsFromSupabaseServer(false),
     fetchPublicCatalogFromSupabaseServer(usePublicTestBaseline).catch(() => null)
   ]);
+
+  if (!(blogPosts ?? []).some((item) => item.slug === slug)) {
+    notFound();
+  }
 
   return (
     <BlogPostClient

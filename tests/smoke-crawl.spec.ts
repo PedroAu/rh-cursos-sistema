@@ -24,12 +24,15 @@ const publicPaths = [
   "/falar-com-especialista"
 ];
 
-// Slugs reais presentes no export estático — atualizar se o catálogo mudar
-// (ver nota equivalente em route-auth.spec.ts).
-const dynamicPaths = [
-  "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
-  "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
-];
+// O catálogo de produção e o baseline determinístico têm slugs diferentes.
+// Ambos precisam apontar para conteúdo publicado; slugs obsoletos devem falhar
+// como 404, não ser aceitos pelo smoke crawl.
+const dynamicPaths = process.env.PLAYWRIGHT_TEST_BUILD === "1"
+  ? [
+      "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
+      "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
+    ]
+  : ["/cursos/curso-de-auditoria-da-folha-de-pagamento"];
 
 const adminPaths = [
   "/admin",

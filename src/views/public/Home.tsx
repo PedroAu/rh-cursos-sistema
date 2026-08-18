@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Chip } from "@/components/ui/chip";
 import { useAppStore } from "@/lib/app-store";
-import { company } from "@/lib/company";
+import { company, getCompanyYears } from "@/lib/company";
 import { getPublicCourseName } from "@/lib/seo";
 import { Link } from "@/lib/router-compat";
 import { cn, parseDate } from "@/lib/utils";
@@ -94,12 +94,6 @@ const consultingBullets = [
   "Acompanhamento por especialistas com experiência de campo"
 ] as const;
 
-const stats = [
-  { label: "formando equipes de organizações públicas e privadas com foco em aplicação prática", value: "+18 anos" },
-  { label: "turmas realizadas entre cursos abertos e programas in company", value: "+320" },
-  { label: "de recomendação média nas avaliações de turmas concluídas", value: "96%" }
-] as const;
-
 const testimonials = [
   {
     company: "CIAMA",
@@ -147,7 +141,15 @@ function formatHeroMode(modality: string, location: string) {
 }
 
 export function HomePage() {
-  const { classes, courses } = useAppStore();
+  const { classes, courses, trainingPaths } = useAppStore();
+  const stats = [
+    {
+      label: "formando equipes de organizações públicas e privadas com foco em aplicação prática",
+      value: `+${getCompanyYears()} anos`
+    },
+    { label: "turmas realizadas entre cursos abertos e programas in company", value: company.reportedMetrics.completedClasses },
+    { label: "de recomendação média nas avaliações de turmas concluídas", value: company.reportedMetrics.averageRecommendation }
+  ] as const;
   const reduceMotion = useReducedMotion();
   const [motionReady, setMotionReady] = useState(false);
   const sectionContainerClass = "mx-auto w-[min(var(--tk-container),calc(100%-24px))] md:w-[min(var(--tk-container),calc(100%-40px))]";
@@ -206,7 +208,10 @@ export function HomePage() {
             </div>
 
             <div className="mt-7 flex flex-wrap gap-[10px]">
-              {["Quase 80 cursos em 6 trilhas", "Presencial, online e in company"].map((item) => (
+              {[
+                `${courses.length} cursos em ${trainingPaths.length} trilhas`,
+                "Presencial, online e in company"
+              ].map((item) => (
                 <Chip key={item} variant="info" className="cursor-default disabled:opacity-100" disabled>
                   {item}
                 </Chip>
