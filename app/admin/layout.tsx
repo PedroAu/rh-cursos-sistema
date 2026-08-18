@@ -9,6 +9,11 @@ import {
   fetchPublicCatalogFromSupabaseServer,
 } from "@/lib/supabase/rh-cursos-api";
 
+// O painel administrativo depende de sessão e de dados mutáveis. Sem esta
+// declaração, um reload pode reutilizar o RSC do layout e reidratar registros
+// já excluídos ou alterados no Supabase.
+export const dynamic = "force-dynamic";
+
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession();
 

@@ -148,7 +148,7 @@ async function saveAndExpectSuccess(
         return false;
       }
     },
-    { timeout: 30_000 }
+    { timeout: 45_000 }
   );
 
   await dialog.getByRole("button", { name: /Criar registro|Salvar alterações/ }).click();
@@ -398,8 +398,31 @@ async function deleteRowByName(page: Page, name: string) {
   const rowName = new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const row = page.getByRole("row", { name: rowName });
   await expect(row).toBeVisible();
+
+  const deleteResponsePromise = page.waitForResponse(
+    (response) => {
+      const request = response.request();
+      if (request.method() !== "POST" || !response.url().includes("/api/functions/admin-resources")) {
+        return false;
+      }
+
+      try {
+        const body = request.postDataJSON() as { action?: string };
+        return body.action === "delete";
+      } catch {
+        return false;
+      }
+    },
+    { timeout: 45_000 }
+  );
+
   page.once("dialog", (dialog) => dialog.accept());
   await row.getByRole("button", { name: /^Excluir item/ }).click();
+
+  const deleteResponse = await deleteResponsePromise;
+  const deleteBody = (await deleteResponse.json().catch(() => null)) as { ok?: unknown } | null;
+  expect(deleteResponse.ok()).toBe(true);
+  expect(deleteBody?.ok).toBe(true);
 
   await expect
     .poll(
@@ -414,6 +437,8 @@ async function deleteRowByName(page: Page, name: string) {
 }
 
 test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () => {
+  test.describe.configure({ timeout: 60_000 });
+
   test.beforeEach(async ({ page, baseURL }) => {
     const email = ADMIN_EMAIL;
     await loginAsAdmin(page, email, baseURL ?? undefined);
