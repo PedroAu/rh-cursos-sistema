@@ -38,7 +38,7 @@ if (existsSync(".env.e2e.local")) loadEnvFile(".env.e2e.local");
  *   - Canvas rendered with missing sub-resources             → CONCERNS
  *   - Route OK + canvas OK, no manual pixel sign-off yet     → CONCERNS
  *   - PASS is emitted ONLY when a target carries an explicit
- *     `manualSignoff: { by, date, evidence }` (none do today).
+ *     `manualSignoff: { by, date, evidence, canvasDigest }` (none do today).
  *
  * `canvasAvailable: false` can therefore never be PASS.
  */

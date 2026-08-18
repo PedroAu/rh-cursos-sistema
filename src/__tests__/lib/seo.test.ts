@@ -96,6 +96,11 @@ describe("SEO de cursos", () => {
         "@type": "VirtualLocation",
         url: "https://www.rhcursos.com.br/cursos/esocial-leiaute-1-3/"
       },
+      organizer: {
+        "@type": "Organization",
+        name: "RH Cursos & Soluções",
+        url: "https://www.rhcursos.com.br/"
+      },
       offers: {
         "@type": "Offer",
         price: 1500,

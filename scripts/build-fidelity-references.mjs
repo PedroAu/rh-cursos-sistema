@@ -230,7 +230,7 @@ function normalizeCustomMarkup(html, adminScreen = null, referenceTitle = "") {
     .replace(/(<select\b[^>]*class=["'][^"']*\brh-fsel\b[^>]*?)\s+value=["'][^"']*["']/gi, "$1")
     .replace(/\s+data-i="Referência"/gi, ' data-i="1"')
     .replace(/\bhref=["']([^"']+\.dc\.html)["']/gi, (_, href) => `href="${DESIGN_LINKS[href] ?? "#"}"`)
-    .replace(/\bclass="([^"']*\brh-modetag\b[^"']*?)\brh-mode-([^"'\s]+)([^"']*)"/gi, (_, before, mode, after) => `class="${before}rh-mode-${mode.toLowerCase()}${after}"`)
+    .replace(/\bclass="([^"']*\brh-modetag)\s+(?:rh-mode-)?([^"'\s]+)([^"']*)"/gi, (_, before, mode, after) => `class="${before} rh-mode-${mode.toLowerCase()}${after}"`)
     .replace(/\s+defaultValue=["'][^"']*["']/gi, "")
     .replace(/(<select\s+id=["']uf-select["'][^>]*>\s*<option\b[^>]*value=["']["'][^>]*)(>)/i, "$1 selected$2")
     .replace(/<input\b([^>]*\bplaceholder=["']Cupom de desconto["'][^>]*)>/gi, (_, attributes) => /\baria-label=/i.test(attributes) ? `<input${attributes}>` : `<input${attributes} aria-label="Cupom de desconto">`)

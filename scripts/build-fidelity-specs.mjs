@@ -37,9 +37,6 @@ function publicSpec([id, route, source, reference, contract]) {
     : id === "checkout"
       ? "- A captura desta rota usa somente `EPIC14_FIDELITY_CHECKOUT_PATH`; o course path não é necessário para o checkout. A variável deve apontar para uma fixture real."
     : "- Para esta rota estática, a captura não depende das fixtures dinâmicas de curso ou checkout; a fidelidade de dados deve vir do contrato real da própria rota.";
-  const returnUrlRequirement = id === "login"
-    ? "- O parâmetro de retorno aceita apenas caminho relativo interno ou URL da mesma origem; valores externos ou inválidos usam `/` como fallback seguro."
-    : "";
   const productionRouteRequirement = id === "agenda"
     ? "- A referência visual é estática; a rota de produção deve continuar renderizando os dados reais de agenda e o JSON-LD de eventos no servidor."
     : id === "about"
@@ -50,7 +47,9 @@ function publicSpec([id, route, source, reference, contract]) {
   const dataRequirements = [
     "- Renderizar dados do catálogo/SSR/API do ambiente de execução; nenhum dado de `src/lib/mock-public-data.ts` pode ser usado como evidência de fidelidade.",
     dynamicFixtureRequirement,
-    returnUrlRequirement,
+    ...(id === "login"
+      ? ["- O parâmetro de retorno aceita apenas caminho relativo interno ou URL da mesma origem; valores externos ou inválidos usam `/` como fallback seguro."]
+      : []),
     productionRouteRequirement,
     "- Estados de carregamento, vazio e erro permanecem cobertos pelos testes funcionais existentes.",
   ].filter(Boolean).join("\n");

@@ -45,6 +45,7 @@ Este epic cobre exclusivamente a **Onda A**. As Ondas B (ciclo de reputação: N
 ## 🎬 Stories da Épica
 
 ### Story EP-21.1: Badge de vagas restantes na agenda e no catálogo
+
 **Fonte:** Ideia 10 (§4.3)
 **Esforço:** 1
 **Status:** Draft — a criar via `@sm *draft`
@@ -55,15 +56,18 @@ Este epic cobre exclusivamente a **Onda A**. As Ondas B (ciclo de reputação: N
 - [ ] Teste unitário cobrindo turma cheia, quase cheia e com vagas abundantes
 
 ### Story EP-21.2: Exportação `.ics` por turma
+
 **Fonte:** Ideia 15 (§4.4) — **desmembrada**: apenas a parte de exportação de calendário, sem lembrete automático
 **Esforço:** 2
 **Status:** Draft — a criar via `@sm *draft`
 **AC:**
 - [ ] Botão "Adicionar ao calendário" na página de detalhe da turma/agenda
 - [ ] Arquivo `.ics` válido conforme RFC 5545, com `DTSTART`, `DTEND` calculado a partir da duração, `UID` estável por turma, `LOCATION`, `DESCRIPTION` e `SUMMARY` derivados de `TrainingClass`, escape de CR/LF, vírgula e ponto-e-vírgula, timezone documentado e testes para campos ausentes/bordas.
+- [ ] O timezone de `DTSTART`/`DTEND` é explicitamente `America/Sao_Paulo`, a duração final vem de `TrainingClass.durationHours` (com fallback documentado) e o `UID` permanece determinístico para a mesma turma.
 - [ ] Sem envio de e-mail automático nesta story — bloqueado por decisão de infraestrutura (ver §6, resposta 6)
 
 ### Story EP-21.3: Ementa em PDF com captura de e-mail
+
 **Fonte:** Ideia 5 (§4.2)
 **Esforço:** 3
 **Status:** Draft — a criar via `@sm *draft`
@@ -72,6 +76,7 @@ Este epic cobre exclusivamente a **Onda A**. As Ondas B (ciclo de reputação: N
 - [ ] Geração ou servir PDF de ementa por curso
 - [ ] Lead capturado registrado no mesmo pipeline de leads existente (`admin-resource-configs.tsx` / `leads`), com consentimento explícito, base legal e texto de privacidade exibidos antes do envio.
 - [ ] Retenção, exclusão sob solicitação e minimização de dados documentadas; endpoint protegido por rate limit, validação de origem e controles anti-abuso.
+- [ ] O formulário informa a finalidade do tratamento, coleta consentimento antes do envio e oferece referência ao aviso de privacidade; o fluxo não armazena o e-mail quando a validação ou o consentimento falhar.
 - [ ] Evento de analytics (`trackEvent`) disparado na captura, alinhado ao padrão de `inscricao_cta`/`lead_enviado`
 
 ---
