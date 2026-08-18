@@ -410,6 +410,58 @@ async function getFunctionErrorMessage(response: Response, fallback: string) {
   return fallback;
 }
 
+const ADMIN_ENROLLMENTS_PAGE_SIZE = 100;
+
+type AdminEnrollmentsResponse = {
+  ok?: boolean;
+  data?: Enrollment[];
+  page?: number;
+  pageSize?: number;
+  total?: number;
+};
+
+/**
+ * Hidrata as inscrições administrativas pelo read model same-origin.
+ *
+ * A tela administrativa mantém paginação e busca locais. Por isso, o provider
+ * percorre as páginas autorizadas do endpoint e entrega à UI o conjunto
+ * completo, sem expor service-role nem depender do cliente Supabase anon.
+ */
+async function fetchAdminEnrollments(): Promise<Enrollment[]> {
+  const enrollments: Enrollment[] = [];
+  let page = 1;
+  let total = 0;
+
+  do {
+    const params = new URLSearchParams({
+      page: String(page),
+      pageSize: String(ADMIN_ENROLLMENTS_PAGE_SIZE),
+    });
+    const response = await fetch(`/api/admin/enrollments?${params.toString()}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(await getFunctionErrorMessage(response, "Não foi possível carregar as inscrições."));
+    }
+
+    const payload = (await response.json().catch(() => null)) as AdminEnrollmentsResponse | null;
+    if (payload?.ok !== true || !Array.isArray(payload.data)) {
+      throw new Error("Resposta inválida ao carregar as inscrições.");
+    }
+
+    enrollments.push(...payload.data);
+    total = typeof payload.total === "number" && payload.total >= 0 ? payload.total : enrollments.length;
+
+    if (payload.data.length === 0 || enrollments.length >= total) break;
+    page += 1;
+  } while (page <= 1_000);
+
+  return enrollments;
+}
+
 async function fetchAdminLeads(): Promise<Lead[]> {
   const response = await invokeFunction("admin-resources", {
     body: {
@@ -611,6 +663,48 @@ export function AppStoreProvider({
     };
   }, [state.currentSession]);
 
+  // O read model same-origin das inscrições não depende do cliente Supabase
+  // público nem de WebSocket. Mantemos esta hidratação separada do efeito de
+  // realtime para que o painel continue funcionando mesmo quando o cliente
+  // browser não estiver configurado para subscriptions.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (state.currentSession?.role !== "admin") return;
+
+    let active = true;
+    let inFlight = false;
+
+    const hydrateAdminEnrollments = async () => {
+      if (inFlight) return;
+      inFlight = true;
+
+      try {
+        const enrollments = await fetchAdminEnrollments();
+        if (active) {
+          setState((current) => ({ ...current, enrollments }));
+        }
+      } catch (error) {
+        if (active) console.error("Falha ao carregar inscrições administrativas:", error);
+      } finally {
+        inFlight = false;
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") void hydrateAdminEnrollments();
+    };
+
+    void hydrateAdminEnrollments();
+    window.addEventListener("focus", hydrateAdminEnrollments);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      active = false;
+      window.removeEventListener("focus", hydrateAdminEnrollments);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [state.currentSession?.role]);
+
   useEffect(() => {
     // Guard explícito de ambiente: subscriptions real-time dependem de WebSocket
     // do browser. Evita side effects de rede em SSR ou em ambientes sem window.
@@ -678,6 +772,19 @@ export function AppStoreProvider({
           setState((current) => ({ ...current, leads: mergeLeads(current.leads, updated) }));
         })
         .catch(() => undefined);
+    }, 300);
+
+    const scheduleEnrollmentRefetch = debounce(() => {
+      if (!active) return;
+      if (stateRef.current.currentSession?.role !== "admin") return;
+      fetchAdminEnrollments()
+        .then((updated) => {
+          if (!active) return;
+          setState((current) => ({ ...current, enrollments: updated }));
+        })
+        .catch((error) => {
+          if (active) console.error("Falha ao atualizar inscrições administrativas:", error);
+        });
     }, 300);
 
     if (bootstrapPublicData) {
@@ -771,6 +878,7 @@ export function AppStoreProvider({
           setState((current) => ({ ...current, leads: mergeLeads(current.leads, leads) }));
         })
         .catch(() => undefined);
+
     }
 
     if (isAdminSession && supabase) {
@@ -823,17 +931,21 @@ export function AppStoreProvider({
         // O bootstrap administrativo contém também registros inativos.
         // Um refetch público não pode substituir esse conjunto por uma
         // visão RLS reduzida após eventos de inscrição/aluno.
-        if (bootstrapPublicData) {
-          // Mudanças em inscrição afetam a capacidade das turmas (vagas),
-          // por isso refetch do catálogo para reconciliar as contagens.
-          const enrollmentSub = createRealtimeSubscription(
-            client,
-            "inscricao_changes",
-            "inscricao",
-            () => active,
-            scheduleCatalogRefetch
-          );
+        // Mudanças em inscrição afetam tanto a lista administrativa quanto a
+        // capacidade das turmas (vagas). Cada consumidor refaz somente seu
+        // read model autorizado, sem ler a tabela diretamente no browser.
+        const enrollmentSub = createRealtimeSubscription(
+          client,
+          "inscricao_changes",
+          "inscricao",
+          () => active,
+          () => {
+            scheduleEnrollmentRefetch();
+            if (bootstrapPublicData) scheduleCatalogRefetch();
+          }
+        );
 
+        if (bootstrapPublicData) {
           // Alterações em aluno podem refletir nas estatísticas do catálogo
           // (total de alunos por curso).
           const studentSub = createRealtimeSubscription(
@@ -845,6 +957,8 @@ export function AppStoreProvider({
           );
 
           subscriptions.push(enrollmentSub, studentSub);
+        } else {
+          subscriptions.push(enrollmentSub);
         }
       });
     }
@@ -859,7 +973,7 @@ export function AppStoreProvider({
         client.removeChannel(channel);
       });
     };
-  }, [bootstrapPublicData]);
+  }, [bootstrapPublicData, state.currentSession?.role]);
 
   const setSession = useCallback<AppStoreValue["setSession"]>((session) => {
     logoutInProgressRef.current = false;

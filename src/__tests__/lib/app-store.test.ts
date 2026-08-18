@@ -588,6 +588,62 @@ describe("AppStoreProvider and hooks", () => {
     });
   });
 
+  it("hydrates admin enrollments from the authenticated read model across pages", async () => {
+    const firstEnrollment = {
+      ...mocks.data.mockEnrollments[0],
+      id: "enrollment-hydrated-1",
+      studentName: "Pré-inscrição Um",
+      status: "Pendente" as const,
+    };
+    const secondEnrollment = {
+      ...mocks.data.mockEnrollments[0],
+      id: "enrollment-hydrated-2",
+      studentName: "Pré-inscrição Dois",
+      status: "Aguardando pagamento" as const,
+    };
+
+    mocks.fetchMock.mockImplementation((input: RequestInfo | URL) => {
+      const url = typeof input === "string" ? input : input.toString();
+      if (url === "/api/admin/enrollments?page=1&pageSize=100") {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ ok: true, data: [firstEnrollment], page: 1, pageSize: 100, total: 2 }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
+        );
+      }
+      if (url === "/api/admin/enrollments?page=2&pageSize=100") {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({ ok: true, data: [secondEnrollment], page: 2, pageSize: 100, total: 2 }),
+            { status: 200, headers: { "Content-Type": "application/json" } }
+          )
+        );
+      }
+      return Promise.resolve(new Response(null, { status: 204 }));
+    });
+
+    const harness = renderStore(
+      { role: "admin", email: "admin@example.com", name: "Admin" },
+      undefined,
+      false
+    );
+
+    await waitFor(() => expect(harness.store.enrollments).toHaveLength(2));
+    expect(harness.store.enrollments.map((item) => item.id)).toEqual([
+      "enrollment-hydrated-1",
+      "enrollment-hydrated-2",
+    ]);
+    expect(mocks.fetchMock).toHaveBeenCalledWith(
+      "/api/admin/enrollments?page=1&pageSize=100",
+      expect.objectContaining({ method: "GET", cache: "no-store" })
+    );
+    expect(mocks.fetchMock).toHaveBeenCalledWith(
+      "/api/admin/enrollments?page=2&pageSize=100",
+      expect.objectContaining({ method: "GET", cache: "no-store" })
+    );
+  });
+
   it("authenticates the realtime channel with an ephemeral token before opening admin subscriptions", async () => {
     // Follow-up REC-204 (post-mortem REC-502, item 6): as tabelas admin têm RLS
     // `to authenticated`; o canal precisa apresentar um JWT válido obtido do BFF
