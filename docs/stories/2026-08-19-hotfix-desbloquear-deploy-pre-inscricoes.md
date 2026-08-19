@@ -69,12 +69,12 @@ assignment_basis: "executor-assignment: infra_ci_cd_deploy"
 
 ## Tasks / Subtasks
 
-- [ ] Preparar o candidato documental e a evidência sanitizada (AC: 1, 2, 6, 7)
-  - [ ] Confirmar que o SHA candidato final contém `8ea1e82` e `85161c8` na ancestralidade, sem confundi-lo com nenhum desses dois SHAs.
-  - [ ] Criar `docs/history/reports/2026-08-19-hotfix-pre-inscricoes-deploy.md` com a evidência agregada da query read-only: `total=3`, `Pendente=3`, `latestCreatedAt=2026-08-18T16:53:00.088272+00:00`.
-  - [ ] Sanitizar o relatório: não incluir nome, e-mail, telefone, documento, identificador individual ou qualquer outra PII.
-  - [ ] Versionar a story e o relatório antes de definir o SHA final do dispatch.
-  - [ ] Confirmar que a alteração do smoke está limitada à descoberta pública e read-only de curso publicado e à falha explícita para catálogo vazio.
+- [x] Preparar o candidato documental e a evidência sanitizada (AC: 1, 2, 6, 7)
+  - [x] Confirmar que o SHA candidato final contém `8ea1e82` e `85161c8` na ancestralidade, sem confundi-lo com nenhum desses dois SHAs.
+  - [x] Criar `docs/history/reports/2026-08-19-hotfix-pre-inscricoes-deploy.md` com a evidência agregada da query read-only: `total=3`, `Pendente=3`, `latestCreatedAt=2026-08-18T16:53:00.088272+00:00`.
+  - [x] Sanitizar o relatório: não incluir nome, e-mail, telefone, documento, identificador individual ou qualquer outra PII.
+  - [x] Versionar a story e o relatório antes de definir o SHA final do dispatch.
+  - [x] Confirmar que a alteração do smoke está limitada à descoberta pública e read-only de curso publicado e à falha explícita para catálogo vazio.
 - [ ] Publicar os commits pelos controles exclusivos de `@devops` e observar o run automático (AC: 4, 6)
   - [ ] Enviar o SHA candidato final e realizar PR/merge conforme a política vigente do repositório.
   - [ ] Registrar o run automático disparado pelo push/merge de `tests/` + `docs/`.
@@ -88,7 +88,7 @@ assignment_basis: "executor-assignment: infra_ci_cd_deploy"
   - [ ] Confirmar test 184, lint, typecheck, build, smoke 12/12, audit e secretlint no SHA candidato final.
   - [ ] Confirmar que a execução remota não reintroduz o `404` causado pelo slug obsoleto.
 - [ ] Preparar e, se necessário, executar o rollback Cloudflare (AC: 9, 10)
-  - [ ] Antes do deploy de frontend, executar `wrangler deployments list` e registrar o deployment/version ID atual e o alvo anterior de rollback.
+  - [x] Antes do deploy de frontend, executar `wrangler deployments list` e registrar o deployment/version ID atual e o alvo anterior de rollback.
   - [ ] Se a verificação pós-deploy falhar, executar `wrangler rollback --message "Rollback hotfix pre-inscricoes"` para a versão anterior verificada.
   - [ ] Registrar o deployment/version ID restaurado e o resultado da verificação após rollback.
   - [ ] Não usar restauração de SHA Git como substituto para o rollback de deployment do Cloudflare.
@@ -182,23 +182,29 @@ assignment_basis: "executor-assignment: infra_ci_cd_deploy"
 
 ### Agent Model Used
 
-_A preencher pelo executor `@devops`._
+GPT-5 (Codex), persona Gage (`@devops`).
 
 ### Debug Log References
 
-_A preencher com os IDs/URLs dos runs automático e manual, logs sanitizados dos gates e referências do rollback, se acionado._
+- `git merge-base --is-ancestor 8ea1e82 HEAD` e `git merge-base --is-ancestor 85161c8 HEAD` → PASS.
+- `wrangler deployments list --json` → deployment sanitizado `e50133ef-d168-4987-a9b6-c39d3f34deb5`, versão ativa `fc2f8175-66cd-4736-b3de-9ed20218afe4`.
+- Evidência agregada read-only registrada em `docs/history/reports/2026-08-19-hotfix-pre-inscricoes-deploy.md`, sem PII.
+- IDs/URLs dos runs automático e manual serão registrados após execução real.
 
 ### Completion Notes List
 
-_A preencher com o SHA final, sua ancestralidade, a ordem efetiva dos jobs, o resultado pós-deploy e os deployment/version IDs do Cloudflare._
+- `8ea1e82` e `85161c8` foram confirmados na ancestralidade do candidato local.
+- O ponto de rollback anterior ao deploy foi capturado antes de qualquer operação remota.
+- A ordem efetiva dos jobs, o resultado pós-deploy e o novo deployment/version ID permanecem pendentes de execução real.
 
 ### File List
 
-_A preencher com a story, o relatório sanitizado versionado e qualquer outro artefato documental autorizado._
+- `docs/stories/2026-08-19-hotfix-desbloquear-deploy-pre-inscricoes.md`
+- `docs/history/reports/2026-08-19-hotfix-pre-inscricoes-deploy.md`
 
 ### Candidate SHA
 
-_A preencher por `@devops`; deve conter `8ea1e82`, `85161c8` e os commits documentais posteriores._
+O candidato local contém `8ea1e82`, `85161c8` e `dbf8c5f`. O SHA final será o merge commit em `main` que também contenha este relatório e será registrado antes do `workflow_dispatch`.
 
 ### Production Pipeline
 
@@ -210,7 +216,9 @@ _A preencher por `@devops` sem PII._
 
 ### Rollback Evidence
 
-_Registrar o deployment/version ID anterior obtido com `wrangler deployments list`. Se acionado, registrar o resultado de `wrangler rollback`; caso contrário, marcar como não acionado._
+- Deployment anterior: `e50133ef-d168-4987-a9b6-c39d3f34deb5`.
+- Versão ativa anterior: `fc2f8175-66cd-4736-b3de-9ed20218afe4` (100%).
+- Rollback ainda não acionado; somente será executado se a verificação pós-deploy falhar.
 
 ## QA Results
 
