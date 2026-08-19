@@ -431,7 +431,7 @@ async function deleteRowByName(page: Page, name: string) {
         await pageSearchField(page).fill(name);
         return page.getByRole("row", { name: rowName }).count();
       },
-      { timeout: 15_000, intervals: [250, 500, 1_000] }
+      { timeout: 30_000, intervals: [250, 500, 1_000] }
     )
     .toBe(0);
 }

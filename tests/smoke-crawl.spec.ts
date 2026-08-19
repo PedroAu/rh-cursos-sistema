@@ -32,7 +32,7 @@ const dynamicPaths = process.env.PLAYWRIGHT_TEST_BUILD === "1"
       "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
       "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
     ]
-  : ["/cursos/curso-de-auditoria-da-folha-de-pagamento"];
+  : ["/cursos/auditoria-da-folha-de-pagamento"];
 
 const adminPaths = [
   "/admin",
