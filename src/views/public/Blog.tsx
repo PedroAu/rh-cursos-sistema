@@ -22,31 +22,6 @@ import { cn, formatDate } from "@/lib/utils";
 
 const canvasCategories = ["Todos", "Licitações", "LGPD", "Compliance", "Gestão Pública"] as const;
 
-// Curadoria editorial fixa por slug: esta listagem não depende de ranking analítico.
-const curatedFeaturedSlug = "nova-lei-licitacoes-7-erros-pregoes-2026";
-
-const curatedGridSlugs = [
-  "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
-  "ripd-quando-deixa-de-ser-opcional",
-  "canal-denuncias-que-as-pessoas-realmente-usam",
-  "planejamento-orcamentario-do-ppa-a-execucao-sem-surpresas",
-  "fiscalizacao-de-contratos-o-que-registrar",
-  "encarregado-de-dados-no-setor-publico-funcao-na-pratica",
-  "due-diligence-de-fornecedores-sem-burocratizar-a-compra",
-  "gestao-de-riscos-transformando-matriz-em-decisao",
-  "pregao-eletronico-pontos-de-atencao-no-julgamento"
-] as const;
-
-// Curadoria editorial fixa por slug: título/categoria/tempo de leitura são
-// sempre derivados do post real publicado, nunca hardcoded aqui (evita
-// exibir um título que não corresponde ao artigo linkado).
-const trendingSlugs = [
-  "pesquisa-de-precos-como-montar-uma-que-resiste-ao-tcu",
-  "ripd-quando-deixa-de-ser-opcional",
-  "canal-denuncias-que-as-pessoas-realmente-usam",
-  "gestao-de-riscos-transformando-matriz-em-decisao"
-] as const;
-
 const categoryPresentation: Record<string, { glyph: string; tint: string }> = {
   Compliance: {
     glyph: "✓",
@@ -204,20 +179,12 @@ export function BlogPage() {
     });
   }, [category, debouncedQuery, publishedPosts]);
 
-  const isEditorialDefault = !debouncedQuery.trim() && category === "Todos";
-  const featuredPost = isEditorialDefault
-    ? publishedPosts.find((post) => post.slug === curatedFeaturedSlug) ?? filteredPosts[0]
-    : filteredPosts[0];
-  const gridPosts = isEditorialDefault
-    ? curatedGridSlugs
-        .map((slug) => publishedPosts.find((post) => post.slug === slug))
-        .filter((post): post is BlogPost => Boolean(post))
-    : filteredPosts.filter((post) => post.slug !== featuredPost?.slug).slice(0, 9);
+  const featuredPost = filteredPosts[0];
+  const gridPosts = filteredPosts.filter((post) => post.slug !== featuredPost?.slug).slice(0, 9);
   const trendingItems = useMemo(
     () =>
-      trendingSlugs
-        .map((slug) => publishedPosts.find((post) => post.slug === slug))
-        .filter((post): post is BlogPost => Boolean(post))
+      publishedPosts
+        .slice(0, 4)
         .map((post) => ({
           slug: post.slug,
           title: post.title,
@@ -226,7 +193,7 @@ export function BlogPage() {
         })),
     [publishedPosts]
   );
-  const visibleCount = isEditorialDefault ? 9 : filteredPosts.length;
+  const visibleCount = filteredPosts.length;
 
   const submitNewsletter = async () => {
     if (!newsletterName.trim()) {
@@ -289,7 +256,7 @@ export function BlogPage() {
                     Em destaque · {featuredPost.category}
                   </span>
                   <span className="absolute bottom-3 right-4 font-tk-display text-[96px] font-bold leading-none tracking-[var(--tk-tracking-display)] text-white/25">
-                    14.133
+                    {getPresentation(featuredPost).glyph}
                   </span>
                 </div>
                 <CardContent className="flex h-[calc(100%-300px)] flex-col gap-4 p-8">

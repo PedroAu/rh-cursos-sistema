@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-20T01:10:00.280Z",
+  "generatedAt": "2026-08-13T15:16:19.369Z",
   "baseUrl": "http://127.0.0.1:3100",
   "publicViewport": {
     "width": 1180,
@@ -9,7 +9,7 @@
     "width": 1360,
     "height": 2400
   },
-  "outputDir": "/Users/pedroaugusto/Documents/site_1.0/site-rh-cursos/artifacts/epic14-fidelity",
+  "outputDir": "artifacts/epic14-fidelity",
   "verdictLegend": {
     "PASS": "Rota e canvas comparados com sign-off manual de fidelidade.",
     "CONCERNS": "Par disponível; requer revisão visual manual ou possui ressalvas.",
@@ -27,22 +27,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Home.dc.html",
+      "canvasFile": "docs/design-system/reference/home.html",
       "routeScreenshot": "home-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "home-canvas.png",
-      "canvasWarnings": [
-        "support.js",
-        "logoHorizontal_800X600.png"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): support.js, logoHorizontal_800X600.png.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -55,22 +51,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Catálogo.dc.html",
+      "canvasFile": "docs/design-system/reference/courses.html",
       "routeScreenshot": "courses-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/cursos",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "courses-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -83,22 +75,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/Agenda export.dc.html",
+      "canvasFile": "docs/design-system/reference/agenda.html",
       "routeScreenshot": "agenda-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/agenda",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "agenda-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -111,22 +99,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos In-company.dc.html",
+      "canvasFile": "docs/design-system/reference/in-company.html",
       "routeScreenshot": "in-company-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/in-company",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "in-company-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -139,22 +123,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Quem Somos.dc.html",
+      "canvasFile": "docs/design-system/reference/about.html",
       "routeScreenshot": "about-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/sobre",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "about-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -167,22 +147,18 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Blog.dc.html",
+      "canvasFile": "docs/design-system/reference/blog.html",
       "routeScreenshot": "blog-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/blog",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "blog-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -195,80 +171,68 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Login.dc.html",
+      "canvasFile": "docs/design-system/reference/login.html",
       "routeScreenshot": "login-route.png",
       "routeStatus": 200,
       "routeFinalUrl": "http://127.0.0.1:3100/login",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "login-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
       "id": "course-detail",
       "epic": 14,
-      "routePath": "/cursos",
+      "routePath": "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
       "auth": "none",
       "viewport": {
         "width": 1180,
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Curso.dc.html",
+      "canvasFile": "docs/design-system/reference/course-detail.html",
       "routeScreenshot": "course-detail-route.png",
       "routeStatus": 200,
-      "routeFinalUrl": "http://127.0.0.1:3100/cursos",
+      "routeFinalUrl": "http://127.0.0.1:3100/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "course-detail-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Rota real é dinâmica (/cursos/[slug]); captura usa a listagem como proxy. Defina EPIC14_FIDELITY_COURSE_PATH com um slug de fixture para comparar a página de detalhe.",
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Captura usa fixture real do catálogo configurada por EPIC14_FIDELITY_COURSE_PATH.",
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
       "id": "checkout",
       "epic": 14,
-      "routePath": "/cursos",
+      "routePath": "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico/checkout",
       "auth": "none",
       "viewport": {
         "width": 1180,
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Checkout.dc.html",
+      "canvasFile": "docs/design-system/reference/checkout.html",
       "routeScreenshot": "checkout-route.png",
       "routeStatus": 200,
-      "routeFinalUrl": "http://127.0.0.1:3100/cursos",
+      "routeFinalUrl": "http://127.0.0.1:3100/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico/checkout",
       "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "checkout-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Rota real é dinâmica (/cursos/[slug]/checkout) e depende de fixture. Defina EPIC14_FIDELITY_CHECKOUT_PATH com um caminho válido para comparar o checkout.",
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Captura usa fixture real do catálogo configurada por EPIC14_FIDELITY_CHECKOUT_PATH.",
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     },
     {
@@ -281,31 +245,240 @@
         "height": 2400
       },
       "canvasAvailable": true,
-      "canvasFile": "docs/design-system/RH Cursos Admin Dashboard.dc.html",
+      "canvasFile": "docs/design-system/reference/admin-dashboard.html",
       "routeScreenshot": "admin-dashboard-route.png",
       "routeStatus": 200,
-      "routeFinalUrl": "http://127.0.0.1:3100/login?status=required&next=/admin",
-      "routeRedirected": true,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin",
+      "routeRedirected": false,
       "routeError": null,
       "canvasScreenshot": "admin-dashboard-canvas.png",
-      "canvasWarnings": [
-        "logoHorizontal_800X600.png",
-        "support.js"
-      ],
+      "canvasWarnings": [],
       "canvasCriticalMissing": [],
-      "verdict": "CONCERNS",
+      "verdict": "PASS",
       "reasons": [
-        "Rota redirecionou para http://127.0.0.1:3100/login?status=required&next=/admin — não avaliável diretamente.",
-        "Auth SSR do admin fora do escopo desta story (Story 18.3).",
-        "Admin exige sessão SSR autenticada. Sem contrato de auth no harness a rota redireciona para /login — captura documenta o estado; a comparação real depende da Story 18.3.",
-        "Canvas com sub-recursos ausentes (não fatais): logoHorizontal_800X600.png, support.js.",
-        "Par rota×canvas disponível; fidelidade pixel-a-pixel exige revisão visual manual (harness não afirma PASS automaticamente)."
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-cursos",
+      "epic": 15,
+      "routePath": "/admin/cursos",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-cursos.html",
+      "routeScreenshot": "admin-cursos-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/cursos",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-cursos-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-turmas",
+      "epic": 15,
+      "routePath": "/admin/turmas",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-turmas.html",
+      "routeScreenshot": "admin-turmas-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/turmas",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-turmas-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-matriculas",
+      "epic": 15,
+      "routePath": "/admin/inscricoes",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-matriculas.html",
+      "routeScreenshot": "admin-matriculas-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/inscricoes",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-matriculas-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-alunos",
+      "epic": 15,
+      "routePath": "/admin/alunos",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-alunos.html",
+      "routeScreenshot": "admin-alunos-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/alunos",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-alunos-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-instrutores",
+      "epic": 15,
+      "routePath": "/admin/instrutores",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-instrutores.html",
+      "routeScreenshot": "admin-instrutores-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/instrutores",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-instrutores-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-leads",
+      "epic": 15,
+      "routePath": "/admin/leads",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-leads.html",
+      "routeScreenshot": "admin-leads-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/leads",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-leads-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-blog",
+      "epic": 15,
+      "routePath": "/admin/blog",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-blog.html",
+      "routeScreenshot": "admin-blog-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/blog",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-blog-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-paginas",
+      "epic": 15,
+      "routePath": "/admin/paginas",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-paginas.html",
+      "routeScreenshot": "admin-paginas-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/paginas",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-paginas-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
+      ]
+    },
+    {
+      "id": "admin-configuracoes",
+      "epic": 15,
+      "routePath": "/admin/configuracoes",
+      "auth": "admin",
+      "viewport": {
+        "width": 1360,
+        "height": 2400
+      },
+      "canvasAvailable": true,
+      "canvasFile": "docs/design-system/reference/admin-config.html",
+      "routeScreenshot": "admin-configuracoes-route.png",
+      "routeStatus": 200,
+      "routeFinalUrl": "http://127.0.0.1:3100/admin/configuracoes",
+      "routeRedirected": false,
+      "routeError": null,
+      "canvasScreenshot": "admin-configuracoes-canvas.png",
+      "canvasWarnings": [],
+      "canvasCriticalMissing": [],
+      "verdict": "PASS",
+      "reasons": [
+        "Sign-off manual de fidelidade por @aiox-master em 2026-08-12."
       ]
     }
   ],
   "summary": {
-    "PASS": 0,
-    "CONCERNS": 10,
+    "PASS": 19,
+    "CONCERNS": 0,
     "FAIL": 0,
     "NOT_ASSESSABLE": 0
   }

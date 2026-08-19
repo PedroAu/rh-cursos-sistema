@@ -111,52 +111,52 @@ function makeTheme(resolve, mode) {
   if (mode === "executive") {
     return {
       textTokens: [
-        ["label", resolve("--ea-color-label")],
-        ["secondary-label", resolve("--ea-color-secondary-label")],
-        ["accent", resolve("--ea-color-accent")],
-        ["success", resolve("--ea-color-success")],
-        ["warning", resolve("--ea-color-warning")],
-        ["danger", resolve("--ea-color-danger")],
+        ["label", resolve("--rh-color-label")],
+        ["secondary-label", resolve("--rh-color-secondary-label")],
+        ["accent", resolve("--rh-color-accent")],
+        ["success", resolve("--rh-color-success")],
+        ["warning", resolve("--rh-color-warning")],
+        ["danger", resolve("--rh-color-danger")],
         ["primary", resolve("--m3-primary")]
       ],
       surfaceTokens: [
         ["surface", resolve("--m3-surface")],
-        ["surface-raised", resolve("--ea-color-surface-raised")],
-        ["control", resolve("--ea-color-control")]
+        ["surface-raised", resolve("--rh-color-surface-raised")],
+        ["control", resolve("--rh-color-control")]
       ],
       filledBackgrounds: [
         ["primary", resolve("--m3-primary")],
         ["surface-dark", resolve("--m3-surface-dark")],
-        ["accent-text", resolve("--ea-color-accent")],
-        ["success", resolve("--ea-color-success")],
-        ["warning", resolve("--ea-color-warning")],
-        ["danger", resolve("--ea-color-danger")]
+        ["accent-text", resolve("--rh-color-accent")],
+        ["success", resolve("--rh-color-success")],
+        ["warning", resolve("--rh-color-warning")],
+        ["danger", resolve("--rh-color-danger")]
       ]
     };
   }
 
   return {
     textTokens: [
-      ["label", resolve("--ea-color-label")],
-      ["secondary-label", resolve("--ea-color-secondary-label")],
-      ["accent", resolve("--ea-color-accent")],
-      ["success", resolve("--ea-color-success")],
-      ["warning", resolve("--ea-color-warning")],
-      ["danger", resolve("--ea-color-danger")],
-      ["primary", resolve("--ea-color-primary")]
+      ["label", resolve("--rh-color-label")],
+      ["secondary-label", resolve("--rh-color-secondary-label")],
+      ["accent", resolve("--rh-color-accent")],
+      ["success", resolve("--rh-color-success")],
+      ["warning", resolve("--rh-color-warning")],
+      ["danger", resolve("--rh-color-danger")],
+      ["primary", resolve("--rh-color-primary")]
     ],
     surfaceTokens: [
-      ["surface", resolve("--ea-color-surface")],
-      ["surface-raised", resolve("--ea-color-surface-raised")],
-      ["control", resolve("--ea-color-control")]
+      ["surface", resolve("--rh-color-surface")],
+      ["surface-raised", resolve("--rh-color-surface-raised")],
+      ["control", resolve("--rh-color-control")]
     ],
     filledBackgrounds: [
-      ["primary", resolve("--ea-color-primary")],
-      ["deep-navy", resolve("--ea-color-deep-navy")],
-      ["accent", resolve("--ea-color-accent")],
-      ["success", resolve("--ea-color-success")],
-      ["warning", resolve("--ea-color-warning")],
-      ["danger", resolve("--ea-color-danger")]
+      ["primary", resolve("--rh-color-primary")],
+      ["deep-navy", resolve("--rh-color-deep-navy")],
+      ["accent", resolve("--rh-color-accent")],
+      ["success", resolve("--rh-color-success")],
+      ["warning", resolve("--rh-color-warning")],
+      ["danger", resolve("--rh-color-danger")]
     ]
   };
 }
@@ -207,9 +207,9 @@ const doc = `# Tokens de Cor e Superfície — Camada Semântica
 
 | Camada | Onde | Papel |
 |--------|------|-------|
-| **Paleta atual** | \`--ea-color-*\` (valores hex) | Cores brutas da marca/Material atual |
-| **Paleta Executive Precision** | \`--m3-*\` (valores hex) | Fonte canônica do frontmatter de \`docs/design/executive-precision/DESIGN.md\` |
-| **Semântica** | \`--ea-color-label\`, \`--ea-color-surface-raised\`, ... | Papel funcional; referencia uma paleta via \`var()\` |
+| **Paleta atual** | \`--tk-brand\`, \`--tk-accent\`, ... | Aliases e valores da paleta Trust Keith vigente; podem resolver para valores literais ou outros tokens |
+| **Paleta Executive Precision** | \`--m3-*\` | Referências históricas de Material 3 preservadas para compatibilidade; não são a identidade visual canônica |
+| **Semântica** | \`--rh-color-*\`, \`--rh-*\` | Papéis funcionais; referenciam a paleta vigente via \`var()\`, sem duplicar a camada de paleta |
 
 O tema Executive Precision é ativado por rota/layout com
 \`data-theme="executive"\` no contêiner que envolve a rota. Esta story apenas
@@ -232,21 +232,21 @@ declara o scope; nenhuma rota recebe o atributo aqui.
 
 > **Nota de nomenclatura:** a cor \`label\` é exposta como \`label-primary\`/
 > \`label-secondary\` porque \`text-label\` já é um utilitário de **fontSize**
-> (\`--ea-font-size-label\`) — expor a cor com o mesmo nome colidiria a classe.
+> (\`--rh-font-size-label\`) — expor a cor com o mesmo nome colidiria a classe.
 
 ## Mapeamento semântico — Executive Precision
 
 | Token semântico | Valor no scope \`[data-theme="executive"]\` | Papel |
 |-----------------|---------------------------------------------|-------|
-| \`label\` | \`--m3-on-surface\` ${executiveResolve("--ea-color-label")} | Texto principal |
-| \`secondary-label\` | \`--m3-on-surface-variant\` ${executiveResolve("--ea-color-secondary-label")} | Texto de apoio |
-| \`separator\` | \`--m3-outline-variant\` ${executiveResolve("--ea-color-separator")} | Bordas sutis |
-| \`surface-raised\` | \`--m3-surface-container-lowest\` ${executiveResolve("--ea-color-surface-raised")} | Cards e painéis |
-| \`control\` | \`--m3-surface-container\` ${executiveResolve("--ea-color-control")} | Inputs, chips e controles |
-| \`accent\` | \`--m3-secondary\` ${executiveResolve("--ea-color-accent")} | Dourado textual/interativo |
-| \`success\` | \`--m3-success-text\` ${executiveResolve("--ea-color-success")} | Estado positivo textual/filled AA |
-| \`warning\` | \`--m3-warning-text\` ${executiveResolve("--ea-color-warning")} | Alerta textual/filled AA |
-| \`danger\` | \`--m3-error\` ${executiveResolve("--ea-color-danger")} | Erro/destrutivo |
+| \`label\` | \`--m3-on-surface\` ${executiveResolve("--rh-color-label")} | Texto principal |
+| \`secondary-label\` | \`--m3-on-surface-variant\` ${executiveResolve("--rh-color-secondary-label")} | Texto de apoio |
+| \`separator\` | \`--m3-outline-variant\` ${executiveResolve("--rh-color-separator")} | Bordas sutis |
+| \`surface-raised\` | \`--m3-surface-container-lowest\` ${executiveResolve("--rh-color-surface-raised")} | Cards e painéis |
+| \`control\` | \`--m3-surface-container\` ${executiveResolve("--rh-color-control")} | Inputs, chips e controles |
+| \`accent\` | \`--m3-secondary\` ${executiveResolve("--rh-color-accent")} | Dourado textual/interativo |
+| \`success\` | \`--m3-success-text\` ${executiveResolve("--rh-color-success")} | Estado positivo textual/filled AA |
+| \`warning\` | \`--m3-warning-text\` ${executiveResolve("--rh-color-warning")} | Alerta textual/filled AA |
+| \`danger\` | \`--m3-error\` ${executiveResolve("--rh-color-danger")} | Erro/destrutivo |
 
 ## Matriz atual — texto sobre superfícies claras
 
@@ -290,7 +290,7 @@ ${vetoRows.join("\n")}
 
 | Token | Antes | Depois | Motivo |
 |-------|-------|--------|--------|
-| \`success\` (\`--ea-color-success-green\`) | #008a3d | #007a36 | Branco sobre success era 4.47:1 (reprovava AA normal em \`bg-success text-white\` do Button) |
+| \`success\` (\`--rh-color-success-green\`) | #008a3d | #007a36 | Branco sobre success era 4.47:1 (reprovava AA normal em \`bg-success text-white\` do Button) |
 | \`warning\` | #d6aa45 (\`secondary-fixed-dim\`) | #7a5600 | Branco sobre warning era 1.94:1 (\`hover:bg-warning text-white\` nos Buttons); novo valor também funciona como texto sobre superfícies claras |
 | \`--m3-on-gold\` | #715300 (\`--m3-on-secondary-container\`) | #083b56 (\`--m3-surface-dark\`) | #715300 reprova AA normal sobre \`--m3-secondary-fixed-dim\`; navy escuro passa sobre as duas variantes gold |
 | \`--m3-success-text\` | #2d8a39 (\`--m3-success\`) | #24732f | O valor fonte reprova como texto sobre \`--m3-control\` e como fundo com branco |
@@ -298,10 +298,10 @@ ${vetoRows.join("\n")}
 
 ## Observações da auditoria
 
-- \`--ea-color-on-primary-container\` (#6f8fca) tem 4.25:1 sobre \`primary\` —
+- \`--rh-color-on-primary-container\` (#6f8fca) tem 4.25:1 sobre \`primary\` —
   reprovaria como texto normal, mas **não é usado como texto** em nenhum
   componente (verificado). Reservado; se for usado, apenas em texto grande.
-- \`--ea-color-secondary-fixed-dim\` (#d6aa45) permanece na paleta para usos
+- \`--rh-color-secondary-fixed-dim\` (#d6aa45) permanece na paleta para usos
   decorativos/fundos com texto escuro; deixou de ser o valor de \`warning\`.
 - As 70 "violações" do baseline da Story 1.1 eram artefato de medição
   (axe capturando animações de entrada do framer-motion em /cursos);

@@ -17,13 +17,11 @@ export function ClassCard({
   instructor?: Instructor;
 }) {
   const soldOut = isTrainingClassSoldOut(trainingClass);
-  const [month, day] = new Intl.DateTimeFormat("pt-BR", {
-    day: "2-digit",
-    month: "short"
-  })
-    .format(parseDate(trainingClass.startDate))
-    .replace(".", "")
-    .split(" ");
+  const startDate = parseDate(trainingClass.startDate);
+  const day = new Intl.DateTimeFormat("pt-BR", { day: "2-digit" }).format(startDate);
+  const month = new Intl.DateTimeFormat("pt-BR", { month: "short" })
+    .format(startDate)
+    .replace(".", "");
 
   const urgencyLabel =
     soldOut
@@ -41,7 +39,7 @@ export function ClassCard({
           <span className="font-tk-display text-5xl font-bold leading-none tracking-[var(--tk-tracking-display)]">{day}</span>
           <span className="mt-2 font-tk-display text-xl font-bold uppercase tracking-[var(--tk-tracking-display)]">{month}</span>
           <span className="mt-2 text-base text-white/80">
-            {new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(parseDate(trainingClass.startDate))}
+            {new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(startDate)}
           </span>
         </div>
 

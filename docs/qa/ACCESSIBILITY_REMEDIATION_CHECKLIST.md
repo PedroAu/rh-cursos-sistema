@@ -1,9 +1,9 @@
 # Accessibility Remediation Checklist
-**Created:** 2026-06-29  
-**Assignee:** @dev (Dex)  
-**Priority:** CRITICAL (Blocks Wave 3 QA Gate)  
-**Deadline:** 2026-06-30 (before Custom-1.2 QA gate)  
-**Status:** Ready for Implementation  
+**Created:** 2026-06-29
+**Assignee:** @dev (Dex)
+**Priority:** CRITICAL (Blocks Wave 3 QA Gate)
+**Deadline:** 2026-06-30 (before Custom-1.2 QA gate)
+**Status:** Ready for Implementation
 
 ---
 
@@ -11,8 +11,8 @@
 
 This checklist contains all identified accessibility issues found during Wave 1 a11y audit. All items are **critical** and must be fixed before Custom-1.2 QA gate can pass.
 
-**Total Issues:** 1 critical  
-**Time Estimate:** ~15 minutes  
+**Total Issues:** 1 critical
+**Time Estimate:** ~15 minutes
 
 ---
 
@@ -20,11 +20,11 @@ This checklist contains all identified accessibility issues found during Wave 1 
 
 ### Issue #1: Color Contrast Violation on Agenda Filter Button
 
-**Severity:** CRITICAL (Serious Impact)  
-**Impact:** Blocks WCAG 2.1 AA compliance  
-**Affected Component:** Mantine Button ("Limpar Filtros")  
-**File:** `src/views/public/Agenda.tsx`  
-**Lines:** 244-255  
+**Severity:** CRITICAL (Serious Impact)
+**Impact:** Blocks WCAG 2.1 AA compliance
+**Affected Component:** Mantine Button ("Limpar Filtros")
+**File:** `src/views/public/Agenda.tsx`
+**Lines:** 244-255
 
 #### Description
 
@@ -341,8 +341,8 @@ If fix is correct, CI passes. If not, CI fails with violation details.
 - [ ] **Commit Created:** Git history shows fix
 - [ ] **Handoff Documented:** Ready for @qa verification
 
-**Estimated Time:** 15 minutes  
-**Complexity:** LOW  
+**Estimated Time:** 15 minutes
+**Complexity:** LOW
 **Risk:** LOW (change only affects button color, isolated component)
 
 ---
@@ -367,6 +367,6 @@ If fix doesn't work:
 
 ---
 
-*Checklist created by Quinn (QA Agent) — 2026-06-29*  
-*Reference:** `docs/qa/ACCESSIBILITY_AUDIT_REPORT.md`  
-*Status:** Ready for Implementation
+*Checklist created by Quinn (QA Agent) — 2026-06-29*
+**Reference:** `docs/qa/ACCESSIBILITY_AUDIT_REPORT.md`
+**Status:** Ready for Implementation

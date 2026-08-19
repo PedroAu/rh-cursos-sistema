@@ -20,6 +20,9 @@ function explicitStatus(content) {
   const headingStatus = content.match(/(?:^|\n)##\s+Status\s*\n(?:[ \t]*\n)*([^\n#]+)/i)?.[1]?.trim();
   if (headingStatus) return headingStatus;
 
+  const plainStatus = content.match(/^Status:\s*(.+)$/im)?.[1]?.trim();
+  if (plainStatus) return plainStatus;
+
   return content.match(/^\*\*Status:\*\*\s*(.+)$/im)?.[1]?.trim() ?? null;
 }
 

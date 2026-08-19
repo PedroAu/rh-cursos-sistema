@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
 import { CourseDetailClient } from "@/components/page-clients/course-detail-client";
 import {
@@ -81,6 +82,10 @@ export default async function Page({ params }: PageProps) {
   }
 
   const course = catalogState.catalog.courses.find((item) => item.slug === slug);
+  if (!course) {
+    notFound();
+  }
+
   const courseContent = course
     ? catalogState.catalog.coursePublicContents.find((item) => item.courseId === course.id)
     : undefined;

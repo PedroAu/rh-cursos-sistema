@@ -17,9 +17,6 @@ export function GET() {
     "Disallow: /api/",
     "Disallow: /aluno/",
     "Disallow: /instrutor/",
-    "Disallow: /login/",
-    "Disallow: /auth/",
-    "Disallow: /recuperar-senha/",
     `Sitemap: ${SITE_URL}/sitemap.xml`,
     ""
   ].join("\n");

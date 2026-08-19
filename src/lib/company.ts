@@ -20,8 +20,16 @@ export const company = {
     maps: "https://www.google.com/maps/search/?api=1&query=Ed.%20P%C3%A1tio%20Capital%2C%20%C3%81guas%20Claras%2C%20Bras%C3%ADlia%20-%20DF"
   },
   email: "info@rhcursos.com.br",
+  reportedMetrics: {
+    completedClasses: "+320",
+    averageRecommendation: "96%"
+  },
   logo: {
     src: "/images/brand/rh-cursos-logo-azul.png",
     alt: "RH Cursos e Soluções Empresarial"
   }
 } as const;
+
+export function getCompanyYears(currentYear = new Date().getFullYear()) {
+  return Math.max(0, currentYear - company.foundedYear);
+}

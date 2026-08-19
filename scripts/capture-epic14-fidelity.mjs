@@ -4,15 +4,19 @@ import {
   mkdirSync,
   readFileSync,
   readdirSync,
-  rmSync,
   unlinkSync,
   writeFileSync,
 } from "node:fs";
 import net from "node:net";
-import { join } from "node:path";
+import { join, relative } from "node:path";
+import { loadEnvFile } from "node:process";
 import { pathToFileURL } from "node:url";
 
 import { chromium } from "playwright";
+import { createHash } from "node:crypto";
+import { ADMIN_VIEWPORT, PUBLIC_VIEWPORT } from "./fidelity-constants.mjs";
+
+if (existsSync(".env.e2e.local")) loadEnvFile(".env.e2e.local");
 
 /**
  * Epic 14/15 fidelity capture harness (Story 18.2).
@@ -21,15 +25,11 @@ import { chromium } from "playwright";
  * dropped (every `canvasPaths: []`). For each target it captures:
  *   - the live route screenshot (HTTP status validated), and
  *   - the reference canvas screenshot rendered from the versioned
- *     `docs/design-system/*.dc.html` at the same viewport.
+ *     `docs/design-system/reference/*.html` at the same viewport.
  *
- * The reference canvases ship with design-tool asset paths under a hashed
- * `_ds/trust-keith-design-system-.../` prefix that does not exist on disk.
- * The real assets live unhashed in `docs/design-system/` (styles.css,
- * _ds_bundle.js, tokens/*). We resolve the prefix to render the canvas with
- * its own `--tk-*` tokens. Missing runtime shims (support.js) and missing
- * uploads (logo) are recorded as canvas warnings — they degrade the render to
- * CONCERNS, they never silently pass.
+ * References are generated and validated as static, self-contained HTML by
+ * `build-fidelity-references.mjs`; no design-tool runtime or missing asset is
+ * allowed in this comparison layer.
  *
  * Verdict rules (AC3/AC4):
  *   - No reference canvas, or canvas failed to render        → NOT_ASSESSABLE
@@ -38,37 +38,39 @@ import { chromium } from "playwright";
  *   - Canvas rendered with missing sub-resources             → CONCERNS
  *   - Route OK + canvas OK, no manual pixel sign-off yet     → CONCERNS
  *   - PASS is emitted ONLY when a target carries an explicit
- *     `manualSignoff: { by, date, evidence }` (none do today).
+ *     `manualSignoff: { by, date, evidence, canvasDigest }` (none do today).
  *
  * `canvasAvailable: false` can therefore never be PASS.
  */
 
 const REPO_ROOT = process.cwd();
 const DESIGN_SYSTEM_DIR = join(REPO_ROOT, "docs", "design-system");
-const HASHED_ASSET_PREFIX =
-  "_ds/trust-keith-design-system-e3aaece8-51bd-4e84-9608-1b258b4c11e3/";
+const REFERENCE_DIR = join(DESIGN_SYSTEM_DIR, "reference");
+const SIGNOFF_PATH = join(REPO_ROOT, "docs", "qa", "fidelity-signoff.json");
 
 // ADR-014 D6 ratifies 1180px for the public canvases; the admin dashboard
 // canvas / spec-admin-dashboard.md use a 1360px reference width.
-const PUBLIC_VIEWPORT = { width: 1180, height: 2400 };
-const ADMIN_VIEWPORT = { width: 1360, height: 2400 };
+const KNOWN_TARGET_IDS = new Set([
+  "home", "courses", "agenda", "in-company", "about", "blog", "login", "course-detail", "checkout",
+  "admin-dashboard", "admin-cursos", "admin-turmas", "admin-matriculas", "admin-alunos", "admin-instrutores",
+  "admin-leads", "admin-blog", "admin-paginas", "admin-configuracoes",
+]);
 
 const OUTPUT_DIR = process.env.EPIC14_FIDELITY_OUT_DIR
   ? join(REPO_ROOT, process.env.EPIC14_FIDELITY_OUT_DIR)
   : join(REPO_ROOT, "artifacts", "epic14-fidelity");
 
 /**
- * Canvas-backed targets. `canvasFile` is a file in docs/design-system/.
- * `routeRequired: false` marks routes that are not deterministically
- * reachable in the harness (dynamic slug / auth wall) — their HTTP status is
- * still recorded but a non-200 does not hard-fail the run.
+ * Canvas-backed targets. `canvasFile` is a file in docs/design-system/reference/.
+ * Dynamic public routes are required to receive explicit real catalog fixtures;
+ * the harness fails closed instead of silently comparing the catalog proxy.
  */
 const auditTargets = [
   {
     id: "home",
     epic: 14,
     routePath: "/",
-    canvasFile: "RH Cursos Home.dc.html",
+    canvasFile: "home.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -77,7 +79,7 @@ const auditTargets = [
     id: "courses",
     epic: 14,
     routePath: "/cursos",
-    canvasFile: "RH Cursos Catálogo.dc.html",
+    canvasFile: "courses.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -86,7 +88,7 @@ const auditTargets = [
     id: "agenda",
     epic: 14,
     routePath: "/agenda",
-    canvasFile: "Agenda export.dc.html",
+    canvasFile: "agenda.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -95,7 +97,7 @@ const auditTargets = [
     id: "in-company",
     epic: 14,
     routePath: "/in-company",
-    canvasFile: "RH Cursos In-company.dc.html",
+    canvasFile: "in-company.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -104,7 +106,7 @@ const auditTargets = [
     id: "about",
     epic: 14,
     routePath: "/sobre",
-    canvasFile: "RH Cursos Quem Somos.dc.html",
+    canvasFile: "about.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -113,7 +115,7 @@ const auditTargets = [
     id: "blog",
     epic: 14,
     routePath: "/blog",
-    canvasFile: "RH Cursos Blog.dc.html",
+    canvasFile: "blog.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -122,7 +124,7 @@ const auditTargets = [
     id: "login",
     epic: 14,
     routePath: "/login",
-    canvasFile: "RH Cursos Login.dc.html",
+    canvasFile: "login.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
     routeRequired: true,
@@ -130,37 +132,75 @@ const auditTargets = [
   {
     id: "course-detail",
     epic: 14,
-    routePath: process.env.EPIC14_FIDELITY_COURSE_PATH ?? "/cursos",
-    canvasFile: "RH Cursos Curso.dc.html",
+    routePath: process.env.EPIC14_FIDELITY_COURSE_PATH,
+    canvasFile: "course-detail.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
-    routeRequired: false,
+    routeRequired: true,
     routeNote:
-      "Rota real é dinâmica (/cursos/[slug]); captura usa a listagem como proxy. Defina EPIC14_FIDELITY_COURSE_PATH com um slug de fixture para comparar a página de detalhe.",
+      "Captura usa fixture real do catálogo configurada por EPIC14_FIDELITY_COURSE_PATH.",
   },
   {
     id: "checkout",
     epic: 14,
-    routePath: process.env.EPIC14_FIDELITY_CHECKOUT_PATH ?? "/cursos",
-    canvasFile: "RH Cursos Checkout.dc.html",
+    routePath: process.env.EPIC14_FIDELITY_CHECKOUT_PATH,
+    canvasFile: "checkout.html",
     viewport: PUBLIC_VIEWPORT,
     auth: "none",
-    routeRequired: false,
+    routeRequired: true,
     routeNote:
-      "Rota real é dinâmica (/cursos/[slug]/checkout) e depende de fixture. Defina EPIC14_FIDELITY_CHECKOUT_PATH com um caminho válido para comparar o checkout.",
+      "Captura usa fixture real do catálogo configurada por EPIC14_FIDELITY_CHECKOUT_PATH.",
   },
-  {
-    id: "admin-dashboard",
+  ...[
+    ["admin-dashboard", "/admin", "dashboard"],
+    ["admin-cursos", "/admin/cursos", "cursos"],
+    ["admin-turmas", "/admin/turmas", "turmas"],
+    ["admin-matriculas", "/admin/inscricoes", "matriculas"],
+    ["admin-alunos", "/admin/alunos", "alunos"],
+    ["admin-instrutores", "/admin/instrutores", "instrutores"],
+    ["admin-leads", "/admin/leads", "leads"],
+    ["admin-blog", "/admin/blog", "blog"],
+    ["admin-paginas", "/admin/paginas", "paginas"],
+    ["admin-configuracoes", "/admin/configuracoes", "config"],
+  ].map(([id, routePath, screen]) => ({
+    id,
     epic: 15,
-    routePath: "/admin",
-    canvasFile: "RH Cursos Admin Dashboard.dc.html",
+    routePath,
+    canvasFile: `admin-${screen}.html`,
     viewport: ADMIN_VIEWPORT,
     auth: "admin",
-    routeRequired: false,
-    routeNote:
-      "Admin exige sessão SSR autenticada. Sem contrato de auth no harness a rota redireciona para /login — captura documenta o estado; a comparação real depende da Story 18.3.",
-  },
+    routeRequired: true,
+  })),
 ];
+
+function loadManualSignoffs() {
+  if (!existsSync(SIGNOFF_PATH)) return new Map();
+  try {
+    const payload = JSON.parse(readFileSync(SIGNOFF_PATH, "utf8"));
+    if (!payload.routes || typeof payload.routes !== "object" || Array.isArray(payload.routes)) {
+      throw new Error("Campo routes ausente ou inválido.");
+    }
+    const entries = Object.entries(payload.routes ?? {});
+    for (const [targetId, signoff] of entries) {
+      if (!KNOWN_TARGET_IDS.has(targetId)) throw new Error(`Target de sign-off desconhecido: ${targetId}.`);
+      if (
+        !signoff ||
+        typeof signoff !== "object" ||
+        Array.isArray(signoff) ||
+        typeof signoff.by !== "string" ||
+        !signoff.by.trim() ||
+        typeof signoff.date !== "string" ||
+        Number.isNaN(Date.parse(signoff.date))
+      ) {
+        throw new Error(`Sign-off manual inválido para ${targetId}.`);
+      }
+    }
+    return new Map(entries);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Falha ao ler sign-offs em ${SIGNOFF_PATH}: ${message}`, { cause: error });
+  }
+}
 
 function isPortFree(port) {
   return new Promise((resolve) => {
@@ -217,9 +257,10 @@ async function ensureServer() {
     return { baseUrl: externalBase, teardown: () => {} };
   }
 
-  if (!existsSync(join(REPO_ROOT, ".next", "BUILD_ID"))) {
+  const distDir = process.env.NEXT_DIST_DIR ?? ".next";
+  if (!existsSync(join(REPO_ROOT, distDir, "BUILD_ID"))) {
     throw new Error(
-      "Nenhum servidor alcançável e build de produção ausente. Rode `npm run build` ou aponte EPIC14_FIDELITY_BASE_URL para um servidor ativo."
+      `Nenhum servidor alcançável e build de produção ausente em ${distDir}. Rode o build correspondente ou aponte EPIC14_FIDELITY_BASE_URL para um servidor ativo.`
     );
   }
 
@@ -255,6 +296,7 @@ async function waitForStablePage(page) {
 }
 
 async function captureRoute(context, baseUrl, target) {
+  if (target.auth === "admin") await authenticateAdmin(context, baseUrl, target.id);
   const page = await context.newPage();
   const filePath = join(OUTPUT_DIR, `${target.id}-route.png`);
   const url = new URL(target.routePath, baseUrl).toString();
@@ -262,7 +304,15 @@ async function captureRoute(context, baseUrl, target) {
     const response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45_000 });
     const status = response?.status() ?? 0;
     await waitForStablePage(page);
+    const visibleText = await page.locator("body").innerText();
+    const mockSignatures = [
+      "nova-lei-de-licitacoes-na-pratica",
+      "lgpd-para-o-setor-publico-da-teoria-a-rotina",
+      "course-nova-lei-licitacoes",
+    ];
+    const mockDetected = mockSignatures.some((signature) => `${target.routePath} ${visibleText}`.toLowerCase().includes(signature));
     await page.screenshot({ path: filePath, fullPage: true });
+    if (mockDetected) throw new Error(`Guarda anti-mock acionada para ${target.routePath}.`);
     const finalUrl = page.url();
     const redirected = new URL(finalUrl).pathname !== new URL(url).pathname;
     return { status, finalUrl, redirected, screenshot: `${target.id}-route.png` };
@@ -271,22 +321,38 @@ async function captureRoute(context, baseUrl, target) {
   }
 }
 
+async function authenticateAdmin(context, baseUrl, targetId) {
+  const email = process.env.E2E_ADMIN_EMAIL ?? "admin-contract@rhcursos.test";
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) throw new Error("ADMIN_PASSWORD deve ser definido para capturas autenticadas.");
+  const ipOctet = [...targetId].reduce((sum, character) => sum + character.charCodeAt(0), 0) % 200 + 20;
+  const ip = `10.24.18.${ipOctet}`;
+  const response = await context.request.post(new URL("/api/auth/session", baseUrl).toString(), {
+    data: { email, password, role: "admin" },
+    headers: {
+      "cf-connecting-ip": ip,
+      "x-forwarded-for": ip,
+      "x-real-ip": ip,
+    },
+  });
+  if (!response.ok()) {
+    throw new Error(`Falha ao autenticar fixture admin via /api/auth/session: ${response.status()}`);
+  }
+  const payload = await response.json();
+  if (payload.ok !== true || payload.session?.role !== "admin") {
+    throw new Error("Contrato SSR não confirmou uma sessão admin válida para a captura.");
+  }
+}
+
 /**
- * Render a reference canvas by resolving its hashed asset prefix to the real
- * files in docs/design-system/. Writes a temp resolved html next to the assets
- * (so relative token @imports resolve), screenshots it, then removes the temp.
+ * Render the generated, self-contained reference canvas. The generated file is
+ * reused directly so any missing asset becomes a deterministic harness finding.
  */
 async function captureCanvas(context, target) {
-  const sourcePath = join(DESIGN_SYSTEM_DIR, target.canvasFile);
+  const sourcePath = join(REFERENCE_DIR, target.canvasFile);
   if (!existsSync(sourcePath)) {
-    return { available: false, reason: `Canvas de referência ausente: docs/design-system/${target.canvasFile}` };
+    return { available: false, reason: `Canvas de referência ausente: docs/design-system/reference/${target.canvasFile}` };
   }
-
-  const raw = readFileSync(sourcePath, "utf8");
-  const resolved = raw.split(HASHED_ASSET_PREFIX).join("");
-  const tempName = `.epic14-fidelity-${target.id}.resolved.html`;
-  const tempPath = join(DESIGN_SYSTEM_DIR, tempName);
-  writeFileSync(tempPath, resolved);
 
   const page = await context.newPage();
   const missingAssets = new Set();
@@ -297,7 +363,7 @@ async function captureCanvas(context, target) {
 
   const filePath = join(OUTPUT_DIR, `${target.id}-canvas.png`);
   try {
-    const fileUrl = pathToFileURL(tempPath).toString();
+    const fileUrl = pathToFileURL(sourcePath).toString();
     const response = await page.goto(fileUrl, { waitUntil: "domcontentloaded", timeout: 30_000 });
     await waitForStablePage(page);
     await page.screenshot({ path: filePath, fullPage: true });
@@ -308,14 +374,13 @@ async function captureCanvas(context, target) {
       available: true,
       screenshot: `${target.id}-canvas.png`,
       status: response?.status() ?? 0,
-      canvasFile: `docs/design-system/${target.canvasFile}`,
+      canvasFile: `docs/design-system/reference/${target.canvasFile}`,
       viewport: target.viewport,
       warnings,
       criticalMissing,
     };
   } finally {
     await page.close();
-    rmSync(tempPath, { force: true });
   }
 }
 
@@ -326,6 +391,10 @@ function shortAsset(url) {
   } catch {
     return url;
   }
+}
+
+function canvasDigest(canvasFile) {
+  return createHash("sha256").update(readFileSync(join(REFERENCE_DIR, canvasFile))).digest("hex");
 }
 
 function computeVerdict(target, route, canvas) {
@@ -348,9 +417,7 @@ function computeVerdict(target, route, canvas) {
 
   if (route.redirected) {
     reasons.push(`Rota redirecionou para ${route.finalUrl} — não avaliável diretamente.`);
-    if (target.auth === "admin") {
-      reasons.push("Auth SSR do admin fora do escopo desta story (Story 18.3).");
-    }
+    return { verdict: "FAIL", reasons };
   }
 
   if (target.routeNote) reasons.push(target.routeNote);
@@ -382,7 +449,18 @@ function cleanupStaleArtifacts(filesToKeep) {
 }
 
 async function main() {
+  if (!process.env.EPIC14_FIDELITY_COURSE_PATH || !process.env.EPIC14_FIDELITY_CHECKOUT_PATH) {
+    throw new Error(
+      "Captura fechada: defina EPIC14_FIDELITY_COURSE_PATH e EPIC14_FIDELITY_CHECKOUT_PATH com caminhos reais do catálogo; /cursos não é um proxy válido."
+    );
+  }
+
   mkdirSync(OUTPUT_DIR, { recursive: true });
+  const manualSignoffs = loadManualSignoffs();
+  for (const target of auditTargets) {
+    const signoff = manualSignoffs.get(target.id);
+    if (signoff && signoff.canvasDigest === canvasDigest(target.canvasFile)) target.manualSignoff = signoff;
+  }
 
   const filesToKeep = [];
   for (const target of auditTargets) {

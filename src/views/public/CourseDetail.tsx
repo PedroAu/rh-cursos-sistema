@@ -264,8 +264,15 @@ export function CourseDetailPage() {
 
   const instructor = instructors.find((item) => item.id === course?.instructorId);
   const courseContent = course ? coursePublicContents.find((item) => item.courseId === course.id && item.published) : undefined;
-  const selectedClass = courseClasses.find((item) => item.id === selectedClassId) ?? courseClasses[0];
-  const nextClass = courseClasses[0];
+  const requestedClass = courseClasses.find((item) => item.id === selectedClassId);
+  const firstOpenClass = courseClasses.find(isEnrollmentClassOpen);
+  const selectedClass =
+    (requestedClass && isEnrollmentClassOpen(requestedClass) ? requestedClass : undefined) ??
+    firstOpenClass ??
+    requestedClass ??
+    courseClasses[0];
+  const resolvedSelectedClassId = selectedClass?.id ?? "";
+  const nextClass = firstOpenClass ?? courseClasses[0];
   const openClassesCount = courseClasses.filter(isEnrollmentClassOpen).length;
   const highlightCards = course ? buildHighlightCards(course, courseContent).slice(0, 6) : [];
   const faqItems = course ? buildFaqItems(course, selectedClass, courseContent) : [];
@@ -278,16 +285,21 @@ export function CourseDetailPage() {
     }
 
     const preferredClassId =
-      courseClasses.find((item) => item.id === course?.nextClassId)?.id ?? courseClasses[0]?.id ?? "";
+      courseClasses.find((item) => item.id === course?.nextClassId && isEnrollmentClassOpen(item))?.id ??
+      courseClasses.find(isEnrollmentClassOpen)?.id ??
+      courseClasses.find((item) => item.id === course?.nextClassId)?.id ??
+      courseClasses[0]?.id ??
+      "";
 
     setSelectedClassId((current) => {
-      if (current && courseClasses.some((item) => item.id === current)) {
+      const currentClass = courseClasses.find((item) => item.id === current);
+      if (currentClass && (!firstOpenClass || isEnrollmentClassOpen(currentClass))) {
         return current;
       }
 
       return preferredClassId;
     });
-  }, [course?.nextClassId, courseClasses]);
+  }, [course?.nextClassId, courseClasses, firstOpenClass]);
 
   const startCheckoutHref = selectedClass?.id
     ? `/cursos/${course?.slug}/checkout?classId=${selectedClass.id}`
@@ -579,7 +591,7 @@ export function CourseDetailPage() {
                       <div className="mt-5 flex flex-wrap gap-2">
                         <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
                           <UserRound aria-hidden="true" className="h-4 w-4 text-tk-accent" />
-                          {courseClasses.length} turmas abertas
+                        {openClassesCount} turmas abertas
                         </span>
                         {course.studentsCount > 0 ? (
                           <span className="inline-flex items-center gap-2 rounded-tk-pill border border-[var(--tk-border)] bg-[var(--tk-surface-2)] px-3 py-1.5 text-caption font-semibold text-tk-ink">
@@ -697,7 +709,8 @@ export function CourseDetailPage() {
                       {courseClasses.length ? (
                         courseClasses.map((trainingClass) => {
                           const spotMeta = getSpotMeta(trainingClass);
-                          const selected = selectedClassId === trainingClass.id;
+                          const selectable = isEnrollmentClassOpen(trainingClass) || !firstOpenClass;
+                          const selected = resolvedSelectedClassId === trainingClass.id;
 
                           return (
                             <button
@@ -705,7 +718,10 @@ export function CourseDetailPage() {
                               type="button"
                               role="radio"
                               aria-checked={selected}
-                              onClick={() => setSelectedClassId(trainingClass.id)}
+                              disabled={!selectable}
+                              onClick={() => {
+                                if (selectable) setSelectedClassId(trainingClass.id);
+                              }}
                               className={cn(
                                 "flex w-full items-center gap-3 rounded-[12px] border p-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                                 selected

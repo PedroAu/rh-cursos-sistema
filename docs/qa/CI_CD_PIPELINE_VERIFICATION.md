@@ -1,8 +1,8 @@
 # CI/CD Testing Pipeline Verification Report
-**Date:** 2026-06-29  
-**Agent:** Quinn (QA)  
-**Task:** #9 — CI/CD Testing Pipeline Setup (Wave 1)  
-**Status:** ✅ **COMPLETE & VERIFIED**  
+**Date:** 2026-06-29
+**Agent:** Quinn (QA)
+**Task:** #9 — CI/CD Testing Pipeline Setup (Wave 1)
+**Status:** ✅ **COMPLETE & VERIFIED**
 
 ---
 
@@ -46,10 +46,10 @@ concurrency:
 
 ### Lane 1: Static Checks ✅
 
-**Name:** `static`  
-**Purpose:** Fast type/lint validation  
-**Runs:** On every push/PR  
-**Duration:** ~2-3 minutes  
+**Name:** `static`
+**Purpose:** Fast type/lint validation
+**Runs:** On every push/PR
+**Duration:** ~2-3 minutes
 
 **Steps:**
 1. Checkout code
@@ -68,10 +68,10 @@ concurrency:
 
 ### Lane 2: Unit Tests ✅
 
-**Name:** `unit`  
-**Purpose:** Test coverage verification  
-**Runs:** On every push/PR  
-**Duration:** ~3-5 minutes  
+**Name:** `unit`
+**Purpose:** Test coverage verification
+**Runs:** On every push/PR
+**Duration:** ~3-5 minutes
 
 **Steps:**
 1. Checkout code
@@ -79,8 +79,8 @@ concurrency:
 3. Install dependencies: `npm ci`
 4. Run coverage tests: `npm run test:coverage`
 
-**Test Framework:** Vitest v4.1.9  
-**Coverage Tool:** @vitest/coverage-v8  
+**Test Framework:** Vitest v4.1.9
+**Coverage Tool:** @vitest/coverage-v8
 
 **Exit Criteria:**
 - ✅ All unit tests passing
@@ -96,11 +96,11 @@ concurrency:
 
 ### Lane 3: Build & Accessibility & E2E ✅
 
-**Name:** `e2e`  
-**Purpose:** Production build + WCAG compliance gate + smoke tests  
-**Runs:** On every push/PR  
-**Duration:** ~8-12 minutes (longest lane)  
-**Criticality:** HIGHEST (blocks deployment if fails)  
+**Name:** `e2e`
+**Purpose:** Production build + WCAG compliance gate + smoke tests
+**Runs:** On every push/PR
+**Duration:** ~8-12 minutes (longest lane)
+**Criticality:** HIGHEST (blocks deployment if fails)
 
 **Steps:**
 
@@ -137,9 +137,9 @@ npm run build
 npm run test:a11y
 ```
 
-**Framework:** Axe-core via Playwright  
-**Standard:** WCAG 2.1 Level A/AA  
-**Routes Tested:** 7 public pages (/, /cursos, /agenda, /blog, /in-company, /contato, /login)  
+**Framework:** Axe-core via Playwright
+**Standard:** WCAG 2.1 Level A/AA
+**Routes Tested:** 7 public pages (/, /cursos, /agenda, /blog, /in-company, /contato, /login)
 
 **Current Status:**
 - ✅ 6/7 routes passing
@@ -158,8 +158,8 @@ npm run test:a11y
 npm run test:e2e:smoke
 ```
 
-**Framework:** Playwright v1.60.0  
-**Scope:** Smoke tests (critical user workflows)  
+**Framework:** Playwright v1.60.0
+**Scope:** Smoke tests (critical user workflows)
 **Coverage:** Homepage, form submissions, navigation
 
 **Exit Criteria:**
@@ -170,10 +170,10 @@ npm run test:e2e:smoke
 
 ### Lane 4: API Documentation ✅
 
-**Name:** `docs-api`  
-**Purpose:** OpenAPI schema validation  
-**Runs:** On every push/PR  
-**Duration:** ~2-3 minutes  
+**Name:** `docs-api`
+**Purpose:** OpenAPI schema validation
+**Runs:** On every push/PR
+**Duration:** ~2-3 minutes
 
 **Steps:**
 1. Checkout code
@@ -194,10 +194,10 @@ npm run test:e2e:smoke
 
 ### Lane 5: Performance Budgets ✅
 
-**Name:** `performance`  
-**Purpose:** Bundle size & Lighthouse performance gates  
-**Runs:** On every push/PR  
-**Duration:** ~5-8 minutes  
+**Name:** `performance`
+**Purpose:** Bundle size & Lighthouse performance gates
+**Runs:** On every push/PR
+**Duration:** ~5-8 minutes
 
 **Steps:**
 
@@ -211,8 +211,8 @@ npm run build
 npm run bundle:check
 ```
 
-**Validates:** Production bundle doesn't exceed size budgets  
-**Config:** `scripts/check-bundle-size.mjs`  
+**Validates:** Production bundle doesn't exceed size budgets
+**Config:** `scripts/check-bundle-size.mjs`
 
 **Budget Targets:**
 - Main bundle: < 250KB
@@ -248,10 +248,10 @@ npx lhci autorun --config=./lighthouserc.cjs
 
 ### Lane 6: Database Tests ✅
 
-**Name:** `db-tests`  
-**Purpose:** Supabase contract & migration validation  
-**Runs:** On every push/PR  
-**Duration:** ~3-5 minutes  
+**Name:** `db-tests`
+**Purpose:** Supabase contract & migration validation
+**Runs:** On every push/PR
+**Duration:** ~3-5 minutes
 
 **Steps:**
 1. Checkout code
@@ -298,8 +298,8 @@ npx lhci autorun --config=./lighthouserc.cjs
 
 ### Latest Run Status
 
-**Date:** 2026-06-29  
-**Branch:** `redesign/ep-0-fundacao`  
+**Date:** 2026-06-29
+**Branch:** `redesign/ep-0-fundacao`
 **Overall Status:** ⚠️ **PARTIALLY PASSING**
 
 | Lane | Status | Issue |
@@ -311,8 +311,8 @@ npx lhci autorun --config=./lighthouserc.cjs
 | Performance | ✅ PASS | — |
 | DB Tests | ✅ PASS | — |
 
-**Accessibility Issue:** 1 WCAG 2.1 AA violation on `/agenda` route  
-**Impact:** Blocks Lane 3 (and full CI completion)  
+**Accessibility Issue:** 1 WCAG 2.1 AA violation on `/agenda` route
+**Impact:** Blocks Lane 3 (and full CI completion)
 **Remediation:** See `docs/qa/ACCESSIBILITY_REMEDIATION_CHECKLIST.md`
 
 ---
@@ -433,9 +433,9 @@ npx lhci autorun --config=./lighthouserc.cjs
 
 ### Current Implementation
 
-**File:** `tests/a11y.spec.ts`  
-**Framework:** Playwright + Axe-core  
-**Standard:** WCAG 2.1 Level A/AA  
+**File:** `tests/a11y.spec.ts`
+**Framework:** Playwright + Axe-core
+**Standard:** WCAG 2.1 Level A/AA
 
 **Test Structure:**
 
@@ -658,6 +658,6 @@ A11y violations found on /agenda:
 
 ---
 
-*Report generated by Quinn (QA Agent) — 2026-06-29*  
-*Task #9 Completion: CI/CD Testing Pipeline Setup (Wave 1)*  
+*Report generated by Quinn (QA Agent) — 2026-06-29*
+*Task #9 Completion: CI/CD Testing Pipeline Setup (Wave 1)*
 *Status: Ready for Wave 3 Final Verification*

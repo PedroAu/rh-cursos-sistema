@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { PublicPageShell } from "@/components/next-page-shell";
 import { AgendaPage } from "@/features/public/agenda/agenda-page";
+import { buildAgendaEventJsonLd } from "@/lib/seo";
 import {
   fetchPublicCatalogServerState,
   isServerPublicTestBaselineEnabled,
@@ -36,18 +37,28 @@ export default async function Page() {
     throw catalogState.error;
   }
 
+  const agendaEvents = buildAgendaEventJsonLd(catalogState.catalog.courses, catalogState.catalog.classes);
+
   return (
-    <PublicPageShell
-      initialData={{
-        courses: catalogState.catalog.courses,
-        classes: catalogState.catalog.classes,
-        instructors: catalogState.catalog.instructors,
-        trainingPaths: catalogState.catalog.trainingPaths,
-        coursePublicContents: catalogState.catalog.coursePublicContents,
-        courseCategories: catalogState.catalog.courseCategories
-      }}
-    >
-      <AgendaPage />
-    </PublicPageShell>
+    <>
+      {agendaEvents.length ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(agendaEvents).replace(/</g, "\\u003c") }}
+        />
+      ) : null}
+      <PublicPageShell
+        initialData={{
+          courses: catalogState.catalog.courses,
+          classes: catalogState.catalog.classes,
+          instructors: catalogState.catalog.instructors,
+          trainingPaths: catalogState.catalog.trainingPaths,
+          coursePublicContents: catalogState.catalog.coursePublicContents,
+          courseCategories: catalogState.catalog.courseCategories
+        }}
+      >
+        <AgendaPage />
+      </PublicPageShell>
+    </>
   );
 }

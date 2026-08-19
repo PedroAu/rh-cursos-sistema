@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 import { createAdminStoreFixture } from "../../../tests/fixtures/admin-store";
 import { AdminResourcePage } from "@/views/admin/AdminResourcePage";
@@ -23,6 +23,10 @@ function createStore() {
 }
 
 describe("AdminResourcePage — instrutores e leads", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
     vi.useRealTimers();
     mocks.useAppStore.mockReset();
@@ -121,6 +125,5 @@ describe("AdminResourcePage — instrutores e leads", () => {
     expect(window.confirm).toHaveBeenCalledWith("Excluir instrutores instructor-6? Esta ação não pode ser desfeita.");
     expect(store.deleteInstructor).not.toHaveBeenCalled();
 
-    vi.unstubAllGlobals();
   });
 });

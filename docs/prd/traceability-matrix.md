@@ -2,10 +2,10 @@
 
 **Owner de produto:** `@pm` (Morgan)
 **Autor da reconciliação:** `@analyst` (Story 18.1)
-**Data de geração:** 2026-07-19
-**Baseline Git (HEAD):** `b86d07e` (branch `main`)
-**Working tree auditado:** não commitado; diff SHA-256 `68a7765b1fdd1ae47ec34527dfc73a287c0729f58382c8ccb8935c0f81bd221f`
-**Fontes primárias:** `docs/prd/prd.md`, `docs/prd/modernizacao-ui-2026.md`, `docs/epics/` (Épicas 1–18 descritas nos arquivos canônicos existentes), `docs/stories/`, `docs/qa/gates/`, verificação direta do worktree auditado.
+**Data de geração:** 2026-08-12
+**Baseline Git (HEAD):** `06f9366` (branch `codex/hotfixes-no-payments`; snapshot dos paths antes das correções documentais deste PR)
+**Working tree auditado:** alterações locais de SEO, JSON-LD de agenda, stories 12/08, migration editorial e ajustes de fidelidade; a migration ainda precisa ser aplicada ao projeto remoto Supabase via `supabase db push` antes do deploy. Nenhuma alteração remota foi aplicada por esta auditoria.
+**Fontes primárias:** `docs/prd/prd.md`, `docs/prd/modernizacao-ui-2026.md`, `docs/epics/`, `docs/stories/`, `docs/qa/gates/`, verificação direta do worktree e gates executados em 2026-08-12.
 **Regra de classificação (Article IV — No Invention):** só é `ATENDIDO` o requisito com link verificável para código, story ou gate real. Sem evidência verificável → `PARCIAL`, `DIFERIDO` ou `NÃO ATENDIDO`. Nunca `ATENDIDO` por inferência ou por semelhança de nome.
 
 ---
@@ -14,13 +14,23 @@
 
 | Estado | Contagem | Requisitos |
 |---|---:|---|
-| `ATENDIDO` | 23 | FR1–FR11, FR13, FR15; NFR1, NFR2, NFR3, NFR5, NFR6, NFR7, NFR8, NFR10; CR2, CR3 |
-| `PARCIAL` | 5 | FR16; NFR4, NFR9; CR1, CR4 |
+| `ATENDIDO` | 28 | FR1–FR11, FR13, FR15–FR16; NFR1–NFR10; CR1–CR4 |
+| `PARCIAL` | 0 | — |
 | `DIFERIDO` | 2 | FR12, FR14 |
 | `NÃO ATENDIDO` | 0 | — |
 | **Total** | **30** | FR1–FR16 (16) + NFR1–NFR10 (10) + CR1–CR4 (4) |
 
-**Leitura de risco:** no snapshot original, os itens não-`ATENDIDO` combinavam dois eixos distintos: (1) reconciliação pós-cutover Supabase SSR — drift OpenAPI, suíte unitária e harness Epic 15; e (2) prova visual/contraste — NFR4 e CR4 ligados à fidelidade WCAG/canvas. Estado vigente após as Stories 18.2/18.3: drift OpenAPI, unitários e `test:epic15:fidelity` foram restaurados; a matriz preserva o histórico de risco por requisito e a evidência final fica registrada nas stories de fechamento.
+**Leitura de risco:** os cinco itens anteriormente `PARCIAL` foram reavaliados contra o estado atual. A suíte unitária (796 testes), o build, o drift OpenAPI (16 rotas), a acessibilidade/baselines e a suíte E2E isolada estão verdes; FR12 e FR14 continuam `DIFERIDO` por decisão explícita do MVP.
+
+## Validação corrente — 2026-08-12
+
+- `npm run lint`: PASS.
+- `npm run typecheck`: PASS.
+- `npm run test:unit`: PASS — 80 arquivos / 796 testes.
+- `npm run build`: PASS.
+- `npm run docs:api:check-drift`: PASS — 16 rotas reconciliadas.
+- `npm test`: PASS em 2026-08-12 — 184/184 em 3,1 min, após a implementação do JSON-LD da agenda.
+- Stories novas: [SEO de conteúdo de cursos](../stories/2026-08-12-seo-conteudo-cursos.md) e [JSON-LD de eventos da agenda](../stories/2026-08-12-event-jsonld-agenda.md), ambas `Done`.
 
 ---
 
@@ -47,7 +57,7 @@
 | **FR13** — área do instrutor autenticada (identidade, cursos/turmas, alunos autorizados) | `ATENDIDO` | PRD-brownfield Epic 1; Épica 14 | GAP formal (ver §3) + `docs/stories/2026-07-02-epic14-story1-4-portals-resign.md` (Done) | `app/instrutor/page.tsx` → `src/views/portal/InstructorPortal.tsx`; `src/lib/supabase/portal-data.ts` | reskin/portal em `epic14-story1-4-portals-resign` (Done) | Portal do instrutor implementado e roteado | `@pm` | — |
 | **FR14** — ações operacionais do instrutor (presença, publicação, comunicação) | `DIFERIDO` | PRD-brownfield Epic 1 (§Requirements MVP) | — | Sem evidência de implementação (fora do MVP por decisão do PRD) | — | PRD declara fora do MVP até story dedicada com schema/API/RLS | `@po` | Abrir story dedicada antes de implementar |
 | **FR15** — navegação pública expõe os caminhos-chave | `ATENDIDO` | PRD-brownfield Epic 1; Épica 4 | `docs/stories/1.1.story.md` (Done) | rotas `app/cursos`, `app/agenda`, `app/in-company`, `app/consultoria`, `app/blog`, `app/contato`, `app/login`, `app/falar-com-especialista`, `app/sobre` | gate 1.1 (PASS) | Todos os caminhos de negócio expostos na navegação | `@pm` | — |
-| **FR16** — comportamento existente (catálogo, agenda, in-company, checkout, admin, auth) continua funcionando | `PARCIAL` | Épica 16; Épica 17 | `docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md` (Done) + REC-* | fluxos preservados em `app/**`, `src/**` | `docs/qa/gates/16.1-remover-fallback-mock-producao.yml` (PASS); **porém** `npm run test:unit` 746/748 e `docs:api:check-drift` FAIL (Épica 18 §4) | Funcional em runtime, mas gates automatizados não estão 100% verdes no mesmo SHA | `@dev` | Story 18.3: reconciliar drift OpenAPI e restaurar suíte verde |
+| **FR16** — comportamento existente (catálogo, agenda, in-company, checkout, admin, auth) continua funcionando | `ATENDIDO` | Épica 16; Épica 17; Épica 18 | `docs/stories/2026-07-19-epic18-story3-restaurar-gates.md` (Done) + REC-* | fluxos preservados em `app/**`, `src/**` | `npm test` 184/184 em ambiente Supabase isolado; unitários, build e OpenAPI verdes | Regressão funcional e contratos reconciliados após o cutover SSR | `@dev` | — |
 
 ### 1.2 Requisitos Não Funcionais (NFR1–NFR10)
 
@@ -56,22 +66,22 @@
 | **NFR1** — preservar Next.js 16 / React 19 / TS / Supabase / Cloudflare Workers | `ATENDIDO` | Épica 18 (contexto) | — | `package.json`, `app/`, `src/`, `supabase/`, `open-next.config.ts` | — | Stack confirmada no PRD e na Épica 18 §Contexto | `@architect` | — |
 | **NFR2** — acesso fail-closed, sem vazamento entre papéis | `ATENDIDO` | Épica 11; Épica 17 | `docs/stories/2026-07-16-rec-202-sessao-supabase-ssr.md` (Done); `docs/stories/2026-07-16-rec-203-autorizacao-servidor.md` (Done) | `supabase/functions/_shared/auth.ts`, guards SSR | `docs/qa/gates/rec-202-sessao-supabase-ssr.yml`, `docs/qa/gates/rec-203-autorizacao-servidor.yml`, `docs/qa/gates/rec-003-fail-closed-indisponibilidade.yml` | AAL2 fail-closed + autorização no servidor | `@architect` | — |
 | **NFR3** — captura pública preserva rate limit, validação, CORS, anti-abuso | `ATENDIDO` | Épica 17 | `docs/stories/2026-07-16-rec-107-endurecer-endpoints-publicos.md` (Done); `docs/stories/2026-07-17-rec-205-rate-limit-identidade-autenticada.md` (Done) | endpoints públicos endurecidos | `docs/qa/gates/rec-107-endurecer-endpoints-publicos.yml`, `docs/qa/gates/rec-205-rate-limit-identidade-autenticada.yml` | Rate limit e validação reforçados | `@architect` | — |
-| **NFR4** — consultoria atende baseline de acessibilidade (teclado, labels, foco, WCAG) | `PARCIAL` | Épica 1 (modernização); Épica 17 (REC-308) | `docs/stories/2026-07-17-rec-308-corrigir-acessibilidade-critica.md` (Done) | `SpecialistContact.tsx` (labels, validação inline, erros por campo) | `docs/qa/gates/rec-308-corrigir-acessibilidade-critica.yml` (PASS); **porém** capturador de fidelidade/contraste WCAG CONCERNS (Épica 18 §3; critério S5 do PRD modernização não reproduzível) | A11y crítica remediada, mas prova reproduzível de contraste/fidelidade pendente | `@ux-design-expert` | Story 18.2: restaurar auditoria WCAG/contraste reproduzível |
+| **NFR4** — consultoria atende baseline de acessibilidade (teclado, labels, foco, WCAG) | `ATENDIDO` | Épica 1 (modernização); Épica 17 (REC-308); Épica 18 | `docs/stories/2026-07-17-rec-308-corrigir-acessibilidade-critica.md` (Done) | `SpecialistContact.tsx` e rotas públicas com labels, validação inline, foco e erros associados | `npm test` 184/184; `tests/ui-governance.spec.ts`; `tests/a11y.spec.ts`; `tests/keyboard.baseline.spec.ts`; `tests/contrast-report.baseline.spec.ts`; relatórios versionados em `docs/qa/` | Acessibilidade crítica e prova automatizada reproduzível confirmadas | `@ux-design-expert` | — |
 | **NFR5** — novas telas seguem o design system existente | `ATENDIDO` | Épica 14; Épica 15 | `docs/stories/2026-07-13-epic15-story1-1-admin-dashboard-fidelidade-total.md` (Done) | tokens `--tk-*` em `src/styles/`, componentes `src/components/**` | `docs/qa/gates/epic14.1-5-mantine-purge.yml`; `npm run purge:gate` PASS (Épica 18 §3) | Design system Trust Keith unificado, zero Mantine/Emotion | `@ux-design-expert` | — |
-| **NFR6** — verificação automatizada de fluxos críticos (conversão, leads, RBAC) | `ATENDIDO` | Épica 12; Épica 17 | `docs/stories/2026-06-24-epic12-story2-e2e-auth-checkout.md` (Done); `docs/stories/2026-07-14-rec-403-suite-agregada-baseline-verde.md` (Done — sem arquivo de gate dedicado) | `src/__tests__/**`, `e2e/**` | `docs/qa/gates/epic12.2-e2e-login-logout-checkout.yml`, `docs/qa/gates/rec-404-medir-cobertura-real.yml` | Suítes de integração/E2E e coverage gate existentes (2 falhas atuais de drift tratadas em NFR9/CR1) | `@dev` | — |
+| **NFR6** — verificação automatizada de fluxos críticos (conversão, leads, RBAC) | `ATENDIDO` | Épica 12; Épica 17; Épica 18 | `docs/stories/2026-06-24-epic12-story2-e2e-auth-checkout.md` (Done); `docs/stories/2026-07-19-epic18-story3-restaurar-gates.md` (Done) | `src/__tests__/**`, `tests/**` | `npm run test:unit` 796/796 e `npm test` 184/184 | Conversão, admin, auth, RBAC, acessibilidade e regressão pública automatizados | `@dev` | — |
 | **NFR7** — políticas/migrations preservam RLS e têm cobertura de testes | `ATENDIDO` | Épica 12; Épica 17 | `docs/stories/2026-06-24-epic12-story4-db-transactions-rls.md` (Done); REC-101..106 (Done) | `supabase/migrations/**`, RLS policies | `docs/qa/gates/epic12.4-db-transactions-rls.yml`, `docs/qa/gates/rec-101..106-*.yml` | RLS endurecida e coberta por testes transacionais | `@data-engineer` | — |
 | **NFR8** — site permanece deployável via Cloudflare Workers/OpenNext | `ATENDIDO` | Épica 17 | `docs/stories/2026-07-14-rec-401-encadear-ci-deploy.md` (Done); `docs/stories/2026-07-14-rec-402-migrations-obrigatorias-deploy.md` (Done) | `open-next.config.ts`, `.github/workflows/deploy-functions.yml` | `docs/qa/gates/rec-401-encadear-ci-deploy.yml`, `docs/qa/gates/rec-402-migrations-obrigatorias-deploy.yml` | CI encadeia deploy; migrations obrigatórias | `@devops` | — |
-| **NFR9** — documentação/OpenAPI atualizada quando lead/auth/admin mudam | `PARCIAL` | Épica 13; Épica 17 (REC-406) | `docs/stories/2026-07-17-rec-406-sincronizar-openapi.md` (Done) | `docs/api/openapi.yaml` | `docs/qa/gates/epic13.3-swagger-ui-drift-gate.yml`; **porém** `docs:api:check-drift` FAIL — spec ainda declara `/functions/v1/auth-session`, removido do código (`supabase/functions/auth-session/index.ts` deletado no worktree) | Sincronização parcial; drift residual do endpoint removido | `@dev` | Story 18.3: remover `auth-session` da OpenAPI (ou restaurar endpoint por decisão de arquitetura — nunca ambos) |
+| **NFR9** — documentação/OpenAPI atualizada quando lead/auth/admin mudam | `ATENDIDO` | Épica 13; Épica 17 (REC-406); Épica 18 | `docs/stories/2026-07-19-epic18-story3-restaurar-gates.md` (Done) | `docs/api/openapi.yaml`, `docs/api/*.md` | `npm run docs:api:check-drift`: PASS — 16 rotas reconciliadas | Contrato publicado alinhado à superfície HTTP real | `@dev` | — |
 | **NFR10** — sem reintroduzir demo-auth ou mock-only em produção | `ATENDIDO` | Épica 11; Épica 16; Épica 17 | `docs/stories/2026-07-13-epic16-story1-1-remover-fallback-mock-producao.md` (Done); `docs/stories/2026-07-17-rec-204-remover-hmac-localstorage-header.md` (Done) | remoção de fallback mock e HMAC legado | `docs/qa/gates/16.1-remover-fallback-mock-producao.yml`, `docs/qa/gates/epic11.3-demo-auth-logout-global.yml` | Mock e demo-auth removidos; cutover para Supabase SSR | `@architect` | — |
 
 ### 1.3 Requisitos de Compatibilidade (CR1–CR4)
 
 | Req | Estado | Épica | Story (artefato) | Código | Teste/Gate | Evidência | Owner | Próximo passo |
 |---|---|---|---|---|---|---|---|---|
-| **CR1** — compatibilidade de API (public, admin, auth-session, enrollments, leads, admin-resources) | `PARCIAL` | Épica 13; Épica 17 | `docs/stories/2026-07-17-rec-406-sincronizar-openapi.md` (Done) | route handlers em `app/api/**` | drift gate `docs/qa/gates/epic13.3-swagger-ui-drift-gate.yml`; **porém** `auth-session` removido sem reconciliação versionada da spec | APIs vigentes compatíveis, exceto o contrato do endpoint removido | `@dev` | Story 18.3: reconciliar contrato do endpoint removido de forma versionada |
+| **CR1** — compatibilidade de API (public, admin, auth-session, enrollments, leads, admin-resources) | `ATENDIDO` | Épica 13; Épica 17; Épica 18 | `docs/stories/2026-07-19-epic18-story3-restaurar-gates.md` (Done) | route handlers em `app/api/**`, `docs/api/openapi.yaml` | OpenAPI drift PASS — 16 rotas; contratos e rotas atuais reconciliados | A remoção de `auth-session` foi refletida na documentação vigente sem reintroduzir endpoint legado | `@dev` | — |
 | **CR2** — compatibilidade de schema (tabelas e helpers RLS) | `ATENDIDO` | Épica 17 | REC-101..106, `docs/stories/2026-07-17-rec-303-read-models-alunos-inscricoes.md` (Done) | `supabase/migrations/**`, `docs/database/SCHEMA.md` | gates REC-101..106; `docs/qa/gates/rec-303-read-models-alunos-inscricoes.yml` | Nenhuma alteração destrutiva de schema; tabelas base preservadas | `@data-engineer` | — |
 | **CR3** — consistência UI/UX (identidade visual única) | `ATENDIDO` | Épica 14; Épica 15 | `docs/stories/2026-07-06-epic14-story3-1-auditoria-visual-final.md` (Done) | tokens `--tk-*`, componentes Trust Keith | `docs/qa/gates/14.3.1-auditoria-visual-final-a11y-e-lighthouse.yml`; `npm run purge:gate` PASS | Linguagem visual única Trust Keith (sem identidade concorrente ativa) | `@ux-design-expert` | — |
-| **CR4** — compatibilidade de integração (Supabase SSR/Edge, OpenAPI, Playwright, Vitest, deploy CF) | `PARCIAL` | Épica 12; Épica 17; Épica 18 | `docs/stories/2026-06-24-epic12-story1-harness-coverage-gate.md` (Done) | harness Vitest/Playwright, Edge Functions | `docs/qa/gates/epic12.2-*.yml`; **porém** `test:epic15:fidelity` FAIL (importa `SESSION_COOKIE`/`encodeSession` de `@/lib/auth` removidos) e `test:unit` 746/748 (Épica 18 §3/§4) | Integrações operam em runtime, mas parte do harness quebrou após o cutover SSR | `@dev` | Story 18.3: migrar harness da Épica 15 p/ sessão Supabase SSR e restaurar suíte verde |
+| **CR4** — compatibilidade de integração (Supabase SSR/Edge, OpenAPI, Playwright, Vitest, deploy CF) | `ATENDIDO` | Épica 12; Épica 17; Épica 18 | `docs/stories/2026-07-19-epic18-story3-restaurar-gates.md` (Done) | harness Vitest/Playwright, Edge Functions, OpenAPI, deploy CF | `npm run test:unit` 796/796; `npm run docs:api:check-drift` PASS; `npm test` 184/184; build PASS | Integrações atuais reconciliadas e verificadas em ambiente isolado | `@dev` | — |
 
 ---
 
@@ -120,7 +130,7 @@
 | **1.3** — Lead Classification and Admin Visibility | Classificação de leads e visibilidade admin | **NÃO** | `src/types/index.ts` (`LeadType`/`LeadOrigin` com `Consultoria`); `src/lib/admin-resource-configs.tsx` (resource `leads`) | `rec-206-consolidar-bff-canonico.md`; `rec-303-read-models-alunos-inscricoes.md` | **ENTREGUE EM CÓDIGO; GAP de artefato formal.** Decisão do `@po` |
 | **1.4** — Student MVP Portal Activation | Portal MVP do aluno | **NÃO** | `app/aluno/page.tsx` → `src/views/portal/StudentPortal.tsx`; `src/lib/contexts/student-context.tsx`; `src/lib/supabase/portal-data.ts` | reskin: `2026-07-02-epic14-story1-4-portals-resign.md` (Done) | **ENTREGUE EM CÓDIGO; GAP de artefato formal.** Decisão do `@po` |
 | **1.5** — Instructor MVP Portal Activation | Portal MVP do instrutor | **NÃO** | `app/instrutor/page.tsx` → `src/views/portal/InstructorPortal.tsx`; `src/lib/supabase/portal-data.ts` | reskin: `2026-07-02-epic14-story1-4-portals-resign.md` (Done) | **ENTREGUE EM CÓDIGO; GAP de artefato formal.** Decisão do `@po` |
-| **1.6** — Regression, Access Control, and Compatibility Hardening | Regressão, controle de acesso e hardening | **NÃO** | cobertura de facto por Épica 11 (auth), Épica 12 (integração), Épica 17 (REC-* segurança) | `epic11.*`, `epic12.*`, `rec-*` (Done) | **COBERTO DE FACTO POR ÉPICAS POSTERIORES; GAP de artefato formal 1.6.** A suíte agregada não está 100% verde (ver FR16/CR4). Decisão do `@po`/`@dev` |
+| **1.6** — Regression, Access Control, and Compatibility Hardening | Regressão, controle de acesso e hardening | **NÃO** | cobertura de facto por Épica 11 (auth), Épica 12 (integração), Épica 17 (REC-* segurança) | `epic11.*`, `epic12.*`, `rec-*` (Done) | **COBERTO DE FACTO POR ÉPICAS POSTERIORES; GAP de artefato formal 1.6.** A suíte agregada está verde (184/184); permanece apenas o gap documental. Decisão do `@po`/`@dev` |
 
 **Conclusão da §3:** apenas a Story 1.1 tem artefato formal. As capacidades de 1.2–1.6 existem no produto (código verificado) e foram tocadas por épicas posteriores, mas **não há stories de substituição numeradas 1.2–1.6**. Isso é um gap de rastreabilidade formal (não de funcionalidade), a ser resolvido por decisão explícita do `@po`/`@pm` — não por inferência desta story.
 
@@ -138,7 +148,7 @@
 | `docs/diagnosis/implementation-summary-2026-06-04.md` | PRD modernização §1.3 | **AUSENTE** | Registro de correções admin não verificável | `@pm` |
 | `docs/design/apple-hig-application-plan-2026-05-26.md` | PRD modernização §1.3 | **AUSENTE** | Plano P0→P5 (auditoria de runtime) não verificável | `@ux-design-expert` |
 | `docs/stories/2026-06-04-publication-readiness-portal-scope.md` | PRD modernização §1.3 e §4.1 | **AUSENTE** | Recorte de escopo de publicação (portais fora de escopo) não verificável como artefato | `@po` |
-| `supabase/functions/auth-session/index.ts` | `docs/api/openapi.yaml`, testes de drift | **REMOVIDO** (git status `D`) | OpenAPI ainda declara `/functions/v1/auth-session` → drift; `docs:api:check-drift` FAIL | `@dev` (Story 18.3) |
+| `supabase/functions/auth-session/index.ts` | documentação histórica e contratos anteriores | **REMOVIDO POR DECISÃO ARQUITETURAL** | Endpoint legado não faz parte da superfície vigente; OpenAPI reconciliada (`docs/stories/2026-07-19-epic18-story3-restaurar-gates.md`; `npm run docs:api:check-drift` PASS) | `@dev` |
 
 **Fontes citadas que EXISTEM** (confirmadas, sem ação): `docs/history/reports/BROWNFIELD-DISCOVERY-COMPLETE.md`, `docs/ARCHITECTURE.md`, `docs/architecture/system-architecture.md`, `docs/architecture/TECHNICAL-DEBT-REPORT.md`, `docs/database/SCHEMA.md`, `docs/api/openapi.yaml`, `docs/design/redesign/spec-admin-dashboard.md`, `docs/qa/gates/1.1-public-positioning-and-journey-clarity.yml`.
 
@@ -158,6 +168,6 @@
 ## 6. Método de reprodução
 
 - **Requisitos (30):** extraídos de `docs/prd/prd.md` §Requirements e §Compatibility Requirements sem renomear/fundir IDs.
-- **Estados dos gates de qualidade atuais** (Épica 18 §3/§4, verificação 2026-07-19): `lint` PASS, `typecheck` PASS, `purge:gate` PASS, `bundle:check` PASS, `test:epic14:fidelity` 8/8 PASS, `test:unit` 746/748 FAIL (drift OpenAPI), `docs:api:check-drift` FAIL, `test:epic15:fidelity` FAIL. Não reexecutados nesta story documental; reportados como declarados pela Épica 18 (a reexecução é escopo da Story 18.3).
-- **Existência de paths:** cada path citado como `ATENDIDO` foi confirmado por `find`/`ls`/`grep` no worktree (SHA `b86d07e`).
-- **Índice de stories:** ver `docs/stories/index.md`, regenerado do estado real (104 arquivos de story) na mesma data/SHA.
+- **Estados dos gates de qualidade atuais** (verificação 2026-08-12): `lint` PASS, `typecheck` PASS, `test:unit` 796/796 PASS, `build` PASS, `docs:api:check-drift` PASS em 16 rotas; `npm test` 184/184 PASS em ambiente Supabase isolado após a validação da agenda.
+- **Existência de paths:** cada path citado como `ATENDIDO` foi confirmado por `find`/`ls`/`grep` no worktree (snapshot `06f9366`). Próximo passo operacional: `@data-engineer` executar `supabase db push` com credencial de projeto e registrar o resultado; esta matriz não declara o remoto como sincronizado.
+- **Índice de stories:** ver `docs/stories/index.md`, regenerado do estado real de todos os arquivos `docs/stories/*.md`, incluindo as stories de 12/08.

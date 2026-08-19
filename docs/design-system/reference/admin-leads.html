@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Admin Leads</title><style data-reference-inline-css>
+/* Trust Keith — Webfonts
+ * Inter, Merriweather and Caveat: loaded from Google Fonts (1:1 with brand sources).
+ * Merriweather: serif supporting text token (subheadings), weights 400/700.
+ * Fraunces: brand-owned display serif. Loaded from the brand's own Webflow CDN
+ *   (the only public source). If you self-host, drop the .woff files in
+ *   assets/fonts/ and repoint the src below.
+ */
+
+/* Trust Keith — Color tokens
+ * Brand teal anchors trust/authority (CTAs only); bright blue is the high-frequency
+ * UI accent (links, secondary actions). Grays never go true-black. Shadows are
+ * always dark-tinted, never colored. Cream accents humanize the technical product.
+ */
+
+:root {
+  /* ---- Brand & accent ---- */
+  --tk-brand: #235875;          /* Trust Keith teal — primary CTAs, logo, authority */
+  --tk-brand-hover: #194359;    /* darker teal — primary button hover */
+  --tk-accent: #4285f4;         /* bright blue — links, secondary CTAs, highlights */
+  --tk-accent-strong: #2459b3;  /* darker blue — secondary action hover */
+  --tk-accent-soft: #e0eeff;    /* light blue — hover bg for blue-accented elements */
+  --tk-focus: #4d65ff;          /* focus ring blue */
+
+  /* ---- Neutral scale (no true black) ---- */
+  --tk-ink: #222525;            /* default heading & body text */
+  --tk-ink-muted: #4f5057;      /* secondary / muted text */
+  --tk-line: #ebebeb;           /* borders, dividers, nav surface */
+  --tk-surface-2: #fafafa;      /* subtle background tint / alt rows */
+  --tk-surface: #ffffff;        /* primary surface, cards */
+  --tk-black-8: rgba(0,0,0,0.08); /* universal shadow overlay / hairline */
+  --tk-black-5: rgba(0,0,0,0.05); /* secondary button fill */
+
+  /* ---- Warm cream accents ---- */
+  --tk-cream: #fffaf4;          /* warm featured/testimonial backgrounds */
+  --tk-cream-dark: #c3b6aa;     /* cream-context dividers/accents */
+
+  /* ---- Semantic ---- */
+  --tk-success: #068466;        /* confirmation, positive states */
+  --tk-error: #ea384c;          /* alerts, destructive actions */
+
+  /* ---- Semantic aliases ---- */
+  --tk-text: var(--tk-ink);
+  --tk-text-muted: var(--tk-ink-muted);
+  --tk-border: var(--tk-line);
+  --tk-bg: var(--tk-surface);
+  --tk-bg-alt: var(--tk-surface-2);
+  --tk-bg-warm: var(--tk-cream);
+  --tk-cta: var(--tk-brand);
+  --tk-cta-hover: var(--tk-brand-hover);
+  --tk-link: var(--tk-accent);
+}
+
+/* Trust Keith — Typography tokens
+ * Three families, weight-as-hierarchy. Fraunces (700) for display headlines,
+ * Merriweather (400/700) for elegant serif subheadings, Inter for body/UI.
+ * Caveat reserved for decorative/handwritten accent moments only.
+ */
+
+:root {
+  /* ---- Families ---- */
+  --tk-font-display: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --tk-font-serif: "Merriweather", Georgia, "Times New Roman", serif;
+  --tk-font-body: "Inter", "Helvetica Neue", Arial, sans-serif;
+  --tk-font-hand: "Caveat", "Segoe Script", cursive;
+
+  /* ---- Sizes ---- */
+  --tk-text-display-hero: 3.75rem;   /* 60px — hero headlines */
+  --tk-text-display-large: 2.75rem;  /* 44px — section headers */
+  --tk-text-section: 2rem;           /* 32px — page section breaks */
+  --tk-text-subhead-lg: 1.5rem;      /* 24px — feature descriptions (serif) */
+  --tk-text-subhead: 1.25rem;        /* 20px — subsection (serif) */
+  --tk-text-body-lg: 1.125rem;       /* 18px — product/feature copy */
+  --tk-text-body: 1rem;              /* 16px — default body */
+  --tk-text-body-sm: 0.875rem;       /* 14px — secondary text, buttons, links */
+  --tk-text-caption: 0.75rem;        /* 12px — helper text, metadata */
+  --tk-text-caption-sm: 0.6875rem;   /* 11px — micro labels */
+
+  /* ---- Weights ---- */
+  --tk-weight-light: 300;
+  --tk-weight-regular: 400;
+  --tk-weight-medium: 500;
+  --tk-weight-semibold: 600;
+  --tk-weight-bold: 700;
+
+  /* ---- Line heights ---- */
+  --tk-leading-tight: 1.1;
+  --tk-leading-snug: 1.25;
+  --tk-leading-normal: 1.4;
+  --tk-leading-relaxed: 1.5;
+
+  /* ---- Tracking ---- */
+  --tk-tracking-display: -0.02em;  /* tight at display sizes */
+  --tk-tracking-normal: 0;
+  --tk-tracking-eyebrow: 0.08em;   /* uppercase eyebrows */
+}
+
+/* Trust Keith — Spacing & radius tokens
+ * Base unit 4px. Roomy by design: cards 32px padding, buttons 20px, sections 48-64px.
+ * Radius scales with element size: inputs 4px < buttons 6px < glass 16px < cards 24px < pills.
+ */
+
+:root {
+  /* ---- Spacing scale (4px base) ---- */
+  --tk-space-1: 0.25rem;  /* 4px */
+  --tk-space-2: 0.5rem;   /* 8px */
+  --tk-space-3: 0.75rem;  /* 12px */
+  --tk-space-4: 1rem;     /* 16px */
+  --tk-space-5: 1.25rem;  /* 20px — button padding */
+  --tk-space-6: 1.5rem;   /* 24px */
+  --tk-space-8: 2rem;     /* 32px — card padding */
+  --tk-space-12: 3rem;    /* 48px — section separation (min) */
+  --tk-space-16: 4rem;    /* 64px — section separation (large) */
+
+  /* ---- Semantic spacing ---- */
+  --tk-pad-card: var(--tk-space-8);
+  --tk-pad-button: var(--tk-space-5);
+  --tk-gap-component: var(--tk-space-6);
+  --tk-gap-section: var(--tk-space-16);
+
+  /* ---- Radius scale ---- */
+  --tk-radius-input: 4px;   /* near-square utilitarian inputs */
+  --tk-radius-button: 6px;  /* tight, functional */
+  --tk-radius-md: 8px;
+  --tk-radius-glass: 16px;  /* glass card variant */
+  --tk-radius-card: 24px;   /* standard card — brand visual signature */
+  --tk-radius-pill: 100rem; /* badges, switches */
+
+  /* ---- Layout ---- */
+  --tk-container: 1200px;
+  --tk-container-wide: 1400px;
+}
+
+/* Trust Keith — Effects: shadows, focus, motion
+ * Shadows are ALWAYS dark-tinted, never colored. Signature card shadow is dual-layer
+ * (2px crisp edge + soft diffusion) creating a glass-pane elevation — NOT glassmorphism
+ * (no backdrop-filter blur anywhere in the system).
+ */
+
+:root {
+  /* ---- Shadows ---- */
+  --tk-shadow-hairline: inset 0 0 0 1px var(--tk-line);          /* flat bordered surface */
+  --tk-shadow-glass: 0 4px 16px rgba(0,0,0,0.08);                /* ambient — glass card variant */
+  --tk-shadow-card: 0 2px 16px rgba(0,0,0,0.02), 0 16px 64px rgba(0,0,0,0.12); /* signature card elevation */
+  --tk-shadow-pop: 0 12px 36px -8px rgba(41,43,78,0.18);         /* dropdowns, popovers */
+
+  /* ---- Focus ring ---- */
+  --tk-focus-ring: 0.125rem solid var(--tk-focus);
+  --tk-focus-offset: 0.125rem;
+
+  /* ---- Motion ---- */
+  --tk-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);  /* @kind other */ /* the brand's single easing curve */
+  --tk-duration-fast: 200ms;  /* @kind other */
+  --tk-duration-base: 300ms;  /* @kind other */
+  --tk-duration-slow: 500ms;  /* @kind other */
+
+  /* ---- Surface gradients (subtle, light) ---- */
+  --tk-gradient-soft: radial-gradient(circle, #f7f9fc 35%, #ebf3ff);  /* @kind color */
+  --tk-gradient-hero: linear-gradient(135deg, #ffffff 0%, var(--tk-cream) 52%, var(--tk-accent-soft) 100%);
+}
+
+/* Trust Keith Design System — global entry point.
+ * Consumers link this single file. It is a manifest of @imports only.
+ */
+
+
+
+.reference-screen-hidden{display:none!important}
+[data-reference-document]{display:block}
+.rh-wrap{width:min(1120px,calc(100% - 48px))}.rh-journeys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.rh-consult{display:grid;grid-template-columns:1fr 1fr;gap:24px}.rh-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.rh-jlink{display:inline-flex;align-items:center}
+</style></head>
+<body data-reference-admin-screen="leads">
+<div data-reference-document>
+<div data-reference-head>
+
+
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;background:#eef0f2}
+    .adm{width:1360px;margin:28px auto;display:grid;grid-template-columns:248px 1fr;background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:20px;overflow:hidden;box-shadow:0 30px 80px -30px rgba(0,0,0,0.25);font-family:var(--tk-font-body);color:var(--tk-ink)}
+    .adm{--rh-teal-deep:#0c6a83;--rh-teal:#1791a9;--rh-teal-lt:#37b7cc;--tk-brand:#0c6a83;--tk-brand-hover:#084f63;--tk-cta:#0c6a83;--tk-cta-hover:#084f63;--tk-accent:#1791a9;--tk-accent-strong:#0c6a83;--tk-accent-soft:#e0f2f6}
+    .adm :focus-visible{outline:2px solid #4d65ff;outline-offset:2px;border-radius:4px}
+    @media (prefers-reduced-motion:reduce){.adm *{transition:none !important;animation:none !important}}
+    .adm-side{border-right:1px solid var(--tk-border);background:var(--tk-lightest-grey,#fafafa);display:flex;flex-direction:column;min-height:940px}
+    .adm-grouplabel{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--tk-ink-muted);padding:22px 24px 8px}
+    .adm-item{display:flex;align-items:center;gap:11px;margin:1px 12px;padding:9px 12px;border:none;background:transparent;text-align:left;font-family:inherit;border-radius:8px;font-size:var(--tk-text-body-sm);font-weight:500;color:var(--tk-ink);opacity:.82;text-decoration:none;cursor:pointer;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .adm-item:hover{opacity:1;background:rgba(0,0,0,0.045)}
+    .adm-item[data-cur="1"]{opacity:1;background:var(--tk-accent-soft);color:var(--tk-brand);font-weight:600}
+    .adm-item svg{flex-shrink:0;color:currentColor}
+    .adm-count{margin-left:auto;font-size:11px;font-weight:600;background:var(--tk-brand);color:#fff;border-radius:var(--tk-radius-pill);padding:2px 8px}
+    .adm-kpi{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass);padding:22px 24px;transition:transform .25s cubic-bezier(.25,.46,.45,.94),box-shadow .25s}
+    .adm-kpi:hover{transform:translateY(-2px);box-shadow:var(--tk-shadow-card)}
+    .adm-kpilabel{font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--tk-ink-muted);margin-bottom:12px}
+    .adm-kpinum{font-family:var(--tk-font-body);font-weight:700;font-size:33px;line-height:1;letter-spacing:-0.02em;color:var(--tk-ink);font-variant-numeric:tabular-nums}
+    .adm-card{background:var(--tk-surface);border:1px solid var(--tk-border);border-radius:var(--tk-radius-card);box-shadow:var(--tk-shadow-glass)}
+    .adm-cardhead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 26px;border-bottom:1px solid var(--tk-line)}
+    .adm-cardtitle{font-family:var(--tk-font-display);font-weight:700;font-size:19px;letter-spacing:-0.01em;margin:0}
+    .adm-h1{font-family:var(--tk-font-display);font-weight:700;font-size:30px;letter-spacing:-0.02em;line-height:1.1;margin:0 0 6px}
+    .adm-sub{font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted);margin:0}
+    .adm-jlink{color:var(--tk-accent-strong);font-size:var(--tk-text-body-sm);font-weight:600;text-decoration:none;background:transparent;border:none;padding:0;font-family:inherit;cursor:pointer;white-space:nowrap}
+    .adm-jlink:hover{color:var(--tk-brand-hover)}
+    .adm-td .adm-jlink{display:inline-block;padding:8px 6px;margin:-8px -6px}
+    .adm-chip{font-size:12.5px;font-weight:500;padding:6px 13px;border-radius:var(--tk-radius-pill);border:1px solid var(--tk-border);background:var(--tk-surface);color:var(--tk-ink-muted);cursor:pointer;font-family:inherit;transition:all .2s cubic-bezier(.25,.46,.45,.94)}
+    .adm-chip:hover{border-color:var(--tk-accent);color:var(--tk-ink)}
+    .adm-chip[data-on="1"]{background:var(--tk-brand);border-color:var(--tk-brand);color:#fff;font-weight:600}
+    .adm-th{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--tk-ink-muted);text-align:left;padding:12px 14px;border-bottom:1px solid var(--tk-line)}
+    .adm-td{padding:14px;border-bottom:1px solid var(--tk-line);font-size:var(--tk-text-body-sm);vertical-align:middle}
+    .adm-trow:hover .adm-td{background:var(--tk-lightest-grey,#fafafa)}
+    .adm-trow:last-child .adm-td{border-bottom:none}
+    .adm-otag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:var(--tk-radius-pill);white-space:nowrap}
+    .adm-status{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:500;color:var(--tk-ink);white-space:nowrap}
+    .adm-status i{width:8px;height:8px;border-radius:50%;display:inline-block}
+    .adm-turma{display:grid;grid-template-columns:52px 1fr;gap:14px;padding:16px 0;border-bottom:1px solid var(--tk-line)}
+    .adm-turma:last-child{border-bottom:none}
+    .adm-tdate{text-align:center;border-right:1px solid var(--tk-line);padding-right:12px}
+    .adm-tnum{font-family:var(--tk-font-body);font-weight:700;font-size:22px;line-height:1;color:var(--tk-brand);letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+    .adm-tmon{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--tk-ink-muted);margin-top:3px}
+    .adm-bar{height:6px;border-radius:99px;background:var(--tk-line);overflow:hidden}
+    .adm-bar i{display:block;height:100%;border-radius:99px;background:var(--tk-accent)}
+    .adm-bar i[data-hot="1"]{background:#c0293b}
+    .adm-obar{height:8px;border-radius:99px;background:var(--tk-line);overflow:hidden}
+    .adm-obar i{display:block;height:100%;border-radius:99px;background:var(--tk-brand)}
+    .adm-empty{padding:26px 14px;margin:0;font-size:var(--tk-text-body-sm);color:var(--tk-ink-muted)}
+    .adm-foot{display:flex;justify-content:space-between;align-items:center;padding:14px 26px;border-top:1px solid var(--tk-line);font-size:12.5px;color:var(--tk-ink-muted)}
+  </style>
+</div>
+
+<div class="adm" lang="pt-BR">
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="adm-side">
+    <div style="display:flex;align-items:center;gap:10px;padding:22px 24px 16px;border-bottom:1px solid var(--tk-line)">
+      <img src="data:image/png;base64,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" alt="RH Cursos" style="height:36px;width:auto;display:block">
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--tk-brand);background:var(--tk-accent-soft);border-radius:var(--tk-radius-pill);padding:3px 8px">Admin</span>
+    </div>
+
+    <nav aria-label="Menu administrativo" style="display:flex;flex-direction:column;flex:1">
+      <div class="adm-grouplabel">Visão geral</div>
+      <button type="button" class="adm-item" data-nav="dashboard"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.6"></rect><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.6"></rect><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.6"></rect><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.6"></rect></svg>Dashboard</button>
+
+      <div class="adm-grouplabel">Operação</div>
+      <button type="button" class="adm-item" data-nav="cursos"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 19V5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Cursos</button>
+      <button type="button" class="adm-item" data-nav="turmas"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"></rect><path d="M3 9h18M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Turmas</button>
+      <button type="button" class="adm-item" data-nav="matriculas"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M9 5h6M9 5a2 2 0 0 0-2 2v13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V7a2 2 0 0 0-2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9.5 13l2 2 3.5-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Matrículas</button>
+      <button type="button" class="adm-item" data-nav="alunos"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"></circle><path d="M3.5 20c.6-3 2.8-4.6 5.5-4.6S13.9 17 14.5 20M15.5 5.4a3.2 3.2 0 0 1 0 5.2M17.5 15.6c1.7.6 2.7 1.9 3 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Alunos</button>
+      <button type="button" class="adm-item" data-nav="instrutores"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7.5" r="3.2" stroke="currentColor" stroke-width="1.6"></circle><path d="M5.5 20c.7-3.4 3.2-5.2 6.5-5.2s5.8 1.8 6.5 5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Instrutores</button>
+
+      <div class="adm-grouplabel">Comercial</div>
+      <button type="button" class="adm-item" data-cur="1" aria-current="page" data-nav="leads"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M3 5h18l-7 8v5.5l-4 2V13L3 5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Leads<span class="adm-count">12</span></button>
+
+      <div class="adm-grouplabel">Conteúdo do site</div>
+      <button type="button" class="adm-item" data-nav="blog"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5Z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Blog</button>
+      <button type="button" class="adm-item" data-nav="paginas"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M14 3v6h6M9 14h6M9 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>Páginas</button>
+
+      <div style="flex:1"></div>
+      <button type="button" class="adm-item" style="margin-bottom:4px" data-nav="config"><svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34h.09a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87v.09a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>Configurações</button>
+    </nav>
+    <div style="display:flex;align-items:center;gap:11px;padding:16px 20px;border-top:1px solid var(--tk-line)">
+      <span data-reference-component size="sm">MR</span>
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:600;line-height:1.2">Márcia Ribeiro</div>
+        <div style="font-size:11.5px;color:var(--tk-ink-muted)">Administradora</div>
+      </div>
+      <a class="adm-jlink" style="margin-left:auto;font-size:12px" href="#">Sair</a>
+    </div>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <main style="padding:30px 36px 44px;min-width:0;background:var(--tk-surface)">
+
+    <!-- ============ DASHBOARD ============ -->
+    <section data-reference-screen="dashboard" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Dashboard">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:28px">
+          <div>
+            <h1 class="adm-h1">Visão geral</h1>
+            <p class="adm-sub">Sexta-feira, 3 de julho de 2026 · últimos 30 dias</p>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <a class="adm-jlink" href="#">Ver site →</a>
+            <span data-reference-component variant="secondary" size="sm">Novo curso</span>
+            <span data-reference-component variant="primary" size="sm">Nova turma</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px">
+          <div class="adm-kpi">
+            <div class="adm-kpilabel">Matrículas no mês</div>
+            <div class="adm-kpinum">86</div>
+            <div style="font-size:12.5px;margin-top:10px;color:#05654e;font-weight:600">▲ 12% <span style="color:var(--tk-ink-muted);font-weight:400">vs. junho</span></div>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpilabel">Leads novos</div>
+            <div class="adm-kpinum">42</div>
+            <div style="font-size:12.5px;margin-top:10px;color:#05654e;font-weight:600">▲ 8 <span style="color:var(--tk-ink-muted);font-weight:400">aguardando contato</span></div>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpilabel">Turmas abertas</div>
+            <div class="adm-kpinum">9</div>
+            <div style="font-size:12.5px;margin-top:10px;color:var(--tk-ink-muted)">2 iniciam em até 45 dias</div>
+          </div>
+          <div class="adm-kpi">
+            <div class="adm-kpilabel">Ocupação média</div>
+            <div class="adm-kpinum">74%</div>
+            <div style="margin-top:12px" class="adm-obar" role="img" aria-label="Ocupação média de 74%"><i style="width:74%"></i></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start">
+          <div class="adm-card">
+            <div class="adm-cardhead">
+              <h2 class="adm-cardtitle">Leads recentes</h2>
+              <button type="button" class="adm-jlink" data-nav="leads">Ver todos os leads →</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;padding:16px 26px 4px" role="group" aria-label="Filtrar leads por origem">
+
+                <button type="button" class="adm-chip" data-on="1" aria-pressed="true" data-val="Referência RH Cursos">Referência RH Cursos</button>
+
+            </div>
+            <div style="padding:8px 12px 10px">
+              <table aria-label="Leads recentes" style="width:100%;border-collapse:collapse">
+                <thead>
+                  <tr><th scope="col" class="adm-th">Lead</th><th scope="col" class="adm-th">Origem</th><th scope="col" class="adm-th">Interesse</th><th scope="col" class="adm-th">Recebido</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+                </thead>
+                <tbody>
+
+                    <tr class="adm-trow">
+                      <td class="adm-td">
+                        <div style="font-weight:600;font-size:13.5px;line-height:1.25">Referência RH Cursos</div>
+                        <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência RH Cursos</div>
+                      </td>
+                      <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Referência</span></td>
+                      <td class="adm-td" style="max-width:210px"><span style="font-size:12.5px;color:var(--tk-ink);display:block;line-height:1.3">Referência</span></td>
+                      <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                      <td class="adm-td"><span class="adm-status"><i style="background:var(--tk-accent-soft);color:var(--tk-brand)"></i>Aberta</span></td>
+                      <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Abrir lead de Referência RH Cursos">Abrir →</a></td>
+                    </tr>
+
+                </tbody>
+              </table>
+
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="adm-card">
+              <div class="adm-cardhead" style="padding:20px 24px">
+                <h2 class="adm-cardtitle">Próximas turmas</h2>
+                <button type="button" class="adm-jlink" data-nav="turmas">Turmas →</button>
+              </div>
+              <div style="padding:4px 24px 12px">
+
+                  <div class="adm-turma">
+                    <div class="adm-tdate">
+                      <div class="adm-tnum">18</div>
+                      <div class="adm-tmon">12</div>
+                    </div>
+                    <div style="min-width:0">
+                      <div style="font-size:13px;font-weight:600;line-height:1.3;margin-bottom:6px;text-wrap:pretty">Referência RH Cursos</div>
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:7px">
+                        <span style="font-size:11.5px;color:var(--tk-ink-muted)">Online · 12</span>
+                        <span style="font-size:11.5px;font-weight:600;color:var(--tk-brand)">12%</span>
+                      </div>
+                      <div class="adm-bar" role="img" aria-label="Ocupação de 74%"><i data-hot="1" style="width:74%"></i></div>
+                    </div>
+                  </div>
+
+              </div>
+            </div>
+
+
+              <div class="adm-card">
+                <div class="adm-cardhead" style="padding:20px 24px">
+                  <h2 class="adm-cardtitle">Leads por origem</h2>
+                  <span style="font-size:12px;color:var(--tk-ink-muted)">30 dias</span>
+                </div>
+                <div style="padding:18px 24px 22px;display:flex;flex-direction:column;gap:14px">
+
+                    <div>
+                      <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:6px">
+                        <span style="font-size:12.5px;font-weight:500">Referência RH Cursos</span>
+                        <span style="font-size:12.5px;color:var(--tk-ink-muted)">12</span>
+                      </div>
+                      <div class="adm-bar" role="img" aria-label="Referência RH Cursos: 12 leads"><i style="width:74%;background:var(--tk-accent)"></i></div>
+                    </div>
+
+                </div>
+              </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CURSOS ============ -->
+    <section data-reference-screen="cursos" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Cursos">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Cursos</h1>
+            <p class="adm-sub">7 cursos no catálogo · 5 publicados no site</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Novo curso</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:18px">
+          <div style="width:340px">
+            <span data-reference-component placeholder="Buscar por curso ou categoria…" aria-label="Buscar cursos" value="Referência">Buscar por curso ou categoria…</span>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Cursos" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Curso</th><th scope="col" class="adm-th">Categoria</th><th scope="col" class="adm-th">Modalidade</th><th scope="col" class="adm-th">Carga horária</th><th scope="col" class="adm-th">Turmas ativas</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td" style="max-width:320px"><div style="font-weight:600;font-size:13.5px;line-height:1.3;text-wrap:pretty">Referência RH Cursos</div></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted)">Referência RH Cursos</td>
+                    <td class="adm-td">Online</td>
+                    <td class="adm-td" style="font-variant-numeric:tabular-nums">12</td>
+                    <td class="adm-td" style="font-variant-numeric:tabular-nums">12</td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Aberta</span></td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Editar curso Referência RH Cursos">Editar →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+
+
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TURMAS ============ -->
+    <section data-reference-screen="turmas" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Turmas">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Turmas</h1>
+            <p class="adm-sub">9 turmas abertas · 74% de ocupação média</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Nova turma</span>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Turmas" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Turma</th><th scope="col" class="adm-th">Início</th><th scope="col" class="adm-th">Modalidade</th><th scope="col" class="adm-th" style="width:200px">Inscritos</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td" style="max-width:300px">
+                      <div style="font-weight:600;font-size:13.5px;line-height:1.3;text-wrap:pretty">Referência RH Cursos</div>
+                      <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência</div>
+                    </td>
+                    <td class="adm-td" style="white-space:nowrap">Referência</td>
+                    <td class="adm-td">Online</td>
+                    <td class="adm-td">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <div class="adm-bar" style="flex:1" role="img" aria-label="Ocupação de 74%"><i data-hot="1" style="width:74%"></i></div>
+                        <span style="font-size:12px;color:var(--tk-ink-muted);white-space:nowrap;font-variant-numeric:tabular-nums">12</span>
+                      </div>
+                    </td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Aberta</span></td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Gerenciar turma Referência">Gerenciar →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MATRÍCULAS ============ -->
+    <section data-reference-screen="matriculas" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Matrículas">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Matrículas</h1>
+            <p class="adm-sub">86 matrículas no mês · 7 aguardando pagamento</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Nova matrícula</span>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Matrículas" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Aluno</th><th scope="col" class="adm-th">Turma</th><th scope="col" class="adm-th">Recebida</th><th scope="col" class="adm-th">Pagamento</th><th scope="col" class="adm-th" style="text-align:right">Valor</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td">
+                      <div style="font-weight:600;font-size:13.5px;line-height:1.25">Referência RH Cursos</div>
+                      <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência RH Cursos</div>
+                    </td>
+                    <td class="adm-td" style="max-width:280px"><span style="font-size:12.5px;display:block;line-height:1.3;text-wrap:pretty">Referência</span></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Referência</span></td>
+                    <td class="adm-td" style="text-align:right;font-variant-numeric:tabular-nums;font-weight:600">R$ 1.200</td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Abrir matrícula de Referência RH Cursos">Abrir →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+          </div>
+          <div class="adm-foot"><span>Mostrando 7 de 86 matrículas do mês</span><a class="adm-jlink" href="#">Próxima página →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ALUNOS ============ -->
+    <section data-reference-screen="alunos" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Alunos">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Alunos</h1>
+            <p class="adm-sub">412 alunos cadastrados · 68 ativos em turmas abertas</p>
+          </div>
+          <span data-reference-component variant="secondary" size="sm">Novo aluno</span>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:18px">
+          <div style="width:340px">
+            <span data-reference-component placeholder="Buscar por nome ou organização…" aria-label="Buscar alunos" value="Referência">Buscar por nome ou organização…</span>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Alunos" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Aluno</th><th scope="col" class="adm-th">E-mail</th><th scope="col" class="adm-th">Organização</th><th scope="col" class="adm-th">Matrículas</th><th scope="col" class="adm-th">Última atividade</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td"><div style="font-weight:600;font-size:13.5px">Referência RH Cursos</div></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted)">contato@rhcursos.com.br</td>
+                    <td class="adm-td">Referência RH Cursos</td>
+                    <td class="adm-td" style="font-variant-numeric:tabular-nums">Referência</td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Ver perfil de Referência RH Cursos">Perfil →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+
+
+
+          </div>
+          <div class="adm-foot"><span>Mostrando 7 de 412 alunos</span><a class="adm-jlink" href="#">Próxima página →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INSTRUTORES ============ -->
+    <section data-reference-screen="instrutores" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Instrutores">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Instrutores</h1>
+            <p class="adm-sub">5 instrutores · 4 com turmas atribuídas</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Novo instrutor</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+
+            <div class="adm-kpi" style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;align-items:center;gap:12px">
+                <span data-reference-component size="md">MR</span>
+                <div style="min-width:0">
+                  <div style="font-weight:600;font-size:14.5px;line-height:1.2">Referência RH Cursos</div>
+                  <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência</div>
+                </div>
+                <span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand);margin-left:auto">Aberta</span>
+              </div>
+              <div style="display:flex;gap:18px;padding-top:12px;border-top:1px solid var(--tk-line)">
+                <div><div style="font-weight:700;font-size:18px;font-variant-numeric:tabular-nums">Referência</div><div style="font-size:11.5px;color:var(--tk-ink-muted)">cursos</div></div>
+                <div><div style="font-weight:700;font-size:18px;font-variant-numeric:tabular-nums">12</div><div style="font-size:11.5px;color:var(--tk-ink-muted)">turmas ativas</div></div>
+                <a class="adm-jlink" href="#" style="margin-left:auto;align-self:end" aria-label="Ver perfil de Referência RH Cursos">Perfil →</a>
+              </div>
+            </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LEADS ============ -->
+    <section data-reference-screen="leads">
+      <div data-screen-label="Admin — Leads">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Leads</h1>
+            <p class="adm-sub">42 leads nos últimos 30 dias · 12 aguardando contato</p>
+          </div>
+          <span data-reference-component variant="secondary" size="sm">Exportar CSV</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px" role="group" aria-label="Filtrar leads por origem">
+
+            <button type="button" class="adm-chip" data-on="1" aria-pressed="true" data-val="Referência RH Cursos">Referência RH Cursos</button>
+
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Leads" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Lead</th><th scope="col" class="adm-th">Contato</th><th scope="col" class="adm-th">Origem</th><th scope="col" class="adm-th">Interesse</th><th scope="col" class="adm-th">Recebido</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td">
+                      <div style="font-weight:600;font-size:13.5px;line-height:1.25">Referência RH Cursos</div>
+                      <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência RH Cursos</div>
+                    </td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);font-size:12.5px">contato@rhcursos.com.br</td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Referência</span></td>
+                    <td class="adm-td" style="max-width:200px"><span style="font-size:12.5px;display:block;line-height:1.3">Referência</span></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                    <td class="adm-td"><span class="adm-status"><i style="background:var(--tk-accent-soft);color:var(--tk-brand)"></i>Aberta</span></td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Abrir lead de Referência RH Cursos">Abrir →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ BLOG ============ -->
+    <section data-reference-screen="blog" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Blog">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Blog</h1>
+            <p class="adm-sub">24 artigos publicados · 2 rascunhos</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Novo artigo</span>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Artigos do blog" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Artigo</th><th scope="col" class="adm-th">Autor</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th">Atualizado</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td" style="max-width:380px">
+                      <div style="font-weight:600;font-size:13.5px;line-height:1.3;text-wrap:pretty">Referência RH Cursos</div>
+                      <div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Referência RH Cursos</div>
+                    </td>
+                    <td class="adm-td">Referência</td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Aberta</span></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Editar artigo Referência RH Cursos">Editar →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PÁGINAS ============ -->
+    <section data-reference-screen="paginas" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Páginas">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Páginas do site</h1>
+            <p class="adm-sub">Conteúdo institucional e das jornadas comerciais</p>
+          </div>
+        </div>
+        <div class="adm-card">
+          <div style="padding:6px 12px 8px">
+            <table aria-label="Páginas do site" style="width:100%;border-collapse:collapse">
+              <thead>
+                <tr><th scope="col" class="adm-th">Página</th><th scope="col" class="adm-th">Rota</th><th scope="col" class="adm-th">Status</th><th scope="col" class="adm-th">Última edição</th><th scope="col" class="adm-th"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Ações</span></th></tr>
+              </thead>
+              <tbody>
+
+                  <tr class="adm-trow">
+                    <td class="adm-td"><div style="font-weight:600;font-size:13.5px">Referência RH Cursos</div></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);font-family:ui-monospace,monospace;font-size:12.5px">Referência</td>
+                    <td class="adm-td"><span class="adm-otag" style="background:var(--tk-accent-soft);color:var(--tk-brand)">Aberta</span></td>
+                    <td class="adm-td" style="color:var(--tk-ink-muted);white-space:nowrap">Referência</td>
+                    <td class="adm-td" style="text-align:right"><a class="adm-jlink" href="#" aria-label="Editar página Referência RH Cursos">Editar →</a></td>
+                  </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONFIGURAÇÕES ============ -->
+    <section data-reference-screen="config" class="reference-screen-hidden">
+      <div data-screen-label="Admin — Configurações">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px">
+          <div>
+            <h1 class="adm-h1">Configurações</h1>
+            <p class="adm-sub">Dados institucionais, notificações e equipe de acesso</p>
+          </div>
+          <span data-reference-component variant="primary" size="sm">Salvar alterações</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+          <div class="adm-card" style="padding:26px;display:grid;gap:18px">
+            <h2 class="adm-cardtitle" style="margin-bottom:2px">Dados da empresa</h2>
+            <span data-reference-component label="Nome institucional" value="RH Cursos e Consultoria">Nome institucional</span>
+            <span data-reference-component label="E-mail comercial" value="contato@rhcursos.com.br">E-mail comercial</span>
+            <span data-reference-component label="WhatsApp comercial" value="(31) 99999-0000">WhatsApp comercial</span>
+          </div>
+          <div style="display:grid;gap:16px">
+            <div class="adm-card" style="padding:26px;display:grid;gap:16px">
+              <h2 class="adm-cardtitle">Notificações</h2>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div><div style="font-size:13.5px;font-weight:600">Novo lead por e-mail</div><div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Avisar a equipe comercial a cada lead recebido</div></div>
+                <span data-reference-component checked="true" aria-label="Novo lead por e-mail">Novo lead por e-mail</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div><div style="font-size:13.5px;font-weight:600">Resumo semanal</div><div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Matrículas, leads e ocupação toda segunda-feira</div></div>
+                <span data-reference-component checked="true" aria-label="Resumo semanal">Resumo semanal</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div><div style="font-size:13.5px;font-weight:600">Alerta de turma quase lotada</div><div style="font-size:12px;color:var(--tk-ink-muted);margin-top:2px">Notificar quando a ocupação passar de 80%</div></div>
+                <span data-reference-component checked="true" aria-label="Alerta de turma quase lotada">Alerta de turma quase lotada</span>
+              </div>
+            </div>
+            <div class="adm-card" style="padding:26px">
+              <h2 class="adm-cardtitle" style="margin-bottom:16px">Equipe de acesso</h2>
+              <div style="display:grid;gap:14px">
+
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span data-reference-component size="sm">MR</span>
+                    <div style="min-width:0"><div style="font-size:13.5px;font-weight:600">Referência RH Cursos</div><div style="font-size:12px;color:var(--tk-ink-muted)">Referência</div></div>
+                    <a class="adm-jlink" href="#" style="margin-left:auto;font-size:12.5px" aria-label="Gerenciar acesso de Referência RH Cursos">Gerenciar →</a>
+                  </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+</div>
+
+</body>
+</html>

@@ -13,6 +13,8 @@ export default defineConfig({
     harnessMode: "production-build + local webServer",
     smokeProject: "functional",
     baselineProjects: ["baseline-desktop", "baseline-mobile"],
+    contrastProjects: ["contrast-desktop", "contrast-mobile"],
+    visualProjects: ["visual-desktop", "visual-mobile"],
     adminFixture: "tests/fixtures/admin-store.ts",
   },
   use: {
@@ -29,11 +31,37 @@ export default defineConfig({
     {
       name: "baseline-desktop",
       testMatch: /baseline\.spec\.ts/,
+      testIgnore: /(?:contrast-report|visual)\.baseline\.spec\.ts/,
       use: { ...devices["Desktop Chrome"] }
     },
     {
       name: "baseline-mobile",
       testMatch: /baseline\.spec\.ts/,
+      testIgnore: /(?:contrast-report|visual)\.baseline\.spec\.ts/,
+      use: { ...devices["Pixel 5"] }
+    },
+    // O relatório de contraste usa axe em sete rotas e precisa de um browser
+    // próprio: executá-lo após todos os snapshots/a11y baseline pode esgotar
+    // o contexto compartilhado e produzir timeout de infraestrutura, sem
+    // qualquer mudança no resultado da auditoria.
+    {
+      name: "contrast-desktop",
+      testMatch: /contrast-report\.baseline\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] }
+    },
+    {
+      name: "contrast-mobile",
+      testMatch: /contrast-report\.baseline\.spec\.ts/,
+      use: { ...devices["Pixel 5"] }
+    },
+    {
+      name: "visual-desktop",
+      testMatch: /visual\.baseline\.spec\.ts/,
+      use: { ...devices["Desktop Chrome"] }
+    },
+    {
+      name: "visual-mobile",
+      testMatch: /visual\.baseline\.spec\.ts/,
       use: { ...devices["Pixel 5"] }
     }
   ],

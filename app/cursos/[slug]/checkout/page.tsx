@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 import { CourseCheckoutClient } from "@/components/page-clients/course-checkout-client";
 import {
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {
       title: "Pré-inscrição temporariamente indisponível | RH Cursos",
       description: "Não foi possível carregar esta pré-inscrição no momento.",
+      robots: { index: false, follow: false }
     };
   }
   const course = courses.find((item) => item.slug === slug);
@@ -38,13 +40,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!course) {
     return {
       title: "Pré-inscrição não encontrada | RH Cursos",
+      robots: { index: false, follow: false }
     };
   }
 
   return {
     title: `Pré-inscrição • ${getPublicCourseName(course.title)} | RH Cursos`,
     description: `Envie uma solicitação de pré-inscrição para ${getPublicCourseName(course.title)}.`,
-    alternates: { canonical: `/cursos/${course.slug}/checkout` },
+    robots: { index: false, follow: true },
+    alternates: { canonical: `/cursos/${course.slug}` },
     openGraph: {
       title: `Pré-inscrição • ${getPublicCourseName(course.title)} | RH Cursos`,
       description: `Envie uma solicitação de pré-inscrição para ${getPublicCourseName(course.title)}.`,
@@ -54,7 +58,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function Page() {
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
   const [catalogState, testimonials] = await Promise.all([
     fetchPublicCatalogServerState(),
     fetchPublicTestimonialsFromSupabaseServer().catch(() => []),
@@ -65,9 +70,11 @@ export default async function Page() {
     throw catalogState.error;
   }
 
-  // Sem fallback para mockCatalog: se o curso/turma não existir no catálogo
-  // real, `CourseCheckoutPage` já renderiza seu estado de "não encontrado"
-  // existente a partir de `courses`/`classes` vazios (AC3).
+  if (!catalogState.catalog.courses.some((course) => course.slug === slug)) {
+    notFound();
+  }
+
+  // A pré-inscrição é uma etapa transacional, não uma landing page indexável.
   return (
     <CourseCheckoutClient
       initialData={{

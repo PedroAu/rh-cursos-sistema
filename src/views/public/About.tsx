@@ -6,15 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAppStore } from "@/lib/app-store";
+import { company } from "@/lib/company";
 import { Link } from "@/lib/router-compat";
 import { cn } from "@/lib/utils";
-
-const institutionalStats = [
-  { label: "Ano de fundação", value: "2007" },
-  { label: "Cursos no portfólio", value: "~80" },
-  { label: "Trilhas de conhecimento", value: "6" },
-  { label: "Alcance de atuação", value: "Nacional" }
-];
 
 const values = [
   "Ética e transparência em todas as relações.",
@@ -51,7 +45,6 @@ const trackDefinitions = [
   {
     audience: "Servidores do DP, RH, gestores de contratos e contadores da Administração Pública.",
     description: "Da legislação trabalhista à conformidade digital com eSocial, FGTS Digital e LGPD.",
-    fallbackCount: 14,
     icon: Section,
     matchCategories: ["Departamento Pessoal", "eSocial"],
     tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-brand) 76%,var(--tk-accent)))",
@@ -60,7 +53,6 @@ const trackDefinitions = [
   {
     audience: "Pregoeiros, gestores e fiscais de contratos, equipes de licitação e procurement público.",
     description: "Da legislação básica à fiscalização avançada, com cobertura completa da Lei nº 14.133/2021.",
-    fallbackCount: 12,
     icon: Scale,
     matchCategories: ["Licitações e Contratos", "Licitações"],
     tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 72%,var(--tk-accent)),var(--tk-success))",
@@ -69,7 +61,6 @@ const trackDefinitions = [
   {
     audience: "Gestores, líderes de equipe, servidores e profissionais de RH dos setores público e privado.",
     description: "Formação humanizada para líderes e equipes: inteligência emocional, cultura e gestão por resultados.",
-    fallbackCount: 14,
     icon: Gem,
     matchCategories: ["Gestão de Pessoas", "Liderança"],
     tint: "linear-gradient(135deg,var(--tk-brand),color-mix(in_srgb,var(--tk-success) 58%,var(--tk-brand)))",
@@ -78,7 +69,6 @@ const trackDefinitions = [
   {
     audience: "Servidores, ouvidores, assessores de comunicação, profissionais jurídicos e atendentes.",
     description: "Do atendimento ao cidadão à redação oficial, oratória, mídias digitais e conformidade com LAI/LGPD.",
-    fallbackCount: 10,
     icon: SquareDashedMousePointer,
     matchCategories: ["Comunicação"],
     tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 34%,var(--tk-cream-dark)),color-mix(in_srgb,var(--tk-cream-dark) 82%,white))",
@@ -87,7 +77,6 @@ const trackDefinitions = [
   {
     audience: "Contadores, auditores, controllers, analistas financeiros e servidores das áreas de controle.",
     description: "Domínio técnico em contabilidade pública, obrigações acessórias, Tesouro Gerencial, SIAFI e auditoria.",
-    fallbackCount: 19,
     icon: Diamond,
     matchCategories: ["Compliance", "Auditoria", "Contabilidade", "Tributos"],
     tint: "linear-gradient(135deg,var(--tk-accent),var(--tk-brand))",
@@ -96,7 +85,6 @@ const trackDefinitions = [
   {
     audience: "Servidores, analistas de TI, gestores de processos e inovação, e todos que usam tecnologia no trabalho.",
     description: "Ferramentas digitais, análise de dados, modelagem de processos, IA e governança.",
-    fallbackCount: 11,
     icon: Gem,
     matchCategories: ["Tecnologia"],
     tint: "linear-gradient(135deg,color-mix(in_srgb,var(--tk-brand) 60%,var(--tk-focus)),color-mix(in_srgb,var(--tk-focus) 78%,white))",
@@ -111,7 +99,13 @@ function SectionEyebrow({ children }: { children: string }) {
 }
 
 export function AboutPage() {
-  const { courses } = useAppStore();
+  const { courses, trainingPaths } = useAppStore();
+  const institutionalStats = [
+    { label: "Ano de fundação", value: String(company.foundedYear) },
+    { label: "Cursos publicados", value: String(courses.length) },
+    { label: "Trilhas de conhecimento", value: String(trainingPaths.length) },
+    { label: "Alcance de atuação", value: "Nacional" }
+  ];
   const countsByCategory = courses.reduce<Map<string, number>>((accumulator, course) => {
     const categories = [course.category, course.pathName, ...(course.categories ?? [])].filter(Boolean) as string[];
 
@@ -127,8 +121,7 @@ export function AboutPage() {
 
     return {
       ...track,
-      count: `${derivedCount || track.fallbackCount} cursos`,
-      usesFallback: derivedCount === 0
+      count: `${derivedCount} cursos`
     };
   });
 
@@ -283,7 +276,7 @@ export function AboutPage() {
             <div>
               <SectionEyebrow>Áreas de conhecimento</SectionEyebrow>
               <h2 className="mt-2 font-tk-display text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-tk-ink">
-                6 trilhas, aproximadamente {courses.length || 80} cursos
+                {trainingPaths.length} trilhas, {courses.length} cursos publicados
               </h2>
             </div>
             <p className="max-w-[38ch] text-sm leading-7 text-tk-ink-muted">
@@ -316,11 +309,6 @@ export function AboutPage() {
                       <p className="mt-2 text-xs leading-6 text-tk-ink-muted">
                         <strong className="text-tk-ink">Público:</strong> {track.audience}
                       </p>
-                      {track.usesFallback ? (
-                        <p className="mt-2 text-[11px] leading-5 text-tk-ink-muted">
-                          Contagem exibida com fallback institucional enquanto essa trilha ainda nao possui cursos suficientes no catalogo publico atual.
-                        </p>
-                      ) : null}
                     </div>
                   </CardContent>
                 </Card>

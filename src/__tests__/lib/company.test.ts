@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { company } from '@/lib/company';
+import { company, getCompanyYears } from '@/lib/company';
 
 describe('Company Configuration', () => {
   describe('Brand Information', () => {
@@ -17,6 +17,11 @@ describe('Company Configuration', () => {
 
     it('should have correct founded year', () => {
       expect(company.foundedYear).toBe(2007);
+    });
+
+    it('should derive years of operation from the founded year', () => {
+      expect(getCompanyYears(2026)).toBe(19);
+      expect(getCompanyYears(2006)).toBe(0);
     });
   });
 
