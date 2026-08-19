@@ -49,6 +49,7 @@ uma regressão da Epic 20.
 
 - `.github/workflows/ci.yml`
 - `package.json`
+- `tests/smoke-crawl.spec.ts`
 - `docs/CONTRIBUTING.md`
 - `docs/guides/e2e-isolated-supabase-ci.md`
 
