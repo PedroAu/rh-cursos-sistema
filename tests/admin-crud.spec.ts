@@ -799,6 +799,14 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
   test("inscrições: cria inscrição administrativa e exclui", async ({ page }) => {
     const name = `${MARKER} inscricao`;
     await page.goto("/admin/inscricoes");
+    await expect(page.getByRole("heading", { name: "Pré-inscrições e matrículas", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Pré-inscrições e matrículas", exact: true })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole("heading", { name: "Pré-inscrições e matrículas", exact: true })).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole("button", { name: "Alternar navegação" }).click();
+    await expect(page.getByRole("link", { name: "Pré-inscrições e matrículas", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Fechar navegação" }).click();
     const target = await resolveAvailableCheckoutTarget();
 
     const dialog = await openCreateDialog(page);
@@ -814,6 +822,8 @@ test.describe("admin CRUD — ciclo completo criar → salvar → excluir", () =
     await forceSelectValue(dialog, "Turma", target.classId);
 
     await saveAndExpectSuccess(page, dialog);
+    const createdRow = page.getByRole("row", { name: new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) });
+    await expect(createdRow).toContainText("Empresa");
     await deleteRowByName(page, name);
   });
 });
