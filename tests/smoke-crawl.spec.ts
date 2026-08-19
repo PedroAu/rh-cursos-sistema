@@ -24,15 +24,15 @@ const publicPaths = [
   "/falar-com-especialista"
 ];
 
-// O catálogo de produção e o baseline determinístico têm slugs diferentes.
-// Ambos precisam apontar para conteúdo publicado; slugs obsoletos devem falhar
-// como 404, não ser aceitos pelo smoke crawl.
-const dynamicPaths = process.env.PLAYWRIGHT_TEST_BUILD === "1"
+// O baseline determinístico controla os próprios slugs. No smoke conectado ao
+// catálogo real, a rota de curso é descoberta em `/cursos`: slugs editoriais
+// mudam e não devem bloquear um deploy saudável por ficarem obsoletos no teste.
+const deterministicDynamicPaths = process.env.PLAYWRIGHT_TEST_BUILD === "1"
   ? [
       "/cursos/introducao-as-licitacoes-e-contratos-administrativos-nocoes-essenciais-para-o-setor-publico",
       "/blog/3-alertas-para-revisar-antes-de-enviar-eventos-do-esocial"
     ]
-  : ["/cursos/auditoria-da-folha-de-pagamento"];
+  : [];
 
 const adminPaths = [
   "/admin",
@@ -89,12 +89,54 @@ async function crawl(page: Page, path: string, options: { expectAuthenticated?: 
   expect(consoleErrors, `${path} logou console.error: ${consoleErrors.join(" | ")}`).toEqual([]);
 }
 
+async function discoverPublishedCoursePath(page: Page): Promise<string> {
+  const response = await page.goto("/cursos", { waitUntil: "domcontentloaded" });
+  expect(response?.status(), "/cursos deveria responder 2xx durante a descoberta").toBeLessThan(400);
+
+  const courseLinks = page.locator('a[href^="/cursos/"]');
+  await expect(
+    courseLinks.first(),
+    "O catálogo público deve expor ao menos um link para um curso publicado"
+  ).toBeAttached({ timeout: 10_000 });
+
+  const hrefs = await courseLinks.evaluateAll((links) =>
+    links
+      .map((link) => link.getAttribute("href"))
+      .filter((href): href is string => Boolean(href))
+  );
+  const coursePath = hrefs.find((href) => /^\/cursos\/[^/?#]+\/?$/.test(href));
+
+  expect(
+    coursePath,
+    "O catálogo público não expôs uma rota canônica de detalhe de curso publicada"
+  ).toBeDefined();
+
+  return coursePath!;
+}
+
 test.describe("smoke crawl — páginas públicas", () => {
-  for (const path of [...publicPaths, ...dynamicPaths]) {
+  for (const path of [...publicPaths, ...deterministicDynamicPaths]) {
     test(`${path} carrega sem erro`, async ({ page }) => {
       await crawl(page, path);
     });
   }
+
+  test("uma rota de curso publicada descoberta pelo catálogo carrega sem erro", async ({ context, page }) => {
+    test.skip(
+      process.env.PLAYWRIGHT_TEST_BUILD === "1",
+      "O baseline determinístico já valida seu slug de curso conhecido"
+    );
+
+    const discoveryPage = await context.newPage();
+    let coursePath: string;
+    try {
+      coursePath = await discoverPublishedCoursePath(discoveryPage);
+    } finally {
+      await discoveryPage.close();
+    }
+
+    await crawl(page, coursePath);
+  });
 });
 
 test.describe("smoke crawl — admin", () => {
