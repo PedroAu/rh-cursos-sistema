@@ -511,24 +511,62 @@ test("enrollments expose only supported payment and value data", () => {
   const store = createAdminStoreFixture();
   const config = buildResourceConfig("enrollments", store as never, createDeps() as never);
 
-  expect(config.title).toBe("Matrículas");
-  expect(config.primaryActionLabel).toBe("Nova matrícula");
+  expect(config.title).toBe("Pré-inscrições e matrículas");
+  expect(config.description).toContain("pré-inscrições e matrículas");
+  expect(config.primaryActionLabel).toBe("Nova pré-inscrição");
   expect(config.columns.map((column) => column.label)).toEqual([
     "Aluno",
     "Turma",
     "Inscrição",
     "Pagamento",
     "Valor",
+    "Tipo de inscrição",
     "Status",
   ]);
   expect(config.columns.find((column) => column.key === "value")?.render(store.enrollments[0])).toBe("R$ 1.200,00");
+  const enrollmentTypeColumn = config.columns.find((column) => column.key === "enrollmentType");
+  expect(enrollmentTypeColumn?.render(store.enrollments[0])).toMatchObject({
+    props: { children: "Órgão público", "aria-label": "Tipo de inscrição: Órgão público" },
+  });
+  expect(enrollmentTypeColumn?.exportValue?.(store.enrollments[0])).toBe("Órgão público");
+  const editConfig = buildResourceConfig(
+    "enrollments",
+    store as never,
+    { ...createDeps(), editingId: store.enrollments[0].id } as never
+  );
+  expect(editConfig.fields.find((field) => field.key === "status")?.options?.map((option) => option.label)).toEqual([
+    "Pendente",
+    "Aguardando pagamento",
+    "Confirmada",
+    "Cancelada",
+    "Concluída",
+  ]);
+  expect(config.columns.find((column) => column.key === "status")?.render(store.enrollments[0])).toMatchObject({
+    props: { children: "Confirmada", "aria-label": "Status: Confirmada" },
+  });
 
   store.classes[0] = { ...store.classes[0], price: 0 };
   store.courses[0] = { ...store.courses[0], price: 0 };
-  store.enrollments[0] = { ...store.enrollments[0], paymentMethod: null };
+  store.enrollments[0] = { ...store.enrollments[0], paymentMethod: null, enrollmentType: null } as never;
   const unavailable = buildResourceConfig("enrollments", store as never, createDeps() as never);
   expect(unavailable.columns.find((column) => column.key === "value")?.render(store.enrollments[0])).toBe("Informação indisponível");
   expect(unavailable.columns.find((column) => column.key === "paymentMethod")?.render(store.enrollments[0])).toBe("Informação indisponível");
+  expect(unavailable.columns.find((column) => column.key === "enrollmentType")?.render(store.enrollments[0])).toMatchObject({
+    props: { children: "Informação indisponível" },
+  });
+});
+
+test("enrollment search includes the type returned by the read model", () => {
+  const store = createAdminStoreFixture();
+  store.enrollments = store.enrollments.map((enrollment, index) => ({
+    ...enrollment,
+    enrollmentType: index === 0 ? "Órgão público" : "Empresa",
+  }));
+
+  expect(buildResourceConfig("enrollments", store as never, { ...createDeps(), search: "órgão público" } as never).rows)
+    .toHaveLength(1);
+  expect(buildResourceConfig("enrollments", store as never, { ...createDeps(), search: "empresa" } as never).rows)
+    .toHaveLength(1);
 });
 
 test("manual lead creation closes only after persistence and emits one success toast", async () => {

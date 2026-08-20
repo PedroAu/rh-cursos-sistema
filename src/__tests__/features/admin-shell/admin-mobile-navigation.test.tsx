@@ -4,6 +4,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 import { AdminMobileDrawer } from "@/features/admin-shell/components/admin-mobile-drawer";
 import { AdminTopbar } from "@/features/admin-shell/components/admin-topbar";
+import { getDashboardNavItems } from "@/features/admin-shell/config/admin-navigation";
 
 const mocks = vi.hoisted(() => ({
   logout: vi.fn(),
@@ -114,6 +115,7 @@ describe("AdminMobileDrawer (REC-306)", () => {
     // Todos os itens do canvas também ficam disponíveis no drawer.
     expect(screen.getByRole("link", { name: /Visão geral/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Catálogo de cursos/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Pré-inscrições e matrículas" })).toBeInTheDocument();
   });
 
   it("organiza os itens nos grupos do canvas", () => {
@@ -147,6 +149,17 @@ describe("AdminMobileDrawer (REC-306)", () => {
 
     const leadsLink = screen.getByRole("link", { name: /Leads/i });
     expect(leadsLink).toHaveTextContent("2");
+  });
+});
+
+describe("Rótulo unificado de inscrições e matrículas", () => {
+  it("compartilha o mesmo texto exato entre navegação desktop e mobile", () => {
+    const item = getDashboardNavItems("admin").find((candidate) => candidate.to === "/admin/inscricoes");
+
+    expect(item).toMatchObject({
+      label: "Pré-inscrições e matrículas",
+      mobileLabel: "Pré-inscrições e matrículas",
+    });
   });
 });
 

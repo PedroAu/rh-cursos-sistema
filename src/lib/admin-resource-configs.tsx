@@ -264,7 +264,7 @@ function getBadgeVariant(value: string) {
 }
 
 function renderStatusBadge(value: string) {
-  return <Badge variant={getBadgeVariant(value)}>{value}</Badge>;
+  return <Badge variant={getBadgeVariant(value)} aria-label={`Status: ${value}`}>{value}</Badge>;
 }
 
 export function deriveEnrollmentOperationalStatus(
@@ -1103,7 +1103,15 @@ export function buildResourceConfig(
       const rows = store.enrollments.filter((item) => {
         const course = store.courses.find((candidate) => candidate.id === item.courseId)?.title ?? "";
         const trainingClass = store.classes.find((candidate) => candidate.id === item.classId);
-        return [item.studentName, item.email, item.cpf, course, trainingClass?.modality ?? "", item.status]
+        return [
+          item.studentName,
+          item.email,
+          item.cpf,
+          course,
+          trainingClass?.modality ?? "",
+          item.enrollmentType ?? "",
+          item.status,
+        ]
           .some((value) => lower(value).includes(normalizedSearch));
       });
       const isEligibleEnrollmentClass = (status: string) =>
@@ -1164,9 +1172,9 @@ export function buildResourceConfig(
       const completedEnrollmentsTotal = store.enrollments.filter((item) => item.status === "Concluída").length;
 
       return {
-        title: "Matrículas",
-        description: "Acompanhar aluno, turma, data, pagamento, valor e situação operacional.",
-        primaryActionLabel: "Nova matrícula",
+        title: "Pré-inscrições e matrículas",
+        description: "Acompanhe pré-inscrições e matrículas do primeiro contato à conclusão, com status, tipo, turma e pagamento em um só lugar.",
+        primaryActionLabel: "Nova pré-inscrição",
         rows,
         stats: [
           {
@@ -1230,6 +1238,19 @@ export function buildResourceConfig(
                 ? new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
                 : "Informação indisponível";
             },
+          },
+          {
+            key: "enrollmentType",
+            label: "Tipo de inscrição",
+            render: (row: Enrollment) => {
+              const enrollmentType = row.enrollmentType || "Informação indisponível";
+              return (
+                <Badge variant="muted" aria-label={`Tipo de inscrição: ${enrollmentType}`}>
+                  {enrollmentType}
+                </Badge>
+              );
+            },
+            exportValue: (row: Enrollment) => row.enrollmentType || "Informação indisponível",
           },
           { key: "status", label: "Status", render: (row: Enrollment) => renderStatusBadge(row.status) },
         ],
