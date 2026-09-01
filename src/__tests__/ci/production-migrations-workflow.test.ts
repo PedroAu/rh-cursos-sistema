@@ -168,7 +168,7 @@ describe("REC-402 mandatory production migrations", () => {
     }
   });
 
-  it("detects database changes and gates migrations only when the database changes", () => {
+  it("detects database changes and requires migrations for every productive scope", () => {
     const changes = readNestedBlock(production, "changes", 2);
     const migrate = readNestedBlock(production, "migrate-database", 2);
 
@@ -181,8 +181,8 @@ describe("REC-402 mandatory production migrations", () => {
     expect(migrate).toContain("needs: [changes, ci]");
     expect(migrate).toContain("needs.ci.result == 'success'");
     expect(migrate).toContain("needs.changes.outputs.database == 'true'");
-    expect(migrate).not.toContain("needs.changes.outputs.functions == 'true'");
-    expect(migrate).not.toContain("needs.changes.outputs.frontend == 'true'");
+    expect(migrate).toContain("needs.changes.outputs.functions == 'true'");
+    expect(migrate).toContain("needs.changes.outputs.frontend == 'true'");
     expect(migrate).toContain("uses: ./.github/workflows/apply-migrations.yml");
     expect(migrate).not.toContain("secrets: inherit");
 
@@ -231,17 +231,15 @@ describe("REC-402 mandatory production migrations", () => {
 
     expect(functions).toContain("needs: [changes, ci, migrate-database]");
     expect(functions).toContain("needs.migrate-database.result == 'success'");
-    expect(functions).toContain("needs.migrate-database.result == 'skipped'");
-    expect(functions).toContain("needs.changes.outputs.database == 'false'");
+    expect(functions).not.toContain("needs.changes.outputs.database");
 
     expect(frontend).toContain("needs: [changes, ci, migrate-database, deploy-functions]");
     expect(frontend).toContain("needs.migrate-database.result == 'success'");
-    expect(frontend).toContain("needs.migrate-database.result == 'skipped'");
     expect(frontend).toContain("needs.changes.outputs.functions == 'true'");
     expect(frontend).toContain("needs.deploy-functions.result == 'success'");
     expect(frontend).toContain("needs.changes.outputs.functions == 'false'");
     expect(frontend).toContain("needs.deploy-functions.result == 'skipped'");
-    expect(frontend).toContain("needs.changes.outputs.database == 'false'");
+    expect(frontend).not.toContain("needs.changes.outputs.database");
     expect(production).not.toContain("continue-on-error");
   });
 });
