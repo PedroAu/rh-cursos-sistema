@@ -140,4 +140,42 @@ describe("app/api/functions/[name] route", () => {
     const body = await response.json();
     expect(body).toEqual({ ok: false, error: "Supabase Functions não configurado." });
   });
+
+  it("rejects unknown function names before contacting the upstream", async () => {
+    process.env.SUPABASE_FUNCTIONS_URL = "https://server-functions.example.com/functions/v1";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { POST } = await import("../../../../app/api/functions/[name]/route");
+    const response = await POST(
+      new Request("http://localhost/api/functions/unknown", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "{}",
+      }),
+      { params: Promise.resolve({ name: "unknown" }) }
+    );
+
+    expect(response.status).toBe(404);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("rejects oversized proxy bodies before forwarding", async () => {
+    process.env.SUPABASE_FUNCTIONS_URL = "https://server-functions.example.com/functions/v1";
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { POST } = await import("../../../../app/api/functions/[name]/route");
+    const response = await POST(
+      new Request("http://localhost/api/functions/leads", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ value: "x".repeat(9_000) }),
+      }),
+      { params: Promise.resolve({ name: "leads" }) }
+    );
+
+    expect(response.status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
