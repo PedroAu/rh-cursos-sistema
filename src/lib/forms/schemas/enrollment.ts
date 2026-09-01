@@ -8,11 +8,11 @@ import { z } from "zod";
  * SEM validação de CPF real ou formato de email (escopo Fase separada).
  */
 export const enrollmentSchema = z.object({
-  nome: z.string().min(1, "Informe o nome completo."),
-  email: z.string().email("E-mail inválido."),
-  cpf: z.string().min(1, "Informe o CPF."),
-  telefone: z.string().min(1, "Informe o telefone."),
-  turma_id: z.string().min(1, "Selecione uma turma."),
+  nome: z.string().trim().min(1, "Informe o nome completo.").max(120, "Nome muito longo."),
+  email: z.string().trim().email("E-mail inválido.").max(254, "E-mail muito longo."),
+  cpf: z.string().trim().min(1, "Informe o CPF.").max(18, "CPF inválido."),
+  telefone: z.string().trim().min(1, "Informe o telefone.").max(30, "Telefone inválido."),
+  turma_id: z.string().trim().min(1, "Selecione uma turma.").max(120, "Turma inválida."),
   pagamento_metodo: z
     .string()
     .min(1, "Selecione a forma de pagamento.")
@@ -20,7 +20,7 @@ export const enrollmentSchema = z.object({
       (v) => ["cartao", "pix", "boleto", "empenho"].includes(v.toLowerCase()),
       "Forma de pagamento inválida.",
     ),
-  observacoes: z.string().optional(),
+  observacoes: z.string().max(2000, "Observações muito longas.").optional(),
   // Checkbox Radix: "on" ou ausente (undefined). Nunca boolean.
   aceite_lgpd: z.literal("on", { message: "Você deve aceitar os termos." }),
 }).passthrough();

@@ -12,7 +12,7 @@ export async function GET(
 ) {
   const { chargeId } = await params;
 
-  if (!chargeId) {
+  if (!chargeId || !/^pay_[A-Za-z0-9_-]{1,80}$/.test(chargeId)) {
     return NextResponse.json({ error: "chargeId is required" }, { status: 400 });
   }
 
@@ -21,7 +21,10 @@ export async function GET(
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
 
   if (!token || !verifyPaymentStatusToken(token, chargeId).ok) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      { error: "unauthorized" },
+      { status: 401, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   // Service-role read stays server-only and is constrained to a token-validated
@@ -34,8 +37,14 @@ export async function GET(
     .maybeSingle<PaymentStatusRow>();
 
   if (result.error || !result.data) {
-    return NextResponse.json({ error: "payment not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "payment not found" },
+      { status: 404, headers: { "Cache-Control": "no-store" } },
+    );
   }
 
-  return NextResponse.json({ status: result.data.status });
+  return NextResponse.json(
+    { status: result.data.status },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

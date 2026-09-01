@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 const PAYMENT_STATUS_PURPOSE = "payment-status";
 const TOKEN_TTL_SECONDS = 30 * 60;
 const CLOCK_SKEW_SECONDS = 30;
+const CHARGE_ID_PATTERN = /^pay_[A-Za-z0-9_-]{1,80}$/;
 
 type PaymentStatusTokenPayload = {
   chargeId: string;
@@ -63,6 +64,10 @@ function isPaymentStatusPayload(value: unknown): value is PaymentStatusTokenPayl
     typeof candidate.chargeId === "string" &&
     typeof candidate.iat === "number" &&
     typeof candidate.exp === "number" &&
+    Number.isSafeInteger(candidate.iat) &&
+    Number.isSafeInteger(candidate.exp) &&
+    candidate.exp >= candidate.iat &&
+    CHARGE_ID_PATTERN.test(candidate.chargeId) &&
     candidate.purpose === PAYMENT_STATUS_PURPOSE
   );
 }
@@ -71,6 +76,9 @@ export function createPaymentStatusToken(
   chargeId: string,
   options: { now?: Date; ttlSeconds?: number } = {},
 ) {
+  if (!CHARGE_ID_PATTERN.test(chargeId)) {
+    throw new Error("Invalid payment charge id");
+  }
   const nowSeconds = Math.floor((options.now ?? new Date()).getTime() / 1000);
   const payload: PaymentStatusTokenPayload = {
     chargeId,
@@ -116,6 +124,10 @@ export function verifyPaymentStatusToken(
   }
 
   const nowSeconds = Math.floor((options.now ?? new Date()).getTime() / 1000);
+
+  if (payload.iat > nowSeconds + CLOCK_SKEW_SECONDS) {
+    return { ok: false, reason: "invalid" };
+  }
 
   if (payload.exp + CLOCK_SKEW_SECONDS < nowSeconds) {
     return { ok: false, reason: "expired" };

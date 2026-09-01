@@ -40,8 +40,15 @@ const knownPaymentStatuses = new Set([
   "FAILED",
 ]);
 
+const MAX_WEBHOOK_BYTES = 64 * 1024;
+const ASAAS_EVENT_ID = /^evt_[A-Za-z0-9_-]{1,80}$/;
+const ASAAS_CHARGE_ID = /^pay_[A-Za-z0-9_-]{1,80}$/;
+
 function jsonError(body: WebhookError, status: number) {
-  return NextResponse.json(body, { status });
+  return NextResponse.json(body, {
+    status,
+    headers: { "Cache-Control": "no-store" },
+  });
 }
 
 function getWebhookToken(request: Request) {
@@ -145,6 +152,13 @@ function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
     return null;
   }
 
+  if (
+    !ASAAS_EVENT_ID.test(candidate.id) ||
+    !ASAAS_CHARGE_ID.test(candidate.payment.id) ||
+    candidate.event.length > 100 ||
+    candidate.payment.status.length > 64
+  ) return null;
+
   return {
     id: candidate.id,
     event: candidate.event,
@@ -157,7 +171,22 @@ function parseWebhookPayload(payload: unknown): AsaasWebhookPayload | null {
 }
 
 export async function POST(request: Request) {
-  const expectedToken = getAsaasEnv().webhookAuthToken;
+  const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+  if (!contentType.startsWith("application/json")) {
+    return jsonError({ error: "content type must be application/json" }, 415);
+  }
+
+  const declaredLength = Number(request.headers.get("content-length"));
+  if (Number.isFinite(declaredLength) && declaredLength > MAX_WEBHOOK_BYTES) {
+    return jsonError({ error: "payload too large" }, 413);
+  }
+
+  let expectedToken: string;
+  try {
+    expectedToken = getAsaasEnv().webhookAuthToken;
+  } catch {
+    return jsonError({ error: "webhook unavailable" }, 503);
+  }
   const receivedToken = getWebhookToken(request);
 
   if (!receivedToken || !constantTimeEquals(receivedToken, expectedToken)) {
@@ -167,7 +196,11 @@ export async function POST(request: Request) {
   let rawPayload: unknown;
 
   try {
-    rawPayload = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_WEBHOOK_BYTES) {
+      return jsonError({ error: "payload too large" }, 413);
+    }
+    rawPayload = JSON.parse(rawBody);
   } catch {
     return jsonError({ error: "invalid json payload" }, 400);
   }
@@ -199,12 +232,15 @@ export async function POST(request: Request) {
   }
 
   if (result.data?.duplicate) {
-    return NextResponse.json({ ok: true, duplicate: true });
+    return NextResponse.json(
+      { ok: true, duplicate: true },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   return NextResponse.json({
     ok: true,
     paymentId: result.data?.payment_id ?? null,
     status: result.data?.applied_status ?? null,
-  });
+  }, { headers: { "Cache-Control": "no-store" } });
 }

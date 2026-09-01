@@ -1,5 +1,7 @@
 "use server";
 
+import { z } from "zod";
+
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   createCharge,
@@ -46,6 +48,32 @@ export type CreatePixOrBoletoChargeResult =
 
 const DUE_DATE_DAYS_AHEAD = 3;
 
+const checkoutInputSchema = z.object({
+  courseId: z.string().uuid("Identificador do curso inválido.").optional(),
+  courseSlug: z
+    .string()
+    .trim()
+    .min(1, "Curso inválido.")
+    .max(120, "Curso inválido.")
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, "Curso inválido.")
+    .optional(),
+  enrollmentRef: z
+    .string()
+    .trim()
+    .max(120, "Referência da inscrição inválida.")
+    .regex(/^[A-Za-z0-9_-]+$/, "Referência da inscrição inválida.")
+    .optional(),
+  billingType: z.enum(["PIX", "BOLETO"]),
+});
+
+const customerSchema = z.object({
+  name: z.string().trim().min(2, "Informe seu nome completo.").max(120, "Nome muito longo."),
+  cpfCnpj: z
+    .string()
+    .transform((value) => value.replace(/\D/g, ""))
+    .refine((value) => value.length === 11 || value.length === 14, "CPF ou CNPJ inválido."),
+});
+
 function buildDueDate() {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() + DUE_DATE_DAYS_AHEAD);
@@ -64,9 +92,16 @@ export async function createPixOrBoletoCharge(
   input: CreatePixOrBoletoChargeInput,
   customer: { name: string; cpfCnpj: string },
 ): Promise<CreatePixOrBoletoChargeResult> {
-  if (input.billingType !== "PIX" && input.billingType !== "BOLETO") {
-    return { error: "Método de pagamento inválido.", success: false };
+  const parsedInput = checkoutInputSchema.safeParse(input);
+  const parsedCustomer = customerSchema.safeParse(customer);
+
+  if (!parsedInput.success) return { error: "Dados da cobrança inválidos.", success: false };
+  if (!parsedCustomer.success) {
+    return { error: parsedCustomer.error.issues[0]?.message ?? "Dados do cliente inválidos.", success: false };
   }
+
+  const safeInput = parsedInput.data;
+  const safeCustomer = parsedCustomer.data;
 
   try {
     assertPaymentStatusTokenConfigured();
@@ -79,8 +114,8 @@ export async function createPixOrBoletoCharge(
   let course: CourseForPayment;
   try {
     course = await resolveCourseForPayment(supabase, {
-      courseId: input.courseId,
-      courseSlug: input.courseSlug,
+      courseId: safeInput.courseId,
+      courseSlug: safeInput.courseSlug,
     });
   } catch (resolveError) {
     return {
@@ -99,12 +134,12 @@ export async function createPixOrBoletoCharge(
 
   let asaasCustomerId: string;
   try {
-    asaasCustomerId = await ensureAsaasCustomer(customer);
+    asaasCustomerId = await ensureAsaasCustomer(safeCustomer);
   } catch {
     return { error: "Não foi possível criar o cliente no Asaas.", success: false };
   }
 
-  const billingType: AsaasBillingType = input.billingType;
+  const billingType: AsaasBillingType = safeInput.billingType;
 
   let charge;
   try {
@@ -113,14 +148,14 @@ export async function createPixOrBoletoCharge(
       billingType,
       value,
       dueDate: buildDueDate(),
-      externalReference: input.enrollmentRef,
+      externalReference: safeInput.enrollmentRef,
     });
   } catch {
     return { error: "Não foi possível criar a cobrança no Asaas.", success: false };
   }
 
   const paymentRow: Record<string, unknown> = {
-    enrollment_ref: input.enrollmentRef ?? null,
+    enrollment_ref: safeInput.enrollmentRef ?? null,
     course_id: course.id,
     amount_cents: amountCents,
     course_preco_snapshot: course.preco,

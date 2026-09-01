@@ -35,7 +35,7 @@ vi.mock("@/lib/public-data", () => ({
       id: "agenda-dp",
       courseSlug: course.slug,
       courseTitle: course.title,
-      startDate: "2026-07-12",
+      startDate: "2027-07-12",
       endDate: null,
       schedule: "09:00 às 17:00",
       location: "Online",
@@ -87,7 +87,7 @@ describe("CourseDetailPage", () => {
     expect(screen.getByText("Acesso ao grupo de WhatsApp da turma")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Garantia operacional/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Dúvidas frequentes sobre este curso/i })).toBeInTheDocument();
-    expect(screen.getByText(/Próxima turma: 12 de julho de 2026/i)).toBeInTheDocument();
+    expect(screen.getByText(/Próxima turma: 12 de julho de 2027/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Turmas fechadas/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: /Outros cursos recomendados/i })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: related.title })).toBeInTheDocument();
