@@ -62,6 +62,11 @@ jobs:
                 app/*|public/*|src/*|next.config.mjs|open-next.config.ts|wrangler.jsonc|package.json|package-lock.json)
                   frontend=true
                   ;;
+                .github/workflows/production-pipeline.yml)
+                  # The production pipeline itself must be publishable without
+                  # forcing a database migration when only CI orchestration changes.
+                  frontend=true
+                  ;;
                 .github/workflows/*)
                   database=true
                   functions=true
