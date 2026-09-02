@@ -22,6 +22,7 @@ const publicPaths = [
   "/login",
   "/inscricao-confirmada",
   "/falar-com-especialista"
+  ,"/lp/departamento-pessoal-do-zero"
 ];
 
 // O baseline determinístico controla os próprios slugs. No smoke conectado ao

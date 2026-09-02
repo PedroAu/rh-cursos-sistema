@@ -1,0 +1,192 @@
+{
+  "timestamp": "2026-09-01T15:00:00-03:00",
+  "story_id": "2026-08-31-asaas-checkout-app-dp-zero",
+  "scope": "LP Departamento Pessoal do Zero, checkout Asaas, callbacks, rate limiting, headers e integração Supabase",
+  "summary": {
+    "critical": 0,
+    "high": 0,
+    "medium": 5,
+    "low": 4,
+    "total": 9,
+    "blocking": false,
+    "recommendation": "CONCERNS — nenhum padrão crítico foi encontrado, mas as proteções antiabuso e de retenção de dados devem ser tratadas antes de escalar tráfego pago."
+  },
+  "issues": [
+    {
+      "id": "SEC-001",
+      "check": "CROSS_SITE_CHECKOUT_ABUSE",
+      "severity": "MEDIUM",
+      "file": "app/api/payments/asaas/checkout/route.ts",
+      "line": 55,
+      "risk": "O endpoint é público, aceita JSON sem validar Content-Type/Origin e reserva uma vaga antes da confirmação do pagamento. Uma requisição cross-site simples com Content-Type text/plain ou um bot distribuído pode criar reservas pendentes e checkouts no Asaas.",
+      "fix": {
+        "description": "Exigir application/json, validar Origin/Sec-Fetch-Site, adicionar Turnstile validado no servidor e aplicar limites por IP, e-mail e CPF, além de limite global de reservas pendentes."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "Rate limit de 5 requisições por minuto por IP existe, mas não cobre identidade nem automação distribuída."
+      }
+    },
+    {
+      "id": "SEC-002",
+      "check": "UNBOUNDED_CHUNKED_BODY",
+      "severity": "MEDIUM",
+      "file": "app/api/payments/asaas/checkout/route.ts",
+      "line": 67,
+      "risk": "Quando Content-Length está ausente ou incorreto, request.text() carrega o corpo inteiro antes de verificar o limite de 4 KiB. Payloads chunked excessivos podem pressionar memória e CPU do Worker.",
+      "fix": {
+        "description": "Aplicar limite de corpo no Cloudflare/WAF e rejeitar ou limitar streaming antes de materializar o texto; manter a checagem pós-leitura como defesa adicional."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "Cloudflare pode impor limites de requisição, mas não substitui o limite explícito da aplicação."
+      }
+    },
+    {
+      "id": "SEC-003",
+      "check": "IDENTITY_RESERVATION_REPLAY",
+      "severity": "MEDIUM",
+      "file": "supabase/migrations/20260831120000_asaas_checkout_persistence.sql",
+      "line": 65,
+      "risk": "A unicidade ativa é aplicada por inscricao_id, que já é um registro individual; não há restrição equivalente para a mesma identidade (aluno/CPF/e-mail) na mesma turma. Novos UUIDs permitem múltiplas reservas pendentes para a mesma pessoa.",
+      "fix": {
+        "description": "Implementar unicidade/lock lógico por identidade e turma ou uma tabela de reservas pendentes com chave natural e expiração atômica."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "O índice de idempotência protege somente a mesma chave UUID."
+      }
+    },
+    {
+      "id": "SEC-004",
+      "check": "PII_RETENTION_BEFORE_PAYMENT",
+      "severity": "MEDIUM",
+      "file": "supabase/migrations/20260831120000_asaas_checkout_persistence.sql",
+      "line": 246,
+      "risk": "Nome, e-mail, CPF e telefone são persistidos antes de existir pagamento. Não foi encontrada rotina automática que remova ou anonimize tentativas não pagas/creation_unknown após a expiração.",
+      "fix": {
+        "description": "Definir retenção LGPD, limpar/anonymizar PII de tentativas abandonadas e separar dados temporários de checkout dos alunos confirmados."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "RLS bloqueia acesso anônimo, mas não resolve retenção excessiva."
+      }
+    },
+    {
+      "id": "SEC-005",
+      "check": "WEBHOOK_PROVIDER_RECONCILIATION",
+      "severity": "MEDIUM",
+      "file": "app/api/webhooks/asaas/route.ts",
+      "line": 80,
+      "risk": "A confirmação CHECKOUT_PAID usa o token do webhook e envia valor fixo de R$ 297 para a RPC, sem consultar o checkout/cobrança no Asaas para confirmar status, valor, referência e método. O fluxo normal está protegido pelo token, mas falta uma defesa independente contra evento indevido após comprometimento do token.",
+      "fix": {
+        "description": "Consultar o Asaas antes de confirmar pagamento e comparar status, valor, moeda, externalReference, forma e parcelas; manter idempotência local."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "Token em comparação resistente a timing, IDs idempotentes e máquina de estados monotônica."
+      }
+    },
+    {
+      "id": "SEC-006",
+      "check": "CPF_CHECKSUM",
+      "severity": "LOW",
+      "file": "src/lib/payments/asaas/contracts.ts",
+      "line": 16,
+      "risk": "A validação confirma somente 11 dígitos após normalização; CPFs com dígitos verificadores inválidos podem avançar no fluxo.",
+      "fix": {
+        "description": "Validar os dois dígitos verificadores e rejeitar sequências repetidas no cliente e no servidor."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "O Asaas pode validar o documento no checkout hospedado, mas a base local ainda aceita valor inválido."
+      }
+    },
+    {
+      "id": "SEC-007",
+      "check": "TRUSTED_PROXY_IP_HEADERS",
+      "severity": "LOW",
+      "file": "src/lib/rate-limit.ts",
+      "line": 138,
+      "risk": "Na ausência de CF-Connecting-IP, X-Forwarded-For e X-Real-IP podem ser fornecidos pelo cliente e fragmentar buckets de rate limit se houver caminho direto à origem.",
+      "fix": {
+        "description": "Em produção confiar somente em CF-Connecting-IP e bloquear origem direta ao Worker; usar fallback apenas em desenvolvimento controlado."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "O tráfego normal passa pelo Cloudflare, que fornece CF-Connecting-IP."
+      }
+    },
+    {
+      "id": "SEC-008",
+      "check": "SENSITIVE_RESPONSE_CACHE",
+      "severity": "LOW",
+      "file": "app/api/payments/asaas/checkout/route.ts",
+      "line": 182,
+      "risk": "A resposta que contém orderId e checkoutUrl não declara Cache-Control no-store explicitamente.",
+      "fix": {
+        "description": "Aplicar applyNoStore/applyApiSecurityHeaders em todas as respostas do checkout e webhook."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "POST normalmente não é armazenado por caches, mas o contrato deve ser explícito."
+      }
+    },
+    {
+      "id": "SEC-009",
+      "check": "UNSCOPED_FUNCTION_PROXY",
+      "severity": "LOW",
+      "file": "app/api/functions/[name]/route.ts",
+      "line": 78,
+      "risk": "A rota encaminha qualquer nome de Edge Function para o Supabase. Uma função futura publicada pode ficar exposta sem passar por revisão específica de autorização e rate limit.",
+      "fix": {
+        "description": "Usar allowlist explícita de funções e métodos permitidos (leads, enrollments e admin-resources)."
+      },
+      "false_positive_check": {
+        "in_comment": false,
+        "in_test": false,
+        "has_compensating_control": "As funções atuais possuem controles próprios; a recomendação é preventiva."
+      }
+    }
+  ],
+  "scan_coverage": {
+    "files_scanned": 24,
+    "lines_analyzed": 2295,
+    "patterns_checked": 8,
+    "checks": [
+      "eval e execução dinâmica",
+      "innerHTML/DOM XSS",
+      "dangerouslySetInnerHTML",
+      "shell=True/execução de comandos",
+      "segredos hardcoded",
+      "SQL injection",
+      "validação de entrada",
+      "CORS inseguro"
+    ],
+    "false_positives_filtered": [
+      "JSON-LD usa dangerouslySetInnerHTML somente após JSON.stringify e escape de '<'.",
+      "Segredos são lidos de variáveis de ambiente e não aparecem nos assets públicos de produção.",
+      "RPCs financeiras usam parâmetros, SECURITY DEFINER, search_path fixo e execução restrita a service_role.",
+      "Nenhum eval, innerHTML executável, shell=True, concatenação SQL ou CORS wildcard foi encontrado no escopo."
+    ],
+    "verification": [
+      "npm run lint: PASS",
+      "npm run typecheck: PASS",
+      "npm audit --omit=dev: 0 vulnerabilidades",
+      "LP produção: HTTP 200",
+      "Checkout inválido: HTTP 400",
+      "Webhook sem token: HTTP 401",
+      "Métodos indevidos: HTTP 405",
+      "RPCs financeiras via anon: negadas",
+      "Leitura/inserção anônima de PII: negadas ou vazias"
+    ]
+  }
+}

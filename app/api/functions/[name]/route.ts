@@ -16,6 +16,9 @@ const FORWARDED_HEADERS = [
   "x-ratelimit-reset",
 ] as const;
 
+const ALLOWED_FUNCTIONS = new Set(["admin-resources", "enrollments", "leads"]);
+const MAX_PROXY_BODY_BYTES = 8 * 1024;
+
 type RouteContext = {
   params: Promise<{ name: string }>;
 };
@@ -87,6 +90,9 @@ function getServerFunctionsBaseUrl(): string | null {
 
 async function proxyRequest(request: Request, context: RouteContext) {
   const { name } = await context.params;
+  if (!ALLOWED_FUNCTIONS.has(name)) {
+    return new Response(JSON.stringify({ ok: false, error: "Função não encontrada." }), { status: 404, headers: { "Content-Type": "application/json" } });
+  }
   const baseUrl = getServerFunctionsBaseUrl();
 
   if (!baseUrl) {
@@ -97,7 +103,6 @@ async function proxyRequest(request: Request, context: RouteContext) {
   }
 
   const upstreamUrl = new URL(`${baseUrl.replace(/\/$/, "")}/${name}`);
-  const body = request.method === "GET" ? undefined : await request.text();
 
   const adminAuthorization =
     name === "admin-resources" ? await authorizeAdminResources() : null;
@@ -111,6 +116,23 @@ async function proxyRequest(request: Request, context: RouteContext) {
       }
     );
   }
+
+  const requestContentType = request.headers.get("content-type")?.toLowerCase() ?? "";
+  if (request.method !== "GET" && !requestContentType.startsWith("application/json")) {
+    return new Response(JSON.stringify({ ok: false, error: "Content-Type deve ser application/json." }), { status: 415, headers: { "Content-Type": "application/json" } });
+  }
+  const declaredLength = Number(request.headers.get("content-length"));
+  if (request.method !== "GET" && Number.isFinite(declaredLength) && declaredLength > MAX_PROXY_BODY_BYTES) {
+    return new Response(JSON.stringify({ ok: false, error: "Corpo da requisição excede o tamanho máximo permitido." }), { status: 413, headers: { "Content-Type": "application/json" } });
+  }
+  const rawBody = request.method === "GET" ? null : await request.text().catch(() => null);
+  if (request.method !== "GET" && rawBody === null) {
+    return new Response(JSON.stringify({ ok: false, error: "Corpo da requisição inválido." }), { status: 400, headers: { "Content-Type": "application/json" } });
+  }
+  if (rawBody !== null && new TextEncoder().encode(rawBody).byteLength > MAX_PROXY_BODY_BYTES) {
+    return new Response(JSON.stringify({ ok: false, error: "Corpo da requisição excede o tamanho máximo permitido." }), { status: 413, headers: { "Content-Type": "application/json" } });
+  }
+  const body = rawBody ?? undefined;
 
   const clientIp =
     request.headers.get("x-rh-client-ip") ??

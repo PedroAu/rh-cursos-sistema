@@ -5,7 +5,7 @@ import { SITE_URL } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-const staticRoutes = [
+export const staticRoutes = [
   "/",
   "/cursos",
   "/agenda",
@@ -15,6 +15,7 @@ const staticRoutes = [
   "/blog",
   "/contato",
   "/falar-com-especialista"
+  ,"/lp/departamento-pessoal-do-zero"
 ] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

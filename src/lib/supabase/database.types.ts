@@ -450,11 +450,25 @@ export type Database = {
           id: string;
           inscricao_id: string;
           valor: number;
-          forma_pagamento: "Pix" | "Cartao" | "Boleto" | "Empenho";
+          forma_pagamento: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
           status: "Pendente" | "Pago" | "Estornado" | "Isento";
           data_pagamento: string | null;
           gateway_ref: string | null;
-          parcelas: number;
+          parcelas: number | null;
+          gateway: "ASAAS" | null;
+          gateway_status:
+            | "CREATING"
+            | "CREATION_UNKNOWN"
+            | "ACTIVE"
+            | "FAILED"
+            | "PAID"
+            | "CANCELED"
+            | "EXPIRED"
+            | "MANUAL_REVIEW"
+            | null;
+          checkout_expires_at: string | null;
+          idempotency_key: string | null;
+          request_hash: string | null;
           observacoes: string | null;
           created_at: string;
           updated_at: string;
@@ -463,14 +477,67 @@ export type Database = {
           id?: string;
           inscricao_id: string;
           valor: number;
-          forma_pagamento: "Pix" | "Cartao" | "Boleto" | "Empenho";
+          forma_pagamento?: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
           status?: "Pendente" | "Pago" | "Estornado" | "Isento";
           data_pagamento?: string | null;
           gateway_ref?: string | null;
-          parcelas?: number;
+          parcelas?: number | null;
+          gateway?: "ASAAS" | null;
+          gateway_status?:
+            | "CREATING"
+            | "CREATION_UNKNOWN"
+            | "ACTIVE"
+            | "FAILED"
+            | "PAID"
+            | "CANCELED"
+            | "EXPIRED"
+            | "MANUAL_REVIEW"
+            | null;
+          checkout_expires_at?: string | null;
+          idempotency_key?: string | null;
+          request_hash?: string | null;
           observacoes?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["pagamento"]["Insert"]>;
+      };
+      pagamento_gateway_evento: {
+        Row: {
+          id: string;
+          gateway: "ASAAS";
+          gateway_event_id: string;
+          event_type:
+            | "CHECKOUT_CREATED"
+            | "CHECKOUT_PAID"
+            | "CHECKOUT_CANCELED"
+            | "CHECKOUT_EXPIRED";
+          gateway_ref: string | null;
+          pagamento_id: string | null;
+          normalized_hash: string;
+          event_created_at: string | null;
+          processing_status: "RECEIVED" | "PROCESSED" | "RETRYABLE_ERROR";
+          processing_error: string | null;
+          processed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          gateway?: "ASAAS";
+          gateway_event_id: string;
+          event_type:
+            | "CHECKOUT_CREATED"
+            | "CHECKOUT_PAID"
+            | "CHECKOUT_CANCELED"
+            | "CHECKOUT_EXPIRED";
+          gateway_ref?: string | null;
+          pagamento_id?: string | null;
+          normalized_hash: string;
+          event_created_at?: string | null;
+          processing_status?: "RECEIVED" | "PROCESSED" | "RETRYABLE_ERROR";
+          processing_error?: string | null;
+          processed_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["pagamento_gateway_evento"]["Insert"]>;
       };
     };
     Functions: {
@@ -489,6 +556,59 @@ export type Database = {
           p_observacoes?: string | null;
         };
         Returns: string;
+      };
+      iniciar_checkout_asaas_dp_zero: {
+        Args: {
+          p_idempotency_key: string;
+          p_nome_completo: string;
+          p_email: string;
+          p_cpf: string;
+          p_telefone: string;
+          p_minutes_to_expire?: number;
+        };
+        Returns: Array<{
+          aluno_id: string;
+          inscricao_id: string;
+          pagamento_id: string;
+          gateway_status: string;
+          idempotency_key: string;
+          created: boolean;
+        }>;
+      };
+      vincular_checkout_asaas: {
+        Args: {
+          p_pagamento_id: string;
+          p_gateway_ref: string;
+          p_checkout_expires_at: string;
+        };
+        Returns: string;
+      };
+      marcar_checkout_asaas_creation_unknown: {
+        Args: { p_pagamento_id: string };
+        Returns: string;
+      };
+      marcar_checkout_asaas_failed: {
+        Args: { p_pagamento_id: string };
+        Returns: string;
+      };
+      processar_evento_checkout_asaas: {
+        Args: {
+          p_event_id: string;
+          p_event_type: string;
+          p_gateway_ref: string;
+          p_external_reference: string;
+          p_normalized_hash: string;
+          p_event_created_at?: string | null;
+          p_valor?: number | null;
+          p_forma_pagamento?: "Pix" | "Cartao" | null;
+          p_parcelas?: number | null;
+        };
+        Returns: Array<{
+          event_status: string;
+          payment_gateway_status: string | null;
+          processed: boolean;
+          duplicate: boolean;
+        }>;
       };
       is_admin: {
         Args: Record<string, never>;

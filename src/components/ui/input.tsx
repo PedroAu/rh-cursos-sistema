@@ -38,7 +38,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label}
         {control}
         {hint ? <span id={hintId} className="text-caption text-tk-ink-muted">{hint}</span> : null}
-        {error ? <span id={errorId} className="text-caption text-tk-error">{error}</span> : null}
+        {error ? <span id={errorId} className="text-caption text-tk-error" role="alert">{error}</span> : null}
       </label>
     );
   }

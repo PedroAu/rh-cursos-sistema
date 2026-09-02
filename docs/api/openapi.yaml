@@ -22,6 +22,8 @@ tags:
     description: Login, sincronização e logout dos portais autenticados
   - name: Enrollments
     description: Inscrição pública em cursos
+  - name: Payment Checkout
+    description: Checkout hospedado do Asaas para a oferta DP Zero
   - name: Leads
     description: Captação de leads corporativos
   - name: Admin Resources
@@ -607,6 +609,87 @@ paths:
                   value:
                     ok: false
                     error: Checkout indisponivel.
+  /api/payments/asaas/checkout:
+    post:
+      tags: [Payment Checkout]
+      summary: Cria checkout hospedado Asaas para Departamento Pessoal do Zero
+      description: >-
+        Recebe somente os dados de identificação do comprador. Preço, turma,
+        parcelas e URLs são definidos exclusivamente pelo servidor antes de a
+        URL oficial do checkout ser devolvida.
+      operationId: createAsaasDpZeroCheckout
+      security: []
+      x-runtime: next-route-handler
+      x-rate-limit:
+        key: asaas-checkout:{ip}
+        windowSeconds: 60
+        maxRequests: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsaasCheckoutRequest'
+      responses:
+        '201':
+          description: Checkout criado e vinculado à inscrição
+          headers:
+            X-RateLimit-Remaining:
+              schema: { type: string }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AsaasCheckoutResponse'
+        '400':
+          description: Payload inválido ou produto não permitido
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentErrorResponse' }
+        '409':
+          description: Conflito de identidade, vaga ou chave idempotente
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentErrorResponse' }
+        '413': { description: Corpo acima do limite permitido }
+        '429':
+          $ref: '#/components/responses/GenericRateLimited'
+        '502':
+          description: Resposta determinística inválida do gateway ou vínculo não concluído
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentErrorResponse' }
+        '503':
+          description: Configuração ausente, estado de criação ambíguo ou serviço indisponível
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PaymentErrorResponse' }
+  /api/webhooks/asaas:
+    post:
+      tags: [Payment Checkout]
+      summary: Recebe eventos de checkout Asaas
+      description: >-
+        Endpoint server-to-server autenticado pelo header `asaas-access-token`.
+        Eventos são idempotentes pelo ID e só `CHECKOUT_PAID` confirma uma inscrição.
+      operationId: receiveAsaasCheckoutWebhook
+      security:
+        - asaasWebhookToken: []
+      x-runtime: next-route-handler
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AsaasCheckoutWebhook'
+      responses:
+        '200':
+          description: Evento processado ou duplicata já processada
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WebhookOkResponse' }
+        '400': { description: Evento inválido ou não suportado }
+        '401': { description: Token do webhook inválido }
+        '413': { description: Corpo acima do limite permitido }
+        '503': { description: Processamento transitório; Asaas deve repetir a entrega }
   /functions/v1/enrollments:
     post:
       tags: [Enrollments]
@@ -819,6 +902,11 @@ components:
       description: >-
         Cookies httpOnly de sessão Supabase gerenciados por `@supabase/ssr`,
         enviados automaticamente same-origin. Nenhum token é lido do corpo.
+    asaasWebhookToken:
+      type: apiKey
+      in: header
+      name: asaas-access-token
+      description: Token aleatório exclusivo do webhook, configurado no Asaas e no servidor.
   parameters:
     FunctionName:
       name: name
@@ -1143,6 +1231,71 @@ components:
         error:
           type: string
       required: [ok, error]
+    PaymentErrorResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        error: { type: string }
+        retryWithNewAttempt: { type: boolean }
+      required: [error]
+    AsaasCheckoutRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        productSlug:
+          type: string
+          const: departamento-pessoal-do-zero
+        idempotencyKey:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 3
+          maxLength: 100
+        email:
+          type: string
+          format: email
+        cpf:
+          type: string
+          description: CPF com ou sem máscara; normalizado no servidor.
+        phone:
+          type: string
+          description: Telefone com ou sem máscara; normalizado no servidor.
+      required: [productSlug, idempotencyKey, name, email, cpf, phone]
+    AsaasCheckoutResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        orderId: { type: string, format: uuid }
+        checkoutUrl:
+          type: string
+          format: uri
+          description: URL HTTPS allowlisted do checkout hospedado pelo Asaas.
+      required: [orderId, checkoutUrl]
+    AsaasCheckoutWebhook:
+      type: object
+      additionalProperties: true
+      properties:
+        id: { type: string }
+        event:
+          type: string
+          enum: [CHECKOUT_CREATED, CHECKOUT_PAID, CHECKOUT_CANCELED, CHECKOUT_EXPIRED]
+        dateCreated: { type: string }
+        checkout:
+          type: object
+          additionalProperties: true
+          properties:
+            id: { type: string }
+            externalReference: { type: string, format: uuid }
+            status: { type: string }
+          required: [id]
+      required: [id, event, checkout]
+    WebhookOkResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        ok: { type: boolean, const: true }
+      required: [ok]
     ValidationErrorResponse:
       allOf:
         - $ref: '#/components/schemas/ErrorResponse'

@@ -39,6 +39,9 @@ const isPlaywrightServer =
 
 export const rateLimitConfigs = {
   enrollment: { windowMs: 60 * 1000, maxRequests: 20 },
+  checkout: { windowMs: 60 * 1000, maxRequests: 5 },
+  checkoutIdentity: { windowMs: 10 * 60 * 1000, maxRequests: 3 },
+  checkoutGlobal: { windowMs: 60 * 1000, maxRequests: 60 },
   lead: { windowMs: 60 * 1000, maxRequests: 10 },
   auth: { windowMs: 15 * 60 * 1000, maxRequests: isPlaywrightServer ? 30 : 5 },
   authGlobalLogout: { windowMs: 60 * 1000, maxRequests: 5 },
@@ -135,12 +138,10 @@ export async function checkRateLimit(
 }
 
 export function clientIp(request: Request): string {
-  return (
-    request.headers.get("cf-connecting-ip") ||
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
+  const cfIp = request.headers.get("cf-connecting-ip")?.trim();
+  if (cfIp) return cfIp;
+  if (process.env.NODE_ENV === "production") return "unknown";
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
 }
 
 /**

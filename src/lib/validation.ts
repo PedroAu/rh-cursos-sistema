@@ -22,11 +22,40 @@ const cpfSchema = z
   .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/, "CPF deve estar no formato XXX.XXX.XXX-XX")
   .transform((val) => val.replace(/\D/g, ""));
 
+export function isValidCpf(value: string): boolean {
+  const cpf = value.replace(/\D/g, "");
+  if (!/^\d{11}$/.test(cpf) || /^([0-9])\1{10}$/.test(cpf)) return false;
+  const digit = (length: number) => {
+    let sum = 0;
+    for (let index = 0; index < length; index += 1) sum += Number(cpf[index]) * (length + 1 - index);
+    const remainder = (sum * 10) % 11;
+    return remainder === 10 ? 0 : remainder;
+  };
+  return digit(9) === Number(cpf[9]) && digit(10) === Number(cpf[10]);
+}
+
 // Telefone: aceita celular (5 dígitos) ou fixo (4); persiste só os dígitos.
 const phoneSchema = z
   .string()
   .regex(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, "Telefone deve estar no formato (XX) XXXXX-XXXX ou (XX) XXXX-XXXX")
   .transform((val) => val.replace(/\D/g, ""));
+
+export const asaasCheckoutFormSchema = z
+  .object({
+    productSlug: z.literal("departamento-pessoal-do-zero"),
+    idempotencyKey: z.string().uuid(),
+    name: z
+      .string()
+      .min(3, "Nome deve ter pelo menos 3 caracteres")
+      .max(100, "Nome não pode ter mais de 100 caracteres")
+      .transform((val) => val.trim()),
+    email: emailSchema,
+    cpf: cpfSchema,
+    phone: phoneSchema,
+  })
+  .strict();
+
+export type AsaasCheckoutFormInput = z.infer<typeof asaasCheckoutFormSchema>;
 
 // IDs de recurso (curso/turma): allowlist estrita de caracteres — defesa em
 // profundidade contra injeção em paths/queries antes de chegar ao Supabase.

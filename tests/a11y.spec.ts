@@ -21,6 +21,7 @@ const publicRoutes = [
   "/agenda",
   "/blog",
   "/in-company",
+  "/lp/departamento-pessoal-do-zero",
   "/contato",
   "/login"
 ];
