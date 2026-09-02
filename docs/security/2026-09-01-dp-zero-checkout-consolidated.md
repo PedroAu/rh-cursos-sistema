@@ -11,7 +11,7 @@ Nenhuma vulnerabilidade crítica ou alta explorável foi encontrada após a corr
 | Abuso distribuído de reservas | Limites por IP, e-mail e CPF (hash), limite global e cap transacional de reservas pendentes por turma; limpeza oportunista de expirados. |
 | Corpo chunked sem limite | Leitura em streaming com teto de 4 KiB no checkout e 32 KiB no webhook. |
 | Replay de identidade | Unicidade natural existente por aluno/turma, idempotência por UUID, rate limit por identidade e cap de reservas pendentes. |
-| PII pré-pagamento | Reservas expiradas são canceladas e suas vagas liberadas automaticamente; rotina operacional disponível para limpeza. |
+| PII pré-pagamento | Reservas expiradas são canceladas e suas vagas liberadas; após 30 dias, cadastros criados pelo próprio checkout são pseudonimizados automaticamente. Alunos preexistentes, inscrições ativas e pagamentos confirmados ficam fora da rotina. |
 | Webhook sem reconciliação | `CHECKOUT_PAID` consulta `/v3/payments?checkoutSession=...`, confere referência, status pago, método e total de R$ 297 antes da RPC. |
 | CPF sem dígitos verificadores | Validação Zod compartilhada rejeita sequências repetidas e dígitos inválidos. |
 | IP falsificável | Em produção só `CF-Connecting-IP` é aceito; fallbacks ficam restritos ao desenvolvimento. |
@@ -30,4 +30,4 @@ Nenhuma vulnerabilidade crítica ou alta explorável foi encontrada após a corr
 
 ## Limites operacionais
 
-O domínio de produção deve aceitar tráfego somente pelo Cloudflare/WAF; o token Asaas deve permanecer em secret manager. A rotina de limpeza pode ser agendada diariamente para retenção LGPD de cadastros abandonados, sem armazenar dados de cartão.
+O domínio de produção deve aceitar tráfego somente pelo Cloudflare/WAF; o token Asaas deve permanecer em secret manager. A retenção LGPD é executada diariamente quando `pg_cron` está disponível e também é acionada como salvaguarda pela limpeza de reservas expiradas, sem armazenar dados de cartão.

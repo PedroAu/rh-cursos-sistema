@@ -274,7 +274,7 @@ export type Database = {
           aluno_id: string;
           turma_id: string;
           status_inscricao: "Pendente" | "AguardandoPagamento" | "Confirmada" | "Cancelada" | "Concluida" | "ListaEspera";
-          status_pagamento: "Pendente" | "Pago" | "Estornado" | "Isento";
+          status_pagamento: "Pendente" | "Pago" | "Estornado" | "Isento" | "Cancelado";
           valor_pago: number;
           forma_pagamento: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
           codigo_confirmacao: string;
@@ -290,7 +290,7 @@ export type Database = {
           aluno_id: string;
           turma_id: string;
           status_inscricao?: "Pendente" | "AguardandoPagamento" | "Confirmada" | "Cancelada" | "Concluida" | "ListaEspera";
-          status_pagamento?: "Pendente" | "Pago" | "Estornado" | "Isento";
+          status_pagamento?: "Pendente" | "Pago" | "Estornado" | "Isento" | "Cancelado";
           valor_pago?: number;
           forma_pagamento?: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
           codigo_confirmacao?: string;
@@ -451,7 +451,7 @@ export type Database = {
           inscricao_id: string;
           valor: number;
           forma_pagamento: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
-          status: "Pendente" | "Pago" | "Estornado" | "Isento";
+          status: "Pendente" | "Pago" | "Estornado" | "Isento" | "Cancelado";
           data_pagamento: string | null;
           gateway_ref: string | null;
           parcelas: number | null;
@@ -467,6 +467,7 @@ export type Database = {
             | "MANUAL_REVIEW"
             | null;
           checkout_expires_at: string | null;
+          checkout_criou_aluno: boolean;
           idempotency_key: string | null;
           request_hash: string | null;
           observacoes: string | null;
@@ -478,7 +479,7 @@ export type Database = {
           inscricao_id: string;
           valor: number;
           forma_pagamento?: "Pix" | "Cartao" | "Boleto" | "Empenho" | null;
-          status?: "Pendente" | "Pago" | "Estornado" | "Isento";
+          status?: "Pendente" | "Pago" | "Estornado" | "Isento" | "Cancelado";
           data_pagamento?: string | null;
           gateway_ref?: string | null;
           parcelas?: number | null;
@@ -494,6 +495,7 @@ export type Database = {
             | "MANUAL_REVIEW"
             | null;
           checkout_expires_at?: string | null;
+          checkout_criou_aluno?: boolean;
           idempotency_key?: string | null;
           request_hash?: string | null;
           observacoes?: string | null;
