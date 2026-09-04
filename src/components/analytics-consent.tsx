@@ -52,7 +52,15 @@ export function AnalyticsConsent() {
             </Button>
           </div>
         </aside>
-      ) : null}
+      ) : (
+        <button
+          type="button"
+          onClick={() => setChoice(null)}
+          className="fixed bottom-4 right-4 z-50 rounded-full border border-tk-line bg-tk-surface px-4 py-2 text-xs font-semibold text-tk-ink shadow-tk-card underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tk-accent"
+        >
+          Preferências de métricas
+        </button>
+      )}
     </>
   );
 }
