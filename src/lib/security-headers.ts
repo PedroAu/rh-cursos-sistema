@@ -12,7 +12,8 @@ export interface SecurityHeadersConfig {
 
 // REC-408: fonte canônica única da CSP de produção. Cada origem externa tem um
 // consumidor rastreável no código:
-// - www.googletagmanager.com / www.google-analytics.com: Google Analytics 4,
+// - www.googletagmanager.com / www.google-analytics.com / analytics.google.com /
+//   www.google.com / stats.g.doubleclick.net: Google Analytics 4,
 //   injetado condicionalmente por `app/layout.tsx` via `@next/third-parties`
 //   quando `NEXT_PUBLIC_GA_MEASUREMENT_ID` está definido (ver `src/lib/analytics.ts`).
 // - static.cloudflareinsights.com / cloudflareinsights.com: beacon do Cloudflare
@@ -28,7 +29,7 @@ const PRODUCTION_CSP_DIRECTIVES = [
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' https:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://cloudflareinsights.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://analytics.google.com https://www.google.com https://stats.g.doubleclick.net https://cloudflareinsights.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
