@@ -103,11 +103,10 @@ describe("Content-Signal público", () => {
     );
   });
 
-  it("mantém o header estático alinhado ao contrato do middleware", () => {
+  it("não declara uma segunda fonte estática concorrente", () => {
     const nextConfig = readFileSync(path.join(repoRoot, "next.config.mjs"), "utf8");
 
-    expect(nextConfig).toContain('value: "search=yes, ai-input=yes, ai-train=yes"');
-    expect(nextConfig).not.toContain("ai-train=no");
+    expect(nextConfig).not.toMatch(/key:\s*["']Content-Signal["']/);
   });
 });
 
