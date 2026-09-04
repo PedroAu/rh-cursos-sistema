@@ -63,6 +63,9 @@ describe("CSP canônica de produção (REC-408 AC2)", () => {
     // Google Analytics 4 (app/layout.tsx + src/lib/analytics.ts).
     expect(policy).toContain("https://www.googletagmanager.com");
     expect(policy).toContain("https://www.google-analytics.com");
+    expect(policy).toContain("https://analytics.google.com");
+    expect(policy).toContain("https://www.google.com");
+    expect(policy).toContain("https://stats.g.doubleclick.net");
     // Supabase (cliente de dados + realtime).
     expect(policy).toContain("https://*.supabase.co");
     expect(policy).toContain("wss://*.supabase.co");
