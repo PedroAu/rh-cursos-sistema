@@ -61,6 +61,7 @@ describe("SEO indexability contract", () => {
 
   it("marks authentication flows as non-indexable while allowing cleanup crawls", () => {
     const robots = source("app/robots.txt/route.ts");
+    expect(robots).toContain("Content-Signal: search=yes, ai-input=yes, ai-train=yes");
     const loginLayout = source("app/login/layout.tsx");
     const authLayout = source("app/auth/layout.tsx");
     const recoveryLayout = source("app/recuperar-senha/layout.tsx");

@@ -11,7 +11,7 @@ export function GET() {
     "User-agent: PerplexityBot",
     "User-agent: Google-Extended",
     "User-agent: Bytespider",
-    "Content-Signal: search=yes, ai-input=yes, ai-train=no",
+    "Content-Signal: search=yes, ai-input=yes, ai-train=yes",
     "Allow: /",
     "Disallow: /admin/",
     "Disallow: /api/",
@@ -24,7 +24,7 @@ export function GET() {
   return new NextResponse(body, {
     headers: {
       "Cache-Control": "public, max-age=0, must-revalidate",
-      "Content-Signal": "search=yes, ai-input=yes, ai-train=no",
+      "Content-Signal": "search=yes, ai-input=yes, ai-train=yes",
       "Content-Type": "text/plain; charset=utf-8"
     }
   });

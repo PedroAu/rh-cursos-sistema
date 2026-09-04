@@ -8,6 +8,26 @@ const supabaseKey =
 
 export const isSupabaseMiddlewareConfigured = Boolean(supabaseUrl && supabaseKey);
 
+const SESSION_REFRESH_PREFIXES = [
+  "/admin",
+  "/aluno",
+  "/instrutor",
+  "/login",
+  "/recuperar-senha",
+  "/auth",
+  "/api",
+] as const;
+
+/**
+ * Public marketing and discovery pages do not need a session refresh at the
+ * edge. Keep refreshes for authenticated surfaces and API/auth endpoints.
+ */
+export function requiresSupabaseSession(pathname: string) {
+  return SESSION_REFRESH_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
+
 /**
  * Atualiza a sessão Supabase no limite SSR e propaga os cookies renovados para
  * a resposta. O middleware não decide autorização: apenas mantém o refresh

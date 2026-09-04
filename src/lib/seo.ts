@@ -9,13 +9,23 @@ export const organizationJsonLd = {
   url: `${SITE_URL}/`,
   logo: `${SITE_URL}/images/brand/rh-cursos-logo-azul.png`,
   foundingDate: "2007",
+  email: "info@rhcursos.com.br",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Brasília",
+    streetAddress: "QS 03 Lote 3, Ed. Pátio Capital, Sala 1105",
+    addressLocality: "Águas Claras",
     addressRegion: "DF",
+    postalCode: "71953-000",
     addressCountry: "BR"
   },
-  telephone: "+55 61 3965-1929"
+  telephone: "+55 61 3965-1929",
+  sameAs: [
+    "https://www.google.com/maps/search/RH+Cursos+%C3%81guas+Claras+Bras%C3%ADlia",
+    "https://www.linkedin.com/company/rhcursoesolucoes",
+    "https://www.facebook.com/rhcursostreinamento/",
+    "https://www.instagram.com/rhcursos/",
+    "https://www.youtube.com/@rhcursosetreinamentosempre580"
+  ]
 };
 
 /**
