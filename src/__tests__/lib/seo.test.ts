@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getPublicCourseName } from "@/lib/seo";
-import { buildAgendaEventJsonLd } from "@/lib/seo";
+import { buildAgendaEventJsonLd, getPublicCourseName, organizationJsonLd } from "@/lib/seo";
 import type { Course, TrainingClass } from "@/types";
 
 const course: Course = {
@@ -49,6 +48,29 @@ const trainingClass = (overrides: Partial<TrainingClass> = {}): TrainingClass =>
 });
 
 describe("SEO de cursos", () => {
+  it("mantém o NAP canônico e perfis oficiais no schema da organização", () => {
+    expect(organizationJsonLd).toMatchObject({
+      name: "RH Cursos & Soluções",
+      email: "info@rhcursos.com.br",
+      telephone: "+55 61 3965-1929",
+      address: {
+        streetAddress: "QS 03 Lote 3, Ed. Pátio Capital, Sala 1105",
+        addressLocality: "Águas Claras",
+        addressRegion: "DF",
+        postalCode: "71953-000",
+        addressCountry: "BR"
+      }
+    });
+    expect(organizationJsonLd.sameAs).toEqual(
+      expect.arrayContaining([
+        "https://www.linkedin.com/company/rhcursoesolucoes",
+        "https://www.facebook.com/rhcursostreinamento/",
+        "https://www.instagram.com/rhcursos/",
+        "https://www.youtube.com/@rhcursosetreinamentosempre580"
+      ])
+    );
+  });
+
   it("expande o prefixo de curso e a sigla DP", () => {
     expect(getPublicCourseName("eSocial Leiaute 1.3")).toBe("Curso de eSocial Leiaute 1.3");
     expect(getPublicCourseName("DP na Prática (CLT)")).toBe("Curso de Departamento Pessoal na Prática (CLT)");

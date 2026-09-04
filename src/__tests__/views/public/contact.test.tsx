@@ -30,6 +30,15 @@ describe("ContactPage", () => {
     mocks.toastError.mockReset();
   });
 
+  it("oferece o telefone principal como link tel para conversão direta", () => {
+    render(<ContactPage />);
+
+    expect(screen.getByRole("link", { name: "(61) 3965-1929" })).toHaveAttribute(
+      "href",
+      "tel:+556139651929"
+    );
+  });
+
   it("exibe mensagens de validação quando o formulário está inválido", async () => {
     const user = userEvent.setup();
 

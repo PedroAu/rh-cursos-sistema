@@ -2,7 +2,10 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
 import { applySecurityHeaders } from "@/lib/security-headers";
-import { updateSupabaseSession } from "@/lib/supabase/middleware";
+import {
+  requiresSupabaseSession,
+  updateSupabaseSession,
+} from "@/lib/supabase/middleware";
 
 const CANONICAL_HOST = "www.rhcursos.com.br";
 const APEX_HOST = "rhcursos.com.br";
@@ -51,6 +54,10 @@ export async function middleware(request: NextRequest) {
   // They still pass through the canonicalization guard above so HTTP variants
   // cannot expose duplicate sitemap/robots resources.
   if (pathname === "/robots.txt" || pathname === "/sitemap.xml") {
+    return applySecurityHeaders(NextResponse.next());
+  }
+
+  if (!requiresSupabaseSession(pathname)) {
     return applySecurityHeaders(NextResponse.next());
   }
 

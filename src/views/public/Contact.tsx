@@ -49,7 +49,8 @@ const contactItems = [
     icon: PhoneCall,
     title: "TELEFONES",
     headline: company.phones.primary,
-    detail: `${company.phones.whatsapp} (WhatsApp)`
+    detail: `${company.phones.whatsapp} (WhatsApp)`,
+    href: "tel:+556139651929"
   },
   {
     icon: MapPin,
@@ -150,7 +151,13 @@ export function ContactPage() {
                     <div>
                       <p className="text-label font-bold uppercase tracking-[0.08em] text-tk-brand">{item.title}</p>
                       <p className="mt-2 font-tk-display text-[1.35rem] font-bold tracking-[var(--tk-tracking-display)] text-tk-ink">
-                        {item.headline}
+                        {"href" in item ? (
+                          <a className="underline decoration-tk-brand/30 underline-offset-4 hover:decoration-tk-brand" href={item.href}>
+                            {item.headline}
+                          </a>
+                        ) : (
+                          item.headline
+                        )}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-tk-ink-muted">{item.detail}</p>
                     </div>
