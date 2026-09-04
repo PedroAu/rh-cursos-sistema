@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter, Merriweather } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import type { ReactNode } from "react";
 
 import "@/styles/globals.css";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { AppToaster } from "@/components/ui/toaster";
-import { GA_MEASUREMENT_ID } from "@/lib/analytics";
+import { AnalyticsConsent } from "@/components/analytics-consent";
 import { company } from "@/lib/company";
 import "@/lib/env-validation";
 import { organizationJsonLd, SITE_URL } from "@/lib/seo";
@@ -70,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationSchema }} />
         <ErrorBoundary>{children}</ErrorBoundary>
         <AppToaster />
-        {GA_MEASUREMENT_ID ? <GoogleAnalytics gaId={GA_MEASUREMENT_ID} /> : null}
+        <AnalyticsConsent />
       </body>
     </html>
   );
