@@ -102,6 +102,13 @@ describe("Content-Signal público", () => {
       "search=yes, ai-input=yes, ai-train=yes"
     );
   });
+
+  it("mantém o header estático alinhado ao contrato do middleware", () => {
+    const nextConfig = readFileSync(path.join(repoRoot, "next.config.mjs"), "utf8");
+
+    expect(nextConfig).toContain('value: "search=yes, ai-input=yes, ai-train=yes"');
+    expect(nextConfig).not.toContain("ai-train=no");
+  });
 });
 
 describe("Contrato de cache no-store (REC-408 AC3/AC4)", () => {
