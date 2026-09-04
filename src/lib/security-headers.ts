@@ -8,6 +8,7 @@ export interface SecurityHeadersConfig {
   referrerPolicy?: string;
   strictTransportSecurity?: string;
   permissionsPolicy?: string;
+  contentSignal?: string;
 }
 
 // REC-408: fonte canônica única da CSP de produção. Cada origem externa tem um
@@ -130,6 +131,10 @@ export const DEFAULT_SECURITY_HEADERS: SecurityHeadersConfig = {
     "usb=()",
     "xr-spatial-tracking=()",
   ].join(", "),
+
+  // Política canônica confirmada pelo responsável: indexação, recuperação e
+  // treinamento por IA são permitidos nas superfícies públicas.
+  contentSignal: "search=yes, ai-input=yes, ai-train=yes",
 };
 
 /**
@@ -167,6 +172,10 @@ export function applySecurityHeaders(
 
   if (finalConfig.permissionsPolicy) {
     response.headers.set("Permissions-Policy", finalConfig.permissionsPolicy);
+  }
+
+  if (finalConfig.contentSignal) {
+    response.headers.set("Content-Signal", finalConfig.contentSignal);
   }
 
   return response;

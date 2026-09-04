@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   NO_STORE_CACHE_CONTROL,
+  applySecurityHeaders,
   applyApiSecurityHeaders,
   applyNoStore,
   buildContentSecurityPolicy,
@@ -90,6 +91,16 @@ describe("Fonte única de CSP: nenhuma configuração concorrente ativa (REC-408
       .split("\n")
       .some((line) => /^\s*Content-Security-Policy\s*:/i.test(line));
     expect(activeCsp).toBe(false);
+  });
+});
+
+describe("Content-Signal público", () => {
+  it("alinha as respostas públicas à política aprovada para IA", () => {
+    const response = applySecurityHeaders(new NextResponse());
+
+    expect(response.headers.get("Content-Signal")).toBe(
+      "search=yes, ai-input=yes, ai-train=yes"
+    );
   });
 });
 
