@@ -82,7 +82,9 @@ const nextConfig = {
           },
           {
             key: "Content-Signal",
-            value: "search=yes, ai-input=yes, ai-train=no"
+            // Mantém os assets estáticos alinhados ao contrato público aplicado
+            // pelo middleware (src/lib/security-headers.ts).
+            value: "search=yes, ai-input=yes, ai-train=yes"
           }
         ]
       }
