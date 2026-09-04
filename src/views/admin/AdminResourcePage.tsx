@@ -115,6 +115,11 @@ function getSearchLabel(resource: ResourceKey) {
   return "Buscar registros";
 }
 
+function getListHeading(resource: ResourceKey, fallback: string) {
+  if (resource === "enrollments") return "Registros de pré-inscrições e matrículas";
+  return resource === "students" ? "Alunos cadastrados" : fallback;
+}
+
 function getDefaultFormState(resource: ResourceKey) {
   if (resource === "courses") {
     return { featured: "Não" } satisfies Record<string, unknown>;
@@ -415,9 +420,7 @@ export function AdminResourcePage({ resource }: { resource: ResourceKey }) {
         ) : null}
         <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-tk-brand">
-              {resource === "students" ? "Alunos cadastrados" : config.title}
-            </h2>
+            <h2 className="text-2xl font-semibold text-tk-brand">{getListHeading(resource, config.title)}</h2>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <SearchField

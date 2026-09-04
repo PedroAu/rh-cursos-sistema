@@ -10,6 +10,7 @@
     "NEXT_PUBLIC_APP_URL": "https://www.rhcursos.com.br",
     "NEXT_PUBLIC_SUPABASE_URL": "https://hwpsrujkxjhmmwphqdlz.supabase.co",
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_OHCSE9S7HlY-lckwL0-2NA_mjGg81C5",
+    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "G-5C3ZWWSTLD",
     "ASAAS_ENVIRONMENT": "production",
     "ASAAS_CHECKOUT_EXPIRES_MINUTES": "30",
     "ASAAS_12X_INTEREST_FREE_CONFIRMED": "false"

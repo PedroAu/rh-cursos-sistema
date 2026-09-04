@@ -105,7 +105,11 @@ async function discoverPublishedCoursePath(page: Page): Promise<string> {
       .map((link) => link.getAttribute("href"))
       .filter((href): href is string => Boolean(href))
   );
-  const coursePath = hrefs.find((href) => /^\/cursos\/[^/?#]+\/?$/.test(href));
+  const canonicalCourseHrefs = hrefs.filter((href) => /^\/cursos\/[^/?#]+\/?$/.test(href));
+  // Admin CRUD tests run in parallel and briefly expose generated E2E slugs
+  // while their cleanup is still in flight. Prefer a stable editorial course
+  // so this smoke assertion validates the public catalog, not a transient row.
+  const coursePath = canonicalCourseHrefs.find((href) => !/^\/cursos\/e2e-/i.test(href)) ?? canonicalCourseHrefs[0];
 
   expect(
     coursePath,
