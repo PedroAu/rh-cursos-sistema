@@ -9,6 +9,16 @@ import {
 
 const CANONICAL_HOST = "www.rhcursos.com.br";
 const APEX_HOST = "rhcursos.com.br";
+// Matches only the four legacy URLs classified as high-confidence 404
+// replacements. Keep this map exact: broad pattern redirects can conceal
+// unrelated content or turn a useful 404 into an incorrect destination.
+const LEGACY_REDIRECTS: Readonly<Record<string, string>> = {
+  "/agenda-cursos": "/agenda/",
+  "/cursos-in-company": "/in-company/",
+  "/especialista": "/falar-com-especialista/",
+  "/informa-es-do-evento-e-registro/curso-de-interpretacao-dos-requisitos-da-norma-iso-iec-20000-1-1":
+    "/cursos/curso-de-interpretacao-dos-requisitos-da-norma-iso-iec-20000-1/",
+};
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host")?.toLowerCase().split(":")[0];
@@ -16,6 +26,16 @@ export async function middleware(request: NextRequest) {
   const forwardedProtocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
   const protocol = forwardedProtocol ?? request.nextUrl.protocol.replace(":", "");
   const isCanonicalHost = host === CANONICAL_HOST || host === APEX_HOST;
+  const legacyTarget = LEGACY_REDIRECTS[pathname];
+
+  // Send every legacy variant straight to the canonical destination in one
+  // permanent hop, retaining campaign/query attribution.
+  if (legacyTarget) {
+    const redirectUrl = new URL(legacyTarget, `https://${CANONICAL_HOST}`);
+    redirectUrl.search = request.nextUrl.search;
+
+    return applySecurityHeaders(NextResponse.redirect(redirectUrl, 301));
+  }
 
   // Cloudflare should enforce HTTPS at the edge for every request, including
   // robots.txt and sitemap.xml. This application-level guard keeps the
