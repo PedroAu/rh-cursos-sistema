@@ -59,6 +59,19 @@ describe("SEO indexability contract", () => {
     expect(blog).not.toContain("14.133");
   });
 
+  it("keeps the homepage description concise and tied to verified offerings", () => {
+    const homePage = source("app/page.tsx");
+    const description = homePage.match(/const HOME_META_DESCRIPTION =\s*\n\s*"([^"]+)"/)?.[1];
+
+    expect(description).toBeDefined();
+    expect(description!.length).toBeLessThanOrEqual(160);
+    expect(description).toContain("eSocial");
+    expect(description).toContain("Departamento Pessoal");
+    expect(description).toContain("licitações");
+    expect(description).toContain("in company");
+    expect(homePage.match(/description: HOME_META_DESCRIPTION/g)).toHaveLength(2);
+  });
+
   it("marks authentication flows as non-indexable while allowing cleanup crawls", () => {
     const robots = source("app/robots.txt/route.ts");
     expect(robots).toContain("Content-Signal: search=yes, ai-input=yes, ai-train=yes");

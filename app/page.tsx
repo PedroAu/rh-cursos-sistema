@@ -11,14 +11,16 @@ import {
 
 export const dynamic = "force-dynamic";
 
+const HOME_META_DESCRIPTION =
+  "Cursos, treinamentos in company e consultoria em eSocial, Departamento Pessoal e licitações para órgãos públicos e empresas. Desde 2007, em todo o Brasil.";
+
 export const metadata: Metadata = {
   title: "Cursos e Treinamentos para Setor Público e Privado | RH Cursos",
-  description:
-    "Cursos abertos, treinamentos in company e consultoria para servidores públicos e empresas. eSocial, Departamento Pessoal, licitações e mais. Desde 2007, em todo o Brasil.",
+  description: HOME_META_DESCRIPTION,
   alternates: { canonical: "/" },
   openGraph: {
     title: "Cursos e Treinamentos para Setor Público e Privado | RH Cursos",
-    description: "Cursos abertos, treinamentos in company e consultoria para servidores públicos e empresas.",
+    description: HOME_META_DESCRIPTION,
     url: "/",
     type: "website"
   }
